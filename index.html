@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
 <title>VANI</title>
 <meta name="description" content="VANI — ein Zuhause zum Schreiben. Offline, überall.">
+<meta name="robots" content="noindex, nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -65,6 +66,21 @@ html[data-thema="kerze"] {
   --deck: rgba(12, 7, 0, .6);
   --korn: .4;
 }
+html[data-thema="weiss"] {
+  --hg: #ffffff;
+  --hg2: #f6f6f6;
+  --papier: #ffffff;
+  --tinte: #1a1a1a;
+  --blass: #8a8a8a;
+  --linie: rgba(0, 0, 0, .1);
+  --akzent: #1a1a1a;
+  --akzent2: #555555;
+  --gold: #999999;
+  --karte: #fafafa;
+  --schein: rgba(0, 0, 0, .07);
+  --deck: rgba(0, 0, 0, .3);
+  --korn: 0;
+}
 html[data-thema="nebel"] {
   --hg: #e2e5e1;
   --hg2: #d7dcd8;
@@ -92,10 +108,11 @@ body {
   background: var(--hg);
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
-  touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
+button, .lknopf, .knopf, .rundknopf, input[type="range"] { touch-action: manipulation; }
 textarea, input { user-select: text; -webkit-user-select: text; font-family: inherit; color: inherit; }
 textarea { resize: none; border: none; outline: none; background: transparent; }
 input { border: none; outline: none; background: transparent; }
@@ -656,9 +673,115 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22p
   .kopf { padding-left: 16px; padding-right: 16px; }
   .schnipsel-raum { height: calc(100dvh - 0px); }
 }
+
+/* ================================================================
+   Vorhang: das Streichholz beim Aufwachen
+   ================================================================ */
+#vorhang {
+  position: fixed; inset: 0; z-index: 2000;
+  background: var(--hg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px;
+  transition: opacity .6s ease;
+}
+#vorhang.auf { opacity: 0; pointer-events: none; }
+#vorhang .streichholz { position: relative; width: 8px; height: 62px; }
+#vorhang .docht { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 7px; height: 46px; border-radius: 4px; background: linear-gradient(var(--blass), var(--tinte)); opacity: .55; }
+#vorhang .flamme-gross {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 26px; height: 34px;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: radial-gradient(circle at 50% 72%, #fff3c4, #f2a93b 60%, rgba(242,169,59,0));
+  animation: flackern 1.6s ease-in-out infinite, entzuenden .8s ease-out;
+  filter: drop-shadow(0 0 22px rgba(242, 169, 59, .55));
+}
+@keyframes entzuenden { from { transform: translateX(-50%) scale(.1); opacity: 0; } 60% { opacity: 1; } }
+#vorhang .vorhang-wort {
+  font-family: ui-serif, "New York", Georgia, serif;
+  font-size: 26px; letter-spacing: .34em; padding-left: .34em; font-weight: 600;
+  color: var(--tinte); opacity: 0;
+  animation: wortkommt 1s ease .25s forwards;
+}
+@keyframes wortkommt { to { opacity: .9; } }
+
+/* Toast mit Knopf */
+.toast.anfassbar { pointer-events: auto; display: flex; gap: 14px; align-items: center; }
+.toastaktion { color: var(--gold); font-weight: 600; font-size: 15px; }
+
+/* Such-Chips */
+.suchchips { display: flex; gap: 7px; overflow-x: auto; padding: 10px 14px 4px; -webkit-overflow-scrolling: touch; }
+.suchchip { flex: none; padding: 5px 12px; border-radius: 100px; font-size: 12.5px; color: var(--blass); background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.suchchip.an { background: var(--akzent); color: var(--papier); box-shadow: none; }
+.suchtreffer mark { background: none; color: var(--akzent); font-weight: 600; }
+
+/* Blätter */
+.blattliste { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 13px; }
+.blattkarte { text-align: left; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.blattkarte .btitel { font-size: 18px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.blattkarte .bprobe { font-family: ui-serif, Georgia, serif; font-size: 13.5px; font-style: italic; color: var(--blass); line-height: 1.45; min-height: 38px; }
+.blattkarte .bfuss { font-size: 12px; color: var(--blass); }
+
+/* Faden */
+.fadenblase { align-self: flex-start; border-radius: 17px 17px 17px 5px; }
+
+/* Klang / Mischpult */
+.mischpult { max-width: 720px; }
+.szenenchips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+.szenenchip { padding: 8px 14px; border-radius: 100px; font-size: 13.5px; background: var(--karte); box-shadow: 0 1px 4px var(--schein), inset 0 0 0 1px var(--linie); font-family: ui-serif, Georgia, serif; }
+.szenenchip:active { transform: scale(.95); }
+.szenenchip.leiser { color: var(--blass); box-shadow: inset 0 0 0 1px var(--linie); }
+.klangzeile {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 13px; border-radius: 12px; margin-bottom: 6px;
+  background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie);
+  opacity: .62;
+}
+.klangzeile.an { opacity: 1; box-shadow: inset 0 0 0 1.5px var(--akzent2); }
+.klangzeile .klangname { flex: 1; text-align: left; font-size: 15.5px; }
+.klangzeile input[type="range"] { width: 40%; max-width: 190px; }
+.klangfuss { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.mischpult.kompakt .klangzeile { padding: 6px 11px; margin-bottom: 4px; }
+.klang-an { color: var(--akzent2) !important; }
+.klang-an svg.ik { filter: drop-shadow(0 0 5px var(--akzent2)); }
+
+/* Schalter */
+.schalter { width: 46px; height: 28px; border-radius: 100px; background: var(--linie); position: relative; transition: background .2s; flex: none; }
+.schalter i { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--papier); box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: left .2s; }
+.schalter.an { background: var(--akzent2); }
+.schalter.an i { left: 21px; }
+
+/* Sonderzeichenleiste im Schreibraum */
+.zeichenleiste {
+  display: flex; gap: 4px; justify-content: center;
+  padding: 6px 10px calc(env(safe-area-inset-bottom) / 2 + 6px);
+  background: var(--hg2); border-top: 1px solid var(--linie);
+}
+.zeichenleiste button {
+  min-width: 44px; padding: 7px 0; border-radius: 10px;
+  font-family: ui-serif, Georgia, serif; font-size: 19px; line-height: 1;
+  background: var(--papier); box-shadow: inset 0 0 0 1px var(--linie);
+}
+.zeichenleiste button:active { background: var(--akzent); color: var(--papier); }
+
+/* Schreibfeuer, neu gesetzt */
+.feuerkarte .feuer-zeile { display: flex; align-items: center; gap: 18px; }
+.feuer-flamme { width: 44px; height: 52px; flex: none; align-self: flex-end; }
+.feuer-zahlen .gross { font-size: 30px; line-height: 1.1; font-weight: 700; font-family: ui-serif, "New York", Georgia, serif; font-variant-numeric: tabular-nums; }
+.feuer-zahlen .einheit { font-size: 13px; color: var(--blass); margin-top: 1px; }
+.feuer-zahlen .klein { font-size: 12.5px; color: var(--blass); margin-top: 6px; }
+.zielbalken i.geschafft { background: var(--akzent2); }
+
+/* Karten heben sich beim Ziehen */
+.szkarte { -webkit-user-select: none; user-select: none; }
+.szkarte.zieht { opacity: .3; }
+.szgeist { box-shadow: 0 14px 34px rgba(0,0,0,.3); border-radius: 13px; transform: rotate(3deg) scale(1.04); }
+.szvorn .szprobe { -webkit-user-select: none; user-select: none; }
 </style>
 </head>
 <body>
+<div id="vorhang">
+  <div class="streichholz"><div class="flamme-gross"></div><div class="docht"></div></div>
+  <div class="vorhang-wort">VANI</div>
+</div>
 <div id="app">
   <nav id="leiste" aria-label="Räume"></nav>
   <main id="raum"></main>
@@ -694,12 +817,15 @@ function el(tag, attrs = {}, ...kinder) {
 
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-function entprellt(fn, ms) {
-  let t;
-  const g = (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
-  g.sofort = (...a) => { clearTimeout(t); fn(...a); };
+const _spueler = [];
+function entprellt(fn, ms, notfall) {
+  let t, letzteArgs = null;
+  const g = (...a) => { letzteArgs = a; clearTimeout(t); t = setTimeout(() => { letzteArgs = null; fn(...a); }, ms); };
+  g.sofort = (...a) => { clearTimeout(t); letzteArgs = null; fn(...a); };
+  if (notfall) _spueler.push(() => { if (letzteArgs) { clearTimeout(t); const a = letzteArgs; letzteArgs = null; fn(...a); } });
   return g;
 }
+function spueleAlles() { for (const s of _spueler) { try { s(); } catch (e) {} } }
 
 const worte = (t) => { t = (t || '').trim(); return t ? t.split(/\s+/).length : 0; };
 
@@ -709,7 +835,7 @@ function tagKey(ts) { const d = new Date(ts || Date.now()); return d.getFullYear
 function fmtDatum(ts) { const d = new Date(ts); return TAGE[d.getDay()] + ', ' + d.getDate() + '. ' + MONATE[d.getMonth()]; }
 function fmtZeit(ts) { const d = new Date(ts); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
 function vorZeit(ts) {
-  const m = Math.round((Date.now() - ts) / 60000);
+  const m = Math.max(0, Math.round((Date.now() - ts) / 60000));
   if (m < 2) return 'gerade eben';
   if (m < 60) return 'vor ' + m + ' Minuten';
   const h = Math.round(m / 60);
@@ -722,6 +848,55 @@ function vorZeit(ts) {
   return 'vor ' + j + (j === 1 ? ' Jahr' : ' Jahren');
 }
 const zufall = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+/* Suche: normalisieren + kleine Tippfehler-Toleranz */
+function normalisiere(s) {
+  return String(s || '').toLowerCase()
+    .replace(/ß/g, 'ss').replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+function fastGleich(wort, suchwort) {
+  if (wort.includes(suchwort)) return true;
+  if (suchwort.length < 5) return false;
+  const n = suchwort.length;
+  for (let start = 0; start + n - 1 <= wort.length; start++) {
+    const stueck = wort.slice(start, start + n);
+    let fehler = 0;
+    for (let i = 0; i < n && fehler < 2; i++) if (stueck[i] !== suchwort[i]) fehler++;
+    if (fehler <= 1) return true;
+  }
+  return false;
+}
+
+/* Kluge Zeichen: -- wird –, gerade Anführungszeichen werden deutsche. Pur & testbar. */
+function klugeZeichen(t, s) {
+  const davor2 = t.slice(Math.max(0, s - 2), s);
+  if (davor2 === '--') return { text: t.slice(0, s - 2) + '–' + t.slice(s), caret: s - 1 };
+  const letztes = t[s - 1];
+  if (letztes === '"' || letztes === "'") {
+    const vorher = s >= 2 ? t[s - 2] : '';
+    const oeffnend = !vorher || /[\s(\[{\n>»–-]/.test(vorher);
+    const ersatz = letztes === '"' ? (oeffnend ? '„' : '"') : (oeffnend ? '‚' : '’');
+    return { text: t.slice(0, s - 1) + ersatz + t.slice(s), caret: s };
+  }
+  return null;
+}
+
+/* Prüft, ob ein eingelesenes Paket eine echte VANI-Sicherung ist. */
+function pruefeSicherung(paket) {
+  return !!(paket && paket.vani === 1 && Array.isArray(paket.docs) &&
+    paket.docs.every((d) => d && typeof d.id === 'string' && typeof d.typ === 'string'));
+}
+
+/* Text nach draußen: Teilen-Blatt (WhatsApp, Dateien, …) → Zwischenablage */
+async function teileText(text) {
+  if (navigator.share) {
+    try { await navigator.share({ text }); return true; }
+    catch (e) { if (e && e.name === 'AbortError') return false; }
+  }
+  try { await navigator.clipboard.writeText(text); toast('In der Zwischenablage.'); return true; }
+  catch (e) { toast('Das hat leider nicht geklappt.'); return false; }
+}
 
 /* ----- Icons ----- */
 const IK = {
@@ -758,7 +933,13 @@ const IK = {
   fund: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 2"/>',
   buchzu: '<path d="M6 3h13v18H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M6 3v18"/>',
   aufklappen: '<path d="m7 9.5 5 5 5-5"/>',
-  archiv: '<rect x="3.5" y="4" width="17" height="4.5" rx="1"/><path d="M5.5 8.5V20h13V8.5"/><path d="M10 12.5h4"/>'
+  archiv: '<rect x="3.5" y="4" width="17" height="4.5" rx="1"/><path d="M5.5 8.5V20h13V8.5"/><path d="M10 12.5h4"/>',
+  blatt: '<path d="M6 3h8l4 4v14H6V3Z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 15.5h6"/>',
+  faden: '<circle cx="12" cy="7" r="3.5"/><path d="M12 10.5c-4 2-5.5 4.5-4 7 1.2 2 4.5 2.4 6.5 1 2.2-1.5 2-4-.5-5-2-1-4.5 0-4.5 2"/>',
+  wieder: '<path d="M4 10a8 8 0 1 1 2.3 6.3"/><path d="M4 21v-5h5"/>',
+  frieren: '<path d="M12 3v18M5.5 6.5 18.5 17.5M18.5 6.5 5.5 17.5"/><path d="M12 3l-2 2M12 3l2 2M12 21l-2-2M12 21l2-2"/>',
+  ab: '<path d="m7 10 5 5 5-5"/>',
+  auf: '<path d="m7 14 5-5 5 5"/>'
 };
 function ik(name, kl) { return `<svg class="ik${kl ? ' ' + kl : ''}" viewBox="0 0 24 24" aria-hidden="true">${IK[name] || ''}</svg>`; }
 
@@ -766,12 +947,13 @@ function ik(name, kl) { return `<svg class="ik${kl ? ' ' + kl : ''}" viewBox="0 
 let _db;
 function dbAuf() {
   return new Promise((res, rej) => {
-    const r = indexedDB.open('vani', 1);
+    const r = indexedDB.open('vani', 2);
     r.onupgradeneeded = () => {
       const d = r.result;
-      d.createObjectStore('docs', { keyPath: 'id' });
-      d.createObjectStore('media');
-      d.createObjectStore('kv');
+      if (!d.objectStoreNames.contains('docs')) d.createObjectStore('docs', { keyPath: 'id' });
+      if (!d.objectStoreNames.contains('media')) d.createObjectStore('media');
+      if (!d.objectStoreNames.contains('kv')) d.createObjectStore('kv');
+      if (!d.objectStoreNames.contains('papierkorb')) d.createObjectStore('papierkorb', { keyPath: 'id' });
     };
     r.onsuccess = () => { _db = r.result; res(); };
     r.onerror = () => rej(r.error);
@@ -795,8 +977,9 @@ const D = {
   docs: new Map(),
   einst: {
     thema: 'papier', schrift: 'serife', groesse: 19, breite: 'mittel',
-    typewriter: true, fokus: false, klang: 'aus', lautstaerke: .5,
-    tastenklang: false, tagesziel: 0
+    typewriter: true, fokus: false, mischung: {}, lautstaerke: .5,
+    tastenklang: false, tagesziel: 0, ersetzungen: true, autokorrektur: true,
+    raeume: null
   },
   stats: { tage: {}, letzte: {}, letzteSicherung: 0 }
 };
@@ -820,22 +1003,61 @@ function neuDoc(typ, felder) {
 function speichere(d) { d.geaendert = Date.now(); dbPut('docs', d); }
 function speichereStill(d) { dbPut('docs', d); }
 
-async function loesche(id) {
+/* Löschen ist bei VANI nie endgültig: alles wandert erst in den Papierkorb. */
+function _nachfahren(id) {
   const opfer = [id];
   for (let i = 0; i < opfer.length; i++) {
     for (const d of D.docs.values()) {
-      if (d.parent === opfer[i] || d.projekt === opfer[i]) { if (!opfer.includes(d.id)) opfer.push(d.id); }
+      if ((d.parent === opfer[i] || d.projekt === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
       if (d.typ === 'kante' && (d.von === opfer[i] || d.zu === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
     }
   }
+  return opfer;
+}
+
+async function loesche(id, still) {
+  const wurzel = D.docs.get(id);
+  if (!wurzel) return;
+  const opfer = _nachfahren(id);
+  const buendel = { id: uid(), wann: Date.now(), name: wurzel.titel || (wurzel.text || '').slice(0, 40) || wurzel.typ, typ: wurzel.typ, docs: [] };
   for (const oid of opfer) {
     const d = D.docs.get(oid);
     if (!d) continue;
-    if (d.bild) dbDel('media', d.bild);
-    if (d.skizze) dbDel('media', d.skizze);
+    buendel.docs.push(d);
     D.docs.delete(oid);
-    delete D.stats.letzte[oid];
     await dbDel('docs', oid);
+  }
+  await dbPut('papierkorb', buendel);
+  if (!still) {
+    toastMitAktion('Im Papierkorb.', 'Rückgängig', async () => {
+      await holeZurueck(buendel.id);
+      zeichne();
+    });
+  }
+}
+
+async function holeZurueck(buendelId) {
+  const b = await dbGet('papierkorb', buendelId);
+  if (!b) return false;
+  for (const d of b.docs) {
+    D.docs.set(d.id, d);
+    await dbPut('docs', d);
+  }
+  await dbDel('papierkorb', buendelId);
+  return true;
+}
+
+async function papierkorbLeeren(nurAelterAlsTage) {
+  const alle = await dbAlle('papierkorb');
+  const grenze = nurAelterAlsTage ? Date.now() - nurAelterAlsTage * 86400000 : Infinity;
+  for (const b of alle) {
+    if (nurAelterAlsTage && b.wann > grenze) continue;
+    for (const d of b.docs) {
+      if (d.bild) dbDel('media', d.bild);
+      if (d.skizze) dbDel('media', d.skizze);
+      delete D.stats.letzte[d.id];
+    }
+    await dbDel('papierkorb', b.id);
   }
   speichereStats();
 }
@@ -895,6 +1117,12 @@ function setzeThema(name) {
 /* ----- Toast, Modale, Menüs ----- */
 function toast(text, ms = 2400) {
   const t = el('div', { class: 'toast' }, text);
+  $('#toasts').append(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 450); }, ms);
+}
+function toastMitAktion(text, aktion, tu, ms = 5200) {
+  const knopf = el('button', { class: 'toastaktion', onclick: () => { t.remove(); tu(); } }, aktion);
+  const t = el('div', { class: 'toast anfassbar' }, text, knopf);
   $('#toasts').append(t);
   setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 450); }, ms);
 }
@@ -981,7 +1209,8 @@ function autogrow(ta) {
 /* ----- Verweise ([[...]]) und Schlagworte ----- */
 function schmuecke(text) {
   let h = esc(text);
-  h = h.replace(/\[\[([^\[\]]{1,80})\]\]/g, (_, t) => `<span class="verweis" data-ziel="${esc(t)}">${esc(t)}</span>`);
+  /* t ist hier bereits entschärft — ein zweites esc() würde doppelt kodieren */
+  h = h.replace(/\[\[([^\[\]]{1,80})\]\]/g, (_, t) => `<span class="verweis" data-ziel="${t}">${t}</span>`);
   h = h.replace(/(^|\s)#([\wäöüÄÖÜß-]{2,30})/g, (_, vor, t) => `${vor}<span class="schlagwort">#${t}</span>`);
   return h;
 }
@@ -1000,7 +1229,10 @@ function rueckverweise(doc) {
 }
 function oeffneDoc(d) {
   if (!d) return;
-  if (d.typ === 'schnipsel') location.hash = '#/schnipsel';
+  if (d.typ === 'blatt') { location.hash = '#/blaetter'; setTimeout(() => oeffneSchreibraum(d.id), 80); }
+  else if (d.typ === 'faden' || d.typ === 'funkeln') location.hash = '#/faden';
+  else if (d.typ === 'mischung') location.hash = '#/klang';
+  else if (d.typ === 'schnipsel') location.hash = '#/schnipsel';
   else if (d.typ === 'heft') location.hash = '#/heft/' + d.id;
   else if (d.typ === 'seite') { sessionStorage.setItem('zielSeite', d.id); location.hash = '#/heft/' + d.parent; }
   else if (d.typ === 'projekt') location.hash = '#/projekt/' + d.id;
@@ -1043,6 +1275,8 @@ const GRUSS_LANGE_WEG = 'Schön, dass du wieder da bist.';
 function grussZeile() {
   const h = new Date().getHours();
   const topf = h < 5 ? GRUESSE.nacht : h < 11 ? GRUESSE.frueh : h < 14 ? GRUESSE.mittag : h < 18 ? GRUESSE.nachmittag : h < 23 ? GRUESSE.abend : GRUESSE.nacht;
+  const eigene = vomTyp('gruss').map((g) => g.text).filter(Boolean);
+  if (eigene.length && Math.random() < .35) return zufall(eigene);
   return zufall(topf);
 }
 
@@ -1066,7 +1300,20 @@ const FUNKEN = [
   'Der Geruch, der einen sofort zehn Jahre zurückwirft.',
   'Zwei Fremde warten zusammen. Worauf, weiß nur einer von beiden.',
   'Eine Stadt, in der Vergessen als Höflichkeit gilt.',
-  'Das Licht im Nachbarhaus geht seit drei Nächten nicht mehr aus.'
+  'Das Licht im Nachbarhaus geht seit drei Nächten nicht mehr aus.',
+  'Jemand schreibt seit Jahren Briefe an eine Adresse, die es nicht gibt. Heute kommt eine Antwort.',
+  'Das Haus wird verkauft. Beim Ausräumen findet sich eine Tür, die in keinem Grundriss steht.',
+  'Eine Stimme im Radio, mitten in der Nacht, sagt deinen Namen. Nur einmal.',
+  'Der Jahrmarkt kommt dieses Jahr einen Tag zu früh. Niemand hat ihn bestellt.',
+  'Zwei Geschwister teilen sich eine Erinnerung — aber jede Hälfte erzählt sie anders.',
+  'In der Bibliothek steht ein Buch, das jedes Mal anders endet.',
+  'Jemand kehrt in die alte Wohnung zurück. Der eigene Name steht noch am Klingelschild — frisch gedruckt.',
+  'Der Fluss friert zum ersten Mal seit hundert Jahren zu. Etwas liegt im Eis.',
+  'Ein Kind fragt: „Wo warst du, bevor du hier warst?" Und niemand am Tisch kann antworten.',
+  'Die letzte Nachricht wurde nie abgeschickt. Der Entwurf ist noch da.',
+  'Jemand sammelt die letzten Sätze fremder Gespräche. Heute fällt einer, der alles ändert.',
+  'Ein Sommer, in dem alle Uhren der Stadt eine Minute nachgehen. Nur eine nicht.',
+  'Das Gewitter kommt näher, und mit ihm ein Geruch aus der Kindheit.'
 ];
 const FUNKE_WER = [
   'Eine Frau, die Karten für Orte zeichnet, die es nicht mehr gibt,',
@@ -1191,20 +1438,41 @@ async function speichereKritzelei(canvas, alteId) {
    ================================================================ */
 
 const RENDER = {};
-const RAEUME = [
-  { id: 'zuhause', name: 'Zuhause', icon: 'zuhause' },
+const ALLE_RAEUME = [
+  { id: 'zuhause', name: 'Zuhause', icon: 'zuhause', fest: true },
   { id: 'schnipsel', name: 'Schnipsel', icon: 'schnipsel' },
+  { id: 'blaetter', name: 'Blätter', icon: 'blatt' },
   { id: 'hefte', name: 'Hefte', icon: 'hefte' },
   { id: 'projekte', name: 'Projekte', icon: 'projekte' },
   { id: 'cluster', name: 'Cluster', icon: 'cluster' },
-  { id: 'woerter', name: 'Wörter', icon: 'woerter' }
+  { id: 'woerter', name: 'Wörter', icon: 'woerter' },
+  { id: 'klang', name: 'Klang', icon: 'klang' },
+  { id: 'faden', name: 'Faden', icon: 'faden' }
 ];
+
+function standardRaeume() {
+  return ALLE_RAEUME.map((r) => ({ id: r.id, an: r.id !== 'faden' }));
+}
+function raumConfig() {
+  if (!Array.isArray(D.einst.raeume) || !D.einst.raeume.length) D.einst.raeume = standardRaeume();
+  /* neue Räume nachtragen, entfernte bereinigen */
+  for (const r of ALLE_RAEUME) {
+    if (!D.einst.raeume.some((x) => x.id === r.id)) D.einst.raeume.push({ id: r.id, an: r.id !== 'faden' });
+  }
+  D.einst.raeume = D.einst.raeume.filter((x) => ALLE_RAEUME.some((r) => r.id === x.id));
+  return D.einst.raeume;
+}
+function aktiveRaeume() {
+  return raumConfig()
+    .filter((x) => x.an || ALLE_RAEUME.find((r) => r.id === x.id).fest)
+    .map((x) => ALLE_RAEUME.find((r) => r.id === x.id));
+}
 
 function baueLeiste() {
   const l = $('#leiste');
   l.innerHTML = '';
   l.append(el('div', { class: 'wortmarke' }, 'V'));
-  for (const r of RAEUME) {
+  for (const r of aktiveRaeume()) {
     l.append(el('button', {
       class: 'lknopf', 'data-raum': r.id,
       onclick: () => { location.hash = '#/' + (r.id === 'zuhause' ? '' : r.id); }
@@ -1285,12 +1553,13 @@ RENDER.zuhause = function (haupt) {
   /* Schreibfeuer */
   const heutigeWorte = D.stats.tage[tagKey()] || 0;
   const str = straehne();
-  const feuerKarte = el('div', { class: 'karte' },
+  const feuerKarte = el('div', { class: 'karte feuerkarte' },
     el('div', { class: 'kartenkopf' }, el('span', { html: ik('feuer') }), 'SCHREIBFEUER'),
     el('div', { class: 'feuer-zeile' },
       el('div', { class: 'feuer-flamme', html: flammeHTML() }),
       el('div', { class: 'feuer-zahlen' },
-        el('div', { class: 'gross' }, String(heutigeWorte), el('span', { style: 'font-size:15px;font-weight:400' }, ' Wörter heute')),
+        el('div', { class: 'gross' }, heutigeWorte.toLocaleString('de-DE')),
+        el('div', { class: 'einheit' }, heutigeWorte === 1 ? 'Wort heute' : 'Wörter heute'),
         el('div', { class: 'klein' },
           str >= 2 ? str + ' Tage in Folge am Feuer' :
           heutigeWorte > 0 ? 'Das Feuer brennt.' :
@@ -1309,9 +1578,9 @@ RENDER.zuhause = function (haupt) {
       })()
     ),
     D.einst.tagesziel > 0 ? el('div', { style: 'margin-top:12px' },
-      el('div', { class: 'zielbalken' }, el('i', { style: 'width:' + Math.min(100, Math.round(heutigeWorte / D.einst.tagesziel * 100)) + '%' })),
+      el('div', { class: 'zielbalken' }, el('i', { class: heutigeWorte >= D.einst.tagesziel ? 'geschafft' : '', style: 'width:' + Math.min(100, Math.round(heutigeWorte / D.einst.tagesziel * 100)) + '%' })),
       el('div', { style: 'font-size:12px;color:var(--blass);margin-top:5px' },
-        heutigeWorte >= D.einst.tagesziel ? 'Tagesziel erreicht. Der Rest ist Geschenk.' : 'noch ' + (D.einst.tagesziel - heutigeWorte) + ' bis zum Tagesziel')
+        heutigeWorte >= D.einst.tagesziel ? 'Tagesziel erreicht. Der Rest ist Geschenk.' : 'noch ' + (D.einst.tagesziel - heutigeWorte).toLocaleString('de-DE') + ' bis zum Tagesziel')
     ) : null
   );
   gitter.append(feuerKarte);
@@ -1326,8 +1595,8 @@ RENDER.zuhause = function (haupt) {
       el('button', { class: 'knopf zart', onclick: () => { funkeAktuell = neuerFunke(Math.random() < .4); funkeText.textContent = funkeAktuell; } }, 'Anderer'),
       el('button', {
         class: 'knopf', onclick: () => {
-          const seite = seiteAusText('', funkeAktuell + '\n\n');
-          oeffneSchreibraum(seite.id);
+          const blatt = blattAusText('', funkeAktuell + '\n\n');
+          oeffneSchreibraum(blatt.id);
         }
       }, 'Dem nachgehen')
     )
@@ -1335,7 +1604,7 @@ RENDER.zuhause = function (haupt) {
 
   /* Weiterschreiben */
   const zuletzt = [...D.docs.values()]
-    .filter((d) => (d.typ === 'szene' || d.typ === 'seite') && (d.text || '').trim())
+    .filter((d) => (d.typ === 'szene' || d.typ === 'seite' || d.typ === 'blatt') && (d.text || '').trim())
     .sort((a, b) => b.geaendert - a.geaendert).slice(0, 3);
   if (zuletzt.length) {
     gitter.append(el('div', { class: 'karte' },
@@ -1345,12 +1614,14 @@ RENDER.zuhause = function (haupt) {
         if (d.typ === 'szene') {
           const p = D.docs.get(d.projekt), k = D.docs.get(d.parent);
           wo = [p && p.titel, k && k.titel].filter(Boolean).join(' › ');
+        } else if (d.typ === 'blatt') {
+          wo = 'Blätter';
         } else {
           const h = D.docs.get(d.parent);
           wo = h ? h.titel : '';
         }
         const letzterSatz = (d.text || '').trim().split('\n').filter(Boolean).pop() || '';
-        return el('button', { class: 'weiter-eintrag', onclick: () => (d.typ === 'szene' ? oeffneSchreibraum(d.id) : oeffneDoc(d)) },
+        return el('button', { class: 'weiter-eintrag', onclick: () => ((d.typ === 'szene' || d.typ === 'blatt') ? oeffneSchreibraum(d.id) : oeffneDoc(d)) },
           el('span', { class: 'wtitel' }, d.titel || 'Ohne Titel'),
           wo ? el('span', { class: 'wo' }, wo + ' · ' + vorZeit(d.geaendert)) : el('span', { class: 'wo' }, vorZeit(d.geaendert)),
           el('span', { class: 'probe' }, '… ' + letzterSatz.slice(-90))
@@ -1359,11 +1630,13 @@ RENDER.zuhause = function (haupt) {
     ));
   }
 
-  /* Wieder aufgetaucht */
+  /* Wieder aufgetaucht — kuratierte Funkeln zählen dreifach */
+  const funkeln = [...D.docs.values()].filter((d) => d.typ === 'funkeln' && (d.text || '').trim());
   const alteFunde = [...D.docs.values()].filter((d) =>
-    ['schnipsel', 'szene', 'seite', 'blase'].includes(d.typ) &&
+    ['schnipsel', 'szene', 'seite', 'blatt', 'blase'].includes(d.typ) &&
     (d.text || '').trim().length > 40 &&
-    Date.now() - d.angelegt > 3 * 86400000);
+    Date.now() - d.angelegt > 3 * 86400000)
+    .concat(funkeln, funkeln, funkeln);
   if (alteFunde.length) {
     let fund = zufall(alteFunde);
     const fundText = el('div', { class: 'fund-text' }, fund.text.trim());
@@ -1399,13 +1672,6 @@ RENDER.zuhause = function (haupt) {
   haupt.append(inhalt);
 };
 
-/* Ein loses Blatt: für Funken, Wörter-Anfänge, freies Schreiben */
-function seiteAusText(titel, text) {
-  let heft = [...D.docs.values()].find((d) => d.typ === 'heft' && d.titel === 'Lose Blätter');
-  if (!heft) heft = neuDoc('heft', { titel: 'Lose Blätter', farbe: '#4a4a52', papier: 'blank' });
-  const geschwister = kinder(heft.id, 'seite');
-  return neuDoc('seite', { parent: heft.id, ord: geschwister.length, titel, text });
-}
 /* ================================================================
    VANI — Schnipsel: der Chat mit mir selbst
    ================================================================ */
@@ -1524,6 +1790,7 @@ async function schnipselMenue(s, blase, neuZeichnen) {
 
 async function verwandleSchnipsel(s, neuZeichnen) {
   const ziel = await menue([
+    { text: 'Als Blatt in den Stapel', icon: 'blatt', wert: 'blatt' },
     { text: 'Auf eine Heftseite kleben', icon: 'hefte', wert: 'seite' },
     { text: 'Als Szene in ein Projekt', icon: 'projekte', wert: 'szene' },
     { text: 'Als Blase auf ein Brett', icon: 'cluster', wert: 'blase' },
@@ -1531,6 +1798,13 @@ async function verwandleSchnipsel(s, neuZeichnen) {
   ], 'Woraus soll das werden?');
   if (!ziel) return;
 
+  if (ziel === 'blatt') {
+    blattAusText('', s.text || '');
+    await loesche(s.id, true);
+    toast('Liegt jetzt bei den Blättern.');
+    if (neuZeichnen) neuZeichnen();
+    return;
+  }
   if (ziel === 'wort') {
     neuDoc('wort', { text: (s.text || '').slice(0, 60) });
     toast('Liegt in der Wortschatzkiste.');
@@ -1619,6 +1893,165 @@ async function waehleBrett() {
   return D.docs.get(wahl);
 }
 /* ================================================================
+   VANI — Blätter: nur Texte, nichts sonst.
+   ================================================================ */
+
+function blattAusText(titel, text) {
+  return neuDoc('blatt', { titel: titel || '', text: text || '', ord: Date.now() });
+}
+
+RENDER.blaetter = function (haupt) {
+  haupt.append(raumkopf('Blätter', 'ein Stapel Texte, mehr nicht',
+    el('button', {
+      class: 'rundknopf voll', html: ik('plus'), onclick: () => {
+        const b = blattAusText('', '');
+        oeffneSchreibraum(b.id);
+      }
+    })
+  ));
+  const inhalt = el('div', { class: 'inhalt' });
+
+  const sortierung = D.einst.blattSortierung || 'zuletzt';
+  const alle = vomTyp('blatt');
+  if (sortierung === 'az') alle.sort((a, b) => (a.titel || a.text || '').localeCompare(b.titel || b.text || '', 'de'));
+  else if (sortierung === 'aeltest') alle.sort((a, b) => a.angelegt - b.angelegt);
+
+  if (alle.length > 1) {
+    const wahl = el('div', { class: 'wahlgruppe', style: 'margin-bottom:12px' });
+    for (const [id, name] of [['zuletzt', 'Zuletzt'], ['aeltest', 'Älteste zuerst'], ['az', 'A–Z']]) {
+      wahl.append(el('button', {
+        class: sortierung === id ? 'an' : '', onclick: () => { D.einst.blattSortierung = id; speichereEinst(); zeichne(); }
+      }, name));
+    }
+    inhalt.append(wahl);
+  }
+
+  if (!alle.length) {
+    inhalt.append(el('div', { class: 'leer' }, 'Ein leerer Stapel.',
+      el('div', { class: 'klein' }, 'Für alles, was einfach nur geschrieben werden will.')));
+  }
+
+  const liste = el('div', { class: 'blattliste' });
+  for (const b of alle) {
+    const worteZahl = worte(b.text);
+    const erste = (b.text || '').trim().split('\n')[0] || '';
+    const karte = el('button', { class: 'karte blattkarte', onclick: () => oeffneSchreibraum(b.id) },
+      el('div', { class: 'btitel serif' }, b.titel || erste.slice(0, 60) || 'Ohne Titel'),
+      el('div', { class: 'bprobe' }, (b.text || '').trim().replace(/\s+/g, ' ').slice(0, 140) || 'Noch leer.'),
+      el('div', { class: 'bfuss' }, (worteZahl ? worteZahl + ' Wörter · ' : '') + vorZeit(b.geaendert))
+    );
+    langdruck(karte, async () => {
+      const wahl = await menue([
+        { text: 'Umbenennen', icon: 'stift', wert: 'name' },
+        { text: 'Teilen', icon: 'teilen', wert: 'teilen' },
+        { text: 'Duplizieren', icon: 'wandel', wert: 'doppel' },
+        { text: 'Löschen', icon: 'muell', wert: 'weg', rot: true }
+      ], b.titel || 'Blatt');
+      if (wahl === 'name') {
+        const neu = await eingabe({ titel: 'Das Blatt heißt jetzt …', wert: b.titel });
+        if (neu !== null) { b.titel = neu; speichereStill(b); zeichne(); }
+      } else if (wahl === 'teilen') {
+        teileText((b.titel ? b.titel + '\n\n' : '') + (b.text || ''));
+      } else if (wahl === 'doppel') {
+        neuDoc('blatt', { titel: (b.titel || 'Blatt') + ' (Abschrift)', text: b.text, ord: Date.now() });
+        zeichne();
+      } else if (wahl === 'weg') {
+        await loesche(b.id); zeichne();
+      }
+    });
+    liste.append(karte);
+  }
+  inhalt.append(liste);
+  haupt.append(inhalt);
+};
+/* ================================================================
+   VANI — Der Faden: der lange Chat, weitergesponnen.
+   ================================================================ */
+
+RENDER.faden = function (haupt) {
+  const raum = el('div', { class: 'schnipsel-raum' });
+  raum.append(el('div', { class: 'kopf', style: 'position:static;background:none' },
+    el('h1', {}, 'Faden', el('div', { class: 'unter' }, 'alles, was je an Vani ging'))
+  ));
+
+  const lauf = el('div', { class: 'schnipsel-lauf' });
+  const innen = el('div', { class: 'innen' });
+  lauf.append(innen);
+
+  const feld = el('textarea', { placeholder: 'Weiter im Faden …', rows: 1 });
+  autogrow(feld);
+  const zeile = el('div', { class: 'schreibzeile' },
+    feld,
+    el('button', {
+      class: 'rundknopf voll', html: ik('senden'), onclick: () => {
+        const t = feld.value.trim();
+        if (!t) return;
+        neuDoc('faden', { text: t });
+        feld.value = ''; feld.style.height = 'auto';
+        baueLauf(true);
+        feld.focus();
+      }
+    })
+  );
+  raum.append(lauf, zeile);
+  haupt.append(raum);
+
+  const alle = () => vomTyp('faden').sort((a, b) => a.angelegt - b.angelegt);
+  let zeigeAb = Math.max(0, alle().length - 150);
+
+  function baueBlase(s) {
+    const blase = el('div', { class: 'blase fadenblase', 'data-id': s.id },
+      el('div', { class: 'btext', html: schmuecke(s.text) }),
+      el('div', { class: 'bzeit' }, fmtZeit(s.angelegt))
+    );
+    blase.addEventListener('click', async (e) => {
+      if (e.target.closest('.verweis')) return;
+      const wahl = await menue([
+        { text: 'Kopieren', icon: 'teilen', wert: 'kopie' },
+        { text: 'Als Blatt herauslösen', icon: 'blatt', wert: 'blatt' },
+        { text: 'Löschen', icon: 'muell', wert: 'weg', rot: true }
+      ]);
+      if (wahl === 'kopie') { try { await navigator.clipboard.writeText(s.text); toast('Kopiert.'); } catch (x) { teileText(s.text); } }
+      else if (wahl === 'blatt') { blattAusText('', s.text); toast('Liegt jetzt bei den Blättern.'); }
+      else if (wahl === 'weg') { await loesche(s.id); baueLauf(); }
+    });
+    return blase;
+  }
+
+  function baueLauf(ansEnde) {
+    innen.innerHTML = '';
+    const liste = alle();
+    if (!liste.length) {
+      innen.append(el('div', { class: 'leer' }, 'Der Faden liegt noch woanders.',
+        el('div', { class: 'klein' }, 'Er kommt als private Datei zu dir — Feinheiten → „Sicher ist sicher" → einlesen. Danach läuft er hier weiter.')));
+      return;
+    }
+    if (zeigeAb > 0) {
+      innen.append(el('button', {
+        class: 'knopf zart', style: 'align-self:center;margin:10px 0', onclick: () => {
+          const alteHoehe = lauf.scrollHeight;
+          zeigeAb = Math.max(0, zeigeAb - 300);
+          baueLauf();
+          lauf.scrollTop = lauf.scrollHeight - alteHoehe;
+        }
+      }, '… frühere zeigen (' + zeigeAb + ')'));
+    }
+    let letzterTag = '';
+    for (const s of liste.slice(zeigeAb)) {
+      const tag = tagKey(s.angelegt);
+      if (tag !== letzterTag) {
+        letzterTag = tag;
+        const d = new Date(s.angelegt);
+        innen.append(el('div', { class: 'datumstrenner' }, fmtDatum(s.angelegt) + ' ' + d.getFullYear()));
+      }
+      innen.append(baueBlase(s));
+    }
+    if (ansEnde !== false) requestAnimationFrame(() => { lauf.scrollTop = lauf.scrollHeight; });
+  }
+
+  baueLauf();
+};
+/* ================================================================
    VANI — Hefte: Papier, Zettel, Fotos, Kritzeleien
    ================================================================ */
 
@@ -1697,7 +2130,7 @@ async function heftMenue(h, danach) {
     delete h.archiv; speichereStill(h);
   } else if (wahl === 'weg') {
     const seiten = kinder(h.id, 'seite').length;
-    if (await frage('„' + h.titel + '" mit ' + (seiten === 1 ? 'einer Seite' : seiten + ' Seiten') + ' endgültig verbrennen?', { ja: 'Verbrennen', gefahr: true })) {
+    if (await frage('„' + h.titel + '" mit ' + (seiten === 1 ? 'einer Seite' : seiten + ' Seiten') + ' in den Papierkorb legen?', { ja: 'In den Papierkorb', gefahr: true })) {
       await loesche(h.id);
       if (location.hash.includes(h.id)) location.hash = '#/hefte';
     }
@@ -2134,7 +2567,7 @@ async function projektMenue(p, danach) {
     zeigeLeseansicht(p);
     return;
   } else if (wahl === 'weg') {
-    if (await frage('„' + p.titel + '" mit allem darin löschen? Das lässt sich nicht zurückholen.', { ja: 'Löschen', gefahr: true })) {
+    if (await frage('„' + p.titel + '" mit allem darin in den Papierkorb legen?', { ja: 'In den Papierkorb', gefahr: true })) {
       await loesche(p.id);
       location.hash = '#/projekte';
       return;
@@ -2273,33 +2706,50 @@ function baueSzenenkarte(s, p) {
   return karte;
 }
 
-/* Ziehen, Tippen, Langdruck auf Szenenkarten */
+/* Halten hebt die Karte an, dann ziehen; kurzes Tippen öffnet. */
 function szenenGesten(karte, s, p) {
-  let start = null, geist = null, gezogen = false;
+  let start = null, geist = null, gezogen = false, hebeTimer = null;
+  const sperreScrollen = (e) => { if (gezogen) e.preventDefault(); };
+  karte.addEventListener('touchmove', sperreScrollen, { passive: false });
+
+  const hebeAn = (e) => {
+    gezogen = true;
+    karte._zieht = true;
+    karte.classList.add('zieht');
+    try { karte.setPointerCapture(e.pointerId); } catch (x) {}
+    geist = karte.cloneNode(true);
+    geist.classList.add('szgeist');
+    geist.classList.remove('zieht');
+    geist.style.left = (e.clientX - 95) + 'px';
+    geist.style.top = (e.clientY - 30) + 'px';
+    document.body.append(geist);
+  };
+
   karte.addEventListener('pointerdown', (e) => {
     if (karte.classList.contains('rueckseite')) return;
+    if (e.target.closest('button') || e.target.closest('textarea')) return;
     start = { x: e.clientX, y: e.clientY, id: e.pointerId };
-    karte.setPointerCapture(e.pointerId);
+    if (e.pointerType === 'mouse') return;
+    hebeTimer = setTimeout(() => { hebeTimer = null; if (start) hebeAn(e); }, 300);
   });
   karte.addEventListener('pointermove', (e) => {
     if (!start) return;
     const dx = e.clientX - start.x, dy = e.clientY - start.y;
-    if (!gezogen && Math.hypot(dx, dy) > 12) {
-      gezogen = true;
-      karte._zieht = true;
-      karte.classList.add('zieht');
-      geist = karte.cloneNode(true);
-      geist.classList.add('szgeist');
-      geist.classList.remove('zieht');
-      document.body.append(geist);
+    if (!gezogen) {
+      if (Math.hypot(dx, dy) > 10) {
+        if (e.pointerType === 'mouse') { hebeAn(e); }
+        else { clearTimeout(hebeTimer); hebeTimer = null; start = null; }
+      }
+      return;
     }
-    if (gezogen && geist) {
+    if (geist) {
       geist.style.left = (e.clientX - 95) + 'px';
       geist.style.top = (e.clientY - 30) + 'px';
     }
   });
   karte.addEventListener('pointerup', async (e) => {
-    if (!start) return;
+    clearTimeout(hebeTimer); hebeTimer = null;
+    if (!start && !gezogen) return;
     const warGezogen = gezogen;
     start = null; gezogen = false;
     karte.classList.remove('zieht');
@@ -2329,15 +2779,20 @@ function szenenGesten(karte, s, p) {
     zeichne();
   });
   karte.addEventListener('pointercancel', () => {
+    clearTimeout(hebeTimer); hebeTimer = null;
     start = null; gezogen = false;
     karte.classList.remove('zieht');
     if (geist) { geist.remove(); geist = null; }
   });
 
   langdruck(karte, async () => {
+    if (karte._zieht || gezogen) return;
     const wahl = await menue([
       { text: 'Umbenennen', icon: 'stift', wert: 'name' },
       { text: 'Andere Farbe', icon: 'farbe', wert: 'farbe' },
+      { text: 'Duplizieren', icon: 'wandel', wert: 'doppel' },
+      { text: 'In anderes Kapitel …', icon: 'projekte', wert: 'zieh' },
+      { text: 'Teilen', icon: 'teilen', wert: 'teilen' },
       { text: 'Szene löschen', icon: 'muell', wert: 'weg', rot: true }
     ], s.titel || 'Szene');
     if (wahl === 'name') {
@@ -2346,10 +2801,23 @@ function szenenGesten(karte, s, p) {
     } else if (wahl === 'farbe') {
       const i = (SZENENFARBEN.indexOf(s.farbe || '') + 1) % SZENENFARBEN.length;
       s.farbe = SZENENFARBEN[i]; speichereStill(s); zeichne();
+    } else if (wahl === 'doppel') {
+      neuDoc('szene', { parent: s.parent, projekt: s.projekt, ord: (s.ord || 0) + .5, titel: (s.titel || 'Szene') + ' (Fassung 2)', text: s.text, status: s.status, farbe: s.farbe, notiz: s.notiz });
+      kinder(s.parent, 'szene').forEach((x, i) => { x.ord = i; speichereStill(x); });
+      zeichne();
+    } else if (wahl === 'zieh') {
+      const wo = await waehleProjektKapitel();
+      if (!wo) return;
+      s.parent = wo.kapitel.id;
+      s.projekt = wo.projekt.id;
+      s.ord = kinder(wo.kapitel.id, 'szene').length;
+      speichereStill(s);
+      toast('Umgezogen nach „' + wo.projekt.titel + '".');
+      zeichne();
+    } else if (wahl === 'teilen') {
+      teileText((s.titel ? s.titel + '\n\n' : '') + (s.text || ''));
     } else if (wahl === 'weg') {
-      if (await frage('„' + (s.titel || 'Diese Szene') + '" löschen?', { ja: 'Löschen', gefahr: true })) {
-        await loesche(s.id); zeichne();
-      }
+      await loesche(s.id); zeichne();
     }
   });
 }
@@ -2389,7 +2857,7 @@ function zeigeLeseansicht(p) {
   document.body.append(bogen, leiste);
 }
 /* ================================================================
-   VANI — Schreibraum: Vollbild, Fokus, Kerze
+   VANI — Schreibraum: Vollbild, Fokus, Kerze, Feinwerk
    ================================================================ */
 
 let _sr = null;
@@ -2400,13 +2868,12 @@ function oeffneSchreibraum(docId) {
   if (!doc) return;
 
   const startWorte = worte(doc.text);
-  const startZeit = Date.now();
 
   const titel = el('input', {
     class: 'sr-titel', type: 'text', value: doc.titel || '',
     placeholder: doc.typ === 'szene' ? 'Szene ohne Namen' : 'Ohne Titel'
   });
-  titel.addEventListener('input', entprellt(() => { doc.titel = titel.value; speichere(doc); }, 400));
+  titel.addEventListener('input', entprellt(() => { doc.titel = titel.value; speichere(doc); }, 400, true));
 
   const worteAnzeige = el('span', { class: 'sr-worte' }, String(startWorte));
   const kerzenhalter = el('div', { class: 'kerzenhalter' });
@@ -2418,32 +2885,66 @@ function oeffneSchreibraum(docId) {
   const spalte = el('div', { class: 'sr-spalte ' + (D.einst.breite || 'mittel') }, wrap);
   const mitte = el('div', { class: 'sr-mitte' }, spalte);
 
+  const klangKnopf = el('button', { class: 'rundknopf zart' + (klangAktiv() ? ' klang-an' : ''), html: ik('klang'), onclick: () => { oeffneMischpult(); } });
+
   const kopf = el('div', { class: 'sr-kopf' },
     el('button', { class: 'knopf', onclick: () => schliesseSchreibraum(true) }, el('span', { html: ik('haken'), style: 'display:flex' }), 'Fertig'),
     titel,
     kerzenhalter,
     worteAnzeige,
-    el('button', { class: 'rundknopf zart', html: ik('klang'), onclick: () => klangMenue() }),
+    klangKnopf,
     el('button', { class: 'rundknopf zart', html: ik('feinheiten'), onclick: () => srEinstellungen() })
   );
 
-  const raum = el('div', { class: 'schreibraum' }, kopf, mitte);
+  /* Sonderzeichen, immer griffbereit über der Tastatur */
+  const zeichen = ['–', '„', '"', '…', '‚', '’', '»', '«'];
+  const leiste = el('div', { class: 'zeichenleiste' },
+    zeichen.map((z) => el('button', {
+      onpointerdown: (e) => e.preventDefault(),
+      onclick: () => { fuegeEin(z); }
+    }, z === '’' ? '’' : z))
+  );
+
+  const raum = el('div', { class: 'schreibraum' }, kopf, mitte, leiste);
   document.body.append(raum);
-  _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, startZeit, sprint: null };
+  _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, sprint: null, klangKnopf };
 
   wendeSchriftAn();
+  wendeTastaturArtAn();
   autogrow(ta);
+
+  function fuegeEin(z) {
+    const s = ta.selectionStart, e = ta.selectionEnd;
+    ta.value = ta.value.slice(0, s) + z + ta.value.slice(e);
+    ta.setSelectionRange(s + z.length, s + z.length);
+    ta.dispatchEvent(new Event('input'));
+    ta.focus();
+  }
 
   const sichern = entprellt(() => {
     doc.text = ta.value;
     speichere(doc);
     zaehleWorte(doc.id, doc.text);
-  }, 500);
+  }, 500, true);
+  _sr.sichern = sichern;
+
+  /* Deutsche Feder: -- wird –, gerade Anführungszeichen werden „so" */
+  function ersetzeKlug() {
+    if (!D.einst.ersetzungen) return;
+    const erg = klugeZeichen(ta.value, ta.selectionStart);
+    if (erg) {
+      ta.value = erg.text;
+      ta.setSelectionRange(erg.caret, erg.caret);
+    }
+  }
 
   let zielKlangGespielt = false;
   ta.addEventListener('input', () => {
+    ersetzeKlug();
     sichern();
-    worteAnzeige.textContent = String(worte(ta.value));
+    const n = worte(ta.value);
+    const dazu = n - startWorte;
+    worteAnzeige.textContent = String(n) + (dazu > 0 ? ' · +' + dazu : '');
     kopf.classList.add('versunken');
     aktualisiereSpiegel();
     if (D.einst.typewriter) zentriereZeile();
@@ -2457,7 +2958,7 @@ function oeffneSchreibraum(docId) {
     if (e.key === 'Escape') schliesseSchreibraum(true);
   });
   document.addEventListener('selectionchange', spiegelBeiAuswahl);
-  raum.addEventListener('pointerdown', () => kopf.classList.remove('versunken'));
+  raum.addEventListener('pointerdown', (e) => { if (!e.target.closest('.zeichenleiste')) kopf.classList.remove('versunken'); });
 
   aktualisiereSpiegel();
   setTimeout(() => {
@@ -2465,8 +2966,6 @@ function oeffneSchreibraum(docId) {
     ta.setSelectionRange(ta.value.length, ta.value.length);
     if (D.einst.typewriter) zentriereZeile();
   }, 80);
-
-  _sr.sichern = sichern;
 
   function spiegelBeiAuswahl() {
     if (!_sr || document.activeElement !== ta) return;
@@ -2483,11 +2982,8 @@ function schliesseSchreibraum(zurueck) {
   if (_sr.sprint) beendeSprint(true);
   const geschrieben = worte(_sr.ta.value) - _sr.startWorte;
   _sr.raum.remove();
-  const doc = _sr.doc;
   _sr = null;
-  if (zurueck && geschrieben > 30) {
-    toast('+' + geschrieben + ' Wörter. Gut gemacht.');
-  }
+  if (zurueck && geschrieben > 30) toast('+' + geschrieben + ' Wörter. Gut gemacht.');
   zeichne();
 }
 
@@ -2500,11 +2996,17 @@ function wendeSchriftAn() {
     if (s.schrift === 'mono') zielEl.classList.add('mono');
   }
   _sr.spalte.className = 'sr-spalte ' + (s.breite || 'mittel');
-  _sr.spalte.style.setProperty('--sr-groesse', s.groesse + 'px');
   _sr.ta.style.fontSize = s.groesse + 'px';
   _sr.spiegel.style.fontSize = s.groesse + 'px';
   _sr.raum.classList.toggle('sr-fokus', !!s.fokus);
   aktualisiereSpiegel();
+}
+function wendeTastaturArtAn() {
+  if (!_sr) return;
+  const an = D.einst.autokorrektur;
+  _sr.ta.setAttribute('autocorrect', an ? 'on' : 'off');
+  _sr.ta.setAttribute('autocapitalize', an ? 'sentences' : 'off');
+  _sr.ta.setAttribute('spellcheck', an ? 'true' : 'false');
 }
 
 function aktualisiereSpiegel() {
@@ -2520,20 +3022,20 @@ function aktualisiereSpiegel() {
   spiegel.innerHTML = esc(t.slice(0, anfang)) + '<mark>' + esc(t.slice(anfang, ende)) + '</mark>' + esc(t.slice(ende)) + '\n';
 }
 
+let _messer = null;
 function zentriereZeile() {
   if (!_sr) return;
   const { ta, mitte } = _sr;
   const stil = getComputedStyle(ta);
-  const zh = parseFloat(stil.lineHeight) || 32;
-  const bisCaret = ta.value.slice(0, ta.selectionStart || 0);
-  const messer = el('div', {
-    class: ta.className.replace('sr-text', 'sr-spiegel'),
-    style: 'position:absolute;inset:auto;top:0;left:0;visibility:hidden;width:' + ta.clientWidth + 'px;font-size:' + stil.fontSize + ';line-height:' + stil.lineHeight + ';white-space:pre-wrap;word-wrap:break-word'
-  });
-  messer.textContent = bisCaret || ' ';
-  ta.parentElement.append(messer);
-  const caretY = messer.offsetHeight;
-  messer.remove();
+  if (!_messer || _messer.parentElement !== ta.parentElement) {
+    if (_messer) _messer.remove();
+    _messer = el('div', { class: 'sr-spiegel text', style: 'position:absolute;inset:auto;top:0;left:0;visibility:hidden' });
+    ta.parentElement.append(_messer);
+  }
+  _messer.className = ta.className.replace('sr-text', 'sr-spiegel');
+  _messer.style.cssText = 'position:absolute;inset:auto;top:0;left:0;visibility:hidden;width:' + ta.clientWidth + 'px;font-size:' + stil.fontSize + ';line-height:' + stil.lineHeight + ';white-space:pre-wrap;word-wrap:break-word';
+  _messer.textContent = ta.value.slice(0, ta.selectionStart || 0) || ' ';
+  const caretY = _messer.offsetHeight;
   const zielY = ta.offsetTop + caretY - mitte.clientHeight * .42;
   mitte.scrollTo({ top: Math.max(0, zielY) });
 }
@@ -2541,6 +3043,7 @@ function zentriereZeile() {
 /* ----- Einstellungen im Schreibraum ----- */
 function srEinstellungen() {
   const s = D.einst;
+  const doc = _sr.doc;
   const zeileFuer = (name, inhalt) => el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, name), inhalt);
   const wahl = (optionen, aktiv, tu) => {
     const g = el('div', { class: 'wahlgruppe' });
@@ -2551,6 +3054,7 @@ function srEinstellungen() {
           $$('button', g).forEach((b) => b.classList.toggle('an', b === e.currentTarget));
           speichereEinst();
           wendeSchriftAn();
+          wendeTastaturArtAn();
         }
       }, name));
     }
@@ -2567,10 +3071,14 @@ function srEinstellungen() {
     zeileFuer('Schreibmaschine', wahl([[true, 'An'], [false, 'Aus']], s.typewriter, (v) => { s.typewriter = v; })),
     zeileFuer('Zeilen-Fokus', wahl([[true, 'An'], [false, 'Aus']], s.fokus, (v) => { s.fokus = v; })),
     zeileFuer('Tastenklang', wahl([[true, 'An'], [false, 'Aus']], s.tastenklang, (v) => { s.tastenklang = v; })),
-    el('div', { class: 'reihe', style: 'justify-content:space-between' },
-      el('button', {
-        class: 'knopf', onclick: () => { zu(); zeigeVerknuepfungen(_sr.doc); }
-      }, el('span', { html: ik('verbinden'), style: 'display:flex' }), 'Verknüpfungen'),
+    zeileFuer('„Kluge Zeichen"', wahl([[true, 'An'], [false, 'Aus']], s.ersetzungen, (v) => { s.ersetzungen = v; })),
+    zeileFuer('Autokorrektur', wahl([[true, 'An'], [false, 'Aus']], s.autokorrektur, (v) => { s.autokorrektur = v; })),
+    el('div', { class: 'reihe', style: 'justify-content:flex-start;flex-wrap:wrap;gap:8px' },
+      el('button', { class: 'knopf', onclick: () => { zu(); sucheErsetze(); } }, el('span', { html: ik('suche'), style: 'display:flex' }), 'Suchen & Ersetzen'),
+      el('button', { class: 'knopf', onclick: () => { zu(); friereEin(); } }, el('span', { html: ik('frieren'), style: 'display:flex' }), 'Stand einfrieren'),
+      (doc.staende && doc.staende.length) ? el('button', { class: 'knopf', onclick: () => { zu(); zeigeStaende(); } }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Frühere Stände (' + doc.staende.length + ')') : null,
+      el('button', { class: 'knopf', onclick: () => { zu(); teileText((doc.titel ? doc.titel + '\n\n' : '') + _sr.ta.value); } }, el('span', { html: ik('teilen'), style: 'display:flex' }), 'Teilen'),
+      el('button', { class: 'knopf', onclick: () => { zu(); zeigeVerknuepfungen(doc); } }, el('span', { html: ik('verbinden'), style: 'display:flex' }), 'Verknüpfungen'),
       el('button', {
         class: 'knopf', onclick: async () => {
           zu();
@@ -2585,6 +3093,97 @@ function srEinstellungen() {
     )
   );
   const zu = zeigeDeck(kasten);
+}
+
+/* ----- Stände (Schnappschüsse) ----- */
+function friereEin() {
+  if (!_sr) return;
+  const doc = _sr.doc;
+  doc.staende = doc.staende || [];
+  doc.staende.push({ wann: Date.now(), titel: doc.titel || '', text: _sr.ta.value });
+  if (doc.staende.length > 20) doc.staende.shift();
+  speichereStill(doc);
+  toast('Eingefroren. Dieser Stand bleibt.');
+}
+function zeigeStaende() {
+  if (!_sr) return;
+  const doc = _sr.doc;
+  const kasten = el('div', { class: 'menue' },
+    el('div', { class: 'mtitel' }, 'EINGEFRORENE STÄNDE'),
+    [...(doc.staende || [])].reverse().map((st) => el('button', {
+      onclick: async () => {
+        zu();
+        const wahl = await menue([
+          { text: 'Zurückholen (Jetziges wird eingefroren)', icon: 'wieder', wert: 'zurueck' },
+          { text: 'Nur ansehen', icon: 'lesen', wert: 'sehen' },
+          { text: 'Diesen Stand vergessen', icon: 'muell', wert: 'weg', rot: true }
+        ], fmtDatum(st.wann) + ', ' + fmtZeit(st.wann));
+        if (wahl === 'zurueck') {
+          friereEin();
+          _sr.ta.value = st.text;
+          _sr.doc.titel = st.titel;
+          _sr.sichern.sofort();
+          zeichne();
+          toast('Zurückgeholt.');
+        } else if (wahl === 'sehen') {
+          const bogen = el('div', { class: 'lesebogen' },
+            el('div', { class: 'innen' },
+              el('h1', {}, st.titel || 'Stand vom ' + fmtDatum(st.wann)),
+              el('div', { class: 'lmeta' }, worte(st.text) + ' Wörter · eingefroren ' + fmtDatum(st.wann) + ', ' + fmtZeit(st.wann)),
+              el('div', { class: 'lesetext' }, st.text)));
+          const leiste2 = el('div', { class: 'schwebeleiste' },
+            el('button', { class: 'rundknopf zart', html: ik('kreuz'), onclick: () => { bogen.remove(); leiste2.remove(); } }));
+          document.body.append(bogen, leiste2);
+        } else if (wahl === 'weg') {
+          doc.staende = doc.staende.filter((x) => x !== st);
+          speichereStill(doc);
+        }
+      }
+    },
+      el('span', { html: ik('frieren'), style: 'display:flex' }),
+      fmtDatum(st.wann) + ' · ' + fmtZeit(st.wann) + ' · ' + worte(st.text) + ' W.'))
+  );
+  const zu = zeigeDeck(kasten);
+}
+
+/* ----- Suchen & Ersetzen (im offenen Text) ----- */
+function sucheErsetze() {
+  if (!_sr) return;
+  const ta = _sr.ta;
+  const suchFeld = el('input', { type: 'text', placeholder: 'suchen …' });
+  const ersatzFeld = el('input', { type: 'text', placeholder: 'ersetzen durch …' });
+  const zaehler = el('div', { style: 'font-size:13px;color:var(--blass);margin-top:8px' }, '');
+  const zaehle = () => {
+    const q = suchFeld.value;
+    if (!q) { zaehler.textContent = ''; return 0; }
+    const n = ta.value.split(q).length - 1;
+    zaehler.textContent = n === 0 ? 'Kommt nicht vor.' : n === 1 ? 'Einmal gefunden.' : n + ' Treffer.';
+    return n;
+  };
+  suchFeld.addEventListener('input', zaehle);
+  const kasten = el('div', { class: 'modal' },
+    el('h2', {}, 'Suchen & Ersetzen'),
+    suchFeld,
+    el('div', { style: 'margin-top:10px' }, ersatzFeld),
+    zaehler,
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
+      el('button', {
+        class: 'knopf voll', onclick: () => {
+          const n = zaehle();
+          if (!n) { toast('Nichts zu ersetzen.'); return; }
+          friereEin();
+          ta.value = ta.value.split(suchFeld.value).join(ersatzFeld.value);
+          _sr.sichern.sofort();
+          ta.dispatchEvent(new Event('input'));
+          zu();
+          toast(n === 1 ? 'Einmal ersetzt.' : n + '-mal ersetzt. Der alte Stand ist eingefroren.');
+        }
+      }, 'Ersetzen')
+    )
+  );
+  const zu = zeigeDeck(kasten);
+  setTimeout(() => suchFeld.focus(), 60);
 }
 
 /* ----- Sprint: die Kerze ----- */
@@ -2614,7 +3213,12 @@ function beendeSprint(abgebrochen) {
   if (!abgebrochen) {
     const geschrieben = worte(_sr.ta.value) - sp.startWorte;
     glocke();
-    const klangDazu = D.einst.klang !== 'aus' ? { regen: ' Der Regen fällt weiter.', kamin: ' Das Feuer knistert noch.', wind: ' Der Wind hat gedreht.', grillen: ' Die Grillen bleiben.' }[D.einst.klang] || '' : '';
+    const m = D.einst.mischung || {};
+    const klangDazu = m.regenfenster || m.regendach || m.platzregen ? ' Der Regen fällt weiter.'
+      : m.kamin ? ' Das Feuer knistert noch.'
+      : m.wind || m.schneesturm ? ' Der Wind hat gedreht.'
+      : m.grillen ? ' Die Grillen bleiben.'
+      : m.brandung ? ' Das Meer bleibt da.' : '';
     toast('Ein Atemzug Rauch. ' + geschrieben + ' Wörter in ' + sp.minuten + ' Minuten.' + klangDazu, 4200);
   }
 }
@@ -2632,27 +3236,15 @@ function zeigeVerknuepfungen(doc) {
   const herein = rueckverweise(doc);
   const eintrag = (d) => el('button', {
     onclick: () => { zu(); if (_sr) schliesseSchreibraum(); oeffneDoc(d); }
-  }, el('span', { html: ik({ szene: 'projekte', seite: 'hefte', schnipsel: 'schnipsel', blase: 'cluster', wort: 'woerter' }[d.typ] || 'hefte'), style: 'display:flex' }),
+  }, el('span', { html: ik({ szene: 'projekte', seite: 'hefte', schnipsel: 'schnipsel', blase: 'cluster', wort: 'woerter', blatt: 'blatt', faden: 'faden' }[d.typ] || 'hefte'), style: 'display:flex' }),
     (d.titel || (d.text || '').slice(0, 44) || 'Ohne Titel'));
   const kasten = el('div', { class: 'menue' },
     el('div', { class: 'mtitel' }, 'FÜHRT HIN ZU'),
-    hinaus.length ? hinaus.map(eintrag) : el('div', { style: 'padding:6px 14px 12px;color:var(--blass);font-size:14px' }, 'Mit [[doppelten Klammern]] im Text verbindest du Orte miteinander.'),
+    hinaus.length ? hinaus.map(eintrag) : el('div', { style: 'padding:6px 14px 12px;color:var(--blass);font-size:14px' }, 'Mit [[doppelten Klammern]] im Text verbinden sich Orte miteinander.'),
     el('div', { class: 'mtitel' }, 'ZEIGT HIERHER'),
     herein.length ? herein.map(eintrag) : el('div', { style: 'padding:6px 14px 12px;color:var(--blass);font-size:14px' }, 'Noch nichts.')
   );
   const zu = zeigeDeck(kasten);
-}
-
-/* ----- Klang-Menü (nutzt 50-audio) ----- */
-async function klangMenue() {
-  const wahl = await menue([
-    { text: 'Stille', icon: 'kreuz', wert: 'aus' },
-    { text: 'Regen ans Fenster', icon: 'klang', wert: 'regen' },
-    { text: 'Kaminfeuer', icon: 'feuer', wert: 'kamin' },
-    { text: 'Wind ums Haus', icon: 'klang', wert: 'wind' },
-    { text: 'Grillen in der Nacht', icon: 'klang', wert: 'grillen' }
-  ], 'Was soll zu hören sein?');
-  if (wahl) klangSetzen(wahl);
 }
 /* ================================================================
    VANI — Cluster: Denken auf Brettern
@@ -2974,7 +3566,7 @@ RENDER.woerter = function (haupt) {
           { text: 'Aus der Kiste nehmen', icon: 'muell', wert: 'weg', rot: true }
         ], w.text);
         if (wahl === 'schreiben') {
-          const seite = seiteAusText('', w.text + ' —\n\n');
+          const seite = blattAusText('', w.text + ' —\n\n');
           oeffneSchreibraum(seite.id);
         } else if (wahl === 'edit') {
           const neu = await eingabe({ titel: 'Das Wort', wert: w.text });
@@ -3022,7 +3614,7 @@ RENDER.woerter = function (haupt) {
     el('button', {
       class: 'knopf voll', onclick: () => {
         if (!griff.length) { toast('Erst schütteln.'); return; }
-        const seite = seiteAusText('', griff.map((w) => w.text).join(' · ') + '\n\n');
+        const seite = blattAusText('', griff.map((w) => w.text).join(' · ') + '\n\n');
         oeffneSchreibraum(seite.id);
       }
     }, 'Damit schreiben')
@@ -3040,7 +3632,7 @@ RENDER.woerter = function (haupt) {
       el('button', { class: 'knopf', onclick: () => { funke = neuerFunke(true); funkeText.textContent = funke; } }, 'Wer · Wo · Aber'),
       el('button', {
         class: 'knopf voll', onclick: () => {
-          const seite = seiteAusText('', funke + '\n\n');
+          const seite = blattAusText('', funke + '\n\n');
           oeffneSchreibraum(seite.id);
         }
       }, 'Dem nachgehen')
@@ -3050,18 +3642,49 @@ RENDER.woerter = function (haupt) {
   haupt.append(inhalt);
 };
 /* ================================================================
-   VANI — Suche: ein Feld, alles
+   VANI — Suche: ein Feld, alles. Mit Filtern und Nachsicht
+   bei Tippfehlern.
    ================================================================ */
+
+const SUCH_GRUPPEN = [
+  ['schnipsel', 'Schnipsel', 'schnipsel'],
+  ['blatt', 'Blätter', 'blatt'],
+  ['seite', 'Heftseiten', 'hefte'],
+  ['szene', 'Szenen', 'projekte'],
+  ['heft', 'Hefte', 'hefte'],
+  ['projekt', 'Projekte', 'projekte'],
+  ['blase', 'Blasen', 'cluster'],
+  ['zettel', 'Zettel', 'pin'],
+  ['wort', 'Wörter', 'woerter'],
+  ['faden', 'Faden', 'faden'],
+  ['mischung', 'Klang-Szenen', 'klang']
+];
 
 function oeffneSuche() {
   const feld = el('input', { type: 'text', placeholder: 'Wonach suchst du?' });
   const treffer = el('div', { class: 'suchtreffer' });
+  let filter = null;
+
+  const chips = el('div', { class: 'suchchips' });
+  const baueChips = () => {
+    chips.innerHTML = '';
+    for (const [typ, name] of SUCH_GRUPPEN) {
+      if (typ === 'faden' && !D.docs.size) continue;
+      chips.append(el('button', {
+        class: 'suchchip' + (filter === typ ? ' an' : ''),
+        onclick: () => { filter = filter === typ ? null : typ; baueChips(); suche(); }
+      }, name));
+    }
+  };
+  baueChips();
+
   const kasten = el('div', { class: 'suchkasten' },
     el('div', { class: 'suchzeile' },
       el('span', { html: ik('suche'), style: 'display:flex;color:var(--blass)' }),
       feld,
       el('button', { class: 'rundknopf zart', style: 'width:32px;height:32px', html: ik('kreuz'), onclick: () => zu() })
     ),
+    chips,
     treffer
   );
   const bogen = el('div', { class: 'suchbogen' }, kasten);
@@ -3070,42 +3693,82 @@ function oeffneSuche() {
   const zu = () => bogen.remove();
   setTimeout(() => feld.focus(), 60);
 
-  const GRUPPEN = [
-    ['schnipsel', 'SCHNIPSEL', 'schnipsel'],
-    ['seite', 'HEFTSEITEN', 'hefte'],
-    ['szene', 'SZENEN', 'projekte'],
-    ['heft', 'HEFTE', 'hefte'],
-    ['projekt', 'PROJEKTE', 'projekte'],
-    ['blase', 'BLASEN', 'cluster'],
-    ['zettel', 'ZETTEL', 'pin'],
-    ['wort', 'WÖRTER', 'woerter']
-  ];
+  function eintrag(d, umfeldHtml) {
+    return el('button', { onclick: () => { zu(); merkeSuche(feld.value); oeffneDoc(d); } },
+      el('span', { class: 'ttitel' }, d.titel || ((d.text || '').split('\n')[0] || 'Ohne Titel').slice(0, 50)),
+      umfeldHtml ? el('span', { class: 'tprobe', html: umfeldHtml }) : null
+    );
+  }
 
-  function suche() {
-    const q = feld.value.trim().toLowerCase();
+  function leererZustand() {
     treffer.innerHTML = '';
-    if (q.length < 2) {
+    const letzte = JSON.parse(localStorage.getItem('vani-suchen') || '[]');
+    if (letzte.length) {
+      treffer.append(el('div', { class: 'gruppe' }, 'ZULETZT GESUCHT'));
+      for (const q of letzte.slice(0, 5)) {
+        treffer.append(el('button', { onclick: () => { feld.value = q; suche(); } },
+          el('span', { class: 'ttitel', style: 'font-weight:400' }, q)));
+      }
+    }
+    const frisch = [...D.docs.values()]
+      .filter((d) => ['blatt', 'szene', 'seite', 'schnipsel'].includes(d.typ) && (d.text || '').trim())
+      .sort((a, b) => b.geaendert - a.geaendert).slice(0, 5);
+    if (frisch.length) {
+      treffer.append(el('div', { class: 'gruppe' }, 'ZULETZT ANGEFASST'));
+      for (const d of frisch) treffer.append(eintrag(d, esc((d.text || '').replace(/\s+/g, ' ').slice(0, 70))));
+    }
+    if (!letzte.length && !frisch.length) {
       treffer.append(el('div', { style: 'padding:22px;text-align:center;color:var(--blass);font-style:italic;font-family:ui-serif,Georgia,serif' },
         'Alles, was du je geschrieben hast, liegt hier drin.'));
-      return;
     }
+  }
+
+  function merkeSuche(q) {
+    if (!q || q.length < 2) return;
+    const letzte = JSON.parse(localStorage.getItem('vani-suchen') || '[]').filter((x) => x !== q);
+    letzte.unshift(q);
+    localStorage.setItem('vani-suchen', JSON.stringify(letzte.slice(0, 8)));
+  }
+
+  function suche() {
+    const roh = feld.value.trim();
+    if (roh.length < 2) { leererZustand(); return; }
+    treffer.innerHTML = '';
+    const q = normalisiere(roh);
     let gesamt = 0;
-    for (const [typ, name, icon] of GRUPPEN) {
-      const funde = [...D.docs.values()]
-        .filter((d) => d.typ === typ && ((d.titel || '').toLowerCase().includes(q) || (d.text || '').toLowerCase().includes(q)))
-        .sort((a, b) => b.geaendert - a.geaendert)
-        .slice(0, 8);
+    for (const [typ, name] of SUCH_GRUPPEN) {
+      if (filter && typ !== filter) continue;
+      const funde = [];
+      for (const d of D.docs.values()) {
+        if (d.typ !== typ) continue;
+        const titelN = normalisiere(d.titel || '');
+        const textN = normalisiere(d.text || '');
+        let stelle = titelN.indexOf(q);
+        let woText = -1;
+        if (stelle === -1) { woText = textN.indexOf(q); }
+        let unscharf = false;
+        if (stelle === -1 && woText === -1 && q.length >= 5) {
+          if (fastGleich(titelN, q) || fastGleich(textN, q)) unscharf = true;
+          else continue;
+        } else if (stelle === -1 && woText === -1) continue;
+        funde.push({ d, woText, unscharf });
+      }
+      funde.sort((a, b) => b.d.geaendert - a.d.geaendert);
       if (!funde.length) continue;
-      treffer.append(el('div', { class: 'gruppe' }, name));
-      for (const d of funde) {
+      treffer.append(el('div', { class: 'gruppe' }, name.toUpperCase()));
+      for (const { d, woText, unscharf } of funde.slice(0, filter ? 40 : 6)) {
         gesamt++;
+        let umfeld = '';
         const text = d.text || '';
-        const wo = text.toLowerCase().indexOf(q);
-        const umfeld = wo >= 0 ? '… ' + text.slice(Math.max(0, wo - 30), wo + 60).replace(/\n/g, ' ') + ' …' : text.slice(0, 80);
-        treffer.append(el('button', { onclick: () => { zu(); oeffneDoc(d); } },
-          el('span', { class: 'ttitel' }, d.titel || (text.split('\n')[0] || 'Ohne Titel').slice(0, 50)),
-          umfeld.trim() ? el('span', { class: 'tprobe' }, umfeld) : null
-        ));
+        if (woText >= 0) {
+          const von = Math.max(0, woText - 28);
+          const stueck = text.slice(von, woText + q.length + 50).replace(/\n/g, ' ');
+          const rel = woText - von;
+          umfeld = (von > 0 ? '… ' : '') + esc(stueck.slice(0, rel)) + '<mark>' + esc(stueck.slice(rel, rel + q.length)) + '</mark>' + esc(stueck.slice(rel + q.length)) + ' …';
+        } else {
+          umfeld = esc(text.replace(/\s+/g, ' ').slice(0, 78)) + (unscharf ? ' <i style="opacity:.6">(ähnlich)</i>' : '');
+        }
+        treffer.append(eintrag(d, umfeld.trim() || null));
       }
     }
     if (!gesamt) {
@@ -3113,9 +3776,9 @@ function oeffneSuche() {
         'Nichts. Vielleicht muss es erst noch geschrieben werden.'));
     }
   }
-  feld.addEventListener('input', entprellt(suche, 160));
+  feld.addEventListener('input', entprellt(suche, 140));
   feld.addEventListener('keydown', (e) => { if (e.key === 'Escape') zu(); });
-  suche();
+  leererZustand();
 }
 
 document.addEventListener('keydown', (e) => {
@@ -3134,7 +3797,8 @@ RENDER.feinheiten = function (haupt) {
     ['papier', 'Papier', '#f8f3e7', '#2c251c'],
     ['tinte', 'Tinte', '#211c17', '#eae0cd'],
     ['kerze', 'Kerze', '#2b1e0c', '#f2dfb6'],
-    ['nebel', 'Nebel', '#f4f6f2', '#2e3438']
+    ['nebel', 'Nebel', '#f4f6f2', '#2e3438'],
+    ['weiss', 'Weiß', '#ffffff', '#1a1a1a']
   ];
   const themen = el('div', { class: 'themenwahl' });
   for (const [id, name, hg, tinte] of THEMA_INFO) {
@@ -3165,24 +3829,39 @@ RENDER.feinheiten = function (haupt) {
         el('span', { class: 'ename' }, 'Schrift, Größe, Fokus …', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Stellst du direkt im Schreibraum ein — oben rechts.')))
     )));
 
-  /* Klang */
-  const klangwahl = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
-  const KLAENGE = [['aus', 'Stille'], ['regen', 'Regen'], ['kamin', 'Kamin'], ['wind', 'Wind'], ['grillen', 'Grillen']];
-  for (const [id, name] of KLAENGE) {
-    klangwahl.append(el('button', {
-      class: D.einst.klang === id ? 'an' : '', onclick: (e) => {
-        klangSetzen(id);
-        $$('button', klangwahl).forEach((b) => b.classList.toggle('an', b === e.currentTarget));
-      }
-    }, name));
+  /* Räume: an/aus und Reihenfolge */
+  const raumkarte = el('div', { class: 'karte' });
+  function baueRaumliste() {
+    raumkarte.innerHTML = '';
+    const cfg = raumConfig();
+    cfg.forEach((eintrag, i) => {
+      const info = ALLE_RAEUME.find((r) => r.id === eintrag.id);
+      raumkarte.append(el('div', { class: 'einstellzeile' },
+        el('span', { html: ik(info.icon), style: 'display:flex;color:var(--blass)' }),
+        el('span', { class: 'ename' }, info.name),
+        el('button', {
+          class: 'rundknopf zart', style: 'width:32px;height:32px' + (i === 0 ? ';opacity:.2;pointer-events:none' : ''), html: ik('auf'),
+          onclick: () => { [cfg[i - 1], cfg[i]] = [cfg[i], cfg[i - 1]]; speichereEinst(); baueLeiste(); baueRaumliste(); }
+        }),
+        el('button', {
+          class: 'rundknopf zart', style: 'width:32px;height:32px' + (i === cfg.length - 1 ? ';opacity:.2;pointer-events:none' : ''), html: ik('ab'),
+          onclick: () => { [cfg[i], cfg[i + 1]] = [cfg[i + 1], cfg[i]]; speichereEinst(); baueLeiste(); baueRaumliste(); }
+        }),
+        info.fest ? el('span', { style: 'width:52px;text-align:center;font-size:12px;color:var(--blass)' }, 'immer') :
+        el('button', {
+          class: 'schalter' + (eintrag.an ? ' an' : ''), onclick: (e) => {
+            eintrag.an = !eintrag.an;
+            e.currentTarget.classList.toggle('an', eintrag.an);
+            speichereEinst(); baueLeiste();
+          }
+        }, el('i'))
+      ));
+    });
   }
-  const laut = el('input', { type: 'range', min: '0', max: '100', value: String(Math.round(D.einst.lautstaerke * 100)) });
-  laut.addEventListener('input', () => { setzeLautstaerke(parseInt(laut.value, 10) / 100); });
-  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Klang'),
-    el('div', { class: 'karte' },
-      el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, 'Zu hören'), klangwahl),
-      el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, 'Lautstärke'), laut)
-    )));
+  baueRaumliste();
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Räume'),
+    el('div', { style: 'font-size:13.5px;color:var(--blass);margin:-6px 0 10px' }, 'Was du nicht brauchst, verschwindet aus der Leiste. Nichts geht dabei verloren.'),
+    raumkarte));
 
   /* Statistik */
   const gesamt = Object.values(D.stats.tage).reduce((a, b) => a + b, 0);
@@ -3199,18 +3878,58 @@ RENDER.feinheiten = function (haupt) {
       el('b', {}, String(d.getDate()))));
   }
   const anzahl = (typ) => [...D.docs.values()].filter((d) => d.typ === typ).length;
-  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Gezählt, nicht gewogen'),
+  const zaehlwerk = [
+    ['schnipsel', 'Schnipsel', 'Schnipsel'], ['blatt', 'Blatt', 'Blätter'],
+    ['seite', 'Seite', 'Seiten'], ['szene', 'Szene', 'Szenen']
+  ].map(([typ, einzahl, mehrzahl]) => {
+    const n = anzahl(typ);
+    return el('div', { class: 'z' }, el('b', {}, String(n)), el('span', {}, n === 1 ? einzahl : mehrzahl));
+  });
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Zahlen'),
     el('div', { class: 'karte' },
       balken,
       el('div', { class: 'zahlenreihe' },
         el('div', { class: 'z' }, el('b', {}, gesamt.toLocaleString('de-DE')), el('span', {}, 'Wörter insgesamt')),
         el('div', { class: 'z' }, el('b', {}, String(D.stats.tage[tagKey()] || 0)), el('span', {}, 'heute')),
         el('div', { class: 'z' }, el('b', {}, String(straehne())), el('span', {}, 'Tage in Folge')),
-        el('div', { class: 'z' }, el('b', {}, String(anzahl('schnipsel'))), el('span', {}, 'Schnipsel')),
-        el('div', { class: 'z' }, el('b', {}, String(anzahl('seite'))), el('span', {}, 'Seiten')),
-        el('div', { class: 'z' }, el('b', {}, String(anzahl('szene'))), el('span', {}, 'Szenen'))
+        zaehlwerk
       )
     )));
+
+  /* Papierkorb */
+  const korbKarte = el('div', { class: 'karte' });
+  async function baueKorb() {
+    korbKarte.innerHTML = '';
+    const alle = (await dbAlle('papierkorb')).sort((a, b) => b.wann - a.wann);
+    if (!alle.length) {
+      korbKarte.append(el('div', { style: 'color:var(--blass);font-size:14.5px' }, 'Leer. So soll es sein.'));
+      return;
+    }
+    for (const b of alle.slice(0, 30)) {
+      korbKarte.append(el('div', { class: 'einstellzeile' },
+        el('span', { class: 'ename' }, (b.name || b.typ),
+          el('div', { style: 'font-size:12px;color:var(--blass)' }, b.docs.length + (b.docs.length === 1 ? ' Ding · ' : ' Dinge · ') + vorZeit(b.wann))),
+        el('button', {
+          class: 'knopf', style: 'padding:6px 12px', onclick: async () => {
+            await holeZurueck(b.id); toast('Wieder da.'); baueKorb();
+          }
+        }, 'Zurückholen')
+      ));
+    }
+    korbKarte.append(el('div', { style: 'margin-top:12px' },
+      el('button', {
+        class: 'knopf zart', onclick: async () => {
+          if (await frage('Papierkorb endgültig leeren? Das ist die eine Stelle, an der Löschen wirklich löscht.', { ja: 'Endgültig leeren', gefahr: true })) {
+            await papierkorbLeeren();
+            baueKorb();
+          }
+        }
+      }, 'Endgültig leeren')));
+  }
+  baueKorb();
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Papierkorb'),
+    el('div', { style: 'font-size:13.5px;color:var(--blass);margin:-6px 0 10px' }, 'Gelöschtes liegt hier, 30 Tage lang mindestens. Nichts verschwindet einfach so.'),
+    korbKarte));
 
   /* Sicherung */
   const wann = D.stats.letzteSicherung;
@@ -3294,7 +4013,7 @@ function leseSicherung() {
     if (!datei) return;
     let paket;
     try { paket = JSON.parse(await datei.text()); } catch (e) { toast('Das ist keine VANI-Sicherung.'); return; }
-    if (!paket || paket.vani !== 1 || !Array.isArray(paket.docs)) { toast('Das ist keine VANI-Sicherung.'); return; }
+    if (!pruefeSicherung(paket)) { toast('Das ist keine VANI-Sicherung.'); return; }
     const modus = await menue([
       { text: 'Dazulegen (nichts geht verloren)', icon: 'plus', wert: 'dazu' },
       { text: 'Alles ersetzen', icon: 'wandel', wert: 'ersetzen', rot: true }
@@ -3381,7 +4100,8 @@ async function teileDatei(name, inhalt, typ = 'text/plain') {
   }
 }
 /* ================================================================
-   VANI — Klangwelten: alles aus dem Nichts gerechnet, keine Dateien
+   VANI — Klangwelten: alles aus dem Nichts gerechnet, keine Dateien.
+   Rezepte nach Andy Farnell („Designing Sound") und eigenen Ohren.
    ================================================================ */
 
 let _audio = null;
@@ -3390,155 +4110,703 @@ function holeAudio() {
   if (!_audio) {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const master = ctx.createGain();
-    master.gain.value = D.einst.lautstaerke * .6;
-    master.connect(ctx.destination);
-    _audio = { ctx, master, knoten: [], intervalle: [], laeuft: 'aus' };
+    master.gain.value = (D.einst.lautstaerke ?? .5) * .7;
+    const drossel = ctx.createDynamicsCompressor();
+    drossel.threshold.value = -18; drossel.ratio.value = 4;
+    master.connect(drossel); drossel.connect(ctx.destination);
+    _audio = { ctx, master, puffer: {}, hallen: {}, ebenen: new Map() };
   }
   if (_audio.ctx.state === 'suspended') _audio.ctx.resume();
   return _audio;
 }
 
-function rauschPuffer(ctx, sek = 2) {
-  const puffer = ctx.createBuffer(1, ctx.sampleRate * sek, ctx.sampleRate);
-  const d = puffer.getChannelData(0);
-  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-  return puffer;
-}
-function rauschQuelle(a) {
-  const q = a.ctx.createBufferSource();
-  q.buffer = rauschPuffer(a.ctx);
-  q.loop = true;
-  return q;
-}
-
 function setzeLautstaerke(wert) {
   D.einst.lautstaerke = wert;
   speichereEinst();
-  if (_audio) _audio.master.gain.value = wert * .6;
+  if (_audio) _audio.master.gain.setTargetAtTime(wert * .7, _audio.ctx.currentTime, .1);
 }
 
-function klangStopp() {
-  if (!_audio) return;
-  for (const i of _audio.intervalle) clearInterval(i);
-  for (const k of _audio.knoten) { try { k.stop ? k.stop() : k.disconnect(); } catch (e) {} }
-  _audio.knoten = [];
-  _audio.intervalle = [];
-  _audio.laeuft = 'aus';
-}
-
-function klangSetzen(name) {
-  D.einst.klang = name;
-  speichereEinst();
-  klangStopp();
-  if (name === 'aus') return;
-  const a = holeAudio();
-  a.laeuft = name;
-  if (name === 'regen') baueRegen(a);
-  else if (name === 'kamin') baueKamin(a);
-  else if (name === 'wind') baueWind(a);
-  else if (name === 'grillen') baueGrillen(a);
-}
-
-function baueRegen(a) {
-  const q = rauschQuelle(a);
-  const hoch = a.ctx.createBiquadFilter(); hoch.type = 'highpass'; hoch.frequency.value = 400;
-  const tief = a.ctx.createBiquadFilter(); tief.type = 'lowpass'; tief.frequency.value = 2400;
-  const g = a.ctx.createGain(); g.gain.value = .32;
-  q.connect(hoch); hoch.connect(tief); tief.connect(g); g.connect(a.master);
-  q.start();
-  a.knoten.push(q, g);
-  /* einzelne Tropfen */
-  a.intervalle.push(setInterval(() => {
-    if (Math.random() < .6) return;
-    const o = a.ctx.createOscillator();
-    o.type = 'sine';
-    o.frequency.value = 900 + Math.random() * 2200;
-    const og = a.ctx.createGain();
-    og.gain.setValueAtTime(.05 + Math.random() * .05, a.ctx.currentTime);
-    og.gain.exponentialRampToValueAtTime(.0001, a.ctx.currentTime + .06);
-    o.connect(og); og.connect(a.master);
-    o.start(); o.stop(a.ctx.currentTime + .08);
-  }, 180));
-}
-
-function baueKamin(a) {
-  const q = rauschQuelle(a);
-  const tief = a.ctx.createBiquadFilter(); tief.type = 'lowpass'; tief.frequency.value = 320;
-  const g = a.ctx.createGain(); g.gain.value = .5;
-  q.connect(tief); tief.connect(g); g.connect(a.master);
-  q.start();
-  /* Atmen des Feuers */
-  const lfo = a.ctx.createOscillator(); lfo.frequency.value = .18;
-  const lfoG = a.ctx.createGain(); lfoG.gain.value = .12;
-  lfo.connect(lfoG); lfoG.connect(g.gain); lfo.start();
-  a.knoten.push(q, g, lfo);
-  /* Knistern */
-  a.intervalle.push(setInterval(() => {
-    if (Math.random() < .45) return;
-    const k = a.ctx.createBufferSource();
-    k.buffer = rauschPuffer(a.ctx, .06);
-    const band = a.ctx.createBiquadFilter(); band.type = 'bandpass';
-    band.frequency.value = 1800 + Math.random() * 2600; band.Q.value = 2;
-    const kg = a.ctx.createGain();
-    kg.gain.setValueAtTime(.09 + Math.random() * .12, a.ctx.currentTime);
-    kg.gain.exponentialRampToValueAtTime(.0001, a.ctx.currentTime + .05 + Math.random() * .05);
-    k.connect(band); band.connect(kg); kg.connect(a.master);
-    k.start();
-  }, 140));
-}
-
-function baueWind(a) {
-  const q = rauschQuelle(a);
-  const band = a.ctx.createBiquadFilter(); band.type = 'bandpass'; band.frequency.value = 400; band.Q.value = .9;
-  const g = a.ctx.createGain(); g.gain.value = .34;
-  q.connect(band); band.connect(g); g.connect(a.master);
-  q.start();
-  const lfo = a.ctx.createOscillator(); lfo.frequency.value = .06;
-  const lfoG = a.ctx.createGain(); lfoG.gain.value = 260;
-  lfo.connect(lfoG); lfoG.connect(band.frequency); lfo.start();
-  const lfo2 = a.ctx.createOscillator(); lfo2.frequency.value = .11;
-  const lfo2G = a.ctx.createGain(); lfo2G.gain.value = .1;
-  lfo2.connect(lfo2G); lfo2G.connect(g.gain); lfo2.start();
-  a.knoten.push(q, g, lfo, lfo2);
-}
-
-function baueGrillen(a) {
-  /* leiser Nachtboden */
-  const q = rauschQuelle(a);
-  const tief = a.ctx.createBiquadFilter(); tief.type = 'lowpass'; tief.frequency.value = 260;
-  const g = a.ctx.createGain(); g.gain.value = .07;
-  q.connect(tief); tief.connect(g); g.connect(a.master);
-  q.start();
-  a.knoten.push(q, g);
-  /* zwei Grillen, leicht versetzt */
-  const grille = (grundton, takt) => {
-    a.intervalle.push(setInterval(() => {
-      if (Math.random() < .35) return;
-      const zirpen = 4 + Math.floor(Math.random() * 4);
-      for (let i = 0; i < zirpen; i++) {
-        const t = a.ctx.currentTime + i * .045;
-        const o = a.ctx.createOscillator();
-        o.type = 'triangle';
-        o.frequency.value = grundton + Math.random() * 150;
-        const og = a.ctx.createGain();
-        og.gain.setValueAtTime(0, t);
-        og.gain.linearRampToValueAtTime(.035, t + .008);
-        og.gain.exponentialRampToValueAtTime(.0001, t + .038);
-        o.connect(og); og.connect(a.master);
-        o.start(t); o.stop(t + .045);
+/* ----- Rauschfarben (einmal gerechnet, dann geloopt) ----- */
+function _rauschpuffer(a, farbe) {
+  if (a.puffer[farbe]) return a.puffer[farbe];
+  const sek = 3, n = a.ctx.sampleRate * sek;
+  const p = a.ctx.createBuffer(2, n, a.ctx.sampleRate);
+  for (let k = 0; k < 2; k++) {
+    const d = p.getChannelData(k);
+    if (farbe === 'weiss') {
+      for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    } else if (farbe === 'rosa') {
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < n; i++) {
+        const w = Math.random() * 2 - 1;
+        b0 = .99886 * b0 + w * .0555179; b1 = .99332 * b1 + w * .0750759;
+        b2 = .96900 * b2 + w * .1538520; b3 = .86650 * b3 + w * .3104856;
+        b4 = .55000 * b4 + w * .5329522; b5 = -.7616 * b5 - w * .0168980;
+        d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * .5362) * .11;
+        b6 = w * .115926;
       }
-    }, takt));
-  };
-  grille(4100, 900);
-  grille(3600, 1300);
+    } else {
+      let letzt = 0;
+      for (let i = 0; i < n; i++) {
+        const w = Math.random() * 2 - 1;
+        letzt = (letzt + .02 * w) / 1.02;
+        d[i] = letzt * 3.5;
+      }
+    }
+  }
+  a.puffer[farbe] = p;
+  return p;
 }
 
-/* Einzelklänge */
+function _hallIR(a, sek, tiefpass) {
+  const key = sek + ':' + tiefpass;
+  if (a.hallen[key]) return a.hallen[key];
+  const n = Math.floor(a.ctx.sampleRate * sek);
+  const p = a.ctx.createBuffer(2, n, a.ctx.sampleRate);
+  for (let k = 0; k < 2; k++) {
+    const d = p.getChannelData(k);
+    let glatt = 0;
+    const alpha = Math.min(1, tiefpass / (a.ctx.sampleRate / 2));
+    for (let i = 0; i < n; i++) {
+      const w = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2.2);
+      glatt += alpha * (w - glatt);
+      d[i] = glatt;
+    }
+  }
+  a.hallen[key] = p;
+  return p;
+}
+
+/* ----- Werkbank: baut & räumt hinter jeder Ebene auf ----- */
+function neueWerkbank(a, out) {
+  const quellen = [], timer = [], intervalle = [];
+  const w = {
+    a, out,
+    rauschen(farbe) {
+      const q = a.ctx.createBufferSource();
+      q.buffer = _rauschpuffer(a, farbe); q.loop = true; q.start();
+      quellen.push(q); return q;
+    },
+    ton(typ, freq) {
+      const o = a.ctx.createOscillator();
+      o.type = typ; o.frequency.value = freq; o.start();
+      quellen.push(o); return o;
+    },
+    filter(typ, freq, q) {
+      const f = a.ctx.createBiquadFilter();
+      f.type = typ; f.frequency.value = freq; if (q) f.Q.value = q;
+      return f;
+    },
+    pegel(v) { const g = a.ctx.createGain(); g.gain.value = v; return g; },
+    lfo(rate, hub, ziel) {
+      const o = a.ctx.createOscillator(); o.frequency.value = rate;
+      const g = a.ctx.createGain(); g.gain.value = hub;
+      o.connect(g); g.connect(ziel); o.start();
+      quellen.push(o); return o;
+    },
+    wandel(param, min, max, msMin, msMax, glaette) {
+      const tu = () => {
+        param.setTargetAtTime(min + Math.random() * (max - min), a.ctx.currentTime, glaette ?? .6);
+        timer.push(setTimeout(tu, msMin + Math.random() * (msMax - msMin)));
+      };
+      tu();
+    },
+    takt(msMittel, fn) {
+      const tu = () => {
+        fn(a.ctx.currentTime);
+        timer.push(setTimeout(tu, Math.max(30, -Math.log(Math.random()) * msMittel)));
+      };
+      timer.push(setTimeout(tu, Math.random() * msMittel));
+    },
+    immer(ms, fn) { intervalle.push(setInterval(fn, ms)); },
+    hall(sek, tiefpass, anteil) {
+      const c = a.ctx.createConvolver();
+      c.buffer = _hallIR(a, sek, tiefpass);
+      const g = a.ctx.createGain(); g.gain.value = anteil;
+      c.connect(g); g.connect(out);
+      return c;
+    },
+    huelle(ziel, t, spitze, decaySek) {
+      ziel.setValueAtTime(Math.max(.0001, spitze), t);
+      ziel.exponentialRampToValueAtTime(.0001, t + decaySek);
+    },
+    stop() {
+      timer.forEach(clearTimeout);
+      intervalle.forEach(clearInterval);
+      quellen.forEach((q) => { try { q.stop(); } catch (e) {} });
+    }
+  };
+  return w;
+}
+
+/* kurzer tonaler Ping (Tropfen, Blasen, Vogel-Silben) */
+function _ping(w, ziel, { f0, f1, dauer, staerke, typ }) {
+  const t = w.a.ctx.currentTime;
+  const o = w.a.ctx.createOscillator();
+  o.type = typ || 'sine';
+  o.frequency.setValueAtTime(f0, t);
+  if (f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dauer);
+  const g = w.pegel(0);
+  w.huelle(g.gain, t, staerke, dauer);
+  o.connect(g); g.connect(ziel);
+  o.start(t); o.stop(t + dauer + .05);
+}
+function _knack(w, ziel, { freq, q, dauer, staerke }) {
+  const t = w.a.ctx.currentTime;
+  const b = w.a.ctx.createBufferSource();
+  b.buffer = _rauschpuffer(w.a, 'weiss');
+  b.loop = true;
+  const f = w.filter('bandpass', freq, q || 2);
+  const g = w.pegel(0);
+  w.huelle(g.gain, t, staerke, dauer);
+  b.connect(f); f.connect(g); g.connect(ziel);
+  b.start(t); b.stop(t + dauer + .05);
+}
+
+/* ================================================================
+   Die Ebenen
+   ================================================================ */
+const KLANG_EBENEN = [
+
+  /* --- Wetter --- */
+  { id: 'regenfenster', name: 'Regen ans Fenster', kat: 'Wetter', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const bett = w.rauschen('rosa'), hp = w.filter('highpass', 900), g = w.pegel(.16);
+    bett.connect(hp); hp.connect(g); g.connect(out);
+    w.wandel(hp.frequency, 750, 1150, 3000, 9000);
+    w.takt(140, () => {
+      if (Math.random() < .35) return;
+      _ping(w, out, { f0: 1800 + Math.random() * 800, f1: 1500, dauer: .015 + Math.random() * .012, staerke: .05 + Math.random() * .09 });
+    });
+    w.takt(18000, () => _knack(w, out, { freq: 2200, q: 1.2, dauer: .3, staerke: .05 }));
+    return w;
+  }},
+
+  { id: 'regendach', name: 'Regen aufs Dach', kat: 'Wetter', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const bett = w.rauschen('braun'), lp = w.filter('lowpass', 2500), g = w.pegel(.4);
+    const beule = w.filter('peaking', 90, 1); beule.gain.value = 6;
+    bett.connect(lp); lp.connect(beule); beule.connect(g); g.connect(out);
+    w.takt(70, () => _knack(w, out, { freq: 300 + Math.random() * 500, q: 1, dauer: .03 + Math.random() * .03, staerke: .04 + Math.random() * .05 }));
+    return w;
+  }},
+
+  { id: 'platzregen', name: 'Platzregen', kat: 'Wetter', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const bett = w.rauschen('weiss'), hp = w.filter('highpass', 500), lp = w.filter('lowpass', 9000), g = w.pegel(.3);
+    bett.connect(hp); hp.connect(lp); lp.connect(g); g.connect(out);
+    w.wandel(g.gain, .22, .34, 8000, 16000, 1.5);
+    const prasseln = w.rauschen('weiss'), bp = w.filter('bandpass', 4000, 1), flacker = w.pegel(.1);
+    prasseln.connect(bp); bp.connect(flacker); flacker.connect(out);
+    const fl = w.rauschen('weiss'), fllp = w.filter('lowpass', 45), flg = w.pegel(.08);
+    fl.connect(fllp); fllp.connect(flg); flg.connect(flacker.gain);
+    w.takt(400, () => _knack(w, out, { freq: 800 + Math.random() * 700, q: 2, dauer: .05, staerke: .12 }));
+    return w;
+  }},
+
+  { id: 'gewitter', name: 'Fernes Gewitter', kat: 'Wetter', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const hall = w.hall(6, 900, .8);
+    w.takt(45000, (t) => {
+      const b = w.a.ctx.createBufferSource();
+      b.buffer = _rauschpuffer(w.a, 'braun'); b.loop = true;
+      const bp = w.filter('bandpass', 250, .8), g = w.pegel(0);
+      b.connect(bp); bp.connect(g); g.connect(hall); g.connect(out);
+      bp.frequency.setValueAtTime(250, t);
+      bp.frequency.exponentialRampToValueAtTime(80, t + 3.5);
+      const wellen = 2 + Math.floor(Math.random() * 3);
+      let zeit = t + .3;
+      g.gain.setValueAtTime(.0001, t);
+      for (let i = 0; i < wellen; i++) {
+        const spitze = .5 * (1 - i / (wellen + 1)) * (0.7 + Math.random() * .5);
+        g.gain.exponentialRampToValueAtTime(Math.max(.001, spitze), zeit + .6 + Math.random() * .5);
+        zeit += 1.2 + Math.random() * 1.6;
+        g.gain.exponentialRampToValueAtTime(.02 + Math.random() * .05, zeit);
+      }
+      g.gain.exponentialRampToValueAtTime(.0001, zeit + 4 + Math.random() * 6);
+      b.start(t); b.stop(zeit + 12);
+    });
+    return w;
+  }},
+
+  { id: 'wind', name: 'Wind ums Haus', kat: 'Wetter', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const q = w.rauschen('weiss'), bp = w.filter('bandpass', 800, 1), g = w.pegel(.25);
+    q.connect(bp); bp.connect(g); g.connect(out);
+    w.wandel(g.gain, .08, .4, 1200, 4000, 1.2);
+    w.wandel(bp.frequency, 500, 1400, 1200, 4000, 1.2);
+    const pfeifQ = w.rauschen('weiss'), pfeif = w.filter('bandpass', 400, 25), pg = w.pegel(.02);
+    pfeifQ.connect(pfeif); pfeif.connect(pg); pg.connect(out);
+    w.wandel(pfeif.frequency, 300, 620, 2500, 7000);
+    w.wandel(pg.gain, .003, .05, 3000, 9000, 1.8);
+    return w;
+  }},
+
+  { id: 'schneesturm', name: 'Schneesturm', kat: 'Wetter', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const zisch = w.rauschen('weiss'), bp = w.filter('bandpass', 2000, .8), g = w.pegel(.16);
+    zisch.connect(bp); bp.connect(g); g.connect(out);
+    w.wandel(g.gain, .1, .22, 900, 2500, .8);
+    const druck = w.rauschen('braun'), lp = w.filter('lowpass', 150), dg = w.pegel(.3);
+    druck.connect(lp); lp.connect(dg); dg.connect(out);
+    const heulQ = w.rauschen('weiss'), heul = w.filter('bandpass', 700, 40), hg = w.pegel(0);
+    heulQ.connect(heul); heul.connect(hg); hg.connect(out);
+    w.takt(16000, (t) => {
+      heul.frequency.setValueAtTime(550 + Math.random() * 150, t);
+      heul.frequency.exponentialRampToValueAtTime(800 + Math.random() * 200, t + 2 + Math.random() * 2);
+      heul.frequency.exponentialRampToValueAtTime(480 + Math.random() * 120, t + 4 + Math.random() * 3);
+      hg.gain.setTargetAtTime(.06, t, 1.2);
+      hg.gain.setTargetAtTime(.0001, t + 5, 1.5);
+    });
+    return w;
+  }},
+
+  /* --- Wasser --- */
+  { id: 'brandung', name: 'Meeresbrandung', kat: 'Wasser', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const tiefe = w.rauschen('braun'), tlp = w.filter('lowpass', 500), tg = w.pegel(.2);
+    tiefe.connect(tlp); tlp.connect(tg); tg.connect(out);
+    const welleBau = (periode) => {
+      const q2 = w.rauschen('rosa'), lp = w.filter('lowpass', 400), g = w.pegel(.02);
+      q2.connect(lp); lp.connect(g); g.connect(out);
+      const rollen = () => {
+        const t = w.a.ctx.currentTime;
+        const hoehe = .12 + Math.random() * .22;
+        const anstieg = periode * .3;
+        g.gain.setTargetAtTime(hoehe, t, anstieg / 3);
+        lp.frequency.setTargetAtTime(800 + hoehe * 9000, t, anstieg / 3);
+        g.gain.setTargetAtTime(.02, t + anstieg, periode * .28);
+        lp.frequency.setTargetAtTime(400, t + anstieg, periode * .3);
+        _knack(w, out, { freq: 2600, q: .7, dauer: 2.2 + Math.random() * 1.6, staerke: hoehe * .8 });
+      };
+      w.immer(periode * 1000, rollen);
+      rollen();
+    };
+    welleBau(9); welleBau(13);
+    return w;
+  }},
+
+  { id: 'bach', name: 'Bach', kat: 'Wasser', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    for (const [rate, tiefe, staerke] of [[2, 800, .05], [6, 600, .1], [12, 400, .14]]) {
+      const q = w.rauschen('rosa'), bp = w.filter('bandpass', 1400, 1.6), g = w.pegel(staerke);
+      q.connect(bp); bp.connect(g); g.connect(out);
+      w.lfo(rate, tiefe, bp.frequency);
+    }
+    w.takt(180, () => {
+      if (Math.random() < .5) return;
+      const f0 = 300 + Math.random() * 900;
+      _ping(w, out, { f0, f1: f0 * (1.03 + Math.random() * .07), dauer: .06 + Math.random() * .09, staerke: .05 });
+    });
+    return w;
+  }},
+
+  { id: 'tropfen', name: 'Tropfen nach dem Regen', kat: 'Wasser', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const hall = w.hall(3, 1600, .9);
+    w.takt(3200, () => {
+      const f0 = 800 + Math.random() * 800;
+      _ping(w, hall, { f0, f1: f0 * 1.06, dauer: .1 + Math.random() * .1, staerke: .12 });
+      _ping(w, out, { f0, f1: f0 * 1.06, dauer: .08, staerke: .05 });
+    });
+    return w;
+  }},
+
+  /* --- Feuer --- */
+  { id: 'kamin', name: 'Kaminfeuer', kat: 'Feuer', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const koerper = w.rauschen('weiss'), kbp = w.filter('bandpass', 30, 5);
+    const verstaerker = w.pegel(60);
+    const former = a.ctx.createWaveShaper();
+    const kurve = new Float32Array(256);
+    for (let i = 0; i < 256; i++) kurve[i] = Math.max(-.9, Math.min(.9, (i / 128 - 1) * 2));
+    former.curve = kurve;
+    const khp = w.filter('highpass', 25), kg = w.pegel(.5);
+    koerper.connect(kbp); kbp.connect(verstaerker); verstaerker.connect(former); former.connect(khp); khp.connect(kg); kg.connect(out);
+    const zisch = w.rauschen('weiss'), zhp = w.filter('highpass', 1000), zg = w.pegel(.02);
+    zisch.connect(zhp); zhp.connect(zg); zg.connect(out);
+    w.wandel(zg.gain, .004, .05, 700, 2200, .5);
+    w.takt(320, () => {
+      _knack(w, out, { freq: 3200 + Math.random() * 2200, q: 2, dauer: .001 + Math.random() * .03, staerke: .08 + Math.random() * .22 });
+    });
+    w.takt(9000, () => _knack(w, out, { freq: 800, q: 1.5, dauer: .06 + Math.random() * .03, staerke: .3 }));
+    return w;
+  }},
+
+  { id: 'kerze', name: 'Kerzenflackern', kat: 'Feuer', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const q = w.rauschen('rosa'), bp = w.filter('bandpass', 1200, .7), g = w.pegel(.012);
+    q.connect(bp); bp.connect(g); g.connect(out);
+    w.wandel(g.gain, .003, .02, 120, 260, .06);
+    w.takt(16000, () => {
+      for (let i = 0; i < 2 + Math.floor(Math.random() * 3); i++) {
+        setTimeout(() => _knack(w, out, { freq: 3000, q: 3, dauer: .006, staerke: .015 }), i * (60 + Math.random() * 120));
+      }
+    });
+    return w;
+  }},
+
+  /* --- Natur --- */
+  { id: 'blaetter', name: 'Blätterrascheln', kat: 'Natur', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const q = w.rauschen('weiss'), hp = w.filter('highpass', 200), lp = w.filter('lowpass', 4000), g = w.pegel(.05);
+    q.connect(hp); hp.connect(lp); lp.connect(g); g.connect(out);
+    const flacker = w.rauschen('weiss'), flp = w.filter('lowpass', 18), fg = w.pegel(.06);
+    flacker.connect(flp); flp.connect(fg); fg.connect(g.gain);
+    w.wandel(g.gain, .015, .12, 2500, 7000, 1.8);
+    return w;
+  }},
+
+  { id: 'grillen', name: 'Grillen', kat: 'Natur', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const boden = w.rauschen('braun'), blp = w.filter('lowpass', 300), bg = w.pegel(.03);
+    boden.connect(blp); blp.connect(bg); bg.connect(out);
+    for (let tier = 0; tier < 4; tier++) {
+      const traeger = 4200 + Math.random() * 900;
+      const pause = 700 + Math.random() * 900;
+      const pan = a.ctx.createStereoPanner ? a.ctx.createStereoPanner() : null;
+      const ausgang = pan ? (pan.pan.value = -0.7 + Math.random() * 1.4, pan.connect(out), pan) : out;
+      w.takt(pause, (t) => {
+        if (Math.random() < .3) return;
+        const silben = 2 + Math.floor(Math.random() * 3);
+        for (let s = 0; s < silben; s++) {
+          const st = t + s * .045;
+          const o = a.ctx.createOscillator();
+          o.type = 'sine'; o.frequency.value = traeger + Math.random() * 120;
+          const g = w.pegel(0);
+          g.gain.setValueAtTime(0, st);
+          g.gain.linearRampToValueAtTime(.028, st + .006);
+          g.gain.setValueAtTime(.028, st + .02);
+          g.gain.linearRampToValueAtTime(0, st + .032);
+          o.connect(g); g.connect(ausgang);
+          o.start(st); o.stop(st + .045);
+        }
+      });
+    }
+    return w;
+  }},
+
+  { id: 'vogelmorgen', name: 'Vogelmorgen', kat: 'Natur', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const hall = w.hall(1.6, 3500, .35);
+    const stimme = (tief, hoch, fern) => {
+      const ziel = fern ? hall : out;
+      w.takt(5000 + Math.random() * 6000, (t) => {
+        const silben = 3 + Math.floor(Math.random() * 5);
+        let zeit = 0;
+        for (let s = 0; s < silben; s++) {
+          const dauer = .05 + Math.random() * .1;
+          const f0 = tief + Math.random() * (hoch - tief);
+          const f1 = f0 * (Math.random() < .5 ? 1.15 + Math.random() * .5 : .75);
+          setTimeout(() => _ping(w, ziel, { f0, f1, dauer, staerke: fern ? .05 : .12, typ: 'sine' }), zeit * 1000);
+          zeit += dauer + .04 + Math.random() * .1;
+        }
+      });
+    };
+    stimme(1800, 2800, false);
+    stimme(2600, 4200, false);
+    stimme(3400, 5800, true);
+    const luft = w.rauschen('rosa'), lp = w.filter('lowpass', 500), g = w.pegel(.02);
+    luft.connect(lp); lp.connect(g); g.connect(out);
+    return w;
+  }},
+
+  { id: 'moewen', name: 'Möwen', kat: 'Natur', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const hall = w.hall(2, 2600, .5);
+    w.takt(11000, (t) => {
+      const fern = Math.random() < .5;
+      const rufe = 3 + Math.floor(Math.random() * 5);
+      const basis = 450 + Math.random() * 120;
+      for (let r = 0; r < rufe; r++) {
+        const st = t + r * (.28 + Math.random() * .12);
+        const o = a.ctx.createOscillator(); o.type = 'sawtooth';
+        o.frequency.setValueAtTime(basis, st);
+        o.frequency.linearRampToValueAtTime(basis + 180, st + .04);
+        o.frequency.linearRampToValueAtTime(basis + 30, st + .22);
+        const f1 = w.filter('bandpass', 1100, 5), f2 = w.filter('bandpass', 2600, 8);
+        const g = w.pegel(0);
+        const staerke = (fern ? .04 : .12) * (1 - r / (rufe + 2));
+        g.gain.setValueAtTime(.0001, st);
+        g.gain.exponentialRampToValueAtTime(Math.max(.001, staerke), st + .04);
+        g.gain.exponentialRampToValueAtTime(.0001, st + .26);
+        o.connect(f1); o.connect(f2); f1.connect(g); f2.connect(g);
+        g.connect(fern ? hall : out);
+        o.start(st); o.stop(st + .3);
+      }
+    });
+    return w;
+  }},
+
+  { id: 'eule', name: 'Eule', kat: 'Natur', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const hall = w.hall(2.5, 1200, .7);
+    const ruf = (t, basis, staerke, ziel) => {
+      const o = a.ctx.createOscillator(); o.type = 'sine';
+      const g = w.pegel(0);
+      o.frequency.setValueAtTime(basis + 40, t);
+      o.frequency.linearRampToValueAtTime(basis, t + .25);
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(staerke, t + .08);
+      g.gain.exponentialRampToValueAtTime(.0001, t + .25);
+      o.frequency.setValueAtTime(basis, t + .7);
+      o.frequency.linearRampToValueAtTime(basis * .92, t + 1.5);
+      g.gain.setValueAtTime(.0001, t + .7);
+      g.gain.exponentialRampToValueAtTime(staerke, t + .95);
+      g.gain.exponentialRampToValueAtTime(.0001, t + 1.6);
+      const lfo = a.ctx.createOscillator(); lfo.frequency.value = 5;
+      const lg = w.pegel(5); lfo.connect(lg); lg.connect(o.frequency);
+      o.connect(g); g.connect(ziel);
+      o.start(t); o.stop(t + 1.8); lfo.start(t); lfo.stop(t + 1.8);
+    };
+    w.takt(32000, (t) => {
+      const basis = 340 + Math.random() * 50;
+      ruf(t, basis, .09, hall);
+      if (Math.random() < .4) ruf(t + 2 + Math.random() * 1.5, basis * .89, .04, hall);
+    });
+    return w;
+  }},
+
+  { id: 'zikaden', name: 'Zikaden', kat: 'Natur', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const q = w.rauschen('weiss');
+    const hp1 = w.filter('highpass', 5000), lp1 = w.filter('lowpass', 8000);
+    const bp = w.filter('bandpass', 6000, 7), hp2 = w.filter('highpass', 4000), g = w.pegel(.05);
+    q.connect(hp1); hp1.connect(lp1); lp1.connect(bp); bp.connect(hp2); hp2.connect(g); g.connect(out);
+    w.lfo(28, .015, g.gain);
+    w.wandel(g.gain, .03, .07, 4000, 9000, 1.4);
+    return w;
+  }},
+
+  /* --- Nah & warm --- */
+  { id: 'schnurren', name: 'Katzenschnurren', kat: 'Nah & warm', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const lp = w.filter('lowpass', 700), g = w.pegel(.4);
+    lp.connect(g); g.connect(out);
+    let atmung = 0;
+    w.immer(38, () => {
+      atmung += .038 / 2.6;
+      const aus = (atmung % 1) < .55;
+      if (Math.random() < (aus ? .95 : .8)) {
+        _knack(w, lp, { freq: aus ? 320 : 220, q: 1, dauer: .014, staerke: (aus ? .22 : .14) * (0.8 + Math.random() * .4) });
+      }
+    });
+    return w;
+  }},
+
+  { id: 'herzschlag', name: 'Herzschlag', kat: 'Nah & warm', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const lp = w.filter('lowpass', 200), g = w.pegel(.8);
+    lp.connect(g); g.connect(out);
+    let phase = 0;
+    const schlag = () => {
+      const t = a.ctx.currentTime;
+      const lub = a.ctx.createOscillator();
+      lub.frequency.setValueAtTime(60, t);
+      lub.frequency.linearRampToValueAtTime(45, t + .13);
+      const lg = w.pegel(0);
+      lg.gain.setValueAtTime(.0001, t);
+      lg.gain.exponentialRampToValueAtTime(.5, t + .02);
+      lg.gain.exponentialRampToValueAtTime(.0001, t + .15);
+      lub.connect(lg); lg.connect(lp); lub.start(t); lub.stop(t + .2);
+      const dub = a.ctx.createOscillator();
+      dub.frequency.value = 65;
+      const dg = w.pegel(0);
+      dg.gain.setValueAtTime(.0001, t + .18);
+      dg.gain.exponentialRampToValueAtTime(.35, t + .2);
+      dg.gain.exponentialRampToValueAtTime(.0001, t + .29);
+      dub.connect(dg); dg.connect(lp); dub.start(t + .18); dub.stop(t + .32);
+      phase += .25;
+      const periode = 1000 * (0.95 + Math.sin(phase) * .03);
+      setTimeout(schlag, periode);
+    };
+    schlag();
+    return w;
+  }},
+
+  { id: 'uhr', name: 'Uhrenticken', kat: 'Nah & warm', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const hall = w.hall(.12, 2000, .3);
+    let tick = true;
+    w.immer(1000, () => {
+      const satz = tick ? [[6543, .03], [3245, .02], [1356, .01]] : [[7543, .03], [3988, .02], [2765, .01]];
+      const staerke = (tick ? .1 : .08) * (0.94 + Math.random() * .12);
+      for (const [freq, dauer] of satz) {
+        _knack(w, out, { freq, q: 3, dauer, staerke: staerke * .5 });
+        _knack(w, hall, { freq, q: 3, dauer, staerke: staerke * .3 });
+      }
+      tick = !tick;
+    });
+    return w;
+  }},
+
+  { id: 'alteshaus', name: 'Altes Haus', kat: 'Nah & warm', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const bett = w.rauschen('braun'), lp = w.filter('lowpass', 120), g = w.pegel(.06);
+    bett.connect(lp); lp.connect(g); g.connect(out);
+    const resonanz = [62.5, 125, 250, 395, 560, 790].map((f, i) => w.filter('bandpass', f, 1 + Math.floor(i / 2)));
+    const holzG = w.pegel(.2); holzG.connect(out);
+    resonanz.forEach((r) => r.connect(holzG));
+    w.takt(50000, (t) => {
+      const dauer = .5 + Math.random() * 1;
+      const o = a.ctx.createOscillator(); o.type = 'sawtooth';
+      o.frequency.setValueAtTime(20 + Math.random() * 20, t);
+      o.frequency.linearRampToValueAtTime(50 + Math.random() * 40, t + dauer * .5);
+      o.frequency.linearRampToValueAtTime(25 + Math.random() * 15, t + dauer);
+      const og = w.pegel(0);
+      og.gain.setValueAtTime(.0001, t);
+      og.gain.exponentialRampToValueAtTime(.12, t + dauer * .3);
+      og.gain.exponentialRampToValueAtTime(.0001, t + dauer);
+      o.connect(og); resonanz.forEach((r) => og.connect(r));
+      o.start(t); o.stop(t + dauer + .1);
+    });
+    w.takt(70000, () => _knack(w, holzG, { freq: 900, q: 5, dauer: .008, staerke: .3 }));
+    return w;
+  }},
+
+  /* --- Orte --- */
+  { id: 'cafe', name: 'Café-Gemurmel', kat: 'Orte', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const raum = w.hall(.9, 2200, .5);
+    const lp = w.filter('lowpass', 1800), g = w.pegel(.5);
+    lp.connect(g); g.connect(out); lp.connect(raum);
+    for (let s = 0; s < 4; s++) {
+      const o = w.ton('sawtooth', s % 2 ? 115 + Math.random() * 20 : 195 + Math.random() * 40);
+      const f1 = w.filter('bandpass', 500, 5), f2 = w.filter('bandpass', 1400, 8);
+      const sg = w.pegel(0);
+      o.connect(f1); o.connect(f2); f1.connect(sg); f2.connect(sg); sg.connect(lp);
+      w.wandel(o.frequency, o.frequency.value * .8, o.frequency.value * 1.25, 300, 900, .15);
+      w.wandel(f1.frequency, 320, 800, 120, 300, .05);
+      w.wandel(f2.frequency, 900, 2200, 120, 300, .05);
+      const sprich = () => {
+        const t = a.ctx.currentTime;
+        const dauer = 1 + Math.random() * 3;
+        const silbe = 4 + Math.random() * 3;
+        for (let z = 0; z < dauer * silbe; z++) {
+          const st = t + z / silbe;
+          sg.gain.setTargetAtTime(.008 + Math.random() * .012, st, .03);
+          sg.gain.setTargetAtTime(.001, st + .09, .04);
+        }
+        sg.gain.setTargetAtTime(.0001, t + dauer, .1);
+        setTimeout(sprich, (dauer + .5 + Math.random() * 3) * 1000);
+      };
+      setTimeout(sprich, Math.random() * 2000);
+    }
+    w.takt(9000, () => {
+      const f = 2500 + Math.random() * 2000;
+      _ping(w, raum, { f0: f, f1: f, dauer: .08 + Math.random() * .2, staerke: .05 });
+      _ping(w, raum, { f0: f * 2.76, f1: f * 2.76, dauer: .06, staerke: .02 });
+    });
+    return w;
+  }},
+
+  { id: 'zug', name: 'Zugfahrt', kat: 'Orte', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const rumpel = w.rauschen('braun'), rlp = w.filter('lowpass', 250), rg = w.pegel(.3);
+    rumpel.connect(rlp); rlp.connect(rg); rg.connect(out);
+    w.wandel(rg.gain, .24, .36, 400, 1200, .4);
+    const windQ = w.rauschen('rosa'), wbp = w.filter('bandpass', 2000, .8), wg = w.pegel(.06);
+    windQ.connect(wbp); wbp.connect(wg); wg.connect(out);
+    const stoss = (t, staerke) => {
+      _knack(w, out, { freq: 200 + Math.random() * 150, q: 1, dauer: .07, staerke: staerke });
+      _knack(w, out, { freq: 1200, q: 4, dauer: .03, staerke: staerke * .33 });
+    };
+    const takt = 1900;
+    w.immer(takt, () => {
+      const t = a.ctx.currentTime;
+      const j = () => (Math.random() - .5) * .02;
+      stoss(t + j(), .2); setTimeout(() => stoss(0, .18), 120 + j() * 1000);
+      setTimeout(() => { stoss(0, .16); setTimeout(() => stoss(0, .14), 120); }, 600);
+    });
+    return w;
+  }},
+
+  { id: 'glocken', name: 'Glocken in der Ferne', kat: 'Orte', bau(a, out) {
+    const w = neueWerkbank(a, out);
+    const hall = w.hall(4.5, 1800, .85);
+    const lp = w.filter('lowpass', 2200); lp.connect(hall); lp.connect(out);
+    const traeger = w.pegel(.14); traeger.connect(lp);
+    w.wandel(traeger.gain, .05, .16, 4000, 9000, 2);
+    const schlag = (f, t, staerke) => {
+      const teile = [[.5, 12, 1], [1, 7, .7], [1.2, 5, .5], [1.5, 3, .3], [2, 2.5, .4], [2.66, 1.2, .15], [3, .8, .1]];
+      for (const [rel, decay, s] of teile) {
+        const o = a.ctx.createOscillator();
+        o.frequency.value = f * rel * (1 + (Math.random() - .5) * .012);
+        const g = w.pegel(0);
+        g.gain.setValueAtTime(.0001, t);
+        g.gain.exponentialRampToValueAtTime(Math.max(.001, staerke * s), t + .02);
+        g.gain.exponentialRampToValueAtTime(.0001, t + decay);
+        o.connect(g); g.connect(traeger);
+        o.start(t); o.stop(t + decay + .2);
+      }
+    };
+    w.takt(70000, (t) => {
+      const grundton = 196 * (Math.random() < .5 ? 1 : 1.19);
+      const anzahl = 3 + Math.floor(Math.random() * 6);
+      for (let i = 0; i < anzahl; i++) schlag(grundton, t + i * 2.8, .1);
+    });
+    return w;
+  }}
+];
+
+const KLANG_KATEGORIEN = ['Wetter', 'Wasser', 'Feuer', 'Natur', 'Nah & warm', 'Orte'];
+
+/* Vorgemischte Szenen */
+const KLANG_SZENEN = [
+  { name: 'Sturmnacht am Leuchtturm', pegel: { wind: .65, brandung: .8, regenfenster: .5, gewitter: .45, moewen: .12 } },
+  { name: 'Am Lagerfeuer', pegel: { kamin: .8, grillen: .4, wind: .12, eule: .25 } },
+  { name: 'Schreibzimmer', pegel: { uhr: .45, kamin: .3, regenfenster: .45, schnurren: .2 } },
+  { name: 'Nachtzug', pegel: { zug: .8, regendach: .3 } },
+  { name: 'Café am Regentag', pegel: { cafe: .65, regenfenster: .5, glocken: .12 } },
+  { name: 'Sommernacht', pegel: { grillen: .7, blaetter: .3, eule: .3, alteshaus: .12 } },
+  { name: 'Nach dem Regen', pegel: { tropfen: .6, vogelmorgen: .35, bach: .3 } },
+  { name: 'Morgen am Meer', pegel: { brandung: .7, moewen: .4, vogelmorgen: .2, wind: .18 } },
+  { name: 'Wintermorgen', pegel: { schneesturm: .4, kamin: .6, uhr: .3 } },
+  { name: 'Tiefe Nacht', pegel: { herzschlag: .3, uhr: .4, schnurren: .3, wind: .1 } },
+  { name: 'Altes Haus im August', pegel: { zikaden: .5, alteshaus: .3, blaetter: .2 } },
+  { name: 'Bibliothek', pegel: { uhr: .5, alteshaus: .25, kerze: .8, regendach: .2 } }
+];
+
+/* ----- Steuerung ----- */
+function ebeneAn(id, staerke) {
+  const a = holeAudio();
+  let e = a.ebenen.get(id);
+  if (!e) {
+    const def = KLANG_EBENEN.find((x) => x.id === id);
+    if (!def) return;
+    const g = a.ctx.createGain();
+    g.gain.value = 0;
+    g.connect(a.master);
+    const werk = def.bau(a, g);
+    e = { gain: g, werk };
+    a.ebenen.set(id, e);
+  }
+  e.gain.gain.setTargetAtTime(staerke, a.ctx.currentTime, .4);
+}
+function ebeneAus(id) {
+  if (!_audio) return;
+  const e = _audio.ebenen.get(id);
+  if (!e) return;
+  e.gain.gain.setTargetAtTime(.0001, _audio.ctx.currentTime, .3);
+  setTimeout(() => { e.werk.stop(); try { e.gain.disconnect(); } catch (x) {} }, 1200);
+  _audio.ebenen.delete(id);
+}
+function mischungAnwenden(pegel) {
+  D.einst.mischung = pegel || {};
+  speichereEinst();
+  const gewollt = new Set(Object.keys(D.einst.mischung).filter((k) => D.einst.mischung[k] > 0));
+  if (_audio) for (const id of [..._audio.ebenen.keys()]) { if (!gewollt.has(id)) ebeneAus(id); }
+  for (const id of gewollt) ebeneAn(id, D.einst.mischung[id]);
+}
+function alleKlaengeAus() { mischungAnwenden({}); }
+function klangAktiv() { return Object.values(D.einst.mischung || {}).some((v) => v > 0); }
+
+/* ----- Einzelklänge ----- */
 function glocke() {
   try {
     const a = holeAudio();
     const t = a.ctx.currentTime;
-    for (const [freq, staerke] of [[660, .12], [1320, .05], [1980, .02]]) {
+    for (const [freq, staerke] of [[660, .1], [1320, .04], [1980, .015]]) {
       const o = a.ctx.createOscillator();
       o.frequency.value = freq;
       const g = a.ctx.createGain();
@@ -3552,27 +4820,135 @@ function glocke() {
 function tippKlick() {
   try {
     const a = holeAudio();
-    const k = a.ctx.createBufferSource();
-    k.buffer = rauschPuffer(a.ctx, .015);
-    const hoch = a.ctx.createBiquadFilter(); hoch.type = 'highpass'; hoch.frequency.value = 2600;
+    const b = a.ctx.createBufferSource();
+    b.buffer = _rauschpuffer(a, 'weiss'); b.loop = true;
+    const f = a.ctx.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 2600;
     const g = a.ctx.createGain();
-    g.gain.setValueAtTime(.05, a.ctx.currentTime);
+    g.gain.setValueAtTime(.04, a.ctx.currentTime);
     g.gain.exponentialRampToValueAtTime(.0001, a.ctx.currentTime + .02);
-    k.connect(hoch); hoch.connect(g); g.connect(a.master);
-    k.start();
+    b.connect(f); f.connect(g); g.connect(a.master);
+    b.start(); b.stop(a.ctx.currentTime + .03);
   } catch (e) {}
+}
+/* ================================================================
+   VANI — Klang: der Atmosphären-Fundus
+   ================================================================ */
+
+function baueMischpult(kompakt) {
+  const wurzel = el('div', { class: 'mischpult' + (kompakt ? ' kompakt' : '') });
+
+  /* Szenen */
+  const szenen = el('div', { class: 'szenenchips' });
+  const eigene = vomTyp('mischung');
+  const alleSzenen = [...KLANG_SZENEN.map((s) => ({ name: s.name, pegel: s.pegel })),
+                      ...eigene.map((m) => ({ name: m.titel, pegel: m.pegel, doc: m }))];
+  for (const s of alleSzenen) {
+    const chip = el('button', { class: 'szenenchip', onclick: () => { mischungAnwenden(Object.assign({}, s.pegel)); baueRegler(); } }, s.name);
+    if (s.doc) langdruck(chip, async () => {
+      if (await frage('„' + s.name + '" aus den eigenen Szenen nehmen?', { ja: 'Entfernen', gefahr: true })) {
+        await loesche(s.doc.id, true); zeichne();
+      }
+    });
+    szenen.append(chip);
+  }
+  szenen.append(el('button', { class: 'szenenchip leiser', onclick: () => { alleKlaengeAus(); baueRegler(); } }, 'Stille'));
+
+  wurzel.append(el('div', { class: 'kartenkopf' }, el('span', { html: ik('woerter') }), 'SZENEN'), szenen);
+
+  /* Regler nach Kategorien */
+  const reglerhalter = el('div');
+  wurzel.append(reglerhalter);
+
+  function baueRegler() {
+    reglerhalter.innerHTML = '';
+    const misch = D.einst.mischung || {};
+    for (const kat of KLANG_KATEGORIEN) {
+      const block = el('div', { class: 'klangblock' });
+      block.append(el('div', { class: 'kartenkopf', style: 'margin-top:14px' }, kat.toUpperCase()));
+      for (const ebene of KLANG_EBENEN.filter((e) => e.kat === kat)) {
+        const wert = misch[ebene.id] || 0;
+        const schieber = el('input', { type: 'range', min: '0', max: '100', value: String(Math.round(wert * 100)) });
+        const zeile = el('div', { class: 'klangzeile' + (wert > 0 ? ' an' : '') },
+          el('button', {
+            class: 'klangname', onclick: () => {
+              const m = D.einst.mischung || {};
+              if ((m[ebene.id] || 0) > 0) { delete m[ebene.id]; }
+              else { m[ebene.id] = .5; schieber.value = '50'; }
+              mischungAnwenden(m);
+              zeile.classList.toggle('an', !!m[ebene.id]);
+            }
+          }, ebene.name),
+          schieber
+        );
+        schieber.addEventListener('input', () => {
+          const m = D.einst.mischung || {};
+          const v = parseInt(schieber.value, 10) / 100;
+          if (v > 0) { m[ebene.id] = v; } else { delete m[ebene.id]; }
+          mischungAnwenden(m);
+          zeile.classList.toggle('an', v > 0);
+        });
+        block.append(zeile);
+      }
+      reglerhalter.append(block);
+    }
+
+    /* Lautstärke + Speichern */
+    const laut = el('input', { type: 'range', min: '0', max: '100', value: String(Math.round((D.einst.lautstaerke ?? .5) * 100)) });
+    laut.addEventListener('input', () => setzeLautstaerke(parseInt(laut.value, 10) / 100));
+    reglerhalter.append(el('div', { class: 'klangfuss' },
+      el('div', { class: 'klangzeile an', style: 'box-shadow:none' }, el('span', { class: 'klangname', style: 'font-weight:600' }, 'Gesamt'), laut),
+      el('button', {
+        class: 'knopf', onclick: async () => {
+          const m = D.einst.mischung || {};
+          if (!Object.keys(m).length) { toast('Erst etwas mischen.'); return; }
+          const name = await eingabe({ titel: 'Diese Mischung heißt …', platzhalter: 'z. B. Regen überm Schreibtisch' });
+          if (!name) return;
+          neuDoc('mischung', { titel: name, pegel: Object.assign({}, m) });
+          toast('Gemerkt als Szene.');
+          zeichne();
+        }
+      }, 'Mischung merken')
+    ));
+  }
+  baueRegler();
+  return wurzel;
+}
+
+RENDER.klang = function (haupt) {
+  haupt.append(raumkopf('Klang', 'alles errechnet, nichts geladen — mischen erlaubt'));
+  const inhalt = el('div', { class: 'inhalt' });
+  inhalt.append(baueMischpult(false));
+  haupt.append(inhalt);
+};
+
+/* Kompakte Fassung als Überlagerung (aus dem Schreibraum) */
+function oeffneMischpult() {
+  const kasten = el('div', { class: 'modal', style: 'width:min(560px,calc(100vw - 40px))' },
+    el('h2', {}, 'Klang'),
+    baueMischpult(true),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Fertig'))
+  );
+  const zu = zeigeDeck(kasten);
 }
 /* ================================================================
    VANI — Aufwachen
    ================================================================ */
 
 (async function start() {
+  const startzeit = Date.now();
   try {
     await ladeAlles();
   } catch (e) {
     document.body.innerHTML = '<div style="padding:60px;text-align:center;font-family:Georgia,serif">Der Speicher wollte nicht aufwachen. Einmal neu öffnen hilft fast immer.</div>';
     return;
   }
+
+  /* Umzüge von früheren Fassungen */
+  if (typeof D.einst.klang === 'string' && D.einst.klang !== 'aus' && !Object.keys(D.einst.mischung || {}).length) {
+    const alt = { regen: 'regenfenster', kamin: 'kamin', wind: 'wind', grillen: 'grillen' }[D.einst.klang];
+    if (alt) D.einst.mischung = { [alt]: .5 };
+  }
+  delete D.einst.klang;
 
   /* Erste Saat */
   if (!(await dbGet('kv', 'gesaet'))) {
@@ -3582,12 +4958,24 @@ function tippKlick() {
     await dbPut('kv', 1, 'gesaet');
   }
 
+  /* Faden von allein zeigen, sobald es einen gibt */
+  raumConfig();
+  if ([...D.docs.values()].some((d) => d.typ === 'faden')) {
+    const f = D.einst.raeume.find((x) => x.id === 'faden');
+    if (f && !f.an && !D.einst.fadenAbgewaehlt) f.an = true;
+  }
+
   setzeThema(D.einst.thema);
   baueLeiste();
   zeichne();
 
   /* Speicher festhalten */
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+
+  /* Nichts verlieren, auch wenn iOS die App wegwirft */
+  const notSicherung = () => { try { spueleAlles(); } catch (e) {} };
+  window.addEventListener('pagehide', notSicherung);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') notSicherung(); });
 
   /* Tastatur-Höhe (iPad) */
   if (window.visualViewport) {
@@ -3596,20 +4984,45 @@ function tippKlick() {
     };
     window.visualViewport.addEventListener('resize', anpassen);
     anpassen();
+    window.addEventListener('focusout', () => setTimeout(anpassen, 250));
   }
 
   /* Klang wieder aufnehmen? Erst nach der ersten Berührung erlaubt. */
-  if (D.einst.klang && D.einst.klang !== 'aus') {
+  if (Object.values(D.einst.mischung || {}).some((v) => v > 0)) {
     const einmal = () => {
-      document.removeEventListener('pointerdown', einmal);
-      try { klangSetzen(D.einst.klang); } catch (e) {}
+      try { mischungAnwenden(D.einst.mischung); } catch (e) {}
     };
     document.addEventListener('pointerdown', einmal, { once: true });
   }
 
+  /* Papierkorb: sehr Altes still wegräumen */
+  setTimeout(() => { papierkorbLeeren(30).catch(() => {}); }, 4000);
+
   /* Service Worker — nur wo es ihn gibt */
   if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !location.search.includes('kein-sw')) {
-    try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {}
+    try {
+      navigator.serviceWorker.register('sw.js').then((reg) => {
+        reg.addEventListener('updatefound', () => {
+          const neu = reg.installing;
+          if (!neu) return;
+          neu.addEventListener('statechange', () => {
+            if (neu.state === 'installed' && navigator.serviceWorker.controller) {
+              toastMitAktion('Eine neue Fassung liegt bereit.', 'Neu laden', () => location.reload(), 8000);
+            }
+          });
+        });
+      }).catch(() => {});
+    } catch (e) {}
+  }
+
+  /* Vorhang auf */
+  const vorhang = $('#vorhang');
+  if (vorhang) {
+    const warte = Math.max(0, 650 - (Date.now() - startzeit));
+    setTimeout(() => {
+      vorhang.classList.add('auf');
+      setTimeout(() => vorhang.remove(), 700);
+    }, warte);
   }
 })();
 </script>

@@ -116,6 +116,7 @@ async function schnipselMenue(s, blase, neuZeichnen) {
 
 async function verwandleSchnipsel(s, neuZeichnen) {
   const ziel = await menue([
+    { text: 'Als Blatt in den Stapel', icon: 'blatt', wert: 'blatt' },
     { text: 'Auf eine Heftseite kleben', icon: 'hefte', wert: 'seite' },
     { text: 'Als Szene in ein Projekt', icon: 'projekte', wert: 'szene' },
     { text: 'Als Blase auf ein Brett', icon: 'cluster', wert: 'blase' },
@@ -123,6 +124,13 @@ async function verwandleSchnipsel(s, neuZeichnen) {
   ], 'Woraus soll das werden?');
   if (!ziel) return;
 
+  if (ziel === 'blatt') {
+    blattAusText('', s.text || '');
+    await loesche(s.id, true);
+    toast('Liegt jetzt bei den Blättern.');
+    if (neuZeichnen) neuZeichnen();
+    return;
+  }
   if (ziel === 'wort') {
     neuDoc('wort', { text: (s.text || '').slice(0, 60) });
     toast('Liegt in der Wortschatzkiste.');

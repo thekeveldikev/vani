@@ -77,7 +77,7 @@ async function heftMenue(h, danach) {
     delete h.archiv; speichereStill(h);
   } else if (wahl === 'weg') {
     const seiten = kinder(h.id, 'seite').length;
-    if (await frage('„' + h.titel + '" mit ' + (seiten === 1 ? 'einer Seite' : seiten + ' Seiten') + ' endgültig verbrennen?', { ja: 'Verbrennen', gefahr: true })) {
+    if (await frage('„' + h.titel + '" mit ' + (seiten === 1 ? 'einer Seite' : seiten + ' Seiten') + ' in den Papierkorb legen?', { ja: 'In den Papierkorb', gefahr: true })) {
       await loesche(h.id);
       if (location.hash.includes(h.id)) location.hash = '#/hefte';
     }

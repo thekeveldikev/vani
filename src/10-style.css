@@ -49,6 +49,21 @@ html[data-thema="kerze"] {
   --deck: rgba(12, 7, 0, .6);
   --korn: .4;
 }
+html[data-thema="weiss"] {
+  --hg: #ffffff;
+  --hg2: #f6f6f6;
+  --papier: #ffffff;
+  --tinte: #1a1a1a;
+  --blass: #8a8a8a;
+  --linie: rgba(0, 0, 0, .1);
+  --akzent: #1a1a1a;
+  --akzent2: #555555;
+  --gold: #999999;
+  --karte: #fafafa;
+  --schein: rgba(0, 0, 0, .07);
+  --deck: rgba(0, 0, 0, .3);
+  --korn: 0;
+}
 html[data-thema="nebel"] {
   --hg: #e2e5e1;
   --hg2: #d7dcd8;
@@ -76,10 +91,11 @@ body {
   background: var(--hg);
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
-  touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
+button, .lknopf, .knopf, .rundknopf, input[type="range"] { touch-action: manipulation; }
 textarea, input { user-select: text; -webkit-user-select: text; font-family: inherit; color: inherit; }
 textarea { resize: none; border: none; outline: none; background: transparent; }
 input { border: none; outline: none; background: transparent; }
@@ -640,3 +656,105 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22p
   .kopf { padding-left: 16px; padding-right: 16px; }
   .schnipsel-raum { height: calc(100dvh - 0px); }
 }
+
+/* ================================================================
+   Vorhang: das Streichholz beim Aufwachen
+   ================================================================ */
+#vorhang {
+  position: fixed; inset: 0; z-index: 2000;
+  background: var(--hg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px;
+  transition: opacity .6s ease;
+}
+#vorhang.auf { opacity: 0; pointer-events: none; }
+#vorhang .streichholz { position: relative; width: 8px; height: 62px; }
+#vorhang .docht { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 7px; height: 46px; border-radius: 4px; background: linear-gradient(var(--blass), var(--tinte)); opacity: .55; }
+#vorhang .flamme-gross {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 26px; height: 34px;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: radial-gradient(circle at 50% 72%, #fff3c4, #f2a93b 60%, rgba(242,169,59,0));
+  animation: flackern 1.6s ease-in-out infinite, entzuenden .8s ease-out;
+  filter: drop-shadow(0 0 22px rgba(242, 169, 59, .55));
+}
+@keyframes entzuenden { from { transform: translateX(-50%) scale(.1); opacity: 0; } 60% { opacity: 1; } }
+#vorhang .vorhang-wort {
+  font-family: ui-serif, "New York", Georgia, serif;
+  font-size: 26px; letter-spacing: .34em; padding-left: .34em; font-weight: 600;
+  color: var(--tinte); opacity: 0;
+  animation: wortkommt 1s ease .25s forwards;
+}
+@keyframes wortkommt { to { opacity: .9; } }
+
+/* Toast mit Knopf */
+.toast.anfassbar { pointer-events: auto; display: flex; gap: 14px; align-items: center; }
+.toastaktion { color: var(--gold); font-weight: 600; font-size: 15px; }
+
+/* Such-Chips */
+.suchchips { display: flex; gap: 7px; overflow-x: auto; padding: 10px 14px 4px; -webkit-overflow-scrolling: touch; }
+.suchchip { flex: none; padding: 5px 12px; border-radius: 100px; font-size: 12.5px; color: var(--blass); background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.suchchip.an { background: var(--akzent); color: var(--papier); box-shadow: none; }
+.suchtreffer mark { background: none; color: var(--akzent); font-weight: 600; }
+
+/* Blätter */
+.blattliste { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 13px; }
+.blattkarte { text-align: left; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.blattkarte .btitel { font-size: 18px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.blattkarte .bprobe { font-family: ui-serif, Georgia, serif; font-size: 13.5px; font-style: italic; color: var(--blass); line-height: 1.45; min-height: 38px; }
+.blattkarte .bfuss { font-size: 12px; color: var(--blass); }
+
+/* Faden */
+.fadenblase { align-self: flex-start; border-radius: 17px 17px 17px 5px; }
+
+/* Klang / Mischpult */
+.mischpult { max-width: 720px; }
+.szenenchips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+.szenenchip { padding: 8px 14px; border-radius: 100px; font-size: 13.5px; background: var(--karte); box-shadow: 0 1px 4px var(--schein), inset 0 0 0 1px var(--linie); font-family: ui-serif, Georgia, serif; }
+.szenenchip:active { transform: scale(.95); }
+.szenenchip.leiser { color: var(--blass); box-shadow: inset 0 0 0 1px var(--linie); }
+.klangzeile {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 13px; border-radius: 12px; margin-bottom: 6px;
+  background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie);
+  opacity: .62;
+}
+.klangzeile.an { opacity: 1; box-shadow: inset 0 0 0 1.5px var(--akzent2); }
+.klangzeile .klangname { flex: 1; text-align: left; font-size: 15.5px; }
+.klangzeile input[type="range"] { width: 40%; max-width: 190px; }
+.klangfuss { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.mischpult.kompakt .klangzeile { padding: 6px 11px; margin-bottom: 4px; }
+.klang-an { color: var(--akzent2) !important; }
+.klang-an svg.ik { filter: drop-shadow(0 0 5px var(--akzent2)); }
+
+/* Schalter */
+.schalter { width: 46px; height: 28px; border-radius: 100px; background: var(--linie); position: relative; transition: background .2s; flex: none; }
+.schalter i { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--papier); box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: left .2s; }
+.schalter.an { background: var(--akzent2); }
+.schalter.an i { left: 21px; }
+
+/* Sonderzeichenleiste im Schreibraum */
+.zeichenleiste {
+  display: flex; gap: 4px; justify-content: center;
+  padding: 6px 10px calc(env(safe-area-inset-bottom) / 2 + 6px);
+  background: var(--hg2); border-top: 1px solid var(--linie);
+}
+.zeichenleiste button {
+  min-width: 44px; padding: 7px 0; border-radius: 10px;
+  font-family: ui-serif, Georgia, serif; font-size: 19px; line-height: 1;
+  background: var(--papier); box-shadow: inset 0 0 0 1px var(--linie);
+}
+.zeichenleiste button:active { background: var(--akzent); color: var(--papier); }
+
+/* Schreibfeuer, neu gesetzt */
+.feuerkarte .feuer-zeile { display: flex; align-items: center; gap: 18px; }
+.feuer-flamme { width: 44px; height: 52px; flex: none; align-self: flex-end; }
+.feuer-zahlen .gross { font-size: 30px; line-height: 1.1; font-weight: 700; font-family: ui-serif, "New York", Georgia, serif; font-variant-numeric: tabular-nums; }
+.feuer-zahlen .einheit { font-size: 13px; color: var(--blass); margin-top: 1px; }
+.feuer-zahlen .klein { font-size: 12.5px; color: var(--blass); margin-top: 6px; }
+.zielbalken i.geschafft { background: var(--akzent2); }
+
+/* Karten heben sich beim Ziehen */
+.szkarte { -webkit-user-select: none; user-select: none; }
+.szkarte.zieht { opacity: .3; }
+.szgeist { box-shadow: 0 14px 34px rgba(0,0,0,.3); border-radius: 13px; transform: rotate(3deg) scale(1.04); }
+.szvorn .szprobe { -webkit-user-select: none; user-select: none; }

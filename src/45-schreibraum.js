@@ -1,5 +1,5 @@
 /* ================================================================
-   VANI — Schreibraum: Vollbild, Fokus, Kerze
+   VANI — Schreibraum: Vollbild, Fokus, Kerze, Feinwerk
    ================================================================ */
 
 let _sr = null;
@@ -10,13 +10,12 @@ function oeffneSchreibraum(docId) {
   if (!doc) return;
 
   const startWorte = worte(doc.text);
-  const startZeit = Date.now();
 
   const titel = el('input', {
     class: 'sr-titel', type: 'text', value: doc.titel || '',
     placeholder: doc.typ === 'szene' ? 'Szene ohne Namen' : 'Ohne Titel'
   });
-  titel.addEventListener('input', entprellt(() => { doc.titel = titel.value; speichere(doc); }, 400));
+  titel.addEventListener('input', entprellt(() => { doc.titel = titel.value; speichere(doc); }, 400, true));
 
   const worteAnzeige = el('span', { class: 'sr-worte' }, String(startWorte));
   const kerzenhalter = el('div', { class: 'kerzenhalter' });
@@ -28,32 +27,66 @@ function oeffneSchreibraum(docId) {
   const spalte = el('div', { class: 'sr-spalte ' + (D.einst.breite || 'mittel') }, wrap);
   const mitte = el('div', { class: 'sr-mitte' }, spalte);
 
+  const klangKnopf = el('button', { class: 'rundknopf zart' + (klangAktiv() ? ' klang-an' : ''), html: ik('klang'), onclick: () => { oeffneMischpult(); } });
+
   const kopf = el('div', { class: 'sr-kopf' },
     el('button', { class: 'knopf', onclick: () => schliesseSchreibraum(true) }, el('span', { html: ik('haken'), style: 'display:flex' }), 'Fertig'),
     titel,
     kerzenhalter,
     worteAnzeige,
-    el('button', { class: 'rundknopf zart', html: ik('klang'), onclick: () => klangMenue() }),
+    klangKnopf,
     el('button', { class: 'rundknopf zart', html: ik('feinheiten'), onclick: () => srEinstellungen() })
   );
 
-  const raum = el('div', { class: 'schreibraum' }, kopf, mitte);
+  /* Sonderzeichen, immer griffbereit über der Tastatur */
+  const zeichen = ['–', '„', '"', '…', '‚', '’', '»', '«'];
+  const leiste = el('div', { class: 'zeichenleiste' },
+    zeichen.map((z) => el('button', {
+      onpointerdown: (e) => e.preventDefault(),
+      onclick: () => { fuegeEin(z); }
+    }, z === '’' ? '’' : z))
+  );
+
+  const raum = el('div', { class: 'schreibraum' }, kopf, mitte, leiste);
   document.body.append(raum);
-  _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, startZeit, sprint: null };
+  _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, sprint: null, klangKnopf };
 
   wendeSchriftAn();
+  wendeTastaturArtAn();
   autogrow(ta);
+
+  function fuegeEin(z) {
+    const s = ta.selectionStart, e = ta.selectionEnd;
+    ta.value = ta.value.slice(0, s) + z + ta.value.slice(e);
+    ta.setSelectionRange(s + z.length, s + z.length);
+    ta.dispatchEvent(new Event('input'));
+    ta.focus();
+  }
 
   const sichern = entprellt(() => {
     doc.text = ta.value;
     speichere(doc);
     zaehleWorte(doc.id, doc.text);
-  }, 500);
+  }, 500, true);
+  _sr.sichern = sichern;
+
+  /* Deutsche Feder: -- wird –, gerade Anführungszeichen werden „so" */
+  function ersetzeKlug() {
+    if (!D.einst.ersetzungen) return;
+    const erg = klugeZeichen(ta.value, ta.selectionStart);
+    if (erg) {
+      ta.value = erg.text;
+      ta.setSelectionRange(erg.caret, erg.caret);
+    }
+  }
 
   let zielKlangGespielt = false;
   ta.addEventListener('input', () => {
+    ersetzeKlug();
     sichern();
-    worteAnzeige.textContent = String(worte(ta.value));
+    const n = worte(ta.value);
+    const dazu = n - startWorte;
+    worteAnzeige.textContent = String(n) + (dazu > 0 ? ' · +' + dazu : '');
     kopf.classList.add('versunken');
     aktualisiereSpiegel();
     if (D.einst.typewriter) zentriereZeile();
@@ -67,7 +100,7 @@ function oeffneSchreibraum(docId) {
     if (e.key === 'Escape') schliesseSchreibraum(true);
   });
   document.addEventListener('selectionchange', spiegelBeiAuswahl);
-  raum.addEventListener('pointerdown', () => kopf.classList.remove('versunken'));
+  raum.addEventListener('pointerdown', (e) => { if (!e.target.closest('.zeichenleiste')) kopf.classList.remove('versunken'); });
 
   aktualisiereSpiegel();
   setTimeout(() => {
@@ -75,8 +108,6 @@ function oeffneSchreibraum(docId) {
     ta.setSelectionRange(ta.value.length, ta.value.length);
     if (D.einst.typewriter) zentriereZeile();
   }, 80);
-
-  _sr.sichern = sichern;
 
   function spiegelBeiAuswahl() {
     if (!_sr || document.activeElement !== ta) return;
@@ -93,11 +124,8 @@ function schliesseSchreibraum(zurueck) {
   if (_sr.sprint) beendeSprint(true);
   const geschrieben = worte(_sr.ta.value) - _sr.startWorte;
   _sr.raum.remove();
-  const doc = _sr.doc;
   _sr = null;
-  if (zurueck && geschrieben > 30) {
-    toast('+' + geschrieben + ' Wörter. Gut gemacht.');
-  }
+  if (zurueck && geschrieben > 30) toast('+' + geschrieben + ' Wörter. Gut gemacht.');
   zeichne();
 }
 
@@ -110,11 +138,17 @@ function wendeSchriftAn() {
     if (s.schrift === 'mono') zielEl.classList.add('mono');
   }
   _sr.spalte.className = 'sr-spalte ' + (s.breite || 'mittel');
-  _sr.spalte.style.setProperty('--sr-groesse', s.groesse + 'px');
   _sr.ta.style.fontSize = s.groesse + 'px';
   _sr.spiegel.style.fontSize = s.groesse + 'px';
   _sr.raum.classList.toggle('sr-fokus', !!s.fokus);
   aktualisiereSpiegel();
+}
+function wendeTastaturArtAn() {
+  if (!_sr) return;
+  const an = D.einst.autokorrektur;
+  _sr.ta.setAttribute('autocorrect', an ? 'on' : 'off');
+  _sr.ta.setAttribute('autocapitalize', an ? 'sentences' : 'off');
+  _sr.ta.setAttribute('spellcheck', an ? 'true' : 'false');
 }
 
 function aktualisiereSpiegel() {
@@ -130,20 +164,20 @@ function aktualisiereSpiegel() {
   spiegel.innerHTML = esc(t.slice(0, anfang)) + '<mark>' + esc(t.slice(anfang, ende)) + '</mark>' + esc(t.slice(ende)) + '\n';
 }
 
+let _messer = null;
 function zentriereZeile() {
   if (!_sr) return;
   const { ta, mitte } = _sr;
   const stil = getComputedStyle(ta);
-  const zh = parseFloat(stil.lineHeight) || 32;
-  const bisCaret = ta.value.slice(0, ta.selectionStart || 0);
-  const messer = el('div', {
-    class: ta.className.replace('sr-text', 'sr-spiegel'),
-    style: 'position:absolute;inset:auto;top:0;left:0;visibility:hidden;width:' + ta.clientWidth + 'px;font-size:' + stil.fontSize + ';line-height:' + stil.lineHeight + ';white-space:pre-wrap;word-wrap:break-word'
-  });
-  messer.textContent = bisCaret || ' ';
-  ta.parentElement.append(messer);
-  const caretY = messer.offsetHeight;
-  messer.remove();
+  if (!_messer || _messer.parentElement !== ta.parentElement) {
+    if (_messer) _messer.remove();
+    _messer = el('div', { class: 'sr-spiegel text', style: 'position:absolute;inset:auto;top:0;left:0;visibility:hidden' });
+    ta.parentElement.append(_messer);
+  }
+  _messer.className = ta.className.replace('sr-text', 'sr-spiegel');
+  _messer.style.cssText = 'position:absolute;inset:auto;top:0;left:0;visibility:hidden;width:' + ta.clientWidth + 'px;font-size:' + stil.fontSize + ';line-height:' + stil.lineHeight + ';white-space:pre-wrap;word-wrap:break-word';
+  _messer.textContent = ta.value.slice(0, ta.selectionStart || 0) || ' ';
+  const caretY = _messer.offsetHeight;
   const zielY = ta.offsetTop + caretY - mitte.clientHeight * .42;
   mitte.scrollTo({ top: Math.max(0, zielY) });
 }
@@ -151,6 +185,7 @@ function zentriereZeile() {
 /* ----- Einstellungen im Schreibraum ----- */
 function srEinstellungen() {
   const s = D.einst;
+  const doc = _sr.doc;
   const zeileFuer = (name, inhalt) => el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, name), inhalt);
   const wahl = (optionen, aktiv, tu) => {
     const g = el('div', { class: 'wahlgruppe' });
@@ -161,6 +196,7 @@ function srEinstellungen() {
           $$('button', g).forEach((b) => b.classList.toggle('an', b === e.currentTarget));
           speichereEinst();
           wendeSchriftAn();
+          wendeTastaturArtAn();
         }
       }, name));
     }
@@ -177,10 +213,14 @@ function srEinstellungen() {
     zeileFuer('Schreibmaschine', wahl([[true, 'An'], [false, 'Aus']], s.typewriter, (v) => { s.typewriter = v; })),
     zeileFuer('Zeilen-Fokus', wahl([[true, 'An'], [false, 'Aus']], s.fokus, (v) => { s.fokus = v; })),
     zeileFuer('Tastenklang', wahl([[true, 'An'], [false, 'Aus']], s.tastenklang, (v) => { s.tastenklang = v; })),
-    el('div', { class: 'reihe', style: 'justify-content:space-between' },
-      el('button', {
-        class: 'knopf', onclick: () => { zu(); zeigeVerknuepfungen(_sr.doc); }
-      }, el('span', { html: ik('verbinden'), style: 'display:flex' }), 'Verknüpfungen'),
+    zeileFuer('„Kluge Zeichen"', wahl([[true, 'An'], [false, 'Aus']], s.ersetzungen, (v) => { s.ersetzungen = v; })),
+    zeileFuer('Autokorrektur', wahl([[true, 'An'], [false, 'Aus']], s.autokorrektur, (v) => { s.autokorrektur = v; })),
+    el('div', { class: 'reihe', style: 'justify-content:flex-start;flex-wrap:wrap;gap:8px' },
+      el('button', { class: 'knopf', onclick: () => { zu(); sucheErsetze(); } }, el('span', { html: ik('suche'), style: 'display:flex' }), 'Suchen & Ersetzen'),
+      el('button', { class: 'knopf', onclick: () => { zu(); friereEin(); } }, el('span', { html: ik('frieren'), style: 'display:flex' }), 'Stand einfrieren'),
+      (doc.staende && doc.staende.length) ? el('button', { class: 'knopf', onclick: () => { zu(); zeigeStaende(); } }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Frühere Stände (' + doc.staende.length + ')') : null,
+      el('button', { class: 'knopf', onclick: () => { zu(); teileText((doc.titel ? doc.titel + '\n\n' : '') + _sr.ta.value); } }, el('span', { html: ik('teilen'), style: 'display:flex' }), 'Teilen'),
+      el('button', { class: 'knopf', onclick: () => { zu(); zeigeVerknuepfungen(doc); } }, el('span', { html: ik('verbinden'), style: 'display:flex' }), 'Verknüpfungen'),
       el('button', {
         class: 'knopf', onclick: async () => {
           zu();
@@ -195,6 +235,97 @@ function srEinstellungen() {
     )
   );
   const zu = zeigeDeck(kasten);
+}
+
+/* ----- Stände (Schnappschüsse) ----- */
+function friereEin() {
+  if (!_sr) return;
+  const doc = _sr.doc;
+  doc.staende = doc.staende || [];
+  doc.staende.push({ wann: Date.now(), titel: doc.titel || '', text: _sr.ta.value });
+  if (doc.staende.length > 20) doc.staende.shift();
+  speichereStill(doc);
+  toast('Eingefroren. Dieser Stand bleibt.');
+}
+function zeigeStaende() {
+  if (!_sr) return;
+  const doc = _sr.doc;
+  const kasten = el('div', { class: 'menue' },
+    el('div', { class: 'mtitel' }, 'EINGEFRORENE STÄNDE'),
+    [...(doc.staende || [])].reverse().map((st) => el('button', {
+      onclick: async () => {
+        zu();
+        const wahl = await menue([
+          { text: 'Zurückholen (Jetziges wird eingefroren)', icon: 'wieder', wert: 'zurueck' },
+          { text: 'Nur ansehen', icon: 'lesen', wert: 'sehen' },
+          { text: 'Diesen Stand vergessen', icon: 'muell', wert: 'weg', rot: true }
+        ], fmtDatum(st.wann) + ', ' + fmtZeit(st.wann));
+        if (wahl === 'zurueck') {
+          friereEin();
+          _sr.ta.value = st.text;
+          _sr.doc.titel = st.titel;
+          _sr.sichern.sofort();
+          zeichne();
+          toast('Zurückgeholt.');
+        } else if (wahl === 'sehen') {
+          const bogen = el('div', { class: 'lesebogen' },
+            el('div', { class: 'innen' },
+              el('h1', {}, st.titel || 'Stand vom ' + fmtDatum(st.wann)),
+              el('div', { class: 'lmeta' }, worte(st.text) + ' Wörter · eingefroren ' + fmtDatum(st.wann) + ', ' + fmtZeit(st.wann)),
+              el('div', { class: 'lesetext' }, st.text)));
+          const leiste2 = el('div', { class: 'schwebeleiste' },
+            el('button', { class: 'rundknopf zart', html: ik('kreuz'), onclick: () => { bogen.remove(); leiste2.remove(); } }));
+          document.body.append(bogen, leiste2);
+        } else if (wahl === 'weg') {
+          doc.staende = doc.staende.filter((x) => x !== st);
+          speichereStill(doc);
+        }
+      }
+    },
+      el('span', { html: ik('frieren'), style: 'display:flex' }),
+      fmtDatum(st.wann) + ' · ' + fmtZeit(st.wann) + ' · ' + worte(st.text) + ' W.'))
+  );
+  const zu = zeigeDeck(kasten);
+}
+
+/* ----- Suchen & Ersetzen (im offenen Text) ----- */
+function sucheErsetze() {
+  if (!_sr) return;
+  const ta = _sr.ta;
+  const suchFeld = el('input', { type: 'text', placeholder: 'suchen …' });
+  const ersatzFeld = el('input', { type: 'text', placeholder: 'ersetzen durch …' });
+  const zaehler = el('div', { style: 'font-size:13px;color:var(--blass);margin-top:8px' }, '');
+  const zaehle = () => {
+    const q = suchFeld.value;
+    if (!q) { zaehler.textContent = ''; return 0; }
+    const n = ta.value.split(q).length - 1;
+    zaehler.textContent = n === 0 ? 'Kommt nicht vor.' : n === 1 ? 'Einmal gefunden.' : n + ' Treffer.';
+    return n;
+  };
+  suchFeld.addEventListener('input', zaehle);
+  const kasten = el('div', { class: 'modal' },
+    el('h2', {}, 'Suchen & Ersetzen'),
+    suchFeld,
+    el('div', { style: 'margin-top:10px' }, ersatzFeld),
+    zaehler,
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
+      el('button', {
+        class: 'knopf voll', onclick: () => {
+          const n = zaehle();
+          if (!n) { toast('Nichts zu ersetzen.'); return; }
+          friereEin();
+          ta.value = ta.value.split(suchFeld.value).join(ersatzFeld.value);
+          _sr.sichern.sofort();
+          ta.dispatchEvent(new Event('input'));
+          zu();
+          toast(n === 1 ? 'Einmal ersetzt.' : n + '-mal ersetzt. Der alte Stand ist eingefroren.');
+        }
+      }, 'Ersetzen')
+    )
+  );
+  const zu = zeigeDeck(kasten);
+  setTimeout(() => suchFeld.focus(), 60);
 }
 
 /* ----- Sprint: die Kerze ----- */
@@ -224,7 +355,12 @@ function beendeSprint(abgebrochen) {
   if (!abgebrochen) {
     const geschrieben = worte(_sr.ta.value) - sp.startWorte;
     glocke();
-    const klangDazu = D.einst.klang !== 'aus' ? { regen: ' Der Regen fällt weiter.', kamin: ' Das Feuer knistert noch.', wind: ' Der Wind hat gedreht.', grillen: ' Die Grillen bleiben.' }[D.einst.klang] || '' : '';
+    const m = D.einst.mischung || {};
+    const klangDazu = m.regenfenster || m.regendach || m.platzregen ? ' Der Regen fällt weiter.'
+      : m.kamin ? ' Das Feuer knistert noch.'
+      : m.wind || m.schneesturm ? ' Der Wind hat gedreht.'
+      : m.grillen ? ' Die Grillen bleiben.'
+      : m.brandung ? ' Das Meer bleibt da.' : '';
     toast('Ein Atemzug Rauch. ' + geschrieben + ' Wörter in ' + sp.minuten + ' Minuten.' + klangDazu, 4200);
   }
 }
@@ -242,25 +378,13 @@ function zeigeVerknuepfungen(doc) {
   const herein = rueckverweise(doc);
   const eintrag = (d) => el('button', {
     onclick: () => { zu(); if (_sr) schliesseSchreibraum(); oeffneDoc(d); }
-  }, el('span', { html: ik({ szene: 'projekte', seite: 'hefte', schnipsel: 'schnipsel', blase: 'cluster', wort: 'woerter' }[d.typ] || 'hefte'), style: 'display:flex' }),
+  }, el('span', { html: ik({ szene: 'projekte', seite: 'hefte', schnipsel: 'schnipsel', blase: 'cluster', wort: 'woerter', blatt: 'blatt', faden: 'faden' }[d.typ] || 'hefte'), style: 'display:flex' }),
     (d.titel || (d.text || '').slice(0, 44) || 'Ohne Titel'));
   const kasten = el('div', { class: 'menue' },
     el('div', { class: 'mtitel' }, 'FÜHRT HIN ZU'),
-    hinaus.length ? hinaus.map(eintrag) : el('div', { style: 'padding:6px 14px 12px;color:var(--blass);font-size:14px' }, 'Mit [[doppelten Klammern]] im Text verbindest du Orte miteinander.'),
+    hinaus.length ? hinaus.map(eintrag) : el('div', { style: 'padding:6px 14px 12px;color:var(--blass);font-size:14px' }, 'Mit [[doppelten Klammern]] im Text verbinden sich Orte miteinander.'),
     el('div', { class: 'mtitel' }, 'ZEIGT HIERHER'),
     herein.length ? herein.map(eintrag) : el('div', { style: 'padding:6px 14px 12px;color:var(--blass);font-size:14px' }, 'Noch nichts.')
   );
   const zu = zeigeDeck(kasten);
-}
-
-/* ----- Klang-Menü (nutzt 50-audio) ----- */
-async function klangMenue() {
-  const wahl = await menue([
-    { text: 'Stille', icon: 'kreuz', wert: 'aus' },
-    { text: 'Regen ans Fenster', icon: 'klang', wert: 'regen' },
-    { text: 'Kaminfeuer', icon: 'feuer', wert: 'kamin' },
-    { text: 'Wind ums Haus', icon: 'klang', wert: 'wind' },
-    { text: 'Grillen in der Nacht', icon: 'klang', wert: 'grillen' }
-  ], 'Was soll zu hören sein?');
-  if (wahl) klangSetzen(wahl);
 }

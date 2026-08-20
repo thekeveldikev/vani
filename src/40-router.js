@@ -3,20 +3,41 @@
    ================================================================ */
 
 const RENDER = {};
-const RAEUME = [
-  { id: 'zuhause', name: 'Zuhause', icon: 'zuhause' },
+const ALLE_RAEUME = [
+  { id: 'zuhause', name: 'Zuhause', icon: 'zuhause', fest: true },
   { id: 'schnipsel', name: 'Schnipsel', icon: 'schnipsel' },
+  { id: 'blaetter', name: 'Blätter', icon: 'blatt' },
   { id: 'hefte', name: 'Hefte', icon: 'hefte' },
   { id: 'projekte', name: 'Projekte', icon: 'projekte' },
   { id: 'cluster', name: 'Cluster', icon: 'cluster' },
-  { id: 'woerter', name: 'Wörter', icon: 'woerter' }
+  { id: 'woerter', name: 'Wörter', icon: 'woerter' },
+  { id: 'klang', name: 'Klang', icon: 'klang' },
+  { id: 'faden', name: 'Faden', icon: 'faden' }
 ];
+
+function standardRaeume() {
+  return ALLE_RAEUME.map((r) => ({ id: r.id, an: r.id !== 'faden' }));
+}
+function raumConfig() {
+  if (!Array.isArray(D.einst.raeume) || !D.einst.raeume.length) D.einst.raeume = standardRaeume();
+  /* neue Räume nachtragen, entfernte bereinigen */
+  for (const r of ALLE_RAEUME) {
+    if (!D.einst.raeume.some((x) => x.id === r.id)) D.einst.raeume.push({ id: r.id, an: r.id !== 'faden' });
+  }
+  D.einst.raeume = D.einst.raeume.filter((x) => ALLE_RAEUME.some((r) => r.id === x.id));
+  return D.einst.raeume;
+}
+function aktiveRaeume() {
+  return raumConfig()
+    .filter((x) => x.an || ALLE_RAEUME.find((r) => r.id === x.id).fest)
+    .map((x) => ALLE_RAEUME.find((r) => r.id === x.id));
+}
 
 function baueLeiste() {
   const l = $('#leiste');
   l.innerHTML = '';
   l.append(el('div', { class: 'wortmarke' }, 'V'));
-  for (const r of RAEUME) {
+  for (const r of aktiveRaeume()) {
     l.append(el('button', {
       class: 'lknopf', 'data-raum': r.id,
       onclick: () => { location.hash = '#/' + (r.id === 'zuhause' ? '' : r.id); }

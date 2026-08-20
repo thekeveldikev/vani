@@ -11,7 +11,8 @@ RENDER.feinheiten = function (haupt) {
     ['papier', 'Papier', '#f8f3e7', '#2c251c'],
     ['tinte', 'Tinte', '#211c17', '#eae0cd'],
     ['kerze', 'Kerze', '#2b1e0c', '#f2dfb6'],
-    ['nebel', 'Nebel', '#f4f6f2', '#2e3438']
+    ['nebel', 'Nebel', '#f4f6f2', '#2e3438'],
+    ['weiss', 'Weiß', '#ffffff', '#1a1a1a']
   ];
   const themen = el('div', { class: 'themenwahl' });
   for (const [id, name, hg, tinte] of THEMA_INFO) {
@@ -42,24 +43,39 @@ RENDER.feinheiten = function (haupt) {
         el('span', { class: 'ename' }, 'Schrift, Größe, Fokus …', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Stellst du direkt im Schreibraum ein — oben rechts.')))
     )));
 
-  /* Klang */
-  const klangwahl = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
-  const KLAENGE = [['aus', 'Stille'], ['regen', 'Regen'], ['kamin', 'Kamin'], ['wind', 'Wind'], ['grillen', 'Grillen']];
-  for (const [id, name] of KLAENGE) {
-    klangwahl.append(el('button', {
-      class: D.einst.klang === id ? 'an' : '', onclick: (e) => {
-        klangSetzen(id);
-        $$('button', klangwahl).forEach((b) => b.classList.toggle('an', b === e.currentTarget));
-      }
-    }, name));
+  /* Räume: an/aus und Reihenfolge */
+  const raumkarte = el('div', { class: 'karte' });
+  function baueRaumliste() {
+    raumkarte.innerHTML = '';
+    const cfg = raumConfig();
+    cfg.forEach((eintrag, i) => {
+      const info = ALLE_RAEUME.find((r) => r.id === eintrag.id);
+      raumkarte.append(el('div', { class: 'einstellzeile' },
+        el('span', { html: ik(info.icon), style: 'display:flex;color:var(--blass)' }),
+        el('span', { class: 'ename' }, info.name),
+        el('button', {
+          class: 'rundknopf zart', style: 'width:32px;height:32px' + (i === 0 ? ';opacity:.2;pointer-events:none' : ''), html: ik('auf'),
+          onclick: () => { [cfg[i - 1], cfg[i]] = [cfg[i], cfg[i - 1]]; speichereEinst(); baueLeiste(); baueRaumliste(); }
+        }),
+        el('button', {
+          class: 'rundknopf zart', style: 'width:32px;height:32px' + (i === cfg.length - 1 ? ';opacity:.2;pointer-events:none' : ''), html: ik('ab'),
+          onclick: () => { [cfg[i], cfg[i + 1]] = [cfg[i + 1], cfg[i]]; speichereEinst(); baueLeiste(); baueRaumliste(); }
+        }),
+        info.fest ? el('span', { style: 'width:52px;text-align:center;font-size:12px;color:var(--blass)' }, 'immer') :
+        el('button', {
+          class: 'schalter' + (eintrag.an ? ' an' : ''), onclick: (e) => {
+            eintrag.an = !eintrag.an;
+            e.currentTarget.classList.toggle('an', eintrag.an);
+            speichereEinst(); baueLeiste();
+          }
+        }, el('i'))
+      ));
+    });
   }
-  const laut = el('input', { type: 'range', min: '0', max: '100', value: String(Math.round(D.einst.lautstaerke * 100)) });
-  laut.addEventListener('input', () => { setzeLautstaerke(parseInt(laut.value, 10) / 100); });
-  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Klang'),
-    el('div', { class: 'karte' },
-      el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, 'Zu hören'), klangwahl),
-      el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, 'Lautstärke'), laut)
-    )));
+  baueRaumliste();
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Räume'),
+    el('div', { style: 'font-size:13.5px;color:var(--blass);margin:-6px 0 10px' }, 'Was du nicht brauchst, verschwindet aus der Leiste. Nichts geht dabei verloren.'),
+    raumkarte));
 
   /* Statistik */
   const gesamt = Object.values(D.stats.tage).reduce((a, b) => a + b, 0);
@@ -76,18 +92,58 @@ RENDER.feinheiten = function (haupt) {
       el('b', {}, String(d.getDate()))));
   }
   const anzahl = (typ) => [...D.docs.values()].filter((d) => d.typ === typ).length;
-  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Gezählt, nicht gewogen'),
+  const zaehlwerk = [
+    ['schnipsel', 'Schnipsel', 'Schnipsel'], ['blatt', 'Blatt', 'Blätter'],
+    ['seite', 'Seite', 'Seiten'], ['szene', 'Szene', 'Szenen']
+  ].map(([typ, einzahl, mehrzahl]) => {
+    const n = anzahl(typ);
+    return el('div', { class: 'z' }, el('b', {}, String(n)), el('span', {}, n === 1 ? einzahl : mehrzahl));
+  });
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Zahlen'),
     el('div', { class: 'karte' },
       balken,
       el('div', { class: 'zahlenreihe' },
         el('div', { class: 'z' }, el('b', {}, gesamt.toLocaleString('de-DE')), el('span', {}, 'Wörter insgesamt')),
         el('div', { class: 'z' }, el('b', {}, String(D.stats.tage[tagKey()] || 0)), el('span', {}, 'heute')),
         el('div', { class: 'z' }, el('b', {}, String(straehne())), el('span', {}, 'Tage in Folge')),
-        el('div', { class: 'z' }, el('b', {}, String(anzahl('schnipsel'))), el('span', {}, 'Schnipsel')),
-        el('div', { class: 'z' }, el('b', {}, String(anzahl('seite'))), el('span', {}, 'Seiten')),
-        el('div', { class: 'z' }, el('b', {}, String(anzahl('szene'))), el('span', {}, 'Szenen'))
+        zaehlwerk
       )
     )));
+
+  /* Papierkorb */
+  const korbKarte = el('div', { class: 'karte' });
+  async function baueKorb() {
+    korbKarte.innerHTML = '';
+    const alle = (await dbAlle('papierkorb')).sort((a, b) => b.wann - a.wann);
+    if (!alle.length) {
+      korbKarte.append(el('div', { style: 'color:var(--blass);font-size:14.5px' }, 'Leer. So soll es sein.'));
+      return;
+    }
+    for (const b of alle.slice(0, 30)) {
+      korbKarte.append(el('div', { class: 'einstellzeile' },
+        el('span', { class: 'ename' }, (b.name || b.typ),
+          el('div', { style: 'font-size:12px;color:var(--blass)' }, b.docs.length + (b.docs.length === 1 ? ' Ding · ' : ' Dinge · ') + vorZeit(b.wann))),
+        el('button', {
+          class: 'knopf', style: 'padding:6px 12px', onclick: async () => {
+            await holeZurueck(b.id); toast('Wieder da.'); baueKorb();
+          }
+        }, 'Zurückholen')
+      ));
+    }
+    korbKarte.append(el('div', { style: 'margin-top:12px' },
+      el('button', {
+        class: 'knopf zart', onclick: async () => {
+          if (await frage('Papierkorb endgültig leeren? Das ist die eine Stelle, an der Löschen wirklich löscht.', { ja: 'Endgültig leeren', gefahr: true })) {
+            await papierkorbLeeren();
+            baueKorb();
+          }
+        }
+      }, 'Endgültig leeren')));
+  }
+  baueKorb();
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Papierkorb'),
+    el('div', { style: 'font-size:13.5px;color:var(--blass);margin:-6px 0 10px' }, 'Gelöschtes liegt hier, 30 Tage lang mindestens. Nichts verschwindet einfach so.'),
+    korbKarte));
 
   /* Sicherung */
   const wann = D.stats.letzteSicherung;
@@ -171,7 +227,7 @@ function leseSicherung() {
     if (!datei) return;
     let paket;
     try { paket = JSON.parse(await datei.text()); } catch (e) { toast('Das ist keine VANI-Sicherung.'); return; }
-    if (!paket || paket.vani !== 1 || !Array.isArray(paket.docs)) { toast('Das ist keine VANI-Sicherung.'); return; }
+    if (!pruefeSicherung(paket)) { toast('Das ist keine VANI-Sicherung.'); return; }
     const modus = await menue([
       { text: 'Dazulegen (nichts geht verloren)', icon: 'plus', wert: 'dazu' },
       { text: 'Alles ersetzen', icon: 'wandel', wert: 'ersetzen', rot: true }

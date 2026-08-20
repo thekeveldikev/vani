@@ -29,7 +29,7 @@ RENDER.woerter = function (haupt) {
           { text: 'Aus der Kiste nehmen', icon: 'muell', wert: 'weg', rot: true }
         ], w.text);
         if (wahl === 'schreiben') {
-          const seite = seiteAusText('', w.text + ' —\n\n');
+          const seite = blattAusText('', w.text + ' —\n\n');
           oeffneSchreibraum(seite.id);
         } else if (wahl === 'edit') {
           const neu = await eingabe({ titel: 'Das Wort', wert: w.text });
@@ -77,7 +77,7 @@ RENDER.woerter = function (haupt) {
     el('button', {
       class: 'knopf voll', onclick: () => {
         if (!griff.length) { toast('Erst schütteln.'); return; }
-        const seite = seiteAusText('', griff.map((w) => w.text).join(' · ') + '\n\n');
+        const seite = blattAusText('', griff.map((w) => w.text).join(' · ') + '\n\n');
         oeffneSchreibraum(seite.id);
       }
     }, 'Damit schreiben')
@@ -95,7 +95,7 @@ RENDER.woerter = function (haupt) {
       el('button', { class: 'knopf', onclick: () => { funke = neuerFunke(true); funkeText.textContent = funke; } }, 'Wer · Wo · Aber'),
       el('button', {
         class: 'knopf voll', onclick: () => {
-          const seite = seiteAusText('', funke + '\n\n');
+          const seite = blattAusText('', funke + '\n\n');
           oeffneSchreibraum(seite.id);
         }
       }, 'Dem nachgehen')

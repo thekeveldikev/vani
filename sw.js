@@ -1,5 +1,5 @@
 /* VANI Service Worker — Cache-first, aktualisiert leise im Hintergrund. */
-const CACHE = 'vani-v1';
+const CACHE = 'vani-v2';
 const KERN = [
   './',
   './index.html',

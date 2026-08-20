@@ -92,7 +92,7 @@ async function projektMenue(p, danach) {
     zeigeLeseansicht(p);
     return;
   } else if (wahl === 'weg') {
-    if (await frage('„' + p.titel + '" mit allem darin löschen? Das lässt sich nicht zurückholen.', { ja: 'Löschen', gefahr: true })) {
+    if (await frage('„' + p.titel + '" mit allem darin in den Papierkorb legen?', { ja: 'In den Papierkorb', gefahr: true })) {
       await loesche(p.id);
       location.hash = '#/projekte';
       return;
@@ -231,33 +231,50 @@ function baueSzenenkarte(s, p) {
   return karte;
 }
 
-/* Ziehen, Tippen, Langdruck auf Szenenkarten */
+/* Halten hebt die Karte an, dann ziehen; kurzes Tippen öffnet. */
 function szenenGesten(karte, s, p) {
-  let start = null, geist = null, gezogen = false;
+  let start = null, geist = null, gezogen = false, hebeTimer = null;
+  const sperreScrollen = (e) => { if (gezogen) e.preventDefault(); };
+  karte.addEventListener('touchmove', sperreScrollen, { passive: false });
+
+  const hebeAn = (e) => {
+    gezogen = true;
+    karte._zieht = true;
+    karte.classList.add('zieht');
+    try { karte.setPointerCapture(e.pointerId); } catch (x) {}
+    geist = karte.cloneNode(true);
+    geist.classList.add('szgeist');
+    geist.classList.remove('zieht');
+    geist.style.left = (e.clientX - 95) + 'px';
+    geist.style.top = (e.clientY - 30) + 'px';
+    document.body.append(geist);
+  };
+
   karte.addEventListener('pointerdown', (e) => {
     if (karte.classList.contains('rueckseite')) return;
+    if (e.target.closest('button') || e.target.closest('textarea')) return;
     start = { x: e.clientX, y: e.clientY, id: e.pointerId };
-    karte.setPointerCapture(e.pointerId);
+    if (e.pointerType === 'mouse') return;
+    hebeTimer = setTimeout(() => { hebeTimer = null; if (start) hebeAn(e); }, 300);
   });
   karte.addEventListener('pointermove', (e) => {
     if (!start) return;
     const dx = e.clientX - start.x, dy = e.clientY - start.y;
-    if (!gezogen && Math.hypot(dx, dy) > 12) {
-      gezogen = true;
-      karte._zieht = true;
-      karte.classList.add('zieht');
-      geist = karte.cloneNode(true);
-      geist.classList.add('szgeist');
-      geist.classList.remove('zieht');
-      document.body.append(geist);
+    if (!gezogen) {
+      if (Math.hypot(dx, dy) > 10) {
+        if (e.pointerType === 'mouse') { hebeAn(e); }
+        else { clearTimeout(hebeTimer); hebeTimer = null; start = null; }
+      }
+      return;
     }
-    if (gezogen && geist) {
+    if (geist) {
       geist.style.left = (e.clientX - 95) + 'px';
       geist.style.top = (e.clientY - 30) + 'px';
     }
   });
   karte.addEventListener('pointerup', async (e) => {
-    if (!start) return;
+    clearTimeout(hebeTimer); hebeTimer = null;
+    if (!start && !gezogen) return;
     const warGezogen = gezogen;
     start = null; gezogen = false;
     karte.classList.remove('zieht');
@@ -287,15 +304,20 @@ function szenenGesten(karte, s, p) {
     zeichne();
   });
   karte.addEventListener('pointercancel', () => {
+    clearTimeout(hebeTimer); hebeTimer = null;
     start = null; gezogen = false;
     karte.classList.remove('zieht');
     if (geist) { geist.remove(); geist = null; }
   });
 
   langdruck(karte, async () => {
+    if (karte._zieht || gezogen) return;
     const wahl = await menue([
       { text: 'Umbenennen', icon: 'stift', wert: 'name' },
       { text: 'Andere Farbe', icon: 'farbe', wert: 'farbe' },
+      { text: 'Duplizieren', icon: 'wandel', wert: 'doppel' },
+      { text: 'In anderes Kapitel …', icon: 'projekte', wert: 'zieh' },
+      { text: 'Teilen', icon: 'teilen', wert: 'teilen' },
       { text: 'Szene löschen', icon: 'muell', wert: 'weg', rot: true }
     ], s.titel || 'Szene');
     if (wahl === 'name') {
@@ -304,10 +326,23 @@ function szenenGesten(karte, s, p) {
     } else if (wahl === 'farbe') {
       const i = (SZENENFARBEN.indexOf(s.farbe || '') + 1) % SZENENFARBEN.length;
       s.farbe = SZENENFARBEN[i]; speichereStill(s); zeichne();
+    } else if (wahl === 'doppel') {
+      neuDoc('szene', { parent: s.parent, projekt: s.projekt, ord: (s.ord || 0) + .5, titel: (s.titel || 'Szene') + ' (Fassung 2)', text: s.text, status: s.status, farbe: s.farbe, notiz: s.notiz });
+      kinder(s.parent, 'szene').forEach((x, i) => { x.ord = i; speichereStill(x); });
+      zeichne();
+    } else if (wahl === 'zieh') {
+      const wo = await waehleProjektKapitel();
+      if (!wo) return;
+      s.parent = wo.kapitel.id;
+      s.projekt = wo.projekt.id;
+      s.ord = kinder(wo.kapitel.id, 'szene').length;
+      speichereStill(s);
+      toast('Umgezogen nach „' + wo.projekt.titel + '".');
+      zeichne();
+    } else if (wahl === 'teilen') {
+      teileText((s.titel ? s.titel + '\n\n' : '') + (s.text || ''));
     } else if (wahl === 'weg') {
-      if (await frage('„' + (s.titel || 'Diese Szene') + '" löschen?', { ja: 'Löschen', gefahr: true })) {
-        await loesche(s.id); zeichne();
-      }
+      await loesche(s.id); zeichne();
     }
   });
 }

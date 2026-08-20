@@ -22,6 +22,8 @@ const GRUSS_LANGE_WEG = 'Schön, dass du wieder da bist.';
 function grussZeile() {
   const h = new Date().getHours();
   const topf = h < 5 ? GRUESSE.nacht : h < 11 ? GRUESSE.frueh : h < 14 ? GRUESSE.mittag : h < 18 ? GRUESSE.nachmittag : h < 23 ? GRUESSE.abend : GRUESSE.nacht;
+  const eigene = vomTyp('gruss').map((g) => g.text).filter(Boolean);
+  if (eigene.length && Math.random() < .35) return zufall(eigene);
   return zufall(topf);
 }
 
@@ -45,7 +47,20 @@ const FUNKEN = [
   'Der Geruch, der einen sofort zehn Jahre zurückwirft.',
   'Zwei Fremde warten zusammen. Worauf, weiß nur einer von beiden.',
   'Eine Stadt, in der Vergessen als Höflichkeit gilt.',
-  'Das Licht im Nachbarhaus geht seit drei Nächten nicht mehr aus.'
+  'Das Licht im Nachbarhaus geht seit drei Nächten nicht mehr aus.',
+  'Jemand schreibt seit Jahren Briefe an eine Adresse, die es nicht gibt. Heute kommt eine Antwort.',
+  'Das Haus wird verkauft. Beim Ausräumen findet sich eine Tür, die in keinem Grundriss steht.',
+  'Eine Stimme im Radio, mitten in der Nacht, sagt deinen Namen. Nur einmal.',
+  'Der Jahrmarkt kommt dieses Jahr einen Tag zu früh. Niemand hat ihn bestellt.',
+  'Zwei Geschwister teilen sich eine Erinnerung — aber jede Hälfte erzählt sie anders.',
+  'In der Bibliothek steht ein Buch, das jedes Mal anders endet.',
+  'Jemand kehrt in die alte Wohnung zurück. Der eigene Name steht noch am Klingelschild — frisch gedruckt.',
+  'Der Fluss friert zum ersten Mal seit hundert Jahren zu. Etwas liegt im Eis.',
+  'Ein Kind fragt: „Wo warst du, bevor du hier warst?" Und niemand am Tisch kann antworten.',
+  'Die letzte Nachricht wurde nie abgeschickt. Der Entwurf ist noch da.',
+  'Jemand sammelt die letzten Sätze fremder Gespräche. Heute fällt einer, der alles ändert.',
+  'Ein Sommer, in dem alle Uhren der Stadt eine Minute nachgehen. Nur eine nicht.',
+  'Das Gewitter kommt näher, und mit ihm ein Geruch aus der Kindheit.'
 ];
 const FUNKE_WER = [
   'Eine Frau, die Karten für Orte zeichnet, die es nicht mehr gibt,',

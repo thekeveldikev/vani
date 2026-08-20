@@ -42,12 +42,13 @@ RENDER.zuhause = function (haupt) {
   /* Schreibfeuer */
   const heutigeWorte = D.stats.tage[tagKey()] || 0;
   const str = straehne();
-  const feuerKarte = el('div', { class: 'karte' },
+  const feuerKarte = el('div', { class: 'karte feuerkarte' },
     el('div', { class: 'kartenkopf' }, el('span', { html: ik('feuer') }), 'SCHREIBFEUER'),
     el('div', { class: 'feuer-zeile' },
       el('div', { class: 'feuer-flamme', html: flammeHTML() }),
       el('div', { class: 'feuer-zahlen' },
-        el('div', { class: 'gross' }, String(heutigeWorte), el('span', { style: 'font-size:15px;font-weight:400' }, ' Wörter heute')),
+        el('div', { class: 'gross' }, heutigeWorte.toLocaleString('de-DE')),
+        el('div', { class: 'einheit' }, heutigeWorte === 1 ? 'Wort heute' : 'Wörter heute'),
         el('div', { class: 'klein' },
           str >= 2 ? str + ' Tage in Folge am Feuer' :
           heutigeWorte > 0 ? 'Das Feuer brennt.' :
@@ -66,9 +67,9 @@ RENDER.zuhause = function (haupt) {
       })()
     ),
     D.einst.tagesziel > 0 ? el('div', { style: 'margin-top:12px' },
-      el('div', { class: 'zielbalken' }, el('i', { style: 'width:' + Math.min(100, Math.round(heutigeWorte / D.einst.tagesziel * 100)) + '%' })),
+      el('div', { class: 'zielbalken' }, el('i', { class: heutigeWorte >= D.einst.tagesziel ? 'geschafft' : '', style: 'width:' + Math.min(100, Math.round(heutigeWorte / D.einst.tagesziel * 100)) + '%' })),
       el('div', { style: 'font-size:12px;color:var(--blass);margin-top:5px' },
-        heutigeWorte >= D.einst.tagesziel ? 'Tagesziel erreicht. Der Rest ist Geschenk.' : 'noch ' + (D.einst.tagesziel - heutigeWorte) + ' bis zum Tagesziel')
+        heutigeWorte >= D.einst.tagesziel ? 'Tagesziel erreicht. Der Rest ist Geschenk.' : 'noch ' + (D.einst.tagesziel - heutigeWorte).toLocaleString('de-DE') + ' bis zum Tagesziel')
     ) : null
   );
   gitter.append(feuerKarte);
@@ -83,8 +84,8 @@ RENDER.zuhause = function (haupt) {
       el('button', { class: 'knopf zart', onclick: () => { funkeAktuell = neuerFunke(Math.random() < .4); funkeText.textContent = funkeAktuell; } }, 'Anderer'),
       el('button', {
         class: 'knopf', onclick: () => {
-          const seite = seiteAusText('', funkeAktuell + '\n\n');
-          oeffneSchreibraum(seite.id);
+          const blatt = blattAusText('', funkeAktuell + '\n\n');
+          oeffneSchreibraum(blatt.id);
         }
       }, 'Dem nachgehen')
     )
@@ -92,7 +93,7 @@ RENDER.zuhause = function (haupt) {
 
   /* Weiterschreiben */
   const zuletzt = [...D.docs.values()]
-    .filter((d) => (d.typ === 'szene' || d.typ === 'seite') && (d.text || '').trim())
+    .filter((d) => (d.typ === 'szene' || d.typ === 'seite' || d.typ === 'blatt') && (d.text || '').trim())
     .sort((a, b) => b.geaendert - a.geaendert).slice(0, 3);
   if (zuletzt.length) {
     gitter.append(el('div', { class: 'karte' },
@@ -102,12 +103,14 @@ RENDER.zuhause = function (haupt) {
         if (d.typ === 'szene') {
           const p = D.docs.get(d.projekt), k = D.docs.get(d.parent);
           wo = [p && p.titel, k && k.titel].filter(Boolean).join(' › ');
+        } else if (d.typ === 'blatt') {
+          wo = 'Blätter';
         } else {
           const h = D.docs.get(d.parent);
           wo = h ? h.titel : '';
         }
         const letzterSatz = (d.text || '').trim().split('\n').filter(Boolean).pop() || '';
-        return el('button', { class: 'weiter-eintrag', onclick: () => (d.typ === 'szene' ? oeffneSchreibraum(d.id) : oeffneDoc(d)) },
+        return el('button', { class: 'weiter-eintrag', onclick: () => ((d.typ === 'szene' || d.typ === 'blatt') ? oeffneSchreibraum(d.id) : oeffneDoc(d)) },
           el('span', { class: 'wtitel' }, d.titel || 'Ohne Titel'),
           wo ? el('span', { class: 'wo' }, wo + ' · ' + vorZeit(d.geaendert)) : el('span', { class: 'wo' }, vorZeit(d.geaendert)),
           el('span', { class: 'probe' }, '… ' + letzterSatz.slice(-90))
@@ -116,11 +119,13 @@ RENDER.zuhause = function (haupt) {
     ));
   }
 
-  /* Wieder aufgetaucht */
+  /* Wieder aufgetaucht — kuratierte Funkeln zählen dreifach */
+  const funkeln = [...D.docs.values()].filter((d) => d.typ === 'funkeln' && (d.text || '').trim());
   const alteFunde = [...D.docs.values()].filter((d) =>
-    ['schnipsel', 'szene', 'seite', 'blase'].includes(d.typ) &&
+    ['schnipsel', 'szene', 'seite', 'blatt', 'blase'].includes(d.typ) &&
     (d.text || '').trim().length > 40 &&
-    Date.now() - d.angelegt > 3 * 86400000);
+    Date.now() - d.angelegt > 3 * 86400000)
+    .concat(funkeln, funkeln, funkeln);
   if (alteFunde.length) {
     let fund = zufall(alteFunde);
     const fundText = el('div', { class: 'fund-text' }, fund.text.trim());
@@ -156,10 +161,3 @@ RENDER.zuhause = function (haupt) {
   haupt.append(inhalt);
 };
 
-/* Ein loses Blatt: für Funken, Wörter-Anfänge, freies Schreiben */
-function seiteAusText(titel, text) {
-  let heft = [...D.docs.values()].find((d) => d.typ === 'heft' && d.titel === 'Lose Blätter');
-  if (!heft) heft = neuDoc('heft', { titel: 'Lose Blätter', farbe: '#4a4a52', papier: 'blank' });
-  const geschwister = kinder(heft.id, 'seite');
-  return neuDoc('seite', { parent: heft.id, ord: geschwister.length, titel, text });
-}

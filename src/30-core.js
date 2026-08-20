@@ -26,12 +26,15 @@ function el(tag, attrs = {}, ...kinder) {
 
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-function entprellt(fn, ms) {
-  let t;
-  const g = (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
-  g.sofort = (...a) => { clearTimeout(t); fn(...a); };
+const _spueler = [];
+function entprellt(fn, ms, notfall) {
+  let t, letzteArgs = null;
+  const g = (...a) => { letzteArgs = a; clearTimeout(t); t = setTimeout(() => { letzteArgs = null; fn(...a); }, ms); };
+  g.sofort = (...a) => { clearTimeout(t); letzteArgs = null; fn(...a); };
+  if (notfall) _spueler.push(() => { if (letzteArgs) { clearTimeout(t); const a = letzteArgs; letzteArgs = null; fn(...a); } });
   return g;
 }
+function spueleAlles() { for (const s of _spueler) { try { s(); } catch (e) {} } }
 
 const worte = (t) => { t = (t || '').trim(); return t ? t.split(/\s+/).length : 0; };
 
@@ -41,7 +44,7 @@ function tagKey(ts) { const d = new Date(ts || Date.now()); return d.getFullYear
 function fmtDatum(ts) { const d = new Date(ts); return TAGE[d.getDay()] + ', ' + d.getDate() + '. ' + MONATE[d.getMonth()]; }
 function fmtZeit(ts) { const d = new Date(ts); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
 function vorZeit(ts) {
-  const m = Math.round((Date.now() - ts) / 60000);
+  const m = Math.max(0, Math.round((Date.now() - ts) / 60000));
   if (m < 2) return 'gerade eben';
   if (m < 60) return 'vor ' + m + ' Minuten';
   const h = Math.round(m / 60);
@@ -54,6 +57,55 @@ function vorZeit(ts) {
   return 'vor ' + j + (j === 1 ? ' Jahr' : ' Jahren');
 }
 const zufall = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+/* Suche: normalisieren + kleine Tippfehler-Toleranz */
+function normalisiere(s) {
+  return String(s || '').toLowerCase()
+    .replace(/ß/g, 'ss').replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+function fastGleich(wort, suchwort) {
+  if (wort.includes(suchwort)) return true;
+  if (suchwort.length < 5) return false;
+  const n = suchwort.length;
+  for (let start = 0; start + n - 1 <= wort.length; start++) {
+    const stueck = wort.slice(start, start + n);
+    let fehler = 0;
+    for (let i = 0; i < n && fehler < 2; i++) if (stueck[i] !== suchwort[i]) fehler++;
+    if (fehler <= 1) return true;
+  }
+  return false;
+}
+
+/* Kluge Zeichen: -- wird –, gerade Anführungszeichen werden deutsche. Pur & testbar. */
+function klugeZeichen(t, s) {
+  const davor2 = t.slice(Math.max(0, s - 2), s);
+  if (davor2 === '--') return { text: t.slice(0, s - 2) + '–' + t.slice(s), caret: s - 1 };
+  const letztes = t[s - 1];
+  if (letztes === '"' || letztes === "'") {
+    const vorher = s >= 2 ? t[s - 2] : '';
+    const oeffnend = !vorher || /[\s(\[{\n>»–-]/.test(vorher);
+    const ersatz = letztes === '"' ? (oeffnend ? '„' : '"') : (oeffnend ? '‚' : '’');
+    return { text: t.slice(0, s - 1) + ersatz + t.slice(s), caret: s };
+  }
+  return null;
+}
+
+/* Prüft, ob ein eingelesenes Paket eine echte VANI-Sicherung ist. */
+function pruefeSicherung(paket) {
+  return !!(paket && paket.vani === 1 && Array.isArray(paket.docs) &&
+    paket.docs.every((d) => d && typeof d.id === 'string' && typeof d.typ === 'string'));
+}
+
+/* Text nach draußen: Teilen-Blatt (WhatsApp, Dateien, …) → Zwischenablage */
+async function teileText(text) {
+  if (navigator.share) {
+    try { await navigator.share({ text }); return true; }
+    catch (e) { if (e && e.name === 'AbortError') return false; }
+  }
+  try { await navigator.clipboard.writeText(text); toast('In der Zwischenablage.'); return true; }
+  catch (e) { toast('Das hat leider nicht geklappt.'); return false; }
+}
 
 /* ----- Icons ----- */
 const IK = {
@@ -90,7 +142,13 @@ const IK = {
   fund: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 2"/>',
   buchzu: '<path d="M6 3h13v18H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M6 3v18"/>',
   aufklappen: '<path d="m7 9.5 5 5 5-5"/>',
-  archiv: '<rect x="3.5" y="4" width="17" height="4.5" rx="1"/><path d="M5.5 8.5V20h13V8.5"/><path d="M10 12.5h4"/>'
+  archiv: '<rect x="3.5" y="4" width="17" height="4.5" rx="1"/><path d="M5.5 8.5V20h13V8.5"/><path d="M10 12.5h4"/>',
+  blatt: '<path d="M6 3h8l4 4v14H6V3Z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 15.5h6"/>',
+  faden: '<circle cx="12" cy="7" r="3.5"/><path d="M12 10.5c-4 2-5.5 4.5-4 7 1.2 2 4.5 2.4 6.5 1 2.2-1.5 2-4-.5-5-2-1-4.5 0-4.5 2"/>',
+  wieder: '<path d="M4 10a8 8 0 1 1 2.3 6.3"/><path d="M4 21v-5h5"/>',
+  frieren: '<path d="M12 3v18M5.5 6.5 18.5 17.5M18.5 6.5 5.5 17.5"/><path d="M12 3l-2 2M12 3l2 2M12 21l-2-2M12 21l2-2"/>',
+  ab: '<path d="m7 10 5 5 5-5"/>',
+  auf: '<path d="m7 14 5-5 5 5"/>'
 };
 function ik(name, kl) { return `<svg class="ik${kl ? ' ' + kl : ''}" viewBox="0 0 24 24" aria-hidden="true">${IK[name] || ''}</svg>`; }
 
@@ -98,12 +156,13 @@ function ik(name, kl) { return `<svg class="ik${kl ? ' ' + kl : ''}" viewBox="0 
 let _db;
 function dbAuf() {
   return new Promise((res, rej) => {
-    const r = indexedDB.open('vani', 1);
+    const r = indexedDB.open('vani', 2);
     r.onupgradeneeded = () => {
       const d = r.result;
-      d.createObjectStore('docs', { keyPath: 'id' });
-      d.createObjectStore('media');
-      d.createObjectStore('kv');
+      if (!d.objectStoreNames.contains('docs')) d.createObjectStore('docs', { keyPath: 'id' });
+      if (!d.objectStoreNames.contains('media')) d.createObjectStore('media');
+      if (!d.objectStoreNames.contains('kv')) d.createObjectStore('kv');
+      if (!d.objectStoreNames.contains('papierkorb')) d.createObjectStore('papierkorb', { keyPath: 'id' });
     };
     r.onsuccess = () => { _db = r.result; res(); };
     r.onerror = () => rej(r.error);
@@ -127,8 +186,9 @@ const D = {
   docs: new Map(),
   einst: {
     thema: 'papier', schrift: 'serife', groesse: 19, breite: 'mittel',
-    typewriter: true, fokus: false, klang: 'aus', lautstaerke: .5,
-    tastenklang: false, tagesziel: 0
+    typewriter: true, fokus: false, mischung: {}, lautstaerke: .5,
+    tastenklang: false, tagesziel: 0, ersetzungen: true, autokorrektur: true,
+    raeume: null
   },
   stats: { tage: {}, letzte: {}, letzteSicherung: 0 }
 };
@@ -152,22 +212,61 @@ function neuDoc(typ, felder) {
 function speichere(d) { d.geaendert = Date.now(); dbPut('docs', d); }
 function speichereStill(d) { dbPut('docs', d); }
 
-async function loesche(id) {
+/* Löschen ist bei VANI nie endgültig: alles wandert erst in den Papierkorb. */
+function _nachfahren(id) {
   const opfer = [id];
   for (let i = 0; i < opfer.length; i++) {
     for (const d of D.docs.values()) {
-      if (d.parent === opfer[i] || d.projekt === opfer[i]) { if (!opfer.includes(d.id)) opfer.push(d.id); }
+      if ((d.parent === opfer[i] || d.projekt === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
       if (d.typ === 'kante' && (d.von === opfer[i] || d.zu === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
     }
   }
+  return opfer;
+}
+
+async function loesche(id, still) {
+  const wurzel = D.docs.get(id);
+  if (!wurzel) return;
+  const opfer = _nachfahren(id);
+  const buendel = { id: uid(), wann: Date.now(), name: wurzel.titel || (wurzel.text || '').slice(0, 40) || wurzel.typ, typ: wurzel.typ, docs: [] };
   for (const oid of opfer) {
     const d = D.docs.get(oid);
     if (!d) continue;
-    if (d.bild) dbDel('media', d.bild);
-    if (d.skizze) dbDel('media', d.skizze);
+    buendel.docs.push(d);
     D.docs.delete(oid);
-    delete D.stats.letzte[oid];
     await dbDel('docs', oid);
+  }
+  await dbPut('papierkorb', buendel);
+  if (!still) {
+    toastMitAktion('Im Papierkorb.', 'Rückgängig', async () => {
+      await holeZurueck(buendel.id);
+      zeichne();
+    });
+  }
+}
+
+async function holeZurueck(buendelId) {
+  const b = await dbGet('papierkorb', buendelId);
+  if (!b) return false;
+  for (const d of b.docs) {
+    D.docs.set(d.id, d);
+    await dbPut('docs', d);
+  }
+  await dbDel('papierkorb', buendelId);
+  return true;
+}
+
+async function papierkorbLeeren(nurAelterAlsTage) {
+  const alle = await dbAlle('papierkorb');
+  const grenze = nurAelterAlsTage ? Date.now() - nurAelterAlsTage * 86400000 : Infinity;
+  for (const b of alle) {
+    if (nurAelterAlsTage && b.wann > grenze) continue;
+    for (const d of b.docs) {
+      if (d.bild) dbDel('media', d.bild);
+      if (d.skizze) dbDel('media', d.skizze);
+      delete D.stats.letzte[d.id];
+    }
+    await dbDel('papierkorb', b.id);
   }
   speichereStats();
 }
@@ -227,6 +326,12 @@ function setzeThema(name) {
 /* ----- Toast, Modale, Menüs ----- */
 function toast(text, ms = 2400) {
   const t = el('div', { class: 'toast' }, text);
+  $('#toasts').append(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 450); }, ms);
+}
+function toastMitAktion(text, aktion, tu, ms = 5200) {
+  const knopf = el('button', { class: 'toastaktion', onclick: () => { t.remove(); tu(); } }, aktion);
+  const t = el('div', { class: 'toast anfassbar' }, text, knopf);
   $('#toasts').append(t);
   setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 450); }, ms);
 }
@@ -313,7 +418,8 @@ function autogrow(ta) {
 /* ----- Verweise ([[...]]) und Schlagworte ----- */
 function schmuecke(text) {
   let h = esc(text);
-  h = h.replace(/\[\[([^\[\]]{1,80})\]\]/g, (_, t) => `<span class="verweis" data-ziel="${esc(t)}">${esc(t)}</span>`);
+  /* t ist hier bereits entschärft — ein zweites esc() würde doppelt kodieren */
+  h = h.replace(/\[\[([^\[\]]{1,80})\]\]/g, (_, t) => `<span class="verweis" data-ziel="${t}">${t}</span>`);
   h = h.replace(/(^|\s)#([\wäöüÄÖÜß-]{2,30})/g, (_, vor, t) => `${vor}<span class="schlagwort">#${t}</span>`);
   return h;
 }
@@ -332,7 +438,10 @@ function rueckverweise(doc) {
 }
 function oeffneDoc(d) {
   if (!d) return;
-  if (d.typ === 'schnipsel') location.hash = '#/schnipsel';
+  if (d.typ === 'blatt') { location.hash = '#/blaetter'; setTimeout(() => oeffneSchreibraum(d.id), 80); }
+  else if (d.typ === 'faden' || d.typ === 'funkeln') location.hash = '#/faden';
+  else if (d.typ === 'mischung') location.hash = '#/klang';
+  else if (d.typ === 'schnipsel') location.hash = '#/schnipsel';
   else if (d.typ === 'heft') location.hash = '#/heft/' + d.id;
   else if (d.typ === 'seite') { sessionStorage.setItem('zielSeite', d.id); location.hash = '#/heft/' + d.parent; }
   else if (d.typ === 'projekt') location.hash = '#/projekt/' + d.id;

@@ -1,0 +1,82 @@
+/* Baut die App-Logik in einer Node-Sandbox auf: echte Quelldateien,
+   gefälschte Browser-Umgebung, In-Memory-IndexedDB. */
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+import vm from 'node:vm';
+
+const wurzel = join(dirname(fileURLToPath(import.meta.url)), '..');
+
+function fakeIndexedDB() {
+  const datenbanken = {};
+  return {
+    _alles: datenbanken,
+    open(name, version) {
+      const req = {};
+      queueMicrotask(() => {
+        let db = datenbanken[name];
+        const neu = !db;
+        if (neu) {
+          db = datenbanken[name] = {
+            stores: {},
+            objectStoreNames: { contains: (n) => n in db.stores },
+            createObjectStore(n) { db.stores[n] = new Map(); return {}; },
+            transaction(storeName, modus) {
+              const tx = { oncomplete: null, onerror: null };
+              tx.objectStore = (n) => {
+                const map = db.stores[n];
+                const op = (fn) => { const r = {}; r.result = fn(); return r; };
+                return {
+                  put: (wert, key) => op(() => { map.set(key !== undefined ? key : wert.id, wert); }),
+                  get: (key) => op(() => map.get(key)),
+                  delete: (key) => op(() => { map.delete(key); }),
+                  getAll: () => op(() => [...map.values()]),
+                  clear: () => op(() => map.clear())
+                };
+              };
+              queueMicrotask(() => { if (tx.oncomplete) tx.oncomplete(); });
+              return tx;
+            }
+          };
+        }
+        req.result = db;
+        if (neu && req.onupgradeneeded) req.onupgradeneeded({ target: req });
+        if (req.onsuccess) req.onsuccess({ target: req });
+      });
+      return req;
+    }
+  };
+}
+
+export function baueSandkasten() {
+  const kontext = {
+    console, setTimeout, clearTimeout, setInterval, clearInterval,
+    queueMicrotask, Promise, JSON, Math, Date, Array, Object, String, Number,
+    RegExp, Map, Set, Infinity, NaN, undefined,
+    indexedDB: fakeIndexedDB(),
+    localStorage: (() => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) }; })(),
+    sessionStorage: (() => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) }; })(),
+    document: {
+      addEventListener() {}, removeEventListener() {},
+      querySelector: () => null, querySelectorAll: () => [],
+      documentElement: { dataset: {}, style: { setProperty() {} } }
+    },
+    window: { addEventListener() {}, removeEventListener() {} },
+    navigator: {},
+    location: { hash: '', search: '', protocol: 'file:' }
+  };
+  kontext.globalThis = kontext;
+  vm.createContext(kontext);
+  for (const datei of ['30-core.js', '34-inhalt.js', '40-router.js']) {
+    vm.runInContext(readFileSync(join(wurzel, 'src', datei), 'utf8'), kontext, { filename: datei });
+  }
+  /* Top-Level-const/let landen im lexikalischen Scope, nicht am Global —
+     hier holen wir alles heraus, was die Prüfungen brauchen. */
+  const exporte = vm.runInContext(
+    '({ worte, uid, D, dbPut, dbGet, dbDel, dbAlle, esc, entprellt, tagKey, fmtDatum, fmtZeit, vorZeit, zufall, normalisiere, fastGleich, teileText, klugeZeichen, pruefeSicherung, IK, SAATWORTE, FUNKEN, ALLE_RAEUME, speichereEinst, speichereStats })',
+    kontext);
+  Object.assign(kontext, exporte);
+  return kontext;
+}
+
+export const mikrotasksLeeren = () => new Promise((r) => setTimeout(r, 5));
