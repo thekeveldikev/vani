@@ -3951,6 +3951,22 @@ RENDER.feinheiten = function (haupt) {
       )
     )));
 
+  /* Frisch anfangen */
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Frisch anfangen'),
+    el('div', { class: 'karte' },
+      el('div', { style: 'font-size:14px;color:var(--blass);line-height:1.6;margin-bottom:14px' },
+        'Setzt die Zahlen zurueck: Woerter pro Tag, Straehne, Schreibfeuer. Texte, Hefte, Projekte und der Faden bleiben unangetastet.'),
+      el('button', {
+        class: 'knopf', onclick: async () => {
+          if (!await frage('Alle Zaehlungen auf null? Geschriebenes bleibt, nur das Feuer faengt neu an.', { ja: 'Auf null' })) return;
+          D.stats = { tage: {}, letzte: {}, letzteSicherung: D.stats.letzteSicherung };
+          for (const d of D.docs.values()) D.stats.letzte[d.id] = worte(d.text || '');
+          speichereStats();
+          toast('Frisch. Der erste Satz macht wieder Feuer.');
+          zeichne();
+        }
+      }, 'Zaehlungen auf null'))));
+
   /* Kleingedrucktes */
   inhalt.append(el('div', { class: 'kleingedruckt' },
     el('div', { class: 'wortmarke' }, 'VANI'),
