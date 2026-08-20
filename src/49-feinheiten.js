@@ -165,6 +165,14 @@ RENDER.feinheiten = function (haupt) {
       )
     )));
 
+  /* Faden holen — verschluesselt, ohne Datei-Dialog */
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Den Faden holen'),
+    el('div', { class: 'karte' },
+      el('div', { style: 'font-size:14px;color:var(--blass);line-height:1.6;margin-bottom:14px' },
+        'Der alte Chat liegt verschluesselt bereit. Einmal das Passwort eingeben, dann ist er hier — danach brauchst du das nie wieder.'),
+      el('button', { class: 'knopf voll', onclick: () => holeFaden() },
+        el('span', { html: ik('faden'), style: 'display:flex' }), 'Faden hereinholen'))));
+
   /* Frisch anfangen */
   inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Frisch anfangen'),
     el('div', { class: 'karte' },
@@ -328,4 +336,44 @@ async function teileDatei(name, inhalt, typ = 'text/plain') {
     toast('Das hat leider nicht geklappt.');
     return false;
   }
+}
+
+/* ----- Faden entschluesseln und einlesen ----- */
+async function holeFaden() {
+  const passwort = await eingabe({ titel: 'Das Passwort fuer den Faden', platzhalter: 'wort-wort-zahl-wort-wort', ok: 'Holen' });
+  if (!passwort) return;
+  toast('Hole den Faden …', 4000);
+  let paket;
+  try {
+    const antwort = await fetch('faden.enc', { cache: 'no-store' });
+    if (!antwort.ok) throw new Error('nicht da');
+    paket = await antwort.json();
+  } catch (e) { toast('Der Faden liegt hier nicht bereit.'); return; }
+  let klartext;
+  try {
+    const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+    const basis = await crypto.subtle.importKey('raw', new TextEncoder().encode(passwort), 'PBKDF2', false, ['deriveKey']);
+    const schluessel = await crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt: b64(paket.salz), iterations: 600000, hash: 'SHA-256' },
+      basis, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+    const roh = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(paket.iv) }, schluessel, b64(paket.daten));
+    klartext = JSON.parse(new TextDecoder().decode(roh));
+  } catch (e) { toast('Das Passwort passt nicht. Nochmal?'); return; }
+  if (!pruefeSicherung(klartext)) { toast('Der Faden ist beschaedigt.'); return; }
+  let dazu = 0;
+  for (const d of klartext.docs) {
+    if (D.docs.has(d.id)) continue;
+    D.docs.set(d.id, d);
+    D.stats.letzte[d.id] = worte(d.text || '');
+    await dbPut('docs', d);
+    dazu++;
+  }
+  speichereStats();
+  raumConfig();
+  const f = D.einst.raeume.find((x) => x.id === 'faden');
+  if (f) f.an = true;
+  speichereEinst();
+  baueLeiste();
+  toast(dazu ? 'Da ist er. ' + dazu + ' Dinge sind angekommen.' : 'War schon alles da.', 4000);
+  setTimeout(() => { location.hash = '#/faden'; }, 900);
 }
