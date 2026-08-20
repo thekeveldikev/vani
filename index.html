@@ -1,0 +1,3617 @@
+<!doctype html>
+<html lang="de" data-thema="papier">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<title>VANI</title>
+<meta name="description" content="VANI — ein Zuhause zum Schreiben. Offline, überall.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="VANI">
+<meta name="theme-color" content="#efe7d8">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<style>
+/* ================================================================
+   VANI — Stilwelt
+   ================================================================ */
+
+/* ----- Themen ----- */
+:root, html[data-thema="papier"] {
+  --hg: #ece3d1;
+  --hg2: #e2d7c2;
+  --papier: #f8f3e7;
+  --tinte: #2c251c;
+  --blass: #82755f;
+  --linie: rgba(90, 74, 52, .16);
+  --akzent: #b0552f;
+  --akzent2: #5f7752;
+  --gold: #b8923f;
+  --karte: #f5efe1;
+  --schein: rgba(60, 44, 20, .16);
+  --deck: rgba(46, 36, 22, .38);
+  --korn: .5;
+  --statusleiste: #ece3d1;
+}
+html[data-thema="tinte"] {
+  --hg: #141110;
+  --hg2: #1b1714;
+  --papier: #211c17;
+  --tinte: #eae0cd;
+  --blass: #97897a;
+  --linie: rgba(234, 224, 205, .13);
+  --akzent: #d98a54;
+  --akzent2: #93a883;
+  --gold: #cfa75c;
+  --karte: #262019;
+  --schein: rgba(0, 0, 0, .5);
+  --deck: rgba(0, 0, 0, .55);
+  --korn: .35;
+}
+html[data-thema="kerze"] {
+  --hg: #1b1206;
+  --hg2: #241809;
+  --papier: #2b1e0c;
+  --tinte: #f2dfb6;
+  --blass: #a98f5f;
+  --linie: rgba(242, 223, 182, .14);
+  --akzent: #e2a24e;
+  --akzent2: #b08d4f;
+  --gold: #e8b662;
+  --karte: #31220e;
+  --schein: rgba(0, 0, 0, .55);
+  --deck: rgba(12, 7, 0, .6);
+  --korn: .4;
+}
+html[data-thema="nebel"] {
+  --hg: #e2e5e1;
+  --hg2: #d7dcd8;
+  --papier: #f4f6f2;
+  --tinte: #2e3438;
+  --blass: #71808a;
+  --linie: rgba(50, 70, 80, .14);
+  --akzent: #4f7587;
+  --akzent2: #7a8a63;
+  --gold: #9a8b58;
+  --karte: #eef1ec;
+  --schein: rgba(40, 60, 70, .14);
+  --deck: rgba(40, 52, 60, .38);
+  --korn: .3;
+}
+
+/* ----- Grund ----- */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; }
+body {
+  height: 100%;
+  font-family: ui-rounded, -apple-system, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+  font-size: 17px;
+  color: var(--tinte);
+  background: var(--hg);
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+textarea, input { user-select: text; -webkit-user-select: text; font-family: inherit; color: inherit; }
+textarea { resize: none; border: none; outline: none; background: transparent; }
+input { border: none; outline: none; background: transparent; }
+button { border: none; background: none; color: inherit; font: inherit; cursor: pointer; touch-action: manipulation; }
+svg.ik { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+.serif, textarea.text { font-family: ui-serif, "New York", "Iowan Old Style", Georgia, "Times New Roman", serif; }
+.hand { font-family: "Bradley Hand", "Noteworthy", "Segoe Print", "Comic Sans MS", cursive; }
+
+/* Papierkorn über allem, ganz leise */
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 999;
+  opacity: calc(var(--korn) * .16);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='k'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23k)' opacity='.6'/%3E%3C/svg%3E");
+}
+html[data-thema="kerze"] body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 998;
+  background: radial-gradient(ellipse 90% 70% at 50% 38%, transparent 40%, rgba(10, 5, 0, .5) 100%);
+}
+
+/* ----- Gerüst ----- */
+#app {
+  display: grid; grid-template-columns: 86px 1fr;
+  height: 100dvh;
+  padding-left: env(safe-area-inset-left);
+}
+#raum { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; position: relative; min-width: 0; }
+
+/* Leiste */
+#leiste {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: calc(env(safe-area-inset-top) + 14px) 0 14px;
+  background: var(--hg2);
+  border-right: 1px solid var(--linie);
+  z-index: 20;
+}
+#leiste .wortmarke {
+  font-family: ui-serif, "New York", Georgia, serif;
+  font-size: 21px; letter-spacing: .16em; font-weight: 600;
+  color: var(--akzent); margin-bottom: 14px; padding-left: .16em;
+}
+.lknopf {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  width: 68px; padding: 9px 0 7px; border-radius: 14px;
+  color: var(--blass); font-size: 10.5px; letter-spacing: .02em;
+}
+.lknopf svg.ik { width: 24px; height: 24px; }
+.lknopf.an { color: var(--akzent); background: var(--papier); box-shadow: 0 1px 6px var(--schein); }
+.lknopf:active { transform: scale(.94); }
+#leiste .luecke { flex: 1; }
+
+/* ----- Raumkopf ----- */
+.kopf {
+  position: sticky; top: 0; z-index: 15;
+  display: flex; align-items: center; gap: 10px;
+  padding: calc(env(safe-area-inset-top) + 14px) 22px 12px;
+  background: linear-gradient(var(--hg) 75%, transparent);
+}
+.kopf h1 { font-family: ui-serif, "New York", Georgia, serif; font-size: 27px; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kopf .unter { font-size: 13px; color: var(--blass); margin-top: 2px; font-family: ui-rounded, -apple-system, system-ui, sans-serif; font-weight: 400; }
+
+.inhalt { padding: 6px 22px calc(env(safe-area-inset-bottom) + 30px); max-width: 1060px; margin: 0 auto; }
+
+/* ----- Knöpfe ----- */
+.knopf {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 16px; border-radius: 13px;
+  background: var(--karte); color: var(--tinte);
+  box-shadow: 0 1px 4px var(--schein), inset 0 0 0 1px var(--linie);
+  font-size: 15px; font-weight: 500;
+}
+.knopf:active { transform: scale(.96); }
+.knopf.voll { background: var(--akzent); color: var(--papier); box-shadow: 0 2px 8px var(--schein); }
+.knopf.zart { background: none; box-shadow: none; color: var(--blass); }
+.rundknopf {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--karte); color: var(--tinte);
+  box-shadow: 0 1px 4px var(--schein), inset 0 0 0 1px var(--linie); flex: none;
+}
+.rundknopf:active { transform: scale(.92); }
+.rundknopf.voll { background: var(--akzent); color: var(--papier); }
+.rundknopf.zart { background: none; box-shadow: none; color: var(--blass); }
+
+/* ----- Karten ----- */
+.karte {
+  background: var(--karte); border-radius: 16px; padding: 16px 18px;
+  box-shadow: 0 1px 5px var(--schein), inset 0 0 0 1px var(--linie);
+}
+.leer {
+  text-align: center; color: var(--blass); padding: 46px 20px;
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 18px; font-style: italic;
+  line-height: 1.6;
+}
+.leer .klein { font-size: 13px; font-style: normal; font-family: ui-rounded, -apple-system, system-ui, sans-serif; margin-top: 8px; }
+
+/* ----- Deck: Modale, Menüs, Overlays ----- */
+#deck:empty { display: none; }
+.schleier {
+  position: fixed; inset: 0; z-index: 100; background: var(--deck);
+  display: flex; align-items: center; justify-content: center;
+  animation: einblenden .18s ease;
+}
+@keyframes einblenden { from { opacity: 0; } }
+@keyframes hochkommen { from { opacity: 0; transform: translateY(14px); } }
+.modal {
+  background: var(--papier); border-radius: 20px; padding: 22px;
+  width: min(430px, calc(100vw - 48px));
+  max-height: 82dvh; overflow-y: auto;
+  box-shadow: 0 12px 44px rgba(0,0,0,.3);
+  animation: hochkommen .2s ease;
+}
+.modal h2 { font-family: ui-serif, "New York", Georgia, serif; font-size: 21px; margin-bottom: 14px; }
+.modal .reihe { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+.modal input[type="text"], .modal textarea {
+  width: 100%; padding: 11px 13px; border-radius: 12px;
+  background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie);
+  font-size: 17px;
+}
+.menue {
+  background: var(--papier); border-radius: 17px; padding: 7px;
+  width: min(330px, calc(100vw - 48px));
+  max-height: 76dvh; overflow-y: auto;
+  box-shadow: 0 12px 44px rgba(0,0,0,.3);
+  animation: hochkommen .2s ease;
+}
+.menue .mtitel { padding: 10px 14px 6px; font-size: 13px; color: var(--blass); }
+.menue button {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 12px 14px; border-radius: 12px; font-size: 16px; text-align: left;
+}
+.menue button:active { background: var(--karte); }
+.menue button.rot { color: #c0392b; }
+html[data-thema="tinte"] .menue button.rot, html[data-thema="kerze"] .menue button.rot { color: #e07b6a; }
+
+/* Toast */
+#toasts { position: fixed; bottom: calc(env(safe-area-inset-bottom) + 22px); left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
+.toast {
+  background: var(--tinte); color: var(--hg);
+  padding: 10px 20px; border-radius: 100px; font-size: 15px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.25);
+  animation: hochkommen .25s ease;
+  max-width: 84vw; text-align: center;
+}
+
+/* ================================================================
+   Zuhause
+   ================================================================ */
+.zuhause-gruss { margin: 18px 0 4px; }
+.zuhause-gruss h1 { font-family: ui-serif, "New York", Georgia, serif; font-size: 34px; font-weight: 600; }
+.zuhause-gruss p { color: var(--blass); margin-top: 5px; font-size: 16px; }
+.zuhause-gitter { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+.zuhause-gitter > * { min-width: 0; }
+.zuhause-gitter .breit { grid-column: 1 / -1; }
+.weiter-eintrag { min-width: 0; max-width: 100%; }
+.weiter-eintrag .probe, .weiter-eintrag .wtitel { max-width: 100%; }
+@media (max-width: 640px) { .zuhause-gitter { grid-template-columns: 1fr; } }
+
+.fang { display: flex; gap: 10px; align-items: flex-end; }
+.fang textarea { flex: 1; min-height: 44px; max-height: 130px; padding: 11px 14px; border-radius: 14px; background: var(--papier); box-shadow: inset 0 0 0 1px var(--linie); font-size: 17px; line-height: 1.45; }
+
+.kartenkopf { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--blass); margin-bottom: 10px; letter-spacing: .04em; }
+.kartenkopf svg.ik { width: 16px; height: 16px; }
+.kartenkopf .rest { flex: 1; }
+
+.weiter-eintrag { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-radius: 12px; width: 100%; text-align: left; }
+.weiter-eintrag:active { background: var(--papier); }
+.weiter-eintrag .wtitel { font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; font-weight: 600; }
+.weiter-eintrag .wo { font-size: 12.5px; color: var(--blass); }
+.weiter-eintrag .probe { font-family: ui-serif, "New York", Georgia, serif; font-size: 14.5px; color: var(--blass); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.fund-text { font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; line-height: 1.55; font-style: italic; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.fund-wann { font-size: 12.5px; color: var(--blass); margin-top: 8px; }
+
+.feuer-zeile { display: flex; align-items: center; gap: 16px; }
+.feuer-flamme { width: 46px; height: 56px; flex: none; }
+.feuer-zahlen { flex: 1; }
+.feuer-zahlen .gross { font-size: 26px; font-weight: 700; font-family: ui-serif, "New York", Georgia, serif; }
+.feuer-zahlen .klein { font-size: 13px; color: var(--blass); margin-top: 2px; }
+.wochenbalken { display: flex; gap: 4px; align-items: flex-end; height: 40px; }
+.wochenbalken i { width: 9px; border-radius: 4px 4px 2px 2px; background: var(--akzent); opacity: .85; min-height: 3px; }
+.wochenbalken i.heute { background: var(--gold); }
+.wochenbalken i.null { background: var(--linie); }
+
+.funke-text { font-family: ui-serif, "New York", Georgia, serif; font-size: 18px; line-height: 1.5; }
+.karte .fussreihe { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+.sicherungs-mahnung { font-size: 13px; color: var(--blass); text-align: center; margin-top: 18px; }
+.sicherungs-mahnung button { color: var(--akzent); font-size: 13px; }
+
+/* ================================================================
+   Schnipsel
+   ================================================================ */
+.schnipsel-raum { display: flex; flex-direction: column; height: 100%; height: min(100%, var(--vvh, 100dvh)); }
+.schnipsel-lauf { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 4px 20px 12px; display: flex; flex-direction: column; }
+.schnipsel-lauf .innen { max-width: 760px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; }
+.datumstrenner { align-self: center; font-size: 12px; color: var(--blass); background: var(--hg2); padding: 4px 13px; border-radius: 100px; margin: 16px 0 8px; }
+.blase {
+  align-self: flex-end; max-width: 84%;
+  background: var(--karte); border-radius: 17px 17px 5px 17px;
+  padding: 10px 14px 7px; margin: 3px 0;
+  box-shadow: 0 1px 4px var(--schein), inset 0 0 0 1px var(--linie);
+  animation: hochkommen .18s ease;
+}
+.blase.gepinnt { box-shadow: 0 1px 4px var(--schein), inset 0 0 0 1.5px var(--gold); }
+.blase .btext { font-family: ui-serif, "New York", Georgia, serif; font-size: 16.5px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; user-select: text; -webkit-user-select: text; }
+.blase .bzeit { font-size: 10.5px; color: var(--blass); text-align: right; margin-top: 3px; display: flex; gap: 5px; justify-content: flex-end; align-items: center; }
+.blase img { max-width: 100%; border-radius: 10px; margin: 4px 0; display: block; }
+.blase .bearbeiten { width: 100%; font-family: ui-serif, Georgia, serif; font-size: 16.5px; line-height: 1.5; min-height: 60px; }
+.pinnzeile { display: flex; gap: 8px; overflow-x: auto; padding: 8px 20px; -webkit-overflow-scrolling: touch; }
+.pinnzeile:empty { display: none; }
+.pinnchip {
+  flex: none; max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  background: var(--karte); border-radius: 100px; padding: 7px 14px; font-size: 13.5px;
+  box-shadow: inset 0 0 0 1.5px var(--gold);
+  font-family: ui-serif, Georgia, serif;
+}
+.schreibzeile {
+  display: flex; gap: 9px; align-items: flex-end;
+  padding: 10px 20px calc(env(safe-area-inset-bottom) + 12px);
+  background: var(--hg2); border-top: 1px solid var(--linie);
+}
+.schreibzeile textarea {
+  flex: 1; min-height: 42px; max-height: 150px;
+  padding: 10px 15px; border-radius: 21px;
+  background: var(--papier); box-shadow: inset 0 0 0 1px var(--linie);
+  font-size: 17px; line-height: 1.4; font-family: ui-serif, Georgia, serif;
+}
+.verweis { color: var(--akzent); text-decoration: underline; text-decoration-color: var(--linie); text-underline-offset: 3px; cursor: pointer; }
+.schlagwort { color: var(--akzent2); }
+
+/* ================================================================
+   Hefte
+   ================================================================ */
+.regal { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px; margin-top: 12px; }
+.heftdeckel {
+  aspect-ratio: 3 / 4; border-radius: 6px 14px 14px 6px; position: relative;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  padding: 18px 14px 18px 22px;
+  box-shadow: 0 3px 10px var(--schein), inset -2px 0 6px rgba(0,0,0,.08);
+  color: rgba(255, 252, 240, .96);
+}
+.heftdeckel::before { content: ""; position: absolute; left: 9px; top: 0; bottom: 0; width: 2px; background: rgba(0,0,0,.18); }
+.heftdeckel::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: .5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.5' numOctaves='2'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23l)' opacity='.25'/%3E%3C/svg%3E");
+}
+.heftdeckel .htitel { font-family: ui-serif, "New York", Georgia, serif; font-size: 19px; font-weight: 600; line-height: 1.3; text-shadow: 0 1px 3px rgba(0,0,0,.3); word-break: break-word; }
+.heftdeckel .hseiten { position: absolute; bottom: 12px; left: 0; right: 0; font-size: 11.5px; opacity: .85; }
+.heftdeckel:active { transform: scale(.97); }
+.heftdeckel.archiv { filter: saturate(.45) brightness(.88); }
+.heftdeckel .hdatum { position: absolute; top: 10px; left: 0; right: 0; font-size: 10.5px; opacity: .8; letter-spacing: .06em; }
+.regal-trenner { margin: 26px 0 10px; font-size: 13px; color: var(--blass); letter-spacing: .05em; display: flex; align-items: center; gap: 12px; }
+.regal-trenner::after { content: ""; flex: 1; height: 1px; background: var(--linie); }
+
+/* Heft innen: die Seite */
+.seitenhalter { max-width: 820px; margin: 8px auto 0; position: relative; }
+.papierseite {
+  position: relative; border-radius: 4px;
+  background: var(--papier);
+  box-shadow: 0 4px 18px var(--schein), 0 1px 3px var(--schein);
+  min-height: 74dvh; padding: 34px 38px 46px;
+  overflow: hidden;
+}
+.papierseite.liniert .schreibflaeche {
+  background-image: repeating-linear-gradient(transparent, transparent 31px, var(--linie) 31px, var(--linie) 32px);
+  background-position-y: 9px;
+}
+.papierseite.kariert {
+  background-image: linear-gradient(var(--linie) 1px, transparent 1px), linear-gradient(90deg, var(--linie) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+.papierseite .stitel { width: 100%; font-family: ui-serif, "New York", Georgia, serif; font-size: 22px; font-weight: 600; margin-bottom: 10px; }
+.papierseite .stitel::placeholder, textarea::placeholder, input::placeholder { color: var(--blass); opacity: .55; font-style: italic; }
+.schreibflaeche {
+  width: 100%; min-height: 56dvh; display: block;
+  font-size: 17.5px; line-height: 32px;
+}
+.seitenfuss { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 14px 0 4px; color: var(--blass); font-size: 14px; }
+.seitenfuss .snummer { min-width: 110px; text-align: center; font-family: ui-serif, Georgia, serif; font-style: italic; }
+.seitenwerkzeuge { position: absolute; right: 10px; top: 10px; display: flex; gap: 6px; z-index: 6; }
+.seitenwerkzeuge .rundknopf { width: 36px; height: 36px; background: var(--karte); }
+
+/* Angeklebtes */
+.anlage { position: absolute; z-index: 5; touch-action: none; }
+.anlage.aktiv { z-index: 7; }
+.zettel {
+  padding: 26px 12px 12px; border-radius: 2px;
+  box-shadow: 0 3px 9px rgba(0,0,0,.18);
+  width: 100%;
+}
+.zettel::before {
+  content: ""; position: absolute; top: -8px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+  width: 74px; height: 20px; background: rgba(255,255,255,.4);
+  box-shadow: 0 1px 2px rgba(0,0,0,.1); border-left: 1px dashed rgba(0,0,0,.06); border-right: 1px dashed rgba(0,0,0,.06);
+}
+.zettel textarea {
+  width: 100%; font-family: "Bradley Hand", "Noteworthy", "Segoe Print", "Comic Sans MS", cursive;
+  font-size: 15.5px; line-height: 1.45; color: #3a3325; min-height: 40px; overflow: hidden;
+}
+.zettel.gelb { background: #f6e9a8; } .zettel.rosa { background: #f3cfd3; }
+.zettel.blau { background: #cadfea; } .zettel.gruen { background: #d3e3bd; }
+.foto-anlage { padding: 10px 10px 26px; background: #fdfcf7; box-shadow: 0 4px 12px rgba(0,0,0,.22); width: 100%; }
+.foto-anlage img { width: 100%; display: block; pointer-events: none; }
+.foto-anlage::before, .foto-anlage::after {
+  content: ""; position: absolute; width: 58px; height: 20px; background: rgba(250, 245, 220, .55);
+  box-shadow: 0 1px 2px rgba(0,0,0,.12); z-index: 2;
+}
+.foto-anlage::before { top: -7px; left: -14px; transform: rotate(-38deg); }
+.foto-anlage::after { top: -7px; right: -14px; transform: rotate(38deg); }
+.anlage .griff {
+  position: absolute; right: -7px; bottom: -7px; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--akzent); color: var(--papier); display: none; align-items: center; justify-content: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,.3); z-index: 8;
+}
+.anlage .griff svg.ik { width: 14px; height: 14px; }
+.anlage.aktiv .griff { display: flex; }
+
+/* Kritzeln */
+.skizzenbild { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.skizzenbild img { width: 100%; height: 100%; object-fit: contain; object-position: top left; }
+.kritzelflaeche { position: absolute; inset: 0; z-index: 9; touch-action: none; }
+.kritzelleiste {
+  position: sticky; top: calc(env(safe-area-inset-top) + 8px); z-index: 30;
+  display: flex; gap: 9px; align-items: center; justify-content: center;
+  background: var(--karte); border-radius: 100px; padding: 8px 14px;
+  box-shadow: 0 4px 16px var(--schein), inset 0 0 0 1px var(--linie);
+  width: fit-content; margin: 0 auto 10px;
+}
+.stiftfarbe { width: 30px; height: 30px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+.stiftfarbe.an { box-shadow: 0 0 0 3px var(--akzent); }
+
+/* ================================================================
+   Projekte
+   ================================================================ */
+.projektliste { display: flex; flex-direction: column; gap: 13px; margin-top: 12px; }
+.projektkarte { display: flex; flex-direction: column; gap: 7px; text-align: left; width: 100%; }
+.projektkarte .pzeile1 { display: flex; align-items: baseline; gap: 10px; }
+.projektkarte h3 { font-family: ui-serif, "New York", Georgia, serif; font-size: 21px; font-weight: 600; flex: 1; }
+.artmarke { font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--blass); background: var(--hg2); border-radius: 100px; padding: 3px 10px; flex: none; }
+.projektkarte .pzahlen { font-size: 13px; color: var(--blass); }
+.zielbalken { height: 5px; border-radius: 3px; background: var(--linie); overflow: hidden; }
+.zielbalken i { display: block; height: 100%; border-radius: 3px; background: var(--akzent2); transition: width .4s ease; }
+
+.kapitelblock { margin-top: 24px; }
+.kapitelzeile { display: flex; align-items: baseline; gap: 10px; padding: 0 2px 9px; }
+.kapitelzeile h3 { font-family: ui-serif, "New York", Georgia, serif; font-size: 19px; font-weight: 600; }
+.kapitelzeile .kworte { font-size: 12.5px; color: var(--blass); flex: 1; }
+.pinnwand { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.szkarte { perspective: 900px; height: 148px; position: relative; }
+.szkarte .dreher { position: absolute; inset: 0; transition: transform .5s; transform-style: preserve-3d; }
+.szkarte.rueckseite .dreher { transform: rotateY(180deg); }
+.szvorn, .szhinten {
+  position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  background: var(--karte); border-radius: 13px; padding: 12px 14px;
+  box-shadow: 0 1px 5px var(--schein), inset 0 0 0 1px var(--linie);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.szvorn { border-top: 4px solid var(--szfarbe, var(--linie)); }
+.szhinten { transform: rotateY(180deg); background: var(--hg2); }
+.szvorn .sztitel { font-family: ui-serif, "New York", Georgia, serif; font-size: 16px; font-weight: 600; line-height: 1.25; margin-bottom: 5px; }
+.szvorn .szprobe { font-family: ui-serif, Georgia, serif; font-size: 13px; font-style: italic; color: var(--blass); line-height: 1.4; flex: 1; overflow: hidden; }
+.szfusszeile { display: flex; align-items: center; gap: 7px; margin-top: 7px; }
+.szfusszeile .szworte { font-size: 11.5px; color: var(--blass); flex: 1; }
+.statuspunkt { width: 13px; height: 13px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
+.statuspunkt.funke { background: transparent; box-shadow: inset 0 0 0 1.6px var(--blass); }
+.statuspunkt.entwurf { background: var(--gold); }
+.statuspunkt.steht { background: var(--akzent2); }
+.szhinten textarea { flex: 1; font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 14px; line-height: 1.4; }
+.szhinten .hintenhinweis { font-size: 10.5px; color: var(--blass); letter-spacing: .05em; margin-bottom: 4px; }
+.szkarte.zieht { opacity: .35; }
+.szgeist { position: fixed; z-index: 90; width: 190px; pointer-events: none; transform: rotate(3deg); opacity: .92; }
+.plusskarte {
+  border: 1.6px dashed var(--linie); border-radius: 13px; min-height: 60px;
+  display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--blass); font-size: 14.5px;
+}
+.plusskarte:active { background: var(--karte); }
+
+/* Leseansicht */
+.lesebogen { position: fixed; inset: 0; z-index: 80; background: var(--hg); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.lesebogen .innen { max-width: 660px; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 70px) 26px 90px; }
+.lesebogen h1 { font-family: ui-serif, "New York", Georgia, serif; font-size: 32px; margin-bottom: 6px; }
+.lesebogen h2 { font-family: ui-serif, "New York", Georgia, serif; font-size: 22px; margin: 38px 0 12px; }
+.lesebogen .lesetext { font-family: ui-serif, "New York", Georgia, serif; font-size: 18px; line-height: 1.75; white-space: pre-wrap; user-select: text; -webkit-user-select: text; }
+.lesebogen .lmeta { color: var(--blass); font-size: 13.5px; margin-bottom: 22px; }
+.schwebeleiste {
+  position: fixed; top: calc(env(safe-area-inset-top) + 10px); left: 50%; transform: translateX(-50%);
+  display: flex; gap: 8px; z-index: 85;
+  background: var(--karte); border-radius: 100px; padding: 7px 10px;
+  box-shadow: 0 4px 18px var(--schein), inset 0 0 0 1px var(--linie);
+}
+
+/* ================================================================
+   Schreibraum
+   ================================================================ */
+.schreibraum { position: fixed; inset: 0; bottom: auto; height: 100dvh; height: min(100dvh, var(--vvh, 100dvh)); z-index: 70; background: var(--hg); display: flex; flex-direction: column; }
+.sr-kopf {
+  display: flex; align-items: center; gap: 8px;
+  padding: calc(env(safe-area-inset-top) + 10px) 16px 8px;
+  transition: opacity .5s ease;
+}
+.sr-kopf.versunken { opacity: 0; pointer-events: none; }
+.sr-titel { flex: 1; text-align: center; font-family: ui-serif, Georgia, serif; font-size: 16px; font-weight: 600; color: var(--blass); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sr-worte { font-size: 13px; color: var(--blass); font-variant-numeric: tabular-nums; }
+.sr-mitte { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; position: relative; }
+.sr-spalte { margin: 0 auto; padding: 4vh 26px 45vh; position: relative; }
+.sr-spalte.schmal { max-width: 540px; } .sr-spalte.mittel { max-width: 680px; } .sr-spalte.breit { max-width: 860px; }
+.sr-text {
+  width: 100%; display: block; overflow: hidden;
+  font-size: var(--sr-groesse, 19px); line-height: 1.7;
+  caret-color: var(--akzent);
+}
+.sr-text.klar { font-family: ui-rounded, -apple-system, "Segoe UI", system-ui, sans-serif; }
+.sr-text.mono { font-family: ui-monospace, "SF Mono", Consolas, monospace; }
+.sr-spiegel {
+  position: absolute; inset: 0; padding: inherit; pointer-events: none;
+  white-space: pre-wrap; word-wrap: break-word; visibility: hidden;
+}
+.sr-fokus .sr-text { color: transparent; }
+.sr-fokus .sr-spiegel { visibility: visible; color: var(--blass); }
+html[data-thema="papier"] .sr-fokus .sr-spiegel, html[data-thema="nebel"] .sr-fokus .sr-spiegel { color: rgba(130, 117, 95, .55); }
+.sr-fokus .sr-spiegel mark { background: none; color: var(--tinte); }
+
+/* Kerze */
+.kerzenhalter { display: flex; align-items: flex-end; gap: 6px; height: 34px; padding: 0 4px; }
+.kerze { width: 11px; background: linear-gradient(#f7ecd4, #e8d9b4); border-radius: 3px 3px 2px 2px; position: relative; box-shadow: inset -2px 0 3px rgba(0,0,0,.08); transition: height 1s linear; }
+.kerze::before { content: ""; position: absolute; top: -3px; left: 50%; transform: translateX(-50%); width: 1.5px; height: 4px; background: #6b5a3a; }
+.kerzenflamme { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); width: 8px; height: 11px; border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%; background: radial-gradient(#fff3c4, #f2a93b 65%, transparent); animation: flackern 2.2s ease-in-out infinite; }
+@keyframes flackern { 0%,100% { transform: translateX(-50%) scale(1); } 30% { transform: translateX(-52%) scale(1.08, .94); } 60% { transform: translateX(-48%) scale(.95, 1.06); } }
+
+/* Flamme (Schreibfeuer) */
+.flammenbild { position: relative; width: 100%; height: 100%; }
+.flammenbild .f1, .flammenbild .f2 {
+  position: absolute; bottom: 6px; left: 50%; transform-origin: 50% 100%;
+  border-radius: 50% 50% 50% 50% / 66% 66% 34% 34%;
+  animation: flackern 1.9s ease-in-out infinite;
+}
+.flammenbild .f1 { width: 30px; height: 40px; margin-left: -15px; background: radial-gradient(circle at 50% 78%, #ffdf8e, #e8813a 70%, transparent); }
+.flammenbild .f2 { width: 15px; height: 21px; margin-left: -7.5px; background: radial-gradient(circle at 50% 80%, #fff7d6, #ffc860 75%, transparent); animation-delay: -.7s; }
+.flammenbild .holz { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 38px; height: 7px; border-radius: 4px; background: #6e4a2a; box-shadow: 0 2px 2px rgba(0,0,0,.2); }
+.flammenbild.glut .f1 { width: 17px; height: 15px; margin-left: -8.5px; opacity: .65; }
+.flammenbild.glut .f2 { display: none; }
+.flammenbild.aus .f1, .flammenbild.aus .f2 { display: none; }
+.flammenbild.aus .rauch { position: absolute; bottom: 10px; left: 50%; width: 3px; height: 16px; margin-left: -1px; border-radius: 3px; background: var(--blass); opacity: .35; }
+.flammenbild.lodert .f1 { width: 38px; height: 52px; margin-left: -19px; }
+
+/* ================================================================
+   Cluster
+   ================================================================ */
+.brettliste { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-top: 12px; }
+.brettkarte { text-align: left; display: flex; flex-direction: column; gap: 6px; min-height: 110px; justify-content: flex-end; position: relative; overflow: hidden; }
+.brettkarte h3 { font-family: ui-serif, "New York", Georgia, serif; font-size: 19px; font-weight: 600; }
+.brettkarte .bzahl { font-size: 12.5px; color: var(--blass); }
+.brettkarte .minis { position: absolute; inset: 12px 12px auto auto; display: flex; gap: 5px; }
+.brettkarte .minis i { width: 14px; height: 14px; border-radius: 50%; background: var(--akzent); opacity: .35; }
+.brettkarte .minis i:nth-child(2) { background: var(--akzent2); } .brettkarte .minis i:nth-child(3) { background: var(--gold); }
+
+.brett-raum { position: fixed; inset: 0; z-index: 60; background: var(--hg); overflow: hidden; touch-action: none; }
+.brett-flaeche { position: absolute; left: 0; top: 0; width: 100%; height: 100%; transform-origin: 0 0; }
+.brett-kanten { position: absolute; left: -20000px; top: -20000px; width: 40000px; height: 40000px; pointer-events: none; overflow: visible; }
+.brett-kanten line { stroke: var(--blass); stroke-width: 1.6; opacity: .55; }
+.brett-kanten line.klickbar { stroke-width: 16; stroke: transparent; opacity: 1; pointer-events: stroke; }
+.brett-kanten text { fill: var(--blass); font-size: 12px; font-family: ui-rounded, -apple-system, system-ui, sans-serif; }
+.denkblase {
+  position: absolute; width: 220px; border-radius: 15px; padding: 11px 13px;
+  background: var(--karte); box-shadow: 0 2px 8px var(--schein), inset 0 0 0 1px var(--linie);
+  touch-action: none;
+}
+.denkblase textarea { width: 100%; font-family: ui-serif, Georgia, serif; font-size: 15.5px; line-height: 1.45; min-height: 24px; overflow: hidden; }
+.denkblase.gewaehlt { box-shadow: 0 0 0 3px var(--akzent), 0 2px 8px var(--schein); }
+.denkblase.b-rot { background: #ecc9b8; color: #3a2417; } .denkblase.b-gruen { background: #ccd9b4; color: #26301a; }
+.denkblase.b-blau { background: #bfd4dd; color: #1d2c33; } .denkblase.b-gelb { background: #ecdca3; color: #383014; }
+html[data-thema="tinte"] .denkblase.b-rot, html[data-thema="kerze"] .denkblase.b-rot { background: #4c3020; color: #f0ddcf; }
+html[data-thema="tinte"] .denkblase.b-gruen, html[data-thema="kerze"] .denkblase.b-gruen { background: #35402a; color: #dde8cd; }
+html[data-thema="tinte"] .denkblase.b-blau, html[data-thema="kerze"] .denkblase.b-blau { background: #29404a; color: #d3e5ec; }
+html[data-thema="tinte"] .denkblase.b-gelb, html[data-thema="kerze"] .denkblase.b-gelb { background: #4a4020; color: #ece0b8; }
+.brett-werkzeuge {
+  position: fixed; bottom: calc(env(safe-area-inset-bottom) + 16px); left: 50%; transform: translateX(-50%);
+  display: flex; gap: 8px; z-index: 65;
+  background: var(--karte); border-radius: 100px; padding: 8px 12px;
+  box-shadow: 0 6px 22px var(--schein), inset 0 0 0 1px var(--linie);
+}
+.brett-werkzeuge .rundknopf { box-shadow: none; background: none; }
+.brett-werkzeuge .rundknopf.an { background: var(--akzent); color: var(--papier); }
+
+/* ================================================================
+   Wörter & Funken
+   ================================================================ */
+.wortgitter { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.wortkarte {
+  font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 17px;
+  background: var(--karte); padding: 9px 16px; border-radius: 100px;
+  box-shadow: 0 1px 4px var(--schein), inset 0 0 0 1px var(--linie);
+  transform: rotate(var(--dreh, 0deg));
+}
+.wortkarte:active { transform: scale(.94); }
+.dreiklang { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; padding: 10px 0; }
+.dreiklang span { font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 23px; transform: rotate(var(--dreh)); }
+.wortzugabe { display: flex; gap: 9px; margin-top: 16px; }
+.wortzugabe input { flex: 1; padding: 10px 15px; border-radius: 100px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 16px; }
+
+/* ================================================================
+   Suche
+   ================================================================ */
+.suchbogen { position: fixed; inset: 0; z-index: 110; background: var(--deck); display: flex; justify-content: center; align-items: flex-start; padding: calc(env(safe-area-inset-top) + 8vh) 20px 20px; animation: einblenden .15s ease; }
+.suchkasten { width: min(620px, 100%); background: var(--papier); border-radius: 20px; box-shadow: 0 16px 50px rgba(0,0,0,.35); overflow: hidden; display: flex; flex-direction: column; max-height: 74dvh; animation: hochkommen .2s ease; }
+.suchkasten .suchzeile { display: flex; align-items: center; gap: 10px; padding: 15px 18px; border-bottom: 1px solid var(--linie); }
+.suchkasten input { flex: 1; font-size: 18px; font-family: ui-serif, Georgia, serif; }
+.suchtreffer { overflow-y: auto; padding: 8px; }
+.suchtreffer .gruppe { font-size: 12px; color: var(--blass); letter-spacing: .06em; padding: 10px 12px 4px; }
+.suchtreffer button { display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: left; padding: 10px 12px; border-radius: 12px; }
+.suchtreffer button:active { background: var(--karte); }
+.suchtreffer .ttitel { font-family: ui-serif, Georgia, serif; font-size: 16px; font-weight: 600; }
+.suchtreffer .tprobe { font-size: 13.5px; color: var(--blass); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ================================================================
+   Feinheiten
+   ================================================================ */
+.abschnitt { margin-top: 26px; }
+.abschnitt > h2 { font-family: ui-serif, "New York", Georgia, serif; font-size: 20px; margin-bottom: 12px; }
+.themenwahl { display: flex; gap: 12px; flex-wrap: wrap; }
+.themenkachel { width: 86px; border-radius: 15px; overflow: hidden; box-shadow: 0 1px 5px var(--schein), inset 0 0 0 1px var(--linie); }
+.themenkachel .vorschau { height: 54px; display: flex; align-items: center; justify-content: center; font-family: ui-serif, Georgia, serif; font-size: 19px; font-style: italic; }
+.themenkachel .tname { font-size: 12px; padding: 6px 0 8px; text-align: center; background: var(--karte); }
+.themenkachel.an { box-shadow: 0 0 0 2.5px var(--akzent); }
+.einstellzeile { display: flex; align-items: center; gap: 12px; padding: 12px 2px; border-bottom: 1px solid var(--linie); }
+.einstellzeile:last-child { border-bottom: none; }
+.einstellzeile .ename { flex: 1; font-size: 16px; }
+.einstellzeile .ewert { color: var(--blass); font-size: 14px; }
+.wahlgruppe { display: inline-flex; background: var(--hg2); border-radius: 100px; padding: 3px; }
+.wahlgruppe button { padding: 6px 13px; border-radius: 100px; font-size: 13.5px; color: var(--blass); }
+.wahlgruppe button.an { background: var(--papier); color: var(--tinte); box-shadow: 0 1px 3px var(--schein); }
+input[type="range"] { -webkit-appearance: none; appearance: none; width: 130px; height: 4px; border-radius: 2px; background: var(--linie); }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--akzent); box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+.statistikbalken { display: flex; gap: 5px; align-items: flex-end; height: 74px; padding: 8px 0; }
+.statistikbalken .tag { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.statistikbalken .tag i { width: 100%; max-width: 26px; border-radius: 5px 5px 2px 2px; background: var(--akzent); opacity: .85; min-height: 3px; }
+.statistikbalken .tag.leer i { background: var(--linie); }
+.statistikbalken .tag b { font-size: 9px; color: var(--blass); font-weight: 400; }
+.zahlenreihe { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 8px; }
+.zahlenreihe .z { display: flex; flex-direction: column; }
+.zahlenreihe .z b { font-size: 23px; font-family: ui-serif, Georgia, serif; }
+.zahlenreihe .z span { font-size: 12px; color: var(--blass); }
+.kleingedruckt { margin-top: 40px; text-align: center; color: var(--blass); font-size: 13px; line-height: 1.7; }
+.kleingedruckt .wortmarke { font-family: ui-serif, Georgia, serif; letter-spacing: .18em; font-size: 15px; color: var(--akzent); }
+
+/* Schmale Bildschirme: Leiste nach unten */
+@media (max-width: 620px) {
+  #app { grid-template-columns: 1fr; grid-template-rows: 1fr auto; padding-left: 0; }
+  #leiste {
+    flex-direction: row; justify-content: space-around; order: 2;
+    padding: 6px 8px calc(env(safe-area-inset-bottom) + 6px);
+    border-right: none; border-top: 1px solid var(--linie);
+  }
+  #leiste .wortmarke, #leiste .luecke { display: none; }
+  .lknopf { width: auto; min-width: 54px; padding: 6px 6px 4px; }
+  .inhalt { padding-left: 16px; padding-right: 16px; }
+  .kopf { padding-left: 16px; padding-right: 16px; }
+  .schnipsel-raum { height: calc(100dvh - 0px); }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <nav id="leiste" aria-label="Räume"></nav>
+  <main id="raum"></main>
+</div>
+<div id="deck"></div>
+<div id="toasts"></div>
+<script>
+'use strict';
+/* ================================================================
+   VANI — Kern: Helfer, Icons, Datenbank, Modale
+   ================================================================ */
+
+const $ = (s, w) => (w || document).querySelector(s);
+const $$ = (s, w) => [...(w || document).querySelectorAll(s)];
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+function el(tag, attrs = {}, ...kinder) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null) continue;
+    if (k === 'class') e.className = v;
+    else if (k === 'html') e.innerHTML = v;
+    else if (k === 'style') e.style.cssText = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v);
+  }
+  for (const kind of kinder.flat(9)) {
+    if (kind == null || kind === false) continue;
+    e.append(kind.nodeType ? kind : document.createTextNode(kind));
+  }
+  return e;
+}
+
+const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function entprellt(fn, ms) {
+  let t;
+  const g = (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+  g.sofort = (...a) => { clearTimeout(t); fn(...a); };
+  return g;
+}
+
+const worte = (t) => { t = (t || '').trim(); return t ? t.split(/\s+/).length : 0; };
+
+const MONATE = ['Jan', 'Feb', 'März', 'Apr', 'Mai', 'Juni', 'Juli', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+const TAGE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+function tagKey(ts) { const d = new Date(ts || Date.now()); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function fmtDatum(ts) { const d = new Date(ts); return TAGE[d.getDay()] + ', ' + d.getDate() + '. ' + MONATE[d.getMonth()]; }
+function fmtZeit(ts) { const d = new Date(ts); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function vorZeit(ts) {
+  const m = Math.round((Date.now() - ts) / 60000);
+  if (m < 2) return 'gerade eben';
+  if (m < 60) return 'vor ' + m + ' Minuten';
+  const h = Math.round(m / 60);
+  if (h < 24) return 'vor ' + h + (h === 1 ? ' Stunde' : ' Stunden');
+  const t = Math.round(h / 24);
+  if (t < 30) return 'vor ' + t + (t === 1 ? ' Tag' : ' Tagen');
+  const mo = Math.round(t / 30);
+  if (mo < 12) return 'vor ' + mo + (mo === 1 ? ' Monat' : ' Monaten');
+  const j = Math.round(mo / 12);
+  return 'vor ' + j + (j === 1 ? ' Jahr' : ' Jahren');
+}
+const zufall = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+/* ----- Icons ----- */
+const IK = {
+  zuhause: '<path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/>',
+  schnipsel: '<path d="M21 12a8 8 0 0 1-8 8c-1.6 0-3-.4-4.3-1L4 20l1.2-4A8 8 0 1 1 21 12Z"/>',
+  hefte: '<path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4Z"/><path d="M5 4v14"/><path d="M9 8h6M9 11.5h6"/>',
+  projekte: '<rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/>',
+  cluster: '<circle cx="7" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><circle cx="10" cy="17" r="2.8"/><path d="M9.5 9.2 9.8 14M9.8 8.5l4.8.2M12.5 15.5l3-4.2"/>',
+  woerter: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/><path d="M18.5 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7Z"/>',
+  suche: '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>',
+  feinheiten: '<path d="M4 8h9M17 8h3M4 16h3M11 16h9"/><circle cx="15" cy="8" r="2.2"/><circle cx="9" cy="16" r="2.2"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  zurueck: '<path d="M14.5 5 8 12l6.5 7"/>',
+  mehr: '<circle cx="5.5" cy="12" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="18.5" cy="12" r="1.2" fill="currentColor"/>',
+  stift: '<path d="m14 5 5 5L8.5 20.5 3 21l.5-5.5Z"/><path d="m12.5 6.5 5 5"/>',
+  kamera: '<path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.5" r="3.5"/>',
+  senden: '<path d="M12 19V6"/><path d="m6 11.5 6-6 6 6"/>',
+  kreuz: '<path d="M6 6l12 12M18 6 6 18"/>',
+  haken: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  rechts: '<path d="m9.5 5 6.5 7-6.5 7"/>',
+  feuer: '<path d="M12 3s-5 4.5-5 9.5a5 5 0 0 0 10 0c0-2-1-4-2.5-5.5 0 2-.7 3-1.8 3.7C12.5 9.5 12 6.5 12 3Z"/>',
+  klang: '<path d="M4 10v4h3l5 4V6l-5 4H4Z"/><path d="M15.5 9.5a4 4 0 0 1 0 5M18 7a7.5 7.5 0 0 1 0 10"/>',
+  pin: '<path d="M9 4h6l-1 6 3 3v1.5H7V13l3-3Z"/><path d="M12 14.5V21"/>',
+  wandel: '<path d="M4 9a8 8 0 0 1 14-2.5"/><path d="M18 3v4h-4"/><path d="M20 15a8 8 0 0 1-14 2.5"/><path d="M6 21v-4h4"/>',
+  muell: '<path d="M5 7h14M10 7V5h4v2"/><path d="M7 7l1 13h8l1-13"/><path d="M10.5 11v5M13.5 11v5"/>',
+  lesen: '<path d="M12 6c-2-1.6-4.5-2-8-2v14c3.5 0 6 .4 8 2 2-1.6 4.5-2 8-2V4c-3.5 0-6 .4-8 2Z"/><path d="M12 6v14"/>',
+  ziel: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>',
+  teilen: '<path d="M12 14V4"/><path d="m8 7.5 4-4 4 4"/><path d="M5 12v8h14v-8"/>',
+  runter: '<path d="M12 4v11"/><path d="m7.5 11 4.5 4.5L16.5 11"/><path d="M5 20h14"/>',
+  verbinden: '<circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/><path d="M8.5 8.5l7 7"/>',
+  drehen: '<path d="M19 12a7 7 0 1 1-2-4.9"/><path d="M17.5 3v4.5H13"/>',
+  farbe: '<path d="M12 3.5s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11Z"/>',
+  wuerfel: '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.1" fill="currentColor"/><circle cx="15" cy="15" r="1.1" fill="currentColor"/><circle cx="15" cy="9" r="1.1" fill="currentColor"/><circle cx="9" cy="15" r="1.1" fill="currentColor"/>',
+  fund: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 2"/>',
+  buchzu: '<path d="M6 3h13v18H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M6 3v18"/>',
+  aufklappen: '<path d="m7 9.5 5 5 5-5"/>',
+  archiv: '<rect x="3.5" y="4" width="17" height="4.5" rx="1"/><path d="M5.5 8.5V20h13V8.5"/><path d="M10 12.5h4"/>'
+};
+function ik(name, kl) { return `<svg class="ik${kl ? ' ' + kl : ''}" viewBox="0 0 24 24" aria-hidden="true">${IK[name] || ''}</svg>`; }
+
+/* ----- Datenbank ----- */
+let _db;
+function dbAuf() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('vani', 1);
+    r.onupgradeneeded = () => {
+      const d = r.result;
+      d.createObjectStore('docs', { keyPath: 'id' });
+      d.createObjectStore('media');
+      d.createObjectStore('kv');
+    };
+    r.onsuccess = () => { _db = r.result; res(); };
+    r.onerror = () => rej(r.error);
+  });
+}
+function dbTu(store, modus, arbeit) {
+  return new Promise((res, rej) => {
+    const tx = _db.transaction(store, modus);
+    const antwort = arbeit(tx.objectStore(store));
+    tx.oncomplete = () => res(antwort && 'result' in antwort ? antwort.result : undefined);
+    tx.onerror = () => rej(tx.error);
+  });
+}
+const dbPut = (store, wert, key) => dbTu(store, 'readwrite', (s) => (key !== undefined ? s.put(wert, key) : s.put(wert)));
+const dbDel = (store, key) => dbTu(store, 'readwrite', (s) => s.delete(key));
+const dbGet = (store, key) => dbTu(store, 'readonly', (s) => s.get(key));
+const dbAlle = (store) => dbTu(store, 'readonly', (s) => s.getAll());
+
+/* ----- Bestand ----- */
+const D = {
+  docs: new Map(),
+  einst: {
+    thema: 'papier', schrift: 'serife', groesse: 19, breite: 'mittel',
+    typewriter: true, fokus: false, klang: 'aus', lautstaerke: .5,
+    tastenklang: false, tagesziel: 0
+  },
+  stats: { tage: {}, letzte: {}, letzteSicherung: 0 }
+};
+
+async function ladeAlles() {
+  await dbAuf();
+  (await dbAlle('docs')).forEach((d) => D.docs.set(d.id, d));
+  const e = await dbGet('kv', 'einst'); if (e) Object.assign(D.einst, e);
+  const s = await dbGet('kv', 'stats'); if (s) D.stats = Object.assign({ tage: {}, letzte: {}, letzteSicherung: 0 }, s);
+}
+const speichereEinst = entprellt(() => dbPut('kv', D.einst, 'einst'), 300);
+const speichereStats = entprellt(() => dbPut('kv', D.stats, 'stats'), 800);
+
+function neuDoc(typ, felder) {
+  const d = Object.assign({ id: uid(), typ, angelegt: Date.now(), geaendert: Date.now() }, felder);
+  D.docs.set(d.id, d);
+  dbPut('docs', d);
+  D.stats.letzte[d.id] = worte(d.text || '');
+  return d;
+}
+function speichere(d) { d.geaendert = Date.now(); dbPut('docs', d); }
+function speichereStill(d) { dbPut('docs', d); }
+
+async function loesche(id) {
+  const opfer = [id];
+  for (let i = 0; i < opfer.length; i++) {
+    for (const d of D.docs.values()) {
+      if (d.parent === opfer[i] || d.projekt === opfer[i]) { if (!opfer.includes(d.id)) opfer.push(d.id); }
+      if (d.typ === 'kante' && (d.von === opfer[i] || d.zu === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
+    }
+  }
+  for (const oid of opfer) {
+    const d = D.docs.get(oid);
+    if (!d) continue;
+    if (d.bild) dbDel('media', d.bild);
+    if (d.skizze) dbDel('media', d.skizze);
+    D.docs.delete(oid);
+    delete D.stats.letzte[oid];
+    await dbDel('docs', oid);
+  }
+  speichereStats();
+}
+
+function kinder(pid, typ) {
+  return [...D.docs.values()]
+    .filter((d) => d.parent === pid && (!typ || d.typ === typ))
+    .sort((a, b) => (a.ord || 0) - (b.ord || 0) || a.angelegt - b.angelegt);
+}
+function vomTyp(typ) {
+  return [...D.docs.values()].filter((d) => d.typ === typ).sort((a, b) => b.geaendert - a.geaendert);
+}
+
+/* ----- Statistik ----- */
+function zaehleWorte(docId, text) {
+  const n = worte(text);
+  const alt = D.stats.letzte[docId];
+  if (alt !== undefined && n > alt) {
+    const k = tagKey();
+    D.stats.tage[k] = (D.stats.tage[k] || 0) + (n - alt);
+  }
+  D.stats.letzte[docId] = n;
+  speichereStats();
+}
+function straehne() {
+  let n = 0;
+  const t = new Date();
+  if (!D.stats.tage[tagKey(t)]) t.setDate(t.getDate() - 1);
+  while (D.stats.tage[tagKey(t)]) { n++; t.setDate(t.getDate() - 1); }
+  return n;
+}
+function feuerstufe() {
+  let letzte3 = 0;
+  const t = new Date();
+  for (let i = 0; i < 3; i++) { letzte3 += D.stats.tage[tagKey(t)] || 0; t.setDate(t.getDate() - 1); }
+  const heute = D.stats.tage[tagKey()] || 0;
+  if (heute >= 800) return 'lodert';
+  if (heute > 0) return 'brennt';
+  if (letzte3 > 0) return 'glut';
+  return 'aus';
+}
+function flammeHTML() {
+  const stufe = feuerstufe();
+  return `<div class="flammenbild ${stufe === 'brennt' ? '' : stufe}"><i class="f1"></i><i class="f2"></i><i class="holz"></i>${stufe === 'aus' ? '<i class="rauch"></i>' : ''}</div>`;
+}
+
+/* ----- Thema ----- */
+const THEMEN = { papier: '#ece3d1', tinte: '#141110', kerze: '#1b1206', nebel: '#e2e5e1' };
+function setzeThema(name) {
+  document.documentElement.dataset.thema = name;
+  D.einst.thema = name;
+  const m = $('meta[name="theme-color"]');
+  if (m) m.content = THEMEN[name] || '#ece3d1';
+  speichereEinst();
+}
+
+/* ----- Toast, Modale, Menüs ----- */
+function toast(text, ms = 2400) {
+  const t = el('div', { class: 'toast' }, text);
+  $('#toasts').append(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 450); }, ms);
+}
+
+function zeigeDeck(inhalt, beiZu) {
+  const schleier = el('div', { class: 'schleier' }, inhalt);
+  schleier.addEventListener('pointerdown', (e) => { if (e.target === schleier) zu(); });
+  const zu = () => { schleier.remove(); if (beiZu) beiZu(); };
+  $('#deck').append(schleier);
+  return zu;
+}
+
+function frage(text, { ja = 'Ja', nein = 'Lieber nicht', gefahr = false } = {}) {
+  return new Promise((res) => {
+    const kasten = el('div', { class: 'modal' },
+      el('div', { class: 'serif', style: 'font-size:18px;line-height:1.5' }, text),
+      el('div', { class: 'reihe' },
+        el('button', { class: 'knopf zart', onclick: () => { res(false); zu(); } }, nein),
+        el('button', { class: 'knopf ' + (gefahr ? '' : 'voll'), style: gefahr ? 'color:#c0392b' : '', onclick: () => { res(true); zu(); } }, ja)
+      )
+    );
+    const zu = zeigeDeck(kasten, () => res(false));
+  });
+}
+
+function eingabe({ titel, wert = '', platzhalter = '', mehrzeilig = false, ok = 'Fertig' }) {
+  return new Promise((res) => {
+    const feld = mehrzeilig
+      ? el('textarea', { rows: 4, placeholder: platzhalter })
+      : el('input', { type: 'text', value: wert, placeholder: platzhalter });
+    if (mehrzeilig) feld.value = wert;
+    const kasten = el('div', { class: 'modal' },
+      el('h2', {}, titel),
+      feld,
+      el('div', { class: 'reihe' },
+        el('button', { class: 'knopf zart', onclick: () => { res(null); zu(); } }, 'Abbrechen'),
+        el('button', { class: 'knopf voll', onclick: () => { const v = feld.value.trim(); res(v || null); zu(); } }, ok)
+      )
+    );
+    feld.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !mehrzeilig) { e.preventDefault(); const v = feld.value.trim(); res(v || null); zu(); } });
+    const zu = zeigeDeck(kasten, () => res(null));
+    setTimeout(() => feld.focus(), 60);
+  });
+}
+
+function menue(punkte, titel) {
+  return new Promise((res) => {
+    const kasten = el('div', { class: 'menue' },
+      titel ? el('div', { class: 'mtitel' }, titel) : null,
+      punkte.filter(Boolean).map((p) =>
+        el('button', { class: p.rot ? 'rot' : '', onclick: () => { res(p.wert !== undefined ? p.wert : p.text); zu(); } },
+          p.icon ? el('span', { html: ik(p.icon), style: 'display:flex' }) : null,
+          p.text)
+      )
+    );
+    const zu = zeigeDeck(kasten, () => res(null));
+  });
+}
+
+/* ----- Gesten ----- */
+function langdruck(elem, fn) {
+  let timer = null, sx = 0, sy = 0;
+  elem.addEventListener('pointerdown', (e) => {
+    sx = e.clientX; sy = e.clientY;
+    timer = setTimeout(() => { timer = null; if (!elem._zieht) fn(e); }, 480);
+  });
+  const abbruch = (e) => {
+    if (timer && e.type === 'pointermove' && Math.hypot(e.clientX - sx, e.clientY - sy) < 12) return;
+    clearTimeout(timer); timer = null;
+  };
+  elem.addEventListener('pointermove', abbruch);
+  elem.addEventListener('pointerup', abbruch);
+  elem.addEventListener('pointercancel', abbruch);
+  elem.addEventListener('contextmenu', (e) => { e.preventDefault(); fn(e); });
+}
+
+function autogrow(ta) {
+  const anpassen = () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; };
+  ta.addEventListener('input', anpassen);
+  requestAnimationFrame(anpassen);
+  return anpassen;
+}
+
+/* ----- Verweise ([[...]]) und Schlagworte ----- */
+function schmuecke(text) {
+  let h = esc(text);
+  h = h.replace(/\[\[([^\[\]]{1,80})\]\]/g, (_, t) => `<span class="verweis" data-ziel="${esc(t)}">${esc(t)}</span>`);
+  h = h.replace(/(^|\s)#([\wäöüÄÖÜß-]{2,30})/g, (_, vor, t) => `${vor}<span class="schlagwort">#${t}</span>`);
+  return h;
+}
+function findeNachTitel(titel) {
+  const t = titel.trim().toLowerCase();
+  for (const d of D.docs.values()) {
+    if ((d.titel || '').trim().toLowerCase() === t) return d;
+    if (d.typ === 'wort' && (d.text || '').trim().toLowerCase() === t) return d;
+  }
+  return null;
+}
+function rueckverweise(doc) {
+  const t = (doc.titel || doc.text || '').trim().toLowerCase();
+  if (!t) return [];
+  return [...D.docs.values()].filter((d) => d.id !== doc.id && (d.text || '').toLowerCase().includes('[[' + t + ']]'));
+}
+function oeffneDoc(d) {
+  if (!d) return;
+  if (d.typ === 'schnipsel') location.hash = '#/schnipsel';
+  else if (d.typ === 'heft') location.hash = '#/heft/' + d.id;
+  else if (d.typ === 'seite') { sessionStorage.setItem('zielSeite', d.id); location.hash = '#/heft/' + d.parent; }
+  else if (d.typ === 'projekt') location.hash = '#/projekt/' + d.id;
+  else if (d.typ === 'kapitel') location.hash = '#/projekt/' + d.parent;
+  else if (d.typ === 'szene') { location.hash = '#/projekt/' + d.projekt; setTimeout(() => oeffneSchreibraum(d.id), 80); }
+  else if (d.typ === 'board') location.hash = '#/brett/' + d.id;
+  else if (d.typ === 'blase') location.hash = '#/brett/' + d.parent;
+  else if (d.typ === 'wort') location.hash = '#/woerter';
+  else if (d.typ === 'zettel' || d.typ === 'foto') { const s = D.docs.get(d.parent); if (s) oeffneDoc(s); }
+}
+document.addEventListener('click', (e) => {
+  const v = e.target.closest('.verweis');
+  if (!v) return;
+  e.preventDefault(); e.stopPropagation();
+  const ziel = findeNachTitel(v.dataset.ziel);
+  if (ziel) oeffneDoc(ziel);
+  else toast('„' + v.dataset.ziel + '" gibt es noch nicht. Vielleicht bald.');
+});
+/* ================================================================
+   VANI — Stimmen: Grüße, Funken, Saatworte
+   ================================================================ */
+
+const GRUESSE = {
+  frueh: ['Guten Morgen.', 'Früh wach.', 'Der Tag ist noch leer.'],
+  mittag: ['Mittendrin.', 'Guten Tag.', 'Zeit für ein paar Zeilen.'],
+  nachmittag: ['Nachmittagslicht.', 'Schön, dass du da bist.', 'Weiter im Text.'],
+  abend: ['Der Abend gehört den Seiten.', 'Guten Abend.', 'Zeit, die Tür zuzumachen.'],
+  nacht: ['Noch wach.', 'Die beste Stunde.', 'Ganz leise jetzt.']
+};
+const GRUSS_UNTEN = [
+  'Die Seiten warten schon.',
+  'Alles ist da, wo du es gelassen hast.',
+  'Kein Internet nötig. Nur du.',
+  'Ein Satz reicht für den Anfang.',
+  'Was liegen bleibt, bleibt liegen. Nichts verschwindet.',
+  'Irgendwo hier liegt ein angefangener Gedanke.'
+];
+const GRUSS_LANGE_WEG = 'Schön, dass du wieder da bist.';
+
+function grussZeile() {
+  const h = new Date().getHours();
+  const topf = h < 5 ? GRUESSE.nacht : h < 11 ? GRUESSE.frueh : h < 14 ? GRUESSE.mittag : h < 18 ? GRUESSE.nachmittag : h < 23 ? GRUESSE.abend : GRUESSE.nacht;
+  return zufall(topf);
+}
+
+const FUNKEN = [
+  'Ein Ort, an den niemand zurückkehrt — außer einmal im Jahr.',
+  'Jemand findet einen Brief, der eindeutig an ihn gerichtet ist. Nur ist er hundert Jahre alt.',
+  'Das Haus tauscht nachts die Zimmer. Alle tun so, als wäre das normal.',
+  'Zwei Menschen, die sich jeden Tag sehen, sprechen zum ersten Mal.',
+  'Etwas, das man aus Versehen behalten hat. Und jetzt ist es zu spät, es zurückzugeben.',
+  'Die letzte Nacht in einer Wohnung. Die Wände sind schon leer.',
+  'Ein Gespräch, das nur aus dem besteht, was nicht gesagt wird.',
+  'Der Moment, in dem eine Lüge zur Wahrheit wird, weil alle sie glauben.',
+  'Jemand kann nur an einem einzigen Ort auf der Welt schlafen.',
+  'Eine Landkarte mit einem Ort, der auf keiner anderen Karte ist.',
+  'Das Meer gibt etwas zurück. Nicht das, was man vermisst hat.',
+  'Ein Beruf, den es nicht gibt: Was macht die Person den ganzen Tag?',
+  'Der erste Schnee, aus der Sicht von jemandem, der ihn zum letzten Mal sieht.',
+  'Ein Zug hält an einem Bahnhof, der nicht im Fahrplan steht.',
+  'Jemand erbt ein Notizbuch. Die Hälfte ist schon vollgeschrieben — von wem?',
+  'Was in der Woche zwischen den Jahren passiert, zählt nicht. Sagt man.',
+  'Der Geruch, der einen sofort zehn Jahre zurückwirft.',
+  'Zwei Fremde warten zusammen. Worauf, weiß nur einer von beiden.',
+  'Eine Stadt, in der Vergessen als Höflichkeit gilt.',
+  'Das Licht im Nachbarhaus geht seit drei Nächten nicht mehr aus.'
+];
+const FUNKE_WER = [
+  'Eine Frau, die Karten für Orte zeichnet, die es nicht mehr gibt,',
+  'Ein Junge mit einem geliehenen Namen,',
+  'Die letzte Leuchtturmwärterin,',
+  'Ein Übersetzer, der an einem einzigen Wort scheitert,',
+  'Jemand, der nie zweimal denselben Weg geht,',
+  'Eine alte Frau, die alle Geburtstage der Stadt auswendig kennt,',
+  'Ein Kind, das Dinge findet, bevor sie verloren gehen,',
+  'Der Mann, der die Bahnhofsuhr von Hand stellt,'
+];
+const FUNKE_WO = [
+  'in einem Haus, das nachts die Zimmer tauscht,',
+  'auf einer Fähre, die nur bei Nebel fährt,',
+  'in der letzten Telefonzelle des Landes,',
+  'in einer Bibliothek, in der geflüstert wird, obwohl sie leer ist,',
+  'am Rand eines Dorfes, das auf keiner Karte steht,',
+  'in einem Sommer, der nicht enden will,',
+  'im Treppenhaus zwischen zwei Wohnungen,',
+  'an einem Bahnsteig, an dem nie ein Zug hält,'
+];
+const FUNKE_ABER = [
+  'aber jemand hat die Wahrheit zuerst erzählt.',
+  'aber der Brief kommt zwölf Jahre zu spät an.',
+  'aber das Meer gibt nichts zurück.',
+  'aber diesmal brennt kein Licht im Fenster.',
+  'aber der Name im Register ist der eigene.',
+  'aber heute klopft es zweimal.',
+  'aber der Schlüssel passt plötzlich nicht mehr.',
+  'aber es liegt Schnee. Mitten im August.'
+];
+function neuerFunke(kombi) {
+  if (kombi) return zufall(FUNKE_WER) + ' ' + zufall(FUNKE_WO) + ' ' + zufall(FUNKE_ABER);
+  return zufall(FUNKEN);
+}
+function funkeDesTages() {
+  const k = tagKey();
+  let h = 0;
+  for (const c of k) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return FUNKEN[h % FUNKEN.length];
+}
+
+const SAATWORTE = ['flirren', 'windschief', 'Nachklang', 'Lichtsaum', 'aufgeraut', 'zwischenblau', 'verwunschen', 'Splittergold', 'seidenmatt', 'herzwärts'];
+
+const HEFTFARBEN = ['#8c5a3b', '#5b4a6e', '#3f6258', '#7a4048', '#41597a', '#736a34', '#4a4a52', '#966030'];
+const SZENENFARBEN = ['', '#b0552f', '#5f7752', '#b8923f', '#41597a', '#7a4048'];
+const PROJEKT_ARTEN = ['Roman', 'Erzählung', 'Sammlung', 'Gedichte', 'Welt', 'Anderes'];
+/* ================================================================
+   VANI — Bilder: aufnehmen, verkleinern, zeigen
+   ================================================================ */
+
+function waehleBild() {
+  return new Promise((res) => {
+    const inp = el('input', { type: 'file', accept: 'image/*', style: 'display:none' });
+    document.body.append(inp);
+    let fertig = false;
+    inp.addEventListener('change', async () => {
+      fertig = true;
+      const datei = inp.files && inp.files[0];
+      inp.remove();
+      if (!datei) return res(null);
+      try { res(await verkleinereUndSpeichere(datei)); }
+      catch (e) { toast('Das Bild wollte nicht.'); res(null); }
+    });
+    inp.addEventListener('cancel', () => { if (!fertig) { inp.remove(); res(null); } });
+    inp.click();
+  });
+}
+
+function verkleinereUndSpeichere(datei, maxKante = 1600) {
+  return new Promise((res, rej) => {
+    const leser = new FileReader();
+    leser.onerror = rej;
+    leser.onload = () => {
+      const bild = new Image();
+      bild.onerror = rej;
+      bild.onload = () => {
+        let { width: b, height: h } = bild;
+        const f = Math.min(1, maxKante / Math.max(b, h));
+        b = Math.round(b * f); h = Math.round(h * f);
+        const c = document.createElement('canvas');
+        c.width = b; c.height = h;
+        c.getContext('2d').drawImage(bild, 0, 0, b, h);
+        c.toBlob(async (blob) => {
+          if (!blob) return rej(new Error('kein Blob'));
+          const id = uid();
+          await dbPut('media', blob, id);
+          res({ id, breite: b, hoehe: h });
+        }, 'image/jpeg', .82);
+      };
+      bild.src = leser.result;
+    };
+    leser.readAsDataURL(datei);
+  });
+}
+
+const _bildURLs = new Map();
+async function bildURL(id) {
+  if (_bildURLs.has(id)) return _bildURLs.get(id);
+  const blob = await dbGet('media', id);
+  if (!blob) return null;
+  const url = URL.createObjectURL(blob);
+  _bildURLs.set(id, url);
+  return url;
+}
+function setzeBild(img, id) {
+  bildURL(id).then((u) => { if (u) img.src = u; });
+}
+async function speichereKritzelei(canvas, alteId) {
+  return new Promise((res) => {
+    canvas.toBlob(async (blob) => {
+      if (!blob) return res(null);
+      const id = alteId || uid();
+      await dbPut('media', blob, id);
+      _bildURLs.delete(id);
+      res(id);
+    }, 'image/png');
+  });
+}
+/* ================================================================
+   VANI — Räume & Wege
+   ================================================================ */
+
+const RENDER = {};
+const RAEUME = [
+  { id: 'zuhause', name: 'Zuhause', icon: 'zuhause' },
+  { id: 'schnipsel', name: 'Schnipsel', icon: 'schnipsel' },
+  { id: 'hefte', name: 'Hefte', icon: 'hefte' },
+  { id: 'projekte', name: 'Projekte', icon: 'projekte' },
+  { id: 'cluster', name: 'Cluster', icon: 'cluster' },
+  { id: 'woerter', name: 'Wörter', icon: 'woerter' }
+];
+
+function baueLeiste() {
+  const l = $('#leiste');
+  l.innerHTML = '';
+  l.append(el('div', { class: 'wortmarke' }, 'V'));
+  for (const r of RAEUME) {
+    l.append(el('button', {
+      class: 'lknopf', 'data-raum': r.id,
+      onclick: () => { location.hash = '#/' + (r.id === 'zuhause' ? '' : r.id); }
+    }, el('span', { html: ik(r.icon), style: 'display:flex' }), el('span', {}, r.name)));
+  }
+  l.append(el('div', { class: 'luecke' }));
+  l.append(el('button', { class: 'lknopf', onclick: () => oeffneSuche() },
+    el('span', { html: ik('suche'), style: 'display:flex' }), el('span', {}, 'Suche')));
+  l.append(el('button', { class: 'lknopf', 'data-raum': 'feinheiten', onclick: () => { location.hash = '#/feinheiten'; } },
+    el('span', { html: ik('feinheiten'), style: 'display:flex' }), el('span', {}, 'Feinheiten')));
+}
+
+function zeichne() {
+  const teile = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  const raum = teile[0] || 'zuhause';
+  const arg = teile[1];
+  const haupt = $('#raum');
+  haupt.innerHTML = '';
+  haupt.scrollTop = 0;
+  const fn = RENDER[raum] || RENDER.zuhause;
+  fn(haupt, arg);
+  const aktiv = { heft: 'hefte', projekt: 'projekte', brett: 'cluster' }[raum] || raum;
+  $$('#leiste .lknopf').forEach((k) => k.classList.toggle('an', k.dataset.raum === aktiv));
+}
+
+function raumkopf(titel, unter, ...aktionen) {
+  return el('div', { class: 'kopf' },
+    el('h1', {}, titel, unter ? el('div', { class: 'unter' }, unter) : null),
+    ...aktionen
+  );
+}
+function zurueckknopf(ziel) {
+  return el('button', { class: 'rundknopf zart', html: ik('zurueck'), onclick: () => { location.hash = ziel; } });
+}
+
+window.addEventListener('hashchange', zeichne);
+/* ================================================================
+   VANI — Zuhause
+   ================================================================ */
+
+RENDER.zuhause = function (haupt) {
+  const inhalt = el('div', { class: 'inhalt' });
+
+  /* Gruß */
+  const tageWeg = (() => {
+    const letzteTage = Object.keys(D.stats.tage).sort();
+    if (!letzteTage.length) return 0;
+    const letzter = new Date(letzteTage[letzteTage.length - 1]);
+    return Math.floor((Date.now() - letzter.getTime()) / 86400000);
+  })();
+  inhalt.append(el('div', { class: 'zuhause-gruss' },
+    el('h1', {}, tageWeg > 6 ? GRUSS_LANGE_WEG : grussZeile()),
+    el('p', {}, zufall(GRUSS_UNTEN))
+  ));
+
+  const gitter = el('div', { class: 'zuhause-gitter' });
+  inhalt.append(gitter);
+
+  /* Schnell einfangen */
+  const fangFeld = el('textarea', { placeholder: 'Kurz festhalten, bevor es weg ist …', rows: 1 });
+  autogrow(fangFeld);
+  gitter.append(el('div', { class: 'karte breit' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('schnipsel') }), 'IN DIE SCHNIPSEL'),
+    el('div', { class: 'fang' },
+      fangFeld,
+      el('button', {
+        class: 'rundknopf voll', html: ik('senden'), onclick: () => {
+          const t = fangFeld.value.trim();
+          if (!t) return;
+          neuDoc('schnipsel', { text: t });
+          fangFeld.value = ''; fangFeld.style.height = 'auto';
+          toast('Eingefangen.');
+        }
+      })
+    )
+  ));
+
+  /* Schreibfeuer */
+  const heutigeWorte = D.stats.tage[tagKey()] || 0;
+  const str = straehne();
+  const feuerKarte = el('div', { class: 'karte' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('feuer') }), 'SCHREIBFEUER'),
+    el('div', { class: 'feuer-zeile' },
+      el('div', { class: 'feuer-flamme', html: flammeHTML() }),
+      el('div', { class: 'feuer-zahlen' },
+        el('div', { class: 'gross' }, String(heutigeWorte), el('span', { style: 'font-size:15px;font-weight:400' }, ' Wörter heute')),
+        el('div', { class: 'klein' },
+          str >= 2 ? str + ' Tage in Folge am Feuer' :
+          heutigeWorte > 0 ? 'Das Feuer brennt.' :
+          feuerstufe() === 'glut' ? 'Noch Glut von neulich. Ein Satz genügt.' :
+          'Kalt hier. Ein Satz macht Feuer.')
+      ),
+      (() => {
+        const b = el('div', { class: 'wochenbalken' });
+        const max = Math.max(1, ...[...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return D.stats.tage[tagKey(d)] || 0; }));
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(); d.setDate(d.getDate() - i);
+          const w = D.stats.tage[tagKey(d)] || 0;
+          b.append(el('i', { class: (i === 0 ? 'heute ' : '') + (w ? '' : 'null'), style: 'height:' + Math.max(8, Math.round(w / max * 100)) + '%' }));
+        }
+        return b;
+      })()
+    ),
+    D.einst.tagesziel > 0 ? el('div', { style: 'margin-top:12px' },
+      el('div', { class: 'zielbalken' }, el('i', { style: 'width:' + Math.min(100, Math.round(heutigeWorte / D.einst.tagesziel * 100)) + '%' })),
+      el('div', { style: 'font-size:12px;color:var(--blass);margin-top:5px' },
+        heutigeWorte >= D.einst.tagesziel ? 'Tagesziel erreicht. Der Rest ist Geschenk.' : 'noch ' + (D.einst.tagesziel - heutigeWorte) + ' bis zum Tagesziel')
+    ) : null
+  );
+  gitter.append(feuerKarte);
+
+  /* Funke des Tages */
+  let funkeAktuell = funkeDesTages();
+  const funkeText = el('div', { class: 'funke-text' }, funkeAktuell);
+  gitter.append(el('div', { class: 'karte' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('woerter') }), 'FUNKE'),
+    funkeText,
+    el('div', { class: 'fussreihe' },
+      el('button', { class: 'knopf zart', onclick: () => { funkeAktuell = neuerFunke(Math.random() < .4); funkeText.textContent = funkeAktuell; } }, 'Anderer'),
+      el('button', {
+        class: 'knopf', onclick: () => {
+          const seite = seiteAusText('', funkeAktuell + '\n\n');
+          oeffneSchreibraum(seite.id);
+        }
+      }, 'Dem nachgehen')
+    )
+  ));
+
+  /* Weiterschreiben */
+  const zuletzt = [...D.docs.values()]
+    .filter((d) => (d.typ === 'szene' || d.typ === 'seite') && (d.text || '').trim())
+    .sort((a, b) => b.geaendert - a.geaendert).slice(0, 3);
+  if (zuletzt.length) {
+    gitter.append(el('div', { class: 'karte' },
+      el('div', { class: 'kartenkopf' }, el('span', { html: ik('stift') }), 'WEITERSCHREIBEN'),
+      zuletzt.map((d) => {
+        let wo = '';
+        if (d.typ === 'szene') {
+          const p = D.docs.get(d.projekt), k = D.docs.get(d.parent);
+          wo = [p && p.titel, k && k.titel].filter(Boolean).join(' › ');
+        } else {
+          const h = D.docs.get(d.parent);
+          wo = h ? h.titel : '';
+        }
+        const letzterSatz = (d.text || '').trim().split('\n').filter(Boolean).pop() || '';
+        return el('button', { class: 'weiter-eintrag', onclick: () => (d.typ === 'szene' ? oeffneSchreibraum(d.id) : oeffneDoc(d)) },
+          el('span', { class: 'wtitel' }, d.titel || 'Ohne Titel'),
+          wo ? el('span', { class: 'wo' }, wo + ' · ' + vorZeit(d.geaendert)) : el('span', { class: 'wo' }, vorZeit(d.geaendert)),
+          el('span', { class: 'probe' }, '… ' + letzterSatz.slice(-90))
+        );
+      })
+    ));
+  }
+
+  /* Wieder aufgetaucht */
+  const alteFunde = [...D.docs.values()].filter((d) =>
+    ['schnipsel', 'szene', 'seite', 'blase'].includes(d.typ) &&
+    (d.text || '').trim().length > 40 &&
+    Date.now() - d.angelegt > 3 * 86400000);
+  if (alteFunde.length) {
+    let fund = zufall(alteFunde);
+    const fundText = el('div', { class: 'fund-text' }, fund.text.trim());
+    const fundWann = el('div', { class: 'fund-wann' }, '');
+    const aktualisiere = () => { fundWann.textContent = vorZeit(fund.angelegt) + ' geschrieben · Tippen zum Hingehen'; };
+    aktualisiere();
+    const karte = el('div', { class: 'karte' + (zuletzt.length ? '' : ' breit') },
+      el('div', { class: 'kartenkopf' }, el('span', { html: ik('fund') }), 'WIEDER AUFGETAUCHT',
+        el('span', { class: 'rest' }),
+        el('button', {
+          class: 'rundknopf zart', style: 'width:30px;height:30px', html: ik('wandel'), onclick: (e) => {
+            e.stopPropagation();
+            fund = zufall(alteFunde);
+            fundText.textContent = fund.text.trim();
+            aktualisiere();
+          }
+        })),
+      fundText, fundWann
+    );
+    karte.addEventListener('click', (e) => { if (!e.target.closest('button')) oeffneDoc(fund); });
+    gitter.append(karte);
+  }
+
+  /* Sicherungs-Erinnerung, ganz leise */
+  const tageOhneSicherung = D.stats.letzteSicherung ? Math.floor((Date.now() - D.stats.letzteSicherung) / 86400000) : null;
+  if (D.docs.size > 12 && (tageOhneSicherung === null || tageOhneSicherung > 14)) {
+    inhalt.append(el('div', { class: 'sicherungs-mahnung' },
+      tageOhneSicherung === null ? 'Noch nie gesichert. ' : 'Letzte Sicherung: vor ' + tageOhneSicherung + ' Tagen. ',
+      el('button', { onclick: () => { location.hash = '#/feinheiten'; } }, 'Sicher ist sicher →')
+    ));
+  }
+
+  haupt.append(inhalt);
+};
+
+/* Ein loses Blatt: für Funken, Wörter-Anfänge, freies Schreiben */
+function seiteAusText(titel, text) {
+  let heft = [...D.docs.values()].find((d) => d.typ === 'heft' && d.titel === 'Lose Blätter');
+  if (!heft) heft = neuDoc('heft', { titel: 'Lose Blätter', farbe: '#4a4a52', papier: 'blank' });
+  const geschwister = kinder(heft.id, 'seite');
+  return neuDoc('seite', { parent: heft.id, ord: geschwister.length, titel, text });
+}
+/* ================================================================
+   VANI — Schnipsel: der Chat mit mir selbst
+   ================================================================ */
+
+RENDER.schnipsel = function (haupt) {
+  const raum = el('div', { class: 'schnipsel-raum' });
+
+  raum.append(el('div', { class: 'kopf', style: 'position:static;background:none' },
+    el('h1', {}, 'Schnipsel', el('div', { class: 'unter' }, 'an mich, für später'))
+  ));
+
+  const pinnzeile = el('div', { class: 'pinnzeile' });
+  const lauf = el('div', { class: 'schnipsel-lauf' });
+  const innen = el('div', { class: 'innen' });
+  lauf.append(innen);
+
+  const feld = el('textarea', { placeholder: 'An mich …', rows: 1 });
+  autogrow(feld);
+  const zeile = el('div', { class: 'schreibzeile' },
+    el('button', {
+      class: 'rundknopf zart', html: ik('kamera'), onclick: async () => {
+        const bild = await waehleBild();
+        if (!bild) return;
+        neuDoc('schnipsel', { text: feld.value.trim(), bild: bild.id });
+        feld.value = ''; feld.style.height = 'auto';
+        baueLauf(); runter();
+      }
+    }),
+    feld,
+    el('button', {
+      class: 'rundknopf voll', html: ik('senden'), onclick: () => {
+        const t = feld.value.trim();
+        if (!t) return;
+        neuDoc('schnipsel', { text: t });
+        feld.value = ''; feld.style.height = 'auto';
+        baueLauf(); runter();
+        feld.focus();
+      }
+    })
+  );
+
+  raum.append(pinnzeile, lauf, zeile);
+  haupt.append(raum);
+
+  function runter() { requestAnimationFrame(() => { lauf.scrollTop = lauf.scrollHeight; }); }
+
+  function baueLauf() {
+    innen.innerHTML = '';
+    pinnzeile.innerHTML = '';
+    const alle = vomTyp('schnipsel').sort((a, b) => a.angelegt - b.angelegt);
+
+    for (const s of alle.filter((x) => x.gepinnt)) {
+      pinnzeile.append(el('button', {
+        class: 'pinnchip', onclick: () => {
+          const ziel = innen.querySelector('[data-id="' + s.id + '"]');
+          if (ziel) { ziel.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+        }
+      }, s.text || '[Bild]'));
+    }
+
+    if (!alle.length) {
+      innen.append(el('div', { class: 'leer' }, 'Noch still hier.',
+        el('div', { class: 'klein' }, 'Der erste Gedanke findet von allein den Weg.')));
+      return;
+    }
+
+    let letzterTag = '';
+    for (const s of alle) {
+      const tag = tagKey(s.angelegt);
+      if (tag !== letzterTag) {
+        letzterTag = tag;
+        const heute = tagKey();
+        const gestern = tagKey(Date.now() - 86400000);
+        innen.append(el('div', { class: 'datumstrenner' },
+          tag === heute ? 'Heute' : tag === gestern ? 'Gestern' : fmtDatum(s.angelegt)));
+      }
+      const blase = el('div', { class: 'blase' + (s.gepinnt ? ' gepinnt' : ''), 'data-id': s.id });
+      if (s.bild) {
+        const img = el('img', { alt: '' });
+        setzeBild(img, s.bild);
+        blase.append(img);
+      }
+      if (s.text) blase.append(el('div', { class: 'btext', html: schmuecke(s.text) }));
+      blase.append(el('div', { class: 'bzeit' },
+        s.gepinnt ? el('span', { html: ik('pin'), style: 'display:flex;width:11px;color:var(--gold)' }) : null,
+        fmtZeit(s.angelegt)));
+      blase.addEventListener('click', (e) => {
+        if (e.target.closest('.verweis') || e.target.closest('textarea')) return;
+        schnipselMenue(s, blase, baueLauf);
+      });
+      innen.append(blase);
+    }
+  }
+
+  baueLauf();
+  runter();
+};
+
+async function schnipselMenue(s, blase, neuZeichnen) {
+  const wahl = await menue([
+    { text: s.gepinnt ? 'Losmachen' : 'Anpinnen', icon: 'pin', wert: 'pin' },
+    s.text ? { text: 'Bearbeiten', icon: 'stift', wert: 'edit' } : null,
+    { text: 'Verwandeln …', icon: 'wandel', wert: 'wandel' },
+    { text: 'Löschen', icon: 'muell', wert: 'weg', rot: true }
+  ]);
+  if (wahl === 'pin') { s.gepinnt = !s.gepinnt; speichereStill(s); neuZeichnen(); }
+  else if (wahl === 'edit') {
+    const neu = await eingabe({ titel: 'Schnipsel', wert: s.text, mehrzeilig: true });
+    if (neu !== null) { s.text = neu; speichere(s); neuZeichnen(); }
+  }
+  else if (wahl === 'weg') {
+    if (await frage('Diesen Schnipsel wegwerfen?', { ja: 'Wegwerfen', gefahr: true })) { await loesche(s.id); neuZeichnen(); }
+  }
+  else if (wahl === 'wandel') verwandleSchnipsel(s, neuZeichnen);
+}
+
+async function verwandleSchnipsel(s, neuZeichnen) {
+  const ziel = await menue([
+    { text: 'Auf eine Heftseite kleben', icon: 'hefte', wert: 'seite' },
+    { text: 'Als Szene in ein Projekt', icon: 'projekte', wert: 'szene' },
+    { text: 'Als Blase auf ein Brett', icon: 'cluster', wert: 'blase' },
+    { text: 'Als Wort in die Kiste', icon: 'woerter', wert: 'wort' }
+  ], 'Woraus soll das werden?');
+  if (!ziel) return;
+
+  if (ziel === 'wort') {
+    neuDoc('wort', { text: (s.text || '').slice(0, 60) });
+    toast('Liegt in der Wortschatzkiste.');
+    return;
+  }
+  if (ziel === 'seite') {
+    const heft = await waehleHeft();
+    if (!heft) return;
+    const geschwister = kinder(heft.id, 'seite');
+    const seite = neuDoc('seite', { parent: heft.id, ord: geschwister.length, titel: '', text: s.text || '' });
+    if (s.bild) {
+      neuDoc('foto', { parent: seite.id, bild: s.bild, pos: { x: 55, y: 8, rot: -2 + Math.random() * 4, w: 38 } });
+      delete s.bild;
+    }
+    await loesche(s.id);
+    toast('Eingeklebt: ' + heft.titel);
+    if (neuZeichnen) neuZeichnen();
+    return;
+  }
+  if (ziel === 'szene') {
+    const wo = await waehleProjektKapitel();
+    if (!wo) return;
+    const geschwister = kinder(wo.kapitel.id, 'szene');
+    neuDoc('szene', {
+      parent: wo.kapitel.id, projekt: wo.projekt.id, ord: geschwister.length,
+      titel: (s.text || '').split('\n')[0].slice(0, 40), text: s.text || '', status: 'funke', farbe: ''
+    });
+    await loesche(s.id);
+    toast('Jetzt eine Szene in „' + wo.projekt.titel + '".');
+    if (neuZeichnen) neuZeichnen();
+    return;
+  }
+  if (ziel === 'blase') {
+    const brett = await waehleBrett();
+    if (!brett) return;
+    neuDoc('blase', { parent: brett.id, text: s.text || '', farbe: '', pos: { x: 80 + Math.random() * 300, y: 80 + Math.random() * 300 } });
+    await loesche(s.id);
+    toast('Schwebt jetzt auf „' + brett.titel + '".');
+    if (neuZeichnen) neuZeichnen();
+  }
+}
+
+/* Auswahl-Helfer */
+async function waehleHeft() {
+  const hefte = vomTyp('heft').filter((h) => !h.archiv);
+  const wahl = await menue([
+    ...hefte.map((h) => ({ text: h.titel, icon: 'hefte', wert: h.id })),
+    { text: 'Neues Heft', icon: 'plus', wert: '_neu' }
+  ], 'In welches Heft?');
+  if (!wahl) return null;
+  if (wahl === '_neu') {
+    const name = await eingabe({ titel: 'Ein neues Heft', platzhalter: 'Wie soll es heißen?' });
+    if (!name) return null;
+    return neuDoc('heft', { titel: name, farbe: zufall(HEFTFARBEN), papier: 'liniert' });
+  }
+  return D.docs.get(wahl);
+}
+async function waehleProjektKapitel() {
+  const projekte = vomTyp('projekt');
+  if (!projekte.length) { toast('Noch kein Projekt. Leg erst eins an.'); return null; }
+  const pWahl = await menue(projekte.map((p) => ({ text: p.titel, icon: 'projekte', wert: p.id })), 'Welches Projekt?');
+  if (!pWahl) return null;
+  const projekt = D.docs.get(pWahl);
+  const kapitel = kinder(projekt.id, 'kapitel');
+  if (!kapitel.length) {
+    const k = neuDoc('kapitel', { parent: projekt.id, titel: 'Kapitel 1', ord: 0 });
+    return { projekt, kapitel: k };
+  }
+  if (kapitel.length === 1) return { projekt, kapitel: kapitel[0] };
+  const kWahl = await menue(kapitel.map((k) => ({ text: k.titel, wert: k.id })), 'Wohin genau?');
+  if (!kWahl) return null;
+  return { projekt, kapitel: D.docs.get(kWahl) };
+}
+async function waehleBrett() {
+  const bretter = vomTyp('board');
+  const wahl = await menue([
+    ...bretter.map((b) => ({ text: b.titel, icon: 'cluster', wert: b.id })),
+    { text: 'Neues Brett', icon: 'plus', wert: '_neu' }
+  ], 'Auf welches Brett?');
+  if (!wahl) return null;
+  if (wahl === '_neu') {
+    const name = await eingabe({ titel: 'Ein neues Brett', platzhalter: 'Wofür ist es?' });
+    if (!name) return null;
+    return neuDoc('board', { titel: name });
+  }
+  return D.docs.get(wahl);
+}
+/* ================================================================
+   VANI — Hefte: Papier, Zettel, Fotos, Kritzeleien
+   ================================================================ */
+
+RENDER.hefte = function (haupt) {
+  haupt.append(raumkopf('Hefte', null,
+    el('button', {
+      class: 'rundknopf voll', html: ik('plus'), onclick: async () => {
+        const name = await eingabe({ titel: 'Ein neues Heft', platzhalter: 'Wie soll es heißen?' });
+        if (!name) return;
+        const h = neuDoc('heft', { titel: name, farbe: zufall(HEFTFARBEN), papier: 'liniert' });
+        location.hash = '#/heft/' + h.id;
+      }
+    })
+  ));
+  const inhalt = el('div', { class: 'inhalt' });
+
+  const alle = vomTyp('heft').sort((a, b) => b.geaendert - a.geaendert);
+  const aktive = alle.filter((h) => !h.archiv);
+  const imRegal = alle.filter((h) => h.archiv);
+
+  if (!alle.length) {
+    inhalt.append(el('div', { class: 'leer' }, 'Ein leeres Regal.',
+      el('div', { class: 'klein' }, 'Das erste Heft ist das beste Versprechen, das es gibt.')));
+  }
+
+  const baueDeckel = (h) => {
+    const seiten = kinder(h.id, 'seite').length;
+    const deckel = el('button', {
+      class: 'heftdeckel' + (h.archiv ? ' archiv' : ''),
+      style: 'background:linear-gradient(155deg,' + h.farbe + ',' + h.farbe + 'cc)',
+      onclick: () => { location.hash = '#/heft/' + h.id; }
+    },
+      h.archiv ? el('div', { class: 'hdatum' }, 'INS REGAL · ' + fmtDatum(h.archiv)) : null,
+      el('div', { class: 'htitel' }, h.titel),
+      el('div', { class: 'hseiten' }, seiten === 1 ? '1 Seite' : seiten + ' Seiten')
+    );
+    langdruck(deckel, () => heftMenue(h, () => zeichne()));
+    return deckel;
+  };
+
+  if (aktive.length) {
+    const regal = el('div', { class: 'regal' });
+    aktive.forEach((h) => regal.append(baueDeckel(h)));
+    inhalt.append(regal);
+  }
+  if (imRegal.length) {
+    inhalt.append(el('div', { class: 'regal-trenner' }, 'IM REGAL'));
+    const regal = el('div', { class: 'regal' });
+    imRegal.forEach((h) => regal.append(baueDeckel(h)));
+    inhalt.append(regal);
+  }
+  haupt.append(inhalt);
+};
+
+async function heftMenue(h, danach) {
+  const wahl = await menue([
+    { text: 'Umbenennen', icon: 'stift', wert: 'name' },
+    { text: 'Papier: ' + ({ liniert: 'liniert', kariert: 'kariert', blank: 'blanko' }[h.papier] || 'liniert'), icon: 'hefte', wert: 'papier' },
+    { text: 'Andere Farbe', icon: 'farbe', wert: 'farbe' },
+    h.archiv ? { text: 'Zurück auf den Tisch', icon: 'archiv', wert: 'zurueck' } : { text: 'Ins Regal stellen', icon: 'archiv', wert: 'archiv' },
+    { text: 'Heft verbrennen', icon: 'muell', wert: 'weg', rot: true }
+  ], h.titel);
+  if (wahl === 'name') {
+    const neu = await eingabe({ titel: 'Das Heft heißt jetzt …', wert: h.titel });
+    if (neu) { h.titel = neu; speichere(h); }
+  } else if (wahl === 'papier') {
+    h.papier = { liniert: 'kariert', kariert: 'blank', blank: 'liniert' }[h.papier] || 'kariert';
+    speichereStill(h);
+  } else if (wahl === 'farbe') {
+    const i = (HEFTFARBEN.indexOf(h.farbe) + 1) % HEFTFARBEN.length;
+    h.farbe = HEFTFARBEN[i]; speichereStill(h);
+  } else if (wahl === 'archiv') {
+    h.archiv = Date.now(); speichereStill(h);
+    toast('Feierlich ins Regal gestellt.');
+  } else if (wahl === 'zurueck') {
+    delete h.archiv; speichereStill(h);
+  } else if (wahl === 'weg') {
+    const seiten = kinder(h.id, 'seite').length;
+    if (await frage('„' + h.titel + '" mit ' + (seiten === 1 ? 'einer Seite' : seiten + ' Seiten') + ' endgültig verbrennen?', { ja: 'Verbrennen', gefahr: true })) {
+      await loesche(h.id);
+      if (location.hash.includes(h.id)) location.hash = '#/hefte';
+    }
+  }
+  if (danach) danach();
+}
+
+/* ----- Ein Heft, eine Seite ----- */
+RENDER.heft = function (haupt, heftId) {
+  const heft = D.docs.get(heftId);
+  if (!heft) { location.hash = '#/hefte'; return; }
+
+  let seiten = kinder(heft.id, 'seite');
+  if (!seiten.length) {
+    neuDoc('seite', { parent: heft.id, ord: 0, titel: '', text: '' });
+    seiten = kinder(heft.id, 'seite');
+  }
+
+  let idx = Math.min(seiten.length - 1, parseInt(sessionStorage.getItem('heftSeite:' + heftId) || '0', 10) || 0);
+  const ziel = sessionStorage.getItem('zielSeite');
+  if (ziel) {
+    sessionStorage.removeItem('zielSeite');
+    const zi = seiten.findIndex((s) => s.id === ziel);
+    if (zi >= 0) idx = zi;
+  }
+
+  haupt.append(el('div', { class: 'kopf' },
+    zurueckknopf('#/hefte'),
+    el('h1', {}, heft.titel),
+    el('button', { class: 'rundknopf zart', html: ik('mehr'), onclick: () => heftMenue(heft, () => zeichne()) })
+  ));
+
+  const inhalt = el('div', { class: 'inhalt' });
+  const halter = el('div', { class: 'seitenhalter' });
+  const fuss = el('div', { class: 'seitenfuss' });
+  inhalt.append(halter, fuss);
+  haupt.append(inhalt);
+
+  function zeigeSeite() {
+    seiten = kinder(heft.id, 'seite');
+    idx = Math.max(0, Math.min(idx, seiten.length - 1));
+    sessionStorage.setItem('heftSeite:' + heftId, String(idx));
+    const seite = seiten[idx];
+    halter.innerHTML = '';
+    fuss.innerHTML = '';
+    halter.append(baueSeite(seite, heft, zeigeSeite));
+
+    fuss.append(
+      el('button', { class: 'rundknopf zart', html: ik('zurueck'), style: idx === 0 ? 'opacity:.25;pointer-events:none' : '', onclick: () => { idx--; zeigeSeite(); } }),
+      el('div', { class: 'snummer' }, 'Seite ' + (idx + 1) + ' von ' + seiten.length),
+      el('button', { class: 'rundknopf zart', html: ik('rechts'), style: idx === seiten.length - 1 ? 'opacity:.25;pointer-events:none' : '', onclick: () => { idx++; zeigeSeite(); } }),
+      el('button', {
+        class: 'rundknopf', html: ik('plus'), title: 'Neue Seite', onclick: () => {
+          neuDoc('seite', { parent: heft.id, ord: seiten.length, titel: '', text: '' });
+          heft.geaendert = Date.now(); speichereStill(heft);
+          idx = seiten.length; zeigeSeite();
+        }
+      })
+    );
+  }
+  zeigeSeite();
+};
+
+function baueSeite(seite, heft, neuZeichnen) {
+  const blatt = el('div', { class: 'papierseite ' + (heft.papier || 'liniert') });
+
+  /* Werkzeuge oben rechts */
+  const werkzeuge = el('div', { class: 'seitenwerkzeuge' },
+    el('button', {
+      class: 'rundknopf', title: 'Zettel ankleben', html: ik('pin'), onclick: () => {
+        neuDoc('zettel', { parent: seite.id, text: '', farbe: zufall(['gelb', 'rosa', 'blau', 'gruen']), pos: { x: 8 + Math.random() * 40, y: 6 + Math.random() * 20, rot: -4 + Math.random() * 8, w: 30 } });
+        baueAnlagen();
+      }
+    }),
+    el('button', {
+      class: 'rundknopf', title: 'Foto einkleben', html: ik('kamera'), onclick: async () => {
+        const bild = await waehleBild();
+        if (!bild) return;
+        neuDoc('foto', { parent: seite.id, bild: bild.id, pos: { x: 12 + Math.random() * 35, y: 8 + Math.random() * 20, rot: -3 + Math.random() * 6, w: 42 } });
+        baueAnlagen();
+      }
+    }),
+    el('button', { class: 'rundknopf', title: 'Kritzeln', html: ik('stift'), onclick: () => starteKritzeln(blatt, seite) }),
+    el('button', {
+      class: 'rundknopf', title: 'Mehr', html: ik('mehr'), onclick: async () => {
+        const wahl = await menue([
+          { text: 'Im Schreibraum öffnen', icon: 'stift', wert: 'sr' },
+          { text: 'Seite herausreißen', icon: 'muell', wert: 'weg', rot: true }
+        ]);
+        if (wahl === 'sr') oeffneSchreibraum(seite.id);
+        else if (wahl === 'weg' && await frage('Diese Seite herausreißen? Alles darauf geht mit.', { ja: 'Herausreißen', gefahr: true })) {
+          await loesche(seite.id);
+          kinder(heft.id, 'seite').forEach((s, i) => { s.ord = i; speichereStill(s); });
+          neuZeichnen();
+        }
+      }
+    })
+  );
+
+  /* Titel + Text */
+  const titel = el('input', { class: 'stitel serif', type: 'text', value: seite.titel || '', placeholder: 'Überschrift, wenn du magst' });
+  titel.addEventListener('input', entprellt(() => { seite.titel = titel.value; speichere(seite); }, 400));
+
+  const text = el('textarea', { class: 'schreibflaeche text', placeholder: 'Hier darf alles stehen.' });
+  text.value = seite.text || '';
+  autogrow(text);
+  text.addEventListener('input', entprellt(() => {
+    seite.text = text.value;
+    speichere(seite);
+    zaehleWorte(seite.id, seite.text);
+  }, 400));
+
+  const skizzenbild = el('div', { class: 'skizzenbild' });
+  if (seite.skizze) {
+    const img = el('img', { alt: '' });
+    setzeBild(img, seite.skizze);
+    skizzenbild.append(img);
+  }
+
+  blatt.append(skizzenbild, titel, text, werkzeuge);
+
+  /* Angeklebtes */
+  function baueAnlagen() {
+    $$('.anlage', blatt).forEach((a) => a.remove());
+    for (const a of kinder(seite.id)) {
+      if (a.typ === 'zettel') blatt.append(baueZettel(a, blatt, baueAnlagen));
+      else if (a.typ === 'foto') blatt.append(baueFoto(a, blatt, baueAnlagen));
+    }
+  }
+  baueAnlagen();
+
+  blatt.addEventListener('pointerdown', (e) => {
+    if (!e.target.closest('.anlage')) $$('.anlage.aktiv', blatt).forEach((a) => a.classList.remove('aktiv'));
+  });
+
+  return blatt;
+}
+
+function positioniere(elem, a) {
+  const p = a.pos || { x: 10, y: 10, rot: 0, w: 30 };
+  elem.style.left = p.x + '%';
+  elem.style.top = p.y + '%';
+  elem.style.width = p.w + '%';
+  elem.style.transform = 'rotate(' + (p.rot || 0) + 'deg)';
+}
+
+function anlageGesten(elem, a, blatt, neuBauen) {
+  let zieht = null;
+  elem.addEventListener('pointerdown', (e) => {
+    if (e.target.tagName === 'TEXTAREA' && elem.classList.contains('aktiv')) return;
+    $$('.anlage.aktiv', blatt).forEach((x) => { if (x !== elem) x.classList.remove('aktiv'); });
+    const r = blatt.getBoundingClientRect();
+    zieht = { sx: e.clientX, sy: e.clientY, px: a.pos.x, py: a.pos.y, r, bewegt: false };
+    elem.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  elem.addEventListener('pointermove', (e) => {
+    if (!zieht) return;
+    const dx = e.clientX - zieht.sx, dy = e.clientY - zieht.sy;
+    if (!zieht.bewegt && Math.hypot(dx, dy) < 6) return;
+    zieht.bewegt = true;
+    elem._zieht = true;
+    a.pos.x = Math.max(-10, Math.min(96, zieht.px + dx / zieht.r.width * 100));
+    a.pos.y = Math.max(-2, Math.min(102, zieht.py + dy / zieht.r.height * 100));
+    elem.style.left = a.pos.x + '%';
+    elem.style.top = a.pos.y + '%';
+  });
+  const ende = (e) => {
+    if (!zieht) return;
+    if (zieht.bewegt) speichereStill(a);
+    else elem.classList.add('aktiv');
+    zieht = null;
+    setTimeout(() => { elem._zieht = false; }, 0);
+  };
+  elem.addEventListener('pointerup', ende);
+  elem.addEventListener('pointercancel', ende);
+
+  /* Griff: Größe ziehen */
+  const griff = el('div', { class: 'griff', html: ik('rechts') });
+  griff.style.transform = 'rotate(45deg)';
+  let groesse = null;
+  griff.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    const r = blatt.getBoundingClientRect();
+    groesse = { sx: e.clientX, w: a.pos.w, r };
+    griff.setPointerCapture(e.pointerId);
+  });
+  griff.addEventListener('pointermove', (e) => {
+    if (!groesse) return;
+    a.pos.w = Math.max(12, Math.min(92, groesse.w + (e.clientX - groesse.sx) / groesse.r.width * 100));
+    elem.style.width = a.pos.w + '%';
+  });
+  griff.addEventListener('pointerup', () => { if (groesse) speichereStill(a); groesse = null; });
+  elem.append(griff);
+
+  langdruck(elem, async () => {
+    const wahl = await menue([
+      a.typ === 'zettel' ? { text: 'Andere Farbe', icon: 'farbe', wert: 'farbe' } : null,
+      { text: 'Etwas drehen', icon: 'drehen', wert: 'drehen' },
+      { text: 'Abmachen', icon: 'muell', wert: 'weg', rot: true }
+    ]);
+    if (wahl === 'farbe') {
+      const folge = ['gelb', 'rosa', 'blau', 'gruen'];
+      a.farbe = folge[(folge.indexOf(a.farbe) + 1) % folge.length];
+      speichereStill(a); neuBauen();
+    } else if (wahl === 'drehen') {
+      a.pos.rot = ((a.pos.rot || 0) + 4.5);
+      if (a.pos.rot > 10) a.pos.rot = -9;
+      speichereStill(a);
+      elem.style.transform = 'rotate(' + a.pos.rot + 'deg)';
+    } else if (wahl === 'weg') {
+      if (await frage(a.typ === 'zettel' ? 'Zettel abmachen und wegwerfen?' : 'Foto abmachen?', { ja: 'Abmachen', gefahr: true })) {
+        await loesche(a.id); neuBauen();
+      }
+    }
+  });
+}
+
+function baueZettel(a, blatt, neuBauen) {
+  const halter = el('div', { class: 'anlage' });
+  positioniere(halter, a);
+  const z = el('div', { class: 'zettel ' + (a.farbe || 'gelb') });
+  const ta = el('textarea', { placeholder: '…', rows: 1 });
+  ta.value = a.text || '';
+  autogrow(ta);
+  ta.addEventListener('input', entprellt(() => { a.text = ta.value; speichereStill(a); }, 400));
+  z.append(ta);
+  halter.append(z);
+  anlageGesten(halter, a, blatt, neuBauen);
+  return halter;
+}
+
+function baueFoto(a, blatt, neuBauen) {
+  const halter = el('div', { class: 'anlage' });
+  positioniere(halter, a);
+  const rahmen = el('div', { class: 'foto-anlage' });
+  const img = el('img', { alt: '' });
+  setzeBild(img, a.bild);
+  rahmen.append(img);
+  halter.append(rahmen);
+  anlageGesten(halter, a, blatt, neuBauen);
+  return halter;
+}
+
+/* ----- Kritzeln ----- */
+const STIFTFARBEN = ['#2c251c', '#b0552f', '#41597a', '#5f7752'];
+async function starteKritzeln(blatt, seite) {
+  if ($('.kritzelflaeche', blatt)) return;
+  const r = blatt.getBoundingClientRect();
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const canvas = el('canvas', { class: 'kritzelflaeche' });
+  canvas.width = Math.round(r.width * dpr);
+  canvas.height = Math.round(r.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  if (seite.skizze) {
+    const url = await bildURL(seite.skizze);
+    if (url) {
+      const alt = new Image();
+      await new Promise((res) => { alt.onload = res; alt.onerror = res; alt.src = url; });
+      try { ctx.drawImage(alt, 0, 0, r.width, alt.height / alt.width * r.width); } catch (e) {}
+    }
+  }
+  const altesBild = $('.skizzenbild', blatt);
+  if (altesBild) altesBild.style.display = 'none';
+
+  let farbe = D.einst.thema === 'tinte' || D.einst.thema === 'kerze' ? '#eae0cd' : STIFTFARBEN[0];
+  let radierer = false;
+  let strich = null;
+
+  canvas.addEventListener('pointerdown', (e) => {
+    canvas.setPointerCapture(e.pointerId);
+    strich = { x: e.offsetX, y: e.offsetY };
+    e.preventDefault();
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!strich) return;
+    const punkte = (e.getCoalescedEvents && e.getCoalescedEvents().length ? e.getCoalescedEvents() : [e]);
+    for (const p of punkte) {
+      const cr = canvas.getBoundingClientRect();
+      const x = p.clientX - cr.left, y = p.clientY - cr.top;
+      const druck = p.pressure && p.pressure > 0 ? p.pressure : .5;
+      ctx.globalCompositeOperation = radierer ? 'destination-out' : 'source-over';
+      ctx.strokeStyle = farbe;
+      ctx.lineWidth = radierer ? 26 : (1 + druck * 3.4);
+      ctx.beginPath();
+      ctx.moveTo(strich.x, strich.y);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      strich = { x, y };
+    }
+  });
+  const strichEnde = () => { strich = null; };
+  canvas.addEventListener('pointerup', strichEnde);
+  canvas.addEventListener('pointercancel', strichEnde);
+
+  const leiste = el('div', { class: 'kritzelleiste' },
+    STIFTFARBEN.map((f) =>
+      el('button', {
+        class: 'stiftfarbe' + (f === farbe ? ' an' : ''), style: 'background:' + f, onclick: (e) => {
+          farbe = f; radierer = false;
+          $$('.stiftfarbe', leiste).forEach((k) => k.classList.toggle('an', k === e.currentTarget));
+          radierKnopf.classList.remove('an');
+        }
+      })
+    ),
+    (() => {
+      const k = el('button', {
+        class: 'rundknopf', style: 'width:34px;height:34px', html: ik('kreuz'), title: 'Radierer', onclick: () => {
+          radierer = !radierer;
+          k.classList.toggle('an', radierer);
+          if (radierer) $$('.stiftfarbe', leiste).forEach((x) => x.classList.remove('an'));
+          k.style.background = radierer ? 'var(--akzent)' : '';
+          k.style.color = radierer ? 'var(--papier)' : '';
+        }
+      });
+      return k;
+    })(),
+    el('button', {
+      class: 'knopf voll', style: 'padding:7px 14px', onclick: async () => {
+        seite.skizze = await speichereKritzelei(canvas, seite.skizze);
+        speichere(seite);
+        leiste.remove();
+        canvas.remove();
+        if (altesBild) {
+          altesBild.style.display = '';
+          altesBild.innerHTML = '';
+          const img = el('img', { alt: '' });
+          setzeBild(img, seite.skizze);
+          altesBild.append(img);
+        }
+      }
+    }, 'Fertig')
+  );
+  const radierKnopf = leiste.children[STIFTFARBEN.length];
+
+  blatt.closest('.inhalt').prepend(leiste);
+  blatt.append(canvas);
+}
+/* ================================================================
+   VANI — Projekte: Kapitel, Szenen, Pinnwand, Leseansicht
+   ================================================================ */
+
+function projektWorte(p) {
+  let n = 0;
+  for (const d of D.docs.values()) if (d.typ === 'szene' && d.projekt === p.id) n += worte(d.text);
+  return n;
+}
+
+RENDER.projekte = function (haupt) {
+  haupt.append(raumkopf('Projekte', null,
+    el('button', { class: 'rundknopf voll', html: ik('plus'), onclick: () => neuesProjekt() })
+  ));
+  const inhalt = el('div', { class: 'inhalt' });
+  const alle = vomTyp('projekt');
+
+  if (!alle.length) {
+    inhalt.append(el('div', { class: 'leer' }, 'Hier entsteht Größeres.',
+      el('div', { class: 'klein' }, 'Ein Roman, eine Sammlung, eine Welt — alles fängt mit einem Namen an.')));
+  }
+
+  const liste = el('div', { class: 'projektliste' });
+  for (const p of alle) {
+    const w = projektWorte(p);
+    const szenen = [...D.docs.values()].filter((d) => d.typ === 'szene' && d.projekt === p.id).length;
+    const karte = el('button', { class: 'karte projektkarte', onclick: () => { location.hash = '#/projekt/' + p.id; } },
+      el('div', { class: 'pzeile1' },
+        el('h3', {}, p.titel),
+        el('span', { class: 'artmarke' }, p.art || 'Projekt')
+      ),
+      el('div', { class: 'pzahlen' },
+        w.toLocaleString('de-DE') + ' Wörter · ' + (szenen === 1 ? 'eine Szene' : szenen + ' Szenen') + ' · ' + vorZeit(p.geaendert)),
+      p.ziel ? el('div', { class: 'zielbalken' }, el('i', { style: 'width:' + Math.min(100, Math.round(w / p.ziel * 100)) + '%' })) : null
+    );
+    langdruck(karte, () => projektMenue(p, () => zeichne()));
+    liste.append(karte);
+  }
+  inhalt.append(liste);
+  haupt.append(inhalt);
+};
+
+function neuesProjekt() {
+  let art = 'Roman';
+  const name = el('input', { type: 'text', placeholder: 'Der Arbeitstitel' });
+  const ziel = el('input', { type: 'text', inputmode: 'numeric', placeholder: 'Wortziel — leer lassen ist auch gut' });
+  const artWahl = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' },
+    PROJEKT_ARTEN.map((a) => el('button', {
+      class: a === art ? 'an' : '', onclick: (e) => {
+        art = a;
+        $$('button', artWahl).forEach((b) => b.classList.toggle('an', b === e.currentTarget));
+      }
+    }, a))
+  );
+  const kasten = el('div', { class: 'modal' },
+    el('h2', {}, 'Etwas Neues, Größeres'),
+    name,
+    el('div', { style: 'margin-top:12px' }, artWahl),
+    el('div', { style: 'margin-top:12px' }, ziel),
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
+      el('button', {
+        class: 'knopf voll', onclick: () => {
+          const t = name.value.trim();
+          if (!t) return;
+          const p = neuDoc('projekt', { titel: t, art, ziel: parseInt(ziel.value, 10) || 0 });
+          neuDoc('kapitel', { parent: p.id, titel: 'Kapitel 1', ord: 0 });
+          zu();
+          location.hash = '#/projekt/' + p.id;
+        }
+      }, 'Anlegen')
+    )
+  );
+  const zu = zeigeDeck(kasten);
+  setTimeout(() => name.focus(), 60);
+}
+
+async function projektMenue(p, danach) {
+  const wahl = await menue([
+    { text: 'Umbenennen', icon: 'stift', wert: 'name' },
+    { text: 'Wortziel: ' + (p.ziel ? p.ziel.toLocaleString('de-DE') : 'keins'), icon: 'ziel', wert: 'ziel' },
+    { text: 'Leseansicht', icon: 'lesen', wert: 'lesen' },
+    { text: 'Projekt löschen', icon: 'muell', wert: 'weg', rot: true }
+  ], p.titel);
+  if (wahl === 'name') {
+    const neu = await eingabe({ titel: 'Das Projekt heißt jetzt …', wert: p.titel });
+    if (neu) { p.titel = neu; speichere(p); }
+  } else if (wahl === 'ziel') {
+    const neu = await eingabe({ titel: 'Wortziel (0 = keins)', wert: String(p.ziel || '') });
+    if (neu !== null) { p.ziel = parseInt(neu, 10) || 0; speichereStill(p); }
+  } else if (wahl === 'lesen') {
+    zeigeLeseansicht(p);
+    return;
+  } else if (wahl === 'weg') {
+    if (await frage('„' + p.titel + '" mit allem darin löschen? Das lässt sich nicht zurückholen.', { ja: 'Löschen', gefahr: true })) {
+      await loesche(p.id);
+      location.hash = '#/projekte';
+      return;
+    }
+  }
+  if (danach) danach();
+}
+
+RENDER.projekt = function (haupt, pid) {
+  const p = D.docs.get(pid);
+  if (!p) { location.hash = '#/projekte'; return; }
+  const w = projektWorte(p);
+
+  haupt.append(el('div', { class: 'kopf' },
+    zurueckknopf('#/projekte'),
+    el('h1', {}, p.titel, el('div', { class: 'unter' },
+      w.toLocaleString('de-DE') + ' Wörter' + (p.ziel ? ' von ' + p.ziel.toLocaleString('de-DE') : '') + ' · ' + (p.art || ''))),
+    el('button', { class: 'rundknopf zart', html: ik('lesen'), title: 'Leseansicht', onclick: () => zeigeLeseansicht(p) }),
+    el('button', { class: 'rundknopf zart', html: ik('mehr'), onclick: () => projektMenue(p, () => zeichne()) })
+  ));
+
+  const inhalt = el('div', { class: 'inhalt' });
+  if (p.ziel) {
+    inhalt.append(el('div', { class: 'zielbalken', style: 'margin-top:4px' },
+      el('i', { style: 'width:' + Math.min(100, Math.round(w / p.ziel * 100)) + '%' })));
+  }
+
+  const kapitel = kinder(p.id, 'kapitel');
+  for (const k of kapitel) inhalt.append(baueKapitel(k, p));
+
+  inhalt.append(el('button', {
+    class: 'plusskarte', style: 'width:100%;margin-top:22px', onclick: async () => {
+      const name = await eingabe({ titel: 'Neues Kapitel', wert: 'Kapitel ' + (kapitel.length + 1) });
+      if (!name) return;
+      neuDoc('kapitel', { parent: p.id, titel: name, ord: kapitel.length });
+      zeichne();
+    }
+  }, el('span', { html: ik('plus'), style: 'display:flex' }), 'Neues Kapitel'));
+
+  haupt.append(inhalt);
+};
+
+function baueKapitel(k, p) {
+  const szenen = kinder(k.id, 'szene');
+  const kw = szenen.reduce((n, s) => n + worte(s.text), 0);
+  const block = el('div', { class: 'kapitelblock' });
+  const zeile = el('div', { class: 'kapitelzeile' },
+    el('h3', {}, k.titel),
+    el('span', { class: 'kworte' }, kw ? kw.toLocaleString('de-DE') + ' Wörter' : ''),
+    el('button', {
+      class: 'rundknopf zart', style: 'width:32px;height:32px', html: ik('mehr'), onclick: async () => {
+        const geschwister = kinder(p.id, 'kapitel');
+        const i = geschwister.findIndex((x) => x.id === k.id);
+        const wahl = await menue([
+          { text: 'Umbenennen', icon: 'stift', wert: 'name' },
+          i > 0 ? { text: 'Nach oben', icon: 'senden', wert: 'hoch' } : null,
+          i < geschwister.length - 1 ? { text: 'Nach unten', icon: 'aufklappen', wert: 'runter' } : null,
+          { text: 'Kapitel löschen', icon: 'muell', wert: 'weg', rot: true }
+        ], k.titel);
+        if (wahl === 'name') {
+          const neu = await eingabe({ titel: 'Das Kapitel heißt jetzt …', wert: k.titel });
+          if (neu) { k.titel = neu; speichereStill(k); zeichne(); }
+        } else if (wahl === 'hoch' || wahl === 'runter') {
+          const j = wahl === 'hoch' ? i - 1 : i + 1;
+          geschwister.forEach((x, n2) => { x.ord = n2; });
+          [geschwister[i].ord, geschwister[j].ord] = [j, i];
+          geschwister.forEach((x) => speichereStill(x));
+          zeichne();
+        } else if (wahl === 'weg') {
+          if (await frage('„' + k.titel + '" mit ' + szenen.length + ' Szenen löschen?', { ja: 'Löschen', gefahr: true })) {
+            await loesche(k.id); zeichne();
+          }
+        }
+      }
+    })
+  );
+  const wand = el('div', { class: 'pinnwand', 'data-kapitel': k.id });
+  for (const s of szenen) wand.append(baueSzenenkarte(s, p));
+  wand.append(el('button', {
+    class: 'plusskarte', onclick: () => {
+      const s = neuDoc('szene', { parent: k.id, projekt: p.id, ord: szenen.length, titel: '', text: '', status: 'funke', farbe: '' });
+      oeffneSchreibraum(s.id);
+    }
+  }, el('span', { html: ik('plus'), style: 'display:flex' }), 'Szene'));
+  block.append(zeile, wand);
+  return block;
+}
+
+function baueSzenenkarte(s, p) {
+  const karte = el('div', { class: 'szkarte', 'data-id': s.id });
+  const probe = (s.text || '').trim().replace(/\s+/g, ' ').slice(0, 110);
+
+  const notizFeld = el('textarea', { placeholder: 'Zweifel, Ideen, Alternativen — nur für dich.' });
+  notizFeld.value = s.notiz || '';
+  notizFeld.addEventListener('input', entprellt(() => { s.notiz = notizFeld.value; speichereStill(s); }, 400));
+  notizFeld.addEventListener('pointerdown', (e) => e.stopPropagation());
+
+  const statusFolge = ['funke', 'entwurf', 'steht'];
+  const statusPunkt = el('button', {
+    class: 'statuspunkt ' + (s.status || 'funke'), title: 'Status', onpointerdown: (e) => e.stopPropagation(), onclick: (e) => {
+      e.stopPropagation();
+      s.status = statusFolge[(statusFolge.indexOf(s.status || 'funke') + 1) % 3];
+      speichereStill(s);
+      e.currentTarget.className = 'statuspunkt ' + s.status;
+    }
+  });
+
+  const dreher = el('div', { class: 'dreher' },
+    el('div', { class: 'szvorn', style: s.farbe ? '--szfarbe:' + s.farbe : '' },
+      el('div', { class: 'sztitel' }, s.titel || 'Ohne Titel'),
+      el('div', { class: 'szprobe' }, probe || 'Noch leer. Noch alles möglich.'),
+      el('div', { class: 'szfusszeile' },
+        statusPunkt,
+        el('span', { class: 'szworte' }, worte(s.text) ? worte(s.text) + ' W.' : ''),
+        el('button', {
+          class: 'rundknopf zart', style: 'width:28px;height:28px', html: ik('drehen'),
+          onpointerdown: (e) => e.stopPropagation(),
+          onclick: (e) => { e.stopPropagation(); karte.classList.add('rueckseite'); }
+        })
+      )
+    ),
+    el('div', { class: 'szhinten' },
+      el('div', { class: 'hintenhinweis' }, 'RÜCKSEITE'),
+      notizFeld,
+      el('div', { style: 'display:flex;justify-content:flex-end' },
+        el('button', {
+          class: 'rundknopf zart', style: 'width:28px;height:28px', html: ik('drehen'),
+          onpointerdown: (e) => e.stopPropagation(),
+          onclick: (e) => { e.stopPropagation(); karte.classList.remove('rueckseite'); }
+        }))
+    )
+  );
+  karte.append(dreher);
+
+  szenenGesten(karte, s, p);
+  return karte;
+}
+
+/* Ziehen, Tippen, Langdruck auf Szenenkarten */
+function szenenGesten(karte, s, p) {
+  let start = null, geist = null, gezogen = false;
+  karte.addEventListener('pointerdown', (e) => {
+    if (karte.classList.contains('rueckseite')) return;
+    start = { x: e.clientX, y: e.clientY, id: e.pointerId };
+    karte.setPointerCapture(e.pointerId);
+  });
+  karte.addEventListener('pointermove', (e) => {
+    if (!start) return;
+    const dx = e.clientX - start.x, dy = e.clientY - start.y;
+    if (!gezogen && Math.hypot(dx, dy) > 12) {
+      gezogen = true;
+      karte._zieht = true;
+      karte.classList.add('zieht');
+      geist = karte.cloneNode(true);
+      geist.classList.add('szgeist');
+      geist.classList.remove('zieht');
+      document.body.append(geist);
+    }
+    if (gezogen && geist) {
+      geist.style.left = (e.clientX - 95) + 'px';
+      geist.style.top = (e.clientY - 30) + 'px';
+    }
+  });
+  karte.addEventListener('pointerup', async (e) => {
+    if (!start) return;
+    const warGezogen = gezogen;
+    start = null; gezogen = false;
+    karte.classList.remove('zieht');
+    setTimeout(() => { karte._zieht = false; }, 0);
+    if (geist) { geist.remove(); geist = null; }
+    if (!warGezogen) {
+      if (!e.target.closest('button') && !e.target.closest('textarea')) oeffneSchreibraum(s.id);
+      return;
+    }
+    /* Ablegen: wohin? */
+    const unter = document.elementsFromPoint(e.clientX, e.clientY);
+    const zielKarte = unter.find((x) => x.classList && x.classList.contains('szkarte') && x !== karte);
+    const zielWand = unter.find((x) => x.classList && x.classList.contains('pinnwand'));
+    if (!zielWand) return;
+    const zielKapitelId = zielWand.dataset.kapitel;
+    const geschwister = kinder(zielKapitelId, 'szene').filter((x) => x.id !== s.id);
+    let einfuegen = geschwister.length;
+    if (zielKarte) {
+      const zielSzene = D.docs.get(zielKarte.dataset.id);
+      const zi = geschwister.findIndex((x) => x.id === zielSzene.id);
+      const r = zielKarte.getBoundingClientRect();
+      einfuegen = e.clientX < r.left + r.width / 2 ? zi : zi + 1;
+    }
+    s.parent = zielKapitelId;
+    geschwister.splice(einfuegen, 0, s);
+    geschwister.forEach((x, i) => { x.ord = i; speichereStill(x); });
+    zeichne();
+  });
+  karte.addEventListener('pointercancel', () => {
+    start = null; gezogen = false;
+    karte.classList.remove('zieht');
+    if (geist) { geist.remove(); geist = null; }
+  });
+
+  langdruck(karte, async () => {
+    const wahl = await menue([
+      { text: 'Umbenennen', icon: 'stift', wert: 'name' },
+      { text: 'Andere Farbe', icon: 'farbe', wert: 'farbe' },
+      { text: 'Szene löschen', icon: 'muell', wert: 'weg', rot: true }
+    ], s.titel || 'Szene');
+    if (wahl === 'name') {
+      const neu = await eingabe({ titel: 'Die Szene heißt jetzt …', wert: s.titel });
+      if (neu !== null) { s.titel = neu || s.titel; speichereStill(s); zeichne(); }
+    } else if (wahl === 'farbe') {
+      const i = (SZENENFARBEN.indexOf(s.farbe || '') + 1) % SZENENFARBEN.length;
+      s.farbe = SZENENFARBEN[i]; speichereStill(s); zeichne();
+    } else if (wahl === 'weg') {
+      if (await frage('„' + (s.titel || 'Diese Szene') + '" löschen?', { ja: 'Löschen', gefahr: true })) {
+        await loesche(s.id); zeichne();
+      }
+    }
+  });
+}
+
+/* ----- Leseansicht ----- */
+function zeigeLeseansicht(p) {
+  const kapitel = kinder(p.id, 'kapitel');
+  let gesamt = '';
+  const innen = el('div', { class: 'innen' });
+  innen.append(el('h1', {}, p.titel));
+  let w = 0;
+  for (const k of kapitel) {
+    const szenen = kinder(k.id, 'szene').filter((s) => (s.text || '').trim());
+    if (!szenen.length) continue;
+    innen.append(el('h2', {}, k.titel));
+    gesamt += '\n\n' + k.titel.toUpperCase() + '\n\n';
+    const texte = szenen.map((s) => s.text.trim());
+    gesamt += texte.join('\n\n*\n\n');
+    innen.append(el('div', { class: 'lesetext' }, texte.join('\n\n*\n\n')));
+    szenen.forEach((s) => { w += worte(s.text); });
+  }
+  const h1 = innen.querySelector('h1');
+  h1.after(el('div', { class: 'lmeta' }, w.toLocaleString('de-DE') + ' Wörter am Stück'));
+  gesamt = p.titel.toUpperCase() + '\n' + gesamt;
+
+  const bogen = el('div', { class: 'lesebogen' }, innen);
+  const leiste = el('div', { class: 'schwebeleiste' },
+    el('button', { class: 'rundknopf zart', html: ik('kreuz'), onclick: () => { bogen.remove(); leiste.remove(); } }),
+    el('button', {
+      class: 'knopf', onclick: async () => {
+        try { await navigator.clipboard.writeText(gesamt); toast('Alles in der Zwischenablage.'); }
+        catch (e) { toast('Die Zwischenablage wollte nicht.'); }
+      }
+    }, 'Kopieren'),
+    el('button', { class: 'knopf', onclick: () => teileDatei(p.titel.replace(/[^\wäöüß -]/gi, '') + '.txt', gesamt) }, 'Als Datei')
+  );
+  document.body.append(bogen, leiste);
+}
+/* ================================================================
+   VANI — Schreibraum: Vollbild, Fokus, Kerze
+   ================================================================ */
+
+let _sr = null;
+
+function oeffneSchreibraum(docId) {
+  if (_sr) schliesseSchreibraum();
+  const doc = D.docs.get(docId);
+  if (!doc) return;
+
+  const startWorte = worte(doc.text);
+  const startZeit = Date.now();
+
+  const titel = el('input', {
+    class: 'sr-titel', type: 'text', value: doc.titel || '',
+    placeholder: doc.typ === 'szene' ? 'Szene ohne Namen' : 'Ohne Titel'
+  });
+  titel.addEventListener('input', entprellt(() => { doc.titel = titel.value; speichere(doc); }, 400));
+
+  const worteAnzeige = el('span', { class: 'sr-worte' }, String(startWorte));
+  const kerzenhalter = el('div', { class: 'kerzenhalter' });
+
+  const ta = el('textarea', { class: 'sr-text text', placeholder: 'Schreib einfach. Der Rest der Welt wartet draußen.' });
+  ta.value = doc.text || '';
+  const spiegel = el('div', { class: 'sr-spiegel text', 'aria-hidden': 'true' });
+  const wrap = el('div', { style: 'position:relative' }, spiegel, ta);
+  const spalte = el('div', { class: 'sr-spalte ' + (D.einst.breite || 'mittel') }, wrap);
+  const mitte = el('div', { class: 'sr-mitte' }, spalte);
+
+  const kopf = el('div', { class: 'sr-kopf' },
+    el('button', { class: 'knopf', onclick: () => schliesseSchreibraum(true) }, el('span', { html: ik('haken'), style: 'display:flex' }), 'Fertig'),
+    titel,
+    kerzenhalter,
+    worteAnzeige,
+    el('button', { class: 'rundknopf zart', html: ik('klang'), onclick: () => klangMenue() }),
+    el('button', { class: 'rundknopf zart', html: ik('feinheiten'), onclick: () => srEinstellungen() })
+  );
+
+  const raum = el('div', { class: 'schreibraum' }, kopf, mitte);
+  document.body.append(raum);
+  _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, startZeit, sprint: null };
+
+  wendeSchriftAn();
+  autogrow(ta);
+
+  const sichern = entprellt(() => {
+    doc.text = ta.value;
+    speichere(doc);
+    zaehleWorte(doc.id, doc.text);
+  }, 500);
+
+  let zielKlangGespielt = false;
+  ta.addEventListener('input', () => {
+    sichern();
+    worteAnzeige.textContent = String(worte(ta.value));
+    kopf.classList.add('versunken');
+    aktualisiereSpiegel();
+    if (D.einst.typewriter) zentriereZeile();
+    if (D.einst.tagesziel > 0 && !zielKlangGespielt) {
+      const heute = (D.stats.tage[tagKey()] || 0);
+      if (heute >= D.einst.tagesziel) { zielKlangGespielt = true; glocke(); toast('Tagesziel. Der Rest ist Geschenk.'); }
+    }
+  });
+  ta.addEventListener('keydown', (e) => {
+    if (D.einst.tastenklang && e.key.length === 1) tippKlick();
+    if (e.key === 'Escape') schliesseSchreibraum(true);
+  });
+  document.addEventListener('selectionchange', spiegelBeiAuswahl);
+  raum.addEventListener('pointerdown', () => kopf.classList.remove('versunken'));
+
+  aktualisiereSpiegel();
+  setTimeout(() => {
+    ta.focus();
+    ta.setSelectionRange(ta.value.length, ta.value.length);
+    if (D.einst.typewriter) zentriereZeile();
+  }, 80);
+
+  _sr.sichern = sichern;
+
+  function spiegelBeiAuswahl() {
+    if (!_sr || document.activeElement !== ta) return;
+    aktualisiereSpiegel();
+    if (D.einst.typewriter) zentriereZeile();
+  }
+  _sr.spiegelBeiAuswahl = spiegelBeiAuswahl;
+}
+
+function schliesseSchreibraum(zurueck) {
+  if (!_sr) return;
+  _sr.sichern && _sr.sichern.sofort();
+  document.removeEventListener('selectionchange', _sr.spiegelBeiAuswahl);
+  if (_sr.sprint) beendeSprint(true);
+  const geschrieben = worte(_sr.ta.value) - _sr.startWorte;
+  _sr.raum.remove();
+  const doc = _sr.doc;
+  _sr = null;
+  if (zurueck && geschrieben > 30) {
+    toast('+' + geschrieben + ' Wörter. Gut gemacht.');
+  }
+  zeichne();
+}
+
+function wendeSchriftAn() {
+  if (!_sr) return;
+  const s = D.einst;
+  for (const zielEl of [_sr.ta, _sr.spiegel]) {
+    zielEl.classList.remove('klar', 'mono');
+    if (s.schrift === 'klar') zielEl.classList.add('klar');
+    if (s.schrift === 'mono') zielEl.classList.add('mono');
+  }
+  _sr.spalte.className = 'sr-spalte ' + (s.breite || 'mittel');
+  _sr.spalte.style.setProperty('--sr-groesse', s.groesse + 'px');
+  _sr.ta.style.fontSize = s.groesse + 'px';
+  _sr.spiegel.style.fontSize = s.groesse + 'px';
+  _sr.raum.classList.toggle('sr-fokus', !!s.fokus);
+  aktualisiereSpiegel();
+}
+
+function aktualisiereSpiegel() {
+  if (!_sr) return;
+  const { ta, spiegel, raum } = _sr;
+  if (!D.einst.fokus) { if (raum.classList.contains('sr-fokus')) raum.classList.remove('sr-fokus'); spiegel.innerHTML = ''; return; }
+  raum.classList.add('sr-fokus');
+  const t = ta.value;
+  const caret = ta.selectionStart || 0;
+  let anfang = t.lastIndexOf('\n', Math.max(0, caret - 1)) + 1;
+  let ende = t.indexOf('\n', caret);
+  if (ende === -1) ende = t.length;
+  spiegel.innerHTML = esc(t.slice(0, anfang)) + '<mark>' + esc(t.slice(anfang, ende)) + '</mark>' + esc(t.slice(ende)) + '\n';
+}
+
+function zentriereZeile() {
+  if (!_sr) return;
+  const { ta, mitte } = _sr;
+  const stil = getComputedStyle(ta);
+  const zh = parseFloat(stil.lineHeight) || 32;
+  const bisCaret = ta.value.slice(0, ta.selectionStart || 0);
+  const messer = el('div', {
+    class: ta.className.replace('sr-text', 'sr-spiegel'),
+    style: 'position:absolute;inset:auto;top:0;left:0;visibility:hidden;width:' + ta.clientWidth + 'px;font-size:' + stil.fontSize + ';line-height:' + stil.lineHeight + ';white-space:pre-wrap;word-wrap:break-word'
+  });
+  messer.textContent = bisCaret || ' ';
+  ta.parentElement.append(messer);
+  const caretY = messer.offsetHeight;
+  messer.remove();
+  const zielY = ta.offsetTop + caretY - mitte.clientHeight * .42;
+  mitte.scrollTo({ top: Math.max(0, zielY) });
+}
+
+/* ----- Einstellungen im Schreibraum ----- */
+function srEinstellungen() {
+  const s = D.einst;
+  const zeileFuer = (name, inhalt) => el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, name), inhalt);
+  const wahl = (optionen, aktiv, tu) => {
+    const g = el('div', { class: 'wahlgruppe' });
+    for (const [wert, name] of optionen) {
+      g.append(el('button', {
+        class: wert === aktiv ? 'an' : '', onclick: (e) => {
+          tu(wert);
+          $$('button', g).forEach((b) => b.classList.toggle('an', b === e.currentTarget));
+          speichereEinst();
+          wendeSchriftAn();
+        }
+      }, name));
+    }
+    return g;
+  };
+  const schieber = el('input', { type: 'range', min: '15', max: '26', step: '1', value: String(s.groesse) });
+  schieber.addEventListener('input', () => { s.groesse = parseInt(schieber.value, 10); speichereEinst(); wendeSchriftAn(); });
+
+  const kasten = el('div', { class: 'modal' },
+    el('h2', {}, 'So schreibt es sich gut'),
+    zeileFuer('Schrift', wahl([['serife', 'Serife'], ['klar', 'Klar'], ['mono', 'Mono']], s.schrift, (v) => { s.schrift = v; })),
+    zeileFuer('Größe', schieber),
+    zeileFuer('Breite', wahl([['schmal', 'Schmal'], ['mittel', 'Mittel'], ['breit', 'Breit']], s.breite, (v) => { s.breite = v; })),
+    zeileFuer('Schreibmaschine', wahl([[true, 'An'], [false, 'Aus']], s.typewriter, (v) => { s.typewriter = v; })),
+    zeileFuer('Zeilen-Fokus', wahl([[true, 'An'], [false, 'Aus']], s.fokus, (v) => { s.fokus = v; })),
+    zeileFuer('Tastenklang', wahl([[true, 'An'], [false, 'Aus']], s.tastenklang, (v) => { s.tastenklang = v; })),
+    el('div', { class: 'reihe', style: 'justify-content:space-between' },
+      el('button', {
+        class: 'knopf', onclick: () => { zu(); zeigeVerknuepfungen(_sr.doc); }
+      }, el('span', { html: ik('verbinden'), style: 'display:flex' }), 'Verknüpfungen'),
+      el('button', {
+        class: 'knopf', onclick: async () => {
+          zu();
+          const dauer = await menue([
+            { text: 'Eine kleine Kerze — 10 Minuten', wert: 10 },
+            { text: 'Eine mittlere — 20 Minuten', wert: 20 },
+            { text: 'Eine lange — 45 Minuten', wert: 45 }
+          ], 'Eine Kerze anzünden');
+          if (dauer) starteSprint(dauer);
+        }
+      }, '🕯 Kerze anzünden')
+    )
+  );
+  const zu = zeigeDeck(kasten);
+}
+
+/* ----- Sprint: die Kerze ----- */
+function starteSprint(minuten) {
+  if (!_sr || _sr.sprint) return;
+  const halter = $('.kerzenhalter', _sr.raum);
+  const kerze = el('div', { class: 'kerze', style: 'height:30px' }, el('div', { class: 'kerzenflamme' }));
+  halter.append(kerze);
+  requestAnimationFrame(() => {
+    kerze.style.transition = 'height ' + (minuten * 60) + 's linear';
+    requestAnimationFrame(() => { kerze.style.height = '4px'; });
+  });
+  const startWorte = worte(_sr.ta.value);
+  _sr.sprint = {
+    startWorte, minuten,
+    timer: setTimeout(() => beendeSprint(false), minuten * 60000)
+  };
+  toast('Die Kerze brennt. ' + minuten + ' Minuten gehören dir.');
+}
+function beendeSprint(abgebrochen) {
+  if (!_sr || !_sr.sprint) return;
+  const sp = _sr.sprint;
+  clearTimeout(sp.timer);
+  _sr.sprint = null;
+  const kerze = $('.kerze', _sr.raum);
+  if (kerze) kerze.remove();
+  if (!abgebrochen) {
+    const geschrieben = worte(_sr.ta.value) - sp.startWorte;
+    glocke();
+    const klangDazu = D.einst.klang !== 'aus' ? { regen: ' Der Regen fällt weiter.', kamin: ' Das Feuer knistert noch.', wind: ' Der Wind hat gedreht.', grillen: ' Die Grillen bleiben.' }[D.einst.klang] || '' : '';
+    toast('Ein Atemzug Rauch. ' + geschrieben + ' Wörter in ' + sp.minuten + ' Minuten.' + klangDazu, 4200);
+  }
+}
+
+/* ----- Verknüpfungen ----- */
+function zeigeVerknuepfungen(doc) {
+  const hinaus = [];
+  const t = doc.text || '';
+  const re = /\[\[([^\[\]]{1,80})\]\]/g;
+  let m;
+  while ((m = re.exec(t))) {
+    const ziel = findeNachTitel(m[1]);
+    if (ziel && !hinaus.includes(ziel)) hinaus.push(ziel);
+  }
+  const herein = rueckverweise(doc);
+  const eintrag = (d) => el('button', {
+    onclick: () => { zu(); if (_sr) schliesseSchreibraum(); oeffneDoc(d); }
+  }, el('span', { html: ik({ szene: 'projekte', seite: 'hefte', schnipsel: 'schnipsel', blase: 'cluster', wort: 'woerter' }[d.typ] || 'hefte'), style: 'display:flex' }),
+    (d.titel || (d.text || '').slice(0, 44) || 'Ohne Titel'));
+  const kasten = el('div', { class: 'menue' },
+    el('div', { class: 'mtitel' }, 'FÜHRT HIN ZU'),
+    hinaus.length ? hinaus.map(eintrag) : el('div', { style: 'padding:6px 14px 12px;color:var(--blass);font-size:14px' }, 'Mit [[doppelten Klammern]] im Text verbindest du Orte miteinander.'),
+    el('div', { class: 'mtitel' }, 'ZEIGT HIERHER'),
+    herein.length ? herein.map(eintrag) : el('div', { style: 'padding:6px 14px 12px;color:var(--blass);font-size:14px' }, 'Noch nichts.')
+  );
+  const zu = zeigeDeck(kasten);
+}
+
+/* ----- Klang-Menü (nutzt 50-audio) ----- */
+async function klangMenue() {
+  const wahl = await menue([
+    { text: 'Stille', icon: 'kreuz', wert: 'aus' },
+    { text: 'Regen ans Fenster', icon: 'klang', wert: 'regen' },
+    { text: 'Kaminfeuer', icon: 'feuer', wert: 'kamin' },
+    { text: 'Wind ums Haus', icon: 'klang', wert: 'wind' },
+    { text: 'Grillen in der Nacht', icon: 'klang', wert: 'grillen' }
+  ], 'Was soll zu hören sein?');
+  if (wahl) klangSetzen(wahl);
+}
+/* ================================================================
+   VANI — Cluster: Denken auf Brettern
+   ================================================================ */
+
+RENDER.cluster = function (haupt) {
+  haupt.append(raumkopf('Cluster', null,
+    el('button', {
+      class: 'rundknopf voll', html: ik('plus'), onclick: async () => {
+        const name = await eingabe({ titel: 'Ein neues Brett', platzhalter: 'Wofür ist es?' });
+        if (!name) return;
+        const b = neuDoc('board', { titel: name });
+        location.hash = '#/brett/' + b.id;
+      }
+    })
+  ));
+  const inhalt = el('div', { class: 'inhalt' });
+  const bretter = vomTyp('board');
+  if (!bretter.length) {
+    inhalt.append(el('div', { class: 'leer' }, 'Freier Raum zum Denken.',
+      el('div', { class: 'klein' }, 'Blasen, Fäden dazwischen, keine Ordnung nötig.')));
+  }
+  const liste = el('div', { class: 'brettliste' });
+  for (const b of bretter) {
+    const blasen = kinder(b.id, 'blase').length;
+    const karte = el('button', { class: 'karte brettkarte', onclick: () => { location.hash = '#/brett/' + b.id; } },
+      el('div', { class: 'minis' }, el('i'), el('i'), el('i')),
+      el('h3', {}, b.titel),
+      el('div', { class: 'bzahl' }, blasen === 1 ? 'eine Blase' : blasen + ' Blasen')
+    );
+    langdruck(karte, async () => {
+      const wahl = await menue([
+        { text: 'Umbenennen', icon: 'stift', wert: 'name' },
+        { text: 'Brett löschen', icon: 'muell', wert: 'weg', rot: true }
+      ], b.titel);
+      if (wahl === 'name') {
+        const neu = await eingabe({ titel: 'Das Brett heißt jetzt …', wert: b.titel });
+        if (neu) { b.titel = neu; speichere(b); zeichne(); }
+      } else if (wahl === 'weg') {
+        if (await frage('„' + b.titel + '" mit allen Blasen löschen?', { ja: 'Löschen', gefahr: true })) { await loesche(b.id); zeichne(); }
+      }
+    });
+    liste.append(karte);
+  }
+  inhalt.append(liste);
+  haupt.append(inhalt);
+};
+
+const BLASENFARBEN = ['', 'b-gelb', 'b-rot', 'b-gruen', 'b-blau'];
+
+RENDER.brett = function (haupt, bid) {
+  const brett = D.docs.get(bid);
+  if (!brett) { location.hash = '#/cluster'; return; }
+  const sicht = brett.sicht || { x: 60, y: 60, z: 1 };
+  brett.sicht = sicht;
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'brett-kanten');
+  const flaeche = el('div', { class: 'brett-flaeche' });
+  flaeche.append(svg);
+  const raum = el('div', { class: 'brett-raum' }, flaeche);
+
+  let verbinden = false;
+  let verbindeVon = null;
+
+  const kopfleiste = el('div', { class: 'schwebeleiste', style: 'left:16px;transform:none' },
+    el('button', { class: 'rundknopf zart', html: ik('zurueck'), onclick: () => { speichereStill(brett); location.hash = '#/cluster'; } }),
+    el('span', { style: 'align-self:center;font-family:ui-serif,Georgia,serif;font-weight:600;padding:0 6px' }, brett.titel)
+  );
+
+  const verbindenKnopf = el('button', {
+    class: 'rundknopf', html: ik('verbinden'), title: 'Verbinden', onclick: () => {
+      verbinden = !verbinden;
+      verbindeVon = null;
+      verbindenKnopf.classList.toggle('an', verbinden);
+      $$('.denkblase.gewaehlt', flaeche).forEach((x) => x.classList.remove('gewaehlt'));
+      toast(verbinden ? 'Zwei Blasen antippen — dann spannt sich ein Faden.' : 'Faden-Modus aus.');
+    }
+  });
+  const zoomAnzeige = el('button', {
+    class: 'knopf zart', style: 'min-width:52px;justify-content:center', onclick: () => { sicht.z = 1; sicht.x = 60; sicht.y = 60; wende(); }
+  }, '100%');
+  const werkzeuge = el('div', { class: 'brett-werkzeuge' },
+    el('button', {
+      class: 'rundknopf', html: ik('plus'), title: 'Neue Blase', onclick: () => {
+        const mitte = weltPunkt(raum.clientWidth / 2, raum.clientHeight / 2);
+        neuDoc('blase', { parent: brett.id, text: '', farbe: '', pos: { x: mitte.x - 110 + Math.random() * 40, y: mitte.y - 40 + Math.random() * 40 } });
+        baueBlasen();
+      }
+    }),
+    verbindenKnopf,
+    el('button', { class: 'rundknopf', html: ik('suche'), style: 'transform:scaleX(-1)', title: 'Kleiner', onclick: () => { zoomeUm(1 / 1.25, raum.clientWidth / 2, raum.clientHeight / 2); } }),
+    zoomAnzeige,
+    el('button', { class: 'rundknopf', html: ik('suche'), title: 'Größer', onclick: () => { zoomeUm(1.25, raum.clientWidth / 2, raum.clientHeight / 2); } })
+  );
+
+  haupt.append(raum, kopfleiste, werkzeuge);
+
+  function wende() {
+    flaeche.style.transform = 'translate(' + sicht.x + 'px,' + sicht.y + 'px) scale(' + sicht.z + ')';
+    zoomAnzeige.textContent = Math.round(sicht.z * 100) + '%';
+  }
+  function weltPunkt(cx, cy) { return { x: (cx - sicht.x) / sicht.z, y: (cy - sicht.y) / sicht.z }; }
+  function zoomeUm(f, cx, cy) {
+    const alt = sicht.z;
+    sicht.z = Math.max(.3, Math.min(2.2, sicht.z * f));
+    const echt = sicht.z / alt;
+    sicht.x = cx - (cx - sicht.x) * echt;
+    sicht.y = cy - (cy - sicht.y) * echt;
+    wende();
+    speichereStill(brett);
+  }
+
+  /* Kanten zeichnen */
+  function mittelpunkt(b) {
+    const elem = flaeche.querySelector('[data-id="' + b.id + '"]');
+    const w = elem ? elem.offsetWidth : 220;
+    const h = elem ? elem.offsetHeight : 60;
+    return { x: b.pos.x + w / 2, y: b.pos.y + h / 2 };
+  }
+  function baueKanten() {
+    svg.innerHTML = '';
+    for (const k of kinder(brett.id, 'kante')) {
+      const von = D.docs.get(k.von), zu = D.docs.get(k.zu);
+      if (!von || !zu) continue;
+      const a = mittelpunkt(von), b = mittelpunkt(zu);
+      const linie = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      linie.setAttribute('x1', a.x + 20000); linie.setAttribute('y1', a.y + 20000);
+      linie.setAttribute('x2', b.x + 20000); linie.setAttribute('y2', b.y + 20000);
+      svg.append(linie);
+      const griff = linie.cloneNode();
+      griff.setAttribute('class', 'klickbar');
+      griff.addEventListener('click', async () => {
+        const wahl = await menue([
+          { text: k.label ? 'Beschriftung ändern' : 'Faden beschriften', icon: 'stift', wert: 'label' },
+          { text: 'Faden lösen', icon: 'muell', wert: 'weg', rot: true }
+        ]);
+        if (wahl === 'label') {
+          const neu = await eingabe({ titel: 'Was verbindet die beiden?', wert: k.label || '' });
+          if (neu !== null) { k.label = neu; speichereStill(k); baueKanten(); }
+        } else if (wahl === 'weg') { await loesche(k.id); baueKanten(); }
+      });
+      svg.append(griff);
+      if (k.label) {
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', (a.x + b.x) / 2 + 20000);
+        text.setAttribute('y', (a.y + b.y) / 2 + 20000 - 6);
+        text.setAttribute('text-anchor', 'middle');
+        text.textContent = k.label;
+        svg.append(text);
+      }
+    }
+  }
+
+  /* Blasen bauen */
+  function baueBlasen() {
+    $$('.denkblase', flaeche).forEach((x) => x.remove());
+    for (const b of kinder(brett.id, 'blase')) flaeche.append(baueBlase(b));
+    baueKanten();
+  }
+  function baueBlase(b) {
+    const blase = el('div', { class: 'denkblase ' + (b.farbe || ''), 'data-id': b.id });
+    blase.style.left = b.pos.x + 'px';
+    blase.style.top = b.pos.y + 'px';
+    const ta = el('textarea', { rows: 1, placeholder: '…', readonly: 'readonly' });
+    ta.value = b.text || '';
+    autogrow(ta);
+    ta.addEventListener('input', entprellt(() => { b.text = ta.value; speichereStill(b); }, 400));
+    ta.addEventListener('blur', () => ta.setAttribute('readonly', 'readonly'));
+    blase.append(ta);
+
+    let zieht = null;
+    blase.addEventListener('pointerdown', (e) => {
+      if (!ta.hasAttribute('readonly') && e.target === ta) return;
+      zieht = { sx: e.clientX, sy: e.clientY, px: b.pos.x, py: b.pos.y, bewegt: false };
+      blase.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    blase.addEventListener('pointermove', (e) => {
+      if (!zieht) return;
+      const dx = (e.clientX - zieht.sx) / sicht.z, dy = (e.clientY - zieht.sy) / sicht.z;
+      if (!zieht.bewegt && Math.hypot(dx, dy) < 5) return;
+      zieht.bewegt = true;
+      blase._zieht = true;
+      b.pos.x = zieht.px + dx; b.pos.y = zieht.py + dy;
+      blase.style.left = b.pos.x + 'px';
+      blase.style.top = b.pos.y + 'px';
+      baueKanten();
+    });
+    blase.addEventListener('pointerup', () => {
+      if (!zieht) return;
+      const bewegt = zieht.bewegt;
+      zieht = null;
+      setTimeout(() => { blase._zieht = false; }, 0);
+      if (bewegt) { speichereStill(b); return; }
+      /* Tippen */
+      if (verbinden) {
+        if (!verbindeVon) { verbindeVon = b; blase.classList.add('gewaehlt'); return; }
+        if (verbindeVon.id === b.id) { verbindeVon = null; blase.classList.remove('gewaehlt'); return; }
+        const bestehend = kinder(brett.id, 'kante').find((k) =>
+          (k.von === verbindeVon.id && k.zu === b.id) || (k.von === b.id && k.zu === verbindeVon.id));
+        if (bestehend) { loesche(bestehend.id).then(baueKanten); }
+        else { neuDoc('kante', { parent: brett.id, von: verbindeVon.id, zu: b.id, label: '' }); baueKanten(); }
+        $$('.denkblase.gewaehlt', flaeche).forEach((x) => x.classList.remove('gewaehlt'));
+        verbindeVon = null;
+        return;
+      }
+      ta.removeAttribute('readonly');
+      ta.focus();
+    });
+    blase.addEventListener('pointercancel', () => { zieht = null; });
+
+    langdruck(blase, async () => {
+      const wahl = await menue([
+        { text: 'Andere Farbe', icon: 'farbe', wert: 'farbe' },
+        { text: 'Im Schreibraum öffnen', icon: 'stift', wert: 'sr' },
+        { text: 'Blase zerplatzen', icon: 'muell', wert: 'weg', rot: true }
+      ]);
+      if (wahl === 'farbe') {
+        b.farbe = BLASENFARBEN[(BLASENFARBEN.indexOf(b.farbe || '') + 1) % BLASENFARBEN.length];
+        speichereStill(b);
+        blase.className = 'denkblase ' + (b.farbe || '');
+      } else if (wahl === 'sr') {
+        speichereStill(brett);
+        oeffneSchreibraum(b.id);
+      } else if (wahl === 'weg') {
+        await loesche(b.id); baueBlasen();
+      }
+    });
+    return blase;
+  }
+
+  /* Schieben & Kneifen & Doppeltipp */
+  const zeiger = new Map();
+  let pan = null, kneifen = null, letzterTipp = { t: 0, x: 0, y: 0 };
+  raum.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.denkblase') || e.target.closest('.schwebeleiste') || e.target.closest('.brett-werkzeuge')) return;
+    zeiger.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (zeiger.size === 1) {
+      pan = { sx: e.clientX, sy: e.clientY, px: sicht.x, py: sicht.y };
+    } else if (zeiger.size === 2) {
+      pan = null;
+      const [a, b] = [...zeiger.values()];
+      kneifen = { abstand: Math.hypot(a.x - b.x, a.y - b.y), z: sicht.z };
+    }
+  });
+  raum.addEventListener('pointermove', (e) => {
+    if (!zeiger.has(e.pointerId)) return;
+    zeiger.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (kneifen && zeiger.size === 2) {
+      const [a, b] = [...zeiger.values()];
+      const abstand = Math.hypot(a.x - b.x, a.y - b.y);
+      const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+      const f = (kneifen.z * abstand / kneifen.abstand) / sicht.z;
+      zoomeUm(f, mx, my);
+    } else if (pan) {
+      sicht.x = pan.px + (e.clientX - pan.sx);
+      sicht.y = pan.py + (e.clientY - pan.sy);
+      wende();
+    }
+  });
+  const zeigerWeg = (e) => {
+    if (pan && zeiger.has(e.pointerId)) {
+      const dx = e.clientX - pan.sx, dy = e.clientY - pan.sy;
+      if (Math.hypot(dx, dy) < 8 && !e.target.closest('.denkblase')) {
+        const jetzt = Date.now();
+        if (jetzt - letzterTipp.t < 340 && Math.hypot(e.clientX - letzterTipp.x, e.clientY - letzterTipp.y) < 40) {
+          const p = weltPunkt(e.clientX, e.clientY);
+          neuDoc('blase', { parent: brett.id, text: '', farbe: '', pos: { x: p.x - 110, y: p.y - 30 } });
+          baueBlasen();
+          letzterTipp = { t: 0, x: 0, y: 0 };
+        } else {
+          letzterTipp = { t: jetzt, x: e.clientX, y: e.clientY };
+        }
+      }
+      speichereStill(brett);
+    }
+    zeiger.delete(e.pointerId);
+    if (zeiger.size < 2) kneifen = null;
+    if (zeiger.size === 0) pan = null;
+  };
+  raum.addEventListener('pointerup', zeigerWeg);
+  raum.addEventListener('pointercancel', zeigerWeg);
+
+  wende();
+  baueBlasen();
+  if (!kinder(brett.id, 'blase').length) {
+    toast('Doppelt tippen — da, wo ein Gedanke hin soll.');
+  }
+};
+/* ================================================================
+   VANI — Wörter: die Wortschatzkiste & Funken
+   ================================================================ */
+
+RENDER.woerter = function (haupt) {
+  haupt.append(raumkopf('Wörter'));
+  const inhalt = el('div', { class: 'inhalt' });
+
+  /* Kiste */
+  const kiste = el('div', { class: 'karte' });
+  kiste.append(el('div', { class: 'kartenkopf' }, el('span', { html: ik('woerter') }), 'WORTSCHATZKISTE'));
+  const gitter = el('div', { class: 'wortgitter' });
+
+  function baueKiste() {
+    gitter.innerHTML = '';
+    const alle = vomTyp('wort').sort((a, b) => a.angelegt - b.angelegt);
+    if (!alle.length) {
+      gitter.append(el('div', { style: 'color:var(--blass);font-style:italic;font-family:ui-serif,Georgia,serif' }, 'Eine leere Kiste wartet auf schöne Wörter.'));
+    }
+    for (const w of alle) {
+      let h = 0;
+      for (const c of w.id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+      const dreh = (h % 7) - 3;
+      const karte = el('button', { class: 'wortkarte', style: '--dreh:' + dreh + 'deg' }, w.text);
+      karte.addEventListener('click', async () => {
+        const wahl = await menue([
+          { text: 'Damit schreiben', icon: 'stift', wert: 'schreiben' },
+          { text: 'Ändern', icon: 'drehen', wert: 'edit' },
+          { text: 'Aus der Kiste nehmen', icon: 'muell', wert: 'weg', rot: true }
+        ], w.text);
+        if (wahl === 'schreiben') {
+          const seite = seiteAusText('', w.text + ' —\n\n');
+          oeffneSchreibraum(seite.id);
+        } else if (wahl === 'edit') {
+          const neu = await eingabe({ titel: 'Das Wort', wert: w.text });
+          if (neu) { w.text = neu; speichereStill(w); baueKiste(); }
+        } else if (wahl === 'weg') { await loesche(w.id); baueKiste(); }
+      });
+      gitter.append(karte);
+    }
+  }
+  baueKiste();
+
+  const feld = el('input', { type: 'text', placeholder: 'Ein Wort, das bleiben soll …' });
+  const zugabe = el('div', { class: 'wortzugabe' },
+    feld,
+    el('button', {
+      class: 'rundknopf voll', html: ik('plus'), onclick: () => {
+        const t = feld.value.trim();
+        if (!t) return;
+        neuDoc('wort', { text: t });
+        feld.value = '';
+        baueKiste();
+      }
+    })
+  );
+  feld.addEventListener('keydown', (e) => { if (e.key === 'Enter') zugabe.querySelector('button').click(); });
+
+  kiste.append(gitter, zugabe);
+  inhalt.append(kiste);
+
+  /* Schütteln */
+  const klangkarte = el('div', { class: 'karte', style: 'margin-top:14px' });
+  klangkarte.append(el('div', { class: 'kartenkopf' }, el('span', { html: ik('wuerfel') }), 'KISTE SCHÜTTELN'));
+  const bühne = el('div', { class: 'dreiklang' }, el('span', { style: 'color:var(--blass);font-size:16px' }, 'Drei Wörter fallen heraus — und wollen zusammen etwas werden.'));
+  let griff = [];
+  klangkarte.append(bühne, el('div', { class: 'fussreihe' },
+    el('button', {
+      class: 'knopf', onclick: () => {
+        const alle = vomTyp('wort');
+        if (alle.length < 3) { toast('Dafür braucht die Kiste mindestens drei Wörter.'); return; }
+        griff = [...alle].sort(() => Math.random() - .5).slice(0, 3);
+        bühne.innerHTML = '';
+        griff.forEach((w, i) => bühne.append(el('span', { style: '--dreh:' + ((i * 5) - 5) + 'deg' }, w.text)));
+      }
+    }, 'Schütteln'),
+    el('button', {
+      class: 'knopf voll', onclick: () => {
+        if (!griff.length) { toast('Erst schütteln.'); return; }
+        const seite = seiteAusText('', griff.map((w) => w.text).join(' · ') + '\n\n');
+        oeffneSchreibraum(seite.id);
+      }
+    }, 'Damit schreiben')
+  ));
+  inhalt.append(klangkarte);
+
+  /* Funken */
+  let funke = neuerFunke(false);
+  const funkeText = el('div', { class: 'funke-text', style: 'min-height:54px' }, funke);
+  inhalt.append(el('div', { class: 'karte', style: 'margin-top:14px' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('feuer') }), 'FUNKEN'),
+    funkeText,
+    el('div', { class: 'fussreihe' },
+      el('button', { class: 'knopf', onclick: () => { funke = neuerFunke(false); funkeText.textContent = funke; } }, 'Neuer Funke'),
+      el('button', { class: 'knopf', onclick: () => { funke = neuerFunke(true); funkeText.textContent = funke; } }, 'Wer · Wo · Aber'),
+      el('button', {
+        class: 'knopf voll', onclick: () => {
+          const seite = seiteAusText('', funke + '\n\n');
+          oeffneSchreibraum(seite.id);
+        }
+      }, 'Dem nachgehen')
+    )
+  ));
+
+  haupt.append(inhalt);
+};
+/* ================================================================
+   VANI — Suche: ein Feld, alles
+   ================================================================ */
+
+function oeffneSuche() {
+  const feld = el('input', { type: 'text', placeholder: 'Wonach suchst du?' });
+  const treffer = el('div', { class: 'suchtreffer' });
+  const kasten = el('div', { class: 'suchkasten' },
+    el('div', { class: 'suchzeile' },
+      el('span', { html: ik('suche'), style: 'display:flex;color:var(--blass)' }),
+      feld,
+      el('button', { class: 'rundknopf zart', style: 'width:32px;height:32px', html: ik('kreuz'), onclick: () => zu() })
+    ),
+    treffer
+  );
+  const bogen = el('div', { class: 'suchbogen' }, kasten);
+  bogen.addEventListener('pointerdown', (e) => { if (e.target === bogen) zu(); });
+  document.body.append(bogen);
+  const zu = () => bogen.remove();
+  setTimeout(() => feld.focus(), 60);
+
+  const GRUPPEN = [
+    ['schnipsel', 'SCHNIPSEL', 'schnipsel'],
+    ['seite', 'HEFTSEITEN', 'hefte'],
+    ['szene', 'SZENEN', 'projekte'],
+    ['heft', 'HEFTE', 'hefte'],
+    ['projekt', 'PROJEKTE', 'projekte'],
+    ['blase', 'BLASEN', 'cluster'],
+    ['zettel', 'ZETTEL', 'pin'],
+    ['wort', 'WÖRTER', 'woerter']
+  ];
+
+  function suche() {
+    const q = feld.value.trim().toLowerCase();
+    treffer.innerHTML = '';
+    if (q.length < 2) {
+      treffer.append(el('div', { style: 'padding:22px;text-align:center;color:var(--blass);font-style:italic;font-family:ui-serif,Georgia,serif' },
+        'Alles, was du je geschrieben hast, liegt hier drin.'));
+      return;
+    }
+    let gesamt = 0;
+    for (const [typ, name, icon] of GRUPPEN) {
+      const funde = [...D.docs.values()]
+        .filter((d) => d.typ === typ && ((d.titel || '').toLowerCase().includes(q) || (d.text || '').toLowerCase().includes(q)))
+        .sort((a, b) => b.geaendert - a.geaendert)
+        .slice(0, 8);
+      if (!funde.length) continue;
+      treffer.append(el('div', { class: 'gruppe' }, name));
+      for (const d of funde) {
+        gesamt++;
+        const text = d.text || '';
+        const wo = text.toLowerCase().indexOf(q);
+        const umfeld = wo >= 0 ? '… ' + text.slice(Math.max(0, wo - 30), wo + 60).replace(/\n/g, ' ') + ' …' : text.slice(0, 80);
+        treffer.append(el('button', { onclick: () => { zu(); oeffneDoc(d); } },
+          el('span', { class: 'ttitel' }, d.titel || (text.split('\n')[0] || 'Ohne Titel').slice(0, 50)),
+          umfeld.trim() ? el('span', { class: 'tprobe' }, umfeld) : null
+        ));
+      }
+    }
+    if (!gesamt) {
+      treffer.append(el('div', { style: 'padding:22px;text-align:center;color:var(--blass);font-style:italic;font-family:ui-serif,Georgia,serif' },
+        'Nichts. Vielleicht muss es erst noch geschrieben werden.'));
+    }
+  }
+  feld.addEventListener('input', entprellt(suche, 160));
+  feld.addEventListener('keydown', (e) => { if (e.key === 'Escape') zu(); });
+  suche();
+}
+
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); oeffneSuche(); }
+});
+/* ================================================================
+   VANI — Feinheiten: Thema, Klang, Statistik, Sicherung
+   ================================================================ */
+
+RENDER.feinheiten = function (haupt) {
+  haupt.append(raumkopf('Feinheiten'));
+  const inhalt = el('div', { class: 'inhalt' });
+
+  /* Thema */
+  const THEMA_INFO = [
+    ['papier', 'Papier', '#f8f3e7', '#2c251c'],
+    ['tinte', 'Tinte', '#211c17', '#eae0cd'],
+    ['kerze', 'Kerze', '#2b1e0c', '#f2dfb6'],
+    ['nebel', 'Nebel', '#f4f6f2', '#2e3438']
+  ];
+  const themen = el('div', { class: 'themenwahl' });
+  for (const [id, name, hg, tinte] of THEMA_INFO) {
+    themen.append(el('button', {
+      class: 'themenkachel' + (D.einst.thema === id ? ' an' : ''), onclick: (e) => {
+        setzeThema(id);
+        $$('.themenkachel', themen).forEach((k) => k.classList.toggle('an', k === e.currentTarget));
+      }
+    },
+      el('div', { class: 'vorschau', style: 'background:' + hg + ';color:' + tinte }, 'Aa'),
+      el('div', { class: 'tname' }, name)
+    ));
+  }
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Stimmung'), themen));
+
+  /* Schreiben */
+  const zielFeld = el('input', { type: 'text', inputmode: 'numeric', value: D.einst.tagesziel || '', placeholder: 'keins', style: 'width:90px;text-align:right;background:var(--karte);border-radius:10px;padding:7px 11px;box-shadow:inset 0 0 0 1px var(--linie)' });
+  zielFeld.addEventListener('input', entprellt(() => {
+    D.einst.tagesziel = parseInt(zielFeld.value, 10) || 0;
+    speichereEinst();
+  }, 400));
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Schreiben'),
+    el('div', { class: 'karte' },
+      el('div', { class: 'einstellzeile' },
+        el('span', { class: 'ename' }, 'Tagesziel in Wörtern', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Leer lassen heißt: kein Soll. Auch gut.')),
+        zielFeld),
+      el('div', { class: 'einstellzeile' },
+        el('span', { class: 'ename' }, 'Schrift, Größe, Fokus …', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Stellst du direkt im Schreibraum ein — oben rechts.')))
+    )));
+
+  /* Klang */
+  const klangwahl = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
+  const KLAENGE = [['aus', 'Stille'], ['regen', 'Regen'], ['kamin', 'Kamin'], ['wind', 'Wind'], ['grillen', 'Grillen']];
+  for (const [id, name] of KLAENGE) {
+    klangwahl.append(el('button', {
+      class: D.einst.klang === id ? 'an' : '', onclick: (e) => {
+        klangSetzen(id);
+        $$('button', klangwahl).forEach((b) => b.classList.toggle('an', b === e.currentTarget));
+      }
+    }, name));
+  }
+  const laut = el('input', { type: 'range', min: '0', max: '100', value: String(Math.round(D.einst.lautstaerke * 100)) });
+  laut.addEventListener('input', () => { setzeLautstaerke(parseInt(laut.value, 10) / 100); });
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Klang'),
+    el('div', { class: 'karte' },
+      el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, 'Zu hören'), klangwahl),
+      el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, 'Lautstärke'), laut)
+    )));
+
+  /* Statistik */
+  const gesamt = Object.values(D.stats.tage).reduce((a, b) => a + b, 0);
+  const balken = el('div', { class: 'statistikbalken' });
+  const werte = [];
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    werte.push({ k: tagKey(d), w: D.stats.tage[tagKey(d)] || 0, d });
+  }
+  const max = Math.max(1, ...werte.map((x) => x.w));
+  for (const { w, d } of werte) {
+    balken.append(el('div', { class: 'tag' + (w ? '' : ' leer') },
+      el('i', { style: 'height:' + Math.max(4, Math.round(w / max * 100)) + '%' }),
+      el('b', {}, String(d.getDate()))));
+  }
+  const anzahl = (typ) => [...D.docs.values()].filter((d) => d.typ === typ).length;
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Gezählt, nicht gewogen'),
+    el('div', { class: 'karte' },
+      balken,
+      el('div', { class: 'zahlenreihe' },
+        el('div', { class: 'z' }, el('b', {}, gesamt.toLocaleString('de-DE')), el('span', {}, 'Wörter insgesamt')),
+        el('div', { class: 'z' }, el('b', {}, String(D.stats.tage[tagKey()] || 0)), el('span', {}, 'heute')),
+        el('div', { class: 'z' }, el('b', {}, String(straehne())), el('span', {}, 'Tage in Folge')),
+        el('div', { class: 'z' }, el('b', {}, String(anzahl('schnipsel'))), el('span', {}, 'Schnipsel')),
+        el('div', { class: 'z' }, el('b', {}, String(anzahl('seite'))), el('span', {}, 'Seiten')),
+        el('div', { class: 'z' }, el('b', {}, String(anzahl('szene'))), el('span', {}, 'Szenen'))
+      )
+    )));
+
+  /* Sicherung */
+  const wann = D.stats.letzteSicherung;
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Sicher ist sicher'),
+    el('div', { class: 'karte' },
+      el('div', { style: 'font-size:14px;color:var(--blass);line-height:1.6;margin-bottom:14px' },
+        'Alles hier lebt nur auf diesem Gerät. Eine Sicherung ist eine einzige Datei mit allem drin — Texte, Hefte, Fotos. ',
+        wann ? 'Zuletzt gesichert: ' + vorZeit(wann) + '.' : 'Noch nie gesichert.'),
+      el('div', { style: 'display:flex;gap:10px;flex-wrap:wrap' },
+        el('button', { class: 'knopf voll', onclick: () => sichereAlles() }, el('span', { html: ik('teilen'), style: 'display:flex' }), 'Alles sichern'),
+        el('button', { class: 'knopf', onclick: () => leseSicherung() }, el('span', { html: ik('runter'), style: 'display:flex;transform:rotate(180deg)' }), 'Sicherung einlesen'),
+        el('button', {
+          class: 'knopf', onclick: async () => {
+            const texte = alleTexteAlsText();
+            try { await navigator.clipboard.writeText(texte); toast('Alle Texte in der Zwischenablage.'); }
+            catch (e) { teileDatei('vani-texte.txt', texte); }
+          }
+        }, 'Nur Texte kopieren')
+      )
+    )));
+
+  /* Kleingedrucktes */
+  inhalt.append(el('div', { class: 'kleingedruckt' },
+    el('div', { class: 'wortmarke' }, 'VANI'),
+    el('div', { style: 'margin-top:6px' }, 'Handgemacht. Offline. Meins.'),
+    el('div', {}, 'Kein Konto, keine Cloud, kein Abo — alles bleibt hier.'),
+    el('button', { class: 'knopf zart', style: 'margin-top:14px', onclick: () => location.reload() }, 'Frisch durchatmen (neu laden)')
+  ));
+
+  haupt.append(inhalt);
+};
+
+/* ----- Sicherung ----- */
+function blobZuDataURL(blob) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(blob);
+  });
+}
+function dataURLZuBlob(durl) {
+  const [kopf, daten] = durl.split(',');
+  const mime = (kopf.match(/data:(.*?);/) || [])[1] || 'application/octet-stream';
+  const bin = atob(daten);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
+
+async function sichereAlles() {
+  toast('Packe alles ein …');
+  const media = {};
+  const ids = new Set();
+  for (const d of D.docs.values()) { if (d.bild) ids.add(d.bild); if (d.skizze) ids.add(d.skizze); }
+  for (const id of ids) {
+    const blob = await dbGet('media', id);
+    if (blob) media[id] = await blobZuDataURL(blob);
+  }
+  const paket = {
+    vani: 1, wann: Date.now(),
+    docs: [...D.docs.values()],
+    einst: D.einst,
+    stats: D.stats,
+    media
+  };
+  const name = 'vani-sicherung-' + tagKey() + '.vani';
+  const ok = await teileDatei(name, JSON.stringify(paket), 'application/json');
+  if (ok) {
+    D.stats.letzteSicherung = Date.now();
+    speichereStats();
+  }
+}
+
+function leseSicherung() {
+  const inp = el('input', { type: 'file', accept: '.vani,.json,application/json,text/plain', style: 'display:none' });
+  document.body.append(inp);
+  inp.addEventListener('change', async () => {
+    const datei = inp.files && inp.files[0];
+    inp.remove();
+    if (!datei) return;
+    let paket;
+    try { paket = JSON.parse(await datei.text()); } catch (e) { toast('Das ist keine VANI-Sicherung.'); return; }
+    if (!paket || paket.vani !== 1 || !Array.isArray(paket.docs)) { toast('Das ist keine VANI-Sicherung.'); return; }
+    const modus = await menue([
+      { text: 'Dazulegen (nichts geht verloren)', icon: 'plus', wert: 'dazu' },
+      { text: 'Alles ersetzen', icon: 'wandel', wert: 'ersetzen', rot: true }
+    ], paket.docs.length + ' Dinge vom ' + fmtDatum(paket.wann));
+    if (!modus) return;
+    if (modus === 'ersetzen') {
+      if (!await frage('Wirklich alles Jetzige durch die Sicherung ersetzen?', { ja: 'Ersetzen', gefahr: true })) return;
+      await dbTu('docs', 'readwrite', (s) => s.clear());
+      await dbTu('media', 'readwrite', (s) => s.clear());
+      D.docs.clear();
+    }
+    for (const d of paket.docs) {
+      if (modus === 'dazu' && D.docs.has(d.id)) continue;
+      D.docs.set(d.id, d);
+      await dbPut('docs', d);
+    }
+    for (const [id, durl] of Object.entries(paket.media || {})) {
+      try { await dbPut('media', dataURLZuBlob(durl), id); } catch (e) {}
+    }
+    if (modus === 'ersetzen') {
+      if (paket.einst) { Object.assign(D.einst, paket.einst); speichereEinst(); setzeThema(D.einst.thema); }
+      if (paket.stats) { D.stats = Object.assign({ tage: {}, letzte: {}, letzteSicherung: 0 }, paket.stats); speichereStats(); }
+    }
+    toast('Alles wieder da.');
+    zeichne();
+  });
+  inp.click();
+}
+
+function alleTexteAlsText() {
+  const teile = [];
+  for (const p of vomTyp('projekt')) {
+    teile.push('══ PROJEKT: ' + p.titel + ' ══');
+    for (const k of kinder(p.id, 'kapitel')) {
+      teile.push('\n— ' + k.titel + ' —');
+      for (const s of kinder(k.id, 'szene')) {
+        if (s.titel) teile.push('· ' + s.titel);
+        if ((s.text || '').trim()) teile.push(s.text.trim());
+      }
+    }
+    teile.push('');
+  }
+  for (const h of vomTyp('heft')) {
+    teile.push('══ HEFT: ' + h.titel + ' ══');
+    for (const s of kinder(h.id, 'seite')) {
+      if (s.titel) teile.push('· ' + s.titel);
+      if ((s.text || '').trim()) teile.push(s.text.trim());
+      for (const z of kinder(s.id, 'zettel')) if ((z.text || '').trim()) teile.push('[Zettel] ' + z.text.trim());
+    }
+    teile.push('');
+  }
+  const schnipsel = vomTyp('schnipsel').sort((a, b) => a.angelegt - b.angelegt);
+  if (schnipsel.length) {
+    teile.push('══ SCHNIPSEL ══');
+    for (const s of schnipsel) if ((s.text || '').trim()) teile.push(fmtDatum(s.angelegt) + ': ' + s.text.trim());
+  }
+  return teile.join('\n');
+}
+
+/* Datei hinausgeben: Teilen-Menü → Download → Zwischenablage */
+async function teileDatei(name, inhalt, typ = 'text/plain') {
+  const blob = new Blob([inhalt], { type: typ + ';charset=utf-8' });
+  const datei = new File([blob], name, { type: typ });
+  if (navigator.canShare && navigator.canShare({ files: [datei] })) {
+    try { await navigator.share({ files: [datei] }); return true; }
+    catch (e) { if (e && e.name === 'AbortError') return false; }
+  }
+  try {
+    const url = URL.createObjectURL(blob);
+    const a = el('a', { href: url, download: name, style: 'display:none' });
+    document.body.append(a);
+    a.click();
+    setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 4000);
+    toast('Gespeichert — schau in „Dateien" nach.');
+    return true;
+  } catch (e) {}
+  try {
+    await navigator.clipboard.writeText(inhalt);
+    toast('Ging nicht als Datei — liegt jetzt in der Zwischenablage.');
+    return true;
+  } catch (e) {
+    toast('Das hat leider nicht geklappt.');
+    return false;
+  }
+}
+/* ================================================================
+   VANI — Klangwelten: alles aus dem Nichts gerechnet, keine Dateien
+   ================================================================ */
+
+let _audio = null;
+
+function holeAudio() {
+  if (!_audio) {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const master = ctx.createGain();
+    master.gain.value = D.einst.lautstaerke * .6;
+    master.connect(ctx.destination);
+    _audio = { ctx, master, knoten: [], intervalle: [], laeuft: 'aus' };
+  }
+  if (_audio.ctx.state === 'suspended') _audio.ctx.resume();
+  return _audio;
+}
+
+function rauschPuffer(ctx, sek = 2) {
+  const puffer = ctx.createBuffer(1, ctx.sampleRate * sek, ctx.sampleRate);
+  const d = puffer.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  return puffer;
+}
+function rauschQuelle(a) {
+  const q = a.ctx.createBufferSource();
+  q.buffer = rauschPuffer(a.ctx);
+  q.loop = true;
+  return q;
+}
+
+function setzeLautstaerke(wert) {
+  D.einst.lautstaerke = wert;
+  speichereEinst();
+  if (_audio) _audio.master.gain.value = wert * .6;
+}
+
+function klangStopp() {
+  if (!_audio) return;
+  for (const i of _audio.intervalle) clearInterval(i);
+  for (const k of _audio.knoten) { try { k.stop ? k.stop() : k.disconnect(); } catch (e) {} }
+  _audio.knoten = [];
+  _audio.intervalle = [];
+  _audio.laeuft = 'aus';
+}
+
+function klangSetzen(name) {
+  D.einst.klang = name;
+  speichereEinst();
+  klangStopp();
+  if (name === 'aus') return;
+  const a = holeAudio();
+  a.laeuft = name;
+  if (name === 'regen') baueRegen(a);
+  else if (name === 'kamin') baueKamin(a);
+  else if (name === 'wind') baueWind(a);
+  else if (name === 'grillen') baueGrillen(a);
+}
+
+function baueRegen(a) {
+  const q = rauschQuelle(a);
+  const hoch = a.ctx.createBiquadFilter(); hoch.type = 'highpass'; hoch.frequency.value = 400;
+  const tief = a.ctx.createBiquadFilter(); tief.type = 'lowpass'; tief.frequency.value = 2400;
+  const g = a.ctx.createGain(); g.gain.value = .32;
+  q.connect(hoch); hoch.connect(tief); tief.connect(g); g.connect(a.master);
+  q.start();
+  a.knoten.push(q, g);
+  /* einzelne Tropfen */
+  a.intervalle.push(setInterval(() => {
+    if (Math.random() < .6) return;
+    const o = a.ctx.createOscillator();
+    o.type = 'sine';
+    o.frequency.value = 900 + Math.random() * 2200;
+    const og = a.ctx.createGain();
+    og.gain.setValueAtTime(.05 + Math.random() * .05, a.ctx.currentTime);
+    og.gain.exponentialRampToValueAtTime(.0001, a.ctx.currentTime + .06);
+    o.connect(og); og.connect(a.master);
+    o.start(); o.stop(a.ctx.currentTime + .08);
+  }, 180));
+}
+
+function baueKamin(a) {
+  const q = rauschQuelle(a);
+  const tief = a.ctx.createBiquadFilter(); tief.type = 'lowpass'; tief.frequency.value = 320;
+  const g = a.ctx.createGain(); g.gain.value = .5;
+  q.connect(tief); tief.connect(g); g.connect(a.master);
+  q.start();
+  /* Atmen des Feuers */
+  const lfo = a.ctx.createOscillator(); lfo.frequency.value = .18;
+  const lfoG = a.ctx.createGain(); lfoG.gain.value = .12;
+  lfo.connect(lfoG); lfoG.connect(g.gain); lfo.start();
+  a.knoten.push(q, g, lfo);
+  /* Knistern */
+  a.intervalle.push(setInterval(() => {
+    if (Math.random() < .45) return;
+    const k = a.ctx.createBufferSource();
+    k.buffer = rauschPuffer(a.ctx, .06);
+    const band = a.ctx.createBiquadFilter(); band.type = 'bandpass';
+    band.frequency.value = 1800 + Math.random() * 2600; band.Q.value = 2;
+    const kg = a.ctx.createGain();
+    kg.gain.setValueAtTime(.09 + Math.random() * .12, a.ctx.currentTime);
+    kg.gain.exponentialRampToValueAtTime(.0001, a.ctx.currentTime + .05 + Math.random() * .05);
+    k.connect(band); band.connect(kg); kg.connect(a.master);
+    k.start();
+  }, 140));
+}
+
+function baueWind(a) {
+  const q = rauschQuelle(a);
+  const band = a.ctx.createBiquadFilter(); band.type = 'bandpass'; band.frequency.value = 400; band.Q.value = .9;
+  const g = a.ctx.createGain(); g.gain.value = .34;
+  q.connect(band); band.connect(g); g.connect(a.master);
+  q.start();
+  const lfo = a.ctx.createOscillator(); lfo.frequency.value = .06;
+  const lfoG = a.ctx.createGain(); lfoG.gain.value = 260;
+  lfo.connect(lfoG); lfoG.connect(band.frequency); lfo.start();
+  const lfo2 = a.ctx.createOscillator(); lfo2.frequency.value = .11;
+  const lfo2G = a.ctx.createGain(); lfo2G.gain.value = .1;
+  lfo2.connect(lfo2G); lfo2G.connect(g.gain); lfo2.start();
+  a.knoten.push(q, g, lfo, lfo2);
+}
+
+function baueGrillen(a) {
+  /* leiser Nachtboden */
+  const q = rauschQuelle(a);
+  const tief = a.ctx.createBiquadFilter(); tief.type = 'lowpass'; tief.frequency.value = 260;
+  const g = a.ctx.createGain(); g.gain.value = .07;
+  q.connect(tief); tief.connect(g); g.connect(a.master);
+  q.start();
+  a.knoten.push(q, g);
+  /* zwei Grillen, leicht versetzt */
+  const grille = (grundton, takt) => {
+    a.intervalle.push(setInterval(() => {
+      if (Math.random() < .35) return;
+      const zirpen = 4 + Math.floor(Math.random() * 4);
+      for (let i = 0; i < zirpen; i++) {
+        const t = a.ctx.currentTime + i * .045;
+        const o = a.ctx.createOscillator();
+        o.type = 'triangle';
+        o.frequency.value = grundton + Math.random() * 150;
+        const og = a.ctx.createGain();
+        og.gain.setValueAtTime(0, t);
+        og.gain.linearRampToValueAtTime(.035, t + .008);
+        og.gain.exponentialRampToValueAtTime(.0001, t + .038);
+        o.connect(og); og.connect(a.master);
+        o.start(t); o.stop(t + .045);
+      }
+    }, takt));
+  };
+  grille(4100, 900);
+  grille(3600, 1300);
+}
+
+/* Einzelklänge */
+function glocke() {
+  try {
+    const a = holeAudio();
+    const t = a.ctx.currentTime;
+    for (const [freq, staerke] of [[660, .12], [1320, .05], [1980, .02]]) {
+      const o = a.ctx.createOscillator();
+      o.frequency.value = freq;
+      const g = a.ctx.createGain();
+      g.gain.setValueAtTime(staerke, t);
+      g.gain.exponentialRampToValueAtTime(.0001, t + 1.8);
+      o.connect(g); g.connect(a.master);
+      o.start(t); o.stop(t + 2);
+    }
+  } catch (e) {}
+}
+function tippKlick() {
+  try {
+    const a = holeAudio();
+    const k = a.ctx.createBufferSource();
+    k.buffer = rauschPuffer(a.ctx, .015);
+    const hoch = a.ctx.createBiquadFilter(); hoch.type = 'highpass'; hoch.frequency.value = 2600;
+    const g = a.ctx.createGain();
+    g.gain.setValueAtTime(.05, a.ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, a.ctx.currentTime + .02);
+    k.connect(hoch); hoch.connect(g); g.connect(a.master);
+    k.start();
+  } catch (e) {}
+}
+/* ================================================================
+   VANI — Aufwachen
+   ================================================================ */
+
+(async function start() {
+  try {
+    await ladeAlles();
+  } catch (e) {
+    document.body.innerHTML = '<div style="padding:60px;text-align:center;font-family:Georgia,serif">Der Speicher wollte nicht aufwachen. Einmal neu öffnen hilft fast immer.</div>';
+    return;
+  }
+
+  /* Erste Saat */
+  if (!(await dbGet('kv', 'gesaet'))) {
+    if (![...D.docs.values()].some((d) => d.typ === 'wort')) {
+      for (const w of SAATWORTE) neuDoc('wort', { text: w });
+    }
+    await dbPut('kv', 1, 'gesaet');
+  }
+
+  setzeThema(D.einst.thema);
+  baueLeiste();
+  zeichne();
+
+  /* Speicher festhalten */
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+
+  /* Tastatur-Höhe (iPad) */
+  if (window.visualViewport) {
+    const anpassen = () => {
+      document.documentElement.style.setProperty('--vvh', window.visualViewport.height + 'px');
+    };
+    window.visualViewport.addEventListener('resize', anpassen);
+    anpassen();
+  }
+
+  /* Klang wieder aufnehmen? Erst nach der ersten Berührung erlaubt. */
+  if (D.einst.klang && D.einst.klang !== 'aus') {
+    const einmal = () => {
+      document.removeEventListener('pointerdown', einmal);
+      try { klangSetzen(D.einst.klang); } catch (e) {}
+    };
+    document.addEventListener('pointerdown', einmal, { once: true });
+  }
+
+  /* Service Worker — nur wo es ihn gibt */
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !location.search.includes('kein-sw')) {
+    try { navigator.serviceWorker.register('sw.js'); } catch (e) {}
+  }
+})();
+</script>
+</body>
+</html>
