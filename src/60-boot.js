@@ -45,6 +45,6 @@
 
   /* Service Worker — nur wo es ihn gibt */
   if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !location.search.includes('kein-sw')) {
-    try { navigator.serviceWorker.register('sw.js'); } catch (e) {}
+    try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {}
   }
 })();
