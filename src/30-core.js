@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.0.0';
+const APP_VERSION = '5.1.0';
 const $ = (s, w) => (w || document).querySelector(s);
 const $$ = (s, w) => [...(w || document).querySelectorAll(s)];
 const uid = () => (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function')
@@ -372,6 +372,7 @@ function sauberesDokument(quelle) {
   if (d.ansicht && !['seiten', 'rolle'].includes(d.ansicht)) d.ansicht = 'seiten';
   if (d.format && !['plain', 'rich'].includes(d.format)) d.format = 'plain';
   if (d.befestigung && !['tesa', 'pin', 'lose'].includes(d.befestigung)) d.befestigung = 'tesa';
+  if (d.favorit != null) d.favorit = d.favorit === true;
   if (d.rich != null && typeof sauberesRichHTML === 'function') d.rich = sauberesRichHTML(d.rich);
   if (d.pos != null) {
     const p = d.pos && typeof d.pos === 'object' && !Array.isArray(d.pos) ? d.pos : {};
@@ -457,11 +458,12 @@ function speichere(d) { d.geaendert = Date.now(); markiereAenderung(d, false); d
 function speichereStill(d) { markiereAenderung(d, false); dbPut('docs', d).catch(() => {}); }
 
 /* Löschen ist bei VANI nie endgültig: alles wandert erst in den Papierkorb. */
-function _nachfahren(id) {
+function _nachfahren(id, kinderDerWurzelBehalten = false) {
   const opfer = [id];
   for (let i = 0; i < opfer.length; i++) {
     for (const d of D.docs.values()) {
-      if ((d.parent === opfer[i] || d.projekt === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
+      const wurzelKindBleibt = kinderDerWurzelBehalten && opfer[i] === id && d.parent === id;
+      if (!wurzelKindBleibt && (d.parent === opfer[i] || d.projekt === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
       if (d.typ === 'kante' && (d.von === opfer[i] || d.zu === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
       if (d.typ === 'bezug' && (d.von === opfer[i] || d.zu === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
     }
@@ -469,10 +471,10 @@ function _nachfahren(id) {
   return opfer;
 }
 
-async function loesche(id, still) {
+async function loesche(id, still, kinderDerWurzelBehalten = false) {
   const wurzel = D.docs.get(id);
   if (!wurzel) return;
-  const opfer = _nachfahren(id);
+  const opfer = _nachfahren(id, kinderDerWurzelBehalten);
   const opferSet = new Set(opfer);
   const buendel = { id: uid(), wann: Date.now(), name: wurzel.titel || (wurzel.text || '').slice(0, 40) || wurzel.typ, typ: wurzel.typ, docs: [], referenzen: [] };
   /* Lose Zuordnungen überleben das Löschen ihres Ziels, dürfen danach aber
@@ -482,6 +484,7 @@ async function loesche(id, still) {
     let geputzt = false;
     if (d.projektRef && opferSet.has(d.projektRef)) { buendel.referenzen.push({ id: d.id, feld: 'projektRef', wert: d.projektRef }); delete d.projektRef; geputzt = true; }
     if (d.quelle && opferSet.has(d.quelle)) { buendel.referenzen.push({ id: d.id, feld: 'quelle', wert: d.quelle }); delete d.quelle; geputzt = true; }
+    if (kinderDerWurzelBehalten && d.parent === id) { buendel.referenzen.push({ id: d.id, feld: 'parent', wert: d.parent }); delete d.parent; geputzt = true; }
     if (geputzt) speichereStill(d);
   }
   for (const oid of opfer) {
@@ -511,7 +514,7 @@ async function holeZurueck(buendelId) {
   }
   for (const r of b.referenzen || []) {
     const d = D.docs.get(r.id);
-    if (!d || !['projektRef', 'quelle'].includes(r.feld) || typeof r.wert !== 'string') continue;
+    if (!d || !['projektRef', 'quelle', 'parent'].includes(r.feld) || typeof r.wert !== 'string') continue;
     d[r.feld] = r.wert; speichereStill(d);
   }
   await dbDel('papierkorb', buendelId);
@@ -769,7 +772,7 @@ function oeffneDoc(d) {
   else if (d.typ === 'szene') { location.hash = '#/projekt/' + d.projekt; setTimeout(() => oeffneSchreibraum(d.id), 80); }
   else if (d.typ === 'board') location.hash = '#/brett/' + d.id;
   else if (d.typ === 'blase') location.hash = '#/brett/' + d.parent;
-  else if (d.typ === 'wort') location.hash = '#/woerter';
+  else if (d.typ === 'wort' || d.typ === 'wortkiste') location.hash = '#/woerter';
   else if (d.typ === 'zettel' || d.typ === 'foto') { const s = D.docs.get(d.parent); if (s) oeffneDoc(s); }
 }
 document.addEventListener('click', (e) => {

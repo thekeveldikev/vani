@@ -597,6 +597,68 @@ html[data-thema="tinte"] .denkblase.b-gelb, html[data-thema="kerze"] .denkblase.
 .wortzugabe { display: flex; gap: 9px; margin-top: 16px; }
 .wortzugabe input { flex: 1; padding: 10px 15px; border-radius: 100px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 16px; }
 
+/* Eigene Wortkisten — ein kleiner, durchsuchbarer Karteikartenschrank. */
+.woerter-raum { max-width: 980px; }
+.wortkisten-kopf { background: linear-gradient(135deg, color-mix(in srgb, var(--karte) 88%, var(--gold)), var(--karte)); }
+.wortkisten-kopf > p { max-width: 720px; color: var(--blass); line-height: 1.6; }
+.wortkisten-schrank {
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(170px, 225px); gap: 11px;
+  margin: 15px 0; padding: 3px 2px 9px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity;
+}
+.wortkiste-mini {
+  --kistenfarbe:#857361; position: relative; min-height: 112px;
+  overflow: hidden; border-radius: 5px 16px 16px 5px; text-align: left; color: #fffaf1;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--kistenfarbe) 88%, white), var(--kistenfarbe));
+  box-shadow: 0 4px 12px var(--schein), inset 0 0 0 1px rgba(38,27,18,.18); scroll-snap-align: start;
+  transition: transform .22s cubic-bezier(.2,.8,.2,1), box-shadow .22s ease;
+}
+.wortkiste-waehlen { position: absolute; inset: 0; width: 100%; display: grid; grid-template-columns: 13px 1fr; text-align: left; color: inherit; }
+.wortkiste-mini:hover { transform: translateY(-3px) rotate(-.25deg); box-shadow: 0 9px 19px var(--schein), inset 0 0 0 1px rgba(38,27,18,.18); }
+.wortkiste-mini.an { box-shadow: 0 0 0 3px var(--papier), 0 0 0 5px var(--akzent), 0 9px 19px var(--schein); }
+.wortkiste-ruecken { background: linear-gradient(90deg, rgba(0,0,0,.28), rgba(255,255,255,.11), rgba(0,0,0,.16)); }
+.wortkiste-mini-inhalt { min-width: 0; display: flex; flex-direction: column; gap: 5px; padding: 17px 31px 15px 13px; }
+.wortkiste-mini strong { overflow: hidden; font: 600 17px/1.2 ui-serif, Georgia, serif; text-overflow: ellipsis; }
+.wortkiste-mini small { color: rgba(255,250,241,.78); font-size: 11.5px; }
+.wortkiste-mini em { overflow: hidden; color: rgba(255,250,241,.76); font: italic 11.5px/1.35 ui-serif, Georgia, serif; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.wortkiste-menue { position: absolute; z-index: 2; top: 5px; right: 8px; padding: 6px; border-radius: 9px; color: rgba(255,255,255,.84); letter-spacing: 1px; }
+.wortkiste-menue:hover, .wortkiste-menue:focus-visible { background: rgba(0,0,0,.16); color: white; }
+.wortkisten-arbeit { min-height: 310px; }
+.wortkisten-titelzeile { display: flex; align-items: flex-start; justify-content: space-between; gap: 13px; }
+.wortkisten-titelzeile h2 { font: 600 clamp(21px,4vw,29px)/1.2 ui-serif, Georgia, serif; }
+.wortkisten-titelzeile p { max-width: 660px; margin-top: 5px; color: var(--blass); font: italic 13.5px/1.5 ui-serif, Georgia, serif; }
+.wortkisten-filter { display: grid; grid-template-columns: 22px minmax(150px,1fr) auto; align-items: center; gap: 8px; margin: 17px 0 4px; padding: 9px 11px; border-radius: 13px; background: var(--hg2); box-shadow: inset 0 0 0 1px var(--linie); }
+.wortkisten-filter > span { display: flex; color: var(--blass); }
+.wortkisten-filter input { min-width: 0; font-size: 15px; }
+.wort-sortierung { max-width: 160px; padding: 6px 9px; border-radius: 9px; color: var(--blass); background: var(--papier); box-shadow: inset 0 0 0 1px var(--linie); font-size: 12px; }
+.wortkisten-arbeit .wortgitter { gap: 12px; min-height: 74px; padding: 10px 3px; align-items: flex-start; }
+.wortkisten-arbeit .wortkarte { position: relative; max-width: min(310px, 100%); display: flex; flex-direction: column; align-items: flex-start; gap: 3px; border-radius: 14px 14px 16px 12px; text-align: left; }
+.wortkisten-arbeit .wortkarte.favorit { padding-left: 30px; background: color-mix(in srgb, var(--karte) 88%, var(--gold)); box-shadow: 0 3px 10px var(--schein), inset 0 0 0 1px color-mix(in srgb, var(--gold) 45%, var(--linie)); }
+.wortkarte .wortstern { position: absolute; left: 10px; top: 10px; color: var(--gold); font: 14px system-ui, sans-serif; }
+.wortkarte small { max-width: 260px; overflow: hidden; color: var(--blass); font: italic 11.5px/1.35 ui-serif, Georgia, serif; white-space: nowrap; text-overflow: ellipsis; }
+.wortkisten-leer { width: 100%; padding: 17px; color: var(--blass); text-align: center; font: italic 14px/1.5 ui-serif,Georgia,serif; }
+.wortzugabe-mehrfach { align-items: stretch; }
+.wortzugabe-mehrfach textarea { flex: 1; min-width: 0; resize: vertical; padding: 11px 14px; border-radius: 14px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 15px; line-height: 1.4; }
+.wortzugabe-mehrfach .rundknopf { align-self: center; flex: none; }
+.wortkisten-hinweis { display: block; margin-top: 7px; color: var(--blass); font-size: 11.5px; line-height: 1.45; }
+.wortkisten-schuetteln, .wortkisten-funken { margin-top: 14px; }
+.wortkisten-modal { max-height: min(700px, 90dvh); overflow: auto; }
+.wortkisten-modal > label:not(.wort-favorit) { display: grid; gap: 6px; margin-top: 12px; color: var(--blass); font-size: 12px; }
+.wortkisten-modal input[type="text"], .wortkisten-modal textarea { width: 100%; padding: 11px 13px; border-radius: 12px; color: var(--tinte); background: var(--hg2); box-shadow: inset 0 0 0 1px var(--linie); font-size: 15px; }
+.wortkisten-modal textarea { resize: vertical; line-height: 1.45; }
+.wortkisten-farbzeile { grid-template-columns: 1fr auto !important; align-items: center; }
+.wortkisten-farbzeile input { width: 48px; height: 34px; padding: 2px; border-radius: 9px; background: var(--hg2); }
+.wort-favorit { display: flex; align-items: center; gap: 9px; margin-top: 13px; color: var(--tinte); font-size: 13px; }
+.wort-favorit input { width: 18px; height: 18px; accent-color: var(--akzent); }
+.wortkisten-meldung { min-height: 20px; margin-top: 7px; color: var(--akzent); font-size: 12.5px; }
+@media (max-width: 620px) {
+  .wortkisten-schrank { grid-auto-columns: minmax(155px, 78vw); margin-inline: -2px; }
+  .wortkiste-mini { min-height: 104px; }
+  .wortkisten-filter { grid-template-columns: 20px minmax(0,1fr); }
+  .wort-sortierung { grid-column: 2; width: 100%; max-width: none; }
+  .wortkisten-arbeit .wortkarte { max-width: 100%; }
+  .wortkisten-hinweis { display: none; }
+}
+
 /* ================================================================
    Suche
    ================================================================ */

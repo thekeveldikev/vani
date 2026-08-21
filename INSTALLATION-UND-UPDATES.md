@@ -30,8 +30,8 @@ lesen. Darum nur direkt auf das eigene oder wirklich vertraute Gerät kopieren.
 
 ## Windows
 
-- Normal installieren: `VANI-5.0.0-x64-Setup.exe` doppelklicken.
-- Ohne Installation testen: `VANI-5.0.0-x64-Portable.exe` öffnen.
+- Normal installieren: `VANI-5.1.0-x64-Setup.exe` doppelklicken.
+- Ohne Installation testen: `VANI-5.1.0-x64-Portable.exe` öffnen.
 - Eine spätere Setup-Datei einfach über die alte Fassung installieren. Die
   Programm-ID bleibt gleich und die eigenen Inhalte bleiben im Benutzerprofil.
 - Beim Deinstallieren lässt VANI die persönlichen Daten absichtlich stehen.

@@ -74,6 +74,15 @@ test('Goodnotes-Vertrag: Archiv bleibt aus der allgemeinen Suche heraus', () => 
   assert.match(lies('src/42d-goodnotes.js'), /Im Archiv nach Titel, Stichwort oder Notiz suchen/);
 });
 
+test('Wortkisten-Vertrag: Kisten sind synchronisierte Dokumente und alte lose Wörter bleiben sichtbar', () => {
+  const woerter = lies('src/47-woerter.js');
+  assert.match(woerter, /neuDoc\('wortkiste'/);
+  assert.match(woerter, /kistenId === 'lose'/);
+  assert.match(woerter, /Nur Kiste löschen · Wörter bleiben lose/);
+  assert.match(lies('src/48-suche.js'), /\['wortkiste', 'Wortkisten'/);
+  assert.match(lies('src/31-sync.js'), /'titel'.*'notiz'/);
+});
+
 test('Desktop-Vertrag: eigenes sicheres Protokoll wird erkannt und Fremdseiten bleiben ausgesperrt', () => {
   const main = lies('desktop/main.cjs');
   assert.match(main, /u\.protocol === 'vani:' && u\.hostname === 'app'/);

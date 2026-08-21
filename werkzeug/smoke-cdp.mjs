@@ -86,16 +86,28 @@ const uiPruefung = await sende('Runtime.evaluate', {
     const seiten = kinder(heft.id, 'seite');
     const gesamt = seiten.map((s) => s.text || '').join(' ').replace(/\\s+/g,' ').trim();
     const erwartet = Array.from({length:850}, (_,i) => (i % 17 === 0 ? 'NACHTMEER ' : '') + 'Wort' + i).join(' ').replace(/\\s+/g,' ').trim();
+    const editorPasst = (() => { const f=document.querySelector('.schreibflaeche.rich-editor'); return !f || f.scrollHeight <= f.clientHeight + 2; })();
+    let wortkiste = wortkisten().find((d) => d.titel === 'Prüfkiste · Schimmer');
+    if (!wortkiste) wortkiste = neuDoc('wortkiste', { titel:'Prüfkiste · Schimmer', notiz:'Wörter für Licht am Wasser', farbe:'#637984' });
+    fuegeWoerterHinzu(wortkiste.id, 'glimmen, schimmern, flirren, leuchten');
+    const glimmen = woerterInKiste(wortkiste.id).find((d) => d.text === 'glimmen');
+    if (glimmen && glimmen.notiz !== 'Licht am Wasser') { glimmen.notiz = 'Licht am Wasser'; speichereStill(glimmen); }
+    const wortSuche = woerterInKiste(wortkiste.id, 'wasser');
+    location.hash = '#/woerter'; zeichne();
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     return { heft:heft.id, seiten:seiten.length, rich:seiten.every((s) => s.format === 'rich'), textVollstaendig:gesamt === erwartet,
       eigeneFunken:eigeneFunken().length, ueberlauf:document.documentElement.scrollWidth <= innerWidth + 1,
-      editorPasst:(() => { const f=document.querySelector('.schreibflaeche.rich-editor'); return !f || f.scrollHeight <= f.clientHeight + 2; })(),
+      editorPasst, wortkisten:wortkisten().length, woerter:woerterInKiste(wortkiste.id).length, wortSuche:wortSuche.length,
+      wortkistenUI:document.querySelectorAll('.wortkiste-mini').length >= 3 && !!document.querySelector('.wortkisten-arbeit'),
+      wortkistenUeberlauf:document.documentElement.scrollWidth <= innerWidth + 1,
       sauber:!sauberesRichHTML('<b onclick="x()">gut</b><script>boese()</script>').includes('onclick') };
   })()`, returnByValue: true, awaitPromise: true
 });
 if (uiPruefung.exceptionDetails) throw new Error(uiPruefung.exceptionDetails.exception?.description || uiPruefung.exceptionDetails.text || 'UI-Prüfung fehlgeschlagen');
 if (!uiPruefung.result || !uiPruefung.result.value) throw new Error('UI-Prüfung gab kein Ergebnis zurück');
 if (uiPruefung.result.value.seiten < 2 || !uiPruefung.result.value.rich || !uiPruefung.result.value.textVollstaendig ||
-    !uiPruefung.result.value.ueberlauf || !uiPruefung.result.value.editorPasst || !uiPruefung.result.value.sauber) {
+    !uiPruefung.result.value.ueberlauf || !uiPruefung.result.value.editorPasst || !uiPruefung.result.value.sauber ||
+    uiPruefung.result.value.woerter < 4 || uiPruefung.result.value.wortSuche < 1 || !uiPruefung.result.value.wortkistenUI || !uiPruefung.result.value.wortkistenUeberlauf) {
   throw new Error('UI-Regressionsprüfung fehlgeschlagen: ' + JSON.stringify(uiPruefung.result.value));
 }
 const auswertung = await sende('Runtime.evaluate', {

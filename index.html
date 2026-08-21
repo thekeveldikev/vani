@@ -615,6 +615,68 @@ html[data-thema="tinte"] .denkblase.b-gelb, html[data-thema="kerze"] .denkblase.
 .wortzugabe { display: flex; gap: 9px; margin-top: 16px; }
 .wortzugabe input { flex: 1; padding: 10px 15px; border-radius: 100px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 16px; }
 
+/* Eigene Wortkisten — ein kleiner, durchsuchbarer Karteikartenschrank. */
+.woerter-raum { max-width: 980px; }
+.wortkisten-kopf { background: linear-gradient(135deg, color-mix(in srgb, var(--karte) 88%, var(--gold)), var(--karte)); }
+.wortkisten-kopf > p { max-width: 720px; color: var(--blass); line-height: 1.6; }
+.wortkisten-schrank {
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(170px, 225px); gap: 11px;
+  margin: 15px 0; padding: 3px 2px 9px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity;
+}
+.wortkiste-mini {
+  --kistenfarbe:#857361; position: relative; min-height: 112px;
+  overflow: hidden; border-radius: 5px 16px 16px 5px; text-align: left; color: #fffaf1;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--kistenfarbe) 88%, white), var(--kistenfarbe));
+  box-shadow: 0 4px 12px var(--schein), inset 0 0 0 1px rgba(38,27,18,.18); scroll-snap-align: start;
+  transition: transform .22s cubic-bezier(.2,.8,.2,1), box-shadow .22s ease;
+}
+.wortkiste-waehlen { position: absolute; inset: 0; width: 100%; display: grid; grid-template-columns: 13px 1fr; text-align: left; color: inherit; }
+.wortkiste-mini:hover { transform: translateY(-3px) rotate(-.25deg); box-shadow: 0 9px 19px var(--schein), inset 0 0 0 1px rgba(38,27,18,.18); }
+.wortkiste-mini.an { box-shadow: 0 0 0 3px var(--papier), 0 0 0 5px var(--akzent), 0 9px 19px var(--schein); }
+.wortkiste-ruecken { background: linear-gradient(90deg, rgba(0,0,0,.28), rgba(255,255,255,.11), rgba(0,0,0,.16)); }
+.wortkiste-mini-inhalt { min-width: 0; display: flex; flex-direction: column; gap: 5px; padding: 17px 31px 15px 13px; }
+.wortkiste-mini strong { overflow: hidden; font: 600 17px/1.2 ui-serif, Georgia, serif; text-overflow: ellipsis; }
+.wortkiste-mini small { color: rgba(255,250,241,.78); font-size: 11.5px; }
+.wortkiste-mini em { overflow: hidden; color: rgba(255,250,241,.76); font: italic 11.5px/1.35 ui-serif, Georgia, serif; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.wortkiste-menue { position: absolute; z-index: 2; top: 5px; right: 8px; padding: 6px; border-radius: 9px; color: rgba(255,255,255,.84); letter-spacing: 1px; }
+.wortkiste-menue:hover, .wortkiste-menue:focus-visible { background: rgba(0,0,0,.16); color: white; }
+.wortkisten-arbeit { min-height: 310px; }
+.wortkisten-titelzeile { display: flex; align-items: flex-start; justify-content: space-between; gap: 13px; }
+.wortkisten-titelzeile h2 { font: 600 clamp(21px,4vw,29px)/1.2 ui-serif, Georgia, serif; }
+.wortkisten-titelzeile p { max-width: 660px; margin-top: 5px; color: var(--blass); font: italic 13.5px/1.5 ui-serif, Georgia, serif; }
+.wortkisten-filter { display: grid; grid-template-columns: 22px minmax(150px,1fr) auto; align-items: center; gap: 8px; margin: 17px 0 4px; padding: 9px 11px; border-radius: 13px; background: var(--hg2); box-shadow: inset 0 0 0 1px var(--linie); }
+.wortkisten-filter > span { display: flex; color: var(--blass); }
+.wortkisten-filter input { min-width: 0; font-size: 15px; }
+.wort-sortierung { max-width: 160px; padding: 6px 9px; border-radius: 9px; color: var(--blass); background: var(--papier); box-shadow: inset 0 0 0 1px var(--linie); font-size: 12px; }
+.wortkisten-arbeit .wortgitter { gap: 12px; min-height: 74px; padding: 10px 3px; align-items: flex-start; }
+.wortkisten-arbeit .wortkarte { position: relative; max-width: min(310px, 100%); display: flex; flex-direction: column; align-items: flex-start; gap: 3px; border-radius: 14px 14px 16px 12px; text-align: left; }
+.wortkisten-arbeit .wortkarte.favorit { padding-left: 30px; background: color-mix(in srgb, var(--karte) 88%, var(--gold)); box-shadow: 0 3px 10px var(--schein), inset 0 0 0 1px color-mix(in srgb, var(--gold) 45%, var(--linie)); }
+.wortkarte .wortstern { position: absolute; left: 10px; top: 10px; color: var(--gold); font: 14px system-ui, sans-serif; }
+.wortkarte small { max-width: 260px; overflow: hidden; color: var(--blass); font: italic 11.5px/1.35 ui-serif, Georgia, serif; white-space: nowrap; text-overflow: ellipsis; }
+.wortkisten-leer { width: 100%; padding: 17px; color: var(--blass); text-align: center; font: italic 14px/1.5 ui-serif,Georgia,serif; }
+.wortzugabe-mehrfach { align-items: stretch; }
+.wortzugabe-mehrfach textarea { flex: 1; min-width: 0; resize: vertical; padding: 11px 14px; border-radius: 14px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 15px; line-height: 1.4; }
+.wortzugabe-mehrfach .rundknopf { align-self: center; flex: none; }
+.wortkisten-hinweis { display: block; margin-top: 7px; color: var(--blass); font-size: 11.5px; line-height: 1.45; }
+.wortkisten-schuetteln, .wortkisten-funken { margin-top: 14px; }
+.wortkisten-modal { max-height: min(700px, 90dvh); overflow: auto; }
+.wortkisten-modal > label:not(.wort-favorit) { display: grid; gap: 6px; margin-top: 12px; color: var(--blass); font-size: 12px; }
+.wortkisten-modal input[type="text"], .wortkisten-modal textarea { width: 100%; padding: 11px 13px; border-radius: 12px; color: var(--tinte); background: var(--hg2); box-shadow: inset 0 0 0 1px var(--linie); font-size: 15px; }
+.wortkisten-modal textarea { resize: vertical; line-height: 1.45; }
+.wortkisten-farbzeile { grid-template-columns: 1fr auto !important; align-items: center; }
+.wortkisten-farbzeile input { width: 48px; height: 34px; padding: 2px; border-radius: 9px; background: var(--hg2); }
+.wort-favorit { display: flex; align-items: center; gap: 9px; margin-top: 13px; color: var(--tinte); font-size: 13px; }
+.wort-favorit input { width: 18px; height: 18px; accent-color: var(--akzent); }
+.wortkisten-meldung { min-height: 20px; margin-top: 7px; color: var(--akzent); font-size: 12.5px; }
+@media (max-width: 620px) {
+  .wortkisten-schrank { grid-auto-columns: minmax(155px, 78vw); margin-inline: -2px; }
+  .wortkiste-mini { min-height: 104px; }
+  .wortkisten-filter { grid-template-columns: 20px minmax(0,1fr); }
+  .wort-sortierung { grid-column: 2; width: 100%; max-width: none; }
+  .wortkisten-arbeit .wortkarte { max-width: 100%; }
+  .wortkisten-hinweis { display: none; }
+}
+
 /* ================================================================
    Suche
    ================================================================ */
@@ -1140,7 +1202,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.0.0';
+const APP_VERSION = '5.1.0';
 const $ = (s, w) => (w || document).querySelector(s);
 const $$ = (s, w) => [...(w || document).querySelectorAll(s)];
 const uid = () => (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function')
@@ -1509,6 +1571,7 @@ function sauberesDokument(quelle) {
   if (d.ansicht && !['seiten', 'rolle'].includes(d.ansicht)) d.ansicht = 'seiten';
   if (d.format && !['plain', 'rich'].includes(d.format)) d.format = 'plain';
   if (d.befestigung && !['tesa', 'pin', 'lose'].includes(d.befestigung)) d.befestigung = 'tesa';
+  if (d.favorit != null) d.favorit = d.favorit === true;
   if (d.rich != null && typeof sauberesRichHTML === 'function') d.rich = sauberesRichHTML(d.rich);
   if (d.pos != null) {
     const p = d.pos && typeof d.pos === 'object' && !Array.isArray(d.pos) ? d.pos : {};
@@ -1594,11 +1657,12 @@ function speichere(d) { d.geaendert = Date.now(); markiereAenderung(d, false); d
 function speichereStill(d) { markiereAenderung(d, false); dbPut('docs', d).catch(() => {}); }
 
 /* Löschen ist bei VANI nie endgültig: alles wandert erst in den Papierkorb. */
-function _nachfahren(id) {
+function _nachfahren(id, kinderDerWurzelBehalten = false) {
   const opfer = [id];
   for (let i = 0; i < opfer.length; i++) {
     for (const d of D.docs.values()) {
-      if ((d.parent === opfer[i] || d.projekt === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
+      const wurzelKindBleibt = kinderDerWurzelBehalten && opfer[i] === id && d.parent === id;
+      if (!wurzelKindBleibt && (d.parent === opfer[i] || d.projekt === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
       if (d.typ === 'kante' && (d.von === opfer[i] || d.zu === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
       if (d.typ === 'bezug' && (d.von === opfer[i] || d.zu === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
     }
@@ -1606,10 +1670,10 @@ function _nachfahren(id) {
   return opfer;
 }
 
-async function loesche(id, still) {
+async function loesche(id, still, kinderDerWurzelBehalten = false) {
   const wurzel = D.docs.get(id);
   if (!wurzel) return;
-  const opfer = _nachfahren(id);
+  const opfer = _nachfahren(id, kinderDerWurzelBehalten);
   const opferSet = new Set(opfer);
   const buendel = { id: uid(), wann: Date.now(), name: wurzel.titel || (wurzel.text || '').slice(0, 40) || wurzel.typ, typ: wurzel.typ, docs: [], referenzen: [] };
   /* Lose Zuordnungen überleben das Löschen ihres Ziels, dürfen danach aber
@@ -1619,6 +1683,7 @@ async function loesche(id, still) {
     let geputzt = false;
     if (d.projektRef && opferSet.has(d.projektRef)) { buendel.referenzen.push({ id: d.id, feld: 'projektRef', wert: d.projektRef }); delete d.projektRef; geputzt = true; }
     if (d.quelle && opferSet.has(d.quelle)) { buendel.referenzen.push({ id: d.id, feld: 'quelle', wert: d.quelle }); delete d.quelle; geputzt = true; }
+    if (kinderDerWurzelBehalten && d.parent === id) { buendel.referenzen.push({ id: d.id, feld: 'parent', wert: d.parent }); delete d.parent; geputzt = true; }
     if (geputzt) speichereStill(d);
   }
   for (const oid of opfer) {
@@ -1648,7 +1713,7 @@ async function holeZurueck(buendelId) {
   }
   for (const r of b.referenzen || []) {
     const d = D.docs.get(r.id);
-    if (!d || !['projektRef', 'quelle'].includes(r.feld) || typeof r.wert !== 'string') continue;
+    if (!d || !['projektRef', 'quelle', 'parent'].includes(r.feld) || typeof r.wert !== 'string') continue;
     d[r.feld] = r.wert; speichereStill(d);
   }
   await dbDel('papierkorb', buendelId);
@@ -1906,7 +1971,7 @@ function oeffneDoc(d) {
   else if (d.typ === 'szene') { location.hash = '#/projekt/' + d.projekt; setTimeout(() => oeffneSchreibraum(d.id), 80); }
   else if (d.typ === 'board') location.hash = '#/brett/' + d.id;
   else if (d.typ === 'blase') location.hash = '#/brett/' + d.parent;
-  else if (d.typ === 'wort') location.hash = '#/woerter';
+  else if (d.typ === 'wort' || d.typ === 'wortkiste') location.hash = '#/woerter';
   else if (d.typ === 'zettel' || d.typ === 'foto') { const s = D.docs.get(d.parent); if (s) oeffneDoc(s); }
 }
 document.addEventListener('click', (e) => {
@@ -3077,13 +3142,13 @@ window.addEventListener('pagehide', () => {
    VANI — Dinge zusammenlegen: Beziehungen, Hefte, Projekte, Cluster
    ================================================================ */
 
-const SICHTBARE_TYPEN = new Set(['schnipsel', 'blatt', 'seite', 'heft', 'projekt', 'kapitel', 'szene', 'board', 'blase', 'wort', 'faden', 'funkeln', 'goodnote']);
+const SICHTBARE_TYPEN = new Set(['schnipsel', 'blatt', 'seite', 'heft', 'projekt', 'kapitel', 'szene', 'board', 'blase', 'wort', 'wortkiste', 'faden', 'funkeln', 'goodnote']);
 function docName(d) {
   if (!d) return 'Nicht mehr da';
   return (d.titel || (d.text || '').trim().split('\n')[0] || ({ seite: 'Heftseite', blase: 'Blase', faden: 'Fadenstück', goodnote: 'Goodnotes-Notizbuch' }[d.typ]) || d.typ).slice(0, 80);
 }
 function docIcon(d) {
-  return ({ schnipsel: 'schnipsel', blatt: 'blatt', seite: 'hefte', heft: 'hefte', projekt: 'projekte', kapitel: 'projekte', szene: 'projekte', board: 'cluster', blase: 'cluster', wort: 'woerter', faden: 'faden', funkeln: 'wieder', goodnote: 'buchzu' }[d && d.typ]) || 'verbinden';
+  return ({ schnipsel: 'schnipsel', blatt: 'blatt', seite: 'hefte', heft: 'hefte', projekt: 'projekte', kapitel: 'projekte', szene: 'projekte', board: 'cluster', blase: 'cluster', wort: 'woerter', wortkiste: 'woerter', faden: 'faden', funkeln: 'wieder', goodnote: 'buchzu' }[d && d.typ]) || 'verbinden';
 }
 
 function waehleDokument(auslassenId, titel = 'Womit verbinden?') {
@@ -6093,90 +6158,377 @@ RENDER.brett = function (haupt, bid) {
 };
 
 /* ================================================================
-   VANI — Wörter: die Wortschatzkiste & Funken
+   VANI — Wörter: eigene Kisten, Wortschatz & Funken
    ================================================================ */
+
+const WORTKISTEN_FARBEN = ['#8f6a55', '#a9785f', '#8c7853', '#70806f', '#637984', '#746b87', '#8c6675', '#766c60'];
+
+function wortkisten() {
+  return vomTyp('wortkiste').slice(0, 5000).sort((a, b) =>
+    String(a.titel || '').localeCompare(String(b.titel || ''), 'de', { sensitivity: 'base', numeric: true }) ||
+    (a.angelegt || 0) - (b.angelegt || 0));
+}
+
+function wortZufallsgriff(liste, anzahl = 3, zufallsquelle = Math.random) {
+  if (!Array.isArray(liste) || typeof zufallsquelle !== 'function') return [];
+  const kopie = liste.slice(0, 100000);
+  const n = Math.min(kopie.length, Math.max(0, Math.round(Number(anzahl) || 0)));
+  for (let i = 0; i < n; i++) {
+    const roh = Number(zufallsquelle());
+    const z = Number.isFinite(roh) ? Math.max(0, Math.min(.999999999999, roh)) : 0;
+    const j = i + Math.floor(z * (kopie.length - i));
+    [kopie[i], kopie[j]] = [kopie[j], kopie[i]];
+  }
+  return kopie.slice(0, n);
+}
+
+function wortkisteGueltig(id) {
+  if (id == null || id === 'lose') return null;
+  const kiste = D.docs.get(String(id));
+  return kiste && kiste.typ === 'wortkiste' ? kiste : false;
+}
+
+function wortlisteAusText(roherText) {
+  if (typeof roherText !== 'string') return [];
+  const gesehen = new Set();
+  const ergebnis = [];
+  /* Zeilen, Semikola und Kommata dürfen als schnelle Mehrfachzugabe dienen.
+     Gedankenstriche und Leerzeichen bleiben Teil eines Ausdrucks. */
+  for (const teil of roherText.slice(0, 200000).split(/[\n\r;,]+/)) {
+    const wort = teil.replace(/\s+/g, ' ').trim().slice(0, 160);
+    const schluessel = normalisiere(wort);
+    if (!wort || !schluessel || gesehen.has(schluessel)) continue;
+    gesehen.add(schluessel);
+    ergebnis.push(wort);
+    if (ergebnis.length >= 500) break;
+  }
+  return ergebnis;
+}
+
+function woerterInKiste(kistenId = 'alle', suche = '', sortierung = 'az') {
+  const q = normalisiere(String(suche || '').slice(0, 500));
+  const kiste = wortkisteGueltig(kistenId);
+  const bekannteKisten = new Set(wortkisten().map((d) => d.id));
+  const ergebnis = vomTyp('wort').filter((w) => {
+    const passtKiste = kistenId === 'alle' ? true
+      : (kistenId === 'lose' || kistenId == null) ? !bekannteKisten.has(w.parent)
+        : !!kiste && w.parent === kiste.id;
+    return passtKiste && (!q || normalisiere([w.text, w.notiz].filter(Boolean).join(' ')).includes(q));
+  });
+  const zeit = (d) => Number.isFinite(d.geaendert) ? d.geaendert : (d.angelegt || 0);
+  ergebnis.sort((a, b) => Number(!!b.favorit) - Number(!!a.favorit) || (
+    sortierung === 'zuletzt' ? zeit(b) - zeit(a) :
+      sortierung === 'aeltest' ? zeit(a) - zeit(b) :
+        String(a.text || '').localeCompare(String(b.text || ''), 'de', { sensitivity: 'base', numeric: true })
+  ) || String(a.id).localeCompare(String(b.id)));
+  return ergebnis;
+}
+
+function fuegeWoerterHinzu(kistenId, roherText) {
+  const kiste = wortkisteGueltig(kistenId);
+  if (kistenId !== 'lose' && kistenId != null && !kiste) return { hinzu: [], uebersprungen: 0 };
+  const parent = kiste ? kiste.id : null;
+  const vorhanden = new Set(woerterInKiste(parent || 'lose').map((w) => normalisiere(w.text || '')));
+  const hinzu = [], liste = wortlisteAusText(roherText);
+  let uebersprungen = 0;
+  for (const text of liste) {
+    const schluessel = normalisiere(text);
+    if (vorhanden.has(schluessel)) { uebersprungen++; continue; }
+    vorhanden.add(schluessel);
+    const felder = { text };
+    if (parent) felder.parent = parent;
+    hinzu.push(neuDoc('wort', felder));
+  }
+  return { hinzu, uebersprungen };
+}
+
+function wortInKiste(wort, kistenId, kopieren = false) {
+  if (!wort || wort.typ !== 'wort' || !D.docs.has(wort.id)) return null;
+  const kiste = wortkisteGueltig(kistenId);
+  if (kistenId !== 'lose' && kistenId != null && !kiste) return null;
+  const parent = kiste ? kiste.id : null;
+  const doppelt = woerterInKiste(parent || 'lose').find((d) => d.id !== wort.id && normalisiere(d.text || '') === normalisiere(wort.text || ''));
+  if (doppelt) return doppelt;
+  if (!kopieren && (wort.parent || null) === parent) return wort;
+  if (kopieren) {
+    const felder = { text: wort.text || '' };
+    if (wort.notiz) felder.notiz = wort.notiz;
+    if (wort.favorit) felder.favorit = true;
+    if (parent) felder.parent = parent;
+    return neuDoc('wort', felder);
+  }
+  if (parent) wort.parent = parent; else delete wort.parent;
+  speichere(wort);
+  return wort;
+}
+
+async function loescheWortkiste(kistenId, samtInhalt = false, still = false) {
+  const kiste = wortkisteGueltig(kistenId);
+  if (!kiste) return false;
+  await loesche(kiste.id, still, !samtInhalt);
+  return true;
+}
+
+function wortkistenFormular(kiste) {
+  return new Promise((resolve) => {
+    const titel = el('input', { type: 'text', maxlength: '120', value: kiste ? kiste.titel || '' : '', placeholder: 'z. B. Synonyme' });
+    const notiz = el('textarea', { rows: 3, maxlength: '600', placeholder: 'Wofür ist diese Kiste? (freiwillig)' });
+    notiz.value = kiste ? kiste.notiz || '' : '';
+    const farbe = el('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(kiste && kiste.farbe || '') ? kiste.farbe : WORTKISTEN_FARBEN[wortkisten().length % WORTKISTEN_FARBEN.length] });
+    const meldung = el('div', { class: 'wortkisten-meldung', role: 'status' });
+    let erledigt = false;
+    const fertig = () => {
+      const t = titel.value.replace(/\s+/g, ' ').trim();
+      if (!t) { meldung.textContent = 'Die Kiste braucht einen Namen.'; titel.focus(); return; }
+      if (wortkisten().some((d) => d.id !== (kiste && kiste.id) && normalisiere(d.titel || '') === normalisiere(t))) {
+        meldung.textContent = 'Eine Kiste mit diesem Namen gibt es schon.'; titel.focus(); return;
+      }
+      erledigt = true; zu(); resolve({ titel: t.slice(0, 120), notiz: notiz.value.trim().slice(0, 600), farbe: farbe.value });
+    };
+    const kasten = el('div', { class: 'modal wortkisten-modal' },
+      el('div', { class: 'kartenkopf' }, el('span', { html: ik('woerter') }), kiste ? 'KISTE GESTALTEN' : 'NEUE WORTKISTE'),
+      el('label', {}, el('span', {}, 'Name'), titel),
+      el('label', {}, el('span', {}, 'Kleine Notiz'), notiz),
+      el('label', { class: 'wortkisten-farbzeile' }, el('span', {}, 'Farbe'), farbe),
+      meldung,
+      el('div', { class: 'reihe' },
+        el('button', { class: 'knopf zart', onclick: () => { zu(); } }, 'Abbrechen'),
+        el('button', { class: 'knopf voll', onclick: fertig }, kiste ? 'Übernehmen' : 'Kiste bauen'))
+    );
+    const zu = zeigeDeck(kasten, () => { if (!erledigt) resolve(null); });
+    titel.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); fertig(); } });
+    setTimeout(() => titel.focus(), 60);
+  });
+}
+
+function wortFormular(wort) {
+  return new Promise((resolve) => {
+    const text = el('input', { type: 'text', maxlength: '160', value: wort.text || '', placeholder: 'Wort oder Ausdruck' });
+    const notiz = el('textarea', { rows: 4, maxlength: '1000', placeholder: 'Bedeutung, Synonyme, ein Beispielsatz …' });
+    notiz.value = wort.notiz || '';
+    const favorit = el('input', { type: 'checkbox', checked: !!wort.favorit });
+    const meldung = el('div', { class: 'wortkisten-meldung', role: 'status' });
+    let erledigt = false;
+    const fertig = () => {
+      const t = text.value.replace(/\s+/g, ' ').trim();
+      if (!t) { meldung.textContent = 'Ganz ohne Wort geht es nicht.'; text.focus(); return; }
+      erledigt = true; zu(); resolve({ text: t.slice(0, 160), notiz: notiz.value.trim().slice(0, 1000), favorit: favorit.checked });
+    };
+    const kasten = el('div', { class: 'modal wortkisten-modal' },
+      el('div', { class: 'kartenkopf' }, el('span', { html: ik('stift') }), 'WORTZETTEL'),
+      el('label', {}, el('span', {}, 'Wort oder Ausdruck'), text),
+      el('label', {}, el('span', {}, 'Notiz'), notiz),
+      el('label', { class: 'wort-favorit' }, favorit, el('span', {}, 'Oben anheften')),
+      meldung,
+      el('div', { class: 'reihe' },
+        el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
+        el('button', { class: 'knopf voll', onclick: fertig }, 'Übernehmen'))
+    );
+    const zu = zeigeDeck(kasten, () => { if (!erledigt) resolve(null); });
+    setTimeout(() => text.focus(), 60);
+  });
+}
 
 RENDER.woerter = function (haupt) {
   haupt.append(raumkopf('Wörter'));
-  const inhalt = el('div', { class: 'inhalt' });
+  const inhalt = el('div', { class: 'inhalt woerter-raum' });
+  let aktiveKiste = 'alle';
+  let suche = '';
+  let sortierung = 'az';
+  let griff = [];
 
-  /* Kiste */
-  const kiste = el('div', { class: 'karte' });
-  kiste.append(el('div', { class: 'kartenkopf' }, el('span', { html: ik('woerter') }), 'WORTSCHATZKISTE'));
-  const gitter = el('div', { class: 'wortgitter' });
+  const kopf = el('div', { class: 'karte wortkisten-kopf' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('woerter') }), 'DEINE WORTKISTEN'),
+    el('p', {}, 'Baue dir kleine Sammlungen: Synonyme, Lieblingsverben, Figurenwörter, Wörter für einen Vibe — oder etwas, das nur du verstehst.'),
+    el('div', { class: 'fussreihe' },
+      el('button', { class: 'knopf voll', onclick: async () => {
+        if (wortkisten().length >= 200) { toast('Zweihundert Kisten sind genug für einen sehr großen Schrank.'); return; }
+        const daten = await wortkistenFormular(null);
+        if (!daten) return;
+        const kiste = neuDoc('wortkiste', daten);
+        aktiveKiste = kiste.id; baueAlles(); toast('Die neue Kiste steht bereit.');
+      } }, '＋ Neue Kiste'))
+  );
 
-  function baueKiste() {
-    gitter.innerHTML = '';
-    const alle = vomTyp('wort').sort((a, b) => a.angelegt - b.angelegt);
-    if (!alle.length) {
-      gitter.append(el('div', { style: 'color:var(--blass);font-style:italic;font-family:ui-serif,Georgia,serif' }, 'Eine leere Kiste wartet auf schöne Wörter.'));
-    }
-    for (const w of alle) {
-      let h = 0;
-      for (const c of w.id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-      const dreh = (h % 7) - 3;
-      const karte = el('button', { class: 'wortkarte', style: '--dreh:' + dreh + 'deg' }, w.text);
-      karte.addEventListener('click', async () => {
-        const wahl = await menue([
-          { text: 'Damit schreiben', icon: 'stift', wert: 'schreiben' },
-          { text: 'Ändern', icon: 'drehen', wert: 'edit' },
-          { text: 'Aus der Kiste nehmen', icon: 'muell', wert: 'weg', rot: true }
-        ], w.text);
-        if (wahl === 'schreiben') {
-          const seite = blattAusText('', w.text + ' —\n\n');
-          oeffneSchreibraum(seite.id);
-        } else if (wahl === 'edit') {
-          const neu = await eingabe({ titel: 'Das Wort', wert: w.text });
-          if (neu) { w.text = neu; speichereStill(w); baueKiste(); }
-        } else if (wahl === 'weg') { await loesche(w.id); baueKiste(); }
-      });
-      gitter.append(karte);
+  const schrank = el('div', { class: 'wortkisten-schrank', 'aria-label': 'Wortkisten' });
+  const arbeitskarte = el('div', { class: 'karte wortkisten-arbeit' });
+
+  function kistenName(id) {
+    if (id === 'alle') return 'Alle Wörter';
+    if (id === 'lose') return 'Lose Wörter';
+    const k = wortkisteGueltig(id);
+    return k ? k.titel || 'Wortkiste' : 'Alle Wörter';
+  }
+
+  async function kistenMenue(kiste) {
+    const wahl = await menue([
+      { text: 'Name, Notiz & Farbe ändern', icon: 'stift', wert: 'edit' },
+      { text: 'Nur Kiste löschen · Wörter bleiben lose', icon: 'drehen', wert: 'loese', rot: true },
+      { text: 'Kiste und ihre Wörter löschen', icon: 'muell', wert: 'alles', rot: true }
+    ], kiste.titel || 'Wortkiste');
+    if (wahl === 'edit') {
+      const daten = await wortkistenFormular(kiste);
+      if (daten) { Object.assign(kiste, daten); speichere(kiste); baueAlles(); }
+    } else if (wahl === 'loese') {
+      if (await frage('Die Kiste verschwindet. Ihre Wörter landen sicher bei „Lose Wörter“. Fortfahren?', { ja: 'Kiste lösen', gefahr: true })) {
+        await loescheWortkiste(kiste.id, false); aktiveKiste = 'lose'; baueAlles();
+      }
+    } else if (wahl === 'alles') {
+      const anzahl = woerterInKiste(kiste.id).length;
+      if (await frage('Diese Kiste und ' + (anzahl === 1 ? 'ihr Wort' : anzahl + ' Wörter') + ' wandern gemeinsam in den Papierkorb.', { ja: 'In den Papierkorb', gefahr: true })) {
+        await loescheWortkiste(kiste.id, true); aktiveKiste = 'alle'; baueAlles();
+      }
     }
   }
-  baueKiste();
 
-  const feld = el('input', { type: 'text', placeholder: 'Ein Wort, das bleiben soll …' });
-  const zugabe = el('div', { class: 'wortzugabe' },
-    feld,
-    el('button', {
-      class: 'rundknopf voll', html: ik('plus'), title: 'Neues Wort', onclick: () => {
-        const t = feld.value.trim();
-        if (!t) return;
-        neuDoc('wort', { text: t });
-        feld.value = '';
-        baueKiste();
-      }
-    })
-  );
-  feld.addEventListener('keydown', (e) => { if (e.key === 'Enter') zugabe.querySelector('button').click(); });
+  function baueSchrank() {
+    schrank.innerHTML = '';
+    const kistenListe = wortkisten();
+    const zaehler = new Map(kistenListe.map((d) => [d.id, 0]));
+    let loseZahl = 0;
+    const alleWoerter = vomTyp('wort');
+    for (const wort of alleWoerter) {
+      if (zaehler.has(wort.parent)) zaehler.set(wort.parent, zaehler.get(wort.parent) + 1);
+      else loseZahl++;
+    }
+    const baueKnopf = (id, titel, anzahl, farbe, notiz, kiste) => {
+      const waehlen = el('button', {
+        class: 'wortkiste-waehlen',
+        'aria-pressed': aktiveKiste === id ? 'true' : 'false',
+        onclick: () => { aktiveKiste = id; griff = []; baueAlles(); }
+      },
+      el('span', { class: 'wortkiste-ruecken' }),
+      el('span', { class: 'wortkiste-mini-inhalt' },
+        el('strong', {}, titel),
+        el('small', {}, anzahl + (anzahl === 1 ? ' Wort' : ' Wörter')),
+        notiz ? el('em', {}, notiz) : null));
+      const umschlag = el('div', {
+        class: 'wortkiste-mini' + (aktiveKiste === id ? ' an' : ''),
+        style: '--kistenfarbe:' + (farbe || '#857361')
+      }, waehlen);
+      if (kiste) umschlag.append(el('button', {
+        class: 'wortkiste-menue', title: 'Kiste bearbeiten', 'aria-label': titel + ' bearbeiten',
+        onclick: () => kistenMenue(kiste)
+      }, '•••'));
+      schrank.append(umschlag);
+    };
+    baueKnopf('alle', 'Alle Wörter', alleWoerter.length, '#6f6357', 'Der ganze Schrank');
+    baueKnopf('lose', 'Lose Wörter', loseZahl, '#9a8d7d', 'Noch ohne eigene Kiste');
+    for (const kiste of kistenListe) baueKnopf(kiste.id, kiste.titel || 'Wortkiste', zaehler.get(kiste.id) || 0, kiste.farbe, kiste.notiz, kiste);
+  }
 
-  kiste.append(gitter, zugabe);
-  inhalt.append(kiste);
+  async function waehleZiel(wort, kopieren) {
+    const ziele = [
+      { text: 'Lose Wörter', icon: 'woerter', wert: 'lose' },
+      ...wortkisten().slice(0, 200).map((k) => ({ text: k.titel || 'Wortkiste', icon: 'woerter', wert: k.id }))
+    ];
+    const ziel = await menue(ziele, kopieren ? 'Kopieren nach …' : 'Verschieben nach …');
+    if (!ziel) return;
+    const vorher = wort.parent || null;
+    const vorherZahl = woerterInKiste(ziel).length;
+    const ergebnis = wortInKiste(wort, ziel, kopieren);
+    if (!ergebnis) { toast('Das Ziel gibt es nicht mehr.'); return; }
+    const dazu = woerterInKiste(ziel).length > vorherZahl;
+    const umgezogen = !kopieren && (ziel === 'lose' ? vorher !== null && !wort.parent : vorher !== ziel && wort.parent === ziel);
+    if (dazu) toast(kopieren ? 'Eine Kopie liegt jetzt dort.' : 'Der Wortzettel ist umgezogen.');
+    else if (umgezogen) toast('Der Wortzettel ist umgezogen.');
+    else toast('Dieses Wort liegt dort schon.');
+    baueAlles();
+  }
 
-  /* Schütteln */
-  const klangkarte = el('div', { class: 'karte', style: 'margin-top:14px' });
-  klangkarte.append(el('div', { class: 'kartenkopf' }, el('span', { html: ik('wuerfel') }), 'KISTE SCHÜTTELN'));
-  const bühne = el('div', { class: 'dreiklang' }, el('span', { style: 'color:var(--blass);font-size:16px' }, 'Drei Wörter fallen heraus — und wollen zusammen etwas werden.'));
-  let griff = [];
-  klangkarte.append(bühne, el('div', { class: 'fussreihe' },
-    el('button', {
-      class: 'knopf', onclick: () => {
-        const alle = vomTyp('wort');
-        if (alle.length < 3) { toast('Dafür braucht die Kiste mindestens drei Wörter.'); return; }
-        griff = [...alle].sort(() => Math.random() - .5).slice(0, 3);
-        bühne.innerHTML = '';
-        griff.forEach((w, i) => bühne.append(el('span', { style: '--dreh:' + ((i * 5) - 5) + 'deg' }, w.text)));
+  async function wortAktion(wort) {
+    const wahl = await menue([
+      { text: 'Damit schreiben', icon: 'stift', wert: 'schreiben' },
+      { text: 'Wortzettel bearbeiten', icon: 'drehen', wert: 'edit' },
+      { text: wort.favorit ? 'Oben lösen' : 'Oben anheften', icon: 'pin', wert: 'favorit' },
+      wortkisten().length ? { text: 'In eine andere Kiste verschieben', icon: 'woerter', wert: 'verschieben' } : null,
+      wortkisten().length ? { text: 'In eine Kiste kopieren', icon: 'plus', wert: 'kopieren' } : null,
+      { text: 'Aus der Sammlung nehmen', icon: 'muell', wert: 'weg', rot: true }
+    ], wort.text || 'Wort');
+    if (wahl === 'schreiben') {
+      const seite = blattAusText('', (wort.text || '') + ' —\n\n'); oeffneSchreibraum(seite.id);
+    } else if (wahl === 'edit') {
+      const daten = await wortFormular(wort);
+      if (daten) { Object.assign(wort, daten); speichere(wort); baueAlles(); }
+    } else if (wahl === 'favorit') {
+      wort.favorit = !wort.favorit; speichere(wort); baueAlles();
+    } else if (wahl === 'verschieben') await waehleZiel(wort, false);
+    else if (wahl === 'kopieren') await waehleZiel(wort, true);
+    else if (wahl === 'weg') { await loesche(wort.id); baueAlles(); }
+  }
+
+  function baueArbeitskarte() {
+    arbeitskarte.innerHTML = '';
+    if (aktiveKiste !== 'alle' && aktiveKiste !== 'lose' && !wortkisteGueltig(aktiveKiste)) aktiveKiste = 'alle';
+    const kiste = wortkisteGueltig(aktiveKiste);
+    const titel = kistenName(aktiveKiste);
+    const beschreibung = kiste && kiste.notiz ? kiste.notiz : aktiveKiste === 'alle'
+      ? 'Suche, schüttle oder greife quer durch alle Kisten.' : aktiveKiste === 'lose'
+        ? 'Hier warten die Wörter, denen du noch keine eigene Kiste gegeben hast.' : '';
+    const suchfeld = el('input', { type: 'search', value: suche, placeholder: 'In den Wörtern und Notizen suchen …', 'aria-label': 'Wörter suchen' });
+    const sort = el('select', { class: 'wort-sortierung', 'aria-label': 'Wörter sortieren' },
+      el('option', { value: 'az' }, 'A–Z'), el('option', { value: 'zuletzt' }, 'Zuletzt geändert'), el('option', { value: 'aeltest' }, 'Älteste zuerst'));
+    sort.value = sortierung;
+    const gitter = el('div', { class: 'wortgitter' });
+    const zugabefeld = el('textarea', { rows: 2, placeholder: aktiveKiste === 'alle' ? 'Neue Wörter landen bei „Lose Wörter“ …' : 'Ein Wort oder mehrere — mit Komma oder neuer Zeile …' });
+    const zielId = aktiveKiste === 'alle' ? 'lose' : aktiveKiste;
+
+    const baueWoerter = () => {
+      gitter.innerHTML = '';
+      const alle = woerterInKiste(aktiveKiste, suche, sortierung);
+      if (!alle.length) gitter.append(el('div', { class: 'wortkisten-leer' }, suche ? 'Hier passt gerade kein Wort zur Suche.' : 'Eine leere Kiste wartet auf schöne Wörter.'));
+      for (const wort of alle) {
+        let h = 0; for (const c of wort.id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+        const karte = el('button', { class: 'wortkarte' + (wort.favorit ? ' favorit' : ''), style: '--dreh:' + ((h % 7) - 3) + 'deg', onclick: () => wortAktion(wort) },
+          wort.favorit ? el('span', { class: 'wortstern', 'aria-label': 'Oben angeheftet' }, '✦') : null,
+          el('span', {}, wort.text || ''),
+          wort.notiz ? el('small', {}, wort.notiz) : null);
+        gitter.append(karte);
       }
-    }, 'Schütteln'),
-    el('button', {
-      class: 'knopf voll', onclick: () => {
-        if (!griff.length) { toast('Erst schütteln.'); return; }
-        const seite = blattAusText('', griff.map((w) => w.text).join(' · ') + '\n\n');
-        oeffneSchreibraum(seite.id);
-      }
-    }, 'Damit schreiben')
-  ));
-  inhalt.append(klangkarte);
+    };
+    const hinzu = () => {
+      const paket = fuegeWoerterHinzu(zielId, zugabefeld.value);
+      if (!paket.hinzu.length) { if (zugabefeld.value.trim()) toast(paket.uebersprungen ? 'Diese Wörter liegen schon in der Kiste.' : 'Da war noch kein Wort drin.'); return; }
+      zugabefeld.value = ''; baueAlles();
+      toast(paket.hinzu.length === 1 ? 'Ein Wort liegt jetzt in der Kiste.' : paket.hinzu.length + ' Wörter sind einsortiert.');
+    };
+    suchfeld.addEventListener('input', () => { suche = suchfeld.value; baueWoerter(); });
+    sort.addEventListener('change', () => { sortierung = sort.value; baueWoerter(); });
+    zugabefeld.addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); hinzu(); } });
+    arbeitskarte.append(
+      el('div', { class: 'wortkisten-titelzeile' },
+        el('div', {}, el('h2', {}, titel), beschreibung ? el('p', {}, beschreibung) : null),
+        kiste ? el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Kiste bearbeiten', onclick: () => kistenMenue(kiste) }) : null),
+      el('div', { class: 'wortkisten-filter' }, el('span', { html: ik('suche') }), suchfeld, sort),
+      gitter,
+      el('div', { class: 'wortzugabe wortzugabe-mehrfach' }, zugabefeld,
+        el('button', { class: 'rundknopf voll', html: ik('plus'), title: 'Wörter hinzufügen', onclick: hinzu })),
+      el('small', { class: 'wortkisten-hinweis' }, 'Tipp: Mehrere Wörter lassen sich mit Komma, Semikolon oder je einer neuen Zeile auf einmal einfüllen. Strg/⌘ + Enter legt sie ab.')
+    );
+    baueWoerter();
+  }
+
+  const klangkarte = el('div', { class: 'karte wortkisten-schuetteln' });
+  function baueSchuetteln() {
+    klangkarte.innerHTML = '';
+    const buehne = el('div', { class: 'dreiklang' },
+      el('span', { style: 'color:var(--blass);font-size:16px' }, 'Drei Wörter fallen aus „' + kistenName(aktiveKiste) + '“ — und wollen zusammen etwas werden.'));
+    const schreibknopf = el('button', { class: 'knopf voll', onclick: () => {
+      if (!griff.length) { toast('Erst schütteln.'); return; }
+      const seite = blattAusText('', griff.map((w) => w.text).join(' · ') + '\n\n'); oeffneSchreibraum(seite.id);
+    } }, 'Damit schreiben');
+    klangkarte.append(el('div', { class: 'kartenkopf' }, el('span', { html: ik('wuerfel') }), 'KISTE SCHÜTTELN'), buehne,
+      el('div', { class: 'fussreihe' }, el('button', { class: 'knopf', onclick: () => {
+        const alle = woerterInKiste(aktiveKiste);
+        if (alle.length < 3) { toast('Dafür braucht diese Auswahl mindestens drei Wörter.'); return; }
+        griff = wortZufallsgriff(alle, 3); buehne.innerHTML = '';
+        griff.forEach((w, i) => buehne.append(el('span', { style: '--dreh:' + ((i * 5) - 5) + 'deg' }, w.text)));
+      } }, 'Schütteln'), schreibknopf));
+  }
+
+  function baueAlles() { baueSchrank(); baueArbeitskarte(); baueSchuetteln(); }
+  baueAlles();
+  inhalt.append(kopf, schrank, arbeitskarte, klangkarte);
 
   /* Funken */
   let funke = neuerFunke(false);
@@ -6187,19 +6539,13 @@ RENDER.woerter = function (haupt) {
   for (const [id, name] of [['szene', 'Szene'], ['kombi', 'Wer · Wo · Aber'], ['frage', 'Frage'], ['form', 'Form'], ['satz', 'Satz']]) arten.append(el('button', {
     class: id === funkeArt ? 'an' : '', onclick: (e) => { funkeArt = id; $$('button', arten).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); ziehe(); }
   }, name));
-  inhalt.append(el('div', { class: 'karte', style: 'margin-top:14px' },
+  inhalt.append(el('div', { class: 'karte wortkisten-funken' },
     el('div', { class: 'kartenkopf' }, el('span', { html: ik('feuer') }), 'FUNKEN'),
     arten, funkeText,
     el('div', { class: 'fussreihe' },
       el('button', { class: 'knopf', onclick: ziehe }, 'Neuer Funke'),
       el('button', { class: 'knopf zart', onclick: () => { neuDoc('funkeln', { text: funke, quelle: 'funke' }); toast('Dieser Funke taucht wieder auf.'); } }, 'Merken'),
-      el('button', {
-        class: 'knopf voll', onclick: () => {
-          const seite = blattAusText('', funke + '\n\n');
-          oeffneSchreibraum(seite.id);
-        }
-      }, 'Dem nachgehen')
-    )
+      el('button', { class: 'knopf voll', onclick: () => { const seite = blattAusText('', funke + '\n\n'); oeffneSchreibraum(seite.id); } }, 'Dem nachgehen'))
   ));
 
   haupt.append(inhalt);
@@ -6219,6 +6565,7 @@ const SUCH_GRUPPEN = [
   ['projekt', 'Projekte', 'projekte'],
   ['blase', 'Blasen', 'cluster'],
   ['zettel', 'Zettel', 'pin'],
+  ['wortkiste', 'Wortkisten', 'woerter'],
   ['wort', 'Wörter', 'woerter'],
   ['faden', 'Faden', 'faden'],
   ['funkeln', 'Funken', 'woerter'],
@@ -6307,7 +6654,7 @@ function oeffneSuche() {
       for (const d of D.docs.values()) {
         if (d.typ !== typ) continue;
         const titelN = normalisiere(d.titel || '');
-        const suchText = d.text || '';
+        const suchText = [d.text, d.notiz].filter(Boolean).join('\n');
         const textN = normalisiere(suchText);
         let stelle = titelN.indexOf(q);
         let woText = -1;

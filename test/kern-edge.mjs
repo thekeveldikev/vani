@@ -130,6 +130,67 @@ test('Eigene Funken bleiben eine getrennte, durchsuchbare Sammlung', async () =>
   assert.deepEqual(roh(k.eigeneFunken().map((d) => d.id)), [b.id, a.id]);
 });
 
+test('Wortkisten: Mehrfachzugabe normalisiert, begrenzt und lässt Dubletten draußen', async () => {
+  const k = await frisch();
+  const kiste = k.neuDoc('wortkiste', { titel: 'Synonyme', farbe: '#70806f' });
+  const paket = k.fuegeWoerterHinzu(kiste.id, ' leuchten, Leuchten ;\n glimmen\n' + 'x'.repeat(400));
+  assert.deepEqual(roh(paket.hinzu.map((d) => d.text)), ['leuchten', 'glimmen', 'x'.repeat(160)]);
+  assert.equal(paket.uebersprungen, 0, 'Dubletten innerhalb derselben Eingabe werden still zusammengelegt');
+  assert.ok(paket.hinzu.every((d) => d.parent === kiste.id));
+  assert.deepEqual(roh(k.wortlisteAusText(null)), []);
+  assert.equal(k.wortlisteAusText(Array.from({ length: 700 }, (_, i) => 'w' + i).join(',')).length, 500, 'ein einzelner Import kann die Oberfläche nicht fluten');
+  const nochEinmal = k.fuegeWoerterHinzu(kiste.id, 'GLIMMEN; funkeln');
+  assert.equal(nochEinmal.hinzu.length, 1);
+  assert.equal(nochEinmal.uebersprungen, 1);
+});
+
+test('Wortkisten: Suche, Favoriten und Sortierung bleiben innerhalb der gewählten Kiste', async () => {
+  const k = await frisch();
+  const a = k.neuDoc('wortkiste', { titel: 'A' });
+  const b = k.neuDoc('wortkiste', { titel: 'B' });
+  k.neuDoc('wort', { parent: a.id, text: 'Flimmern', notiz: 'Licht am Wasser', favorit: false, geaendert: 20 });
+  k.neuDoc('wort', { parent: a.id, text: 'Glanz', notiz: 'hell', favorit: true, geaendert: 10 });
+  k.neuDoc('wort', { parent: b.id, text: 'Wasser', notiz: 'Meer', favorit: true, geaendert: 30 });
+  assert.deepEqual(roh(k.woerterInKiste(a.id).map((d) => d.text)), ['Glanz', 'Flimmern'], 'angeheftete Wörter bleiben oben');
+  assert.deepEqual(roh(k.woerterInKiste(a.id, 'wasser').map((d) => d.text)), ['Flimmern'], 'Notizen sind durchsuchbar');
+  assert.deepEqual(roh(k.woerterInKiste(a.id, '', 'zuletzt').map((d) => d.text)), ['Glanz', 'Flimmern'], 'Favoriten gelten vor der gewählten Zeitsortierung');
+  assert.equal(k.woerterInKiste(b.id).length, 1);
+});
+
+test('Wortkisten: Verschieben, Kopieren und Löschen beschädigen keine fremden Wörter', async () => {
+  const k = await frisch();
+  const a = k.neuDoc('wortkiste', { titel: 'A' });
+  const b = k.neuDoc('wortkiste', { titel: 'B' });
+  const wort = k.neuDoc('wort', { parent: a.id, text: 'Schimmer', notiz: 'fein', favorit: true });
+  const fremd = k.neuDoc('wort', { parent: b.id, text: 'Anders' });
+  const kopie = k.wortInKiste(wort, b.id, true);
+  assert.notEqual(kopie.id, wort.id);
+  assert.equal(kopie.parent, b.id); assert.equal(kopie.notiz, 'fein'); assert.equal(kopie.favorit, true);
+  assert.equal(k.wortInKiste(wort, 'fehlt', false), null);
+  assert.equal(k.wortInKiste(wort, b.id, false).id, kopie.id, 'ein vorhandenes gleiches Wort wird nicht verdoppelt');
+  assert.equal(wort.parent, a.id, 'bei einem Zieldublett bleibt das Original an seinem Ort');
+  await k.loescheWortkiste(a.id, false, true);
+  assert.equal(wort.parent, undefined); assert.ok(k.D.docs.has(wort.id));
+  const aBuendel = (await k.dbAlle('papierkorb')).find((d) => d.name === 'A');
+  await k.holeZurueck(aBuendel.id);
+  assert.equal(wort.parent, a.id, 'Rückgängig stellt auch die Einsortierung wieder her');
+  await k.loescheWortkiste(a.id, false, true);
+  await k.loescheWortkiste(b.id, true, true);
+  assert.ok(!k.D.docs.has(b.id)); assert.ok(!k.D.docs.has(kopie.id)); assert.ok(!k.D.docs.has(fremd.id));
+  assert.ok(k.D.docs.has(wort.id));
+});
+
+test('Wortkisten: Zufallsgriff terminiert bei kaputter Quelle und liefert nie Dubletten', async () => {
+  const k = await frisch();
+  const liste = ['a', 'b', 'c', 'd'];
+  assert.deepEqual(roh(k.wortZufallsgriff(liste, 3, () => Infinity)), ['a', 'b', 'c']);
+  const griff = roh(k.wortZufallsgriff(liste, 99, () => .999999));
+  assert.equal(griff.length, 4);
+  assert.equal(new Set(griff).size, 4);
+  assert.deepEqual(liste, ['a', 'b', 'c', 'd'], 'die Ursprungsliste bleibt unverändert');
+  assert.deepEqual(roh(k.wortZufallsgriff(null, 3)), []);
+});
+
 test('Faden-Ziel: auch auf bereits offener Route wird ein exakter Neuzeichnen-Sprung verlangt', async () => {
   const k = await frisch();
   assert.equal(k.merkeFadenZiel('nachricht-mit-]:sonderzeichen', '#/faden'), 'neuzeichnen');

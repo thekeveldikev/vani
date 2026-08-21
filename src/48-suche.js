@@ -12,6 +12,7 @@ const SUCH_GRUPPEN = [
   ['projekt', 'Projekte', 'projekte'],
   ['blase', 'Blasen', 'cluster'],
   ['zettel', 'Zettel', 'pin'],
+  ['wortkiste', 'Wortkisten', 'woerter'],
   ['wort', 'Wörter', 'woerter'],
   ['faden', 'Faden', 'faden'],
   ['funkeln', 'Funken', 'woerter'],
@@ -100,7 +101,7 @@ function oeffneSuche() {
       for (const d of D.docs.values()) {
         if (d.typ !== typ) continue;
         const titelN = normalisiere(d.titel || '');
-        const suchText = d.text || '';
+        const suchText = [d.text, d.notiz].filter(Boolean).join('\n');
         const textN = normalisiere(suchText);
         let stelle = titelN.indexOf(q);
         let woText = -1;
