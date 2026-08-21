@@ -233,5 +233,6 @@ test('Papiervertrag: das Raster hat denselben Takt wie die Zeilen und liegt bei 
     assert.match(block, /background-position:/, art + ': das Muster braucht seine Ausrichtung an der Grundlinie');
   }
   /* Formatierter Text hat wechselnde Zeilenhöhen und darf kein Raster erben. */
-  assert.match(css, /\.papierseite \.rich-editor \{ background-image: none; \}/);
+  /* Die Regel muss so spezifisch sein wie die Linienregel, sonst gewinnt die Linie. */
+  assert.match(css, /\.papierseite \.schreibflaeche\.rich-editor \{ background-image: none; \}/);
 });
