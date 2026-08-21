@@ -9,7 +9,7 @@ function blattAusText(titel, text) {
 RENDER.blaetter = function (haupt) {
   haupt.append(raumkopf('Blätter', 'ein Stapel Texte, mehr nicht',
     el('button', {
-      class: 'rundknopf voll', html: ik('plus'), onclick: () => {
+      class: 'rundknopf voll', html: ik('plus'), title: 'Neues Blatt', onclick: () => {
         const b = blattAusText('', '');
         oeffneSchreibraum(b.id);
       }
@@ -51,6 +51,8 @@ RENDER.blaetter = function (haupt) {
         { text: 'Umbenennen', icon: 'stift', wert: 'name' },
         { text: 'Teilen', icon: 'teilen', wert: 'teilen' },
         { text: 'Duplizieren', icon: 'wandel', wert: 'doppel' },
+        { text: 'In ein Heft legen …', icon: 'hefte', wert: 'heft' },
+        { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
         { text: 'Löschen', icon: 'muell', wert: 'weg', rot: true }
       ], b.titel || 'Blatt');
       if (wahl === 'name') {
@@ -59,8 +61,12 @@ RENDER.blaetter = function (haupt) {
       } else if (wahl === 'teilen') {
         teileText((b.titel ? b.titel + '\n\n' : '') + (b.text || ''));
       } else if (wahl === 'doppel') {
-        neuDoc('blatt', { titel: (b.titel || 'Blatt') + ' (Abschrift)', text: b.text, ord: Date.now() });
+        neuDoc('blatt', { titel: (b.titel || 'Blatt') + ' (Abschrift)', text: b.text, rich: b.rich || '', format: b.format || 'plain', ord: Date.now() });
         zeichne();
+      } else if (wahl === 'heft') {
+        if (await legeBlattInHeft(b)) zeichne();
+      } else if (wahl === 'dazu') {
+        await hinzufuegenMenue(b); zeichne();
       } else if (wahl === 'weg') {
         await loesche(b.id); zeichne();
       }

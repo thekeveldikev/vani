@@ -1,0 +1,86 @@
+{
+  "name": "vani",
+  "version": "5.0.0",
+  "private": true,
+  "description": "VANI – ein privates Zuhause zum Schreiben, auf iPad und Desktop.",
+  "main": "desktop/main.cjs",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "vendor": "esbuild werkzeug/vani-sync-vendor.mjs --bundle --format=iife --global-name=VaniY --minify --legal-comments=none --outfile=vendor/vani-sync.js",
+    "build:web": "npm run vendor && node werkzeug/build-web.mjs",
+    "start": "node server.js",
+    "start:sync": "node sync-server/server.mjs",
+    "test": "node --test test/*.mjs",
+    "desktop": "npm run build:web && electron .",
+    "desktop:dir": "npm run build:web && electron-builder --dir",
+    "desktop:win": "npm run build:web && electron-builder --win nsis portable",
+    "desktop:smoke": "node werkzeug/smoke-cdp.mjs 9333"
+  },
+  "dependencies": {
+    "electron-updater": "6.8.9",
+    "y-indexeddb": "9.0.12",
+    "yjs": "13.6.32"
+  },
+  "devDependencies": {
+    "electron": "43.4.1",
+    "electron-builder": "26.15.3",
+    "esbuild": "0.28.2"
+  },
+  "build": {
+    "appId": "de.vani.schreibzuhause",
+    "productName": "VANI",
+    "artifactName": "VANI-${version}-${arch}-${os}.${ext}",
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/electron-updater/**"
+    ],
+    "files": [
+      "desktop/**",
+      "icons/**",
+      "index.html",
+      "manifest.json",
+      "sw.js",
+      "faden.enc",
+      "node_modules/electron-updater/**",
+      "node_modules/builder-util-runtime/**",
+      "node_modules/lazy-val/**",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release",
+      "buildResources": "icons"
+    },
+    "win": {
+      "icon": "icons/icon-512.png",
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "artifactName": "VANI-${version}-${arch}-Setup.${ext}",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "deleteAppDataOnUninstall": false,
+      "shortcutName": "VANI"
+    },
+    "portable": {
+      "artifactName": "VANI-${version}-${arch}-Portable.${ext}"
+    },
+    "mac": {
+      "icon": "icons/icon-512.png",
+      "target": ["dmg", "zip"],
+      "category": "public.app-category.productivity"
+    },
+    "linux": {
+      "icon": "icons/icon-512.png",
+      "target": ["AppImage", "deb"],
+      "category": "Office"
+    }
+  }
+}

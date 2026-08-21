@@ -45,7 +45,7 @@ RENDER.woerter = function (haupt) {
   const zugabe = el('div', { class: 'wortzugabe' },
     feld,
     el('button', {
-      class: 'rundknopf voll', html: ik('plus'), onclick: () => {
+      class: 'rundknopf voll', html: ik('plus'), title: 'Neues Wort', onclick: () => {
         const t = feld.value.trim();
         if (!t) return;
         neuDoc('wort', { text: t });
@@ -86,13 +86,19 @@ RENDER.woerter = function (haupt) {
 
   /* Funken */
   let funke = neuerFunke(false);
+  let funkeArt = 'szene';
   const funkeText = el('div', { class: 'funke-text', style: 'min-height:54px' }, funke);
+  const arten = el('div', { class: 'funke-arten' });
+  const ziehe = () => { funke = funkeArt === 'kombi' ? neuerFunke(true) : neuerFunke(false, funkeArt); funkeText.textContent = funke; };
+  for (const [id, name] of [['szene', 'Szene'], ['kombi', 'Wer · Wo · Aber'], ['frage', 'Frage'], ['form', 'Form'], ['satz', 'Satz']]) arten.append(el('button', {
+    class: id === funkeArt ? 'an' : '', onclick: (e) => { funkeArt = id; $$('button', arten).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); ziehe(); }
+  }, name));
   inhalt.append(el('div', { class: 'karte', style: 'margin-top:14px' },
     el('div', { class: 'kartenkopf' }, el('span', { html: ik('feuer') }), 'FUNKEN'),
-    funkeText,
+    arten, funkeText,
     el('div', { class: 'fussreihe' },
-      el('button', { class: 'knopf', onclick: () => { funke = neuerFunke(false); funkeText.textContent = funke; } }, 'Neuer Funke'),
-      el('button', { class: 'knopf', onclick: () => { funke = neuerFunke(true); funkeText.textContent = funke; } }, 'Wer · Wo · Aber'),
+      el('button', { class: 'knopf', onclick: ziehe }, 'Neuer Funke'),
+      el('button', { class: 'knopf zart', onclick: () => { neuDoc('funkeln', { text: funke, quelle: 'funke' }); toast('Dieser Funke taucht wieder auf.'); } }, 'Merken'),
       el('button', {
         class: 'knopf voll', onclick: () => {
           const seite = blattAusText('', funke + '\n\n');

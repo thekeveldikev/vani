@@ -5,20 +5,40 @@
 RENDER.schnipsel = function (haupt) {
   const raum = el('div', { class: 'schnipsel-raum' });
 
-  raum.append(el('div', { class: 'kopf', style: 'position:static;background:none' },
-    el('h1', {}, 'Schnipsel', el('div', { class: 'unter' }, 'an mich, für später'))
-  ));
+  const kopf = el('div', { class: 'kopf', style: 'position:static;background:none' },
+    el('h1', {}, 'Schnipsel', el('div', { class: 'unter' }, 'an mich, für später')));
+  const modus = el('div', { class: 'schnipsel-modus wahlgruppe' });
+  for (const [id, name] of [['lauf', 'Faden'], ['frei', 'Ungeordnet']]) modus.append(el('button', {
+    class: D.einst.schnipselAnsicht === id ? 'an' : '', onclick: () => {
+      D.einst.schnipselAnsicht = id; speichereEinst();
+      $$('button', modus).forEach((b) => b.classList.toggle('an', b.textContent === name));
+      baueLauf();
+    }
+  }, name));
+  kopf.append(modus);
+  raum.append(kopf);
 
   const pinnzeile = el('div', { class: 'pinnzeile' });
   const lauf = el('div', { class: 'schnipsel-lauf' });
   const innen = el('div', { class: 'innen' });
   lauf.append(innen);
 
+  let freieSuche = '';
+  const suchfeld = el('input', { type: 'search', placeholder: 'Auf der Fläche suchen …' });
+  const fundzahl = el('span', {}, '');
+  const suchzeile = el('div', { class: 'freie-suche' }, el('span', { html: ik('suche') }), suchfeld, fundzahl,
+    el('button', { class: 'knopf zart', onclick: () => {
+      const sichtbar = $$('.freier-schnipsel:not(.such-versteckt)', innen);
+      if (!sichtbar.length) return;
+      zufall(sichtbar).scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    } }, 'Fundstück'));
+  suchfeld.addEventListener('input', entprellt(() => { freieSuche = normalisiere(suchfeld.value.trim()).slice(0, 120); filtereFreie(); }, 100));
+
   const feld = el('textarea', { placeholder: 'An mich …', rows: 1 });
   autogrow(feld);
   const zeile = el('div', { class: 'schreibzeile' },
     el('button', {
-      class: 'rundknopf zart', html: ik('kamera'), onclick: async () => {
+      class: 'rundknopf zart', html: ik('kamera'), title: 'Bild hinzufügen', onclick: async () => {
         const bild = await waehleBild();
         if (!bild) return;
         neuDoc('schnipsel', { text: feld.value.trim(), bild: bild.id });
@@ -28,7 +48,7 @@ RENDER.schnipsel = function (haupt) {
     }),
     feld,
     el('button', {
-      class: 'rundknopf voll', html: ik('senden'), onclick: () => {
+      class: 'rundknopf voll', html: ik('senden'), title: 'Schnipsel festhalten', onclick: () => {
         const t = feld.value.trim();
         if (!t) return;
         neuDoc('schnipsel', { text: t });
@@ -39,7 +59,7 @@ RENDER.schnipsel = function (haupt) {
     })
   );
 
-  raum.append(pinnzeile, lauf, zeile);
+  raum.append(suchzeile, pinnzeile, lauf, zeile);
   haupt.append(raum);
 
   function runter() { requestAnimationFrame(() => { lauf.scrollTop = lauf.scrollHeight; }); }
@@ -48,6 +68,18 @@ RENDER.schnipsel = function (haupt) {
     innen.innerHTML = '';
     pinnzeile.innerHTML = '';
     const alle = vomTyp('schnipsel').sort((a, b) => a.angelegt - b.angelegt);
+
+    const frei = D.einst.schnipselAnsicht === 'frei';
+    lauf.classList.toggle('frei', frei);
+    innen.classList.toggle('freie-flaeche', frei);
+    suchzeile.style.display = frei ? 'flex' : 'none';
+    pinnzeile.style.display = frei ? 'none' : '';
+    if (!frei) { innen.style.width = ''; innen.style.height = ''; }
+
+    if (frei) {
+      baueFreie(alle);
+      return;
+    }
 
     for (const s of alle.filter((x) => x.gepinnt)) {
       pinnzeile.append(el('button', {
@@ -92,6 +124,68 @@ RENDER.schnipsel = function (haupt) {
     }
   }
 
+  function baueFreie(alle) {
+    if (!alle.length) {
+      innen.append(el('div', { class: 'leer freie-leere' }, 'Noch viel freie Fläche.', el('div', { class: 'klein' }, 'Schnipsel werden hier lose ausgelegt. Du kannst sie verschieben und in alle Richtungen wandern.')));
+      return;
+    }
+    const positionen = alle.map((s, i) => s.freiPos || freieSchnipselPosition(i, s.id));
+    const grenze = freieFlaechenGrenzen(positionen, Math.max(900, lauf.clientWidth || 0), Math.max(680, lauf.clientHeight || 0));
+    innen.style.width = grenze.breite + 'px'; innen.style.height = grenze.hoehe + 'px';
+    const rand = 80;
+    alle.forEach((s, i) => {
+      const p = positionen[i];
+      const karte = el('article', {
+        class: 'freier-schnipsel' + (s.gepinnt ? ' gepinnt' : ''), 'data-id': s.id,
+        style: 'left:' + (p.x - grenze.minX + rand) + 'px;top:' + (p.y - grenze.minY + rand) + 'px;width:' + begrenze(p.w, 180, 520, 260) + 'px;--frei-rot:' + begrenze(p.rot, -12, 12, 0) + 'deg'
+      });
+      if (s.bild) { const img = el('img', { alt: '' }); setzeBild(img, s.bild); karte.append(img); }
+      if (s.text) karte.append(el('div', { class: 'btext', html: schmuecke(s.text) }));
+      karte.append(el('div', { class: 'bzeit' }, s.gepinnt ? el('span', { html: ik('pin') }) : null, fmtDatum(s.angelegt) + ' · ' + fmtZeit(s.angelegt)));
+      freieGeste(karte, s, p, grenze);
+      karte.addEventListener('click', (e) => {
+        if (karte._zieht || e.target.closest('.verweis')) return;
+        schnipselMenue(s, karte, baueLauf);
+      });
+      innen.append(karte);
+    });
+    filtereFreie();
+  }
+
+  function freieGeste(karte, s, p, grenze) {
+    let zug = null;
+    karte.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.verweis')) return;
+      zug = { sx: e.clientX, sy: e.clientY, x: p.x, y: p.y, bewegt: false };
+      try { karte.setPointerCapture(e.pointerId); } catch (x) {}
+    });
+    karte.addEventListener('pointermove', (e) => {
+      if (!zug) return;
+      const dx = e.clientX - zug.sx, dy = e.clientY - zug.sy;
+      if (!zug.bewegt && Math.hypot(dx, dy) < 7) return;
+      zug.bewegt = true; karte._zieht = true;
+      p.x = zug.x + dx; p.y = zug.y + dy;
+      karte.style.left = (p.x - grenze.minX + 80) + 'px'; karte.style.top = (p.y - grenze.minY + 80) + 'px';
+    });
+    const ende = () => {
+      if (!zug) return;
+      if (zug.bewegt) { s.freiPos = { x: p.x, y: p.y, rot: p.rot, w: p.w }; speichereStill(s); }
+      zug = null; setTimeout(() => { karte._zieht = false; }, 0);
+    };
+    karte.addEventListener('pointerup', ende); karte.addEventListener('pointercancel', ende);
+  }
+
+  function filtereFreie() {
+    if (D.einst.schnipselAnsicht !== 'frei') return;
+    let n = 0;
+    for (const karte of $$('.freier-schnipsel', innen)) {
+      const s = D.docs.get(karte.dataset.id);
+      const passt = !freieSuche || normalisiere((s && s.text) || '').includes(freieSuche);
+      karte.classList.toggle('such-versteckt', !passt); if (passt) n++;
+    }
+    fundzahl.textContent = freieSuche ? (n === 1 ? '1 Fund' : n + ' Funde') : '';
+  }
+
   baueLauf();
   runter();
 };
@@ -100,6 +194,7 @@ async function schnipselMenue(s, blase, neuZeichnen) {
   const wahl = await menue([
     { text: s.gepinnt ? 'Losmachen' : 'Anpinnen', icon: 'pin', wert: 'pin' },
     s.text ? { text: 'Bearbeiten', icon: 'stift', wert: 'edit' } : null,
+    { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
     { text: 'Verwandeln …', icon: 'wandel', wert: 'wandel' },
     { text: 'Löschen', icon: 'muell', wert: 'weg', rot: true }
   ]);
@@ -111,6 +206,7 @@ async function schnipselMenue(s, blase, neuZeichnen) {
   else if (wahl === 'weg') {
     if (await frage('Diesen Schnipsel wegwerfen?', { ja: 'Wegwerfen', gefahr: true })) { await loesche(s.id); neuZeichnen(); }
   }
+  else if (wahl === 'dazu') { await hinzufuegenMenue(s); if (neuZeichnen) neuZeichnen(); }
   else if (wahl === 'wandel') verwandleSchnipsel(s, neuZeichnen);
 }
 
@@ -134,6 +230,8 @@ async function verwandleSchnipsel(s, neuZeichnen) {
   if (ziel === 'wort') {
     neuDoc('wort', { text: (s.text || '').slice(0, 60) });
     toast('Liegt in der Wortschatzkiste.');
+    await loesche(s.id, true);
+    if (neuZeichnen) neuZeichnen();
     return;
   }
   if (ziel === 'seite') {
@@ -184,7 +282,7 @@ async function waehleHeft() {
   if (wahl === '_neu') {
     const name = await eingabe({ titel: 'Ein neues Heft', platzhalter: 'Wie soll es heißen?' });
     if (!name) return null;
-    return neuDoc('heft', { titel: name, farbe: zufall(HEFTFARBEN), papier: 'liniert' });
+    return neuDoc('heft', { titel: name, farbe: zufall(HEFTFARBEN), farbe2: zufall(HEFTFARBEN), band: '#d6bd92', muster: 'leinen', papier: 'liniert', ansicht: 'seiten' });
   }
   return D.docs.get(wahl);
 }

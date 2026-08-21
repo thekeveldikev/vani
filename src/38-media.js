@@ -38,6 +38,7 @@ function verkleinereUndSpeichere(datei, maxKante = 1600) {
           if (!blob) return rej(new Error('kein Blob'));
           const id = uid();
           await dbPut('media', blob, id);
+          if (typeof syncMediaGeaendert === 'function') syncMediaGeaendert(id);
           res({ id, breite: b, hoehe: h });
         }, 'image/jpeg', .82);
       };
@@ -59,14 +60,31 @@ async function bildURL(id) {
 function setzeBild(img, id) {
   bildURL(id).then((u) => { if (u) img.src = u; });
 }
+function loeseMedienURL(id) {
+  const url = _bildURLs.get(id);
+  if (url) URL.revokeObjectURL(url);
+  _bildURLs.delete(id);
+}
+async function speichereDateiBlob(datei) {
+  if (!datei || typeof datei.size !== 'number') throw new Error('Keine Datei');
+  const id = uid();
+  await dbPut('media', datei, id);
+  if (typeof syncMediaGeaendert === 'function') syncMediaGeaendert(id);
+  return id;
+}
 async function speichereKritzelei(canvas, alteId) {
   return new Promise((res) => {
     canvas.toBlob(async (blob) => {
       if (!blob) return res(null);
       const id = alteId || uid();
       await dbPut('media', blob, id);
-      _bildURLs.delete(id);
+      if (typeof syncMediaGeaendert === 'function') syncMediaGeaendert(id);
+      loeseMedienURL(id);
       res(id);
     }, 'image/png');
   });
 }
+
+window.addEventListener('pagehide', () => {
+  for (const id of [..._bildURLs.keys()]) loeseMedienURL(id);
+});

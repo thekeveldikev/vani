@@ -10,7 +10,7 @@ function projektWorte(p) {
 
 RENDER.projekte = function (haupt) {
   haupt.append(raumkopf('Projekte', null,
-    el('button', { class: 'rundknopf voll', html: ik('plus'), onclick: () => neuesProjekt() })
+    el('button', { class: 'rundknopf voll', html: ik('plus'), title: 'Neues Projekt', onclick: () => neuesProjekt() })
   ));
   const inhalt = el('div', { class: 'inhalt' });
   const alle = vomTyp('projekt');
@@ -80,6 +80,7 @@ async function projektMenue(p, danach) {
     { text: 'Umbenennen', icon: 'stift', wert: 'name' },
     { text: 'Wortziel: ' + (p.ziel ? p.ziel.toLocaleString('de-DE') : 'keins'), icon: 'ziel', wert: 'ziel' },
     { text: 'Leseansicht', icon: 'lesen', wert: 'lesen' },
+    { text: 'Verbindungen ansehen', icon: 'verbinden', wert: 'bezug' },
     { text: 'Projekt löschen', icon: 'muell', wert: 'weg', rot: true }
   ], p.titel);
   if (wahl === 'name') {
@@ -90,6 +91,9 @@ async function projektMenue(p, danach) {
     if (neu !== null) { p.ziel = parseInt(neu, 10) || 0; speichereStill(p); }
   } else if (wahl === 'lesen') {
     zeigeLeseansicht(p);
+    return;
+  } else if (wahl === 'bezug') {
+    zeigeBeziehungen(p);
     return;
   } else if (wahl === 'weg') {
     if (await frage('„' + p.titel + '" mit allem darin in den Papierkorb legen?', { ja: 'In den Papierkorb', gefahr: true })) {
@@ -111,7 +115,7 @@ RENDER.projekt = function (haupt, pid) {
     el('h1', {}, p.titel, el('div', { class: 'unter' },
       w.toLocaleString('de-DE') + ' Wörter' + (p.ziel ? ' von ' + p.ziel.toLocaleString('de-DE') : '') + ' · ' + (p.art || ''))),
     el('button', { class: 'rundknopf zart', html: ik('lesen'), title: 'Leseansicht', onclick: () => zeigeLeseansicht(p) }),
-    el('button', { class: 'rundknopf zart', html: ik('mehr'), onclick: () => projektMenue(p, () => zeichne()) })
+    el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Projekt-Menü', onclick: () => projektMenue(p, () => zeichne()) })
   ));
 
   const inhalt = el('div', { class: 'inhalt' });
@@ -122,6 +126,30 @@ RENDER.projekt = function (haupt, pid) {
 
   const kapitel = kinder(p.id, 'kapitel');
   for (const k of kapitel) inhalt.append(baueKapitel(k, p));
+
+  const projektHefte = vomTyp('heft').filter((h) => h.projektRef === p.id);
+  const heftband = el('div', { class: 'projekt-hefte' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('hefte') }), 'HEFTE AM PROJEKT', el('span', { class: 'rest' }),
+      el('button', { class: 'knopf zart', onclick: async () => {
+        const hefte = vomTyp('heft').filter((h) => !h.projektRef || h.projektRef === p.id);
+        const wahl = await menue([
+          ...hefte.map((h) => ({ text: (h.projektRef === p.id ? '✓ ' : '') + h.titel, icon: 'hefte', wert: h.id })),
+          { text: 'Neues Heft für dieses Projekt', icon: 'plus', wert: '_neu' }
+        ], 'Welches Heft gehört dazu?');
+        if (!wahl) return;
+        let heft;
+        if (wahl === '_neu') {
+          const name = await eingabe({ titel: 'Ein neues Heft', platzhalter: 'Wie soll es heißen?' });
+          if (!name) return;
+          heft = neuDoc('heft', { titel: name, farbe: zufall(HEFTFARBEN), farbe2: zufall(HEFTFARBEN), band: '#d6bd92', muster: 'leinen', papier: 'liniert', ansicht: 'seiten' });
+        } else heft = D.docs.get(wahl);
+        if (heft) { heft.projektRef = heft.projektRef === p.id ? null : p.id; if (!heft.projektRef) delete heft.projektRef; speichere(heft); zeichne(); }
+      } }, 'Heft dazulegen')),
+    el('div', { class: 'projekt-heftband' }, projektHefte.length ? projektHefte.map((h) =>
+      el('button', { class: 'projekt-heftchip', onclick: () => { location.hash = '#/heft/' + h.id; } },
+        (() => { const d = heftDeckelDaten(h); return el('span', { class: 'mini-deckel muster-' + d.muster, style: d.style }); })(), el('span', {}, h.titel),
+        el('small', {}, kinder(h.id, 'seite').length + ' S.'))) : el('span', { class: 'projekt-hefte-leer' }, 'Noch kein Heft liegt daneben.')));
+  inhalt.append(heftband);
 
   inhalt.append(el('button', {
     class: 'plusskarte', style: 'width:100%;margin-top:22px', onclick: async () => {
@@ -143,7 +171,7 @@ function baueKapitel(k, p) {
     el('h3', {}, k.titel),
     el('span', { class: 'kworte' }, kw ? kw.toLocaleString('de-DE') + ' Wörter' : ''),
     el('button', {
-      class: 'rundknopf zart', style: 'width:32px;height:32px', html: ik('mehr'), onclick: async () => {
+      class: 'rundknopf zart', style: 'width:32px;height:32px', html: ik('mehr'), title: 'Kapitel-Menü', onclick: async () => {
         const geschwister = kinder(p.id, 'kapitel');
         const i = geschwister.findIndex((x) => x.id === k.id);
         const wahl = await menue([
@@ -208,7 +236,7 @@ function baueSzenenkarte(s, p) {
         statusPunkt,
         el('span', { class: 'szworte' }, worte(s.text) ? worte(s.text) + ' W.' : ''),
         el('button', {
-          class: 'rundknopf zart', style: 'width:28px;height:28px', html: ik('drehen'),
+          class: 'rundknopf zart', style: 'width:28px;height:28px', html: ik('drehen'), title: 'Karte umdrehen',
           onpointerdown: (e) => e.stopPropagation(),
           onclick: (e) => { e.stopPropagation(); karte.classList.add('rueckseite'); }
         })
@@ -219,7 +247,7 @@ function baueSzenenkarte(s, p) {
       notizFeld,
       el('div', { style: 'display:flex;justify-content:flex-end' },
         el('button', {
-          class: 'rundknopf zart', style: 'width:28px;height:28px', html: ik('drehen'),
+          class: 'rundknopf zart', style: 'width:28px;height:28px', html: ik('drehen'), title: 'Karte zurückdrehen',
           onpointerdown: (e) => e.stopPropagation(),
           onclick: (e) => { e.stopPropagation(); karte.classList.remove('rueckseite'); }
         }))
@@ -370,7 +398,7 @@ function zeigeLeseansicht(p) {
 
   const bogen = el('div', { class: 'lesebogen' }, innen);
   const leiste = el('div', { class: 'schwebeleiste' },
-    el('button', { class: 'rundknopf zart', html: ik('kreuz'), onclick: () => { bogen.remove(); leiste.remove(); } }),
+    el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Leseansicht schließen', onclick: () => { bogen.remove(); leiste.remove(); } }),
     el('button', {
       class: 'knopf', onclick: async () => {
         try { await navigator.clipboard.writeText(gesamt); toast('Alles in der Zwischenablage.'); }

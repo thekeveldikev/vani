@@ -3,9 +3,12 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
+const APP_VERSION = '5.0.0';
 const $ = (s, w) => (w || document).querySelector(s);
 const $$ = (s, w) => [...(w || document).querySelectorAll(s)];
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const uid = () => (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function')
+  ? globalThis.crypto.randomUUID()
+  : Date.now().toString(36) + Math.random().toString(36).slice(2, 11);
 
 function el(tag, attrs = {}, ...kinder) {
   const e = document.createElement(tag);
@@ -20,6 +23,9 @@ function el(tag, attrs = {}, ...kinder) {
   for (const kind of kinder.flat(9)) {
     if (kind == null || kind === false) continue;
     e.append(kind.nodeType ? kind : document.createTextNode(kind));
+  }
+  if (tag === 'button' && !e.hasAttribute('aria-label') && e.hasAttribute('title')) {
+    e.setAttribute('aria-label', e.getAttribute('title'));
   }
   return e;
 }
@@ -93,8 +99,65 @@ function klugeZeichen(t, s) {
 
 /* Prüft, ob ein eingelesenes Paket eine echte VANI-Sicherung ist. */
 function pruefeSicherung(paket) {
-  return !!(paket && paket.vani === 1 && Array.isArray(paket.docs) &&
-    paket.docs.every((d) => d && typeof d.id === 'string' && typeof d.typ === 'string'));
+  if (!paket || (paket.vani !== 1 && paket.vani !== 2) || !Array.isArray(paket.docs) || paket.docs.length > 100000) return false;
+  const ids = new Set();
+  for (const d of paket.docs) {
+    if (!d || typeof d.id !== 'string' || d.id.length < 1 || d.id.length > 200 ||
+        typeof d.typ !== 'string' || d.typ.length < 1 || d.typ.length > 40 || ids.has(d.id) ||
+        Object.keys(d).length > 250) return false;
+    ids.add(d.id);
+  }
+  if (paket.media != null && (typeof paket.media !== 'object' || Array.isArray(paket.media) || Object.keys(paket.media).length > 100000)) return false;
+  if (paket.sync != null && (!Array.isArray(paket.sync) || paket.sync.length > 100000)) return false;
+  return true;
+}
+
+const begrenze = (wert, min, max, ersatz = min) => {
+  const n = Number(wert);
+  return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : ersatz;
+};
+
+/* Pur und absichtlich klein: diese Helfer werden auch adversarial getestet. */
+function freieSchnipselPosition(index, id) {
+  let h = 2166136261;
+  for (const c of String(id || index)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); }
+  const winkel = index * 2.399963229728653 + ((h >>> 8) % 100) / 180;
+  const radius = 95 * Math.sqrt(Math.max(0, index)) + 30;
+  return {
+    x: Math.round(Math.cos(winkel) * radius),
+    y: Math.round(Math.sin(winkel) * radius * .78),
+    rot: ((h >>> 16) % 11) - 5,
+    w: 230 + ((h >>> 24) % 4) * 28
+  };
+}
+function freieFlaechenGrenzen(positionen, minBreite = 900, minHoehe = 680) {
+  if (!Array.isArray(positionen) || !positionen.length) return { minX: 0, minY: 0, breite: minBreite, hoehe: minHoehe };
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const p of positionen) {
+    if (!p) continue;
+    const x = begrenze(p.x, -100000, 100000, 0), y = begrenze(p.y, -100000, 100000, 0);
+    const b = begrenze(p.w, 180, 520, 260), h = begrenze(p.h, 100, 900, 190);
+    minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x + b); maxY = Math.max(maxY, y + h);
+  }
+  if (!Number.isFinite(minX)) return { minX: 0, minY: 0, breite: minBreite, hoehe: minHoehe };
+  return { minX, minY, breite: Math.max(minBreite, maxX - minX + 160), hoehe: Math.max(minHoehe, maxY - minY + 160) };
+}
+
+function seitenUmbruch(text, passt) {
+  text = String(text || '');
+  if (!text || typeof passt !== 'function' || passt(text)) return null;
+  let links = 0, rechts = text.length;
+  while (links < rechts) {
+    const mitte = Math.ceil((links + rechts) / 2);
+    if (passt(text.slice(0, mitte))) links = mitte; else rechts = mitte - 1;
+  }
+  if (links < 1) return { hier: '', weiter: text };
+  let trenn = text.lastIndexOf('\n', links);
+  if (trenn < Math.max(0, links - 700)) trenn = text.lastIndexOf(' ', links);
+  if (trenn < Math.max(0, links - 220)) trenn = links;
+  const hier = text.slice(0, trenn).replace(/[ \t]+$/, '');
+  const weiter = text.slice(trenn).replace(/^[ \t\n]+/, '');
+  return weiter ? { hier, weiter } : null;
 }
 
 /* Text nach draußen: Teilen-Blatt (WhatsApp, Dateien, …) → Zwischenablage */
@@ -154,15 +217,41 @@ function ik(name, kl) { return `<svg class="ik${kl ? ' ' + kl : ''}" viewBox="0 
 
 /* ----- Datenbank ----- */
 let _db;
+let AKTIVES_PROFIL_ID = 'legacy';
+let AKTIVES_PROFIL = null;
+let GERAET_ID = '';
+
+function aktiviereProfil(meta) {
+  AKTIVES_PROFIL = meta || null;
+  AKTIVES_PROFIL_ID = meta && typeof meta.id === 'string' ? meta.id : 'legacy';
+  const schluessel = 'vani-geraet:' + AKTIVES_PROFIL_ID;
+  try {
+    GERAET_ID = localStorage.getItem(schluessel) || uid();
+    localStorage.setItem(schluessel, GERAET_ID);
+  } catch (e) { GERAET_ID = uid(); }
+}
+
+function profilDatenbankName() {
+  if (!AKTIVES_PROFIL || AKTIVES_PROFIL.datenbank === 'vani') return 'vani';
+  const id = String(AKTIVES_PROFIL_ID || '').replace(/[^a-z0-9_-]/gi, '').slice(0, 80);
+  return id ? 'vani-profil-' + id : 'vani';
+}
+
 function dbAuf() {
   return new Promise((res, rej) => {
-    const r = indexedDB.open('vani', 2);
+    const r = indexedDB.open(profilDatenbankName(), 4);
     r.onupgradeneeded = () => {
       const d = r.result;
       if (!d.objectStoreNames.contains('docs')) d.createObjectStore('docs', { keyPath: 'id' });
       if (!d.objectStoreNames.contains('media')) d.createObjectStore('media');
       if (!d.objectStoreNames.contains('kv')) d.createObjectStore('kv');
       if (!d.objectStoreNames.contains('papierkorb')) d.createObjectStore('papierkorb', { keyPath: 'id' });
+      /* Pro Dokument nur der jüngste lokale Änderungsstand. Eine spätere
+         Desktop-Synchronisation kann diese kleinen Marker abholen. */
+      if (!d.objectStoreNames.contains('sync')) d.createObjectStore('sync');
+      /* Verschlüsselte, noch nicht bestätigte Netzpakete überleben Offlinezeit,
+         App-Abbruch und einen Neustart. */
+      if (!d.objectStoreNames.contains('sync-pending')) d.createObjectStore('sync-pending');
     };
     r.onsuccess = () => { _db = r.result; res(); };
     r.onerror = () => rej(r.error);
@@ -170,10 +259,14 @@ function dbAuf() {
 }
 function dbTu(store, modus, arbeit) {
   return new Promise((res, rej) => {
-    const tx = _db.transaction(store, modus);
-    const antwort = arbeit(tx.objectStore(store));
+    let tx, antwort;
+    try {
+      tx = _db.transaction(store, modus);
+      antwort = arbeit(tx.objectStore(store));
+    } catch (e) { rej(e); return; }
     tx.oncomplete = () => res(antwort && 'result' in antwort ? antwort.result : undefined);
-    tx.onerror = () => rej(tx.error);
+    tx.onerror = () => rej(tx.error || new Error('Speichern fehlgeschlagen'));
+    tx.onabort = () => rej(tx.error || new Error('Speichern abgebrochen'));
   });
 }
 const dbPut = (store, wert, key) => dbTu(store, 'readwrite', (s) => (key !== undefined ? s.put(wert, key) : s.put(wert)));
@@ -182,35 +275,186 @@ const dbGet = (store, key) => dbTu(store, 'readonly', (s) => s.get(key));
 const dbAlle = (store) => dbTu(store, 'readonly', (s) => s.getAll());
 
 /* ----- Bestand ----- */
+aktiviereProfil(null);
+
+const STANDARD_EINST = {
+  thema: 'papier', schrift: 'serife', groesse: 19, breite: 'mittel',
+  typewriter: true, fokus: false, mischung: {}, lautstaerke: .5,
+  tastenklang: false, tagesziel: 0, ersetzungen: true, autokorrektur: true,
+  autoSeitenwechsel: true, schnipselAnsicht: 'lauf', blattSortierung: 'zuletzt',
+  goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
+  stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10
+};
 const D = {
   docs: new Map(),
-  einst: {
-    thema: 'papier', schrift: 'serife', groesse: 19, breite: 'mittel',
-    typewriter: true, fokus: false, mischung: {}, lautstaerke: .5,
-    tastenklang: false, tagesziel: 0, ersetzungen: true, autokorrektur: true,
-    raeume: null
-  },
+  einst: Object.assign({}, STANDARD_EINST),
   stats: { tage: {}, letzte: {}, letzteSicherung: 0 }
 };
 
+function uebernehmeEinstellungen(quelle) {
+  if (!quelle || typeof quelle !== 'object') return;
+  for (const k of Object.keys(STANDARD_EINST)) {
+    if (Object.prototype.hasOwnProperty.call(quelle, k)) D.einst[k] = quelle[k];
+  }
+  /* Einmalige Brücke für sehr alte Klang-Einstellungen; Boot wandelt sie in
+     die heutige Mischung um und entfernt das Feld danach. */
+  if (typeof quelle.klang === 'string') D.einst.klang = quelle.klang.slice(0, 40);
+  D.einst.groesse = begrenze(D.einst.groesse, 15, 26, 19);
+  D.einst.lautstaerke = begrenze(D.einst.lautstaerke, 0, 1, .5);
+  D.einst.tagesziel = Math.round(begrenze(D.einst.tagesziel, 0, 10000000, 0));
+  D.einst.stiftDicke = begrenze(D.einst.stiftDicke, 1, 24, 3.5);
+  D.einst.stiftFarbe = /^#[0-9a-f]{6}$/i.test(D.einst.stiftFarbe || '') ? D.einst.stiftFarbe : '#2c251c';
+  D.einst.sperreNachMinuten = Math.round(begrenze(D.einst.sperreNachMinuten, 0, 240, 10));
+  D.einst.thema = ['papier', 'tinte', 'kerze', 'nebel', 'weiss'].includes(D.einst.thema) ? D.einst.thema : 'papier';
+  D.einst.schrift = ['serife', 'klar', 'mono'].includes(D.einst.schrift) ? D.einst.schrift : 'serife';
+  D.einst.breite = ['schmal', 'mittel', 'breit'].includes(D.einst.breite) ? D.einst.breite : 'mittel';
+  for (const k of ['typewriter', 'fokus', 'tastenklang', 'ersetzungen', 'autokorrektur', 'autoSeitenwechsel']) D.einst[k] = D.einst[k] !== false;
+  D.einst.goodnotesSync = D.einst.goodnotesSync === true;
+  D.einst.fadenAbgewaehlt = D.einst.fadenAbgewaehlt === true;
+  D.einst.blattSortierung = ['zuletzt', 'aeltest', 'az'].includes(D.einst.blattSortierung) ? D.einst.blattSortierung : 'zuletzt';
+  D.einst.schnipselAnsicht = D.einst.schnipselAnsicht === 'frei' ? 'frei' : 'lauf';
+  if (!D.einst.mischung || typeof D.einst.mischung !== 'object' || Array.isArray(D.einst.mischung)) D.einst.mischung = {};
+  else {
+    const m = {};
+    for (const [id, wert] of Object.entries(D.einst.mischung).slice(0, 100)) {
+      if (/^[a-z0-9_-]{1,60}$/i.test(id)) { const v = begrenze(wert, 0, 1, 0); if (v > 0) m[id] = v; }
+    }
+    D.einst.mischung = m;
+  }
+  if (D.einst.raeume != null) {
+    const gesehen = new Set();
+    D.einst.raeume = Array.isArray(D.einst.raeume) ? D.einst.raeume.slice(0, 50)
+      .filter((r) => r && typeof r.id === 'string' && r.id.length <= 60)
+      .filter((r) => !gesehen.has(r.id) && gesehen.add(r.id))
+      .map((r) => ({ id: r.id, an: r.an !== false })) : null;
+  }
+}
+function saubereZaehler(quelle, max = 100000) {
+  const ziel = Object.create(null);
+  if (!quelle || typeof quelle !== 'object') return ziel;
+  let n = 0;
+  for (const [k, v] of Object.entries(quelle)) {
+    if (++n > max || typeof k !== 'string' || k.length > 200) break;
+    const zahl = Number(v);
+    if (Number.isFinite(zahl) && zahl >= 0) ziel[k] = zahl;
+  }
+  return ziel;
+}
+function saubererSyncMarker(quelle) {
+  if (!quelle || typeof quelle !== 'object' || typeof quelle.id !== 'string' || quelle.id.length < 1 || quelle.id.length > 200) return null;
+  return {
+    id: quelle.id,
+    rev: Math.round(begrenze(quelle.rev, 0, Number.MAX_SAFE_INTEGER, 0)),
+    geraet: String(quelle.geraet || '').slice(0, 200),
+    wann: begrenze(quelle.wann, 0, Date.now() + 86400000, 0),
+    geloescht: !!quelle.geloescht
+  };
+}
+function sauberesDokument(quelle) {
+  if (!quelle || typeof quelle !== 'object' || typeof quelle.id !== 'string' || quelle.id.length < 1 || quelle.id.length > 200 ||
+      typeof quelle.typ !== 'string' || quelle.typ.length < 1 || quelle.typ.length > 40 || Object.keys(quelle).length > 250) return null;
+  const d = {};
+  for (const [k, v] of Object.entries(quelle)) {
+    if (k === '__proto__' || k === 'prototype' || k === 'constructor') continue;
+    d[k] = v;
+  }
+  for (const k of ['text', 'rich', 'titel', 'notiz', 'schlagworte', 'dateiname', 'dateityp', 'art', 'vibe', 'farbe', 'farbe2', 'band', 'muster', 'papier', 'ansicht', 'format', 'befestigung', 'label']) {
+    if (d[k] != null) d[k] = String(d[k]).slice(0, k === 'text' || k === 'rich' || k === 'notiz' ? 10000000 : 1000);
+  }
+  for (const k of ['parent', 'projekt', 'projektRef', 'von', 'zu', 'bild', 'skizze', 'datei', 'quelle', 'fingerabdruck', '_geraet']) {
+    if (d[k] != null) d[k] = String(d[k]).slice(0, 500);
+  }
+  if (d.farbe && !/^(#[0-9a-f]{3,8}|[a-z0-9_-]{1,30})$/i.test(d.farbe)) d.farbe = '';
+  if (d.farbe2 && !/^#[0-9a-f]{6}$/i.test(d.farbe2)) d.farbe2 = '';
+  if (d.band && !/^#[0-9a-f]{6}$/i.test(d.band)) d.band = '';
+  if (d.muster && !['leinen', 'diagonal', 'punkte', 'rahmen', 'welle', 'schlicht'].includes(d.muster)) d.muster = 'schlicht';
+  if (d.papier && !['liniert', 'kariert', 'blank', 'punkte', 'breit'].includes(d.papier)) d.papier = 'liniert';
+  if (d.ansicht && !['seiten', 'rolle'].includes(d.ansicht)) d.ansicht = 'seiten';
+  if (d.format && !['plain', 'rich'].includes(d.format)) d.format = 'plain';
+  if (d.befestigung && !['tesa', 'pin', 'lose'].includes(d.befestigung)) d.befestigung = 'tesa';
+  if (d.rich != null && typeof sauberesRichHTML === 'function') d.rich = sauberesRichHTML(d.rich);
+  if (d.pos != null) {
+    const p = d.pos && typeof d.pos === 'object' && !Array.isArray(d.pos) ? d.pos : {};
+    d.pos = {
+      x: begrenze(p.x, -100000, 100000, 0), y: begrenze(p.y, -100000, 100000, 0),
+      rot: begrenze(p.rot, -360, 360, 0), w: begrenze(p.w, 8, 2000, 30)
+    };
+  }
+  if (d.freiPos != null) {
+    const p = d.freiPos && typeof d.freiPos === 'object' && !Array.isArray(d.freiPos) ? d.freiPos : {};
+    d.freiPos = {
+      x: begrenze(p.x, -100000, 100000, 0), y: begrenze(p.y, -100000, 100000, 0),
+      rot: begrenze(p.rot, -20, 20, 0), w: begrenze(p.w, 180, 520, 260)
+    };
+  }
+  if (d.sicht != null) {
+    const s = d.sicht && typeof d.sicht === 'object' && !Array.isArray(d.sicht) ? d.sicht : {};
+    d.sicht = { x: begrenze(s.x, -100000, 100000, 60), y: begrenze(s.y, -100000, 100000, 60), z: begrenze(s.z, .1, 5, 1) };
+  }
+  if (d.staende != null) {
+    d.staende = Array.isArray(d.staende) ? d.staende.slice(-20).filter((s) => s && typeof s === 'object').map((s) => ({
+      wann: begrenze(s.wann, 0, Date.now() + 86400000, Date.now()),
+      titel: String(s.titel || '').slice(0, 1000), text: String(s.text || '').slice(0, 10000000)
+    })) : [];
+  }
+  if (d.pegel != null) {
+    const p = d.pegel && typeof d.pegel === 'object' && !Array.isArray(d.pegel) ? d.pegel : {};
+    d.pegel = {};
+    for (const [id, wert] of Object.entries(p).slice(0, 100)) {
+      if (/^[a-z0-9_-]{1,60}$/i.test(id)) { const v = begrenze(wert, 0, 1, 0); if (v > 0) d.pegel[id] = v; }
+    }
+  }
+  d.ord = begrenze(d.ord, -1000000, 1000000, 0);
+  d._rev = Math.round(begrenze(d._rev, 0, Number.MAX_SAFE_INTEGER, 0));
+  d._syncZeit = begrenze(d._syncZeit, 0, Date.now() + 86400000, 0);
+  d.angelegt = begrenze(d.angelegt, 0, Date.now() + 86400000, Date.now());
+  d.geaendert = begrenze(d.geaendert, 0, Date.now() + 86400000, d.angelegt);
+  return d;
+}
+
 async function ladeAlles() {
   await dbAuf();
-  (await dbAlle('docs')).forEach((d) => D.docs.set(d.id, d));
-  const e = await dbGet('kv', 'einst'); if (e) Object.assign(D.einst, e);
-  const s = await dbGet('kv', 'stats'); if (s) D.stats = Object.assign({ tage: {}, letzte: {}, letzteSicherung: 0 }, s);
+  (await dbAlle('docs')).forEach((roh) => {
+    const d = sauberesDokument(roh);
+    if (d) D.docs.set(d.id, d);
+  });
+  uebernehmeEinstellungen(await dbGet('kv', 'einst'));
+  const s = await dbGet('kv', 'stats');
+  if (s && typeof s === 'object') D.stats = {
+    tage: saubereZaehler(s.tage), letzte: saubereZaehler(s.letzte),
+    letzteSicherung: begrenze(s.letzteSicherung, 0, Date.now() + 86400000, 0)
+  };
 }
-const speichereEinst = entprellt(() => dbPut('kv', D.einst, 'einst'), 300);
-const speichereStats = entprellt(() => dbPut('kv', D.stats, 'stats'), 800);
+const speichereEinst = entprellt(() => {
+  dbPut('kv', D.einst, 'einst').catch(() => {});
+  if (typeof syncMetadatenGeaendert === 'function') syncMetadatenGeaendert('einst');
+}, 300);
+const speichereStats = entprellt(() => {
+  dbPut('kv', D.stats, 'stats').catch(() => {});
+  if (typeof syncMetadatenGeaendert === 'function') syncMetadatenGeaendert('stats');
+}, 800);
+
+function markiereAenderung(d, geloescht) {
+  if (!d || !d.id) return;
+  const alt = Number.isFinite(d._rev) ? d._rev : 0;
+  d._rev = alt + 1;
+  d._geraet = GERAET_ID;
+  d._syncZeit = Date.now();
+  const marker = { id: d.id, rev: d._rev, geraet: GERAET_ID, wann: d._syncZeit, geloescht: !!geloescht };
+  dbPut('sync', marker, d.id).catch(() => {});
+  if (typeof syncDokumentGeaendert === 'function') syncDokumentGeaendert(d, !!geloescht);
+}
 
 function neuDoc(typ, felder) {
   const d = Object.assign({ id: uid(), typ, angelegt: Date.now(), geaendert: Date.now() }, felder);
+  markiereAenderung(d, false);
   D.docs.set(d.id, d);
-  dbPut('docs', d);
+  dbPut('docs', d).catch(() => toast('Das Speichern hat gerade nicht geklappt.'));
   D.stats.letzte[d.id] = worte(d.text || '');
   return d;
 }
-function speichere(d) { d.geaendert = Date.now(); dbPut('docs', d); }
-function speichereStill(d) { dbPut('docs', d); }
+function speichere(d) { d.geaendert = Date.now(); markiereAenderung(d, false); dbPut('docs', d).catch(() => {}); }
+function speichereStill(d) { markiereAenderung(d, false); dbPut('docs', d).catch(() => {}); }
 
 /* Löschen ist bei VANI nie endgültig: alles wandert erst in den Papierkorb. */
 function _nachfahren(id) {
@@ -219,6 +463,7 @@ function _nachfahren(id) {
     for (const d of D.docs.values()) {
       if ((d.parent === opfer[i] || d.projekt === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
       if (d.typ === 'kante' && (d.von === opfer[i] || d.zu === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
+      if (d.typ === 'bezug' && (d.von === opfer[i] || d.zu === opfer[i]) && !opfer.includes(d.id)) opfer.push(d.id);
     }
   }
   return opfer;
@@ -228,11 +473,22 @@ async function loesche(id, still) {
   const wurzel = D.docs.get(id);
   if (!wurzel) return;
   const opfer = _nachfahren(id);
-  const buendel = { id: uid(), wann: Date.now(), name: wurzel.titel || (wurzel.text || '').slice(0, 40) || wurzel.typ, typ: wurzel.typ, docs: [] };
+  const opferSet = new Set(opfer);
+  const buendel = { id: uid(), wann: Date.now(), name: wurzel.titel || (wurzel.text || '').slice(0, 40) || wurzel.typ, typ: wurzel.typ, docs: [], referenzen: [] };
+  /* Lose Zuordnungen überleben das Löschen ihres Ziels, dürfen danach aber
+     nicht als unsichtbare, kaputte Verweise im Bestand hängen bleiben. */
+  for (const d of D.docs.values()) {
+    if (opferSet.has(d.id)) continue;
+    let geputzt = false;
+    if (d.projektRef && opferSet.has(d.projektRef)) { buendel.referenzen.push({ id: d.id, feld: 'projektRef', wert: d.projektRef }); delete d.projektRef; geputzt = true; }
+    if (d.quelle && opferSet.has(d.quelle)) { buendel.referenzen.push({ id: d.id, feld: 'quelle', wert: d.quelle }); delete d.quelle; geputzt = true; }
+    if (geputzt) speichereStill(d);
+  }
   for (const oid of opfer) {
     const d = D.docs.get(oid);
     if (!d) continue;
     buendel.docs.push(d);
+    markiereAenderung(d, true);
     D.docs.delete(oid);
     await dbDel('docs', oid);
   }
@@ -249,8 +505,14 @@ async function holeZurueck(buendelId) {
   const b = await dbGet('papierkorb', buendelId);
   if (!b) return false;
   for (const d of b.docs) {
+    markiereAenderung(d, false);
     D.docs.set(d.id, d);
     await dbPut('docs', d);
+  }
+  for (const r of b.referenzen || []) {
+    const d = D.docs.get(r.id);
+    if (!d || !['projektRef', 'quelle'].includes(r.feld) || typeof r.wert !== 'string') continue;
+    d[r.feld] = r.wert; speichereStill(d);
   }
   await dbDel('papierkorb', buendelId);
   return true;
@@ -262,8 +524,9 @@ async function papierkorbLeeren(nurAelterAlsTage) {
   for (const b of alle) {
     if (nurAelterAlsTage && b.wann > grenze) continue;
     for (const d of b.docs) {
-      if (d.bild) dbDel('media', d.bild);
-      if (d.skizze) dbDel('media', d.skizze);
+      if (d.bild) { await dbDel('media', d.bild); if (typeof loeseMedienURL === 'function') loeseMedienURL(d.bild); }
+      if (d.skizze) { await dbDel('media', d.skizze); if (typeof loeseMedienURL === 'function') loeseMedienURL(d.skizze); }
+      if (d.datei) { await dbDel('media', d.datei); if (typeof loeseMedienURL === 'function') loeseMedienURL(d.datei); }
       delete D.stats.letzte[d.id];
     }
     await dbDel('papierkorb', b.id);
@@ -274,10 +537,52 @@ async function papierkorbLeeren(nurAelterAlsTage) {
 function kinder(pid, typ) {
   return [...D.docs.values()]
     .filter((d) => d.parent === pid && (!typ || d.typ === typ))
-    .sort((a, b) => (a.ord || 0) - (b.ord || 0) || a.angelegt - b.angelegt);
+    .sort((a, b) => (Number.isFinite(a.ord) ? a.ord : 0) - (Number.isFinite(b.ord) ? b.ord : 0) ||
+      (Number.isFinite(a.angelegt) ? a.angelegt : 0) - (Number.isFinite(b.angelegt) ? b.angelegt : 0));
 }
 function vomTyp(typ) {
-  return [...D.docs.values()].filter((d) => d.typ === typ).sort((a, b) => b.geaendert - a.geaendert);
+  return [...D.docs.values()].filter((d) => d.typ === typ)
+    .sort((a, b) => (Number.isFinite(b.geaendert) ? b.geaendert : 0) - (Number.isFinite(a.geaendert) ? a.geaendert : 0));
+}
+
+/* ----- Sichtbare, ausdrückliche Beziehungen ----- */
+const BEZUG_ARTEN = ['gehört dazu', 'inspiriert', 'erklärt', 'widerspricht', 'spiegelt', 'Fortsetzung von', 'Figur / Ort'];
+function beziehungenFuer(id) {
+  return vomTyp('bezug').filter((b) => b.von === id || b.zu === id);
+}
+function verbindeDocs(von, zu, art = 'gehört dazu') {
+  if (!von || !zu || von === zu || !D.docs.has(von) || !D.docs.has(zu)) return null;
+  const vorhanden = vomTyp('bezug').find((b) => b.von === von && b.zu === zu && b.art === art);
+  return vorhanden || neuDoc('bezug', { von, zu, art: BEZUG_ARTEN.includes(art) ? art : 'gehört dazu' });
+}
+async function trenneDocs(bezugId) {
+  const b = D.docs.get(bezugId);
+  if (!b || b.typ !== 'bezug') return false;
+  markiereAenderung(b, true);
+  D.docs.delete(b.id);
+  await dbDel('docs', b.id);
+  return true;
+}
+function ordneKinder(parent, typ) {
+  kinder(parent, typ).forEach((d, i) => { d.ord = i; speichereStill(d); });
+}
+function blattInHeft(d, heft, position) {
+  if (!d || !heft || d.typ !== 'blatt' || heft.typ !== 'heft') return false;
+  const seiten = kinder(heft.id, 'seite');
+  const pos = Math.round(begrenze(position, 0, seiten.length, seiten.length));
+  seiten.splice(pos, 0, d);
+  d.typ = 'seite'; d.parent = heft.id; d.ausBlatt = true;
+  seiten.forEach((s, i) => { s.ord = i; speichereStill(s); });
+  heft.geaendert = Date.now(); speichereStill(heft);
+  return true;
+}
+function seiteZuBlatt(d) {
+  if (!d || d.typ !== 'seite') return false;
+  const alt = d.parent;
+  d.typ = 'blatt'; delete d.parent; delete d.ausBlatt; d.ord = Date.now();
+  speichere(d);
+  if (alt) ordneKinder(alt, 'seite');
+  return true;
 }
 
 /* ----- Statistik ----- */
@@ -394,9 +699,14 @@ function menue(punkte, titel) {
 /* ----- Gesten ----- */
 function langdruck(elem, fn) {
   let timer = null, sx = 0, sy = 0;
+  elem.addEventListener('click', (e) => {
+    if (elem._langGedrueckt && Date.now() - elem._langGedrueckt < 900) {
+      e.preventDefault(); e.stopImmediatePropagation();
+    }
+  }, true);
   elem.addEventListener('pointerdown', (e) => {
     sx = e.clientX; sy = e.clientY;
-    timer = setTimeout(() => { timer = null; if (!elem._zieht) fn(e); }, 480);
+    timer = setTimeout(() => { timer = null; if (!elem._zieht) { elem._langGedrueckt = Date.now(); fn(e); } }, 480);
   });
   const abbruch = (e) => {
     if (timer && e.type === 'pointermove' && Math.hypot(e.clientX - sx, e.clientY - sy) < 12) return;
@@ -405,7 +715,7 @@ function langdruck(elem, fn) {
   elem.addEventListener('pointermove', abbruch);
   elem.addEventListener('pointerup', abbruch);
   elem.addEventListener('pointercancel', abbruch);
-  elem.addEventListener('contextmenu', (e) => { e.preventDefault(); fn(e); });
+  elem.addEventListener('contextmenu', (e) => { e.preventDefault(); elem._langGedrueckt = Date.now(); fn(e); });
 }
 
 function autogrow(ta) {
@@ -436,11 +746,21 @@ function rueckverweise(doc) {
   if (!t) return [];
   return [...D.docs.values()].filter((d) => d.id !== doc.id && (d.text || '').toLowerCase().includes('[[' + t + ']]'));
 }
+function merkeFadenZiel(id, hash = location.hash) {
+  if (!id) return 'nichts';
+  sessionStorage.setItem('zielFaden', String(id));
+  return hash === '#/faden' || String(hash || '').startsWith('#/faden/') ? 'neuzeichnen' : 'wechseln';
+}
 function oeffneDoc(d) {
   if (!d) return;
   if (d.typ === 'blatt') { location.hash = '#/blaetter'; setTimeout(() => oeffneSchreibraum(d.id), 80); }
-  else if (d.typ === 'faden' || d.typ === 'funkeln') location.hash = '#/faden';
+  else if (d.typ === 'faden') {
+    if (merkeFadenZiel(d.id) === 'neuzeichnen') zeichne();
+    else location.hash = '#/faden';
+  }
+  else if (d.typ === 'funkeln') { if (typeof zeigeTextFund === 'function') zeigeTextFund(d); }
   else if (d.typ === 'mischung') location.hash = '#/klang';
+  else if (d.typ === 'goodnote') { location.hash = '#/goodnotes'; setTimeout(() => oeffneGoodnote(d), 80); }
   else if (d.typ === 'schnipsel') location.hash = '#/schnipsel';
   else if (d.typ === 'heft') location.hash = '#/heft/' + d.id;
   else if (d.typ === 'seite') { sessionStorage.setItem('zielSeite', d.id); location.hash = '#/heft/' + d.parent; }

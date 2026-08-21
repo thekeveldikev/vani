@@ -2,6 +2,44 @@
    VANI — Feinheiten: Thema, Klang, Statistik, Sicherung
    ================================================================ */
 
+function syncStatusWorte(status) {
+  const art = status && status.art;
+  if (art === 'synchron') return ['synchron', 'Alles ist auf dem gleichen Stand.'];
+  if (art === 'verbindet') return ['arbeitet', 'VANI verbindet die Geräte …'];
+  if (art === 'offline') return ['offline', 'Änderungen bleiben sicher hier und gehen später weiter.'];
+  if (art === 'schluessel') return ['Achtung', 'Der Bereichsschlüssel passt nicht oder wurde zurückgezogen.'];
+  if (art === 'fehler') return ['Achtung', 'Etwas ist noch nicht fertig synchronisiert.'];
+  return ['nur hier', 'Dieser Bestand ist noch mit keinem privaten Bereich verbunden.'];
+}
+
+async function neuerSyncBereich() {
+  const name = await eingabe({ titel: 'Wie soll dein privater Bereich heißen?', wert: 'Mein VANI', platzhalter: 'z. B. Kevins VANI', ok: 'Weiter' });
+  if (!name) return;
+  const standard = await syncStandardServer();
+  const server = await eingabe({ titel: 'Adresse des VANI-Sync-Dienstes', wert: standard, platzhalter: 'https://…', ok: 'Bereich anlegen' });
+  if (!server) return;
+  toast('Lege deinen verschlüsselten Bereich an …', 5000);
+  try { await syncErstelleBereich(name, server); toast('Dein privater Bereich ist bereit.', 4000); zeichne(); }
+  catch (e) { toast((e && e.message) || 'Der Bereich ließ sich noch nicht anlegen.', 5000); }
+}
+
+async function vorhandenenSyncBereichKoppeln() {
+  const code = await eingabe({ titel: 'Kopplungscode vom anderen Gerät', platzhalter: 'VANI1-…', mehrzeilig: true, ok: 'Prüfen und verbinden' });
+  if (!code) return;
+  let modus = 'ersetzen';
+  if (D.docs.size) {
+    modus = await menue([
+      { text: 'Beides zusammenlegen (nichts löschen)', icon: 'plus', wert: 'dazu' },
+      { text: 'Diesen Gerätebestand ersetzen', icon: 'wandel', wert: 'ersetzen', rot: true }
+    ], 'Was soll mit dem jetzigen Bestand auf diesem Gerät geschehen?');
+    if (!modus) return;
+    if (modus === 'ersetzen' && !await frage('Wirklich den jetzigen Bestand auf diesem Gerät durch den gekoppelten Bereich ersetzen? Eine Sicherung vorher ist die sicherste Wahl.', { ja: 'Ersetzen', gefahr: true })) return;
+  }
+  toast('Prüfe den geheimen Bereich …', 5000);
+  try { await syncVerbindeBereich(code, modus); toast('Verbunden. Ab jetzt halten sich die Geräte gegenseitig aktuell.', 5000); zeichne(); }
+  catch (e) { toast((e && e.message) || 'Der Kopplungscode ließ sich nicht verbinden.', 5000); }
+}
+
 RENDER.feinheiten = function (haupt) {
   haupt.append(raumkopf('Feinheiten'));
   const inhalt = el('div', { class: 'inhalt' });
@@ -40,7 +78,15 @@ RENDER.feinheiten = function (haupt) {
         el('span', { class: 'ename' }, 'Tagesziel in Wörtern', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Leer lassen heißt: kein Soll. Auch gut.')),
         zielFeld),
       el('div', { class: 'einstellzeile' },
-        el('span', { class: 'ename' }, 'Schrift, Größe, Fokus …', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Stellst du direkt im Schreibraum ein — oben rechts.')))
+        el('span', { class: 'ename' }, 'Schrift, Größe, Fokus …', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Stellst du direkt im Schreibraum ein — oben rechts.'))),
+      el('div', { class: 'einstellzeile' },
+        el('span', { class: 'ename' }, 'Im Heft automatisch weiterblättern', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Wenn eine Seite voll ist, geht es ohne Unterbrechung auf der nächsten weiter.')),
+        el('button', {
+          class: 'schalter' + (D.einst.autoSeitenwechsel !== false ? ' an' : ''), onclick: (e) => {
+            D.einst.autoSeitenwechsel = D.einst.autoSeitenwechsel === false;
+            e.currentTarget.classList.toggle('an', D.einst.autoSeitenwechsel); speichereEinst();
+          }
+        }, el('i')))
     )));
 
   /* Räume: an/aus und Reihenfolge */
@@ -54,11 +100,11 @@ RENDER.feinheiten = function (haupt) {
         el('span', { html: ik(info.icon), style: 'display:flex;color:var(--blass)' }),
         el('span', { class: 'ename' }, info.name),
         el('button', {
-          class: 'rundknopf zart', style: 'width:32px;height:32px' + (i === 0 ? ';opacity:.2;pointer-events:none' : ''), html: ik('auf'),
+          class: 'rundknopf zart', style: 'width:32px;height:32px' + (i === 0 ? ';opacity:.2;pointer-events:none' : ''), html: ik('auf'), title: 'Raum nach oben',
           onclick: () => { [cfg[i - 1], cfg[i]] = [cfg[i], cfg[i - 1]]; speichereEinst(); baueLeiste(); baueRaumliste(); }
         }),
         el('button', {
-          class: 'rundknopf zart', style: 'width:32px;height:32px' + (i === cfg.length - 1 ? ';opacity:.2;pointer-events:none' : ''), html: ik('ab'),
+          class: 'rundknopf zart', style: 'width:32px;height:32px' + (i === cfg.length - 1 ? ';opacity:.2;pointer-events:none' : ''), html: ik('ab'), title: 'Raum nach unten',
           onclick: () => { [cfg[i], cfg[i + 1]] = [cfg[i + 1], cfg[i]]; speichereEinst(); baueLeiste(); baueRaumliste(); }
         }),
         info.fest ? el('span', { style: 'width:52px;text-align:center;font-size:12px;color:var(--blass)' }, 'immer') :
@@ -165,11 +211,102 @@ RENDER.feinheiten = function (haupt) {
       )
     )));
 
+  /* Goodnotes bleibt ein eigener, stiller Bestand. */
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Goodnotes hereinholen'),
+    el('div', { class: 'karte' },
+      el('div', { style: 'font-size:14px;color:var(--blass);line-height:1.6;margin-bottom:14px' },
+        'Importierte Notizbücher bleiben als ganze Originaldateien in einem eigenen Raum. Sie erzeugen keine Schnipsel, Blätter oder Suchtreffer in deinen anderen Ansichten.'),
+      el('div', { style: 'display:flex;gap:10px;flex-wrap:wrap' },
+        el('button', { class: 'knopf voll', onclick: () => importiereGoodnotes() }, el('span', { html: ik('buchzu'), style: 'display:flex' }), 'PDF, Goodnotes oder ZIP wählen'),
+        vomTyp('goodnote').length ? el('button', { class: 'knopf', onclick: () => { location.hash = '#/goodnotes'; } }, 'Zum Archiv (' + vomTyp('goodnote').length + ')') : null),
+      el('div', { class: 'goodnotes-exporttipp' },
+        'Für die beste, im PDF später durchsuchbare Kopie: In Goodnotes „Exportieren → PDF → Reduziert" wählen und „Handschrifterkennung" einschalten. Exportierte Ordner-ZIPs bleiben als ein ruhiges Archivpaket zusammen.'))));
+
+  /* Eine Installation bleibt dieselbe App. Updates brauchen nie ein neues Icon. */
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'App auf dem Home-Bildschirm'),
+    el('div', { class: 'karte apppflege' },
+      el('div', { class: 'apppflege-kern' },
+        el('span', { class: 'apppflege-icon' }, 'V'),
+        el('span', {}, el('b', {}, 'Ein Icon genügt für immer.'),
+          el('small', {}, 'Solange die Web-Adresse gleich bleibt, ersetzen neue Fassungen die App hinter demselben Icon. Nicht nach jedem Update erneut „Zum Home-Bildschirm" wählen.'))),
+      el('div', { class: 'apppflege-schritte' },
+        el('b', {}, 'Wenn das alte Icon kein Minus/X zeigt:'),
+        el('span', {}, '1. Icon lange halten → „App entfernen".'),
+        el('span', {}, '2. Fehlt das: Einstellungen → Bildschirmzeit → Beschränkungen → iTunes & App Store-Käufe → Apps löschen → Erlauben.'),
+        el('span', {}, '3. Bei einem verwalteten iPad: Einstellungen → Allgemein → VPN & Geräteverwaltung prüfen. Dann kann nur die Verwaltung das Icon freigeben.')),
+      el('div', { class: 'fussreihe' },
+        el('button', { class: 'knopf voll', onclick: () => sucheAppUpdate(true) }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'VANI jetzt aktualisieren'),
+        el('button', { class: 'knopf zart', onclick: () => sichereAlles() }, 'Vor dem Entfernen sichern')))));
+
+  /* Das Profil ist eine lokale Tür. Der Inhalts-Tresor bleibt davon getrennt
+     und wird nur über einen bewussten Kopplungscode mit anderen Geräten geteilt. */
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Mein Profil'),
+    el('div', { class: 'karte profil-einstellungen' },
+      el('div', { class: 'profil-einst-kopf' },
+        el('span', { class: 'profil-monogramm' }, (AKTIVES_PROFIL && AKTIVES_PROFIL.name || '?').slice(0, 1).toUpperCase()),
+        el('span', {}, el('b', {}, AKTIVES_PROFIL && AKTIVES_PROFIL.name || 'Dieses VANI'),
+          el('small', {}, 'Passwortgeschützt auf diesem Gerät · eigener Bestand · eigener Sync-Bereich'))),
+      el('div', { class: 'einstellzeile' },
+        el('span', { class: 'ename' }, 'Automatisch sperren', el('small', {}, 'Wenn VANI im Hintergrund liegt.')),
+        (() => {
+          const s = el('select');
+          for (const [wert, name] of [[0, 'Nie'], [2, 'Nach 2 Min.'], [10, 'Nach 10 Min.'], [30, 'Nach 30 Min.']]) s.append(el('option', { value: String(wert) }, name));
+          s.value = String(D.einst.sperreNachMinuten || 0);
+          s.addEventListener('change', () => { D.einst.sperreNachMinuten = Number(s.value); speichereEinst(); });
+          return s;
+        })()),
+      el('div', { class: 'fussreihe' },
+        el('button', { class: 'knopf', onclick: () => profilPasswortAendern() }, 'Passwort ändern'),
+        el('button', { class: 'knopf', onclick: () => profilWechseln() }, 'Profil wechseln oder anlegen')))));
+
+  /* Ein privater Bereich pro Person. Der Server bewahrt nur Geheimtext auf. */
+  const sinfo = syncInfo();
+  const [sname, stext] = syncStatusWorte(sinfo.status);
+  const syncKarte = el('div', { class: 'karte sync-karte' },
+    el('div', { class: 'sync-kopf' },
+      el('span', { class: 'sync-siegel ' + (sinfo.status.art || 'aus'), html: ik('verbinden') }),
+      el('span', { class: 'ename' }, sinfo.verbunden ? sinfo.name : 'Privater Bereich',
+        el('div', { class: 'sync-status' }, el('i', { class: sinfo.status.art || 'aus' }), el('b', {}, sname), ' · ', stext))),
+    sinfo.verbunden
+      ? el('div', { class: 'sync-inhalt' },
+          el('p', {}, 'Texte, Hefte, Projekte, Schnipsel, Verknüpfungen, Fotos und Einstellungen laufen verschlüsselt zwischen deinen gekoppelten Geräten. Gleichzeitiges und Offline-Schreiben wird beim Wiederverbinden zusammengeführt.'),
+          el('div', { class: 'sync-geheimnis' },
+            el('b', {}, 'Nur deine Geräte können hineinsehen.'),
+            el('span', {}, 'Der Kopplungscode ist wie ein Hausschlüssel. Schicke ihn nur direkt an ein Gerät, das in genau diesen Bereich gehört.')),
+          el('div', { class: 'fussreihe' },
+            el('button', { class: 'knopf voll', onclick: async () => { toast('Gleiche ab …'); await syncJetzt(); zeichne(); } }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Jetzt abgleichen'),
+            el('button', { class: 'knopf', onclick: async () => {
+              if (!await frage('Der Kopplungscode öffnet deinen ganzen privaten Bereich. Nur auf einem eigenen oder wirklich vertrauten Gerät verwenden.', { ja: 'Code kopieren' })) return;
+              const code = syncKopplungscode();
+              try { await navigator.clipboard.writeText(code); toast('Kopplungscode kopiert.'); }
+              catch (e) { await teileText(code); }
+            } }, el('span', { html: ik('verbinden'), style: 'display:flex' }), 'Weiteres Gerät koppeln'),
+            el('button', { class: 'knopf zart', onclick: async () => {
+              if (!await frage('Nur dieses Gerät vom Bereich trennen? Die Inhalte bleiben hier erhalten; die anderen Geräte und der Bereich bleiben unberührt.', { ja: 'Dieses Gerät trennen' })) return;
+              await syncTrennen(); toast('Dieses Gerät arbeitet wieder nur für sich.'); zeichne();
+            } }, 'Gerät trennen')),
+          el('div', { class: 'einstellzeile sync-goodnotes' },
+            el('span', { class: 'ename' }, 'Goodnotes-Originaldateien mitsenden', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Aus heißt: Archiv-Titel und Notizen reisen mit, sehr große PDF/Goodnotes-Dateien bleiben auf ihrem Gerät.')),
+            el('button', { class: 'schalter' + (D.einst.goodnotesSync ? ' an' : ''), onclick: (e) => {
+              D.einst.goodnotesSync = !D.einst.goodnotesSync; e.currentTarget.classList.toggle('an', D.einst.goodnotesSync);
+              speichereEinst(); if (D.einst.goodnotesSync) syncMedienAbgleich().catch(() => {});
+            } }, el('i'))),
+          el('small', { class: 'sync-servername' }, 'Bereich: ' + sinfo.vault.slice(0, 6) + '… · Dienst: ' + (() => { try { return new URL(sinfo.server).host; } catch (e) { return sinfo.server; } })()))
+      : el('div', { class: 'sync-inhalt' },
+          el('p', {}, 'Du und deine Cousine bekommt jeweils einen eigenen Bereich. Ein Bereich wird nur zwischen den Geräten gekoppelt, die wirklich denselben Bestand sehen sollen.'),
+          el('div', { class: 'sync-wege' },
+            el('button', { class: 'sync-weg', onclick: () => neuerSyncBereich() },
+              el('span', { html: ik('plus') }), el('b', {}, 'Neuen privaten Bereich'), el('small', {}, 'Nimmt alles mit, was gerade auf diesem Gerät liegt.')),
+            el('button', { class: 'sync-weg', onclick: () => vorhandenenSyncBereichKoppeln() },
+              el('span', { html: ik('verbinden') }), el('b', {}, 'Mit Bereich verbinden'), el('small', {}, 'Kopplungscode von iPad oder Laptop verwenden.'))),
+          el('small', { class: 'sync-hinweis' }, 'Wichtig: Deine Cousine legt auf ihrem iPad ihren Bereich an. Du legst auf deinem Gerät deinen eigenen an. Nur gleiche Kopplungscodes führen zum gleichen Bestand.')));
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'iPad ↔ Laptop ↔ weitere Geräte'), syncKarte));
+
   /* Faden holen — verschluesselt, ohne Datei-Dialog */
   inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Den Faden holen'),
     el('div', { class: 'karte' },
       el('div', { style: 'font-size:14px;color:var(--blass);line-height:1.6;margin-bottom:14px' },
-        'Der alte Chat liegt verschluesselt bereit. Einmal das Passwort eingeben, dann ist er hier — danach brauchst du das nie wieder.'),
+        'Der alte Chat liegt verschlüsselt bereit. Einmal das Passwort eingeben, dann ist er hier — danach brauchst du das nie wieder.'),
       el('button', { class: 'knopf voll', onclick: () => holeFaden() },
         el('span', { html: ik('faden'), style: 'display:flex' }), 'Faden hereinholen'))));
 
@@ -177,23 +314,23 @@ RENDER.feinheiten = function (haupt) {
   inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Frisch anfangen'),
     el('div', { class: 'karte' },
       el('div', { style: 'font-size:14px;color:var(--blass);line-height:1.6;margin-bottom:14px' },
-        'Setzt die Zahlen zurueck: Woerter pro Tag, Straehne, Schreibfeuer. Texte, Hefte, Projekte und der Faden bleiben unangetastet.'),
+        'Setzt die Zählungen zurück: Wörter pro Tag, Strähne, Schreibfeuer. Texte, Hefte, Projekte und der Faden bleiben unangetastet.'),
       el('button', {
         class: 'knopf', onclick: async () => {
-          if (!await frage('Alle Zaehlungen auf null? Geschriebenes bleibt, nur das Feuer faengt neu an.', { ja: 'Auf null' })) return;
+          if (!await frage('Alle Zählungen auf null? Geschriebenes bleibt, nur das Feuer fängt neu an.', { ja: 'Auf null' })) return;
           D.stats = { tage: {}, letzte: {}, letzteSicherung: D.stats.letzteSicherung };
           for (const d of D.docs.values()) D.stats.letzte[d.id] = worte(d.text || '');
           speichereStats();
           toast('Frisch. Der erste Satz macht wieder Feuer.');
           zeichne();
         }
-      }, 'Zaehlungen auf null'))));
+      }, 'Zählungen auf null'))));
 
   /* Kleingedrucktes */
   inhalt.append(el('div', { class: 'kleingedruckt' },
     el('div', { class: 'wortmarke' }, 'VANI'),
     el('div', { style: 'margin-top:6px' }, 'Handgemacht. Offline. Meins.'),
-    el('div', {}, 'Kein Konto, keine Cloud, kein Abo — alles bleibt hier.'),
+    el('div', {}, sinfo.verbunden ? 'Ohne Konto. Ende-zu-Ende verschlüsselt. Offline weiter benutzbar.' : 'Kein Konto, keine Cloud, kein Abo — alles bleibt hier.'),
     el('button', { class: 'knopf zart', style: 'margin-top:14px', onclick: () => location.reload() }, 'Frisch durchatmen (neu laden)')
   ));
 
@@ -210,8 +347,13 @@ function blobZuDataURL(blob) {
   });
 }
 function dataURLZuBlob(durl) {
-  const [kopf, daten] = durl.split(',');
-  const mime = (kopf.match(/data:(.*?);/) || [])[1] || 'application/octet-stream';
+  if (typeof durl !== 'string' || durl.length > 360 * 1024 * 1024) throw new Error('Ungültige Mediendatei');
+  const treffer = durl.match(/^data:([^;,]{1,120});base64,([A-Za-z0-9+/=\r\n]+)$/);
+  if (!treffer) throw new Error('Ungültige Mediendatei');
+  const mime = treffer[1] || 'application/octet-stream';
+  if (!/^[a-z0-9.+-]+\/[a-z0-9.+-]+$/i.test(mime)) throw new Error('Ungültiger Dateityp');
+  const daten = treffer[2].replace(/[\r\n]/g, '');
+  if (!daten.length || daten.length % 4 || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(daten)) throw new Error('Ungültige Mediendatei');
   const bin = atob(daten);
   const arr = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
@@ -222,17 +364,18 @@ async function sichereAlles() {
   toast('Packe alles ein …');
   const media = {};
   const ids = new Set();
-  for (const d of D.docs.values()) { if (d.bild) ids.add(d.bild); if (d.skizze) ids.add(d.skizze); }
+  for (const d of D.docs.values()) { if (d.bild) ids.add(d.bild); if (d.skizze) ids.add(d.skizze); if (d.datei) ids.add(d.datei); }
   for (const id of ids) {
     const blob = await dbGet('media', id);
     if (blob) media[id] = await blobZuDataURL(blob);
   }
   const paket = {
-    vani: 1, wann: Date.now(),
+    vani: 2, wann: Date.now(),
     docs: [...D.docs.values()],
     einst: D.einst,
     stats: D.stats,
-    media
+    media,
+    sync: await dbAlle('sync')
   };
   const name = 'vani-sicherung-' + tagKey() + '.vani';
   const ok = await teileDatei(name, JSON.stringify(paket), 'application/json');
@@ -249,31 +392,53 @@ function leseSicherung() {
     const datei = inp.files && inp.files[0];
     inp.remove();
     if (!datei) return;
+    if (datei.size > 600 * 1024 * 1024 && !await frage(
+      'Diese Sicherung ist sehr groß (' + formatBytes(datei.size) + '). Das Öffnen kann auf einem älteren iPad viel Arbeitsspeicher brauchen. Trotzdem versuchen?',
+      { ja: 'Trotzdem öffnen' }
+    )) return;
     let paket;
     try { paket = JSON.parse(await datei.text()); } catch (e) { toast('Das ist keine VANI-Sicherung.'); return; }
     if (!pruefeSicherung(paket)) { toast('Das ist keine VANI-Sicherung.'); return; }
     const modus = await menue([
       { text: 'Dazulegen (nichts geht verloren)', icon: 'plus', wert: 'dazu' },
       { text: 'Alles ersetzen', icon: 'wandel', wert: 'ersetzen', rot: true }
-    ], paket.docs.length + ' Dinge vom ' + fmtDatum(paket.wann));
+    ], paket.docs.length + ' Dinge vom ' + fmtDatum(begrenze(paket.wann, 0, Date.now() + 86400000, Date.now())));
     if (!modus) return;
     if (modus === 'ersetzen') {
       if (!await frage('Wirklich alles Jetzige durch die Sicherung ersetzen?', { ja: 'Ersetzen', gefahr: true })) return;
       await dbTu('docs', 'readwrite', (s) => s.clear());
       await dbTu('media', 'readwrite', (s) => s.clear());
+      await dbTu('sync', 'readwrite', (s) => s.clear());
       D.docs.clear();
     }
-    for (const d of paket.docs) {
+    const benoetigteMedien = new Set();
+    for (const roh of paket.docs) {
+      const d = sauberesDokument(roh);
+      if (!d) continue;
       if (modus === 'dazu' && D.docs.has(d.id)) continue;
       D.docs.set(d.id, d);
       await dbPut('docs', d);
+      if (d.bild) benoetigteMedien.add(d.bild);
+      if (d.skizze) benoetigteMedien.add(d.skizze);
+      if (d.datei) benoetigteMedien.add(d.datei);
     }
     for (const [id, durl] of Object.entries(paket.media || {})) {
-      try { await dbPut('media', dataURLZuBlob(durl), id); } catch (e) {}
+      if (!benoetigteMedien.has(id)) continue;
+      try {
+        if (modus === 'ersetzen' || !(await dbGet('media', id))) await dbPut('media', dataURLZuBlob(durl), id);
+      } catch (e) {}
+    }
+    for (const marker of paket.sync || []) {
+      const sauber = saubererSyncMarker(marker);
+      if (sauber) try { await dbPut('sync', sauber, sauber.id); } catch (e) {}
     }
     if (modus === 'ersetzen') {
-      if (paket.einst) { Object.assign(D.einst, paket.einst); speichereEinst(); setzeThema(D.einst.thema); }
-      if (paket.stats) { D.stats = Object.assign({ tage: {}, letzte: {}, letzteSicherung: 0 }, paket.stats); speichereStats(); }
+      if (paket.einst) { uebernehmeEinstellungen(paket.einst); speichereEinst(); setzeThema(D.einst.thema); }
+      if (paket.stats) {
+        D.stats = { tage: saubereZaehler(paket.stats.tage), letzte: saubereZaehler(paket.stats.letzte),
+          letzteSicherung: begrenze(paket.stats.letzteSicherung, 0, Date.now() + 86400000, 0) };
+        speichereStats();
+      }
     }
     toast('Alles wieder da.');
     zeichne();
@@ -340,7 +505,7 @@ async function teileDatei(name, inhalt, typ = 'text/plain') {
 
 /* ----- Faden entschluesseln und einlesen ----- */
 async function holeFaden() {
-  const passwort = await eingabe({ titel: 'Das Passwort fuer den Faden', platzhalter: 'wort-wort-zahl-wort-wort', ok: 'Holen' });
+  const passwort = await eingabe({ titel: 'Das Passwort für den Faden', platzhalter: 'wort-wort-zahl-wort-wort', ok: 'Holen' });
   if (!passwort) return;
   toast('Hole den Faden …', 4000);
   let paket;
@@ -361,7 +526,9 @@ async function holeFaden() {
   } catch (e) { toast('Das Passwort passt nicht. Nochmal?'); return; }
   if (!pruefeSicherung(klartext)) { toast('Der Faden ist beschaedigt.'); return; }
   let dazu = 0;
-  for (const d of klartext.docs) {
+  for (const roh of klartext.docs) {
+    const d = sauberesDokument(roh);
+    if (!d) continue;
     if (D.docs.has(d.id)) continue;
     D.docs.set(d.id, d);
     D.stats.letzte[d.id] = worte(d.text || '');

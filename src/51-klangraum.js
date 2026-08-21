@@ -5,13 +5,27 @@
 function baueMischpult(kompakt) {
   const wurzel = el('div', { class: 'mischpult' + (kompakt ? ' kompakt' : '') });
 
+  const status = el('div', { class: 'klangstatus', role: 'status' });
+  const statusNeu = () => {
+    const z = audioZustand();
+    status.className = 'klangstatus ' + (z.ok ? 'laeuft' : z.fehler ? 'fehler' : 'bereit');
+    status.textContent = !audioUnterstuetzt() ? 'Klang wird von diesem Browser nicht unterstützt.'
+      : z.ok ? 'Klang läuft.'
+      : z.state === 'suspended' || z.state === 'interrupted' ? 'Klang wartet auf eine Berührung.'
+      : z.fehler ? 'Klang braucht einen Neustart: ' + z.fehler
+      : 'Klang ist bereit.';
+  };
+  statusNeu();
+
   /* Szenen */
   const szenen = el('div', { class: 'szenenchips' });
   const eigene = vomTyp('mischung');
   const alleSzenen = [...KLANG_SZENEN.map((s) => ({ name: s.name, pegel: s.pegel })),
                       ...eigene.map((m) => ({ name: m.titel, pegel: m.pegel, doc: m }))];
   for (const s of alleSzenen) {
-    const chip = el('button', { class: 'szenenchip', onclick: () => { mischungAnwenden(Object.assign({}, s.pegel)); baueRegler(); } }, s.name);
+    const chip = el('button', { class: 'szenenchip', onclick: async () => {
+      await audioFreigeben(); mischungAnwenden(Object.assign({}, s.pegel)); baueRegler(); setTimeout(statusNeu, 120);
+    } }, s.name);
     if (s.doc) langdruck(chip, async () => {
       if (await frage('„' + s.name + '" aus den eigenen Szenen nehmen?', { ja: 'Entfernen', gefahr: true })) {
         await loesche(s.doc.id, true); zeichne();
@@ -21,7 +35,7 @@ function baueMischpult(kompakt) {
   }
   szenen.append(el('button', { class: 'szenenchip leiser', onclick: () => { alleKlaengeAus(); baueRegler(); } }, 'Stille'));
 
-  wurzel.append(el('div', { class: 'kartenkopf' }, el('span', { html: ik('woerter') }), 'SZENEN'), szenen);
+  wurzel.append(status, el('div', { class: 'kartenkopf' }, el('span', { html: ik('woerter') }), 'SZENEN'), szenen);
 
   /* Regler nach Kategorien */
   const reglerhalter = el('div');
@@ -38,12 +52,13 @@ function baueMischpult(kompakt) {
         const schieber = el('input', { type: 'range', min: '0', max: '100', value: String(Math.round(wert * 100)) });
         const zeile = el('div', { class: 'klangzeile' + (wert > 0 ? ' an' : '') },
           el('button', {
-            class: 'klangname', onclick: () => {
+            class: 'klangname', onclick: async () => {
               const m = D.einst.mischung || {};
               if ((m[ebene.id] || 0) > 0) { delete m[ebene.id]; }
-              else { m[ebene.id] = .5; schieber.value = '50'; }
+              else { m[ebene.id] = .5; schieber.value = '50'; await audioFreigeben(); }
               mischungAnwenden(m);
               zeile.classList.toggle('an', !!m[ebene.id]);
+              setTimeout(statusNeu, 120);
             }
           }, ebene.name),
           schieber
@@ -54,7 +69,9 @@ function baueMischpult(kompakt) {
           if (v > 0) { m[ebene.id] = v; } else { delete m[ebene.id]; }
           mischungAnwenden(m);
           zeile.classList.toggle('an', v > 0);
+          setTimeout(statusNeu, 120);
         });
+        schieber.addEventListener('pointerdown', () => { audioFreigeben().catch(() => {}); }, { once: true });
         block.append(zeile);
       }
       reglerhalter.append(block);
@@ -62,9 +79,20 @@ function baueMischpult(kompakt) {
 
     /* Lautstärke + Speichern */
     const laut = el('input', { type: 'range', min: '0', max: '100', value: String(Math.round((D.einst.lautstaerke ?? .5) * 100)) });
-    laut.addEventListener('input', () => setzeLautstaerke(parseInt(laut.value, 10) / 100));
+    laut.addEventListener('input', () => { setzeLautstaerke(parseInt(laut.value, 10) / 100); statusNeu(); });
     reglerhalter.append(el('div', { class: 'klangfuss' },
       el('div', { class: 'klangzeile an', style: 'box-shadow:none' }, el('span', { class: 'klangname', style: 'font-weight:600' }, 'Gesamt'), laut),
+      el('button', { class: 'knopf', onclick: async () => {
+        if ((D.einst.lautstaerke || 0) <= 0) { setzeLautstaerke(.5); laut.value = '50'; }
+        const ok = await audioFreigeben({ probe: true });
+        toast(ok ? 'Du solltest jetzt einen hellen Prüfton hören.' : 'Der Klang ist noch gesperrt. Tippe auf „Klang wecken“.');
+        setTimeout(statusNeu, 120);
+      } }, 'Ton prüfen'),
+      el('button', { class: 'knopf zart', onclick: async () => {
+        if (await audioFreigeben({ neu: true, probe: true })) toast('Klang frisch aufgeweckt – der Prüfton und deine Atmosphäre laufen.');
+        else toast('Der Browser gibt den Klang gerade nicht frei.');
+        setTimeout(statusNeu, 120);
+      } }, 'Klang neu wecken'),
       el('button', {
         class: 'knopf', onclick: async () => {
           const m = D.einst.mischung || {};

@@ -188,12 +188,19 @@ test('pruefeSicherung: nimmt nur echte Pakete', async () => {
   const k = await frisch();
   assert.ok(k.pruefeSicherung({ vani: 1, docs: [] }));
   assert.ok(k.pruefeSicherung({ vani: 1, docs: [{ id: 'a', typ: 'blatt' }] }));
+  assert.ok(k.pruefeSicherung({ vani: 2, docs: [], media: {}, sync: [] }));
   assert.ok(!k.pruefeSicherung(null));
   assert.ok(!k.pruefeSicherung({}));
-  assert.ok(!k.pruefeSicherung({ vani: 2, docs: [] }));
+  assert.ok(!k.pruefeSicherung({ vani: 3, docs: [] }));
   assert.ok(!k.pruefeSicherung({ vani: 1, docs: 'nope' }));
   assert.ok(!k.pruefeSicherung({ vani: 1, docs: [{ ohneId: true }] }));
   assert.ok(!k.pruefeSicherung({ vani: 1, docs: [null] }));
+  assert.ok(!k.pruefeSicherung({ vani: 2, docs: [], media: [] }));
+  assert.ok(!k.pruefeSicherung({ vani: 2, docs: [], sync: {} }));
+  assert.ok(!k.pruefeSicherung({ vani: 2, docs: [{ id: 'doppelt', typ: 'blatt' }, { id: 'doppelt', typ: 'seite' }] }));
+  const feldbombe = { id: 'zu-viel', typ: 'blatt' };
+  for (let i = 0; i < 251; i++) feldbombe['feld' + i] = i;
+  assert.ok(!k.pruefeSicherung({ vani: 2, docs: [feldbombe] }));
 });
 
 test('dataURL-Umwandlung: Bytes überleben die Rundreise', async () => {
@@ -208,6 +215,9 @@ test('dataURL-Umwandlung: Bytes überleben die Rundreise', async () => {
   assert.equal(blob.type, 'image/png');
   const zurueck = new Uint8Array(await blob.arrayBuffer());
   assert.deepEqual([...zurueck], [...bytes]);
+  assert.throws(() => dataURLZuBlob('data:text/html;evil;base64,PHNjcmlwdD4='));
+  assert.throws(() => dataURLZuBlob('data:image/png;base64,AAA'));
+  assert.throws(() => dataURLZuBlob('https://example.invalid/bild.png'));
 });
 
 /* ---------- Räume-Konfiguration ---------- */

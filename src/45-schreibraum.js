@@ -20,14 +20,18 @@ function oeffneSchreibraum(docId) {
   const worteAnzeige = el('span', { class: 'sr-worte' }, String(startWorte));
   const kerzenhalter = el('div', { class: 'kerzenhalter' });
 
-  const ta = el('textarea', { class: 'sr-text text', placeholder: 'Schreib einfach. Der Rest der Welt wartet draußen.' });
-  ta.value = doc.text || '';
+  const istRich = doc.format === 'rich';
+  let richPaket = null;
+  const ta = istRich
+    ? (richPaket = baueRichEditor(doc, { class: 'sr-text', platzhalter: 'Schreib einfach. Der Rest der Welt wartet draußen.', warten: 500 })).editor
+    : el('textarea', { class: 'sr-text text', placeholder: 'Schreib einfach. Der Rest der Welt wartet draußen.' });
+  if (!istRich) ta.value = doc.text || '';
   const spiegel = el('div', { class: 'sr-spiegel text', 'aria-hidden': 'true' });
-  const wrap = el('div', { style: 'position:relative' }, spiegel, ta);
-  const spalte = el('div', { class: 'sr-spalte ' + (D.einst.breite || 'mittel') }, wrap);
+  const wrap = el('div', { style: 'position:relative' }, istRich ? null : spiegel, ta);
+  const spalte = el('div', { class: 'sr-spalte ' + (D.einst.breite || 'mittel') }, istRich ? richPaket.leiste : null, wrap);
   const mitte = el('div', { class: 'sr-mitte' }, spalte);
 
-  const klangKnopf = el('button', { class: 'rundknopf zart' + (klangAktiv() ? ' klang-an' : ''), html: ik('klang'), onclick: () => { oeffneMischpult(); } });
+  const klangKnopf = el('button', { class: 'rundknopf zart' + (klangAktiv() ? ' klang-an' : ''), html: ik('klang'), title: 'Klang öffnen', onclick: () => { oeffneMischpult(); } });
 
   const kopf = el('div', { class: 'sr-kopf' },
     el('button', { class: 'knopf', onclick: () => schliesseSchreibraum(true) }, el('span', { html: ik('haken'), style: 'display:flex' }), 'Fertig'),
@@ -35,7 +39,7 @@ function oeffneSchreibraum(docId) {
     kerzenhalter,
     worteAnzeige,
     klangKnopf,
-    el('button', { class: 'rundknopf zart', html: ik('feinheiten'), onclick: () => srEinstellungen() })
+    el('button', { class: 'rundknopf zart', html: ik('feinheiten'), title: 'Schreibraum einstellen', onclick: () => srEinstellungen() })
   );
 
   /* Sonderzeichen, immer griffbereit über der Tastatur */
@@ -49,13 +53,14 @@ function oeffneSchreibraum(docId) {
 
   const raum = el('div', { class: 'schreibraum' }, kopf, mitte, leiste);
   document.body.append(raum);
-  _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, sprint: null, klangKnopf };
+  _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, sprint: null, klangKnopf, istRich, richPaket };
 
   wendeSchriftAn();
   wendeTastaturArtAn();
-  autogrow(ta);
+  if (!istRich) autogrow(ta);
 
   function fuegeEin(z) {
+    if (istRich) { richBefehl(ta, 'insertText', z); ta.dispatchEvent(new Event('input', { bubbles: true })); return; }
     const s = ta.selectionStart, e = ta.selectionEnd;
     ta.value = ta.value.slice(0, s) + z + ta.value.slice(e);
     ta.setSelectionRange(s + z.length, s + z.length);
@@ -63,7 +68,7 @@ function oeffneSchreibraum(docId) {
     ta.focus();
   }
 
-  const sichern = entprellt(() => {
+  const sichern = istRich ? richPaket.sichern : entprellt(() => {
     doc.text = ta.value;
     speichere(doc);
     zaehleWorte(doc.id, doc.text);
@@ -72,7 +77,7 @@ function oeffneSchreibraum(docId) {
 
   /* Deutsche Feder: -- wird –, gerade Anführungszeichen werden „so" */
   function ersetzeKlug() {
-    if (!D.einst.ersetzungen) return;
+    if (istRich || !D.einst.ersetzungen) return;
     const erg = klugeZeichen(ta.value, ta.selectionStart);
     if (erg) {
       ta.value = erg.text;
@@ -84,7 +89,7 @@ function oeffneSchreibraum(docId) {
   ta.addEventListener('input', () => {
     ersetzeKlug();
     sichern();
-    const n = worte(ta.value);
+    const n = worte(istRich ? richReinerText(ta.innerHTML) : ta.value);
     const dazu = n - startWorte;
     worteAnzeige.textContent = String(n) + (dazu > 0 ? ' · +' + dazu : '');
     kopf.classList.add('versunken');
@@ -105,8 +110,8 @@ function oeffneSchreibraum(docId) {
   aktualisiereSpiegel();
   setTimeout(() => {
     ta.focus();
-    ta.setSelectionRange(ta.value.length, ta.value.length);
-    if (D.einst.typewriter) zentriereZeile();
+    if (!istRich) ta.setSelectionRange(ta.value.length, ta.value.length);
+    if (!istRich && D.einst.typewriter) zentriereZeile();
   }, 80);
 
   function spiegelBeiAuswahl() {
@@ -117,12 +122,23 @@ function oeffneSchreibraum(docId) {
   _sr.spiegelBeiAuswahl = spiegelBeiAuswahl;
 }
 
+function srAktuellerText() {
+  if (!_sr) return '';
+  return _sr.istRich ? richReinerText(_sr.ta.innerHTML) : _sr.ta.value;
+}
+function srSetzeText(text) {
+  if (!_sr) return;
+  if (_sr.istRich) _sr.ta.innerHTML = richAusText(text);
+  else _sr.ta.value = text;
+  _sr.ta.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
 function schliesseSchreibraum(zurueck) {
   if (!_sr) return;
   _sr.sichern && _sr.sichern.sofort();
   document.removeEventListener('selectionchange', _sr.spiegelBeiAuswahl);
   if (_sr.sprint) beendeSprint(true);
-  const geschrieben = worte(_sr.ta.value) - _sr.startWorte;
+  const geschrieben = worte(srAktuellerText()) - _sr.startWorte;
   _sr.raum.remove();
   _sr = null;
   if (zurueck && geschrieben > 30) toast('+' + geschrieben + ' Wörter. Gut gemacht.');
@@ -153,6 +169,7 @@ function wendeTastaturArtAn() {
 
 function aktualisiereSpiegel() {
   if (!_sr) return;
+  if (_sr.istRich) return;
   const { ta, spiegel, raum } = _sr;
   if (!D.einst.fokus) { if (raum.classList.contains('sr-fokus')) raum.classList.remove('sr-fokus'); spiegel.innerHTML = ''; return; }
   raum.classList.add('sr-fokus');
@@ -167,6 +184,7 @@ function aktualisiereSpiegel() {
 let _messer = null;
 function zentriereZeile() {
   if (!_sr) return;
+  if (_sr.istRich) return;
   const { ta, mitte } = _sr;
   const stil = getComputedStyle(ta);
   if (!_messer || _messer.parentElement !== ta.parentElement) {
@@ -219,8 +237,12 @@ function srEinstellungen() {
       el('button', { class: 'knopf', onclick: () => { zu(); sucheErsetze(); } }, el('span', { html: ik('suche'), style: 'display:flex' }), 'Suchen & Ersetzen'),
       el('button', { class: 'knopf', onclick: () => { zu(); friereEin(); } }, el('span', { html: ik('frieren'), style: 'display:flex' }), 'Stand einfrieren'),
       (doc.staende && doc.staende.length) ? el('button', { class: 'knopf', onclick: () => { zu(); zeigeStaende(); } }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Frühere Stände (' + doc.staende.length + ')') : null,
-      el('button', { class: 'knopf', onclick: () => { zu(); teileText((doc.titel ? doc.titel + '\n\n' : '') + _sr.ta.value); } }, el('span', { html: ik('teilen'), style: 'display:flex' }), 'Teilen'),
-      el('button', { class: 'knopf', onclick: () => { zu(); zeigeVerknuepfungen(doc); } }, el('span', { html: ik('verbinden'), style: 'display:flex' }), 'Verknüpfungen'),
+      doc.format !== 'rich' ? el('button', { class: 'knopf', onclick: () => {
+        doc.format = 'rich'; doc.rich = richAusText(srAktuellerText()); speichere(doc); zu();
+        const id = doc.id; schliesseSchreibraum(); setTimeout(() => oeffneSchreibraum(id), 30);
+      } }, 'Aa · Text formatieren') : null,
+      el('button', { class: 'knopf', onclick: () => { zu(); teileText((doc.titel ? doc.titel + '\n\n' : '') + srAktuellerText()); } }, el('span', { html: ik('teilen'), style: 'display:flex' }), 'Teilen'),
+      el('button', { class: 'knopf', onclick: () => { zu(); zeigeVerknuepfungen(doc); } }, el('span', { html: ik('verbinden'), style: 'display:flex' }), 'Verknüpfen & einordnen'),
       el('button', {
         class: 'knopf', onclick: async () => {
           zu();
@@ -242,7 +264,7 @@ function friereEin() {
   if (!_sr) return;
   const doc = _sr.doc;
   doc.staende = doc.staende || [];
-  doc.staende.push({ wann: Date.now(), titel: doc.titel || '', text: _sr.ta.value });
+  doc.staende.push({ wann: Date.now(), titel: doc.titel || '', text: srAktuellerText() });
   if (doc.staende.length > 20) doc.staende.shift();
   speichereStill(doc);
   toast('Eingefroren. Dieser Stand bleibt.');
@@ -262,7 +284,7 @@ function zeigeStaende() {
         ], fmtDatum(st.wann) + ', ' + fmtZeit(st.wann));
         if (wahl === 'zurueck') {
           friereEin();
-          _sr.ta.value = st.text;
+          srSetzeText(st.text);
           _sr.doc.titel = st.titel;
           _sr.sichern.sofort();
           zeichne();
@@ -274,7 +296,7 @@ function zeigeStaende() {
               el('div', { class: 'lmeta' }, worte(st.text) + ' Wörter · eingefroren ' + fmtDatum(st.wann) + ', ' + fmtZeit(st.wann)),
               el('div', { class: 'lesetext' }, st.text)));
           const leiste2 = el('div', { class: 'schwebeleiste' },
-            el('button', { class: 'rundknopf zart', html: ik('kreuz'), onclick: () => { bogen.remove(); leiste2.remove(); } }));
+            el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Stand schließen', onclick: () => { bogen.remove(); leiste2.remove(); } }));
           document.body.append(bogen, leiste2);
         } else if (wahl === 'weg') {
           doc.staende = doc.staende.filter((x) => x !== st);
@@ -298,7 +320,7 @@ function sucheErsetze() {
   const zaehle = () => {
     const q = suchFeld.value;
     if (!q) { zaehler.textContent = ''; return 0; }
-    const n = ta.value.split(q).length - 1;
+    const n = srAktuellerText().split(q).length - 1;
     zaehler.textContent = n === 0 ? 'Kommt nicht vor.' : n === 1 ? 'Einmal gefunden.' : n + ' Treffer.';
     return n;
   };
@@ -315,9 +337,8 @@ function sucheErsetze() {
           const n = zaehle();
           if (!n) { toast('Nichts zu ersetzen.'); return; }
           friereEin();
-          ta.value = ta.value.split(suchFeld.value).join(ersatzFeld.value);
+          srSetzeText(srAktuellerText().split(suchFeld.value).join(ersatzFeld.value));
           _sr.sichern.sofort();
-          ta.dispatchEvent(new Event('input'));
           zu();
           toast(n === 1 ? 'Einmal ersetzt.' : n + '-mal ersetzt. Der alte Stand ist eingefroren.');
         }
@@ -338,7 +359,7 @@ function starteSprint(minuten) {
     kerze.style.transition = 'height ' + (minuten * 60) + 's linear';
     requestAnimationFrame(() => { kerze.style.height = '4px'; });
   });
-  const startWorte = worte(_sr.ta.value);
+  const startWorte = worte(srAktuellerText());
   _sr.sprint = {
     startWorte, minuten,
     timer: setTimeout(() => beendeSprint(false), minuten * 60000)
@@ -353,7 +374,7 @@ function beendeSprint(abgebrochen) {
   const kerze = $('.kerze', _sr.raum);
   if (kerze) kerze.remove();
   if (!abgebrochen) {
-    const geschrieben = worte(_sr.ta.value) - sp.startWorte;
+    const geschrieben = worte(srAktuellerText()) - sp.startWorte;
     glocke();
     const m = D.einst.mischung || {};
     const klangDazu = m.regenfenster || m.regendach || m.platzregen ? ' Der Regen fällt weiter.'
@@ -384,7 +405,12 @@ function zeigeVerknuepfungen(doc) {
     el('div', { class: 'mtitel' }, 'FÜHRT HIN ZU'),
     hinaus.length ? hinaus.map(eintrag) : el('div', { style: 'padding:6px 14px 12px;color:var(--blass);font-size:14px' }, 'Mit [[doppelten Klammern]] im Text verbinden sich Orte miteinander.'),
     el('div', { class: 'mtitel' }, 'ZEIGT HIERHER'),
-    herein.length ? herein.map(eintrag) : el('div', { style: 'padding:6px 14px 12px;color:var(--blass);font-size:14px' }, 'Noch nichts.')
+    herein.length ? herein.map(eintrag) : el('div', { style: 'padding:6px 14px 12px;color:var(--blass);font-size:14px' }, 'Noch nichts.'),
+    el('div', { class: 'mtitel' }, 'FREI ZUSAMMENLEGEN'),
+    el('button', { onclick: () => { zu(); zeigeBeziehungen(doc); } },
+      el('span', { html: ik('verbinden'), style: 'display:flex' }), 'Beziehungen ansehen & hinzufügen'),
+    ['blatt', 'seite', 'szene', 'blase'].includes(doc.typ) ? el('button', { onclick: () => { zu(); hinzufuegenMenue(doc); } },
+      el('span', { html: ik('plus'), style: 'display:flex' }), 'Zu Heft, Projekt oder Cluster hinzufügen') : null
   );
   const zu = zeigeDeck(kasten);
 }

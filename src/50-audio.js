@@ -4,25 +4,150 @@
    ================================================================ */
 
 let _audio = null;
+let _audioMussNeu = false;
+let _audioFehler = '';
+let _audioBrueckeLaeuft = null;
+
+function audioUnterstuetzt() { return !!(window.AudioContext || window.webkitAudioContext); }
+
+/* Die Lautstärkeskala war technisch linear und dadurch auf iPad-Lautsprechern
+   in der unteren Hälfte kaum hörbar. Diese Kurve bleibt bei 0 wirklich stumm,
+   gibt den übrigen Bereich aber so wieder, wie Menschen Lautheit wahrnehmen. */
+function audioLautheitsKurve(wert) {
+  const w = begrenze(wert, 0, 1, .5);
+  return w <= 0 ? 0 : .08 + .82 * Math.pow(w, .75);
+}
+
+function _weckImpuls(a) {
+  try {
+    const p = a.ctx.createBuffer(1, 1, Math.max(8000, a.ctx.sampleRate || 44100));
+    const q = a.ctx.createBufferSource(); q.buffer = p; q.connect(a.master); q.start(0);
+  } catch (e) {}
+}
+
+function _baueAudio() {
+  if (!audioUnterstuetzt()) throw new Error('Web Audio wird hier nicht unterstützt');
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  let ctx;
+  try { ctx = new Ctx({ latencyHint: 'interactive' }); } catch (e) { ctx = new Ctx(); }
+  const master = ctx.createGain();
+  master.gain.value = audioLautheitsKurve(D.einst.lautstaerke);
+  const drossel = ctx.createDynamicsCompressor();
+  drossel.threshold.value = -18; drossel.ratio.value = 4;
+  master.connect(drossel); drossel.connect(ctx.destination);
+  const a = { ctx, master, drossel, puffer: {}, hallen: {}, ebenen: new Map(), generation: Date.now() + Math.random() };
+  ctx.onstatechange = () => {
+    if (ctx.state === 'interrupted' || ctx.state === 'closed') _audioMussNeu = klangAktiv();
+  };
+  _weckImpuls(a);
+  _audioFehler = '';
+  return a;
+}
+
+function _verwerfeAudio() {
+  const alt = _audio;
+  _audio = null;
+  if (!alt) return;
+  for (const e of alt.ebenen.values()) { try { clearTimeout(e.stopTimer); e.werk.stop(); e.gain.disconnect(); } catch (x) {} }
+  alt.ebenen.clear();
+  try { alt.ctx.onstatechange = null; alt.ctx.close(); } catch (e) {}
+}
 
 function holeAudio() {
-  if (!_audio) {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const master = ctx.createGain();
-    master.gain.value = (D.einst.lautstaerke ?? .5) * .7;
-    const drossel = ctx.createDynamicsCompressor();
-    drossel.threshold.value = -18; drossel.ratio.value = 4;
-    master.connect(drossel); drossel.connect(ctx.destination);
-    _audio = { ctx, master, puffer: {}, hallen: {}, ebenen: new Map() };
+  if (!_audio || _audio.ctx.state === 'closed') _audio = _baueAudio();
+  if (_audio.ctx.state === 'suspended' || _audio.ctx.state === 'interrupted') {
+    try { Promise.resolve(_audio.ctx.resume()).catch((e) => { _audioFehler = e && e.message || 'Klang blieb stumm'; }); } catch (e) { _audioFehler = e.message; }
   }
-  if (_audio.ctx.state === 'suspended') _audio.ctx.resume();
   return _audio;
 }
 
+function _warte(ms) { return new Promise((resolve) => setTimeout(() => resolve(false), ms)); }
+
+async function _warteAufAudio(ctx, ms = 1100) {
+  if (ctx.state === 'running') return true;
+  try {
+    const fortsetzen = Promise.resolve(ctx.resume()).then(() => ctx.state === 'running', () => false);
+    await Promise.race([fortsetzen, _warte(ms)]);
+  } catch (e) { _audioFehler = e && e.message || 'Klang wurde nicht freigegeben'; }
+  return ctx.state === 'running';
+}
+
+/* Safari/WebKit kann in einer installierten Home-Bildschirm-App nach dem
+   Hintergrundwechsel einen scheinbar „running“ AudioContext ohne Ton behalten.
+   Ein winziger echter Medienklang innerhalb derselben Berührung weckt die
+   iOS-Mediensitzung, bevor wir die errechneten Atmosphären anschließen. */
+async function _audioMedienBruecke() {
+  if (_audioBrueckeLaeuft) return _audioBrueckeLaeuft;
+  _audioBrueckeLaeuft = (async () => {
+    if (typeof document === 'undefined' || !document.createElement || typeof Blob === 'undefined' || typeof URL === 'undefined' || !URL.createObjectURL) return false;
+    const rate = 16000, anzahl = 1440, kopf = 44;
+    const puffer = new ArrayBuffer(kopf + anzahl * 2), v = new DataView(puffer);
+    const wort = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+    wort(0, 'RIFF'); v.setUint32(4, 36 + anzahl * 2, true); wort(8, 'WAVE'); wort(12, 'fmt ');
+    v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+    wort(36, 'data'); v.setUint32(40, anzahl * 2, true);
+    for (let i = 0; i < anzahl; i++) {
+      const h = Math.min(1, i / 100, (anzahl - i) / 180);
+      v.setInt16(kopf + i * 2, Math.sin(i * Math.PI * 2 * 440 / rate) * 950 * h, true);
+    }
+    const url = URL.createObjectURL(new Blob([puffer], { type: 'audio/wav' }));
+    const ton = document.createElement('audio');
+    ton.setAttribute('playsinline', ''); ton.preload = 'auto'; ton.src = url; ton.volume = .45;
+    (document.body || document.documentElement).append(ton);
+    try {
+      const gespielt = await Promise.race([Promise.resolve(ton.play()).then(() => true, () => false), _warte(1200)]);
+      return gespielt;
+    } finally {
+      setTimeout(() => { try { ton.pause(); ton.remove(); URL.revokeObjectURL(url); } catch (e) {} }, 180);
+    }
+  })();
+  try { return await _audioBrueckeLaeuft; } finally { _audioBrueckeLaeuft = null; }
+}
+
+async function audioFreigeben({ neu = false, probe = false } = {}) {
+  if (!audioUnterstuetzt()) { _audioFehler = 'Dieser Browser unterstützt Web Audio nicht.'; return false; }
+  try {
+    if (neu || !_audio || _audio.ctx.state !== 'running' || _audioMussNeu) await _audioMedienBruecke();
+    if (neu || _audioMussNeu || (_audio && (_audio.ctx.state === 'closed' || _audio.ctx.state === 'interrupted'))) _verwerfeAudio();
+    let a = holeAudio();
+    let frei = await _warteAufAudio(a.ctx);
+    if (!frei) {
+      _verwerfeAudio();
+      _audio = _baueAudio(); a = _audio;
+      frei = await _warteAufAudio(a.ctx);
+    }
+    if (!frei) { _audioFehler = 'iOS hält den Klang noch fest. Noch einmal auf „Klang wecken“ tippen.'; return false; }
+    _audioMussNeu = false; _audioFehler = '';
+    for (const [id, pegel] of Object.entries(D.einst.mischung || {})) if (pegel > 0) ebeneAn(id, pegel);
+    if (probe) audioProbe();
+    return true;
+  } catch (e) { _audioFehler = e && e.message || 'Klang konnte nicht starten'; return false; }
+}
+
+function audioNeuStarten() {
+  const pegel = Object.assign({}, D.einst.mischung || {});
+  _verwerfeAudio();
+  _audioMussNeu = false;
+  try {
+    const a = holeAudio(); /* synchron im Tippen erzeugt: wichtig auf iPad/iPhone */
+    _weckImpuls(a);
+    const gewollt = Object.keys(pegel).filter((id) => pegel[id] > 0);
+    for (const id of gewollt) ebeneAn(id, pegel[id]);
+    return true;
+  } catch (e) { _audioFehler = e && e.message || 'Klang konnte nicht starten'; return false; }
+}
+
+function audioZustand() {
+  if (!audioUnterstuetzt()) return { ok: false, state: 'nicht unterstützt', fehler: 'Dieser Browser hat keine Web-Audio-Unterstützung.' };
+  return { ok: !!(_audio && _audio.ctx.state === 'running'), state: _audio ? _audio.ctx.state : 'bereit', fehler: _audioFehler };
+}
+
 function setzeLautstaerke(wert) {
+  wert = begrenze(wert, 0, 1, .5);
   D.einst.lautstaerke = wert;
   speichereEinst();
-  if (_audio) _audio.master.gain.setTargetAtTime(wert * .7, _audio.ctx.currentTime, .1);
+  if (_audio) _audio.master.gain.setTargetAtTime(audioLautheitsKurve(wert), _audio.ctx.currentTime, .1);
 }
 
 /* ----- Rauschfarben (einmal gerechnet, dann geloopt) ----- */
@@ -78,7 +203,7 @@ function _hallIR(a, sek, tiefpass) {
 
 /* ----- Werkbank: baut & räumt hinter jeder Ebene auf ----- */
 function neueWerkbank(a, out) {
-  const quellen = [], timer = [], intervalle = [];
+  const quellen = [], timer = new Set(), intervalle = new Set();
   const w = {
     a, out,
     rauschen(farbe) {
@@ -106,18 +231,22 @@ function neueWerkbank(a, out) {
     wandel(param, min, max, msMin, msMax, glaette) {
       const tu = () => {
         param.setTargetAtTime(min + Math.random() * (max - min), a.ctx.currentTime, glaette ?? .6);
-        timer.push(setTimeout(tu, msMin + Math.random() * (msMax - msMin)));
+        w.spaeter(tu, msMin + Math.random() * (msMax - msMin));
       };
       tu();
     },
     takt(msMittel, fn) {
       const tu = () => {
         fn(a.ctx.currentTime);
-        timer.push(setTimeout(tu, Math.max(30, -Math.log(Math.random()) * msMittel)));
+        w.spaeter(tu, Math.max(30, -Math.log(Math.max(Number.EPSILON, Math.random())) * msMittel));
       };
-      timer.push(setTimeout(tu, Math.random() * msMittel));
+      w.spaeter(tu, Math.random() * msMittel);
     },
-    immer(ms, fn) { intervalle.push(setInterval(fn, ms)); },
+    spaeter(fn, ms) {
+      const id = setTimeout(() => { timer.delete(id); fn(); }, Math.max(0, Number(ms) || 0));
+      timer.add(id); return id;
+    },
+    immer(ms, fn) { const id = setInterval(fn, Math.max(16, Number(ms) || 16)); intervalle.add(id); return id; },
     hall(sek, tiefpass, anteil) {
       const c = a.ctx.createConvolver();
       c.buffer = _hallIR(a, sek, tiefpass);
@@ -130,8 +259,8 @@ function neueWerkbank(a, out) {
       ziel.exponentialRampToValueAtTime(.0001, t + decaySek);
     },
     stop() {
-      timer.forEach(clearTimeout);
-      intervalle.forEach(clearInterval);
+      timer.forEach(clearTimeout); timer.clear();
+      intervalle.forEach(clearInterval); intervalle.clear();
       quellen.forEach((q) => { try { q.stop(); } catch (e) {} });
     }
   };
@@ -339,7 +468,7 @@ const KLANG_EBENEN = [
     w.wandel(g.gain, .003, .02, 120, 260, .06);
     w.takt(16000, () => {
       for (let i = 0; i < 2 + Math.floor(Math.random() * 3); i++) {
-        setTimeout(() => _knack(w, out, { freq: 3000, q: 3, dauer: .006, staerke: .015 }), i * (60 + Math.random() * 120));
+        w.spaeter(() => _knack(w, out, { freq: 3000, q: 3, dauer: .006, staerke: .015 }), i * (60 + Math.random() * 120));
       }
     });
     return w;
@@ -397,7 +526,7 @@ const KLANG_EBENEN = [
           const dauer = .05 + Math.random() * .1;
           const f0 = tief + Math.random() * (hoch - tief);
           const f1 = f0 * (Math.random() < .5 ? 1.15 + Math.random() * .5 : .75);
-          setTimeout(() => _ping(w, ziel, { f0, f1, dauer, staerke: fern ? .05 : .12, typ: 'sine' }), zeit * 1000);
+          w.spaeter(() => _ping(w, ziel, { f0, f1, dauer, staerke: fern ? .05 : .12, typ: 'sine' }), zeit * 1000);
           zeit += dauer + .04 + Math.random() * .1;
         }
       });
@@ -517,7 +646,7 @@ const KLANG_EBENEN = [
       dub.connect(dg); dg.connect(lp); dub.start(t + .18); dub.stop(t + .32);
       phase += .25;
       const periode = 1000 * (0.95 + Math.sin(phase) * .03);
-      setTimeout(schlag, periode);
+      w.spaeter(schlag, periode);
     };
     schlag();
     return w;
@@ -587,9 +716,9 @@ const KLANG_EBENEN = [
           sg.gain.setTargetAtTime(.001, st + .09, .04);
         }
         sg.gain.setTargetAtTime(.0001, t + dauer, .1);
-        setTimeout(sprich, (dauer + .5 + Math.random() * 3) * 1000);
+        w.spaeter(sprich, (dauer + .5 + Math.random() * 3) * 1000);
       };
-      setTimeout(sprich, Math.random() * 2000);
+      w.spaeter(sprich, Math.random() * 2000);
     }
     w.takt(9000, () => {
       const f = 2500 + Math.random() * 2000;
@@ -614,8 +743,8 @@ const KLANG_EBENEN = [
     w.immer(takt, () => {
       const t = a.ctx.currentTime;
       const j = () => (Math.random() - .5) * .02;
-      stoss(t + j(), .2); setTimeout(() => stoss(0, .18), 120 + j() * 1000);
-      setTimeout(() => { stoss(0, .16); setTimeout(() => stoss(0, .14), 120); }, 600);
+      stoss(t + j(), .2); w.spaeter(() => stoss(0, .18), 120 + j() * 1000);
+      w.spaeter(() => { stoss(0, .16); w.spaeter(() => stoss(0, .14), 120); }, 600);
     });
     return w;
   }},
@@ -668,34 +797,55 @@ const KLANG_SZENEN = [
 
 /* ----- Steuerung ----- */
 function ebeneAn(id, staerke) {
+  const def = KLANG_EBENEN.find((x) => x.id === id);
+  if (!def) return false;
+  staerke = begrenze(staerke, 0, 1, 0);
+  if (staerke <= 0) return false;
   const a = holeAudio();
   let e = a.ebenen.get(id);
   if (!e) {
-    const def = KLANG_EBENEN.find((x) => x.id === id);
-    if (!def) return;
     const g = a.ctx.createGain();
     g.gain.value = 0;
     g.connect(a.master);
-    const werk = def.bau(a, g);
+    let werk;
+    try { werk = def.bau(a, g); }
+    catch (fehler) { try { g.disconnect(); } catch (x) {} _audioFehler = fehler && fehler.message || 'Klangquelle fehlgeschlagen'; return false; }
     e = { gain: g, werk };
     a.ebenen.set(id, e);
   }
   e.gain.gain.setTargetAtTime(staerke, a.ctx.currentTime, .4);
+  return true;
 }
 function ebeneAus(id) {
   if (!_audio) return;
   const e = _audio.ebenen.get(id);
   if (!e) return;
   e.gain.gain.setTargetAtTime(.0001, _audio.ctx.currentTime, .3);
-  setTimeout(() => { e.werk.stop(); try { e.gain.disconnect(); } catch (x) {} }, 1200);
+  e.stopTimer = setTimeout(() => { e.werk.stop(); try { e.gain.disconnect(); } catch (x) {} }, 1200);
   _audio.ebenen.delete(id);
 }
+function saubereMischung(pegel) {
+  const raus = {};
+  if (!pegel || typeof pegel !== 'object' || Array.isArray(pegel)) return raus;
+  const erlaubt = new Set(KLANG_EBENEN.map((x) => x.id));
+  for (const [id, wert] of Object.entries(pegel)) {
+    if (!erlaubt.has(id)) continue;
+    const v = begrenze(wert, 0, 1, 0);
+    if (v > 0) raus[id] = v;
+  }
+  return raus;
+}
 function mischungAnwenden(pegel) {
-  D.einst.mischung = pegel || {};
+  D.einst.mischung = saubereMischung(pegel);
   speichereEinst();
   const gewollt = new Set(Object.keys(D.einst.mischung).filter((k) => D.einst.mischung[k] > 0));
   if (_audio) for (const id of [..._audio.ebenen.keys()]) { if (!gewollt.has(id)) ebeneAus(id); }
-  for (const id of gewollt) ebeneAn(id, D.einst.mischung[id]);
+  if (gewollt.size) {
+    try {
+      const a = holeAudio(); _weckImpuls(a);
+      for (const id of gewollt) ebeneAn(id, D.einst.mischung[id]);
+    } catch (e) { _audioFehler = e && e.message || 'Klang konnte nicht starten'; }
+  }
 }
 function alleKlaengeAus() { mischungAnwenden({}); }
 function klangAktiv() { return Object.values(D.einst.mischung || {}).some((v) => v > 0); }
@@ -729,3 +879,27 @@ function tippKlick() {
     b.start(); b.stop(a.ctx.currentTime + .03);
   } catch (e) {}
 }
+
+function audioProbe() {
+  try {
+    const a = holeAudio(); _weckImpuls(a);
+    const t = a.ctx.currentTime;
+    const o = a.ctx.createOscillator(), g = a.ctx.createGain();
+    o.type = 'sine'; o.frequency.value = 523.25;
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.12, t + .03); g.gain.exponentialRampToValueAtTime(.0001, t + .45);
+    o.connect(g); g.connect(a.master); o.start(t); o.stop(t + .5);
+    return true;
+  } catch (e) { _audioFehler = e && e.message || 'Klangprobe fehlgeschlagen'; return false; }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && klangAktiv()) _audioMussNeu = true;
+});
+window.addEventListener('pageshow', (e) => { if (e.persisted && klangAktiv()) _audioMussNeu = true; });
+document.addEventListener('pointerdown', async () => {
+  if (!klangAktiv()) return;
+  if (_audioMussNeu || !_audio || _audio.ctx.state !== 'running') await audioFreigeben({ neu: _audioMussNeu });
+  else {
+    try { const a = holeAudio(); _weckImpuls(a); } catch (e) { _audioFehler = e && e.message || 'Klang blieb stumm'; }
+  }
+}, true);

@@ -5,7 +5,7 @@
 RENDER.cluster = function (haupt) {
   haupt.append(raumkopf('Cluster', null,
     el('button', {
-      class: 'rundknopf voll', html: ik('plus'), onclick: async () => {
+      class: 'rundknopf voll', html: ik('plus'), title: 'Neues Cluster', onclick: async () => {
         const name = await eingabe({ titel: 'Ein neues Brett', platzhalter: 'Wofür ist es?' });
         if (!name) return;
         const b = neuDoc('board', { titel: name });
@@ -63,7 +63,7 @@ RENDER.brett = function (haupt, bid) {
   let verbindeVon = null;
 
   const kopfleiste = el('div', { class: 'schwebeleiste', style: 'left:16px;transform:none' },
-    el('button', { class: 'rundknopf zart', html: ik('zurueck'), onclick: () => { speichereStill(brett); location.hash = '#/cluster'; } }),
+    el('button', { class: 'rundknopf zart', html: ik('zurueck'), title: 'Zurück zu den Clustern', onclick: () => { speichereStill(brett); location.hash = '#/cluster'; } }),
     el('span', { style: 'align-self:center;font-family:ui-serif,Georgia,serif;font-weight:600;padding:0 6px' }, brett.titel)
   );
 
@@ -167,6 +167,10 @@ RENDER.brett = function (haupt, bid) {
     ta.addEventListener('input', entprellt(() => { b.text = ta.value; speichereStill(b); }, 400));
     ta.addEventListener('blur', () => ta.setAttribute('readonly', 'readonly'));
     blase.append(ta);
+    const quelle = b.quelle && D.docs.get(b.quelle);
+    if (quelle) blase.append(el('button', {
+      class: 'blasenquelle', onpointerdown: (e) => e.stopPropagation(), onclick: (e) => { e.stopPropagation(); speichereStill(brett); oeffneDoc(quelle); }
+    }, el('span', { html: ik(docIcon(quelle)) }), docName(quelle)));
 
     let zieht = null;
     blase.addEventListener('pointerdown', (e) => {
@@ -213,6 +217,7 @@ RENDER.brett = function (haupt, bid) {
       const wahl = await menue([
         { text: 'Andere Farbe', icon: 'farbe', wert: 'farbe' },
         { text: 'Im Schreibraum öffnen', icon: 'stift', wert: 'sr' },
+        { text: 'Verbindungen ansehen', icon: 'verbinden', wert: 'bezug' },
         { text: 'Blase zerplatzen', icon: 'muell', wert: 'weg', rot: true }
       ]);
       if (wahl === 'farbe') {
@@ -222,6 +227,8 @@ RENDER.brett = function (haupt, bid) {
       } else if (wahl === 'sr') {
         speichereStill(brett);
         oeffneSchreibraum(b.id);
+      } else if (wahl === 'bezug') {
+        zeigeBeziehungen(b);
       } else if (wahl === 'weg') {
         await loesche(b.id); baueBlasen();
       }

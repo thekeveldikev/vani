@@ -14,6 +14,7 @@ const SUCH_GRUPPEN = [
   ['zettel', 'Zettel', 'pin'],
   ['wort', 'Wörter', 'woerter'],
   ['faden', 'Faden', 'faden'],
+  ['funkeln', 'Funken', 'woerter'],
   ['mischung', 'Klang-Szenen', 'klang']
 ];
 
@@ -26,7 +27,7 @@ function oeffneSuche() {
   const baueChips = () => {
     chips.innerHTML = '';
     for (const [typ, name] of SUCH_GRUPPEN) {
-      if (typ === 'faden' && !D.docs.size) continue;
+      if (typ === 'faden' && !vomTyp('faden').length) continue;
       chips.append(el('button', {
         class: 'suchchip' + (filter === typ ? ' an' : ''),
         onclick: () => { filter = filter === typ ? null : typ; baueChips(); suche(); }
@@ -39,7 +40,7 @@ function oeffneSuche() {
     el('div', { class: 'suchzeile' },
       el('span', { html: ik('suche'), style: 'display:flex;color:var(--blass)' }),
       feld,
-      el('button', { class: 'rundknopf zart', style: 'width:32px;height:32px', html: ik('kreuz'), onclick: () => zu() })
+      el('button', { class: 'rundknopf zart', style: 'width:32px;height:32px', html: ik('kreuz'), title: 'Suche schließen', onclick: () => zu() })
     ),
     chips,
     treffer
@@ -99,7 +100,8 @@ function oeffneSuche() {
       for (const d of D.docs.values()) {
         if (d.typ !== typ) continue;
         const titelN = normalisiere(d.titel || '');
-        const textN = normalisiere(d.text || '');
+        const suchText = d.text || '';
+        const textN = normalisiere(suchText);
         let stelle = titelN.indexOf(q);
         let woText = -1;
         if (stelle === -1) { woText = textN.indexOf(q); }
@@ -108,15 +110,15 @@ function oeffneSuche() {
           if (fastGleich(titelN, q) || fastGleich(textN, q)) unscharf = true;
           else continue;
         } else if (stelle === -1 && woText === -1) continue;
-        funde.push({ d, woText, unscharf });
+        funde.push({ d, woText, unscharf, suchText });
       }
       funde.sort((a, b) => b.d.geaendert - a.d.geaendert);
       if (!funde.length) continue;
       treffer.append(el('div', { class: 'gruppe' }, name.toUpperCase()));
-      for (const { d, woText, unscharf } of funde.slice(0, filter ? 40 : 6)) {
+      for (const { d, woText, unscharf, suchText } of funde.slice(0, filter ? 40 : 6)) {
         gesamt++;
         let umfeld = '';
-        const text = d.text || '';
+        const text = suchText || '';
         if (woText >= 0) {
           const von = Math.max(0, woText - 28);
           const stueck = text.slice(von, woText + q.length + 50).replace(/\n/g, ' ');

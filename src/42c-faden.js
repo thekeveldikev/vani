@@ -17,7 +17,7 @@ RENDER.faden = function (haupt) {
   const zeile = el('div', { class: 'schreibzeile' },
     feld,
     el('button', {
-      class: 'rundknopf voll', html: ik('senden'), onclick: () => {
+      class: 'rundknopf voll', html: ik('senden'), title: 'In den Faden schreiben', onclick: () => {
         const t = feld.value.trim();
         if (!t) return;
         neuDoc('faden', { text: t });
@@ -32,6 +32,12 @@ RENDER.faden = function (haupt) {
 
   const alle = () => vomTyp('faden').sort((a, b) => a.angelegt - b.angelegt);
   let zeigeAb = Math.max(0, alle().length - 150);
+  let zielFaden = sessionStorage.getItem('zielFaden');
+  if (zielFaden) {
+    sessionStorage.removeItem('zielFaden');
+    const zi = alle().findIndex((d) => d.id === zielFaden);
+    if (zi >= 0) zeigeAb = Math.max(0, zi - 35);
+  }
 
   function baueBlase(s) {
     const blase = el('div', { class: 'blase fadenblase', 'data-id': s.id },
@@ -80,7 +86,16 @@ RENDER.faden = function (haupt) {
       }
       innen.append(baueBlase(s));
     }
-    if (ansEnde !== false) requestAnimationFrame(() => { lauf.scrollTop = lauf.scrollHeight; });
+    if (zielFaden) {
+      const zielId = zielFaden; zielFaden = null;
+      requestAnimationFrame(() => {
+      /* Nicht als CSS-Selektor zusammensetzen: auch ein importierter alter
+         Faden darf Sonderzeichen in seiner ID haben und trotzdem exakt springen. */
+      const ziel = [...innen.querySelectorAll('[data-id]')].find((e) => e.dataset.id === zielId);
+      if (ziel) { ziel.classList.add('wieder-ziel'); ziel.scrollIntoView({ block: 'center' }); }
+      });
+    }
+    else if (ansEnde !== false) requestAnimationFrame(() => { lauf.scrollTop = lauf.scrollHeight; });
   }
 
   baueLauf();
