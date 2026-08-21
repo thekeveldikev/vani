@@ -329,8 +329,8 @@ Berechtigung. Die App soll nur die richtige Anleitung geben.
 - Projekt-ID: appgprj_6a8786eb79448191acff5186595d06ec
 - Konfiguration: hosting\.openai\hosting.json
 - Bindings: D1 DB, R2 FILES
-- zuletzt gespeicherte öffentliche Version: 3
-- VANI-5.1-Sites-Quellcommit: 15719d9e213c4c6ad05c3d62957437250d6779d9
+- zuletzt erfolgreich veröffentlichte Sites-Version: 5
+- VANI-5.2.1-Sites-Quellcommit: 41dcb233658707d4ae3fddc4b8a7f7e15e91d3a0
 
 ### Ablauf
 
