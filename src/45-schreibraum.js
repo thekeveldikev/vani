@@ -76,7 +76,7 @@ function oeffneSchreibraum(docId) {
   const spalte = el('div', { class: 'sr-spalte ' + (D.einst.breite || 'mittel') }, istRich ? richPaket.leiste : null, wrap);
   const mitte = el('div', { class: 'sr-mitte' }, spalte);
 
-  const klangKnopf = el('button', { class: 'rundknopf zart' + (klangAktiv() ? ' klang-an' : ''), html: ik('klang'), title: 'Klang öffnen', onclick: () => { oeffneMischpult(); } });
+  const klangKnopf = el('button', { class: 'rundknopf zart' + ((klangAktiv() || (typeof ambienceAktiv === 'function' && ambienceAktiv())) ? ' klang-an' : ''), html: ik('klang'), title: 'Klang öffnen', onclick: () => { oeffneMischpult(); } });
   const vorleseKnopf = el('button', { class: 'rundknopf zart vorlese-knopf', html: ik('vorlesen'), title: 'Vorlesen lassen (nochmal tippen: Stopp)', onclick: (e) => {
     vorlesen((doc.titel ? doc.titel + '. ' : '') + srAktuellerText(), e.currentTarget);
   } });
@@ -138,9 +138,12 @@ function oeffneSchreibraum(docId) {
   ta.addEventListener('input', () => {
     ersetzeKlug();
     sichern();
-    const n = worte(istRich ? richReinerText(ta.innerHTML) : ta.value);
+    const roh = istRich ? richReinerText(ta.innerHTML) : ta.value;
+    const n = worte(roh);
     const dazu = n - startWorte;
     worteAnzeige.textContent = String(n) + (dazu > 0 ? ' · +' + dazu : '');
+    worteAnzeige.title = n.toLocaleString('de-DE') + ' Wörter · ' + roh.length.toLocaleString('de-DE')
+      + ' Zeichen · etwa ' + Math.max(1, Math.round(n / 200)) + ' Min. Lesezeit';
     kopf.classList.add('versunken');
     aktualisiereSpiegel();
     if (D.einst.typewriter) zentriereZeile();
@@ -151,12 +154,27 @@ function oeffneSchreibraum(docId) {
   });
   ta.addEventListener('keydown', (e) => {
     if (D.einst.tastenklang && e.key.length === 1) tippKlick();
-    if (e.key === 'Escape') schliesseSchreibraum(true);
+    if (e.key === 'Escape') { schliesseSchreibraum(true); return; }
+    const cmd = e.metaKey || e.ctrlKey;
+    /* Die Griffe, die man aus jedem Schreibprogramm im Finger hat. */
+    if (cmd && e.key.toLowerCase() === 's') { e.preventDefault(); friereEin(); return; }
+    if (cmd && e.key.toLowerCase() === 'f') { e.preventDefault(); sucheErsetze(); return; }
+    if (cmd && e.key === 'Enter') { e.preventDefault(); schliesseSchreibraum(true); return; }
+    /* Tab rückt ein, statt den Fokus aus dem Text zu werfen. */
+    if (e.key === 'Tab' && !istRich) {
+      e.preventDefault();
+      const s0 = ta.selectionStart, e0 = ta.selectionEnd;
+      ta.value = ta.value.slice(0, s0) + '\t' + ta.value.slice(e0);
+      ta.setSelectionRange(s0 + 1, s0 + 1);
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+    }
   });
   document.addEventListener('selectionchange', spiegelBeiAuswahl);
   raum.addEventListener('pointerdown', (e) => { if (!e.target.closest('.zeichenleiste')) kopf.classList.remove('versunken'); });
 
   aktualisiereSpiegel();
+  /* Hängt an diesem Text ein Klangbild? Dann legt es sich von selbst auf. */
+  if (typeof klangbildFolgen === 'function') klangbildFolgen(doc).catch(() => {});
   setTimeout(() => {
     ta.focus();
     if (!istRich) ta.setSelectionRange(ta.value.length, ta.value.length);

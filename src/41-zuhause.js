@@ -138,6 +138,15 @@ RENDER.zuhause = function (haupt) {
   /* Schnell einfangen */
   const fangFeld = el('textarea', { placeholder: 'Kurz festhalten, bevor es weg ist …', rows: 1 });
   autogrow(fangFeld);
+  fangFeld.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
+    e.preventDefault();
+    const t = fangFeld.value.trim();
+    if (!t) return;
+    neuDoc('schnipsel', { text: t });
+    fangFeld.value = ''; fangFeld.style.height = 'auto';
+    toast('Eingefangen.');
+  });
   gitter.append(el('div', { class: 'karte breit' },
     el('div', { class: 'kartenkopf' }, el('span', { html: ik('schnipsel') }), 'IN DIE SCHNIPSEL'),
     el('div', { class: 'fang' },
@@ -213,6 +222,10 @@ RENDER.zuhause = function (haupt) {
     funkeArten, funkeText,
     el('div', { class: 'fussreihe' },
       el('button', { class: 'knopf zart', onclick: zieheFunke }, 'Anderer'),
+      el('button', { class: 'knopf zart', title: 'Funken kopieren', onclick: async () => {
+        try { await navigator.clipboard.writeText(funkeAktuell); toast('Kopiert.'); }
+        catch (e) { teileText(funkeAktuell); }
+      } }, 'Kopieren'),
       el('button', { class: 'knopf zart', onclick: async () => { const f = await eigenerFunkeAnlegen(); if (f) {
         funkeArt = 'eigene'; funkeAktuell = f.text; funkeText.textContent = f.text;
         $$('.funke-arten button', funkeArten).forEach((b, i) => b.classList.toggle('an', artDaten[i][0] === 'eigene'));

@@ -17,7 +17,9 @@ const SUCH_GRUPPEN = [
   ['wort', 'Wörter', 'woerter'],
   ['faden', 'Faden', 'faden'],
   ['funkeln', 'Funken', 'woerter'],
-  ['mischung', 'Klang-Szenen', 'klang']
+  ['mischung', 'Klang-Szenen', 'klang'],
+  ['klangbild', 'Klangbilder', 'klang'],
+  ['klang', 'Eigene Klänge', 'klang']
 ];
 
 /* Ein kaputter Eintrag im Browser-Speicher darf die Suche nicht lahmlegen. */

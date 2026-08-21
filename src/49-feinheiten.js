@@ -269,7 +269,12 @@ RENDER.feinheiten = function (haupt) {
     for (const b of alle.slice(0, 30)) {
       korbKarte.append(el('div', { class: 'einstellzeile' },
         el('span', { class: 'ename' }, (b.name || b.typ),
-          el('div', { style: 'font-size:12px;color:var(--blass)' }, b.docs.length + (b.docs.length === 1 ? ' Ding · ' : ' Dinge · ') + vorZeit(b.wann))),
+          el('div', { style: 'font-size:12px;color:var(--blass)' },
+            b.docs.length + (b.docs.length === 1 ? ' Ding · ' : ' Dinge · ') + vorZeit(b.wann)
+            + (() => {
+              const w = (b.docs || []).reduce((n, d) => n + worte(d && d.text || ''), 0);
+              return w ? ' · ' + w.toLocaleString('de-DE') + ' Wörter' : '';
+            })())),
         el('button', {
           class: 'knopf', style: 'padding:6px 12px', onclick: async () => {
             await holeZurueck(b.id); toast('Wieder da.'); baueKorb();

@@ -551,3 +551,90 @@ test('Hefte: Papierfarbe, Rand, Zettelschrift und Anpinnen überleben die Saniti
   assert.deepEqual(roh(k.PAPIERFARBEN).map((x) => x[0]), ['hell', 'weiss', 'creme', 'kraft', 'nacht']);
   assert.equal(roh(k.ZETTELFARBEN).length, 8);
 });
+
+test('Ambience-Katalog: nur saubere Einträge, Dateinamen ohne Ausbruch', async () => {
+  const k = baueSandkasten();
+  const liste = k.ambienceKatalogSetzen([
+    { id: 'regen', name: 'Regen', kat: 'Wetter', datei: 'regen.opus', mb: 0.5 },
+    { id: '../../etc/passwd', name: 'böse' },
+    { id: 'pfad', name: 'Pfad', datei: '../geheim/datei.opus' },
+    { id: 'gross', name: 'x'.repeat(200), kat: 'y'.repeat(90), mb: 9999 },
+    null, { name: 'ohne id' }
+  ]);
+  assert.deepEqual(roh(liste).map((x) => x.id), ['regen', 'pfad', 'gross']);
+  assert.equal(roh(liste)[1].datei, '..geheimdatei.opus', 'Pfadtrenner fallen weg');
+  assert.equal(roh(liste)[2].name.length, 60);
+  assert.equal(roh(liste)[2].kat.length, 30);
+  assert.equal(roh(liste)[2].mb, 100);
+  assert.equal(k.ambienceSchluessel('regen'), 'ambience:1:regen');
+  assert.equal(roh(k.ambienceKatalogSetzen('unsinn')).length, 0);
+});
+
+test('Ambience-Mischung und Feinheit: nur bekannte Klänge, alle Werte begrenzt', async () => {
+  const k = baueSandkasten();
+  k.ambienceKatalogSetzen([{ id: 'feuer', name: 'Feuer' }, { id: 'regen', name: 'Regen' }]);
+  const m = roh(k.saubereAmbienceMischung({ feuer: 0.8, regen: 5, unbekannt: 0.5, leise: 0, kaputt: 'x' }));
+  assert.deepEqual(m, { feuer: 0.8, regen: 1 }, 'Unbekanntes und Stummes fällt weg');
+  assert.deepEqual(roh(k.saubereAmbienceMischung(null)), {});
+  assert.deepEqual(roh(k.saubereAmbienceMischung([1, 2])), {});
+  const f = roh(k.saubereAmbienceFeinheit({ tempo: 99, klarheit: -5, tiefe: 'x', atmen: 2, blende: 0 }));
+  assert.deepEqual(f, { tempo: 2, klarheit: 300, tiefe: 20, atmen: 1, blende: 0.5 });
+  assert.deepEqual(roh(k.saubereAmbienceFeinheit(undefined)), { tempo: 1, klarheit: 20000, tiefe: 20, atmen: 0.35, blende: 4 });
+});
+
+test('Klangbilder: hängen an einem Ort, ein Ort trägt nur eines, Lösen räumt auf', async () => {
+  const k = await frisch();
+  const p = k.neuDoc('projekt', { titel: 'P' });
+  const kap = k.neuDoc('kapitel', { parent: p.id, titel: 'K1', ord: 0 });
+  const szene = k.neuDoc('szene', { parent: kap.id, projekt: p.id, ord: 0, titel: 'S', text: '' });
+  const a = k.neuDoc('klangbild', { titel: 'Nacht', pegel: {}, gewebt: {}, orte: [] });
+  const b = k.neuDoc('klangbild', { titel: 'Morgen', pegel: {}, gewebt: {}, orte: [] });
+
+  /* an der Szene selbst */
+  k.klangbildBinden(a, szene.id);
+  assert.equal(k.klangbildFuer(szene).id, a.id);
+  /* ein zweites Bild übernimmt den Ort — das erste lässt los */
+  k.klangbildBinden(b, szene.id);
+  assert.equal(k.klangbildFuer(szene).id, b.id);
+  assert.deepEqual([...a.orte], [], 'das alte Bild hängt nicht mehr daran');
+  /* am Kapitel: gilt für die Szene darin */
+  k.klangbildLoesen(szene.id);
+  assert.equal(k.klangbildFuer(szene), null);
+  k.klangbildBinden(a, kap.id);
+  assert.equal(k.klangbildFuer(szene).id, a.id, 'das Kapitel vererbt an seine Szenen');
+  /* am Projekt: gilt auch */
+  k.klangbildLoesen(kap.id);
+  k.klangbildBinden(b, p.id);
+  assert.equal(k.klangbildFuer(szene).id, b.id, 'das Projekt vererbt an seine Szenen');
+  assert.equal(k.klangbildFuer(null), null);
+});
+
+test('Manuskript: Kapitel, Szenen und Schalter — nichts geht verloren, nichts kommt dazu', async () => {
+  const k = await frisch();
+  const p = k.neuDoc('projekt', { titel: 'Der Hafen', art: 'Roman', ziel: 1000 });
+  const k1 = k.neuDoc('kapitel', { parent: p.id, titel: 'Ankunft', ord: 0 });
+  k.neuDoc('szene', { parent: k1.id, projekt: p.id, ord: 0, titel: 'Erste Szene', text: 'Der Regen kam von See.', notiz: 'Noch unsicher', status: 'entwurf', farbe: '' });
+  k.neuDoc('szene', { parent: k1.id, projekt: p.id, ord: 1, titel: '', text: 'Danach wurde es still.', status: 'steht', farbe: '' });
+  k.neuDoc('szene', { parent: k1.id, projekt: p.id, ord: 2, titel: '', text: '', status: 'funke', farbe: '' });
+  k.neuDoc('figur', { parent: p.id, projekt: p.id, titel: 'Ruth', art: 'figur', notiz: 'Riecht nach Zimt.', ord: 0 });
+
+  const voll = k.manuskriptText(p, { kopf: true, szentitel: true, szenentitel: true, status: true, notizen: true, figuren: true, leere: false });
+  assert.match(voll, /^# Der Hafen/);
+  assert.match(voll, /Roman · \d+ Wörter · Ziel: 1\.000/);
+  assert.match(voll, /## Ankunft/);
+  assert.match(voll, /### Erste Szene {2}`Entwurf`/);
+  assert.ok(voll.includes('Der Regen kam von See.'));
+  assert.ok(voll.includes('Danach wurde es still.'));
+  assert.ok(voll.includes('* * *'), 'Szenen sind getrennt');
+  assert.ok(voll.includes('> **Notiz:** Noch unsicher'));
+  assert.ok(voll.includes('**Ruth** — Figur'));
+  assert.ok(!voll.includes('(noch leer)'), 'leere Szenen bleiben draußen');
+
+  const knapp = k.manuskriptText(p, { kopf: false, szenentitel: false, status: false, notizen: false, figuren: false, leere: false });
+  assert.ok(!knapp.includes('Ziel:') && !knapp.includes('### ') && !knapp.includes('Notiz') && !knapp.includes('Ruth'));
+  assert.ok(knapp.includes('Der Regen kam von See.'), 'der Text bleibt immer');
+
+  const mitLeeren = k.manuskriptText(p, { leere: true });
+  assert.ok(mitLeeren.includes('(noch leer)'));
+  assert.doesNotMatch(k.manuskriptText(p, {}), /\n{4,}/, 'keine Leerzeilenwüsten');
+});

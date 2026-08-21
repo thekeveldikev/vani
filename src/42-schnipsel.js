@@ -36,6 +36,16 @@ RENDER.schnipsel = function (haupt) {
 
   const feld = el('textarea', { placeholder: 'An mich …', rows: 1 });
   autogrow(feld);
+  /* Enter schickt ab wie in jedem Chat; Umschalt+Enter macht eine neue Zeile. */
+  feld.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
+    e.preventDefault();
+    const t = feld.value.trim();
+    if (!t) return;
+    neuDoc('schnipsel', { text: t });
+    feld.value = ''; feld.style.height = 'auto';
+    baueLauf(); runter(); feld.focus();
+  });
   const zeile = el('div', { class: 'schreibzeile' },
     el('button', {
       class: 'rundknopf zart', html: ik('kamera'), title: 'Bild hinzufügen', onclick: async () => {

@@ -1490,6 +1490,60 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 .blatt-nadel { position: absolute; top: 8px; right: 10px; display: flex; color: var(--gold); }
 .blatt-nadel svg.ik { width: 15px; height: 15px; }
 
+/* ================================================================
+   Klang: echte Aufnahmen
+   ================================================================ */
+.klang-reiter { margin: 10px 0 4px; }
+.ambience-liste { margin-top: 4px; }
+.ambience-zeile {
+  position: relative; display: grid; grid-template-columns: minmax(0,1fr) 38% 34px;
+  align-items: center; gap: 10px; padding: 9px 12px; margin-bottom: 6px;
+  border-radius: 13px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie);
+  opacity: .72; transition: opacity .18s ease, box-shadow .18s ease; overflow: hidden;
+}
+.ambience-zeile.an { opacity: 1; box-shadow: inset 0 0 0 1.5px var(--akzent2); }
+.ambience-balken { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: color-mix(in srgb, var(--akzent2) 18%, transparent); pointer-events: none; transition: width .2s linear; }
+.ambience-zeile.laedt .ambience-balken { box-shadow: inset -1px 0 0 var(--akzent2); }
+.ambience-name { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; min-width: 0; z-index: 1; }
+.ambience-titel { font-size: 15.5px; color: var(--tinte); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.ambience-stand { font-size: 11px; color: var(--blass); }
+.ambience-stand.da { color: var(--akzent2); }
+.ambience-zeile input[type="range"] { z-index: 1; width: 100%; }
+.ambience-fein-knopf { z-index: 1; width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: var(--blass); }
+.ambience-fein-knopf svg.ik { width: 17px; height: 17px; }
+.ambience-zeile.fein-offen { grid-template-columns: minmax(0,1fr) 38% 34px; }
+.ambience-zeile.fein-offen .ambience-fein-knopf { color: var(--akzent); }
+.ambience-fein { grid-column: 1 / -1; padding: 10px 2px 2px; border-top: 1px solid var(--linie); margin-top: 6px; z-index: 1; }
+.fein-zeile { display: grid; grid-template-columns: 78px minmax(0,1fr) 82px; align-items: center; gap: 9px; margin-bottom: 6px; }
+.fein-name { font-size: 12.5px; color: var(--blass); }
+.fein-wert { font-size: 12px; color: var(--tinte); text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fein-fuss { display: flex; align-items: center; gap: 10px; justify-content: space-between; margin-top: 8px; flex-wrap: wrap; }
+.ambience-quelle { font-size: 11px; color: var(--blass); }
+.szenenchip.eigen { box-shadow: inset 0 0 0 1.5px var(--gold); }
+.szenenchip small { margin-left: 6px; font-size: 10.5px; color: var(--blass); padding: 1px 5px; border-radius: 100px; background: var(--papier); }
+.klang-folgt { margin: 10px 0 2px; }
+@media (max-width: 620px) {
+  .ambience-zeile { grid-template-columns: minmax(0,1fr) 34% 32px; gap: 7px; padding: 8px 10px; }
+  .fein-zeile { grid-template-columns: 66px minmax(0,1fr) 66px; }
+}
+
+/* ----- Bretter: Gruppen und Bilder ----- */
+.brettgruppe { position: absolute; z-index: 0; border-radius: 18px; border: 1.5px dashed var(--linie); background: color-mix(in srgb, var(--papier) 26%, transparent); }
+.brettgruppe.b-gelb { border-color: #c8a83e; background: color-mix(in srgb, #f6e9a8 20%, transparent); }
+.brettgruppe.b-rot { border-color: #c98088; background: color-mix(in srgb, #f3cfd3 20%, transparent); }
+.brettgruppe.b-gruen { border-color: #8faa6e; background: color-mix(in srgb, #d3e3bd 20%, transparent); }
+.brettgruppe.b-blau { border-color: #7ba3bb; background: color-mix(in srgb, #cadfea 20%, transparent); }
+.gruppentitel { position: absolute; top: -26px; left: 4px; font: 600 13px ui-rounded, system-ui, sans-serif; color: var(--blass); background: var(--hg); padding: 2px 9px; border-radius: 100px; cursor: grab; touch-action: none; white-space: nowrap; max-width: 90%; overflow: hidden; text-overflow: ellipsis; }
+.gruppengriff { position: absolute; right: -7px; bottom: -7px; width: 20px; height: 20px; border-radius: 50%; background: var(--karte); box-shadow: inset 0 0 0 1.5px var(--linie); cursor: nwse-resize; touch-action: none; }
+.brettbild { position: absolute; z-index: 4; padding: 8px 8px 8px; background: #fdfcf7; box-shadow: 0 5px 16px rgba(0,0,0,.24); touch-action: none; }
+.brettbild img { width: 100%; display: block; pointer-events: none; border-radius: 1px; }
+.brettbildtitel { font: 12px ui-rounded, system-ui, sans-serif; color: #3a3325; text-align: center; padding: 7px 2px 1px; }
+.brettbildgriff { position: absolute; right: -6px; bottom: -6px; width: 18px; height: 18px; border-radius: 50%; background: var(--karte); box-shadow: inset 0 0 0 1.5px var(--linie); cursor: ew-resize; touch-action: none; }
+.manuskript-modal { width: min(660px, calc(100vw - 36px)); }
+.manuskript-vorschau { max-height: 30dvh; overflow: auto; padding: 12px 14px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font: 12.5px/1.6 ui-monospace, "SF Mono", Consolas, monospace; white-space: pre-wrap; color: var(--tinte); }
+.blattsuche { width: 100%; padding: 10px 14px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 15px; margin-bottom: 12px; color: var(--tinte); }
+.menue button:focus-visible { background: var(--karte); outline: 2px solid var(--akzent); outline-offset: -2px; }
+
 </style>
 </head>
 <body>
@@ -1516,7 +1570,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.6.0';
+const APP_VERSION = '5.7.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -1752,7 +1806,8 @@ const IK = {
   inhalt: '<path d="M5 6h3M11 6h8M5 12h3M11 12h8M5 18h3M11 18h8"/>',
   lesezeichen: '<path d="M7 4h10v16l-5-3.5L7 20V4Z"/>',
   vorlesen: '<path d="M5 10v4h3l4 3.5v-11L8 10H5Z"/><path d="M15.5 9.5a3.5 3.5 0 0 1 0 5"/><path d="M18 7a7 7 0 0 1 0 10"/>',
-  figur: '<circle cx="12" cy="8" r="3.5"/><path d="M5.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/>'
+  figur: '<circle cx="12" cy="8" r="3.5"/><path d="M5.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/>',
+  rahmen: '<rect x="3.5" y="5.5" width="17" height="13" rx="2.5" stroke-dasharray="3 2.5"/><circle cx="9" cy="11" r="1.6"/><circle cx="15" cy="14" r="1.6"/>'
 };
 function ik(name, kl) { return `<svg class="ik${kl ? ' ' + kl : ''}" viewBox="0 0 24 24" aria-hidden="true">${IK[name] || ''}</svg>`; }
 
@@ -1824,7 +1879,8 @@ const STANDARD_EINST = {
   tastenklang: false, tagesziel: 0, ersetzungen: true, autokorrektur: true,
   autoSeitenwechsel: true, schnipselAnsicht: 'lauf', blattSortierung: 'zuletzt',
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
-  stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10
+  stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
+  ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95
 };
 const D = {
   docs: new Map(),
@@ -1862,6 +1918,27 @@ function uebernehmeEinstellungen(quelle) {
     }
     D.einst.mischung = m;
   }
+  /* Echte Aufnahmen: Pegel je Klang und die Feineinstellungen dazu. */
+  if (!D.einst.ambience || typeof D.einst.ambience !== 'object' || Array.isArray(D.einst.ambience)) D.einst.ambience = {};
+  else {
+    const m = {};
+    for (const [id, wert] of Object.entries(D.einst.ambience).slice(0, 100)) {
+      if (/^(eigen:)?[a-z0-9_:-]{1,80}$/i.test(id)) { const v = begrenze(wert, 0, 1, 0); if (v > 0) m[id] = v; }
+    }
+    D.einst.ambience = m;
+  }
+  if (!D.einst.ambienceFein || typeof D.einst.ambienceFein !== 'object' || Array.isArray(D.einst.ambienceFein)) D.einst.ambienceFein = {};
+  else {
+    const f = {};
+    for (const [id, w] of Object.entries(D.einst.ambienceFein).slice(0, 200)) {
+      if (!/^(eigen:)?[a-z0-9_:-]{1,80}$/i.test(id)) continue;
+      f[id] = typeof saubereAmbienceFeinheit === 'function' ? saubereAmbienceFeinheit(w) : {};
+    }
+    D.einst.ambienceFein = f;
+  }
+  D.einst.klangReiter = D.einst.klangReiter === 'gewebt' ? 'gewebt' : 'echt';
+  D.einst.klangFolgt = D.einst.klangFolgt !== false;
+  D.einst.vorleseTempo = begrenze(D.einst.vorleseTempo, .6, 1.4, .95);
   if (D.einst.raeume != null) {
     const gesehen = new Set();
     D.einst.raeume = Array.isArray(D.einst.raeume) ? D.einst.raeume.slice(0, 50)
@@ -1912,6 +1989,19 @@ function sauberesDokument(quelle) {
   if (d.papier && !['liniert', 'kariert', 'blank', 'punkte', 'breit'].includes(d.papier)) d.papier = 'liniert';
   if (d.ansicht && !['seiten', 'rolle', 'fluss'].includes(d.ansicht)) d.ansicht = 'seiten';
   if (d.papierfarbe && !['hell', 'weiss', 'creme', 'kraft', 'nacht'].includes(d.papierfarbe)) d.papierfarbe = 'hell';
+  /* Klangbilder merken sich Mischungen und woran sie hängen. */
+  if (d.pegel != null && typeof saubereAmbienceMischung === 'function' && d.typ === 'klangbild') d.pegel = saubereAmbienceMischung(d.pegel);
+  if (d.gewebt != null && typeof saubereMischung === 'function') d.gewebt = saubereMischung(d.gewebt);
+  if (d.fein != null) {
+    const raus = {};
+    if (d.fein && typeof d.fein === 'object' && !Array.isArray(d.fein) && typeof saubereAmbienceFeinheit === 'function') {
+      for (const [id, f] of Object.entries(d.fein).slice(0, 200)) raus[String(id).slice(0, 80)] = saubereAmbienceFeinheit(f);
+    }
+    d.fein = raus;
+  }
+  if (d.orte != null) d.orte = Array.isArray(d.orte) ? d.orte.filter((x) => typeof x === 'string' && x.length <= 200).slice(0, 200) : [];
+  if (d.lautstaerke != null) d.lautstaerke = begrenze(d.lautstaerke, 0, 1, .5);
+  if (d.groesse != null) d.groesse = begrenze(d.groesse, 0, 5e9, 0);
   if (d.rand != null) d.rand = d.rand === true;
   if (d.gepinnt != null) d.gepinnt = d.gepinnt === true;
   if (d.schrift && !['hand', 'klar', 'serif'].includes(d.schrift)) d.schrift = 'hand';
@@ -1922,6 +2012,17 @@ function sauberesDokument(quelle) {
   /* Zettel, Fotos und Blasen brauchen immer eine Position — sonst stürzt
      das Anfassen einer beschädigt importierten Anlage ab. */
   if (d.pos == null && ['zettel', 'foto', 'blase'].includes(d.typ)) d.pos = { x: 10, y: 10, rot: 0, w: 30 };
+  /* Gruppen und Bilder auf Brettern liegen in Weltkoordinaten und brauchen
+     eine Größe — pos.w/h dürfen dort viel größer sein als bei einer Anlage. */
+  if (['gruppe', 'brettbild'].includes(d.typ)) {
+    const q2 = d.pos && typeof d.pos === 'object' && !Array.isArray(d.pos) ? d.pos : {};
+    d.pos = {
+      x: begrenze(q2.x, -100000, 100000, 0), y: begrenze(q2.y, -100000, 100000, 0),
+      rot: begrenze(q2.rot, -360, 360, 0),
+      w: begrenze(q2.w, 40, 6000, d.typ === 'gruppe' ? 440 : 260),
+      h: begrenze(q2.h, 40, 6000, 300)
+    };
+  }
   if (d.pos != null) {
     const p = d.pos && typeof d.pos === 'object' && !Array.isArray(d.pos) ? d.pos : {};
     d.pos = {
@@ -2243,6 +2344,22 @@ function eingabe({ titel, wert = '', platzhalter = '', mehrzeilig = false, ok = 
 
 function menue(punkte, titel) {
   return new Promise((res) => {
+    /* Mit der Tastatur: Pfeile wandern, Ziffern springen, Enter wählt. */
+    const beiTaste = (e) => {
+      const knoepfe = $$('button', kasten);
+      if (!knoepfe.length) return;
+      const jetzt = knoepfe.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const naechst = e.key === 'ArrowDown'
+          ? (jetzt + 1) % knoepfe.length
+          : (jetzt <= 0 ? knoepfe.length - 1 : jetzt - 1);
+        knoepfe[naechst].focus();
+      } else if (/^[1-9]$/.test(e.key)) {
+        const k = knoepfe[Number(e.key) - 1];
+        if (k) { e.preventDefault(); k.click(); }
+      }
+    };
     const kasten = el('div', { class: 'menue' },
       titel ? el('div', { class: 'mtitel' }, titel) : null,
       punkte.filter(Boolean).map((p) =>
@@ -2251,7 +2368,9 @@ function menue(punkte, titel) {
           p.text)
       )
     );
-    const zu = zeigeDeck(kasten, () => res(null));
+    const zu = zeigeDeck(kasten, () => { document.removeEventListener('keydown', beiTaste, true); res(null); });
+    document.addEventListener('keydown', beiTaste, true);
+    setTimeout(() => { const erste = $('button', kasten); if (erste && matchMedia('(pointer:fine)').matches) erste.focus(); }, 40);
   });
 }
 
@@ -2327,8 +2446,9 @@ function oeffneDoc(d) {
   else if (d.typ === 'kapitel' || d.typ === 'figur') location.hash = '#/projekt/' + d.parent;
   else if (d.typ === 'szene') { location.hash = '#/projekt/' + d.projekt; setTimeout(() => oeffneSchreibraum(d.id), 80); }
   else if (d.typ === 'board') location.hash = '#/brett/' + d.id;
-  else if (d.typ === 'blase') location.hash = '#/brett/' + d.parent;
+  else if (d.typ === 'blase' || d.typ === 'gruppe' || d.typ === 'brettbild') location.hash = '#/brett/' + d.parent;
   else if (d.typ === 'wort' || d.typ === 'wortkiste') location.hash = '#/woerter';
+  else if (d.typ === 'klang' || d.typ === 'klangbild') location.hash = '#/klang';
   else if (d.typ === 'zettel' || d.typ === 'foto') { const s = D.docs.get(d.parent); if (s) oeffneDoc(s); }
 }
 document.addEventListener('click', (e) => {
@@ -3977,7 +4097,7 @@ function docName(d) {
   return (d.titel || (d.text || '').trim().split('\n')[0] || ({ seite: 'Heftseite', blase: 'Blase', faden: 'Fadenstück', goodnote: 'Goodnotes-Notizbuch' }[d.typ]) || d.typ).slice(0, 80);
 }
 function docIcon(d) {
-  return ({ schnipsel: 'schnipsel', blatt: 'blatt', seite: 'hefte', heft: 'hefte', projekt: 'projekte', kapitel: 'projekte', szene: 'projekte', board: 'cluster', blase: 'cluster', wort: 'woerter', wortkiste: 'woerter', faden: 'faden', funkeln: 'wieder', goodnote: 'buchzu', figur: 'figur' }[d && d.typ]) || 'verbinden';
+  return ({ schnipsel: 'schnipsel', blatt: 'blatt', seite: 'hefte', heft: 'hefte', projekt: 'projekte', kapitel: 'projekte', szene: 'projekte', board: 'cluster', blase: 'cluster', wort: 'woerter', wortkiste: 'woerter', faden: 'faden', funkeln: 'wieder', goodnote: 'buchzu', figur: 'figur', klang: 'klang', klangbild: 'klang' }[d && d.typ]) || 'verbinden';
 }
 
 function waehleDokument(auslassenId, titel = 'Womit verbinden?') {
@@ -4396,6 +4516,15 @@ RENDER.zuhause = function (haupt) {
   /* Schnell einfangen */
   const fangFeld = el('textarea', { placeholder: 'Kurz festhalten, bevor es weg ist …', rows: 1 });
   autogrow(fangFeld);
+  fangFeld.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
+    e.preventDefault();
+    const t = fangFeld.value.trim();
+    if (!t) return;
+    neuDoc('schnipsel', { text: t });
+    fangFeld.value = ''; fangFeld.style.height = 'auto';
+    toast('Eingefangen.');
+  });
   gitter.append(el('div', { class: 'karte breit' },
     el('div', { class: 'kartenkopf' }, el('span', { html: ik('schnipsel') }), 'IN DIE SCHNIPSEL'),
     el('div', { class: 'fang' },
@@ -4471,6 +4600,10 @@ RENDER.zuhause = function (haupt) {
     funkeArten, funkeText,
     el('div', { class: 'fussreihe' },
       el('button', { class: 'knopf zart', onclick: zieheFunke }, 'Anderer'),
+      el('button', { class: 'knopf zart', title: 'Funken kopieren', onclick: async () => {
+        try { await navigator.clipboard.writeText(funkeAktuell); toast('Kopiert.'); }
+        catch (e) { teileText(funkeAktuell); }
+      } }, 'Kopieren'),
       el('button', { class: 'knopf zart', onclick: async () => { const f = await eigenerFunkeAnlegen(); if (f) {
         funkeArt = 'eigene'; funkeAktuell = f.text; funkeText.textContent = f.text;
         $$('.funke-arten button', funkeArten).forEach((b, i) => b.classList.toggle('an', artDaten[i][0] === 'eigene'));
@@ -4595,6 +4728,16 @@ RENDER.schnipsel = function (haupt) {
 
   const feld = el('textarea', { placeholder: 'An mich …', rows: 1 });
   autogrow(feld);
+  /* Enter schickt ab wie in jedem Chat; Umschalt+Enter macht eine neue Zeile. */
+  feld.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
+    e.preventDefault();
+    const t = feld.value.trim();
+    if (!t) return;
+    neuDoc('schnipsel', { text: t });
+    feld.value = ''; feld.style.height = 'auto';
+    baueLauf(); runter(); feld.focus();
+  });
   const zeile = el('div', { class: 'schreibzeile' },
     el('button', {
       class: 'rundknopf zart', html: ik('kamera'), title: 'Bild hinzufügen', onclick: async () => {
@@ -4896,7 +5039,20 @@ RENDER.blaetter = function (haupt) {
   const inhalt = el('div', { class: 'inhalt' });
 
   const sortierung = D.einst.blattSortierung || 'zuletzt';
-  const alle = vomTyp('blatt');
+  let alle = vomTyp('blatt');
+  /* Ab einer Handvoll Blättern hilft ein Suchfeld mehr als Scrollen. */
+  const suchfeld = el('input', { type: 'search', class: 'blattsuche', placeholder: 'In den Blättern suchen …' });
+  const filter = normalisiere((sessionStorage.getItem('blattSuche') || '').trim());
+  if (filter) {
+    suchfeld.value = sessionStorage.getItem('blattSuche') || '';
+    alle = alle.filter((b) => normalisiere((b.titel || '') + ' ' + (b.text || '')).includes(filter));
+  }
+  suchfeld.addEventListener('input', entprellt(() => {
+    sessionStorage.setItem('blattSuche', suchfeld.value);
+    const stelle = suchfeld.selectionStart;
+    zeichne();
+    requestAnimationFrame(() => { const f = $('.blattsuche'); if (f) { f.focus(); f.setSelectionRange(stelle, stelle); } });
+  }, 220));
   if (sortierung === 'az') alle.sort((a, b) => (a.titel || a.text || '').localeCompare(b.titel || b.text || '', 'de'));
   else if (sortierung === 'aeltest') alle.sort((a, b) => a.angelegt - b.angelegt);
   /* Angepinnte Blätter liegen oben — in jeder Sortierung. */
@@ -4911,6 +5067,7 @@ RENDER.blaetter = function (haupt) {
     }
     inhalt.append(wahl);
   }
+  if (vomTyp('blatt').length > 5) inhalt.append(suchfeld);
 
   if (!alle.length) {
     inhalt.append(el('div', { class: 'leer' }, 'Ein leerer Stapel.',
@@ -4925,7 +5082,8 @@ RENDER.blaetter = function (haupt) {
       b.gepinnt ? el('span', { class: 'blatt-nadel', html: ik('pin') }) : null,
       el('div', { class: 'btitel serif' }, b.titel || erste.slice(0, 60) || 'Ohne Titel'),
       el('div', { class: 'bprobe' }, (b.text || '').trim().replace(/\s+/g, ' ').slice(0, 140) || 'Noch leer.'),
-      el('div', { class: 'bfuss' }, (worteZahl ? worteZahl + ' Wörter · ' : '') + vorZeit(b.geaendert))
+      el('div', { class: 'bfuss' }, (worteZahl ? worteZahl.toLocaleString('de-DE') + ' Wörter · ' : '') + vorZeit(b.geaendert)
+        + (worteZahl > 60 ? ' · ' + Math.max(1, Math.round(worteZahl / 200)) + ' Min.' : ''))
     );
     langdruck(karte, async () => {
       const wahl = await menue([
@@ -4979,6 +5137,12 @@ RENDER.faden = function (haupt) {
   lauf.append(innen);
 
   const feld = el('textarea', { placeholder: 'Weiter im Faden …', rows: 1 });
+  feld.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
+    e.preventDefault();
+    const knopf = feld.parentElement && feld.parentElement.querySelector('.rundknopf.voll');
+    if (knopf) knopf.click();
+  });
   autogrow(feld);
   const zeile = el('div', { class: 'schreibzeile' },
     feld,
@@ -6295,6 +6459,7 @@ async function projektMenue(p, danach) {
     { text: 'Umbenennen', icon: 'stift', wert: 'name' },
     { text: 'Wortziel: ' + (p.ziel ? p.ziel.toLocaleString('de-DE') : 'keins'), icon: 'ziel', wert: 'ziel' },
     { text: 'Leseansicht', icon: 'lesen', wert: 'lesen' },
+    { text: 'Als Manuskript hinausgeben', icon: 'teilen', wert: 'export' },
     { text: 'Verbindungen ansehen', icon: 'verbinden', wert: 'bezug' },
     { text: 'Projekt löschen', icon: 'muell', wert: 'weg', rot: true }
   ], p.titel);
@@ -6306,6 +6471,9 @@ async function projektMenue(p, danach) {
     if (neu !== null) { p.ziel = parseInt(neu, 10) || 0; speichereStill(p); }
   } else if (wahl === 'lesen') {
     zeigeLeseansicht(p);
+    return;
+  } else if (wahl === 'export') {
+    await projektHinausgeben(p);
     return;
   } else if (wahl === 'bezug') {
     zeigeBeziehungen(p);
@@ -6646,6 +6814,101 @@ function szenenGesten(karte, s, p) {
   });
 }
 
+/* ----- Als Manuskript hinausgeben -----
+   Eine einzige Datei, die überall aufgeht: Markdown. Kapitel als Überschriften,
+   Szenen durch eine Trennlinie geschieden, wahlweise mit Notizen, Figuren und
+   dem Stand jeder Szene. Wer es in Word will, zieht es dort einfach hinein. */
+function manuskriptText(p, was = {}) {
+  const zeilen = [];
+  const w = projektWorte(p);
+  zeilen.push('# ' + (p.titel || 'Ohne Titel'));
+  if (was.kopf !== false) {
+    const zeile = [p.art || 'Projekt', w.toLocaleString('de-DE') + ' Wörter'];
+    if (p.ziel) zeile.push('Ziel: ' + p.ziel.toLocaleString('de-DE'));
+    zeile.push('Stand: ' + fmtDatum(Date.now()));
+    zeilen.push('', '*' + zeile.join(' · ') + '*');
+  }
+  if (was.figuren) {
+    const figuren = kinder(p.id, 'figur');
+    if (figuren.length) {
+      zeilen.push('', '## Figuren & Orte', '');
+      for (const f of figuren) {
+        zeilen.push('**' + (f.titel || 'Ohne Namen') + '** — ' + ({ figur: 'Figur', ort: 'Ort', ding: 'Ding' }[f.art] || 'Anderes'));
+        if (f.notiz) zeilen.push('', f.notiz.trim());
+        zeilen.push('');
+      }
+    }
+  }
+  for (const k of kinder(p.id, 'kapitel')) {
+    const szenen = kinder(k.id, 'szene').filter((sz) => was.leere || (sz.text || '').trim() || (sz.titel || '').trim());
+    if (!szenen.length && !was.leere) continue;
+    zeilen.push('', '## ' + (k.titel || 'Kapitel'), '');
+    szenen.forEach((sz, i) => {
+      if (i) zeilen.push('', '* * *', '');
+      if (was.szenentitel !== false && (sz.titel || '').trim()) {
+        zeilen.push('### ' + sz.titel.trim() + (was.status ? '  `' + ({ funke: 'Funke', entwurf: 'Entwurf', steht: 'Steht' }[sz.status] || 'Funke') + '`' : ''), '');
+      }
+      const text = (sz.text || '').trim();
+      if (text) zeilen.push(text);
+      else if (was.leere) zeilen.push('*(noch leer)*');
+      if (was.notizen && (sz.notiz || '').trim()) zeilen.push('', '> **Notiz:** ' + sz.notiz.trim().replace(/\n/g, '\n> '));
+    });
+  }
+  if (was.hefte) {
+    const hefte = vomTyp('heft').filter((h) => h.projektRef === p.id);
+    for (const h of hefte) {
+      zeilen.push('', '## Heft: ' + (h.titel || 'Ohne Titel'), '');
+      for (const seite of kinder(h.id, 'seite')) {
+        if ((seite.titel || '').trim()) zeilen.push('### ' + seite.titel.trim(), '');
+        if ((seite.text || '').trim()) zeilen.push(seite.text.trim(), '');
+        for (const z of kinder(seite.id, 'zettel')) if ((z.text || '').trim()) zeilen.push('> ' + z.text.trim().replace(/\n/g, '\n> '), '');
+      }
+    }
+  }
+  return zeilen.join('\n').replace(/\n{4,}/g, '\n\n\n').trim() + '\n';
+}
+
+async function projektHinausgeben(p) {
+  const was = { kopf: true, szenentitel: true, status: false, notizen: false, figuren: true, hefte: false, leere: false };
+  const schalter = (name, schluessel, hinweis) => {
+    const s = el('button', { class: 'schalter' + (was[schluessel] ? ' an' : ''), onclick: (e) => { was[schluessel] = !was[schluessel]; e.currentTarget.classList.toggle('an', was[schluessel]); vorschauNeu(); } }, el('i'));
+    return el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, name, hinweis ? el('div', { style: 'font-size:12.5px;color:var(--blass)' }, hinweis) : null), s);
+  };
+  const vorschau = el('div', { class: 'manuskript-vorschau' });
+  const zahl = el('div', { class: 'einfuege-zaehler' });
+  const vorschauNeu = () => {
+    const t = manuskriptText(p, was);
+    vorschau.textContent = t.slice(0, 1200) + (t.length > 1200 ? '\n…' : '');
+    zahl.textContent = worte(t).toLocaleString('de-DE') + ' Wörter · ' + formatBytes(new Blob([t]).size);
+  };
+  vorschauNeu();
+  const kasten = el('div', { class: 'modal manuskript-modal' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('teilen') }), 'ALS MANUSKRIPT'),
+    el('h2', {}, '„' + (p.titel || 'Ohne Titel') + '" hinausgeben'),
+    el('div', { class: 'karte', style: 'margin-bottom:12px' },
+      schalter('Kopfzeile', 'kopf', 'Art, Wörter, Datum'),
+      schalter('Szenentitel', 'szenentitel'),
+      schalter('Stand je Szene', 'status', 'Funke, Entwurf, Steht'),
+      schalter('Notizen von den Rückseiten', 'notizen'),
+      schalter('Figuren & Orte', 'figuren'),
+      schalter('Hefte am Projekt', 'hefte'),
+      schalter('Auch leere Szenen', 'leere')),
+    vorschau, zahl,
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
+      el('button', { class: 'knopf', onclick: async () => {
+        const t = manuskriptText(p, was);
+        try { await navigator.clipboard.writeText(t); toast('Das Manuskript liegt in der Zwischenablage.'); zu(); }
+        catch (e) { teileText(t); zu(); }
+      } }, 'Kopieren'),
+      el('button', { class: 'knopf voll', onclick: async () => {
+        const name = (p.titel || 'Manuskript').replace(/[^\wäöüÄÖÜß -]/g, '').trim().slice(0, 60) || 'Manuskript';
+        await teileDatei(name + '.md', manuskriptText(p, was), 'text/markdown');
+        zu();
+      } }, 'Als Datei')));
+  const zu = zeigeDeck(kasten);
+}
+
 /* ----- Leseansicht ----- */
 function zeigeLeseansicht(p) {
   const kapitel = kinder(p.id, 'kapitel');
@@ -6760,7 +7023,7 @@ function oeffneSchreibraum(docId) {
   const spalte = el('div', { class: 'sr-spalte ' + (D.einst.breite || 'mittel') }, istRich ? richPaket.leiste : null, wrap);
   const mitte = el('div', { class: 'sr-mitte' }, spalte);
 
-  const klangKnopf = el('button', { class: 'rundknopf zart' + (klangAktiv() ? ' klang-an' : ''), html: ik('klang'), title: 'Klang öffnen', onclick: () => { oeffneMischpult(); } });
+  const klangKnopf = el('button', { class: 'rundknopf zart' + ((klangAktiv() || (typeof ambienceAktiv === 'function' && ambienceAktiv())) ? ' klang-an' : ''), html: ik('klang'), title: 'Klang öffnen', onclick: () => { oeffneMischpult(); } });
   const vorleseKnopf = el('button', { class: 'rundknopf zart vorlese-knopf', html: ik('vorlesen'), title: 'Vorlesen lassen (nochmal tippen: Stopp)', onclick: (e) => {
     vorlesen((doc.titel ? doc.titel + '. ' : '') + srAktuellerText(), e.currentTarget);
   } });
@@ -6822,9 +7085,12 @@ function oeffneSchreibraum(docId) {
   ta.addEventListener('input', () => {
     ersetzeKlug();
     sichern();
-    const n = worte(istRich ? richReinerText(ta.innerHTML) : ta.value);
+    const roh = istRich ? richReinerText(ta.innerHTML) : ta.value;
+    const n = worte(roh);
     const dazu = n - startWorte;
     worteAnzeige.textContent = String(n) + (dazu > 0 ? ' · +' + dazu : '');
+    worteAnzeige.title = n.toLocaleString('de-DE') + ' Wörter · ' + roh.length.toLocaleString('de-DE')
+      + ' Zeichen · etwa ' + Math.max(1, Math.round(n / 200)) + ' Min. Lesezeit';
     kopf.classList.add('versunken');
     aktualisiereSpiegel();
     if (D.einst.typewriter) zentriereZeile();
@@ -6835,12 +7101,27 @@ function oeffneSchreibraum(docId) {
   });
   ta.addEventListener('keydown', (e) => {
     if (D.einst.tastenklang && e.key.length === 1) tippKlick();
-    if (e.key === 'Escape') schliesseSchreibraum(true);
+    if (e.key === 'Escape') { schliesseSchreibraum(true); return; }
+    const cmd = e.metaKey || e.ctrlKey;
+    /* Die Griffe, die man aus jedem Schreibprogramm im Finger hat. */
+    if (cmd && e.key.toLowerCase() === 's') { e.preventDefault(); friereEin(); return; }
+    if (cmd && e.key.toLowerCase() === 'f') { e.preventDefault(); sucheErsetze(); return; }
+    if (cmd && e.key === 'Enter') { e.preventDefault(); schliesseSchreibraum(true); return; }
+    /* Tab rückt ein, statt den Fokus aus dem Text zu werfen. */
+    if (e.key === 'Tab' && !istRich) {
+      e.preventDefault();
+      const s0 = ta.selectionStart, e0 = ta.selectionEnd;
+      ta.value = ta.value.slice(0, s0) + '\t' + ta.value.slice(e0);
+      ta.setSelectionRange(s0 + 1, s0 + 1);
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+    }
   });
   document.addEventListener('selectionchange', spiegelBeiAuswahl);
   raum.addEventListener('pointerdown', (e) => { if (!e.target.closest('.zeichenleiste')) kopf.classList.remove('versunken'); });
 
   aktualisiereSpiegel();
+  /* Hängt an diesem Text ein Klangbild? Dann legt es sich von selbst auf. */
+  if (typeof klangbildFolgen === 'function') klangbildFolgen(doc).catch(() => {});
   setTimeout(() => {
     ta.focus();
     if (!istRich) ta.setSelectionRange(ta.value.length, ta.value.length);
@@ -7216,7 +7497,8 @@ RENDER.brett = function (haupt, bid) {
 
   const kopfleiste = el('div', { class: 'schwebeleiste', style: 'left:16px;transform:none' },
     el('button', { class: 'rundknopf zart', html: ik('zurueck'), title: 'Zurück zu den Clustern', onclick: () => { speichereStill(brett); location.hash = '#/cluster'; } }),
-    el('span', { style: 'align-self:center;font-family:ui-serif,Georgia,serif;font-weight:600;padding:0 6px' }, brett.titel)
+    el('span', { style: 'align-self:center;font-family:ui-serif,Georgia,serif;font-weight:600;padding:0 6px' }, brett.titel),
+    el('button', { class: 'rundknopf zart', html: ik('teilen'), title: 'Brett als Bild hinausgeben', onclick: () => brettAlsBild(brett) })
   );
 
   const verbindenKnopf = el('button', {
@@ -7236,6 +7518,27 @@ RENDER.brett = function (haupt, bid) {
       class: 'rundknopf', html: ik('plus'), title: 'Neue Blase', onclick: () => {
         const mitte = weltPunkt(raum.clientWidth / 2, raum.clientHeight / 2);
         neuDoc('blase', { parent: brett.id, text: '', farbe: '', pos: { x: mitte.x - 110 + Math.random() * 40, y: mitte.y - 40 + Math.random() * 40 } });
+        baueBlasen();
+      }
+    }),
+    el('button', {
+      class: 'rundknopf', html: ik('kamera'), title: 'Bild aufs Brett', onclick: async () => {
+        const bild = await waehleBild();
+        if (!bild) return;
+        const mitte = weltPunkt(raum.clientWidth / 2, raum.clientHeight / 2);
+        const breite = 260;
+        neuDoc('brettbild', { parent: brett.id, bild: bild.id,
+          pos: { x: mitte.x - breite / 2, y: mitte.y - 90, rot: -2 + Math.random() * 4, w: breite } });
+        baueBlasen();
+      }
+    }),
+    el('button', {
+      class: 'rundknopf', html: ik('rahmen'), title: 'Gruppe um etwas legen', onclick: async () => {
+        const name = await eingabe({ titel: 'Wie heißt diese Gruppe?', platzhalter: 'z. B. Erster Teil' });
+        if (name === null) return;
+        const mitte = weltPunkt(raum.clientWidth / 2, raum.clientHeight / 2);
+        neuDoc('gruppe', { parent: brett.id, titel: name || 'Gruppe', farbe: '',
+          pos: { x: mitte.x - 220, y: mitte.y - 150, w: 440, h: 300 } });
         baueBlasen();
       }
     }),
@@ -7305,9 +7608,172 @@ RENDER.brett = function (haupt, bid) {
 
   /* Blasen bauen */
   function baueBlasen() {
-    $$('.denkblase', flaeche).forEach((x) => x.remove());
+    $$('.denkblase, .brettgruppe, .brettbild', flaeche).forEach((x) => x.remove());
+    /* Gruppen zuerst: sie liegen als Rahmen unter allem anderen. */
+    for (const g of kinder(brett.id, 'gruppe')) flaeche.append(baueGruppe(g));
+    for (const bi of kinder(brett.id, 'brettbild')) flaeche.append(baueBrettbild(bi));
     for (const b of kinder(brett.id, 'blase')) flaeche.append(baueBlase(b));
     baueKanten();
+  }
+
+  /* Ein Rahmen, der mitnimmt, was in ihm liegt. */
+  function baueGruppe(g) {
+    const kasten = el('div', { class: 'brettgruppe ' + (g.farbe || ''), 'data-id': g.id });
+    kasten.style.left = g.pos.x + 'px'; kasten.style.top = g.pos.y + 'px';
+    kasten.style.width = Math.max(120, g.pos.w || 440) + 'px';
+    kasten.style.height = Math.max(90, g.pos.h || 300) + 'px';
+    const titel = el('div', { class: 'gruppentitel' }, g.titel || 'Gruppe');
+    const griff = el('div', { class: 'gruppengriff', title: 'Größe ändern' });
+    kasten.append(titel, griff);
+
+    const innen = () => {
+      const x1 = g.pos.x, y1 = g.pos.y, x2 = x1 + (g.pos.w || 440), y2 = y1 + (g.pos.h || 300);
+      return kinder(brett.id, 'blase').concat(kinder(brett.id, 'brettbild'))
+        .filter((b) => b.pos && b.pos.x >= x1 - 8 && b.pos.y >= y1 - 8 && b.pos.x <= x2 && b.pos.y <= y2);
+    };
+
+    let zug = null;
+    titel.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      zug = { sx: e.clientX, sy: e.clientY, px: g.pos.x, py: g.pos.y, mit: innen().map((b) => ({ b, x: b.pos.x, y: b.pos.y })), bewegt: false };
+      try { titel.setPointerCapture(e.pointerId); } catch (x) {}
+    });
+    titel.addEventListener('pointermove', (e) => {
+      if (!zug) return;
+      const dx = (e.clientX - zug.sx) / sicht.z, dy = (e.clientY - zug.sy) / sicht.z;
+      if (!zug.bewegt && Math.hypot(dx, dy) < 5) return;
+      zug.bewegt = true; kasten._zieht = true;
+      g.pos.x = zug.px + dx; g.pos.y = zug.py + dy;
+      kasten.style.left = g.pos.x + 'px'; kasten.style.top = g.pos.y + 'px';
+      for (const m of zug.mit) {
+        m.b.pos.x = m.x + dx; m.b.pos.y = m.y + dy;
+        const el2 = flaeche.querySelector('[data-id="' + m.b.id + '"]');
+        if (el2) { el2.style.left = m.b.pos.x + 'px'; el2.style.top = m.b.pos.y + 'px'; }
+      }
+      baueKanten();
+    });
+    const endeZug = () => {
+      if (!zug) return;
+      if (zug.bewegt) { speichereStill(g); for (const m of zug.mit) speichereStill(m.b); }
+      zug = null; setTimeout(() => { kasten._zieht = false; }, 0);
+    };
+    titel.addEventListener('pointerup', endeZug);
+    titel.addEventListener('pointercancel', endeZug);
+
+    let groesse = null;
+    griff.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      groesse = { sx: e.clientX, sy: e.clientY, w: g.pos.w || 440, h: g.pos.h || 300 };
+      try { griff.setPointerCapture(e.pointerId); } catch (x) {}
+    });
+    griff.addEventListener('pointermove', (e) => {
+      if (!groesse) return;
+      g.pos.w = Math.max(120, groesse.w + (e.clientX - groesse.sx) / sicht.z);
+      g.pos.h = Math.max(90, groesse.h + (e.clientY - groesse.sy) / sicht.z);
+      kasten.style.width = g.pos.w + 'px'; kasten.style.height = g.pos.h + 'px';
+    });
+    const endeGroesse = () => { if (groesse) { speichereStill(g); groesse = null; } };
+    griff.addEventListener('pointerup', endeGroesse);
+    griff.addEventListener('pointercancel', endeGroesse);
+
+    langdruck(titel, async () => {
+      const wahl = await menue([
+        { text: 'Umbenennen', icon: 'stift', wert: 'name' },
+        { text: 'Andere Farbe', icon: 'farbe', wert: 'farbe' },
+        { text: 'Eng um den Inhalt legen', icon: 'wandel', wert: 'eng' },
+        { text: 'Gruppe auflösen (Inhalt bleibt)', icon: 'kreuz', wert: 'los', rot: true }
+      ], g.titel || 'Gruppe');
+      if (wahl === 'name') {
+        const n = await eingabe({ titel: 'Die Gruppe heißt jetzt …', wert: g.titel });
+        if (n !== null) { g.titel = n || 'Gruppe'; speichereStill(g); baueBlasen(); }
+      } else if (wahl === 'farbe') {
+        g.farbe = BLASENFARBEN[(BLASENFARBEN.indexOf(g.farbe || '') + 1) % BLASENFARBEN.length];
+        speichereStill(g); baueBlasen();
+      } else if (wahl === 'eng') {
+        const drin = innen();
+        if (!drin.length) { toast('In dieser Gruppe liegt noch nichts.'); return; }
+        let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+        for (const b of drin) {
+          const e2 = flaeche.querySelector('[data-id="' + b.id + '"]');
+          const bw = e2 ? e2.offsetWidth : 220, bh = e2 ? e2.offsetHeight : 70;
+          x1 = Math.min(x1, b.pos.x); y1 = Math.min(y1, b.pos.y);
+          x2 = Math.max(x2, b.pos.x + bw); y2 = Math.max(y2, b.pos.y + bh);
+        }
+        g.pos = { x: x1 - 26, y: y1 - 40, w: (x2 - x1) + 52, h: (y2 - y1) + 66 };
+        speichereStill(g); baueBlasen();
+      } else if (wahl === 'los') {
+        await loesche(g.id, true); baueBlasen();
+      }
+    });
+    return kasten;
+  }
+
+  /* Ein Bild auf dem Brett: verschieben, Größe ändern, drehen. */
+  function baueBrettbild(bi) {
+    const kasten = el('div', { class: 'brettbild', 'data-id': bi.id });
+    kasten.style.left = bi.pos.x + 'px'; kasten.style.top = bi.pos.y + 'px';
+    kasten.style.width = Math.max(60, bi.pos.w || 260) + 'px';
+    kasten.style.transform = 'rotate(' + (bi.pos.rot || 0) + 'deg)';
+    const img = el('img', { alt: bi.titel || '' });
+    setzeBild(img, bi.bild);
+    const griff = el('div', { class: 'brettbildgriff', title: 'Größe ändern' });
+    kasten.append(img, griff);
+    if (bi.titel) kasten.append(el('div', { class: 'brettbildtitel' }, bi.titel));
+
+    let zug = null;
+    kasten.addEventListener('pointerdown', (e) => {
+      if (e.target === griff) return;
+      zug = { sx: e.clientX, sy: e.clientY, px: bi.pos.x, py: bi.pos.y, bewegt: false };
+      try { kasten.setPointerCapture(e.pointerId); } catch (x) {}
+      e.preventDefault();
+    });
+    kasten.addEventListener('pointermove', (e) => {
+      if (!zug) return;
+      const dx = (e.clientX - zug.sx) / sicht.z, dy = (e.clientY - zug.sy) / sicht.z;
+      if (!zug.bewegt && Math.hypot(dx, dy) < 5) return;
+      zug.bewegt = true; kasten._zieht = true;
+      bi.pos.x = zug.px + dx; bi.pos.y = zug.py + dy;
+      kasten.style.left = bi.pos.x + 'px'; kasten.style.top = bi.pos.y + 'px';
+    });
+    const ende = () => { if (zug) { if (zug.bewegt) speichereStill(bi); zug = null; setTimeout(() => { kasten._zieht = false; }, 0); } };
+    kasten.addEventListener('pointerup', ende);
+    kasten.addEventListener('pointercancel', ende);
+
+    let groesse = null;
+    griff.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      groesse = { sx: e.clientX, w: bi.pos.w || 260 };
+      try { griff.setPointerCapture(e.pointerId); } catch (x) {}
+    });
+    griff.addEventListener('pointermove', (e) => {
+      if (!groesse) return;
+      bi.pos.w = Math.max(60, Math.min(1400, groesse.w + (e.clientX - groesse.sx) / sicht.z));
+      kasten.style.width = bi.pos.w + 'px';
+    });
+    const endeG = () => { if (groesse) { speichereStill(bi); groesse = null; } };
+    griff.addEventListener('pointerup', endeG);
+    griff.addEventListener('pointercancel', endeG);
+
+    langdruck(kasten, async () => {
+      const wahl = await menue([
+        { text: bi.titel ? 'Beschriftung ändern' : 'Beschriften', icon: 'stift', wert: 'titel' },
+        { text: 'Etwas drehen', icon: 'drehen', wert: 'drehen' },
+        { text: 'Gerade rücken', icon: 'ausBlock', wert: 'gerade' },
+        { text: 'Vom Brett nehmen', icon: 'muell', wert: 'weg', rot: true }
+      ]);
+      if (wahl === 'titel') {
+        const n = await eingabe({ titel: 'Was steht auf dem Bild?', wert: bi.titel || '' });
+        if (n !== null) { bi.titel = n; speichereStill(bi); baueBlasen(); }
+      } else if (wahl === 'drehen') {
+        bi.pos.rot = ((bi.pos.rot || 0) + 5); if (bi.pos.rot > 12) bi.pos.rot = -10;
+        speichereStill(bi); kasten.style.transform = 'rotate(' + bi.pos.rot + 'deg)';
+      } else if (wahl === 'gerade') {
+        bi.pos.rot = 0; speichereStill(bi); kasten.style.transform = 'rotate(0deg)';
+      } else if (wahl === 'weg' && await frage('Das Bild vom Brett nehmen?', { ja: 'Wegnehmen', gefahr: true })) {
+        await loesche(bi.id); baueBlasen();
+      }
+    });
+    return kasten;
   }
   function baueBlase(b) {
     const blase = el('div', { class: 'denkblase ' + (b.farbe || ''), 'data-id': b.id });
@@ -7446,6 +7912,177 @@ RENDER.brett = function (haupt, bid) {
     toast('Doppelt tippen — da, wo ein Gedanke hin soll.');
   }
 };
+
+
+/* ----- Ein Brett als Bild -----
+   Alles, was auf dem Brett liegt, wird auf eine Leinwand gemalt: Gruppen als
+   Rahmen, Fäden als Linien, Bilder als Bilder, Blasen als beschriftete Karten.
+   Herauskommt ein PNG, das man verschicken oder ausdrucken kann. */
+async function brettAlsBild(brett) {
+  const blasen = kinder(brett.id, 'blase');
+  const bilder = kinder(brett.id, 'brettbild');
+  const gruppen = kinder(brett.id, 'gruppe');
+  const kanten = kinder(brett.id, 'kante');
+  if (!blasen.length && !bilder.length && !gruppen.length) { toast('Auf diesem Brett liegt noch nichts.'); return; }
+  toast('Male das Brett …');
+
+  /* Vorhandene Maße aus der Anzeige holen, sonst schätzen. */
+  const masse = new Map();
+  for (const b of blasen) {
+    const e = document.querySelector('.denkblase[data-id="' + b.id + '"]');
+    masse.set(b.id, { w: e ? e.offsetWidth : 220, h: e ? e.offsetHeight : 64 });
+  }
+
+  /* Bilder vorher laden, damit sie beim Malen fertig sind. */
+  const geladen = new Map();
+  for (const bi of bilder) {
+    const url = await bildURL(bi.bild);
+    if (!url) continue;
+    const img = new Image();
+    await new Promise((r) => { img.onload = r; img.onerror = r; img.src = url; });
+    if (img.naturalWidth) geladen.set(bi.id, img);
+  }
+
+  let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+  const merke = (x, y, w, h) => { x1 = Math.min(x1, x); y1 = Math.min(y1, y); x2 = Math.max(x2, x + w); y2 = Math.max(y2, y + h); };
+  for (const g of gruppen) merke(g.pos.x, g.pos.y - 24, g.pos.w || 440, (g.pos.h || 300) + 24);
+  for (const b of blasen) { const m = masse.get(b.id); merke(b.pos.x, b.pos.y, m.w, m.h); }
+  for (const bi of bilder) {
+    const img = geladen.get(bi.id);
+    const w = bi.pos.w || 260;
+    merke(bi.pos.x, bi.pos.y, w, img ? w * (img.naturalHeight / img.naturalWidth) + 26 : 180);
+  }
+  if (!Number.isFinite(x1)) { toast('Auf diesem Brett liegt noch nichts.'); return; }
+
+  const rand = 60;
+  const breite = Math.min(6000, Math.round(x2 - x1 + rand * 2));
+  const hoehe = Math.min(6000, Math.round(y2 - y1 + rand * 2 + 54));
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const c = document.createElement('canvas');
+  c.width = Math.round(breite * dpr); c.height = Math.round(hoehe * dpr);
+  const g = c.getContext('2d');
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const stil = getComputedStyle(document.documentElement);
+  const farbe = (n, ersatz) => (stil.getPropertyValue(n) || '').trim() || ersatz;
+  const hg = farbe('--hg', '#ece3d1'), papier = farbe('--papier', '#f8f3e7');
+  const tinte = farbe('--tinte', '#2c251c'), linie = farbe('--linie', 'rgba(90,74,52,.3)');
+  const blass = farbe('--blass', '#82755f'), akzent = farbe('--akzent', '#b0552f');
+
+  g.fillStyle = hg; g.fillRect(0, 0, breite, hoehe);
+  const vx = (x) => x - x1 + rand, vy = (y) => y - y1 + rand + 40;
+
+  /* Kopfzeile */
+  g.fillStyle = tinte; g.font = '600 22px ui-serif, Georgia, serif';
+  g.fillText(brett.titel || 'Brett', rand, 34);
+  g.fillStyle = blass; g.font = '13px ui-rounded, system-ui, sans-serif';
+  g.fillText(blasen.length + (blasen.length === 1 ? ' Blase' : ' Blasen') + ' · ' + fmtDatum(Date.now()), rand, 54);
+
+  const rundesRechteck = (x, y, w, h, r) => {
+    const rr = Math.min(r, w / 2, h / 2);
+    g.beginPath();
+    g.moveTo(x + rr, y); g.lineTo(x + w - rr, y); g.quadraticCurveTo(x + w, y, x + w, y + rr);
+    g.lineTo(x + w, y + h - rr); g.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
+    g.lineTo(x + rr, y + h); g.quadraticCurveTo(x, y + h, x, y + h - rr);
+    g.lineTo(x, y + rr); g.quadraticCurveTo(x, y, x + rr, y); g.closePath();
+  };
+
+  /* Gruppen */
+  for (const gr of gruppen) {
+    g.save();
+    g.strokeStyle = linie; g.setLineDash([7, 6]); g.lineWidth = 1.5;
+    rundesRechteck(vx(gr.pos.x), vy(gr.pos.y), gr.pos.w || 440, gr.pos.h || 300, 16);
+    g.stroke(); g.setLineDash([]);
+    g.fillStyle = blass; g.font = '600 13px ui-rounded, system-ui, sans-serif';
+    g.fillText((gr.titel || 'Gruppe').slice(0, 60), vx(gr.pos.x) + 6, vy(gr.pos.y) - 8);
+    g.restore();
+  }
+
+  /* Fäden */
+  const mitte = (b) => {
+    if (masse.has(b.id)) { const m = masse.get(b.id); return { x: vx(b.pos.x) + m.w / 2, y: vy(b.pos.y) + m.h / 2 }; }
+    const w = b.pos.w || 260;
+    const img = geladen.get(b.id);
+    return { x: vx(b.pos.x) + w / 2, y: vy(b.pos.y) + (img ? w * (img.naturalHeight / img.naturalWidth) : 160) / 2 };
+  };
+  g.strokeStyle = linie; g.lineWidth = 1.6;
+  g.font = '11px ui-rounded, system-ui, sans-serif';
+  for (const k of kanten) {
+    const von = D.docs.get(k.von), zu = D.docs.get(k.zu);
+    if (!von || !zu || !von.pos || !zu.pos) continue;
+    const a = mitte(von), b = mitte(zu);
+    g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
+    if (k.label) {
+      g.fillStyle = blass;
+      g.textAlign = 'center';
+      g.fillText(String(k.label).slice(0, 40), (a.x + b.x) / 2, (a.y + b.y) / 2 - 6);
+      g.textAlign = 'left';
+    }
+  }
+
+  /* Bilder */
+  for (const bi of bilder) {
+    const img = geladen.get(bi.id);
+    const w = bi.pos.w || 260;
+    const h = img ? w * (img.naturalHeight / img.naturalWidth) : 160;
+    g.save();
+    g.translate(vx(bi.pos.x) + w / 2, vy(bi.pos.y) + h / 2);
+    g.rotate((bi.pos.rot || 0) * Math.PI / 180);
+    g.fillStyle = '#fdfcf7';
+    g.shadowColor = 'rgba(0,0,0,.22)'; g.shadowBlur = 12; g.shadowOffsetY = 4;
+    g.fillRect(-w / 2 - 8, -h / 2 - 8, w + 16, h + (bi.titel ? 40 : 16));
+    g.shadowColor = 'transparent';
+    if (img) g.drawImage(img, -w / 2, -h / 2, w, h);
+    if (bi.titel) {
+      g.fillStyle = '#3a3325'; g.font = '12px ui-rounded, system-ui, sans-serif'; g.textAlign = 'center';
+      g.fillText(String(bi.titel).slice(0, 44), 0, h / 2 + 22); g.textAlign = 'left';
+    }
+    g.restore();
+  }
+
+  /* Blasen */
+  const FARBEN = { 'b-gelb': '#f6e9a8', 'b-rot': '#f3cfd3', 'b-gruen': '#d3e3bd', 'b-blau': '#cadfea' };
+  for (const b of blasen) {
+    const m = masse.get(b.id);
+    const x = vx(b.pos.x), y = vy(b.pos.y);
+    g.save();
+    g.shadowColor = 'rgba(0,0,0,.14)'; g.shadowBlur = 9; g.shadowOffsetY = 3;
+    g.fillStyle = FARBEN[b.farbe] || papier;
+    rundesRechteck(x, y, m.w, m.h, 14); g.fill();
+    g.shadowColor = 'transparent';
+    g.strokeStyle = linie; g.lineWidth = 1; g.stroke();
+    g.fillStyle = tinte; g.font = '14px ui-rounded, system-ui, sans-serif';
+    const worte = String(b.text || '').split(/\s+/).filter(Boolean);
+    let zeile = '', zy = y + 22;
+    for (const w of worte) {
+      const probe = zeile ? zeile + ' ' + w : w;
+      if (g.measureText(probe).width > m.w - 26 && zeile) {
+        g.fillText(zeile, x + 13, zy); zeile = w; zy += 19;
+        if (zy > y + m.h - 6) { zeile = ''; break; }
+      } else zeile = probe;
+    }
+    if (zeile) g.fillText(zeile, x + 13, zy);
+    if (b.quelle && D.docs.get(b.quelle)) {
+      g.fillStyle = akzent; g.font = '10px ui-rounded, system-ui, sans-serif';
+      g.fillText(docName(D.docs.get(b.quelle)).slice(0, 28), x + 13, y + m.h - 7);
+    }
+    g.restore();
+  }
+
+  const name = (brett.titel || 'Brett').replace(/[^\wäöüÄÖÜß -]/g, '').trim().slice(0, 50) || 'Brett';
+  c.toBlob(async (blob) => {
+    if (!blob) { toast('Das Bild wollte nicht.'); return; }
+    const datei = new File([blob], name + '.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [datei] })) {
+      try { await navigator.share({ files: [datei] }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    const url = URL.createObjectURL(blob);
+    const a = el('a', { href: url, download: name + '.png', style: 'display:none' });
+    document.body.append(a); a.click();
+    setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 4000);
+    toast('Das Brett liegt als Bild bereit — schau in „Dateien".', 4200);
+  }, 'image/png');
+}
 
 /* ================================================================
    VANI — Wörter: eigene Kisten, Wortschatz & Funken
@@ -7729,13 +8366,17 @@ RENDER.woerter = function (haupt) {
   async function wortAktion(wort) {
     const wahl = await menue([
       { text: 'Damit schreiben', icon: 'stift', wert: 'schreiben' },
+      { text: 'Wort kopieren', icon: 'teilen', wert: 'kopieren-wort' },
       { text: 'Wortzettel bearbeiten', icon: 'drehen', wert: 'edit' },
       { text: wort.favorit ? 'Oben lösen' : 'Oben anheften', icon: 'pin', wert: 'favorit' },
       wortkisten().length ? { text: 'In eine andere Kiste verschieben', icon: 'woerter', wert: 'verschieben' } : null,
       wortkisten().length ? { text: 'In eine Kiste kopieren', icon: 'plus', wert: 'kopieren' } : null,
       { text: 'Aus der Sammlung nehmen', icon: 'muell', wert: 'weg', rot: true }
     ], wort.text || 'Wort');
-    if (wahl === 'schreiben') {
+    if (wahl === 'kopieren-wort') {
+      try { await navigator.clipboard.writeText(wort.text || ''); toast('Kopiert.'); }
+      catch (e) { teileText(wort.text || ''); }
+    } else if (wahl === 'schreiben') {
       const seite = blattAusText('', (wort.text || '') + ' —\n\n'); oeffneSchreibraum(seite.id);
     } else if (wahl === 'edit') {
       const daten = await wortFormular(wort);
@@ -7860,7 +8501,9 @@ const SUCH_GRUPPEN = [
   ['wort', 'Wörter', 'woerter'],
   ['faden', 'Faden', 'faden'],
   ['funkeln', 'Funken', 'woerter'],
-  ['mischung', 'Klang-Szenen', 'klang']
+  ['mischung', 'Klang-Szenen', 'klang'],
+  ['klangbild', 'Klangbilder', 'klang'],
+  ['klang', 'Eigene Klänge', 'klang']
 ];
 
 /* Ein kaputter Eintrag im Browser-Speicher darf die Suche nicht lahmlegen. */
@@ -8276,7 +8919,12 @@ RENDER.feinheiten = function (haupt) {
     for (const b of alle.slice(0, 30)) {
       korbKarte.append(el('div', { class: 'einstellzeile' },
         el('span', { class: 'ename' }, (b.name || b.typ),
-          el('div', { style: 'font-size:12px;color:var(--blass)' }, b.docs.length + (b.docs.length === 1 ? ' Ding · ' : ' Dinge · ') + vorZeit(b.wann))),
+          el('div', { style: 'font-size:12px;color:var(--blass)' },
+            b.docs.length + (b.docs.length === 1 ? ' Ding · ' : ' Dinge · ') + vorZeit(b.wann)
+            + (() => {
+              const w = (b.docs || []).reduce((n, d) => n + worte(d && d.text || ''), 0);
+              return w ? ' · ' + w.toLocaleString('de-DE') + ' Wörter' : '';
+            })())),
         el('button', {
           class: 'knopf', style: 'padding:6px 12px', onclick: async () => {
             await holeZurueck(b.id); toast('Wieder da.'); baueKorb();
@@ -9586,119 +10234,777 @@ document.addEventListener('pointerdown', async () => {
 }, true);
 
 /* ================================================================
-   VANI — Klang: der Atmosphären-Fundus
+   VANI — Ambiences: echte Aufnahmen statt gerechneter Klänge
+
+   Drei Dinge machen das hier besser als üblich:
+
+   1. Nahtlos. Zwei Abspieler laufen versetzt und blenden ineinander über.
+      Dadurch hört man nie die Naht, an der ein Loop von vorn beginnt — auch
+      bei Aufnahmen, die gar nicht als Loop geschnitten wurden.
+   2. Lebendig. Jede Ebene atmet: Lautstärke und Klangfarbe wandern langsam,
+      damit eine Minute Aufnahme nicht nach einer Minute Aufnahme klingt.
+   3. Sparsam. Nichts wird geladen, bevor es gebraucht wird. Einmal geholt,
+      liegt eine Aufnahme dauerhaft im Gerät — auch offline, auch im Flugzeug.
    ================================================================ */
 
-function baueMischpult(kompakt) {
-  const wurzel = el('div', { class: 'mischpult' + (kompakt ? ' kompakt' : '') });
+const AMBIENCE_VERSION = 1;
+const AMBIENCE_MAX = 40 * 1024 * 1024;   /* je Datei: großzügig, aber begrenzt */
 
+/* Der mitgelieferte Fundus. `datei` liegt neben der App, `quelle` nennt die
+   Herkunft ehrlich. Eigene Aufnahmen kommen als Dokumente vom Typ „klang"
+   dazu und stehen gleichberechtigt daneben. */
+let AMBIENCE_KATALOG = [];
+function ambienceKatalogSetzen(liste) {
+  AMBIENCE_KATALOG = (Array.isArray(liste) ? liste : []).filter((k) => k && typeof k.id === 'string' && /^[a-z0-9_-]{1,40}$/.test(k.id))
+    .map((k) => ({
+      id: k.id,
+      name: String(k.name || k.id).slice(0, 60),
+      kat: String(k.kat || 'Sonst').slice(0, 30),
+      datei: String(k.datei || (k.id + '.opus')).replace(/[^a-zA-Z0-9._-]/g, ''),
+      mb: begrenze(k.mb, 0, 100, 0),
+      quelle: String(k.quelle || '').slice(0, 200)
+    }));
+  return AMBIENCE_KATALOG;
+}
+
+/* Eigene Klänge: Dokumente vom Typ „klang" mit der Aufnahme in `datei` (Medien). */
+function eigeneAmbiences() { return vomTyp('klang'); }
+function alleAmbiences() {
+  return [...AMBIENCE_KATALOG.map((k) => ({ ...k, eigen: false })),
+    ...eigeneAmbiences().map((d) => ({ id: 'eigen:' + d.id, name: d.titel || 'Eigener Klang', kat: d.art || 'Meine', eigen: true, doc: d }))];
+}
+function ambienceFinde(id) { return alleAmbiences().find((a) => a.id === id) || null; }
+function ambienceKategorien() {
+  const raus = [];
+  for (const a of alleAmbiences()) if (!raus.includes(a.kat)) raus.push(a.kat);
+  return raus;
+}
+
+/* ----- Vorrat: einmal geholt, für immer da ----- */
+function ambienceSchluessel(id) { return 'ambience:' + AMBIENCE_VERSION + ':' + id; }
+async function ambienceImVorrat(id) {
+  try { return !!(await dbGet('media', ambienceSchluessel(id))); } catch (e) { return false; }
+}
+async function ambienceVorratStand() {
+  const raus = { da: [], fehlt: [], bytes: 0 };
+  for (const a of alleAmbiences()) {
+    if (a.eigen) { raus.da.push(a.id); continue; }
+    const blob = await dbGet('media', ambienceSchluessel(a.id)).catch(() => null);
+    if (blob) { raus.da.push(a.id); raus.bytes += blob.size || 0; } else raus.fehlt.push(a.id);
+  }
+  return raus;
+}
+async function ambienceVorratLeeren() {
+  let weg = 0;
+  for (const a of AMBIENCE_KATALOG) {
+    if (await ambienceImVorrat(a.id)) { await dbDel('media', ambienceSchluessel(a.id)).catch(() => {}); weg++; }
+  }
+  _ambiencePuffer.clear();
+  return weg;
+}
+
+/* Holt eine Aufnahme — aus dem Vorrat, sonst aus dem Netz und dann in den Vorrat. */
+async function ambienceBlob(id, beiFortschritt) {
+  const a = ambienceFinde(id);
+  if (!a) throw new Error('Diesen Klang gibt es nicht.');
+  if (a.eigen) {
+    const blob = await dbGet('media', a.doc.datei);
+    if (!blob) throw new Error('Die Aufnahme ist nicht mehr da.');
+    return blob;
+  }
+  const schluessel = ambienceSchluessel(id);
+  const gespeichert = await dbGet('media', schluessel).catch(() => null);
+  if (gespeichert) return gespeichert;
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) throw new Error('Dafür braucht es einmal Internet.');
+  const antwort = await fetch('klang/' + a.datei, { cache: 'force-cache' });
+  if (!antwort.ok) throw new Error('Der Klang ließ sich nicht laden.');
+  const gesamt = Number(antwort.headers.get('content-length')) || 0;
+  let blob;
+  if (antwort.body && beiFortschritt && gesamt) {
+    const leser = antwort.body.getReader();
+    const stuecke = [];
+    let geladen = 0;
+    for (;;) {
+      const { done, value } = await leser.read();
+      if (done) break;
+      stuecke.push(value); geladen += value.length;
+      if (geladen > AMBIENCE_MAX) throw new Error('Diese Aufnahme ist zu groß.');
+      beiFortschritt(Math.min(1, geladen / gesamt));
+    }
+    blob = new Blob(stuecke, { type: 'audio/ogg' });
+  } else {
+    blob = await antwort.blob();
+    if (blob.size > AMBIENCE_MAX) throw new Error('Diese Aufnahme ist zu groß.');
+  }
+  await dbPut('media', blob, schluessel).catch(() => {});
+  return blob;
+}
+
+/* Dekodierte Aufnahmen bleiben im Speicher, solange die App offen ist. */
+const _ambiencePuffer = new Map();
+async function ambiencePuffer(id, beiFortschritt) {
+  if (_ambiencePuffer.has(id)) return _ambiencePuffer.get(id);
+  const a = holeAudio();
+  const blob = await ambienceBlob(id, beiFortschritt);
+  const roh = await blob.arrayBuffer();
+  const puffer = await new Promise((res, rej) => {
+    const fertig = (p) => res(p), schief = (e) => rej(e || new Error('Diese Aufnahme versteht der Browser nicht.'));
+    try {
+      const p = a.ctx.decodeAudioData(roh, fertig, schief);
+      if (p && typeof p.then === 'function') p.then(fertig, schief);
+    } catch (e) { schief(e); }
+  });
+  _ambiencePuffer.set(id, puffer);
+  return puffer;
+}
+
+/* ----- Der Kern: ein Loop ohne hörbare Naht -----
+   Zwei Quellen laufen abwechselnd. Die zweite startet, während die erste noch
+   ausklingt; beide Rampen kreuzen sich. Wo eine harte Wiederholung knacken
+   würde, entsteht so ein weicher, endloser Übergang. */
+function ambienceStimmeBauen(a, puffer, ziel, einstellung) {
+  const e = einstellung || {};
+  const blende = begrenze(e.blende, .5, 12, Math.min(4, puffer.duration / 5));
+  const tempo = begrenze(e.tempo, .5, 2, 1);
+  const laenge = puffer.duration / tempo;
+  const abstand = Math.max(.6, laenge - blende);
+
+  const aus = a.ctx.createGain();
+  aus.gain.value = 1;
+  const filter = a.ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = begrenze(e.klarheit, 300, 20000, 20000);
+  const tiefe = a.ctx.createBiquadFilter();
+  tiefe.type = 'highpass';
+  tiefe.frequency.value = begrenze(e.tiefe, 20, 2000, 20);
+  aus.connect(tiefe); tiefe.connect(filter); filter.connect(ziel);
+
+  const quellen = new Set();
+  let timer = null, gestoppt = false, erster = true;
+
+  const starte = (wann) => {
+    if (gestoppt) return;
+    const q = a.ctx.createBufferSource();
+    q.buffer = puffer;
+    q.playbackRate.value = tempo;
+    /* Der erste Einsatz kommt schnell — sonst wartet man beim Antippen
+       sekundenlang auf Stille. Erst die Wiederholungen blenden weich. */
+    const auf = erster ? Math.min(.9, blende) : blende;
+    erster = false;
+    const g = a.ctx.createGain();
+    g.gain.setValueAtTime(.0001, wann);
+    g.gain.exponentialRampToValueAtTime(1, wann + auf);
+    g.gain.setValueAtTime(1, wann + Math.max(auf, laenge - blende));
+    g.gain.exponentialRampToValueAtTime(.0001, wann + laenge);
+    q.connect(g); g.connect(aus);
+    q.start(wann);
+    q.stop(wann + laenge + .1);
+    quellen.add(q);
+    q.onended = () => { quellen.delete(q); try { g.disconnect(); } catch (x) {} };
+    timer = setTimeout(() => starte(a.ctx.currentTime + .05), Math.max(120, abstand * 1000 - 220));
+  };
+  starte(a.ctx.currentTime + .04);
+
+  /* Atmen: die Aufnahme wandert langsam in Lautstärke und Klangfarbe. */
+  let atem = null;
+  const atmen = begrenze(e.atmen, 0, 1, .35);
+  if (atmen > 0) {
+    const tu = () => {
+      const t = a.ctx.currentTime;
+      aus.gain.setTargetAtTime(1 - atmen * .45 * Math.random(), t, 4.5);
+      if (filter.frequency.value < 19000) filter.frequency.setTargetAtTime(begrenze(e.klarheit, 300, 20000, 20000) * (.8 + Math.random() * .35), t, 6);
+      atem = setTimeout(tu, 7000 + Math.random() * 9000);
+    };
+    atem = setTimeout(tu, 3000 + Math.random() * 5000);
+  }
+
+  return {
+    ausgang: aus,
+    setzeTempo(v) { for (const q of quellen) { try { q.playbackRate.setTargetAtTime(begrenze(v, .5, 2, 1), a.ctx.currentTime, .4); } catch (x) {} } },
+    setzeKlarheit(v) { try { filter.frequency.setTargetAtTime(begrenze(v, 300, 20000, 20000), a.ctx.currentTime, .3); } catch (x) {} },
+    setzeTiefe(v) { try { tiefe.frequency.setTargetAtTime(begrenze(v, 20, 2000, 20), a.ctx.currentTime, .3); } catch (x) {} },
+    stop() {
+      gestoppt = true;
+      clearTimeout(timer); clearTimeout(atem);
+      for (const q of quellen) { try { q.stop(); } catch (x) {} }
+      quellen.clear();
+      try { aus.disconnect(); } catch (x) {}
+    }
+  };
+}
+
+/* ----- Steuerung: welche Ambience läuft wie laut ----- */
+function saubereAmbienceMischung(pegel) {
+  const raus = {};
+  if (!pegel || typeof pegel !== 'object' || Array.isArray(pegel)) return raus;
+  const erlaubt = new Set(alleAmbiences().map((a) => a.id));
+  for (const [id, wert] of Object.entries(pegel)) {
+    if (!erlaubt.has(id)) continue;
+    const v = begrenze(wert, 0, 1, 0);
+    if (v > 0) raus[id] = v;
+  }
+  return raus;
+}
+function saubereAmbienceFeinheit(f) {
+  const q = f && typeof f === 'object' && !Array.isArray(f) ? f : {};
+  return {
+    tempo: begrenze(q.tempo, .5, 2, 1),
+    klarheit: begrenze(q.klarheit, 300, 20000, 20000),
+    tiefe: begrenze(q.tiefe, 20, 2000, 20),
+    atmen: begrenze(q.atmen, 0, 1, .35),
+    blende: begrenze(q.blende, .5, 12, 4)
+  };
+}
+
+const _ambienceLaeuft = new Map();   /* id -> { gain, stimme } */
+
+function ambienceFeinheitVon(id) {
+  const alle = D.einst.ambienceFein && typeof D.einst.ambienceFein === 'object' ? D.einst.ambienceFein : {};
+  return saubereAmbienceFeinheit(alle[id]);
+}
+function ambienceFeinheitSetzen(id, teil) {
+  if (!D.einst.ambienceFein || typeof D.einst.ambienceFein !== 'object') D.einst.ambienceFein = {};
+  const jetzt = ambienceFeinheitVon(id);
+  D.einst.ambienceFein[id] = saubereAmbienceFeinheit({ ...jetzt, ...teil });
+  speichereEinst();
+  const laeuft = _ambienceLaeuft.get(id);
+  if (laeuft && laeuft.stimme) {
+    const f = D.einst.ambienceFein[id];
+    laeuft.stimme.setzeTempo(f.tempo);
+    laeuft.stimme.setzeKlarheit(f.klarheit);
+    laeuft.stimme.setzeTiefe(f.tiefe);
+  }
+  return D.einst.ambienceFein[id];
+}
+
+function ambienceAus(id) {
+  const l = _ambienceLaeuft.get(id);
+  if (!l) return;
+  _ambienceLaeuft.delete(id);
+  try {
+    l.gain.gain.setTargetAtTime(.0001, _audio.ctx.currentTime, .5);
+    setTimeout(() => { try { l.stimme.stop(); l.gain.disconnect(); } catch (e) {} }, 1600);
+  } catch (e) { try { l.stimme.stop(); } catch (x) {} }
+}
+
+async function ambienceAn(id, staerke, beiFortschritt) {
+  staerke = begrenze(staerke, 0, 1, .5);
+  if (staerke <= 0) { ambienceAus(id); return false; }
+  const a = holeAudio();
+  const laeuft = _ambienceLaeuft.get(id);
+  if (laeuft) { laeuft.gain.gain.setTargetAtTime(staerke, a.ctx.currentTime, .4); return true; }
+  const puffer = await ambiencePuffer(id, beiFortschritt);
+  if (!D.einst.ambience || !D.einst.ambience[id]) return false;  /* zwischenzeitlich abgewählt */
+  const gain = a.ctx.createGain();
+  gain.gain.value = .0001;
+  gain.connect(a.master);
+  const stimme = ambienceStimmeBauen(a, puffer, gain, ambienceFeinheitVon(id));
+  gain.gain.setTargetAtTime(staerke, a.ctx.currentTime, .25);
+  _ambienceLaeuft.set(id, { gain, stimme });
+  return true;
+}
+
+/* Wendet eine ganze Mischung an: neue an, alte aus, Lautstärken nach. */
+async function ambienceMischungAnwenden(pegel, beiFortschritt) {
+  D.einst.ambience = saubereAmbienceMischung(pegel);
+  speichereEinst();
+  for (const id of [..._ambienceLaeuft.keys()]) if (!D.einst.ambience[id]) ambienceAus(id);
+  const fehler = [];
+  for (const [id, v] of Object.entries(D.einst.ambience)) {
+    try { await ambienceAn(id, v, beiFortschritt ? (p) => beiFortschritt(id, p) : null); }
+    catch (e) { fehler.push({ id, meldung: (e && e.message) || 'Ging nicht.' }); delete D.einst.ambience[id]; }
+  }
+  if (fehler.length) speichereEinst();
+  return fehler;
+}
+function ambienceAktiv() { return Object.values(D.einst.ambience || {}).some((v) => v > 0); }
+function ambienceAllesAus() { return ambienceMischungAnwenden({}); }
+
+/* ----- Klangbilder: eine Mischung mit Namen -----
+   Ein Klangbild kann an einer Szene, einem Kapitel, einem Heft oder einem
+   Projekt hängen. Wer dort zu schreiben beginnt, hört es von selbst. */
+function klangbilder() { return vomTyp('klangbild').sort((a, b) => (a.titel || '').localeCompare(b.titel || '', 'de')); }
+function klangbildJetzt(titel) {
+  const pegel = { ...(D.einst.ambience || {}) };
+  const gewebt = { ...(D.einst.mischung || {}) };
+  return neuDoc('klangbild', {
+    titel: String(titel || 'Ohne Namen').slice(0, 60),
+    pegel, gewebt,
+    fein: JSON.parse(JSON.stringify(D.einst.ambienceFein || {})),
+    lautstaerke: begrenze(D.einst.lautstaerke, 0, 1, .5)
+  });
+}
+async function klangbildAnwenden(doc) {
+  if (!doc) return false;
+  if (doc.fein && typeof doc.fein === 'object') {
+    D.einst.ambienceFein = {};
+    for (const [id, f] of Object.entries(doc.fein)) D.einst.ambienceFein[id] = saubereAmbienceFeinheit(f);
+  }
+  if (typeof doc.lautstaerke === 'number') setzeLautstaerke(begrenze(doc.lautstaerke, 0, 1, .5));
+  if (typeof mischungAnwenden === 'function') mischungAnwenden(doc.gewebt || {});
+  await ambienceMischungAnwenden(doc.pegel || {});
+  return true;
+}
+
+/* Bindung: welches Klangbild gehört zu diesem Ort im Text? */
+function klangbildFuer(doc) {
+  if (!doc) return null;
+  const kette = [doc.id, doc.parent, doc.projekt];
+  for (const id of kette) {
+    if (!id) continue;
+    const b = klangbilder().find((k) => Array.isArray(k.orte) && k.orte.includes(id));
+    if (b) return b;
+  }
+  /* eine Ebene höher: Kapitel eines Elternteils */
+  const eltern = doc.parent && D.docs.get(doc.parent);
+  if (eltern && eltern.parent) {
+    const b = klangbilder().find((k) => Array.isArray(k.orte) && k.orte.includes(eltern.parent));
+    if (b) return b;
+  }
+  return null;
+}
+function klangbildBinden(bild, ortId) {
+  if (!bild || !ortId) return false;
+  for (const k of klangbilder()) {
+    if (!Array.isArray(k.orte)) continue;
+    if (k.orte.includes(ortId) && k.id !== bild.id) { k.orte = k.orte.filter((x) => x !== ortId); speichereStill(k); }
+  }
+  bild.orte = [...new Set([...(Array.isArray(bild.orte) ? bild.orte : []), ortId])].slice(0, 200);
+  speichereStill(bild);
+  return true;
+}
+function klangbildLoesen(ortId) {
+  let ab = 0;
+  for (const k of klangbilder()) {
+    if (Array.isArray(k.orte) && k.orte.includes(ortId)) { k.orte = k.orte.filter((x) => x !== ortId); speichereStill(k); ab++; }
+  }
+  return ab;
+}
+
+/* Beim Öffnen eines Textes das passende Klangbild anlegen — nur wenn erlaubt
+   und nur, wenn nicht schon genau dieses läuft. */
+let _klangbildZuletzt = null;
+async function klangbildFolgen(doc) {
+  if (!D.einst.klangFolgt) return false;
+  const bild = klangbildFuer(doc);
+  if (!bild || _klangbildZuletzt === bild.id) return false;
+  _klangbildZuletzt = bild.id;
+  await klangbildAnwenden(bild);
+  toast('Klangbild „' + (bild.titel || 'Ohne Namen') + '" — passend zu diesem Ort.', 3200);
+  return true;
+}
+
+/* ----- Einschlafen: langsam leiser werden ----- */
+let _ausklang = null;
+function ausklangLaeuft() { return !!_ausklang; }
+function ausklangRestMinuten() {
+  if (!_ausklang) return 0;
+  return Math.max(0, Math.ceil((_ausklang.ende - Date.now()) / 60000));
+}
+function ausklangStoppen() {
+  if (!_ausklang) return false;
+  clearInterval(_ausklang.takt);
+  if (typeof setzeLautstaerke === 'function') setzeLautstaerke(_ausklang.start);
+  _ausklang = null;
+  return true;
+}
+function ausklangStarten(minuten) {
+  ausklangStoppen();
+  const dauer = begrenze(minuten, 1, 180, 30) * 60000;
+  const start = begrenze(D.einst.lautstaerke, 0, 1, .5);
+  const von = Date.now();
+  const takt = setInterval(() => {
+    const anteil = (Date.now() - von) / dauer;
+    if (anteil >= 1) {
+      clearInterval(takt);
+      _ausklang = null;
+      ambienceAllesAus();
+      if (typeof alleKlaengeAus === 'function') alleKlaengeAus();
+      setzeLautstaerke(start);
+      toast('Gute Nacht. Der Klang ist ausgegangen.', 5000);
+      return;
+    }
+    /* die letzten 40 % werden hörbar leiser, davor bleibt es fast gleich */
+    const kurve = anteil < .6 ? 1 - anteil * .18 : (1 - .108) * Math.pow(1 - (anteil - .6) / .4, 1.6);
+    setzeLautstaerke(start * Math.max(0, kurve));
+  }, 2000);
+  _ausklang = { ende: von + dauer, start, takt };
+  return ausklangRestMinuten();
+}
+
+/* Eine eigene Aufnahme hereinholen. */
+async function ambienceEigeneHinzufuegen() {
+  return new Promise((res) => {
+    const inp = el('input', { type: 'file', accept: 'audio/*,.mp3,.ogg,.opus,.m4a,.wav,.flac,.webm', style: 'display:none' });
+    document.body.append(inp);
+    let fertig = false;
+    inp.addEventListener('change', async () => {
+      fertig = true;
+      const datei = inp.files && inp.files[0];
+      inp.remove();
+      if (!datei) return res(null);
+      if (datei.size > AMBIENCE_MAX) { toast('Die Aufnahme ist zu groß (höchstens ' + Math.round(AMBIENCE_MAX / 1048576) + ' MB).'); return res(null); }
+      const name = await eingabe({ titel: 'Wie heißt dieser Klang?', wert: datei.name.replace(/\.[a-z0-9]+$/i, '').slice(0, 60), ok: 'Aufnehmen' });
+      if (!name) return res(null);
+      try {
+        const id = await speichereDateiBlob(datei);
+        const doc = neuDoc('klang', { titel: name, datei: id, art: 'Meine', groesse: datei.size, dateiname: datei.name.slice(0, 200) });
+        toast('„' + name + '" liegt jetzt bei deinen Klängen.');
+        res(doc);
+      } catch (e) { toast('Die Aufnahme wollte nicht.'); res(null); }
+    });
+    inp.addEventListener('cancel', () => { if (!fertig) { inp.remove(); res(null); } });
+    inp.click();
+  });
+}
+
+/* ================================================================
+   VANI — Klang: echte Aufnahmen und gewebte Klänge, ein Mischpult
+   ================================================================ */
+
+function klangStatuszeile() {
   const status = el('div', { class: 'klangstatus', role: 'status' });
-  const statusNeu = () => {
+  const neu = () => {
     const z = audioZustand();
     status.className = 'klangstatus ' + (z.ok ? 'laeuft' : z.fehler ? 'fehler' : 'bereit');
     status.textContent = !audioUnterstuetzt() ? 'Klang wird von diesem Browser nicht unterstützt.'
-      : z.ok ? 'Klang läuft.'
+      : z.ok ? (ausklangLaeuft() ? 'Klang läuft — wird in ' + ausklangRestMinuten() + ' Min. leise.' : 'Klang läuft.')
       : z.state === 'suspended' || z.state === 'interrupted' ? 'Klang wartet auf eine Berührung.'
       : z.fehler ? 'Klang braucht einen Neustart: ' + z.fehler
       : 'Klang ist bereit.';
   };
-  statusNeu();
+  neu();
+  return { knoten: status, neu };
+}
 
-  /* Szenen */
-  const szenen = el('div', { class: 'szenenchips' });
-  const eigene = vomTyp('mischung');
-  const alleSzenen = [...KLANG_SZENEN.map((s) => ({ name: s.name, pegel: s.pegel })),
-                      ...eigene.map((m) => ({ name: m.titel, pegel: m.pegel, doc: m }))];
-  for (const s of alleSzenen) {
-    const chip = el('button', { class: 'szenenchip', onclick: async () => {
-      await audioFreigeben(); mischungAnwenden(Object.assign({}, s.pegel)); baueRegler(); setTimeout(statusNeu, 120);
-    } }, s.name);
-    if (s.doc) langdruck(chip, async () => {
-      if (await frage('„' + s.name + '" aus den eigenen Szenen nehmen?', { ja: 'Entfernen', gefahr: true })) {
-        await loesche(s.doc.id, true); zeichne();
+/* ----- Reiter 1: echte Aufnahmen ----- */
+function baueAmbiencePult(kompakt, statusNeu) {
+  const wurzel = el('div', { class: 'ambience-pult' });
+  const liste = el('div', { class: 'ambience-liste' });
+
+  const zeileBauen = (a) => {
+    const pegel = (D.einst.ambience || {})[a.id] || 0;
+    const zeile = el('div', { class: 'ambience-zeile' + (pegel > 0 ? ' an' : ''), 'data-klang': a.id });
+    const balken = el('i', { class: 'ambience-balken' });
+    const stand = el('span', { class: 'ambience-stand' });
+    const schieber = el('input', { type: 'range', min: '0', max: '100', value: String(Math.round(pegel * 100)), 'aria-label': 'Lautstärke ' + a.name });
+
+    const standNeu = async () => {
+      if (a.eigen) { stand.textContent = 'eigen'; stand.className = 'ambience-stand da'; return; }
+      const da = await ambienceImVorrat(a.id);
+      stand.textContent = da ? 'im Gerät' : (a.mb ? a.mb.toFixed(1) + ' MB' : 'holen');
+      stand.className = 'ambience-stand ' + (da ? 'da' : 'fehlt');
+    };
+    standNeu();
+
+    const anAus = async (wert) => {
+      const m = { ...(D.einst.ambience || {}) };
+      if (wert > 0) m[a.id] = wert; else delete m[a.id];
+      zeile.classList.toggle('an', wert > 0);
+      zeile.classList.toggle('laedt', wert > 0 && !a.eigen);
+      await audioFreigeben();
+      const fehler = await ambienceMischungAnwenden(m, (id, p) => {
+        if (id !== a.id) return;
+        balken.style.width = Math.round(p * 100) + '%';
+      });
+      zeile.classList.remove('laedt');
+      balken.style.width = '';
+      const schief = fehler.find((f) => f.id === a.id);
+      if (schief) { zeile.classList.remove('an'); schieber.value = '0'; toast(a.name + ': ' + schief.meldung, 4200); }
+      standNeu();
+      setTimeout(statusNeu, 150);
+    };
+
+    schieber.addEventListener('input', () => { zeile.classList.toggle('an', Number(schieber.value) > 0); });
+    schieber.addEventListener('change', () => anAus(Number(schieber.value) / 100));
+    schieber.addEventListener('pointerdown', () => { audioFreigeben().catch(() => {}); }, { once: true });
+
+    const name = el('button', {
+      class: 'ambience-name', onclick: () => {
+        const jetzt = Number(schieber.value) / 100;
+        const neu = jetzt > 0 ? 0 : .55;
+        schieber.value = String(Math.round(neu * 100));
+        anAus(neu);
       }
-    });
-    szenen.append(chip);
-  }
-  szenen.append(el('button', { class: 'szenenchip leiser', onclick: () => { alleKlaengeAus(); baueRegler(); } }, 'Stille'));
+    }, el('span', { class: 'ambience-titel' }, a.name), stand);
 
-  wurzel.append(status, el('div', { class: 'kartenkopf' }, el('span', { html: ik('woerter') }), 'SZENEN'), szenen);
+    const feinKnopf = el('button', { class: 'ambience-fein-knopf', title: 'Feineinstellung', html: ik('feinheiten'), onclick: () => {
+      const offen = zeile.classList.toggle('fein-offen');
+      if (offen && !zeile.querySelector('.ambience-fein')) zeile.append(baueFeineinstellung(a, statusNeu));
+    } });
 
-  /* Regler nach Kategorien */
-  const reglerhalter = el('div');
-  wurzel.append(reglerhalter);
-
-  function baueRegler() {
-    reglerhalter.innerHTML = '';
-    const misch = D.einst.mischung || {};
-    for (const kat of KLANG_KATEGORIEN) {
-      const block = el('div', { class: 'klangblock' });
-      block.append(el('div', { class: 'kartenkopf', style: 'margin-top:14px' }, kat.toUpperCase()));
-      for (const ebene of KLANG_EBENEN.filter((e) => e.kat === kat)) {
-        const wert = misch[ebene.id] || 0;
-        const schieber = el('input', { type: 'range', min: '0', max: '100', value: String(Math.round(wert * 100)) });
-        const zeile = el('div', { class: 'klangzeile' + (wert > 0 ? ' an' : '') },
-          el('button', {
-            class: 'klangname', onclick: async () => {
-              const m = D.einst.mischung || {};
-              if ((m[ebene.id] || 0) > 0) { delete m[ebene.id]; }
-              else { m[ebene.id] = .5; schieber.value = '50'; await audioFreigeben(); }
-              mischungAnwenden(m);
-              zeile.classList.toggle('an', !!m[ebene.id]);
-              setTimeout(statusNeu, 120);
-            }
-          }, ebene.name),
-          schieber
-        );
-        schieber.addEventListener('input', () => {
-          const m = D.einst.mischung || {};
-          const v = parseInt(schieber.value, 10) / 100;
-          if (v > 0) { m[ebene.id] = v; } else { delete m[ebene.id]; }
-          mischungAnwenden(m);
-          zeile.classList.toggle('an', v > 0);
-          setTimeout(statusNeu, 120);
-        });
-        schieber.addEventListener('pointerdown', () => { audioFreigeben().catch(() => {}); }, { once: true });
-        block.append(zeile);
-      }
-      reglerhalter.append(block);
-    }
-
-    /* Lautstärke + Speichern */
-    const laut = el('input', { type: 'range', min: '0', max: '100', value: String(Math.round((D.einst.lautstaerke ?? .5) * 100)) });
-    laut.addEventListener('input', () => { setzeLautstaerke(parseInt(laut.value, 10) / 100); statusNeu(); });
-    reglerhalter.append(el('div', { class: 'klangfuss' },
-      el('div', { class: 'klangzeile an', style: 'box-shadow:none' }, el('span', { class: 'klangname', style: 'font-weight:600' }, 'Gesamt'), laut),
-      el('button', { class: 'knopf', onclick: async () => {
-        if ((D.einst.lautstaerke || 0) <= 0) { setzeLautstaerke(.5); laut.value = '50'; }
-        const ok = await audioFreigeben({ probe: true });
-        toast(ok ? 'Du solltest jetzt einen hellen Prüfton hören.' : 'Der Klang ist noch gesperrt. Tippe auf „Klang wecken“.');
-        setTimeout(statusNeu, 120);
-      } }, 'Ton prüfen'),
-      el('button', { class: 'knopf zart', onclick: async () => {
-        if (await audioFreigeben({ neu: true, probe: true })) toast('Klang frisch aufgeweckt – der Prüfton und deine Atmosphäre laufen.');
-        else toast('Der Browser gibt den Klang gerade nicht frei.');
-        setTimeout(statusNeu, 120);
-      } }, 'Klang neu wecken'),
-      el('button', {
-        class: 'knopf', onclick: async () => {
-          const m = D.einst.mischung || {};
-          if (!Object.keys(m).length) { toast('Erst etwas mischen.'); return; }
-          const name = await eingabe({ titel: 'Diese Mischung heißt …', platzhalter: 'z. B. Regen überm Schreibtisch' });
-          if (!name) return;
-          neuDoc('mischung', { titel: name, pegel: Object.assign({}, m) });
-          toast('Gemerkt als Szene.');
+    zeile.append(balken, name, schieber, feinKnopf);
+    if (a.eigen) {
+      langdruck(zeile, async () => {
+        const wahl = await menue([
+          { text: 'Umbenennen', icon: 'stift', wert: 'name' },
+          { text: 'Aus den Klängen nehmen', icon: 'muell', wert: 'weg', rot: true }
+        ], a.name);
+        if (wahl === 'name') {
+          const n = await eingabe({ titel: 'Der Klang heißt jetzt …', wert: a.name });
+          if (n) { a.doc.titel = n; speichere(a.doc); zeichne(); }
+        } else if (wahl === 'weg' && await frage('„' + a.name + '" entfernen? Die Aufnahme wird gelöscht.', { ja: 'Entfernen', gefahr: true })) {
+          ambienceAus(a.id);
+          const m = { ...(D.einst.ambience || {}) }; delete m[a.id];
+          await ambienceMischungAnwenden(m);
+          await loesche(a.doc.id, true);
           zeichne();
         }
-      }, 'Mischung merken')
-    ));
-  }
-  baueRegler();
+      });
+    }
+    return zeile;
+  };
+
+  const baueListe = () => {
+    liste.innerHTML = '';
+    const alle = alleAmbiences();
+    if (!alle.length) {
+      liste.append(el('div', { class: 'leer klein' }, 'Noch keine Aufnahmen da. Über „Eigenen Klang" holst du dir welche herein.'));
+      return;
+    }
+    for (const kat of ambienceKategorien()) {
+      const block = el('div', { class: 'klangblock' }, el('div', { class: 'kartenkopf', style: 'margin-top:14px' }, kat.toUpperCase()));
+      for (const a of alle.filter((x) => x.kat === kat)) block.append(zeileBauen(a));
+      liste.append(block);
+    }
+  };
+  baueListe();
+
+  wurzel.append(liste);
+  wurzel.baueListe = baueListe;
   return wurzel;
 }
 
+/* Feineinstellung je Aufnahme — das, was aus einem Loop eine Stimmung macht. */
+function baueFeineinstellung(a, statusNeu) {
+  const f = ambienceFeinheitVon(a.id);
+  const kasten = el('div', { class: 'ambience-fein' });
+  const regler = (name, schluessel, min, max, schritt, formatiere) => {
+    const wert = el('span', { class: 'fein-wert' }, formatiere(f[schluessel]));
+    const s = el('input', { type: 'range', min: String(min), max: String(max), step: String(schritt), value: String(f[schluessel]), 'aria-label': name });
+    s.addEventListener('input', () => { wert.textContent = formatiere(Number(s.value)); });
+    s.addEventListener('change', () => { ambienceFeinheitSetzen(a.id, { [schluessel]: Number(s.value) }); if (statusNeu) setTimeout(statusNeu, 120); });
+    return el('div', { class: 'fein-zeile' }, el('span', { class: 'fein-name' }, name), s, wert);
+  };
+  kasten.append(
+    regler('Tempo', 'tempo', .5, 2, .01, (v) => v === 1 ? 'normal' : (v < 1 ? 'langsamer ' : 'schneller ') + Math.round(Math.abs(1 - v) * 100) + '%'),
+    regler('Klarheit', 'klarheit', 300, 20000, 100, (v) => v >= 19900 ? 'offen' : v < 1200 ? 'dumpf' : v < 5000 ? 'weich' : 'klar'),
+    regler('Tiefe', 'tiefe', 20, 2000, 10, (v) => v <= 30 ? 'voll' : v < 200 ? 'schlank' : 'fern'),
+    regler('Atmen', 'atmen', 0, 1, .05, (v) => v === 0 ? 'gleichmäßig' : v < .4 ? 'ruhig' : v < .75 ? 'lebendig' : 'unruhig'),
+    regler('Übergang', 'blende', .5, 12, .5, (v) => v.toFixed(1) + ' s'),
+    el('div', { class: 'fein-fuss' },
+      el('button', { class: 'knopf zart', onclick: () => {
+        ambienceFeinheitSetzen(a.id, { tempo: 1, klarheit: 20000, tiefe: 20, atmen: .35, blende: 4 });
+        kasten.replaceWith(baueFeineinstellung(a, statusNeu));
+      } }, 'Zurücksetzen'),
+      a.quelle ? el('small', { class: 'ambience-quelle', title: a.quelle }, 'Aufnahme: BBC Sound Effects (privat, RemArc)') : null)
+  );
+  return kasten;
+}
+
+/* ----- Klangbilder: Mischungen mit Namen, an Orte gebunden ----- */
+function baueKlangbilder(statusNeu, neuZeichnen) {
+  const chips = el('div', { class: 'szenenchips' });
+  for (const s of KLANG_SZENEN) {
+    chips.append(el('button', { class: 'szenenchip gewebt', title: 'Gewebte Klänge', onclick: async () => {
+      await audioFreigeben(); mischungAnwenden({ ...s.pegel }); if (neuZeichnen) neuZeichnen(); setTimeout(statusNeu, 150);
+    } }, s.name));
+  }
+  for (const b of klangbilder()) {
+    const anzahl = Array.isArray(b.orte) ? b.orte.length : 0;
+    const chip = el('button', { class: 'szenenchip eigen', onclick: async () => {
+      await audioFreigeben(); await klangbildAnwenden(b); if (neuZeichnen) neuZeichnen(); setTimeout(statusNeu, 200);
+    } }, b.titel, anzahl ? el('small', {}, String(anzahl)) : null);
+    langdruck(chip, async () => {
+      const wahl = await menue([
+        { text: 'Umbenennen', icon: 'stift', wert: 'name' },
+        { text: 'Mit dem Jetzigen überschreiben', icon: 'wieder', wert: 'ueber' },
+        { text: anzahl ? 'Bindungen lösen (' + anzahl + ')' : 'An einen Ort binden …', icon: 'verbinden', wert: anzahl ? 'los' : 'binden' },
+        { text: 'Klangbild löschen', icon: 'muell', wert: 'weg', rot: true }
+      ], b.titel);
+      if (wahl === 'name') {
+        const n = await eingabe({ titel: 'Das Klangbild heißt jetzt …', wert: b.titel });
+        if (n) { b.titel = n; speichere(b); if (neuZeichnen) neuZeichnen(); }
+      } else if (wahl === 'ueber') {
+        b.pegel = { ...(D.einst.ambience || {}) };
+        b.gewebt = { ...(D.einst.mischung || {}) };
+        b.fein = JSON.parse(JSON.stringify(D.einst.ambienceFein || {}));
+        b.lautstaerke = begrenze(D.einst.lautstaerke, 0, 1, .5);
+        speichere(b); toast('„' + b.titel + '" merkt sich jetzt diese Mischung.');
+      } else if (wahl === 'los') {
+        b.orte = []; speichereStill(b); toast('Bindungen gelöst.'); if (neuZeichnen) neuZeichnen();
+      } else if (wahl === 'binden') {
+        const ziel = await waehleDokument(null, 'Woran soll „' + b.titel + '" hängen?');
+        if (ziel) { klangbildBinden(b, ziel.id); toast('Hängt jetzt an „' + docName(ziel) + '".'); if (neuZeichnen) neuZeichnen(); }
+      } else if (wahl === 'weg' && await frage('„' + b.titel + '" löschen?', { ja: 'Löschen', gefahr: true })) {
+        await loesche(b.id, true); if (neuZeichnen) neuZeichnen();
+      }
+    });
+    chips.append(chip);
+  }
+  chips.append(el('button', { class: 'szenenchip leiser', onclick: async () => {
+    await ambienceAllesAus(); alleKlaengeAus(); if (neuZeichnen) neuZeichnen(); setTimeout(statusNeu, 150);
+  } }, 'Stille'));
+  return chips;
+}
+
+/* ----- Das ganze Pult ----- */
+function baueMischpult(kompakt) {
+  const wurzel = el('div', { class: 'mischpult' + (kompakt ? ' kompakt' : '') });
+  const status = klangStatuszeile();
+  const inhalt = el('div', { class: 'klang-inhalt' });
+  const szenenhalter = el('div');
+
+  let reiter = D.einst.klangReiter === 'gewebt' ? 'gewebt' : 'echt';
+  const reiterleiste = el('div', { class: 'wahlgruppe klang-reiter' });
+  const neuZeichnen = () => {
+    szenenhalter.innerHTML = '';
+    szenenhalter.append(el('div', { class: 'kartenkopf' }, el('span', { html: ik('woerter') }), 'KLANGBILDER'),
+      baueKlangbilder(status.neu, neuZeichnen));
+    inhalt.innerHTML = '';
+    inhalt.append(reiter === 'echt' ? baueAmbiencePult(kompakt, status.neu) : baueGewebtPult(kompakt, status.neu));
+  };
+  for (const [id, name] of [['echt', 'Aufnahmen'], ['gewebt', 'Gewebt']]) {
+    reiterleiste.append(el('button', {
+      class: reiter === id ? 'an' : '', onclick: (e) => {
+        reiter = id; D.einst.klangReiter = id; speichereEinst();
+        $$('button', reiterleiste).forEach((b) => b.classList.toggle('an', b === e.currentTarget));
+        neuZeichnen();
+      }
+    }, name));
+  }
+
+  wurzel.append(status.knoten, reiterleiste, szenenhalter, inhalt, baueKlangFuss(status.neu, () => neuZeichnen()));
+  neuZeichnen();
+  return wurzel;
+}
+
+/* Reiter 2: die gewebten Klänge (gerechnet, ohne Datei) */
+function baueGewebtPult(kompakt, statusNeu) {
+  const halter = el('div', { class: 'gewebt-pult' });
+  const misch = D.einst.mischung || {};
+  for (const kat of KLANG_KATEGORIEN) {
+    const block = el('div', { class: 'klangblock' });
+    block.append(el('div', { class: 'kartenkopf', style: 'margin-top:14px' }, kat.toUpperCase()));
+    for (const ebene of KLANG_EBENEN.filter((e) => e.kat === kat)) {
+      const wert = misch[ebene.id] || 0;
+      const schieber = el('input', { type: 'range', min: '0', max: '100', value: String(Math.round(wert * 100)), 'aria-label': ebene.name });
+      const zeile = el('div', { class: 'klangzeile' + (wert > 0 ? ' an' : '') },
+        el('button', {
+          class: 'klangname', onclick: async () => {
+            const m = D.einst.mischung || {};
+            if ((m[ebene.id] || 0) > 0) { delete m[ebene.id]; schieber.value = '0'; }
+            else { m[ebene.id] = .5; schieber.value = '50'; await audioFreigeben(); }
+            mischungAnwenden(m);
+            zeile.classList.toggle('an', !!m[ebene.id]);
+            setTimeout(statusNeu, 120);
+          }
+        }, ebene.name),
+        schieber
+      );
+      schieber.addEventListener('input', () => {
+        const m = D.einst.mischung || {};
+        const v = parseInt(schieber.value, 10) / 100;
+        if (v > 0) m[ebene.id] = v; else delete m[ebene.id];
+        mischungAnwenden(m);
+        zeile.classList.toggle('an', v > 0);
+        setTimeout(statusNeu, 120);
+      });
+      schieber.addEventListener('pointerdown', () => { audioFreigeben().catch(() => {}); }, { once: true });
+      block.append(zeile);
+    }
+    halter.append(block);
+  }
+  return halter;
+}
+
+/* Fuß: Gesamtlautstärke, Merken, Einschlafen, Vorrat, Prüfton */
+function baueKlangFuss(statusNeu, neuZeichnen) {
+  const laut = el('input', { type: 'range', min: '0', max: '100', value: String(Math.round((D.einst.lautstaerke ?? .5) * 100)), 'aria-label': 'Gesamtlautstärke' });
+  laut.addEventListener('input', () => { setzeLautstaerke(parseInt(laut.value, 10) / 100); statusNeu(); });
+
+  const ausklangKnopf = el('button', { class: 'knopf' + (ausklangLaeuft() ? ' voll' : ''), onclick: async () => {
+    if (ausklangLaeuft()) { ausklangStoppen(); toast('Einschlafen abgebrochen.'); neuZeichnen(); return; }
+    const min = await menue([
+      { text: 'In 15 Minuten', wert: 15 }, { text: 'In 30 Minuten', wert: 30 },
+      { text: 'In 45 Minuten', wert: 45 }, { text: 'In einer Stunde', wert: 60 },
+      { text: 'In zwei Stunden', wert: 120 }
+    ], 'Langsam leiser werden und ausgehen');
+    if (!min) return;
+    ausklangStarten(min);
+    toast('Der Klang wird in ' + min + ' Minuten leise. Schlaf gut.', 4200);
+    neuZeichnen();
+  } }, ausklangLaeuft() ? 'Einschlafen: noch ' + ausklangRestMinuten() + ' Min.' : 'Einschlafen …');
+
+  const folgt = el('button', {
+    class: 'schalter' + (D.einst.klangFolgt ? ' an' : ''), title: 'Klangbilder folgen dem Text',
+    onclick: (e) => { D.einst.klangFolgt = !D.einst.klangFolgt; e.currentTarget.classList.toggle('an', D.einst.klangFolgt); speichereEinst(); }
+  }, el('i'));
+
+  return el('div', { class: 'klangfuss' },
+    el('div', { class: 'klangzeile an', style: 'box-shadow:none' }, el('span', { class: 'klangname', style: 'font-weight:600' }, 'Gesamt'), laut),
+    el('div', { class: 'einstellzeile klang-folgt' },
+      el('span', { class: 'ename' }, 'Klangbilder folgen dem Text',
+        el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Wenn ich eine Szene öffne, an der ein Klangbild hängt, legt es sich von selbst auf.')),
+      folgt),
+    el('div', { class: 'fussreihe' },
+      el('button', { class: 'knopf voll', onclick: async () => {
+        const name = await eingabe({ titel: 'Dieses Klangbild heißt …', platzhalter: 'z. B. Regen überm Schreibtisch' });
+        if (!name) return;
+        klangbildJetzt(name);
+        toast('Gemerkt. Lange drücken, um es an eine Szene zu hängen.', 4200);
+        neuZeichnen();
+      } }, 'Klangbild merken'),
+      el('button', { class: 'knopf', onclick: () => ambienceEigeneHinzufuegen().then((d) => { if (d) neuZeichnen(); }) }, '+ Eigener Klang'),
+      ausklangKnopf,
+      el('button', { class: 'knopf zart', onclick: async () => {
+        if ((D.einst.lautstaerke || 0) <= 0) { setzeLautstaerke(.5); laut.value = '50'; }
+        const ok = await audioFreigeben({ probe: true });
+        toast(ok ? 'Du solltest jetzt einen hellen Prüfton hören.' : 'Der Klang ist noch gesperrt. Tippe auf „Klang neu wecken".');
+        setTimeout(statusNeu, 120);
+      } }, 'Ton prüfen'),
+      el('button', { class: 'knopf zart', onclick: async () => {
+        if (await audioFreigeben({ neu: true, probe: true })) toast('Klang frisch aufgeweckt.');
+        else toast('Der Browser gibt den Klang gerade nicht frei.');
+        setTimeout(statusNeu, 120);
+      } }, 'Klang neu wecken'),
+      el('button', { class: 'knopf zart', onclick: () => zeigeKlangVorrat(neuZeichnen) }, 'Vorrat …')
+    )
+  );
+}
+
+/* Der Vorrat: was liegt schon im Gerät, was fehlt noch */
+async function zeigeKlangVorrat(neuZeichnen) {
+  const stand = await ambienceVorratStand();
+  const mb = (stand.bytes / 1048576).toFixed(1);
+  const kasten = el('div', { class: 'modal' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('klang') }), 'KLANGVORRAT'),
+    el('h2', {}, 'Was schon im Gerät liegt'),
+    el('p', { style: 'font-size:14px;color:var(--blass);line-height:1.6' },
+      stand.da.length + (stand.da.length === 1 ? ' Aufnahme liegt' : ' Aufnahmen liegen') + ' hier und brauchen kein Internet mehr (' + mb + ' MB). '
+      + (stand.fehlt.length ? stand.fehlt.length + ' warten noch im Netz.' : 'Es fehlt nichts.')),
+    el('div', { class: 'reihe', style: 'flex-wrap:wrap;justify-content:flex-start' },
+      stand.fehlt.length ? el('button', { class: 'knopf voll', onclick: async () => {
+        zu();
+        toast('Hole ' + stand.fehlt.length + ' Aufnahmen …', 4000);
+        let ok = 0;
+        for (const id of stand.fehlt) { try { await ambienceBlob(id); ok++; } catch (e) {} }
+        toast(ok + ' Aufnahmen liegen jetzt im Gerät. Ab jetzt auch offline.', 5000);
+        if (neuZeichnen) neuZeichnen();
+      } }, 'Alle holen (' + stand.fehlt.length + ')') : null,
+      stand.bytes ? el('button', { class: 'knopf zart', onclick: async () => {
+        if (!await frage('Alle geholten Aufnahmen aus dem Gerät nehmen? Sie lassen sich jederzeit wieder holen.', { ja: 'Platz schaffen', gefahr: true })) return;
+        await ambienceAllesAus();
+        const weg = await ambienceVorratLeeren();
+        zu(); toast(weg + ' Aufnahmen entfernt.');
+        if (neuZeichnen) neuZeichnen();
+      } }, 'Platz schaffen') : null,
+      el('button', { class: 'knopf', onclick: () => zu() }, 'Fertig')));
+  const zu = zeigeDeck(kasten);
+}
+
 RENDER.klang = function (haupt) {
-  haupt.append(raumkopf('Klang', 'alles errechnet, nichts geladen — mischen erlaubt'));
+  haupt.append(raumkopf('Klang', 'echte Aufnahmen und gewebte Klänge — mischen erlaubt'));
   const inhalt = el('div', { class: 'inhalt' });
   inhalt.append(baueMischpult(false));
   haupt.append(inhalt);
@@ -9706,7 +11012,7 @@ RENDER.klang = function (haupt) {
 
 /* Kompakte Fassung als Überlagerung (aus dem Schreibraum) */
 function oeffneMischpult() {
-  const kasten = el('div', { class: 'modal', style: 'width:min(560px,calc(100vw - 40px))' },
+  const kasten = el('div', { class: 'modal', style: 'width:min(620px,calc(100vw - 40px))' },
     el('h2', {}, 'Klang'),
     baueMischpult(true),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Fertig'))
@@ -9881,7 +11187,12 @@ const ANLEITUNG = [
       { t: 'Szenen', p: ['Jede Szene ist eine Karte. Tippen öffnet den Schreibraum. Der Punkt unten links ist der Status: Funke → Entwurf → Steht (einfach weitertippen). Der Dreh-Knopf zeigt die Rückseite: Platz für Zweifel, Ideen, Alternativen — nur für mich.'] },
       { t: 'Szenen verschieben', p: ['Am Touchscreen: Karte kurz halten, bis sie sich hebt, dann ziehen — in diesem oder in ein anderes Kapitel, vor oder hinter eine andere Karte. Mit der Maus: einfach ziehen. „In anderes Kapitel …" im Menü geht auch ohne Ziehen.'] },
       { t: 'Szenen-Menü (lange halten)', p: ['Umbenennen · Andere Farbe · Duplizieren („Fassung 2") · In anderes Kapitel … · Teilen · Szene löschen.'], b: 'Eine Szene in zwei Richtungen probieren: Duplizieren → in der Fassung 2 anders weiterschreiben → die schlechtere später löschen oder als Rückseiten-Notiz behalten.' },
-      { t: 'Leseansicht', p: ['Das Buch-Symbol zeigt das ganze Projekt am Stück wie ein Manuskript: Kapitelüberschriften, Szenen durch Sternchen getrennt, Gesamtwörter. „Kopieren" legt alles in die Zwischenablage, „Als Datei" gibt eine .txt heraus.'] },
+      { t: 'Leseansicht', p: ['Das Buch-Symbol zeigt das ganze Projekt am Stück wie ein Manuskript: Kapitelüberschriften, Szenen durch Sternchen getrennt, Gesamtwörter. „Kopieren" legt alles in die Zwischenablage, „Als Datei" gibt eine .txt heraus. Das Vorlese-Symbol liest das ganze Projekt vor.'] },
+      { t: 'Als Manuskript hinausgeben', p: [
+        'Projekt-Menü → „Als Manuskript hinausgeben". Eine einzige Datei, die überall aufgeht: Kapitel als Überschriften, Szenen sauber getrennt.',
+        'Sieben Schalter bestimmen, was mitkommt: Kopfzeile (Art, Wörter, Datum), Szenentitel, Stand je Szene (Funke, Entwurf, Steht), Notizen von den Rückseiten, Figuren & Orte, Hefte am Projekt, auch leere Szenen. Die Vorschau zeigt sofort, was herauskommt.',
+        '„Als Datei" gibt eine .md-Datei — die zieht man einfach in Word, Pages oder Google Docs.'
+      ], b: 'Zum Weitergeben an jemanden: Notizen aus, Stand aus, Figuren aus. Für mich selbst zum Überarbeiten: alles an.' },
       { t: 'Wortziel', p: ['Mit Wortziel zeigen Karte und Kopf einen Fortschrittsbalken. Das Ziel lässt sich im Projekt-Menü jederzeit ändern (0 = keins).'] },
       { t: 'Hefte am Projekt', p: ['Unten im Projekt liegen Hefte, die dazugehören. „Heft dazulegen" ordnet ein vorhandenes zu oder legt ein neues an. Ein Tipp auf das Heft öffnet es.'] },
       { t: 'Figuren & Orte', p: [
@@ -9899,6 +11210,16 @@ const ANLEITUNG = [
       { t: 'Blasen', p: ['Doppelt auf die Fläche tippen setzt eine Blase genau dort. Das Plus setzt eine in die Mitte. Tippen macht die Blase beschreibbar, Ziehen verschiebt sie. Lange halten: Andere Farbe (vier Töne und neutral), Im Schreibraum öffnen, Verbindungen ansehen, Blase zerplatzen.'] },
       { t: 'Fäden spannen', p: ['Der Verbinden-Knopf schaltet den Faden-Modus an. Zwei Blasen antippen — ein Faden spannt sich. Ein Tipp auf den Faden: Beschriften oder Lösen. Dieselben zwei Blasen noch einmal: der Faden löst sich.'], b: 'Blase „Hafen" und Blase „Tante Ruth" → Faden → beschriftet mit „wohnt dort seit 1987".' },
       { t: 'Schieben und zoomen', p: ['Mit einem Finger (oder der Maus) die Fläche schieben, mit zwei Fingern kneifen zum Zoomen. Die Lupen-Knöpfe zoomen schrittweise, der Prozent-Knopf setzt auf 100 % zurück. Die Ansicht merkt sich das Brett.'] },
+      { t: 'Bilder aufs Brett', p: [
+        'Das Kamera-Symbol legt ein Foto aufs Brett — wie ein Polaroid, leicht schräg. Ziehen verschiebt, der Griff unten rechts ändert die Größe. Lange halten: beschriften, drehen, gerade rücken, wegnehmen.'
+      ] },
+      { t: 'Gruppen mit Rahmen', p: [
+        'Das Rahmen-Symbol legt einen beschrifteten Rahmen um einen Teil des Bretts. Am Titel ziehen verschiebt den Rahmen — und alles, was darin liegt, wandert mit.',
+        'Lange halten auf dem Titel: umbenennen, Farbe wechseln, „Eng um den Inhalt legen" (der Rahmen schmiegt sich an das, was drin liegt) oder auflösen. Beim Auflösen bleibt der Inhalt liegen.'
+      ], b: 'Ein Rahmen „Erster Teil" um sechs Blasen. Beim Umsortieren des Buches schiebe ich den ganzen Teil an eine andere Stelle — mit einem Griff.' },
+      { t: 'Brett als Bild', p: [
+        'Das Teilen-Symbol oben malt das ganze Brett als Bild: Rahmen, Fäden mit Beschriftung, Bilder, Blasen mit Text und Farbe. Herauskommt ein PNG zum Verschicken oder Ausdrucken.'
+      ] },
       { t: 'Dinge aufs Brett legen', p: ['Schnipsel, Blätter, Seiten, Szenen, Hefte und Goodnotes-Archive lassen sich über „Hinzufügen & verbinden → Auf ein Cluster-Brett legen" als Blase ablegen. Die Blase zeigt einen kleinen Quellen-Knopf zurück zum Original.'] }
     ]
   },
@@ -9918,7 +11239,35 @@ const ANLEITUNG = [
     id: 'klang', titel: 'Klang', icon: 'klang', raum: 'klang',
     kurz: 'Atmosphäre zum Schreiben — alles errechnet, nichts geladen.',
     abschnitte: [
-      { t: 'Was der Klang ist', p: ['22 Klangebenen, die VANI selbst erzeugt — kein Download, kein Internet: Wetter (Regen ans Fenster, Regen aufs Dach, Platzregen, Fernes Gewitter, Wind ums Haus, Schneesturm), Wasser (Meeresbrandung, Bach, Tropfen nach dem Regen), Feuer (Kaminfeuer, Kerzenflackern), Natur (Blätterrascheln, Grillen, Vogelmorgen, Möwen, Eule, Zikaden), Nah & warm (Katzenschnurren, Herzschlag, Uhrenticken, Altes Haus), Orte (Café-Gemurmel, Zugfahrt, Glocken in der Ferne).'] },
+      { t: 'Zwei Arten von Klang', p: [
+        'Oben im Klangraum stehen zwei Reiter. „Aufnahmen" sind echte Feldaufnahmen — Lagerfeuer, Landdämmerung, Waldmorgen, alte Mühle. „Gewebt" sind Klänge, die VANI selbst errechnet: Regen, Meer, Wind, Grillen und mehr.',
+        'Beides lässt sich mischen. Ein echtes Lagerfeuer unter gewebtem Regen klingt oft besser als jedes für sich.'
+      ] },
+      { t: 'Aufnahmen holen', p: [
+        'Eine Aufnahme wird erst geholt, wenn ich sie das erste Mal anschalte — dafür braucht es einmal Internet. Danach liegt sie im Gerät und läuft auch offline, im Zug, im Flugzeug.',
+        'Rechts an jeder Zeile steht, ob sie schon „im Gerät" ist oder wie groß sie ist. Unter „Vorrat …" hole ich alle auf einmal oder schaffe wieder Platz.'
+      ], tipp: 'Vor einer Reise einmal „Alle holen" — dann ist der Klang unterwegs sicher da.' },
+      { t: 'Feineinstellung je Aufnahme', p: [
+        'Das kleine Regler-Symbol rechts an jeder Zeile klappt fünf Regler auf, die aus einem Loop eine Stimmung machen:',
+        'Tempo — langsamer macht alles schwerer und tiefer. Klarheit — von offen bis dumpf, als hörte man es durch eine Wand. Tiefe — nimmt den Bass heraus, dann klingt es fern. Atmen — wie stark die Aufnahme in Lautstärke und Farbe wandert, damit sie nicht nach Wiederholung klingt. Übergang — wie weich sich das Ende in den Anfang blendet.'
+      ], b: 'Lagerfeuer mit Tempo „langsamer 20%" und Klarheit „dumpf" klingt wie ein Kamin im Nebenzimmer.' },
+      { t: 'Klangbilder', p: [
+        'Eine Mischung mit Namen. „Klangbild merken" hält alles fest: welche Aufnahmen, welche gewebten Klänge, alle Feineinstellungen und die Gesamtlautstärke.',
+        'Ein Klangbild lange drücken: umbenennen, mit dem Jetzigen überschreiben, an einen Ort binden oder löschen.'
+      ] },
+      { t: 'Klang, der dem Text folgt', p: [
+        'Das Besondere: Ein Klangbild kann an einer Szene, einem Kapitel, einem Heft oder einem ganzen Projekt hängen. Öffne ich dort den Schreibraum, legt sich das Klangbild von selbst auf.',
+        'Ein Kapitel vererbt an seine Szenen, ein Projekt an alles darin. So bekommt jeder Teil des Buches seinen eigenen Ton, ohne dass ich etwas tue.',
+        'Abschalten lässt sich das mit „Klangbilder folgen dem Text" unten im Klangraum.'
+      ], b: 'Klangbild „Sturmnacht" ans Kapitel „Die Überfahrt" gehängt. Jede Szene darin beginnt jetzt mit Wind und Brandung.' },
+      { t: 'Eigene Klänge', p: [
+        '„+ Eigener Klang" nimmt jede Audiodatei vom Gerät auf — eigene Aufnahmen, gekaufte Ambiences, was auch immer. Sie stehen gleichberechtigt neben den mitgelieferten, mit allen Feineinstellungen.',
+        'Eigene Klänge reisen über den privaten Bereich auf die anderen Geräte mit.'
+      ] },
+      { t: 'Einschlafen', p: [
+        '„Einschlafen …" lässt den Klang über 15 Minuten bis zwei Stunden langsam leiser werden und dann ausgehen. Die ersten zwei Drittel bleiben fast gleich laut, erst danach wird es hörbar stiller — so wacht man nicht vom Leiserwerden auf.'
+      ] },
+      { t: 'Die gewebten Klänge', p: ['22 Klangebenen, die VANI selbst erzeugt — kein Download, kein Internet: Wetter (Regen ans Fenster, Regen aufs Dach, Platzregen, Fernes Gewitter, Wind ums Haus, Schneesturm), Wasser (Meeresbrandung, Bach, Tropfen nach dem Regen), Feuer (Kaminfeuer, Kerzenflackern), Natur (Blätterrascheln, Grillen, Vogelmorgen, Möwen, Eule, Zikaden), Nah & warm (Katzenschnurren, Herzschlag, Uhrenticken, Altes Haus), Orte (Café-Gemurmel, Zugfahrt, Glocken in der Ferne).'] },
       { t: 'Mischen', p: ['Jede Ebene hat einen Regler. Ein Tipp auf den Namen schaltet sie an (halbe Stärke) oder aus. Mehrere Ebenen zusammen ergeben eine Mischung. Unten: Gesamtlautstärke.'] },
       { t: 'Szenen', p: ['Zwölf fertige Szenen (Sturmnacht am Leuchtturm, Am Lagerfeuer, Schreibzimmer, Nachtzug, Café am Regentag, Sommernacht, Nach dem Regen, Morgen am Meer, Wintermorgen, Tiefe Nacht, Altes Haus im August, Bibliothek). „Mischung merken" macht aus meiner eigenen Mischung eine Szene mit Namen. Lange halten auf einer eigenen Szene entfernt sie. „Stille" macht alles aus.'], b: 'Regen ans Fenster 45 %, Kaminfeuer 30 %, Uhrenticken 45 % → „Mischung merken" → „Novemberabend".' },
       { t: 'Wenn es stumm bleibt', p: ['Browser erlauben Klang erst nach einer Berührung. Die Statuszeile sagt, was los ist. „Ton prüfen" spielt einen hellen Prüfton. „Klang neu wecken" baut den Klang frisch auf — das hilft vor allem auf dem iPad, wenn die App lange im Hintergrund war oder ein Anruf dazwischenkam.'], tipp: 'Auf dem iPad schaltet das System den Klang nach langem Hintergrund manchmal stumm. Ein Tipp irgendwo in der App oder „Klang neu wecken" holt ihn zurück. Das ist eine Grenze des iPads, nicht von VANI.' },
@@ -10040,7 +11389,12 @@ const ANLEITUNG = [
     id: 'tasten', titel: 'Tasten & Gesten', icon: 'feinheiten', raum: '',
     kurz: 'Die wenigen Griffe, die überall gelten.',
     abschnitte: [
-      { t: 'Tastatur', p: ['Strg/⌘ + K — Suche. Escape — schließt Fenster, Menüs, den Schreibraum und die Suche (immer nur die oberste Lage). Enter — bestätigt einzeilige Eingaben. Strg/⌘ + Enter — Wörter in die Kiste legen.'] },
+      { t: 'Tastatur', p: [
+        'Strg/⌘ + K — Suche. Escape — schließt Fenster, Menüs, den Schreibraum und die Suche (immer nur die oberste Lage).',
+        'Im Schreibraum: Strg/⌘ + S friert den Stand ein. Strg/⌘ + F öffnet Suchen & Ersetzen. Strg/⌘ + Enter schließt und speichert. Tab rückt ein, statt aus dem Text zu springen.',
+        'In Schnipseln und im Faden schickt Enter ab, Umschalt+Enter macht eine neue Zeile. In Menüs wandern die Pfeiltasten, die Ziffern 1–9 wählen direkt.',
+        'Strg/⌘ + Enter legt Wörter in die Kiste.'
+      ] },
       { t: 'Finger und Maus', p: ['Tippen öffnet. Lange halten (oder Rechtsklick) öffnet das Menü. Ziehen verschiebt Zettel, Fotos, Blasen, freie Schnipsel. Szenenkarten: kurz halten, bis sie sich heben, dann ziehen. Doppeltipp auf ein Brett setzt eine Blase. Zwei Finger kneifen zoomt das Brett. Wischen auf einem Zettel-Griff ändert die Größe.'] }
     ]
   },
@@ -10271,6 +11625,15 @@ async function sucheAppUpdate(neuLaden = false) {
   if ([...D.docs.values()].some((d) => d.typ === 'goodnote')) {
     const g = D.einst.raeume.find((x) => x.id === 'goodnotes');
     if (g) g.an = true;
+  }
+
+  /* Der Klangfundus: eine kleine Liste neben der App. Fehlt sie, bleibt nur
+     der gewebte Klang — die App läuft trotzdem. */
+  if (typeof ambienceKatalogSetzen === 'function') {
+    fetch('klang/katalog.json', { cache: 'no-cache' })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((liste) => { if (ambienceKatalogSetzen(liste).length && location.hash.startsWith('#/klang')) zeichne(); })
+      .catch(() => {});
   }
 
   setzeThema(D.einst.thema);

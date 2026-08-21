@@ -13,6 +13,12 @@ RENDER.faden = function (haupt) {
   lauf.append(innen);
 
   const feld = el('textarea', { placeholder: 'Weiter im Faden …', rows: 1 });
+  feld.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
+    e.preventDefault();
+    const knopf = feld.parentElement && feld.parentElement.querySelector('.rundknopf.voll');
+    if (knopf) knopf.click();
+  });
   autogrow(feld);
   const zeile = el('div', { class: 'schreibzeile' },
     feld,

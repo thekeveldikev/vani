@@ -91,6 +91,15 @@ async function sucheAppUpdate(neuLaden = false) {
     if (g) g.an = true;
   }
 
+  /* Der Klangfundus: eine kleine Liste neben der App. Fehlt sie, bleibt nur
+     der gewebte Klang — die App läuft trotzdem. */
+  if (typeof ambienceKatalogSetzen === 'function') {
+    fetch('klang/katalog.json', { cache: 'no-cache' })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((liste) => { if (ambienceKatalogSetzen(liste).length && location.hash.startsWith('#/klang')) zeichne(); })
+      .catch(() => {});
+  }
+
   setzeThema(D.einst.thema);
   baueLeiste();
   zeichne();

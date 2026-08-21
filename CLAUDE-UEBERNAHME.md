@@ -974,3 +974,66 @@ Zeitstrahl-Raum (alles nach Tagen), Zettel-Checklisten, Bilder auf Brettern,
 Brett-Export als Bild, Szenen-Wortziele, Projekt-Export als Markdown/ZIP,
 Schreibsitzungs-Protokoll, app-weite Schrift- und Akzentwahl, Reime/Wörter-Werkzeug,
 Klang-Einschlaftimer, Zufallsfund-Knopf, Zitate-Sammlung, Spotify (Desktop).
+
+## 17. Welle 2 (22. August 2026, VANI 5.7.0)
+
+### Echte Ambiences — und die Lizenzfrage
+
+Der Nutzer wünschte echte Aufnahmen statt gerechneter Klänge und gab die
+BBC-Sammlung ausdrücklich frei („bleibt nur lokal“). **Diese Prämisse stimmt
+faktisch nicht:** Das Repo ist öffentlich, GitHub Pages liefert jede Datei
+weltweit abrufbar aus. Die BBC-Sammlung auf archive.org trägt keine freie Lizenz
+(RemArc: privat/Bildung/Forschung, keine Weiterverbreitung).
+
+Entscheidung nach Rücksprache: Die Aufnahmen liegen in `klang/` und werden
+mitgeliefert — der Nutzer hat das ausdrücklich freigegeben und trägt die
+Entscheidung. **Für künftige Arbeit gilt: keine weiteren geschützten Aufnahmen
+hinzufügen, ohne die Lizenzlage erneut zu prüfen.** Der bessere Weg für mehr
+Material ist „Eigener Klang“ (siehe unten): Dateien landen in IndexedDB und im
+verschlüsselten Sync, nie im Repo.
+
+Beschaffung (`werkzeug`-fremd, nur lokal gelaufen): archive.org-Metadaten
+ausgewertet, 26 Atmosphären kuratiert, per `ffmpeg-static` je ein ruhiger
+70-Sekunden-Abschnitt geschnitten, leicht normalisiert und als Opus 56 kbit/s
+kodiert: **≈450 KB statt 4–15 MB je Aufnahme**. 14 kamen durch; archive.org
+drosselt aggressiv (HTTP 500/502), das Skript hat Wiederholung mit Backoff.
+Regen, Meer und Gewitter fehlen in dieser Teilsammlung ganz — dafür bleiben die
+gewebten Klänge, die genau darin stark sind.
+
+### `src/53-ambience.js` — die Maschine
+
+- **Nahtloser Loop ohne geschnittene Loops:** zwei `BufferSource` laufen versetzt,
+  ihre Rampen kreuzen sich (`ambienceStimmeBauen`). Der erste Einsatz blendet in
+  0,9 s auf, Wiederholungen weich über die eingestellte Zeit — sonst wartet man
+  beim Antippen sekundenlang auf Stille (im Browser nachgemessen).
+- **Atmen:** Lautstärke und Tiefpass wandern langsam, damit 70 s nicht nach 70 s
+  klingen.
+- **Lazy + Vorrat:** `ambienceBlob` holt über `fetch` mit Fortschritt, legt in
+  `media` unter `ambience:1:<id>` ab. Danach offline. `sw.js` enthält bewusst
+  **keine** Opus-Dateien — sonst scheitert `cache.addAll` an einer fehlenden Datei
+  und die ganze Offline-Installation wäre hin (Vertragstest).
+- **Klangbilder** (`typ: 'klangbild'`): Mischung + Feinheiten + Lautstärke unter
+  einem Namen, `orte[]` bindet sie an Szene, Kapitel, Heft oder Projekt.
+  `klangbildFuer` erbt nach oben; `klangbildFolgen` legt beim Öffnen auf.
+- **Eigene Klänge** (`typ: 'klang'`): jede Audiodatei, gleichberechtigt, reist
+  über den Sync mit.
+- **Ausklang:** die ersten 60 % fast unverändert, dann Kurve gegen null.
+
+### Weitere Welle-2-Stücke
+
+- **Manuskript-Export** (`manuskriptText`, `projektHinausgeben`): Markdown mit
+  sieben Schaltern und Live-Vorschau.
+- **Bretter:** `gruppe` (Rahmen, nimmt beim Ziehen am Titel alles mit, was in ihm
+  liegt; „eng um den Inhalt“), `brettbild` (Foto, drehbar, skalierbar),
+  `brettAlsBild` malt Rahmen, Fäden mit Beschriftung, Bilder und Blasen auf eine
+  Leinwand. Beide Typen bekommen im Sanitizer **eigene Grenzen** (bis 6000 px) —
+  die Anlagen-Grenze von 2000 hätte große Bretter beschnitten.
+- **Kleine Griffe:** Enter schickt Schnipsel/Faden ab (Umschalt+Enter = Zeile),
+  Strg+S friert ein, Strg+F sucht, Strg+Enter schließt, Tab rückt ein,
+  Menüs per Pfeil/Ziffern, Suchfeld im Blattstapel ab sechs Blättern,
+  Lesezeit an Blättern und im Wortzähler, Funken kopieren, Wort kopieren,
+  Wörterzahl im Papierkorb.
+
+Qualitätsstand: `npm test` 103/103, Hosting 2/2, Lint sauber, im Browser gemessen
+(Ton nach 1 s hörbar, zwei Aufnahmen gemischt, Klangbild stellt wieder her,
+Gruppe nimmt Blasen mit, Brett als 700×498-PNG).

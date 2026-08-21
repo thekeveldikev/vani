@@ -317,3 +317,45 @@ test('Welle-1-Vertrag: Inhalt, Lesezeichen, Seitenordnung, Figuren, Vorlesen und
   assert.match(lies('src/41-zuhause.js'), /\.\.\.FUNKE_ARTEN/, 'Zuhause kennt alle Funkenarten');
   assert.match(lies('src/47-woerter.js'), /of FUNKE_ARTEN\)/, 'Wörter kennt alle Funkenarten');
 });
+
+test('Klangvertrag: echte Aufnahmen laden erst bei Bedarf und blähen den Offline-Kern nicht auf', () => {
+  const sw = lies('sw.js');
+  assert.doesNotMatch(sw, /\.opus/, 'Aufnahmen gehören nicht in den Offline-Kern — sonst scheitert die Installation daran');
+  assert.doesNotMatch(sw, /klang\//);
+  const amb = lies('src/53-ambience.js');
+  assert.match(amb, /function ambienceStimmeBauen/);
+  assert.match(amb, /exponentialRampToValueAtTime/, 'ein Loop braucht weiche Übergänge');
+  assert.match(amb, /dbPut\('media', blob, schluessel\)/, 'einmal geholt, bleibt eine Aufnahme im Gerät');
+  assert.match(amb, /AMBIENCE_MAX/, 'Größe muss begrenzt sein');
+  for (const s of ['function ausklangStarten', 'function klangbildFolgen', 'function ambienceEigeneHinzufuegen', 'function ambienceVorratLeeren']) {
+    assert.ok(amb.includes(s), 'fehlt: ' + s);
+  }
+  /* Der Katalog wird nachgeladen; ohne ihn läuft die App trotzdem. */
+  assert.match(lies('src/60-boot.js'), /klang\/katalog\.json/);
+  assert.match(lies('src/60-boot.js'), /\.catch\(\(\) => \{\}\)/);
+  /* Build-Reihenfolge: Ambience kennt holeAudio aus 50-audio und wird vom Klangraum benutzt. */
+  for (const datei of ['build.sh', 'werkzeug/build-web.mjs']) {
+    const b = lies(datei);
+    assert.ok(b.indexOf('50-audio.js') < b.indexOf('53-ambience.js'), datei + ': Ambience braucht die Audio-Grundlage');
+    assert.ok(b.indexOf('53-ambience.js') < b.indexOf('51-klangraum.js'), datei + ': der Klangraum baut darauf auf');
+  }
+});
+
+test('Welle-2-Vertrag: Manuskript, Bretter und die kleinen Griffe sind verdrahtet', () => {
+  const pr = lies('src/44-projekte.js');
+  for (const s of ['function manuskriptText', 'async function projektHinausgeben', "'Als Manuskript hinausgeben'"]) {
+    assert.ok(pr.includes(s), 'Projekte: fehlt ' + s);
+  }
+  const cl = lies('src/46-cluster.js');
+  for (const s of ['function baueGruppe', 'function baueBrettbild', 'async function brettAlsBild', "neuDoc('brettbild'", "neuDoc('gruppe'", 'Eng um den Inhalt legen']) {
+    assert.ok(cl.includes(s), 'Bretter: fehlt ' + s);
+  }
+  /* Gruppen und Brettbilder brauchen eigene Grenzen — eine Anlage darf nur 2000 breit sein. */
+  assert.match(lies('src/30-core.js'), /\['gruppe', 'brettbild'\]\.includes\(d\.typ\)/);
+  /* Die kleinen Griffe */
+  assert.match(lies('src/42-schnipsel.js'), /e\.key !== 'Enter' \|\| e\.shiftKey/, 'Enter schickt Schnipsel ab');
+  assert.match(lies('src/45-schreibraum.js'), /e\.key\.toLowerCase\(\) === 's'/, 'Strg+S friert ein');
+  assert.match(lies('src/45-schreibraum.js'), /e\.key === 'Tab'/, 'Tab rückt ein');
+  assert.match(lies('src/30-core.js'), /ArrowDown' \|\| e\.key === 'ArrowUp'/, 'Menüs mit der Tastatur');
+  assert.match(lies('src/42b-blaetter.js'), /blattsuche/, 'Blätter lassen sich durchsuchen');
+});

@@ -8,6 +8,8 @@ const publicDir = join(hosting, 'public');
 const hauptadresse = 'https://thekeveldikev.github.io/vani/';
 mkdirSync(join(publicDir, 'icons'), { recursive: true });
 for (const name of ['manifest.json', 'robots.txt']) cpSync(join(wurzel, name), join(publicDir, name));
+/* Die Klangaufnahmen liegen neben der App und werden erst bei Bedarf geholt. */
+try { cpSync(join(wurzel, 'klang'), join(publicDir, 'klang'), { recursive: true }); } catch (e) {}
 /* Der frühere Sites-Origin bleibt für die verschlüsselten Pakete erhalten, ist
    aber keine zweite installierbare App mehr. Die echte App liegt als bewusst
    aufrufbarer Rettungsraum am selben Origin, damit alte IndexedDB-Inhalte nicht

@@ -1470,3 +1470,57 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 .blattkarte.gepinnt { box-shadow: 0 2px 10px var(--schein), inset 0 0 0 1.5px var(--gold); }
 .blatt-nadel { position: absolute; top: 8px; right: 10px; display: flex; color: var(--gold); }
 .blatt-nadel svg.ik { width: 15px; height: 15px; }
+
+/* ================================================================
+   Klang: echte Aufnahmen
+   ================================================================ */
+.klang-reiter { margin: 10px 0 4px; }
+.ambience-liste { margin-top: 4px; }
+.ambience-zeile {
+  position: relative; display: grid; grid-template-columns: minmax(0,1fr) 38% 34px;
+  align-items: center; gap: 10px; padding: 9px 12px; margin-bottom: 6px;
+  border-radius: 13px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie);
+  opacity: .72; transition: opacity .18s ease, box-shadow .18s ease; overflow: hidden;
+}
+.ambience-zeile.an { opacity: 1; box-shadow: inset 0 0 0 1.5px var(--akzent2); }
+.ambience-balken { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: color-mix(in srgb, var(--akzent2) 18%, transparent); pointer-events: none; transition: width .2s linear; }
+.ambience-zeile.laedt .ambience-balken { box-shadow: inset -1px 0 0 var(--akzent2); }
+.ambience-name { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; min-width: 0; z-index: 1; }
+.ambience-titel { font-size: 15.5px; color: var(--tinte); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.ambience-stand { font-size: 11px; color: var(--blass); }
+.ambience-stand.da { color: var(--akzent2); }
+.ambience-zeile input[type="range"] { z-index: 1; width: 100%; }
+.ambience-fein-knopf { z-index: 1; width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: var(--blass); }
+.ambience-fein-knopf svg.ik { width: 17px; height: 17px; }
+.ambience-zeile.fein-offen { grid-template-columns: minmax(0,1fr) 38% 34px; }
+.ambience-zeile.fein-offen .ambience-fein-knopf { color: var(--akzent); }
+.ambience-fein { grid-column: 1 / -1; padding: 10px 2px 2px; border-top: 1px solid var(--linie); margin-top: 6px; z-index: 1; }
+.fein-zeile { display: grid; grid-template-columns: 78px minmax(0,1fr) 82px; align-items: center; gap: 9px; margin-bottom: 6px; }
+.fein-name { font-size: 12.5px; color: var(--blass); }
+.fein-wert { font-size: 12px; color: var(--tinte); text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fein-fuss { display: flex; align-items: center; gap: 10px; justify-content: space-between; margin-top: 8px; flex-wrap: wrap; }
+.ambience-quelle { font-size: 11px; color: var(--blass); }
+.szenenchip.eigen { box-shadow: inset 0 0 0 1.5px var(--gold); }
+.szenenchip small { margin-left: 6px; font-size: 10.5px; color: var(--blass); padding: 1px 5px; border-radius: 100px; background: var(--papier); }
+.klang-folgt { margin: 10px 0 2px; }
+@media (max-width: 620px) {
+  .ambience-zeile { grid-template-columns: minmax(0,1fr) 34% 32px; gap: 7px; padding: 8px 10px; }
+  .fein-zeile { grid-template-columns: 66px minmax(0,1fr) 66px; }
+}
+
+/* ----- Bretter: Gruppen und Bilder ----- */
+.brettgruppe { position: absolute; z-index: 0; border-radius: 18px; border: 1.5px dashed var(--linie); background: color-mix(in srgb, var(--papier) 26%, transparent); }
+.brettgruppe.b-gelb { border-color: #c8a83e; background: color-mix(in srgb, #f6e9a8 20%, transparent); }
+.brettgruppe.b-rot { border-color: #c98088; background: color-mix(in srgb, #f3cfd3 20%, transparent); }
+.brettgruppe.b-gruen { border-color: #8faa6e; background: color-mix(in srgb, #d3e3bd 20%, transparent); }
+.brettgruppe.b-blau { border-color: #7ba3bb; background: color-mix(in srgb, #cadfea 20%, transparent); }
+.gruppentitel { position: absolute; top: -26px; left: 4px; font: 600 13px ui-rounded, system-ui, sans-serif; color: var(--blass); background: var(--hg); padding: 2px 9px; border-radius: 100px; cursor: grab; touch-action: none; white-space: nowrap; max-width: 90%; overflow: hidden; text-overflow: ellipsis; }
+.gruppengriff { position: absolute; right: -7px; bottom: -7px; width: 20px; height: 20px; border-radius: 50%; background: var(--karte); box-shadow: inset 0 0 0 1.5px var(--linie); cursor: nwse-resize; touch-action: none; }
+.brettbild { position: absolute; z-index: 4; padding: 8px 8px 8px; background: #fdfcf7; box-shadow: 0 5px 16px rgba(0,0,0,.24); touch-action: none; }
+.brettbild img { width: 100%; display: block; pointer-events: none; border-radius: 1px; }
+.brettbildtitel { font: 12px ui-rounded, system-ui, sans-serif; color: #3a3325; text-align: center; padding: 7px 2px 1px; }
+.brettbildgriff { position: absolute; right: -6px; bottom: -6px; width: 18px; height: 18px; border-radius: 50%; background: var(--karte); box-shadow: inset 0 0 0 1.5px var(--linie); cursor: ew-resize; touch-action: none; }
+.manuskript-modal { width: min(660px, calc(100vw - 36px)); }
+.manuskript-vorschau { max-height: 30dvh; overflow: auto; padding: 12px 14px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font: 12.5px/1.6 ui-monospace, "SF Mono", Consolas, monospace; white-space: pre-wrap; color: var(--tinte); }
+.blattsuche { width: 100%; padding: 10px 14px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 15px; margin-bottom: 12px; color: var(--tinte); }
+.menue button:focus-visible { background: var(--karte); outline: 2px solid var(--akzent); outline-offset: -2px; }

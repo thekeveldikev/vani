@@ -18,7 +18,20 @@ RENDER.blaetter = function (haupt) {
   const inhalt = el('div', { class: 'inhalt' });
 
   const sortierung = D.einst.blattSortierung || 'zuletzt';
-  const alle = vomTyp('blatt');
+  let alle = vomTyp('blatt');
+  /* Ab einer Handvoll Blättern hilft ein Suchfeld mehr als Scrollen. */
+  const suchfeld = el('input', { type: 'search', class: 'blattsuche', placeholder: 'In den Blättern suchen …' });
+  const filter = normalisiere((sessionStorage.getItem('blattSuche') || '').trim());
+  if (filter) {
+    suchfeld.value = sessionStorage.getItem('blattSuche') || '';
+    alle = alle.filter((b) => normalisiere((b.titel || '') + ' ' + (b.text || '')).includes(filter));
+  }
+  suchfeld.addEventListener('input', entprellt(() => {
+    sessionStorage.setItem('blattSuche', suchfeld.value);
+    const stelle = suchfeld.selectionStart;
+    zeichne();
+    requestAnimationFrame(() => { const f = $('.blattsuche'); if (f) { f.focus(); f.setSelectionRange(stelle, stelle); } });
+  }, 220));
   if (sortierung === 'az') alle.sort((a, b) => (a.titel || a.text || '').localeCompare(b.titel || b.text || '', 'de'));
   else if (sortierung === 'aeltest') alle.sort((a, b) => a.angelegt - b.angelegt);
   /* Angepinnte Blätter liegen oben — in jeder Sortierung. */
@@ -33,6 +46,7 @@ RENDER.blaetter = function (haupt) {
     }
     inhalt.append(wahl);
   }
+  if (vomTyp('blatt').length > 5) inhalt.append(suchfeld);
 
   if (!alle.length) {
     inhalt.append(el('div', { class: 'leer' }, 'Ein leerer Stapel.',
@@ -47,7 +61,8 @@ RENDER.blaetter = function (haupt) {
       b.gepinnt ? el('span', { class: 'blatt-nadel', html: ik('pin') }) : null,
       el('div', { class: 'btitel serif' }, b.titel || erste.slice(0, 60) || 'Ohne Titel'),
       el('div', { class: 'bprobe' }, (b.text || '').trim().replace(/\s+/g, ' ').slice(0, 140) || 'Noch leer.'),
-      el('div', { class: 'bfuss' }, (worteZahl ? worteZahl + ' Wörter · ' : '') + vorZeit(b.geaendert))
+      el('div', { class: 'bfuss' }, (worteZahl ? worteZahl.toLocaleString('de-DE') + ' Wörter · ' : '') + vorZeit(b.geaendert)
+        + (worteZahl > 60 ? ' · ' + Math.max(1, Math.round(worteZahl / 200)) + ' Min.' : ''))
     );
     langdruck(karte, async () => {
       const wahl = await menue([

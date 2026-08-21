@@ -80,6 +80,7 @@ async function projektMenue(p, danach) {
     { text: 'Umbenennen', icon: 'stift', wert: 'name' },
     { text: 'Wortziel: ' + (p.ziel ? p.ziel.toLocaleString('de-DE') : 'keins'), icon: 'ziel', wert: 'ziel' },
     { text: 'Leseansicht', icon: 'lesen', wert: 'lesen' },
+    { text: 'Als Manuskript hinausgeben', icon: 'teilen', wert: 'export' },
     { text: 'Verbindungen ansehen', icon: 'verbinden', wert: 'bezug' },
     { text: 'Projekt löschen', icon: 'muell', wert: 'weg', rot: true }
   ], p.titel);
@@ -91,6 +92,9 @@ async function projektMenue(p, danach) {
     if (neu !== null) { p.ziel = parseInt(neu, 10) || 0; speichereStill(p); }
   } else if (wahl === 'lesen') {
     zeigeLeseansicht(p);
+    return;
+  } else if (wahl === 'export') {
+    await projektHinausgeben(p);
     return;
   } else if (wahl === 'bezug') {
     zeigeBeziehungen(p);
@@ -429,6 +433,101 @@ function szenenGesten(karte, s, p) {
       await loesche(s.id); zeichne();
     }
   });
+}
+
+/* ----- Als Manuskript hinausgeben -----
+   Eine einzige Datei, die überall aufgeht: Markdown. Kapitel als Überschriften,
+   Szenen durch eine Trennlinie geschieden, wahlweise mit Notizen, Figuren und
+   dem Stand jeder Szene. Wer es in Word will, zieht es dort einfach hinein. */
+function manuskriptText(p, was = {}) {
+  const zeilen = [];
+  const w = projektWorte(p);
+  zeilen.push('# ' + (p.titel || 'Ohne Titel'));
+  if (was.kopf !== false) {
+    const zeile = [p.art || 'Projekt', w.toLocaleString('de-DE') + ' Wörter'];
+    if (p.ziel) zeile.push('Ziel: ' + p.ziel.toLocaleString('de-DE'));
+    zeile.push('Stand: ' + fmtDatum(Date.now()));
+    zeilen.push('', '*' + zeile.join(' · ') + '*');
+  }
+  if (was.figuren) {
+    const figuren = kinder(p.id, 'figur');
+    if (figuren.length) {
+      zeilen.push('', '## Figuren & Orte', '');
+      for (const f of figuren) {
+        zeilen.push('**' + (f.titel || 'Ohne Namen') + '** — ' + ({ figur: 'Figur', ort: 'Ort', ding: 'Ding' }[f.art] || 'Anderes'));
+        if (f.notiz) zeilen.push('', f.notiz.trim());
+        zeilen.push('');
+      }
+    }
+  }
+  for (const k of kinder(p.id, 'kapitel')) {
+    const szenen = kinder(k.id, 'szene').filter((sz) => was.leere || (sz.text || '').trim() || (sz.titel || '').trim());
+    if (!szenen.length && !was.leere) continue;
+    zeilen.push('', '## ' + (k.titel || 'Kapitel'), '');
+    szenen.forEach((sz, i) => {
+      if (i) zeilen.push('', '* * *', '');
+      if (was.szenentitel !== false && (sz.titel || '').trim()) {
+        zeilen.push('### ' + sz.titel.trim() + (was.status ? '  `' + ({ funke: 'Funke', entwurf: 'Entwurf', steht: 'Steht' }[sz.status] || 'Funke') + '`' : ''), '');
+      }
+      const text = (sz.text || '').trim();
+      if (text) zeilen.push(text);
+      else if (was.leere) zeilen.push('*(noch leer)*');
+      if (was.notizen && (sz.notiz || '').trim()) zeilen.push('', '> **Notiz:** ' + sz.notiz.trim().replace(/\n/g, '\n> '));
+    });
+  }
+  if (was.hefte) {
+    const hefte = vomTyp('heft').filter((h) => h.projektRef === p.id);
+    for (const h of hefte) {
+      zeilen.push('', '## Heft: ' + (h.titel || 'Ohne Titel'), '');
+      for (const seite of kinder(h.id, 'seite')) {
+        if ((seite.titel || '').trim()) zeilen.push('### ' + seite.titel.trim(), '');
+        if ((seite.text || '').trim()) zeilen.push(seite.text.trim(), '');
+        for (const z of kinder(seite.id, 'zettel')) if ((z.text || '').trim()) zeilen.push('> ' + z.text.trim().replace(/\n/g, '\n> '), '');
+      }
+    }
+  }
+  return zeilen.join('\n').replace(/\n{4,}/g, '\n\n\n').trim() + '\n';
+}
+
+async function projektHinausgeben(p) {
+  const was = { kopf: true, szenentitel: true, status: false, notizen: false, figuren: true, hefte: false, leere: false };
+  const schalter = (name, schluessel, hinweis) => {
+    const s = el('button', { class: 'schalter' + (was[schluessel] ? ' an' : ''), onclick: (e) => { was[schluessel] = !was[schluessel]; e.currentTarget.classList.toggle('an', was[schluessel]); vorschauNeu(); } }, el('i'));
+    return el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, name, hinweis ? el('div', { style: 'font-size:12.5px;color:var(--blass)' }, hinweis) : null), s);
+  };
+  const vorschau = el('div', { class: 'manuskript-vorschau' });
+  const zahl = el('div', { class: 'einfuege-zaehler' });
+  const vorschauNeu = () => {
+    const t = manuskriptText(p, was);
+    vorschau.textContent = t.slice(0, 1200) + (t.length > 1200 ? '\n…' : '');
+    zahl.textContent = worte(t).toLocaleString('de-DE') + ' Wörter · ' + formatBytes(new Blob([t]).size);
+  };
+  vorschauNeu();
+  const kasten = el('div', { class: 'modal manuskript-modal' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('teilen') }), 'ALS MANUSKRIPT'),
+    el('h2', {}, '„' + (p.titel || 'Ohne Titel') + '" hinausgeben'),
+    el('div', { class: 'karte', style: 'margin-bottom:12px' },
+      schalter('Kopfzeile', 'kopf', 'Art, Wörter, Datum'),
+      schalter('Szenentitel', 'szenentitel'),
+      schalter('Stand je Szene', 'status', 'Funke, Entwurf, Steht'),
+      schalter('Notizen von den Rückseiten', 'notizen'),
+      schalter('Figuren & Orte', 'figuren'),
+      schalter('Hefte am Projekt', 'hefte'),
+      schalter('Auch leere Szenen', 'leere')),
+    vorschau, zahl,
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
+      el('button', { class: 'knopf', onclick: async () => {
+        const t = manuskriptText(p, was);
+        try { await navigator.clipboard.writeText(t); toast('Das Manuskript liegt in der Zwischenablage.'); zu(); }
+        catch (e) { teileText(t); zu(); }
+      } }, 'Kopieren'),
+      el('button', { class: 'knopf voll', onclick: async () => {
+        const name = (p.titel || 'Manuskript').replace(/[^\wäöüÄÖÜß -]/g, '').trim().slice(0, 60) || 'Manuskript';
+        await teileDatei(name + '.md', manuskriptText(p, was), 'text/markdown');
+        zu();
+      } }, 'Als Datei')));
+  const zu = zeigeDeck(kasten);
 }
 
 /* ----- Leseansicht ----- */

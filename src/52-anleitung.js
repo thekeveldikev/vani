@@ -165,7 +165,12 @@ const ANLEITUNG = [
       { t: 'Szenen', p: ['Jede Szene ist eine Karte. Tippen öffnet den Schreibraum. Der Punkt unten links ist der Status: Funke → Entwurf → Steht (einfach weitertippen). Der Dreh-Knopf zeigt die Rückseite: Platz für Zweifel, Ideen, Alternativen — nur für mich.'] },
       { t: 'Szenen verschieben', p: ['Am Touchscreen: Karte kurz halten, bis sie sich hebt, dann ziehen — in diesem oder in ein anderes Kapitel, vor oder hinter eine andere Karte. Mit der Maus: einfach ziehen. „In anderes Kapitel …" im Menü geht auch ohne Ziehen.'] },
       { t: 'Szenen-Menü (lange halten)', p: ['Umbenennen · Andere Farbe · Duplizieren („Fassung 2") · In anderes Kapitel … · Teilen · Szene löschen.'], b: 'Eine Szene in zwei Richtungen probieren: Duplizieren → in der Fassung 2 anders weiterschreiben → die schlechtere später löschen oder als Rückseiten-Notiz behalten.' },
-      { t: 'Leseansicht', p: ['Das Buch-Symbol zeigt das ganze Projekt am Stück wie ein Manuskript: Kapitelüberschriften, Szenen durch Sternchen getrennt, Gesamtwörter. „Kopieren" legt alles in die Zwischenablage, „Als Datei" gibt eine .txt heraus.'] },
+      { t: 'Leseansicht', p: ['Das Buch-Symbol zeigt das ganze Projekt am Stück wie ein Manuskript: Kapitelüberschriften, Szenen durch Sternchen getrennt, Gesamtwörter. „Kopieren" legt alles in die Zwischenablage, „Als Datei" gibt eine .txt heraus. Das Vorlese-Symbol liest das ganze Projekt vor.'] },
+      { t: 'Als Manuskript hinausgeben', p: [
+        'Projekt-Menü → „Als Manuskript hinausgeben". Eine einzige Datei, die überall aufgeht: Kapitel als Überschriften, Szenen sauber getrennt.',
+        'Sieben Schalter bestimmen, was mitkommt: Kopfzeile (Art, Wörter, Datum), Szenentitel, Stand je Szene (Funke, Entwurf, Steht), Notizen von den Rückseiten, Figuren & Orte, Hefte am Projekt, auch leere Szenen. Die Vorschau zeigt sofort, was herauskommt.',
+        '„Als Datei" gibt eine .md-Datei — die zieht man einfach in Word, Pages oder Google Docs.'
+      ], b: 'Zum Weitergeben an jemanden: Notizen aus, Stand aus, Figuren aus. Für mich selbst zum Überarbeiten: alles an.' },
       { t: 'Wortziel', p: ['Mit Wortziel zeigen Karte und Kopf einen Fortschrittsbalken. Das Ziel lässt sich im Projekt-Menü jederzeit ändern (0 = keins).'] },
       { t: 'Hefte am Projekt', p: ['Unten im Projekt liegen Hefte, die dazugehören. „Heft dazulegen" ordnet ein vorhandenes zu oder legt ein neues an. Ein Tipp auf das Heft öffnet es.'] },
       { t: 'Figuren & Orte', p: [
@@ -183,6 +188,16 @@ const ANLEITUNG = [
       { t: 'Blasen', p: ['Doppelt auf die Fläche tippen setzt eine Blase genau dort. Das Plus setzt eine in die Mitte. Tippen macht die Blase beschreibbar, Ziehen verschiebt sie. Lange halten: Andere Farbe (vier Töne und neutral), Im Schreibraum öffnen, Verbindungen ansehen, Blase zerplatzen.'] },
       { t: 'Fäden spannen', p: ['Der Verbinden-Knopf schaltet den Faden-Modus an. Zwei Blasen antippen — ein Faden spannt sich. Ein Tipp auf den Faden: Beschriften oder Lösen. Dieselben zwei Blasen noch einmal: der Faden löst sich.'], b: 'Blase „Hafen" und Blase „Tante Ruth" → Faden → beschriftet mit „wohnt dort seit 1987".' },
       { t: 'Schieben und zoomen', p: ['Mit einem Finger (oder der Maus) die Fläche schieben, mit zwei Fingern kneifen zum Zoomen. Die Lupen-Knöpfe zoomen schrittweise, der Prozent-Knopf setzt auf 100 % zurück. Die Ansicht merkt sich das Brett.'] },
+      { t: 'Bilder aufs Brett', p: [
+        'Das Kamera-Symbol legt ein Foto aufs Brett — wie ein Polaroid, leicht schräg. Ziehen verschiebt, der Griff unten rechts ändert die Größe. Lange halten: beschriften, drehen, gerade rücken, wegnehmen.'
+      ] },
+      { t: 'Gruppen mit Rahmen', p: [
+        'Das Rahmen-Symbol legt einen beschrifteten Rahmen um einen Teil des Bretts. Am Titel ziehen verschiebt den Rahmen — und alles, was darin liegt, wandert mit.',
+        'Lange halten auf dem Titel: umbenennen, Farbe wechseln, „Eng um den Inhalt legen" (der Rahmen schmiegt sich an das, was drin liegt) oder auflösen. Beim Auflösen bleibt der Inhalt liegen.'
+      ], b: 'Ein Rahmen „Erster Teil" um sechs Blasen. Beim Umsortieren des Buches schiebe ich den ganzen Teil an eine andere Stelle — mit einem Griff.' },
+      { t: 'Brett als Bild', p: [
+        'Das Teilen-Symbol oben malt das ganze Brett als Bild: Rahmen, Fäden mit Beschriftung, Bilder, Blasen mit Text und Farbe. Herauskommt ein PNG zum Verschicken oder Ausdrucken.'
+      ] },
       { t: 'Dinge aufs Brett legen', p: ['Schnipsel, Blätter, Seiten, Szenen, Hefte und Goodnotes-Archive lassen sich über „Hinzufügen & verbinden → Auf ein Cluster-Brett legen" als Blase ablegen. Die Blase zeigt einen kleinen Quellen-Knopf zurück zum Original.'] }
     ]
   },
@@ -202,7 +217,35 @@ const ANLEITUNG = [
     id: 'klang', titel: 'Klang', icon: 'klang', raum: 'klang',
     kurz: 'Atmosphäre zum Schreiben — alles errechnet, nichts geladen.',
     abschnitte: [
-      { t: 'Was der Klang ist', p: ['22 Klangebenen, die VANI selbst erzeugt — kein Download, kein Internet: Wetter (Regen ans Fenster, Regen aufs Dach, Platzregen, Fernes Gewitter, Wind ums Haus, Schneesturm), Wasser (Meeresbrandung, Bach, Tropfen nach dem Regen), Feuer (Kaminfeuer, Kerzenflackern), Natur (Blätterrascheln, Grillen, Vogelmorgen, Möwen, Eule, Zikaden), Nah & warm (Katzenschnurren, Herzschlag, Uhrenticken, Altes Haus), Orte (Café-Gemurmel, Zugfahrt, Glocken in der Ferne).'] },
+      { t: 'Zwei Arten von Klang', p: [
+        'Oben im Klangraum stehen zwei Reiter. „Aufnahmen" sind echte Feldaufnahmen — Lagerfeuer, Landdämmerung, Waldmorgen, alte Mühle. „Gewebt" sind Klänge, die VANI selbst errechnet: Regen, Meer, Wind, Grillen und mehr.',
+        'Beides lässt sich mischen. Ein echtes Lagerfeuer unter gewebtem Regen klingt oft besser als jedes für sich.'
+      ] },
+      { t: 'Aufnahmen holen', p: [
+        'Eine Aufnahme wird erst geholt, wenn ich sie das erste Mal anschalte — dafür braucht es einmal Internet. Danach liegt sie im Gerät und läuft auch offline, im Zug, im Flugzeug.',
+        'Rechts an jeder Zeile steht, ob sie schon „im Gerät" ist oder wie groß sie ist. Unter „Vorrat …" hole ich alle auf einmal oder schaffe wieder Platz.'
+      ], tipp: 'Vor einer Reise einmal „Alle holen" — dann ist der Klang unterwegs sicher da.' },
+      { t: 'Feineinstellung je Aufnahme', p: [
+        'Das kleine Regler-Symbol rechts an jeder Zeile klappt fünf Regler auf, die aus einem Loop eine Stimmung machen:',
+        'Tempo — langsamer macht alles schwerer und tiefer. Klarheit — von offen bis dumpf, als hörte man es durch eine Wand. Tiefe — nimmt den Bass heraus, dann klingt es fern. Atmen — wie stark die Aufnahme in Lautstärke und Farbe wandert, damit sie nicht nach Wiederholung klingt. Übergang — wie weich sich das Ende in den Anfang blendet.'
+      ], b: 'Lagerfeuer mit Tempo „langsamer 20%" und Klarheit „dumpf" klingt wie ein Kamin im Nebenzimmer.' },
+      { t: 'Klangbilder', p: [
+        'Eine Mischung mit Namen. „Klangbild merken" hält alles fest: welche Aufnahmen, welche gewebten Klänge, alle Feineinstellungen und die Gesamtlautstärke.',
+        'Ein Klangbild lange drücken: umbenennen, mit dem Jetzigen überschreiben, an einen Ort binden oder löschen.'
+      ] },
+      { t: 'Klang, der dem Text folgt', p: [
+        'Das Besondere: Ein Klangbild kann an einer Szene, einem Kapitel, einem Heft oder einem ganzen Projekt hängen. Öffne ich dort den Schreibraum, legt sich das Klangbild von selbst auf.',
+        'Ein Kapitel vererbt an seine Szenen, ein Projekt an alles darin. So bekommt jeder Teil des Buches seinen eigenen Ton, ohne dass ich etwas tue.',
+        'Abschalten lässt sich das mit „Klangbilder folgen dem Text" unten im Klangraum.'
+      ], b: 'Klangbild „Sturmnacht" ans Kapitel „Die Überfahrt" gehängt. Jede Szene darin beginnt jetzt mit Wind und Brandung.' },
+      { t: 'Eigene Klänge', p: [
+        '„+ Eigener Klang" nimmt jede Audiodatei vom Gerät auf — eigene Aufnahmen, gekaufte Ambiences, was auch immer. Sie stehen gleichberechtigt neben den mitgelieferten, mit allen Feineinstellungen.',
+        'Eigene Klänge reisen über den privaten Bereich auf die anderen Geräte mit.'
+      ] },
+      { t: 'Einschlafen', p: [
+        '„Einschlafen …" lässt den Klang über 15 Minuten bis zwei Stunden langsam leiser werden und dann ausgehen. Die ersten zwei Drittel bleiben fast gleich laut, erst danach wird es hörbar stiller — so wacht man nicht vom Leiserwerden auf.'
+      ] },
+      { t: 'Die gewebten Klänge', p: ['22 Klangebenen, die VANI selbst erzeugt — kein Download, kein Internet: Wetter (Regen ans Fenster, Regen aufs Dach, Platzregen, Fernes Gewitter, Wind ums Haus, Schneesturm), Wasser (Meeresbrandung, Bach, Tropfen nach dem Regen), Feuer (Kaminfeuer, Kerzenflackern), Natur (Blätterrascheln, Grillen, Vogelmorgen, Möwen, Eule, Zikaden), Nah & warm (Katzenschnurren, Herzschlag, Uhrenticken, Altes Haus), Orte (Café-Gemurmel, Zugfahrt, Glocken in der Ferne).'] },
       { t: 'Mischen', p: ['Jede Ebene hat einen Regler. Ein Tipp auf den Namen schaltet sie an (halbe Stärke) oder aus. Mehrere Ebenen zusammen ergeben eine Mischung. Unten: Gesamtlautstärke.'] },
       { t: 'Szenen', p: ['Zwölf fertige Szenen (Sturmnacht am Leuchtturm, Am Lagerfeuer, Schreibzimmer, Nachtzug, Café am Regentag, Sommernacht, Nach dem Regen, Morgen am Meer, Wintermorgen, Tiefe Nacht, Altes Haus im August, Bibliothek). „Mischung merken" macht aus meiner eigenen Mischung eine Szene mit Namen. Lange halten auf einer eigenen Szene entfernt sie. „Stille" macht alles aus.'], b: 'Regen ans Fenster 45 %, Kaminfeuer 30 %, Uhrenticken 45 % → „Mischung merken" → „Novemberabend".' },
       { t: 'Wenn es stumm bleibt', p: ['Browser erlauben Klang erst nach einer Berührung. Die Statuszeile sagt, was los ist. „Ton prüfen" spielt einen hellen Prüfton. „Klang neu wecken" baut den Klang frisch auf — das hilft vor allem auf dem iPad, wenn die App lange im Hintergrund war oder ein Anruf dazwischenkam.'], tipp: 'Auf dem iPad schaltet das System den Klang nach langem Hintergrund manchmal stumm. Ein Tipp irgendwo in der App oder „Klang neu wecken" holt ihn zurück. Das ist eine Grenze des iPads, nicht von VANI.' },
@@ -324,7 +367,12 @@ const ANLEITUNG = [
     id: 'tasten', titel: 'Tasten & Gesten', icon: 'feinheiten', raum: '',
     kurz: 'Die wenigen Griffe, die überall gelten.',
     abschnitte: [
-      { t: 'Tastatur', p: ['Strg/⌘ + K — Suche. Escape — schließt Fenster, Menüs, den Schreibraum und die Suche (immer nur die oberste Lage). Enter — bestätigt einzeilige Eingaben. Strg/⌘ + Enter — Wörter in die Kiste legen.'] },
+      { t: 'Tastatur', p: [
+        'Strg/⌘ + K — Suche. Escape — schließt Fenster, Menüs, den Schreibraum und die Suche (immer nur die oberste Lage).',
+        'Im Schreibraum: Strg/⌘ + S friert den Stand ein. Strg/⌘ + F öffnet Suchen & Ersetzen. Strg/⌘ + Enter schließt und speichert. Tab rückt ein, statt aus dem Text zu springen.',
+        'In Schnipseln und im Faden schickt Enter ab, Umschalt+Enter macht eine neue Zeile. In Menüs wandern die Pfeiltasten, die Ziffern 1–9 wählen direkt.',
+        'Strg/⌘ + Enter legt Wörter in die Kiste.'
+      ] },
       { t: 'Finger und Maus', p: ['Tippen öffnet. Lange halten (oder Rechtsklick) öffnet das Menü. Ziehen verschiebt Zettel, Fotos, Blasen, freie Schnipsel. Szenenkarten: kurz halten, bis sie sich heben, dann ziehen. Doppeltipp auf ein Brett setzt eine Blase. Zwei Finger kneifen zoomt das Brett. Wischen auf einem Zettel-Griff ändert die Größe.'] }
     ]
   },

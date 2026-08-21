@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.6.0';
+const APP_VERSION = '5.7.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -239,7 +239,8 @@ const IK = {
   inhalt: '<path d="M5 6h3M11 6h8M5 12h3M11 12h8M5 18h3M11 18h8"/>',
   lesezeichen: '<path d="M7 4h10v16l-5-3.5L7 20V4Z"/>',
   vorlesen: '<path d="M5 10v4h3l4 3.5v-11L8 10H5Z"/><path d="M15.5 9.5a3.5 3.5 0 0 1 0 5"/><path d="M18 7a7 7 0 0 1 0 10"/>',
-  figur: '<circle cx="12" cy="8" r="3.5"/><path d="M5.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/>'
+  figur: '<circle cx="12" cy="8" r="3.5"/><path d="M5.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/>',
+  rahmen: '<rect x="3.5" y="5.5" width="17" height="13" rx="2.5" stroke-dasharray="3 2.5"/><circle cx="9" cy="11" r="1.6"/><circle cx="15" cy="14" r="1.6"/>'
 };
 function ik(name, kl) { return `<svg class="ik${kl ? ' ' + kl : ''}" viewBox="0 0 24 24" aria-hidden="true">${IK[name] || ''}</svg>`; }
 
@@ -311,7 +312,8 @@ const STANDARD_EINST = {
   tastenklang: false, tagesziel: 0, ersetzungen: true, autokorrektur: true,
   autoSeitenwechsel: true, schnipselAnsicht: 'lauf', blattSortierung: 'zuletzt',
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
-  stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10
+  stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
+  ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95
 };
 const D = {
   docs: new Map(),
@@ -349,6 +351,27 @@ function uebernehmeEinstellungen(quelle) {
     }
     D.einst.mischung = m;
   }
+  /* Echte Aufnahmen: Pegel je Klang und die Feineinstellungen dazu. */
+  if (!D.einst.ambience || typeof D.einst.ambience !== 'object' || Array.isArray(D.einst.ambience)) D.einst.ambience = {};
+  else {
+    const m = {};
+    for (const [id, wert] of Object.entries(D.einst.ambience).slice(0, 100)) {
+      if (/^(eigen:)?[a-z0-9_:-]{1,80}$/i.test(id)) { const v = begrenze(wert, 0, 1, 0); if (v > 0) m[id] = v; }
+    }
+    D.einst.ambience = m;
+  }
+  if (!D.einst.ambienceFein || typeof D.einst.ambienceFein !== 'object' || Array.isArray(D.einst.ambienceFein)) D.einst.ambienceFein = {};
+  else {
+    const f = {};
+    for (const [id, w] of Object.entries(D.einst.ambienceFein).slice(0, 200)) {
+      if (!/^(eigen:)?[a-z0-9_:-]{1,80}$/i.test(id)) continue;
+      f[id] = typeof saubereAmbienceFeinheit === 'function' ? saubereAmbienceFeinheit(w) : {};
+    }
+    D.einst.ambienceFein = f;
+  }
+  D.einst.klangReiter = D.einst.klangReiter === 'gewebt' ? 'gewebt' : 'echt';
+  D.einst.klangFolgt = D.einst.klangFolgt !== false;
+  D.einst.vorleseTempo = begrenze(D.einst.vorleseTempo, .6, 1.4, .95);
   if (D.einst.raeume != null) {
     const gesehen = new Set();
     D.einst.raeume = Array.isArray(D.einst.raeume) ? D.einst.raeume.slice(0, 50)
@@ -399,6 +422,19 @@ function sauberesDokument(quelle) {
   if (d.papier && !['liniert', 'kariert', 'blank', 'punkte', 'breit'].includes(d.papier)) d.papier = 'liniert';
   if (d.ansicht && !['seiten', 'rolle', 'fluss'].includes(d.ansicht)) d.ansicht = 'seiten';
   if (d.papierfarbe && !['hell', 'weiss', 'creme', 'kraft', 'nacht'].includes(d.papierfarbe)) d.papierfarbe = 'hell';
+  /* Klangbilder merken sich Mischungen und woran sie hängen. */
+  if (d.pegel != null && typeof saubereAmbienceMischung === 'function' && d.typ === 'klangbild') d.pegel = saubereAmbienceMischung(d.pegel);
+  if (d.gewebt != null && typeof saubereMischung === 'function') d.gewebt = saubereMischung(d.gewebt);
+  if (d.fein != null) {
+    const raus = {};
+    if (d.fein && typeof d.fein === 'object' && !Array.isArray(d.fein) && typeof saubereAmbienceFeinheit === 'function') {
+      for (const [id, f] of Object.entries(d.fein).slice(0, 200)) raus[String(id).slice(0, 80)] = saubereAmbienceFeinheit(f);
+    }
+    d.fein = raus;
+  }
+  if (d.orte != null) d.orte = Array.isArray(d.orte) ? d.orte.filter((x) => typeof x === 'string' && x.length <= 200).slice(0, 200) : [];
+  if (d.lautstaerke != null) d.lautstaerke = begrenze(d.lautstaerke, 0, 1, .5);
+  if (d.groesse != null) d.groesse = begrenze(d.groesse, 0, 5e9, 0);
   if (d.rand != null) d.rand = d.rand === true;
   if (d.gepinnt != null) d.gepinnt = d.gepinnt === true;
   if (d.schrift && !['hand', 'klar', 'serif'].includes(d.schrift)) d.schrift = 'hand';
@@ -409,6 +445,17 @@ function sauberesDokument(quelle) {
   /* Zettel, Fotos und Blasen brauchen immer eine Position — sonst stürzt
      das Anfassen einer beschädigt importierten Anlage ab. */
   if (d.pos == null && ['zettel', 'foto', 'blase'].includes(d.typ)) d.pos = { x: 10, y: 10, rot: 0, w: 30 };
+  /* Gruppen und Bilder auf Brettern liegen in Weltkoordinaten und brauchen
+     eine Größe — pos.w/h dürfen dort viel größer sein als bei einer Anlage. */
+  if (['gruppe', 'brettbild'].includes(d.typ)) {
+    const q2 = d.pos && typeof d.pos === 'object' && !Array.isArray(d.pos) ? d.pos : {};
+    d.pos = {
+      x: begrenze(q2.x, -100000, 100000, 0), y: begrenze(q2.y, -100000, 100000, 0),
+      rot: begrenze(q2.rot, -360, 360, 0),
+      w: begrenze(q2.w, 40, 6000, d.typ === 'gruppe' ? 440 : 260),
+      h: begrenze(q2.h, 40, 6000, 300)
+    };
+  }
   if (d.pos != null) {
     const p = d.pos && typeof d.pos === 'object' && !Array.isArray(d.pos) ? d.pos : {};
     d.pos = {
@@ -730,6 +777,22 @@ function eingabe({ titel, wert = '', platzhalter = '', mehrzeilig = false, ok = 
 
 function menue(punkte, titel) {
   return new Promise((res) => {
+    /* Mit der Tastatur: Pfeile wandern, Ziffern springen, Enter wählt. */
+    const beiTaste = (e) => {
+      const knoepfe = $$('button', kasten);
+      if (!knoepfe.length) return;
+      const jetzt = knoepfe.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const naechst = e.key === 'ArrowDown'
+          ? (jetzt + 1) % knoepfe.length
+          : (jetzt <= 0 ? knoepfe.length - 1 : jetzt - 1);
+        knoepfe[naechst].focus();
+      } else if (/^[1-9]$/.test(e.key)) {
+        const k = knoepfe[Number(e.key) - 1];
+        if (k) { e.preventDefault(); k.click(); }
+      }
+    };
     const kasten = el('div', { class: 'menue' },
       titel ? el('div', { class: 'mtitel' }, titel) : null,
       punkte.filter(Boolean).map((p) =>
@@ -738,7 +801,9 @@ function menue(punkte, titel) {
           p.text)
       )
     );
-    const zu = zeigeDeck(kasten, () => res(null));
+    const zu = zeigeDeck(kasten, () => { document.removeEventListener('keydown', beiTaste, true); res(null); });
+    document.addEventListener('keydown', beiTaste, true);
+    setTimeout(() => { const erste = $('button', kasten); if (erste && matchMedia('(pointer:fine)').matches) erste.focus(); }, 40);
   });
 }
 
@@ -814,8 +879,9 @@ function oeffneDoc(d) {
   else if (d.typ === 'kapitel' || d.typ === 'figur') location.hash = '#/projekt/' + d.parent;
   else if (d.typ === 'szene') { location.hash = '#/projekt/' + d.projekt; setTimeout(() => oeffneSchreibraum(d.id), 80); }
   else if (d.typ === 'board') location.hash = '#/brett/' + d.id;
-  else if (d.typ === 'blase') location.hash = '#/brett/' + d.parent;
+  else if (d.typ === 'blase' || d.typ === 'gruppe' || d.typ === 'brettbild') location.hash = '#/brett/' + d.parent;
   else if (d.typ === 'wort' || d.typ === 'wortkiste') location.hash = '#/woerter';
+  else if (d.typ === 'klang' || d.typ === 'klangbild') location.hash = '#/klang';
   else if (d.typ === 'zettel' || d.typ === 'foto') { const s = D.docs.get(d.parent); if (s) oeffneDoc(s); }
 }
 document.addEventListener('click', (e) => {

@@ -280,13 +280,17 @@ RENDER.woerter = function (haupt) {
   async function wortAktion(wort) {
     const wahl = await menue([
       { text: 'Damit schreiben', icon: 'stift', wert: 'schreiben' },
+      { text: 'Wort kopieren', icon: 'teilen', wert: 'kopieren-wort' },
       { text: 'Wortzettel bearbeiten', icon: 'drehen', wert: 'edit' },
       { text: wort.favorit ? 'Oben lösen' : 'Oben anheften', icon: 'pin', wert: 'favorit' },
       wortkisten().length ? { text: 'In eine andere Kiste verschieben', icon: 'woerter', wert: 'verschieben' } : null,
       wortkisten().length ? { text: 'In eine Kiste kopieren', icon: 'plus', wert: 'kopieren' } : null,
       { text: 'Aus der Sammlung nehmen', icon: 'muell', wert: 'weg', rot: true }
     ], wort.text || 'Wort');
-    if (wahl === 'schreiben') {
+    if (wahl === 'kopieren-wort') {
+      try { await navigator.clipboard.writeText(wort.text || ''); toast('Kopiert.'); }
+      catch (e) { teileText(wort.text || ''); }
+    } else if (wahl === 'schreiben') {
       const seite = blattAusText('', (wort.text || '') + ' —\n\n'); oeffneSchreibraum(seite.id);
     } else if (wahl === 'edit') {
       const daten = await wortFormular(wort);
