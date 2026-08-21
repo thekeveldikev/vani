@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.1.0';
+const APP_VERSION = '5.1.1';
 const $ = (s, w) => (w || document).querySelector(s);
 const $$ = (s, w) => [...(w || document).querySelectorAll(s)];
 const uid = () => (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function')
@@ -211,7 +211,11 @@ const IK = {
   wieder: '<path d="M4 10a8 8 0 1 1 2.3 6.3"/><path d="M4 21v-5h5"/>',
   frieren: '<path d="M12 3v18M5.5 6.5 18.5 17.5M18.5 6.5 5.5 17.5"/><path d="M12 3l-2 2M12 3l2 2M12 21l-2-2M12 21l2-2"/>',
   ab: '<path d="m7 10 5 5 5-5"/>',
-  auf: '<path d="m7 14 5-5 5 5"/>'
+  auf: '<path d="m7 14 5-5 5 5"/>',
+  ausLinks: '<path d="M4 6h16M4 10.5h9M4 15h16M4 19.5h9"/>',
+  ausMitte: '<path d="M4 6h16M7.5 10.5h9M4 15h16M7.5 19.5h9"/>',
+  ausRechts: '<path d="M4 6h16M11 10.5h9M4 15h16M11 19.5h9"/>',
+  ausBlock: '<path d="M4 6h16M4 10.5h16M4 15h16M4 19.5h16"/>'
 };
 function ik(name, kl) { return `<svg class="ik${kl ? ' ' + kl : ''}" viewBox="0 0 24 24" aria-hidden="true">${IK[name] || ''}</svg>`; }
 
@@ -374,6 +378,9 @@ function sauberesDokument(quelle) {
   if (d.befestigung && !['tesa', 'pin', 'lose'].includes(d.befestigung)) d.befestigung = 'tesa';
   if (d.favorit != null) d.favorit = d.favorit === true;
   if (d.rich != null && typeof sauberesRichHTML === 'function') d.rich = sauberesRichHTML(d.rich);
+  /* Zettel, Fotos und Blasen brauchen immer eine Position — sonst stürzt
+     das Anfassen einer beschädigt importierten Anlage ab. */
+  if (d.pos == null && ['zettel', 'foto', 'blase'].includes(d.typ)) d.pos = { x: 10, y: 10, rot: 0, w: 30 };
   if (d.pos != null) {
     const p = d.pos && typeof d.pos === 'object' && !Array.isArray(d.pos) ? d.pos : {};
     d.pos = {
@@ -622,7 +629,7 @@ function flammeHTML() {
 }
 
 /* ----- Thema ----- */
-const THEMEN = { papier: '#ece3d1', tinte: '#141110', kerze: '#1b1206', nebel: '#e2e5e1' };
+const THEMEN = { papier: '#ece3d1', tinte: '#141110', kerze: '#1b1206', nebel: '#e2e5e1', weiss: '#ffffff' };
 function setzeThema(name) {
   document.documentElement.dataset.thema = name;
   D.einst.thema = name;
@@ -647,7 +654,15 @@ function toastMitAktion(text, aktion, tu, ms = 5200) {
 function zeigeDeck(inhalt, beiZu) {
   const schleier = el('div', { class: 'schleier' }, inhalt);
   schleier.addEventListener('pointerdown', (e) => { if (e.target === schleier) zu(); });
-  const zu = () => { schleier.remove(); if (beiZu) beiZu(); };
+  /* Escape schließt nur die oberste Lage — wie ein Tipp neben den Kasten. */
+  const beiTaste = (e) => {
+    if (e.key !== 'Escape') return;
+    if (!schleier.parentElement || schleier !== schleier.parentElement.lastElementChild) return;
+    e.stopPropagation(); e.preventDefault();
+    zu();
+  };
+  const zu = () => { document.removeEventListener('keydown', beiTaste, true); schleier.remove(); if (beiZu) beiZu(); };
+  document.addEventListener('keydown', beiTaste, true);
   $('#deck').append(schleier);
   return zu;
 }

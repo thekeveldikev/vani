@@ -1176,6 +1176,19 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 
+/* ================================================================
+   Sechste Feinschicht: Ankommen in jedem Raum, ruhige Werkzeuge
+   ================================================================ */
+
+/* Jeder Raum kommt mit einem Atemzug an, statt hart umzuspringen. */
+@keyframes raum-kommt { from { opacity: 0; transform: translateY(6px); } }
+#raum > .kopf, #raum > .inhalt { animation: raum-kommt .24s cubic-bezier(.2,.8,.2,1) both; }
+#raum > .inhalt { animation-delay: .03s; }
+#raum > .schnipsel-raum, #raum > .brett-raum { animation: einblenden .2s ease both; }
+
+/* Formatleiste: Ausrichtung als klare Zeichen, nicht als Rätsel. */
+.format-knopf svg.ik { width: 17px; height: 17px; }
+
 </style>
 </head>
 <body>
@@ -1202,7 +1215,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.1.0';
+const APP_VERSION = '5.1.1';
 const $ = (s, w) => (w || document).querySelector(s);
 const $$ = (s, w) => [...(w || document).querySelectorAll(s)];
 const uid = () => (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function')
@@ -1410,7 +1423,11 @@ const IK = {
   wieder: '<path d="M4 10a8 8 0 1 1 2.3 6.3"/><path d="M4 21v-5h5"/>',
   frieren: '<path d="M12 3v18M5.5 6.5 18.5 17.5M18.5 6.5 5.5 17.5"/><path d="M12 3l-2 2M12 3l2 2M12 21l-2-2M12 21l2-2"/>',
   ab: '<path d="m7 10 5 5 5-5"/>',
-  auf: '<path d="m7 14 5-5 5 5"/>'
+  auf: '<path d="m7 14 5-5 5 5"/>',
+  ausLinks: '<path d="M4 6h16M4 10.5h9M4 15h16M4 19.5h9"/>',
+  ausMitte: '<path d="M4 6h16M7.5 10.5h9M4 15h16M7.5 19.5h9"/>',
+  ausRechts: '<path d="M4 6h16M11 10.5h9M4 15h16M11 19.5h9"/>',
+  ausBlock: '<path d="M4 6h16M4 10.5h16M4 15h16M4 19.5h16"/>'
 };
 function ik(name, kl) { return `<svg class="ik${kl ? ' ' + kl : ''}" viewBox="0 0 24 24" aria-hidden="true">${IK[name] || ''}</svg>`; }
 
@@ -1573,6 +1590,9 @@ function sauberesDokument(quelle) {
   if (d.befestigung && !['tesa', 'pin', 'lose'].includes(d.befestigung)) d.befestigung = 'tesa';
   if (d.favorit != null) d.favorit = d.favorit === true;
   if (d.rich != null && typeof sauberesRichHTML === 'function') d.rich = sauberesRichHTML(d.rich);
+  /* Zettel, Fotos und Blasen brauchen immer eine Position — sonst stürzt
+     das Anfassen einer beschädigt importierten Anlage ab. */
+  if (d.pos == null && ['zettel', 'foto', 'blase'].includes(d.typ)) d.pos = { x: 10, y: 10, rot: 0, w: 30 };
   if (d.pos != null) {
     const p = d.pos && typeof d.pos === 'object' && !Array.isArray(d.pos) ? d.pos : {};
     d.pos = {
@@ -1821,7 +1841,7 @@ function flammeHTML() {
 }
 
 /* ----- Thema ----- */
-const THEMEN = { papier: '#ece3d1', tinte: '#141110', kerze: '#1b1206', nebel: '#e2e5e1' };
+const THEMEN = { papier: '#ece3d1', tinte: '#141110', kerze: '#1b1206', nebel: '#e2e5e1', weiss: '#ffffff' };
 function setzeThema(name) {
   document.documentElement.dataset.thema = name;
   D.einst.thema = name;
@@ -1846,7 +1866,15 @@ function toastMitAktion(text, aktion, tu, ms = 5200) {
 function zeigeDeck(inhalt, beiZu) {
   const schleier = el('div', { class: 'schleier' }, inhalt);
   schleier.addEventListener('pointerdown', (e) => { if (e.target === schleier) zu(); });
-  const zu = () => { schleier.remove(); if (beiZu) beiZu(); };
+  /* Escape schließt nur die oberste Lage — wie ein Tipp neben den Kasten. */
+  const beiTaste = (e) => {
+    if (e.key !== 'Escape') return;
+    if (!schleier.parentElement || schleier !== schleier.parentElement.lastElementChild) return;
+    e.stopPropagation(); e.preventDefault();
+    zu();
+  };
+  const zu = () => { document.removeEventListener('keydown', beiTaste, true); schleier.remove(); if (beiZu) beiZu(); };
+  document.addEventListener('keydown', beiTaste, true);
   $('#deck').append(schleier);
   return zu;
 }
@@ -2788,13 +2816,16 @@ function baueFormatleiste(editor, beiAenderung, kompakt) {
   const groesseWert = el('span', { class: 'format-groesse' }, '19');
   groesse.addEventListener('input', () => { groesseWert.textContent = groesse.value; });
   groesse.addEventListener('change', () => { richGroesse(editor, Number(groesse.value)); if (beiAenderung) beiAenderung(); });
+  const ikKnopf = (icon, titel, befehl, wert) => knopf(el('span', { html: ik(icon), style: 'display:flex' }), titel, befehl, wert);
   return el('div', { class: 'formatleiste' + (kompakt ? ' kompakt' : ''), role: 'toolbar', 'aria-label': 'Text formatieren' },
     knopf('B', 'Fett', 'bold'), knopf('I', 'Kursiv', 'italic'), knopf('U', 'Unterstrichen', 'underline'), knopf('S', 'Durchgestrichen', 'strikeThrough'),
     el('span', { class: 'format-trenner' }),
+    knopf('Ü', 'Überschrift', 'formatBlock', 'h2'), knopf('¶', 'Normaler Absatz', 'formatBlock', 'p'),
     knopf('• Liste', 'Ungeordnete Liste', 'insertUnorderedList'), knopf('1. Liste', 'Nummerierte Liste', 'insertOrderedList'),
     knopf('❝', 'Zitat', 'formatBlock', 'blockquote'),
     el('span', { class: 'format-trenner' }),
-    knopf('≡', 'Links ausrichten', 'justifyLeft'), knopf('≣', 'Zentrieren', 'justifyCenter'), knopf('☰', 'Blocksatz', 'justifyFull'),
+    ikKnopf('ausLinks', 'Links ausrichten', 'justifyLeft'), ikKnopf('ausMitte', 'Zentrieren', 'justifyCenter'),
+    ikKnopf('ausRechts', 'Rechts ausrichten', 'justifyRight'), ikKnopf('ausBlock', 'Blocksatz', 'justifyFull'),
     el('label', { class: 'format-farbe', title: 'Textfarbe' }, 'A', farbe),
     el('label', { class: 'format-farbe marker', title: 'Markierfarbe' }, '▰', marker),
     el('label', { class: 'format-slider' }, 'Größe', groesse, groesseWert));
@@ -4804,7 +4835,7 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
 }
 
 function positioniere(elem, a) {
-  const p = a.pos || { x: 10, y: 10, rot: 0, w: 30 };
+  const p = a.pos || (a.pos = { x: 10, y: 10, rot: 0, w: 30 });
   elem.style.left = p.x + '%';
   elem.style.top = p.y + '%';
   elem.style.width = p.w + '%';
@@ -4818,7 +4849,7 @@ function anlageGesten(elem, a, blatt, neuBauen) {
     $$('.anlage.aktiv', blatt).forEach((x) => { if (x !== elem) x.classList.remove('aktiv'); });
     const r = blatt.getBoundingClientRect();
     zieht = { sx: e.clientX, sy: e.clientY, px: a.pos.x, py: a.pos.y, r, bewegt: false };
-    elem.setPointerCapture(e.pointerId);
+    try { elem.setPointerCapture(e.pointerId); } catch (x) {}
     e.preventDefault();
   });
   elem.addEventListener('pointermove', (e) => {
@@ -4850,7 +4881,7 @@ function anlageGesten(elem, a, blatt, neuBauen) {
     e.stopPropagation();
     const r = blatt.getBoundingClientRect();
     groesse = { sx: e.clientX, w: a.pos.w, r };
-    griff.setPointerCapture(e.pointerId);
+    try { griff.setPointerCapture(e.pointerId); } catch (x) {}
   });
   griff.addEventListener('pointermove', (e) => {
     if (!groesse) return;
@@ -4944,7 +4975,7 @@ async function starteKritzeln(blatt, seite) {
   let letzterStand = null;
 
   canvas.addEventListener('pointerdown', (e) => {
-    canvas.setPointerCapture(e.pointerId);
+    try { canvas.setPointerCapture(e.pointerId); } catch (x) {}
     try { letzterStand = ctx.getImageData(0, 0, canvas.width, canvas.height); } catch (x) { letzterStand = null; }
     strich = { x: e.offsetX, y: e.offsetY };
     e.preventDefault();
@@ -6038,7 +6069,7 @@ RENDER.brett = function (haupt, bid) {
     blase.addEventListener('pointerdown', (e) => {
       if (!ta.hasAttribute('readonly') && e.target === ta) return;
       zieht = { sx: e.clientX, sy: e.clientY, px: b.pos.x, py: b.pos.y, bewegt: false };
-      blase.setPointerCapture(e.pointerId);
+      try { blase.setPointerCapture(e.pointerId); } catch (x) {}
       e.preventDefault();
     });
     blase.addEventListener('pointermove', (e) => {
@@ -6572,6 +6603,14 @@ const SUCH_GRUPPEN = [
   ['mischung', 'Klang-Szenen', 'klang']
 ];
 
+/* Ein kaputter Eintrag im Browser-Speicher darf die Suche nicht lahmlegen. */
+function leseLetzteSuchen() {
+  try {
+    const roh = JSON.parse(localStorage.getItem('vani-suchen') || '[]');
+    return Array.isArray(roh) ? roh.filter((x) => typeof x === 'string').slice(0, 8) : [];
+  } catch (e) { return []; }
+}
+
 function oeffneSuche() {
   const feld = el('input', { type: 'text', placeholder: 'Wonach suchst du?' });
   const treffer = el('div', { class: 'suchtreffer' });
@@ -6614,7 +6653,7 @@ function oeffneSuche() {
 
   function leererZustand() {
     treffer.innerHTML = '';
-    const letzte = JSON.parse(localStorage.getItem('vani-suchen') || '[]');
+    const letzte = leseLetzteSuchen();
     if (letzte.length) {
       treffer.append(el('div', { class: 'gruppe' }, 'ZULETZT GESUCHT'));
       for (const q of letzte.slice(0, 5)) {
@@ -6637,9 +6676,9 @@ function oeffneSuche() {
 
   function merkeSuche(q) {
     if (!q || q.length < 2) return;
-    const letzte = JSON.parse(localStorage.getItem('vani-suchen') || '[]').filter((x) => x !== q);
+    const letzte = leseLetzteSuchen().filter((x) => x !== q);
     letzte.unshift(q);
-    localStorage.setItem('vani-suchen', JSON.stringify(letzte.slice(0, 8)));
+    try { localStorage.setItem('vani-suchen', JSON.stringify(letzte.slice(0, 8))); } catch (e) {}
   }
 
   function suche() {

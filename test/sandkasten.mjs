@@ -70,13 +70,13 @@ export function baueSandkasten() {
   };
   kontext.globalThis = kontext;
   vm.createContext(kontext);
-  for (const datei of ['30-core.js', '29-profile.js', '35-richtext.js', '34-inhalt.js', '40-router.js', '41-zuhause.js', '42d-goodnotes.js', '43-hefte.js', '47-woerter.js', '50-audio.js']) {
+  for (const datei of ['30-core.js', '29-profile.js', '35-richtext.js', '34-inhalt.js', '40-router.js', '41-zuhause.js', '42d-goodnotes.js', '43-hefte.js', '47-woerter.js', '48-suche.js', '50-audio.js']) {
     vm.runInContext(readFileSync(join(wurzel, 'src', datei), 'utf8'), kontext, { filename: datei });
   }
   /* Top-Level-const/let landen im lexikalischen Scope, nicht am Global —
      hier holen wir alles heraus, was die Prüfungen brauchen. */
   const exporte = vm.runInContext(
-    '({ worte, uid, D, dbPut, dbGet, dbDel, dbAlle, esc, entprellt, tagKey, fmtDatum, fmtZeit, vorZeit, zufall, normalisiere, fastGleich, teileText, klugeZeichen, pruefeSicherung, saubererSyncMarker, sauberesDokument, uebernehmeEinstellungen, begrenze, freieSchnipselPosition, freieFlaechenGrenzen, seitenUmbruch, verbindeDocs, trenneDocs, beziehungenFuer, blattInHeft, seiteZuBlatt, merkeFadenZiel, findeWiederEchos, wiederFunde, eigeneFunken, goodnotesArt, goodnotesFingerabdruck, blobsGleich, formatBytes, profilSaubererName, profilSaubereRegistry, profilGleich, profilErstelle, profilPruefePasswort, profilLadeRegistry, richReinerText, richAusText, sauberesRichHTML, heftDeckelDaten, wortkisten, wortlisteAusText, woerterInKiste, fuegeWoerterHinzu, wortInKiste, loescheWortkiste, wortZufallsgriff, saubereMischung, mischungAnwenden, audioUnterstuetzt, audioZustand, audioNeuStarten, audioFreigeben, audioProbe, audioLautheitsKurve, neueWerkbank, IK, SAATWORTE, FUNKEN, FUNKE_FRAGEN, FUNKE_FORMEN, FUNKE_SAETZE, ALLE_RAEUME, speichereEinst, speichereStats })',
+    '({ worte, uid, D, dbPut, dbGet, dbDel, dbAlle, esc, entprellt, tagKey, fmtDatum, fmtZeit, vorZeit, zufall, normalisiere, fastGleich, teileText, klugeZeichen, pruefeSicherung, saubererSyncMarker, sauberesDokument, uebernehmeEinstellungen, begrenze, freieSchnipselPosition, freieFlaechenGrenzen, seitenUmbruch, verbindeDocs, trenneDocs, beziehungenFuer, blattInHeft, seiteZuBlatt, merkeFadenZiel, findeWiederEchos, wiederFunde, eigeneFunken, goodnotesArt, goodnotesFingerabdruck, blobsGleich, formatBytes, profilSaubererName, profilSaubereRegistry, profilGleich, profilErstelle, profilPruefePasswort, profilLadeRegistry, richReinerText, richAusText, sauberesRichHTML, heftDeckelDaten, wortkisten, wortlisteAusText, woerterInKiste, fuegeWoerterHinzu, wortInKiste, loescheWortkiste, wortZufallsgriff, saubereMischung, mischungAnwenden, audioUnterstuetzt, audioZustand, audioNeuStarten, audioFreigeben, audioProbe, audioLautheitsKurve, neueWerkbank, IK, SAATWORTE, FUNKEN, FUNKE_FRAGEN, FUNKE_FORMEN, FUNKE_SAETZE, ALLE_RAEUME, speichereEinst, speichereStats, THEMEN, positioniere, leseLetzteSuchen })',
     kontext);
   Object.assign(kontext, exporte);
   return kontext;

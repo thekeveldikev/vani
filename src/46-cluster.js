@@ -176,7 +176,7 @@ RENDER.brett = function (haupt, bid) {
     blase.addEventListener('pointerdown', (e) => {
       if (!ta.hasAttribute('readonly') && e.target === ta) return;
       zieht = { sx: e.clientX, sy: e.clientY, px: b.pos.x, py: b.pos.y, bewegt: false };
-      blase.setPointerCapture(e.pointerId);
+      try { blase.setPointerCapture(e.pointerId); } catch (x) {}
       e.preventDefault();
     });
     blase.addEventListener('pointermove', (e) => {

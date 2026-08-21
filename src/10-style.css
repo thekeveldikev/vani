@@ -1157,3 +1157,16 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* ================================================================
+   Sechste Feinschicht: Ankommen in jedem Raum, ruhige Werkzeuge
+   ================================================================ */
+
+/* Jeder Raum kommt mit einem Atemzug an, statt hart umzuspringen. */
+@keyframes raum-kommt { from { opacity: 0; transform: translateY(6px); } }
+#raum > .kopf, #raum > .inhalt { animation: raum-kommt .24s cubic-bezier(.2,.8,.2,1) both; }
+#raum > .inhalt { animation-delay: .03s; }
+#raum > .schnipsel-raum, #raum > .brett-raum { animation: einblenden .2s ease both; }
+
+/* Formatleiste: Ausrichtung als klare Zeichen, nicht als Rätsel. */
+.format-knopf svg.ik { width: 17px; height: 17px; }

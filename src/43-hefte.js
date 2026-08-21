@@ -393,7 +393,7 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
 }
 
 function positioniere(elem, a) {
-  const p = a.pos || { x: 10, y: 10, rot: 0, w: 30 };
+  const p = a.pos || (a.pos = { x: 10, y: 10, rot: 0, w: 30 });
   elem.style.left = p.x + '%';
   elem.style.top = p.y + '%';
   elem.style.width = p.w + '%';
@@ -407,7 +407,7 @@ function anlageGesten(elem, a, blatt, neuBauen) {
     $$('.anlage.aktiv', blatt).forEach((x) => { if (x !== elem) x.classList.remove('aktiv'); });
     const r = blatt.getBoundingClientRect();
     zieht = { sx: e.clientX, sy: e.clientY, px: a.pos.x, py: a.pos.y, r, bewegt: false };
-    elem.setPointerCapture(e.pointerId);
+    try { elem.setPointerCapture(e.pointerId); } catch (x) {}
     e.preventDefault();
   });
   elem.addEventListener('pointermove', (e) => {
@@ -439,7 +439,7 @@ function anlageGesten(elem, a, blatt, neuBauen) {
     e.stopPropagation();
     const r = blatt.getBoundingClientRect();
     groesse = { sx: e.clientX, w: a.pos.w, r };
-    griff.setPointerCapture(e.pointerId);
+    try { griff.setPointerCapture(e.pointerId); } catch (x) {}
   });
   griff.addEventListener('pointermove', (e) => {
     if (!groesse) return;
@@ -533,7 +533,7 @@ async function starteKritzeln(blatt, seite) {
   let letzterStand = null;
 
   canvas.addEventListener('pointerdown', (e) => {
-    canvas.setPointerCapture(e.pointerId);
+    try { canvas.setPointerCapture(e.pointerId); } catch (x) {}
     try { letzterStand = ctx.getImageData(0, 0, canvas.width, canvas.height); } catch (x) { letzterStand = null; }
     strich = { x: e.offsetX, y: e.offsetY };
     e.preventDefault();

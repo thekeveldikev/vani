@@ -19,6 +19,14 @@ const SUCH_GRUPPEN = [
   ['mischung', 'Klang-Szenen', 'klang']
 ];
 
+/* Ein kaputter Eintrag im Browser-Speicher darf die Suche nicht lahmlegen. */
+function leseLetzteSuchen() {
+  try {
+    const roh = JSON.parse(localStorage.getItem('vani-suchen') || '[]');
+    return Array.isArray(roh) ? roh.filter((x) => typeof x === 'string').slice(0, 8) : [];
+  } catch (e) { return []; }
+}
+
 function oeffneSuche() {
   const feld = el('input', { type: 'text', placeholder: 'Wonach suchst du?' });
   const treffer = el('div', { class: 'suchtreffer' });
@@ -61,7 +69,7 @@ function oeffneSuche() {
 
   function leererZustand() {
     treffer.innerHTML = '';
-    const letzte = JSON.parse(localStorage.getItem('vani-suchen') || '[]');
+    const letzte = leseLetzteSuchen();
     if (letzte.length) {
       treffer.append(el('div', { class: 'gruppe' }, 'ZULETZT GESUCHT'));
       for (const q of letzte.slice(0, 5)) {
@@ -84,9 +92,9 @@ function oeffneSuche() {
 
   function merkeSuche(q) {
     if (!q || q.length < 2) return;
-    const letzte = JSON.parse(localStorage.getItem('vani-suchen') || '[]').filter((x) => x !== q);
+    const letzte = leseLetzteSuchen().filter((x) => x !== q);
     letzte.unshift(q);
-    localStorage.setItem('vani-suchen', JSON.stringify(letzte.slice(0, 8)));
+    try { localStorage.setItem('vani-suchen', JSON.stringify(letzte.slice(0, 8))); } catch (e) {}
   }
 
   function suche() {

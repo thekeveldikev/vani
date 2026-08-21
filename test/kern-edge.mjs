@@ -340,3 +340,40 @@ test('Audio-Werkbank: Stop räumt ausstehende Timer weg', async () => {
   await new Promise((r) => setTimeout(r, 45));
   assert.equal(aufrufe, 0);
 });
+
+test('Themen: auch Weiß färbt die Statusleiste richtig, kein Thema fällt auf Beige zurück', async () => {
+  const k = baueSandkasten();
+  assert.equal(k.THEMEN.weiss, '#ffffff');
+  for (const [name, wert] of Object.entries(roh(k.THEMEN))) {
+    assert.match(wert, /^#[0-9a-f]{6}$/i, 'Thema ohne echte Farbe: ' + name);
+  }
+});
+
+test('Anlagen ohne Position: Sanitisierung und Laufzeit reparieren, statt abzustürzen', async () => {
+  const k = baueSandkasten();
+  /* Beschädigt importierte Zettel, Fotos und Blasen bekommen immer eine Position … */
+  for (const typ of ['zettel', 'foto', 'blase']) {
+    const d = k.sauberesDokument({ id: 'kaputt-' + typ, typ, angelegt: 1, geaendert: 1 });
+    assert.ok(d && d.pos, typ + ' braucht eine Position');
+    for (const feld of ['x', 'y', 'rot', 'w']) assert.equal(typeof d.pos[feld], 'number');
+  }
+  /* … andere Typen werden nicht mit einer künstlichen Position beschwert … */
+  const s = k.sauberesDokument({ id: 'ohne', typ: 'schnipsel', text: 'hi', angelegt: 1, geaendert: 1 });
+  assert.equal(s.pos, undefined);
+  /* … und positioniere setzt zur Not selbst eine, damit Gesten danach greifen. */
+  const elem = { style: {} };
+  const anlage = { typ: 'zettel' };
+  k.positioniere(elem, anlage);
+  assert.ok(anlage.pos && typeof anlage.pos.x === 'number');
+  assert.equal(elem.style.left, anlage.pos.x + '%');
+});
+
+test('Suche: ein beschädigter Suchverlauf im Browser-Speicher legt nichts lahm', async () => {
+  const k = baueSandkasten();
+  k.localStorage.setItem('vani-suchen', '{kaputt');
+  assert.deepEqual([...k.leseLetzteSuchen()], []);
+  k.localStorage.setItem('vani-suchen', JSON.stringify({ kein: 'array' }));
+  assert.deepEqual([...k.leseLetzteSuchen()], []);
+  k.localStorage.setItem('vani-suchen', JSON.stringify(['abend', 42, null, 'meer']));
+  assert.deepEqual([...k.leseLetzteSuchen()], ['abend', 'meer']);
+});

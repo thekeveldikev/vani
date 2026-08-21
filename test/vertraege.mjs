@@ -92,3 +92,23 @@ test('Desktop-Vertrag: eigenes sicheres Protokoll wird erkannt und Fremdseiten b
   assert.match(main, /safeStorage\.encryptString/);
   assert.match(main, /setPermissionRequestHandler/);
 });
+
+test('Themenvertrag: jede angebotene Stimmung hat ihre eigene Statusleistenfarbe', () => {
+  const kern = lies('src/30-core.js');
+  const fein = lies('src/49-feinheiten.js');
+  const themenBlock = (kern.match(/const THEMEN = \{([^}]*)\}/) || [])[1] || '';
+  const angeboten = [...fein.matchAll(/\[\s*'([a-z]+)',\s*'[^']+',\s*'#[0-9a-f]{6}'/gi)].map((m) => m[1]);
+  assert.ok(angeboten.length >= 5, 'Themenliste in den Feinheiten nicht gefunden');
+  for (const id of angeboten) {
+    assert.ok(themenBlock.includes(id + ':'), 'Stimmung ohne Statusleistenfarbe: ' + id);
+  }
+});
+
+test('Formatleistenvertrag: jede erlaubte Ausrichtung und Überschrift ist auch erreichbar', () => {
+  const rt = lies('src/35-richtext.js');
+  for (const befehl of ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull']) {
+    assert.ok(rt.includes(`'${befehl}'`), 'Knopf fehlt: ' + befehl);
+  }
+  assert.ok(/formatBlock',\s*'h2'/.test(rt), 'Überschrift-Knopf fehlt');
+  assert.ok(/formatBlock',\s*'p'/.test(rt), 'Absatz-Knopf fehlt');
+});

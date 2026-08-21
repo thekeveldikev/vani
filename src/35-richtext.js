@@ -118,13 +118,16 @@ function baueFormatleiste(editor, beiAenderung, kompakt) {
   const groesseWert = el('span', { class: 'format-groesse' }, '19');
   groesse.addEventListener('input', () => { groesseWert.textContent = groesse.value; });
   groesse.addEventListener('change', () => { richGroesse(editor, Number(groesse.value)); if (beiAenderung) beiAenderung(); });
+  const ikKnopf = (icon, titel, befehl, wert) => knopf(el('span', { html: ik(icon), style: 'display:flex' }), titel, befehl, wert);
   return el('div', { class: 'formatleiste' + (kompakt ? ' kompakt' : ''), role: 'toolbar', 'aria-label': 'Text formatieren' },
     knopf('B', 'Fett', 'bold'), knopf('I', 'Kursiv', 'italic'), knopf('U', 'Unterstrichen', 'underline'), knopf('S', 'Durchgestrichen', 'strikeThrough'),
     el('span', { class: 'format-trenner' }),
+    knopf('Ü', 'Überschrift', 'formatBlock', 'h2'), knopf('¶', 'Normaler Absatz', 'formatBlock', 'p'),
     knopf('• Liste', 'Ungeordnete Liste', 'insertUnorderedList'), knopf('1. Liste', 'Nummerierte Liste', 'insertOrderedList'),
     knopf('❝', 'Zitat', 'formatBlock', 'blockquote'),
     el('span', { class: 'format-trenner' }),
-    knopf('≡', 'Links ausrichten', 'justifyLeft'), knopf('≣', 'Zentrieren', 'justifyCenter'), knopf('☰', 'Blocksatz', 'justifyFull'),
+    ikKnopf('ausLinks', 'Links ausrichten', 'justifyLeft'), ikKnopf('ausMitte', 'Zentrieren', 'justifyCenter'),
+    ikKnopf('ausRechts', 'Rechts ausrichten', 'justifyRight'), ikKnopf('ausBlock', 'Blocksatz', 'justifyFull'),
     el('label', { class: 'format-farbe', title: 'Textfarbe' }, 'A', farbe),
     el('label', { class: 'format-farbe marker', title: 'Markierfarbe' }, '▰', marker),
     el('label', { class: 'format-slider' }, 'Größe', groesse, groesseWert));
