@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.1.1';
+const APP_VERSION = '5.2.0';
 const $ = (s, w) => (w || document).querySelector(s);
 const $$ = (s, w) => [...(w || document).querySelectorAll(s)];
 const uid = () => (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function')

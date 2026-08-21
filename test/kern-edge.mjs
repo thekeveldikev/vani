@@ -377,3 +377,50 @@ test('Suche: ein beschädigter Suchverlauf im Browser-Speicher legt nichts lahm'
   k.localStorage.setItem('vani-suchen', JSON.stringify(['abend', 42, null, 'meer']));
   assert.deepEqual([...k.leseLetzteSuchen()], ['abend', 'meer']);
 });
+
+test('Anleitung: vollständig, eindeutig, durchsuchbar — jeder Raum der Leiste hat sein Kapitel', async () => {
+  const k = baueSandkasten();
+  const kapitel = roh(k.ANLEITUNG);
+  const raeume = roh(k.ALLE_RAEUME);
+  const ids = kapitel.map((x) => x.id);
+  assert.equal(new Set(ids).size, ids.length, 'Kapitel-IDs müssen eindeutig sein');
+  for (const kap of kapitel) {
+    assert.ok(kap.titel && Array.isArray(kap.abschnitte) && kap.abschnitte.length >= 1, 'leeres Kapitel: ' + kap.id);
+    for (const a of kap.abschnitte) assert.ok(a.t && ((a.p && a.p.length) || (a.s && a.s.length)), kap.id + ' → Abschnitt ohne Inhalt: ' + a.t);
+    if (kap.raum && kap.raum !== 'suche') {
+      assert.ok(raeume.some((r) => r.id === kap.raum) || kap.raum === 'feinheiten', 'Kapitel führt in unbekannten Raum: ' + kap.raum);
+    }
+  }
+  /* Vollständigkeit: jeder Raum aus der Leiste hat ein Kapitel, das zu ihm führt. */
+  for (const r of raeume) {
+    const ziel = r.id === 'zuhause' ? '' : r.id;
+    assert.ok(kapitel.some((x) => x.raum === ziel), 'Kein Kapitel für den Raum ' + r.id);
+  }
+  /* Suche: nur passende Abschnitte bleiben, Umlaute sind egal, Unbekanntes ergibt nichts, leer ergibt alles. */
+  const treffer = roh(k.anleitungSuche('kopplungscode'));
+  assert.ok(treffer.length >= 1 && treffer.every((t) => t.abschnitte.length >= 1));
+  assert.ok(treffer.some((t) => t.kapitel.id === 'geraete'));
+  assert.equal(roh(k.anleitungSuche('strasse')).length, roh(k.anleitungSuche('Straße')).length);
+  assert.equal(roh(k.anleitungSuche('xyzzy-gibt-es-nicht')).length, 0);
+  assert.equal(roh(k.anleitungSuche('')).length, kapitel.length);
+  /* Hervorheben entschärft HTML, markiert unabhängig von Groß/Klein und stolpert nicht über Sonderzeichen. */
+  const h = k.anleitungHervorheben('Der <b>Faden</b> & faden', 'faden');
+  assert.ok(!h.includes('<b>') && h.includes('&lt;b&gt;'));
+  assert.equal((h.match(/<mark>/g) || []).length, 2);
+  assert.equal(k.anleitungHervorheben('a.b', '.'), 'a.b');
+  assert.equal(k.anleitungHervorheben('a.b(c)', '.b'), 'a<mark>.b</mark>(c)');
+});
+
+test('Sync-Dienst: auf einer reinen Seite wird der öffentliche Dienst vorgeschlagen, sonst die eigene Adresse', async () => {
+  const k = baueSandkasten();
+  const setze = (protocol, origin, hostname) => { k.location.protocol = protocol; k.location.origin = origin; k.location.hostname = hostname; };
+  setze('https:', 'https://jemand.github.io', 'jemand.github.io');
+  assert.equal(await k.syncStandardServer(), k.SYNC_STANDARD_DIENST);
+  setze('https:', 'https://vani.example.org', 'vani.example.org');
+  assert.equal(await k.syncStandardServer(), 'https://vani.example.org');
+  setze('http:', 'http://localhost:4321', 'localhost');
+  assert.equal(await k.syncStandardServer(), 'http://localhost:4321');
+  setze('file:', 'null', '');
+  assert.equal(await k.syncStandardServer(), k.SYNC_STANDARD_DIENST);
+  assert.match(k.SYNC_STANDARD_DIENST, /^https:\/\//);
+});

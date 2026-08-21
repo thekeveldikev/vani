@@ -379,11 +379,18 @@ Nach Änderungen:
 Nur zum Auftrag gehörende Dateien stagen. Bestehende Nutzeränderungen nicht
 überschreiben oder zurücksetzen.
 
-Beim Schreiben dieser Übergabe gilt:
+Beim Schreiben dieser Übergabe galt:
 
 - lokal main: zwei Produktcommits vor origin/main;
 - GitHub ist veraltet;
 - öffentliche Sites-App ist dennoch VANI 5.1.
+
+Seit dem 21. August 2026 (VANI 5.2.0, siehe CLAUDE-UEBERNAHME.md §11): origin/main
+ist wieder auf dem lokalen Stand; GitHub Pages (https://thekeveldikev.github.io/vani/)
+liefert die aktuelle Fassung; die Sites-Adresse wartet auf ein Codex-Deployment.
+Ein Push zu origin/main ist und bleibt eine externe Veröffentlichung — nur nach
+Nutzerfreigabe. Nach einem Push kurz prüfen, dass Pages gebaut hat (GitHub-API
+`/repos/<owner>/vani/pages/builds/latest` oder die Seite mit Cache-Busting laden).
 
 Ein Push zu origin/main ist eine externe Veröffentlichung und soll nur nach
 entsprechender Nutzerfreigabe erfolgen. Kein git reset --hard und kein Checkout über

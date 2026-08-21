@@ -1170,3 +1170,55 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 
 /* Formatleiste: Ausrichtung als klare Zeichen, nicht als Rätsel. */
 .format-knopf svg.ik { width: 17px; height: 17px; }
+
+/* ----- Die Anleitung: ein ruhiges Buch über der App ----- */
+.anleitung-bogen { position: fixed; inset: 0; z-index: 95; background: var(--hg); display: flex; flex-direction: column; animation: einblenden .18s ease; }
+.anleitung-kopf { flex: none; padding: calc(env(safe-area-inset-top) + 14px) 22px 12px; background: var(--hg); box-shadow: 0 1px 0 var(--linie); }
+.anleitung-titelzeile { display: flex; align-items: center; gap: 12px; max-width: 1060px; margin: 0 auto; }
+.anleitung-marke { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; flex: none; background: var(--akzent); color: var(--papier); font-family: ui-serif, "New York", Georgia, serif; font-weight: 700; font-size: 21px; }
+.anleitung-titelzeile h1 { flex: 1; min-width: 0; display: flex; flex-direction: column; font-family: ui-serif, "New York", Georgia, serif; font-size: 24px; font-weight: 600; line-height: 1.15; }
+.anleitung-titelzeile h1 small { font-size: 12.5px; color: var(--blass); font-weight: 400; font-family: ui-rounded, -apple-system, system-ui, sans-serif; margin-top: 2px; }
+.anleitung-suchzeile { display: flex; align-items: center; gap: 10px; max-width: 1060px; margin: 10px auto 0; background: var(--karte); border-radius: 12px; padding: 8px 12px; box-shadow: inset 0 0 0 1px var(--linie); }
+.anleitung-suchzeile input { flex: 1; min-width: 0; background: none; border: 0; outline: none; font-size: 16px; color: var(--tinte); }
+.anleitung-zaehler { font-size: 12.5px; color: var(--blass); white-space: nowrap; }
+.anleitung-koerper { flex: 1; min-height: 0; display: grid; grid-template-columns: 224px minmax(0, 1fr); width: 100%; max-width: 1060px; margin: 0 auto; }
+.anleitung-nav { overflow-y: auto; padding: 16px 10px calc(env(safe-area-inset-bottom) + 40px) 22px; display: flex; flex-direction: column; gap: 2px; }
+.anleitung-navknopf { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 10px; font-size: 14px; text-align: left; color: var(--tinte); }
+.anleitung-navknopf:hover, .anleitung-navknopf:active { background: var(--karte); }
+.anleitung-navknopf svg.ik { width: 17px; height: 17px; color: var(--blass); }
+.anleitung-inhalt { overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 22px calc(env(safe-area-inset-bottom) + 70px); }
+.anleitung-kapitel { padding: 14px 0 26px; border-bottom: 1px solid var(--linie); scroll-margin-top: 12px; }
+.anleitung-kapitel:last-child { border-bottom: 0; }
+.anleitung-kapitelkopf { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.anleitung-kapitelicon { display: flex; color: var(--akzent2); flex: none; }
+.anleitung-kapitelkopf h2 { flex: 1; min-width: 0; font-family: ui-serif, "New York", Georgia, serif; font-size: 24px; font-weight: 600; }
+.anleitung-springen { flex: none; }
+.anleitung-kurz { color: var(--blass); font-size: 14.5px; font-style: italic; margin-bottom: 14px; font-family: ui-serif, "New York", Georgia, serif; }
+.anleitung-abschnitt { margin: 0 0 18px; }
+.anleitung-abschnitt h3 { font-size: 16.5px; font-weight: 600; margin-bottom: 6px; }
+.anleitung-abschnitt p { font-size: 15.5px; line-height: 1.65; margin: 0 0 8px; max-width: 70ch; }
+.anleitung-abschnitt ol { margin: 6px 0 10px 22px; font-size: 15.5px; line-height: 1.6; max-width: 68ch; }
+.anleitung-abschnitt li { margin-bottom: 4px; }
+.anleitung-beispiel, .anleitung-tipp { display: flex; gap: 10px; padding: 10px 14px; border-radius: 12px; font-size: 14.5px; line-height: 1.6; margin: 8px 0 10px; max-width: 70ch; }
+.anleitung-beispiel { background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.anleitung-tipp { background: color-mix(in srgb, var(--gold) 16%, transparent); }
+.anleitung-beispiel b, .anleitung-tipp b { flex: none; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--blass); padding-top: 3px; }
+.anleitung-inhalt mark { background: color-mix(in srgb, var(--gold) 55%, transparent); color: inherit; border-radius: 3px; padding: 0 2px; }
+.anleitung-inhalt .leer { padding-top: 40px; }
+
+/* Die Karte in den Feinheiten, die zur Anleitung führt */
+.anleitung-karte { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; margin-bottom: 18px; }
+.anleitung-karte-icon { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 13px; background: var(--akzent); color: var(--papier); flex: none; }
+.anleitung-karte-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.anleitung-karte-text b { font-family: ui-serif, "New York", Georgia, serif; font-size: 18px; }
+.anleitung-karte-text small { font-size: 13px; color: var(--blass); line-height: 1.45; }
+.anleitung-karte-pfeil { display: flex; color: var(--blass); flex: none; }
+
+@media (max-width: 760px) {
+  .anleitung-koerper { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .anleitung-nav { flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 10px 16px; gap: 6px; scrollbar-width: none; }
+  .anleitung-nav::-webkit-scrollbar { display: none; }
+  .anleitung-navknopf { flex: none; white-space: nowrap; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+  .anleitung-kopf, .anleitung-inhalt { padding-left: 16px; padding-right: 16px; }
+  .anleitung-kapitelkopf h2 { font-size: 21px; }
+}

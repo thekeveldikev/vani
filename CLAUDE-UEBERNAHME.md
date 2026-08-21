@@ -568,8 +568,10 @@ Claude darf diese Punkte nicht als bereits fertig darstellen:
 9. **Die öffentliche URL ist öffentlich erreichbar**, aber persönliche Inhalte sind
    lokal beziehungsweise Ende-zu-Ende verschlüsselt. Öffentlich bedeutet nicht, dass
    Nutzerdaten öffentlich sind.
-10. **GitHub enthält den Codex-Stand noch nicht.** Erst nach bewusster Nutzerfreigabe
-    die lokalen Produkt- und Übergabedokumentationscommits zu `origin/main` pushen.
+10. **GitHub ist seit VANI 5.2.0 wieder auf dem lokalen Stand** (Push am 21. August
+    2026 nach ausdrücklicher Nutzerfreigabe „veröffentliche"). Damit ist auch die
+    GitHub-Pages-Adresse `https://thekeveldikev.github.io/vani/` aktuell — dort hängt
+    die ursprüngliche iPad-Installation des Nutzers. Siehe Abschnitt 11.
 
 ## 9. Externes Material
 
@@ -597,3 +599,75 @@ Nur lesen, wenn eine konkrete Aufgabe den Inhalt benötigt.
 10. Dem Nutzer auf Deutsch, verständlich und ohne Entwicklerjargon zusammenfassen.
 
 Der kopierfertige Prompt steht in `docs/CLAUDE-STARTPROMPT.md`.
+
+## 11. Stand nach der ersten Claude-Runde (21. August 2026, VANI 5.2.0)
+
+Claude hat die Übernahme vollständig durchgeführt (alle Quellen gelesen, `npm test`
+69/69 als Ausgangslage) und danach in zwei Schritten weitergebaut. Commits liegen
+auf `main` hinter `a02ce4a`.
+
+### 5.1.1 — vier stille Fehler, klarere Formatleiste
+
+- `THEMEN` in `src/30-core.js` hatte keinen Eintrag `weiss`: das weiße Thema färbte
+  die Geräte-Statusleiste beige. Vertrag in `test/vertraege.mjs` prüft jetzt, dass
+  jede in den Feinheiten angebotene Stimmung eine Statusleistenfarbe hat.
+- Zettel, Fotos und Blasen ohne `pos` (beschädigter Import) stürzten beim Anfassen
+  bzw. beim Bauen eines Bretts ab. `sauberesDokument` ergänzt für diese Typen eine
+  Position, `positioniere` in `src/43-hefte.js` repariert zur Laufzeit.
+- Formatleiste: `justifyRight` fehlte (die Doku versprach es), dazu Überschrift
+  (`h2`) und Absatz (`p`); Ausrichtung jetzt mit eigenen Icons (`ausLinks` …).
+- `src/48-suche.js`: ein beschädigter Suchverlauf in `localStorage` ließ die Suche
+  nicht mehr aufgehen → `leseLetzteSuchen()` mit Schutz.
+- `zeigeDeck` schließt die oberste Lage mit Escape; alle `setPointerCapture`-Aufrufe
+  sind gegen Zeiger-Rennen abgesichert; Räume kommen mit `raum-kommt`-Animation an.
+
+### 5.2.0 — die Anleitung in der App
+
+- Neue Quelle `src/52-anleitung.js` (Buildreihenfolge: nach `51-klangraum.js`, vor
+  `60-boot.js`): Datenmodell `ANLEITUNG` (23 Kapitel, Abschnitte mit Absätzen,
+  Schritten, Beispiel, Merke), reine Funktionen `anleitungSuche` und
+  `anleitungHervorheben`, Overlay `oeffneAnleitung(kapitelId?)` /
+  `schliesseAnleitung()` mit Kapitelnavigation, Live-Suche, „Aufschlagen"-Sprung in
+  den jeweiligen Raum und Escape. Einstieg: Karte ganz oben in den Feinheiten plus
+  Buch-Symbol im Feinheiten-Kopf. Ton absichtlich in der ersten Person („von mir
+  aufgeschrieben"), kein Tutorial-Duktus.
+- `test/kern-edge.mjs` prüft Vollständigkeit (jeder Raum aus `ALLE_RAEUME` hat ein
+  Kapitel, das zu ihm führt), eindeutige IDs, Suche und Hervorhebung.
+  Wer einen Raum hinzufügt, muss ein Kapitel ergänzen — der Test erzwingt es.
+- `syncStandardServer()` in `src/31-sync.js` schlägt auf reinen Seiten (GitHub
+  Pages, `*.pages.dev`, `file:`) den öffentlichen Dienst `SYNC_STANDARD_DIENST`
+  (`https://vani-schreibzuhause.craftkey.chatgpt.site`) vor; auf eigenen
+  HTTPS-Hosts weiterhin `location.origin`, lokal `localhost`.
+
+Qualitätsstand: `npm test` 77/77, Hosting 2/2, Lint sauber, paketierter Desktop-Smoke
+auf 5.2.0 bestanden, Browser-Verifikation von Anleitung, Formatleiste, Escape und
+Weiß-Thema.
+
+### Veröffentlichung — ehrlich beschrieben
+
+- **GitHub / GitHub Pages:** `origin/main` wurde nach Nutzerfreigabe auf den lokalen
+  Stand gepusht. `https://thekeveldikev.github.io/vani/` (Pages, Branch `main`,
+  Pfad `/`) liefert damit VANI 5.2.0. **Dort hängt die ursprüngliche iPad-Installation
+  des Nutzers** — sie aktualisiert sich hinter demselben Icon.
+- **Sites (`https://vani-schreibzuhause.craftkey.chatgpt.site`):** Claude besitzt das
+  Sites-Hostingwerkzeug nicht. Diese Adresse zeigt weiterhin VANI 5.1.0, bis Codex
+  eine neue Version des bestehenden Projekts `appgprj_6a8786eb79448191acff5186595d06ec`
+  speichert und deployt (Ablauf in `docs/TEST-BUILD-DEPLOYMENT.md` §13). Der
+  Sync-Dienst (`/v1`) dort läuft unverändert und wird von beiden Adressen benutzt.
+- Beide Adressen sind dieselbe App, aber **getrennte Datenbestände** (Browser trennt
+  nach Herkunft). Zusammenführen geht über den Sync-Bereich (Kopplungscode).
+- Windows: `release/VANI-5.2.0-x64-Setup.exe` und `…-Portable.exe` lokal gebaut,
+  nicht öffentlich verteilt.
+
+### Kopierfertiger Codex-Auftrag für das Sites-Update
+
+    Arbeite in C:\Users\kevin\VANI. Der lokale Stand main = origin/main ist VANI
+    5.2.0 und vollständig getestet (npm test 77/77, hosting npm test 2/2, lint sauber,
+    Desktop-Smoke bestanden). Bitte nur veröffentlichen, nichts umbauen: npm run
+    build:web, in hosting npm test und npm run lint ausführen, dann mit der
+    Sites-Hostingfunktion eine neue Version des bestehenden Projekts
+    appgprj_6a8786eb79448191acff5186595d06ec
+    (https://vani-schreibzuhause.craftkey.chatgpt.site, Konfiguration
+    hosting/.openai/hosting.json) speichern und öffentlich deployen. Keine zweite Site,
+    keine Bindings ändern. Danach mit Cache-Busting prüfen, dass APP_VERSION 5.2.0
+    ausgeliefert wird, und mir die Deploymentversion nennen.

@@ -112,3 +112,14 @@ test('Formatleistenvertrag: jede erlaubte Ausrichtung und Überschrift ist auch 
   assert.ok(/formatBlock',\s*'h2'/.test(rt), 'Überschrift-Knopf fehlt');
   assert.ok(/formatBlock',\s*'p'/.test(rt), 'Absatz-Knopf fehlt');
 });
+
+test('Anleitungsvertrag: im Build nach dem Klang und vor dem Boot, aus den Feinheiten erreichbar', () => {
+  for (const datei of ['build.sh', 'werkzeug/build-web.mjs']) {
+    const b = lies(datei);
+    const pos = (s) => b.indexOf(s);
+    assert.ok(pos('52-anleitung.js') > 0, datei + ': Anleitung fehlt im Build');
+    assert.ok(pos('51-klangraum.js') < pos('52-anleitung.js') && pos('52-anleitung.js') < pos('60-boot.js'), datei + ': falsche Reihenfolge');
+  }
+  assert.match(lies('src/49-feinheiten.js'), /oeffneAnleitung\(\)/);
+  assert.match(lies('src/52-anleitung.js'), /function schliesseAnleitung/);
+});

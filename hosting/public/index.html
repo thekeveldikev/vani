@@ -1189,6 +1189,58 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 /* Formatleiste: Ausrichtung als klare Zeichen, nicht als Rätsel. */
 .format-knopf svg.ik { width: 17px; height: 17px; }
 
+/* ----- Die Anleitung: ein ruhiges Buch über der App ----- */
+.anleitung-bogen { position: fixed; inset: 0; z-index: 95; background: var(--hg); display: flex; flex-direction: column; animation: einblenden .18s ease; }
+.anleitung-kopf { flex: none; padding: calc(env(safe-area-inset-top) + 14px) 22px 12px; background: var(--hg); box-shadow: 0 1px 0 var(--linie); }
+.anleitung-titelzeile { display: flex; align-items: center; gap: 12px; max-width: 1060px; margin: 0 auto; }
+.anleitung-marke { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; flex: none; background: var(--akzent); color: var(--papier); font-family: ui-serif, "New York", Georgia, serif; font-weight: 700; font-size: 21px; }
+.anleitung-titelzeile h1 { flex: 1; min-width: 0; display: flex; flex-direction: column; font-family: ui-serif, "New York", Georgia, serif; font-size: 24px; font-weight: 600; line-height: 1.15; }
+.anleitung-titelzeile h1 small { font-size: 12.5px; color: var(--blass); font-weight: 400; font-family: ui-rounded, -apple-system, system-ui, sans-serif; margin-top: 2px; }
+.anleitung-suchzeile { display: flex; align-items: center; gap: 10px; max-width: 1060px; margin: 10px auto 0; background: var(--karte); border-radius: 12px; padding: 8px 12px; box-shadow: inset 0 0 0 1px var(--linie); }
+.anleitung-suchzeile input { flex: 1; min-width: 0; background: none; border: 0; outline: none; font-size: 16px; color: var(--tinte); }
+.anleitung-zaehler { font-size: 12.5px; color: var(--blass); white-space: nowrap; }
+.anleitung-koerper { flex: 1; min-height: 0; display: grid; grid-template-columns: 224px minmax(0, 1fr); width: 100%; max-width: 1060px; margin: 0 auto; }
+.anleitung-nav { overflow-y: auto; padding: 16px 10px calc(env(safe-area-inset-bottom) + 40px) 22px; display: flex; flex-direction: column; gap: 2px; }
+.anleitung-navknopf { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 10px; font-size: 14px; text-align: left; color: var(--tinte); }
+.anleitung-navknopf:hover, .anleitung-navknopf:active { background: var(--karte); }
+.anleitung-navknopf svg.ik { width: 17px; height: 17px; color: var(--blass); }
+.anleitung-inhalt { overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 22px calc(env(safe-area-inset-bottom) + 70px); }
+.anleitung-kapitel { padding: 14px 0 26px; border-bottom: 1px solid var(--linie); scroll-margin-top: 12px; }
+.anleitung-kapitel:last-child { border-bottom: 0; }
+.anleitung-kapitelkopf { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.anleitung-kapitelicon { display: flex; color: var(--akzent2); flex: none; }
+.anleitung-kapitelkopf h2 { flex: 1; min-width: 0; font-family: ui-serif, "New York", Georgia, serif; font-size: 24px; font-weight: 600; }
+.anleitung-springen { flex: none; }
+.anleitung-kurz { color: var(--blass); font-size: 14.5px; font-style: italic; margin-bottom: 14px; font-family: ui-serif, "New York", Georgia, serif; }
+.anleitung-abschnitt { margin: 0 0 18px; }
+.anleitung-abschnitt h3 { font-size: 16.5px; font-weight: 600; margin-bottom: 6px; }
+.anleitung-abschnitt p { font-size: 15.5px; line-height: 1.65; margin: 0 0 8px; max-width: 70ch; }
+.anleitung-abschnitt ol { margin: 6px 0 10px 22px; font-size: 15.5px; line-height: 1.6; max-width: 68ch; }
+.anleitung-abschnitt li { margin-bottom: 4px; }
+.anleitung-beispiel, .anleitung-tipp { display: flex; gap: 10px; padding: 10px 14px; border-radius: 12px; font-size: 14.5px; line-height: 1.6; margin: 8px 0 10px; max-width: 70ch; }
+.anleitung-beispiel { background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.anleitung-tipp { background: color-mix(in srgb, var(--gold) 16%, transparent); }
+.anleitung-beispiel b, .anleitung-tipp b { flex: none; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--blass); padding-top: 3px; }
+.anleitung-inhalt mark { background: color-mix(in srgb, var(--gold) 55%, transparent); color: inherit; border-radius: 3px; padding: 0 2px; }
+.anleitung-inhalt .leer { padding-top: 40px; }
+
+/* Die Karte in den Feinheiten, die zur Anleitung führt */
+.anleitung-karte { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; margin-bottom: 18px; }
+.anleitung-karte-icon { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 13px; background: var(--akzent); color: var(--papier); flex: none; }
+.anleitung-karte-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.anleitung-karte-text b { font-family: ui-serif, "New York", Georgia, serif; font-size: 18px; }
+.anleitung-karte-text small { font-size: 13px; color: var(--blass); line-height: 1.45; }
+.anleitung-karte-pfeil { display: flex; color: var(--blass); flex: none; }
+
+@media (max-width: 760px) {
+  .anleitung-koerper { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .anleitung-nav { flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 10px 16px; gap: 6px; scrollbar-width: none; }
+  .anleitung-nav::-webkit-scrollbar { display: none; }
+  .anleitung-navknopf { flex: none; white-space: nowrap; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+  .anleitung-kopf, .anleitung-inhalt { padding-left: 16px; padding-right: 16px; }
+  .anleitung-kapitelkopf h2 { font-size: 21px; }
+}
+
 </style>
 </head>
 <body>
@@ -1215,7 +1267,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.1.1';
+const APP_VERSION = '5.2.0';
 const $ = (s, w) => (w || document).querySelector(s);
 const $$ = (s, w) => [...(w || document).querySelectorAll(s)];
 const uid = () => (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function')
@@ -2315,6 +2367,9 @@ function syncSaubereConfig(c) {
       !/^[A-Za-z0-9_-]{40,180}$/.test(c.token || '') || !/^[A-Za-z0-9_-]{40,80}$/.test(c.key || '')) return null;
   return { v: 1, name: String(c.name || 'Mein Bereich').slice(0, 80), server, vault: c.vault, token: c.token, key: c.key };
 }
+/* Der öffentliche VANI-Sync-Dienst. Wird vorgeschlagen, wo die App selbst keinen
+   Dienst mitbringt — als reine Seite auf GitHub Pages oder aus einer Datei. */
+const SYNC_STANDARD_DIENST = 'https://vani-schreibzuhause.craftkey.chatgpt.site';
 async function syncStandardServer() {
   try {
     if (globalThis.vaniDesktop && vaniDesktop.konfiguration) {
@@ -2323,8 +2378,13 @@ async function syncStandardServer() {
       if (s) return s;
     }
   } catch (e) {}
-  if (location.protocol === 'https:' || /^http:\/\/(localhost|127\.0\.0\.1)(:|\/)/.test(location.origin || '')) return location.origin;
-  return '';
+  const origin = String(location.origin || '');
+  const host = String(location.hostname || '');
+  const lokal = /^http:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(origin);
+  const reineSeite = /\.github\.io$/i.test(host) || /\.pages\.dev$/i.test(host);
+  if (lokal) return origin;
+  if (location.protocol === 'https:' && !reineSeite) return origin;
+  return SYNC_STANDARD_DIENST;
 }
 async function syncLadeConfig() {
   let roh = null;
@@ -6780,8 +6840,17 @@ async function vorhandenenSyncBereichKoppeln() {
 }
 
 RENDER.feinheiten = function (haupt) {
-  haupt.append(raumkopf('Feinheiten'));
+  haupt.append(raumkopf('Feinheiten', null,
+    el('button', { class: 'rundknopf zart', html: ik('lesen'), title: 'Die Anleitung aufschlagen', onclick: () => oeffneAnleitung() })));
   const inhalt = el('div', { class: 'inhalt' });
+
+  /* Die Anleitung zuerst — sie erklärt alles andere. */
+  inhalt.append(el('button', { class: 'karte anleitung-karte', onclick: () => oeffneAnleitung() },
+    el('span', { class: 'anleitung-karte-icon', html: ik('lesen') }),
+    el('span', { class: 'anleitung-karte-text' },
+      el('b', {}, 'Die Anleitung'),
+      el('small', {}, 'Alles, was VANI kann — Raum für Raum, durchsuchbar, mit Beispielen. Von mir aufgeschrieben.')),
+    el('span', { class: 'anleitung-karte-pfeil', html: ik('rechts') })));
 
   /* Thema */
   const THEMA_INFO = [
@@ -8317,6 +8386,432 @@ function oeffneMischpult() {
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Fertig'))
   );
   const zu = zeigeDeck(kasten);
+}
+
+/* ================================================================
+   VANI — Die Anleitung: alles, was VANI kann, von mir selbst
+   aufgeschrieben. Durchsuchbar, in Kapiteln, mit Beispielen.
+   Aus den Feinheiten aufschlagbar, mit einem Tipp wieder zu.
+   ================================================================ */
+
+/* Aufbau: Kapitel → Abschnitte. Jeder Abschnitt hat einen Titel (t),
+   Absätze (p), optional Schritte (s), ein Beispiel (b) und einen Tipp (tipp).
+   raum = wohin der Knopf „Aufschlagen" führt. */
+const ANLEITUNG = [
+  {
+    id: 'anfang', titel: 'Auf einen Blick', icon: 'zuhause', raum: '',
+    kurz: 'Was VANI ist und wie ich mich darin bewege.',
+    abschnitte: [
+      { t: 'Was VANI ist', p: [
+        'VANI ist mein Schreibzuhause. Alles, was ich schreibe, sammle, klebe, verbinde oder ausprobiere, liegt hier — auf meinem Gerät, ohne Konto, ohne Cloud, auch ohne Internet.',
+        'Es gibt Räume für verschiedene Arten von Schreiben: schnelle Gedanken (Schnipsel), lose Texte (Blätter), Hefte mit Seiten, größere Projekte mit Kapiteln und Szenen, Bretter zum Denken (Cluster), Wortkisten, Klang zum Dabeihaben und den alten Faden.'
+      ] },
+      { t: 'Die Leiste', p: [
+        'Links (am Handy unten) ist die Leiste mit den Räumen. Ein Tipp wechselt den Raum. Welche Räume dort stehen und in welcher Reihenfolge, stelle ich in den Feinheiten ein — nichts geht verloren, wenn ein Raum aus der Leiste verschwindet.'
+      ] },
+      { t: 'Tippen, halten, ziehen', p: [
+        'Fast überall gilt dasselbe: Kurz tippen öffnet. Lange halten (oder am Laptop Rechtsklick) öffnet ein Menü mit allem, was man mit dem Ding machen kann — umbenennen, teilen, verbinden, löschen. Ziehen verschiebt, wo sich etwas verschieben lässt (Zettel, Blasen, Szenen, freie Schnipsel).'
+      ], b: 'Ich halte ein Blatt im Stapel einen Moment gedrückt → Menü: Umbenennen, Teilen, Duplizieren, In ein Heft legen, Hinzufügen & verbinden, Löschen.' },
+      { t: 'Die Suche', p: [
+        'Das Suchfeld unten in der Leiste (oder Strg/⌘ + K) findet alles, was ich je geschrieben habe — über alle Räume hinweg, auch mit kleinen Tippfehlern.'
+      ] },
+      { t: 'Nichts verschwindet einfach', p: [
+        'Gelöschtes landet im Papierkorb und bleibt dort mindestens 30 Tage. Direkt nach dem Löschen erscheint unten „Rückgängig". Eingefrorene Stände im Schreibraum bewahren frühere Fassungen eines Textes.'
+      ] },
+      { t: 'Wo diese Anleitung wohnt', p: [
+        'In den Feinheiten, ganz oben: „Die Anleitung aufschlagen". Oben im Kopf ist ein Suchfeld — ich tippe ein Wort, und nur die passenden Stellen bleiben stehen. Der Knopf „Aufschlagen" bei jedem Kapitel springt direkt in den Raum.'
+      ] }
+    ]
+  },
+  {
+    id: 'zuhause', titel: 'Zuhause', icon: 'zuhause', raum: '',
+    kurz: 'Der Startraum: einfangen, weiterschreiben, wiederfinden.',
+    abschnitte: [
+      { t: 'Der Gruß', p: ['Oben steht ein Gruß zur Tageszeit. War ich länger als eine Woche weg, heißt es „Schön, dass du wieder da bist." Eigene Grußzeilen sind möglich, wenn im Bestand Dokumente vom Typ „gruss" liegen — die kommen aus dem Faden mit.'] },
+      { t: 'In die Schnipsel', p: ['Das Feld „Kurz festhalten, bevor es weg ist …" schickt einen Gedanken direkt in die Schnipsel, ohne den Raum zu wechseln. Pfeil tippen oder Enter — weg ist er, sicher.'], b: 'Mitten im Lesen fällt mir ein Satz ein → Zuhause → eintippen → Pfeil. Später liegt er in den Schnipseln mit Uhrzeit.' },
+      { t: 'Das Schreibfeuer', p: [
+        'Die Karte zählt meine Wörter heute, die Tage in Folge („Strähne") und zeigt die letzten sieben Tage als kleine Balken. Gezählt wird nur, was ich selbst tippe — Importe und eingelesene Sicherungen machen kein Feuer.',
+        'Ist kein Wort geschrieben, glimmt noch Glut von neulich oder es ist kalt. Ein Satz genügt.'
+      ], tipp: 'Ein Tagesziel in Wörtern stelle ich in den Feinheiten ein. Dann zeigt die Karte einen Balken, und im Schreibraum klingt eine Glocke, wenn es erreicht ist.' },
+      { t: 'Der Funke', p: [
+        'Ein Schreibanstoß. Die Knöpfe wechseln die Art: Szene (ein Bild), Wer · Wo · Aber (eine zusammengewürfelte Ausgangslage), Frage, Form (eine Schreibübung), Satz (ein erster Satz) und Meine (meine eigene Funkenkiste).',
+        '„Anderer" würfelt neu. „Merken" legt den Funken in die Funkeln, damit er irgendwann unter „Wieder aufgetaucht" zurückkommt. „Dem nachgehen" legt sofort ein Blatt mit dem Funken an und öffnet den Schreibraum.'
+      ], b: 'Wer · Wo · Aber: „Die letzte Leuchtturmwärterin, in einem Hotel, dessen Zimmernummern sich jede Nacht ändern, aber heute klopft es zweimal."' },
+      { t: 'Eigene Funken', p: ['„+ Eigener" fängt einen gehörten Satz, ein Bild, eine Frage oder nur einen Vibe ein — mit kurzer Stimmungsnotiz. Die Funkenkiste sammelt sie, ist durchsuchbar, jeder Funke lässt sich ändern, verbinden oder vergessen und direkt zu einem Blatt machen.'] },
+      { t: 'Weiterschreiben', p: ['Die drei zuletzt angefassten Texte (Szenen, Heftseiten, Blätter) mit ihrem letzten Satz. Ein Tipp, und ich bin wieder drin.'] },
+      { t: 'Wieder aufgetaucht', p: [
+        'Jeden Tag holt VANI ein paar ältere Dinge nach vorn — nie bloß zufällig, sondern mit einem Grund: Liegen geblieben, Eine offene Frage, Noch nicht fertig, Ein Anfang, Ein Ende, Eine Verbindung, Aus einem Traum, Ein Zeitfaden, Ein Satz wie eine Tür, Eine alte Liste, Erster & letzter Satz, Heute vor X Jahren, Funkeln, Aus dem Faden.',
+        'Ein Echo legt zwei Texte nebeneinander, die Wochen auseinander liegen und doch ein seltenes Wort teilen. „Andere Funde" blättert weiter.'
+      ] },
+      { t: 'Die leise Mahnung', p: ['Liegen mehr als zwölf Dinge hier und ist die letzte Sicherung älter als zwei Wochen (oder es gab nie eine), erscheint unten eine Zeile „Sicher ist sicher →". Sie führt in die Feinheiten.'] }
+    ]
+  },
+  {
+    id: 'schnipsel', titel: 'Schnipsel', icon: 'schnipsel', raum: 'schnipsel',
+    kurz: 'Der Chat mit mir selbst.',
+    abschnitte: [
+      { t: 'Was ein Schnipsel ist', p: ['Ein Schnipsel ist ein Gedanke, den ich mir selbst schicke. Unten tippen, Pfeil — oben sammelt es sich mit Uhrzeit, nach Tagen getrennt (Heute, Gestern, Datum).'] },
+      { t: 'Bilder', p: ['Der Kamera-Knopf hängt ein Foto an — aus der Mediathek oder direkt aufgenommen. Das Bild wird verkleinert gespeichert, bleibt aber nur auf meinem Gerät (und in Sicherungen).'] },
+      { t: 'Zwei Ansichten', p: [
+        '„Faden" ist der Lauf von oben nach unten wie ein Chat. „Ungeordnet" legt alle Schnipsel lose auf eine große Fläche: jeden kann ich verschieben, die Fläche wächst mit. Oben gibt es dort eine eigene Suche („Auf der Fläche suchen …") und den Knopf „Fundstück", der mich zu einem zufälligen sichtbaren Schnipsel trägt.'
+      ] },
+      { t: 'Anpinnen', p: ['Im Menü eines Schnipsels: Anpinnen. Gepinnte Schnipsel bekommen eine goldene Nadel und stehen oben in der Pinnzeile — ein Tipp dort scrollt hin. Losmachen hebt es wieder auf.'] },
+      { t: 'Das Menü', p: ['Tipp auf einen Schnipsel: Anpinnen/Losmachen, Bearbeiten, Hinzufügen & verbinden, Verwandeln …, Löschen.'] },
+      { t: 'Verwandeln', p: ['Aus einem Schnipsel kann werden: ein Blatt im Stapel, eine Heftseite (das Bild klebt als Foto mit drauf), eine Szene in einem Projekt, eine Blase auf einem Brett oder ein Wort in der Kiste. Der Schnipsel selbst wandert dabei in den Papierkorb.'], b: 'Drei Schnipsel über dieselbe Figur → je „Verwandeln … → Als Szene in ein Projekt" → sie liegen als drei Karten nebeneinander im Kapitel.' },
+      { t: 'Verweise und Schlagworte im Text', p: ['[[Titel eines anderen Textes]] in doppelten Klammern wird anklickbar und springt dorthin. #wort wird als Schlagwort hervorgehoben. Beides funktioniert in Schnipseln, im Faden und überall, wo Text gezeigt wird.'] }
+    ]
+  },
+  {
+    id: 'blaetter', titel: 'Blätter', icon: 'blatt', raum: 'blaetter',
+    kurz: 'Ein Stapel Texte, sonst nichts.',
+    abschnitte: [
+      { t: 'Der Stapel', p: ['Blätter sind einzelne Texte ohne Drumherum. Das Plus legt ein neues an und öffnet sofort den Schreibraum. Jede Karte zeigt Titel (oder die erste Zeile), eine Probe und die Wörterzahl.'] },
+      { t: 'Sortieren', p: ['Ab zwei Blättern erscheinen Knöpfe: Zuletzt, Älteste zuerst, A–Z. Die Wahl bleibt gespeichert.'] },
+      { t: 'Das Menü (lange halten)', p: ['Umbenennen · Teilen · Duplizieren (eine „Abschrift") · In ein Heft legen … · Hinzufügen & verbinden · Löschen.'], b: 'Ein Blatt ist fertig gedacht → lange halten → „In ein Heft legen …" → Heft wählen, Stelle wählen (ganz vorne, nach Seite 3, am Ende). Das Blatt ist jetzt eine Seite.' },
+      { t: 'Formatiert oder schlicht', p: ['Ein Blatt ist zuerst schlichter Text. Im Schreibraum unter den Einstellungen steht „Aa · Text formatieren" — danach gibt es eine Formatleiste mit fett, kursiv, Überschriften, Listen, Farben und Ausrichtung. Zurück zu schlicht gibt es nicht — aber der schlichte Text bleibt immer mitgespeichert, für Suche, Zählung und Sicherung.'] }
+    ]
+  },
+  {
+    id: 'schreibraum', titel: 'Der Schreibraum', icon: 'stift', raum: 'blaetter',
+    kurz: 'Vollbild, Ruhe, und alles Handwerk in einer Ecke.',
+    abschnitte: [
+      { t: 'Hinein und hinaus', p: ['Blätter, Szenen und Heftseiten öffnen sich im Schreibraum: eine Seite, ein Titel, der Text, sonst nichts. „Fertig" oder Escape schließt ihn. Beim Schreiben versinkt der Kopf; ein Tipp irgendwohin holt ihn zurück. Gespeichert wird von selbst — nach jeder Pause und auf jeden Fall, wenn die App in den Hintergrund geht.'] },
+      { t: 'Der Zähler', p: ['Rechts oben stehen die Wörter des Textes und, sobald ich tippe, „+ neu" für das, was in dieser Sitzung dazukam. Beim Schließen mit mehr als 30 neuen Wörtern sagt VANI kurz Danke.'] },
+      { t: 'Die Zeichenleiste', p: ['Über der Tastatur liegen die Zeichen, die auf einer Tastatur sonst fehlen: – „ " … ‚ ’ » «. Ein Tipp setzt sie an der Schreibstelle ein.'] },
+      { t: 'Kluge Zeichen', p: ['Ist „Kluge Zeichen" an, wird aus -- ein Gedankenstrich und aus geraden Anführungszeichen werden deutsche „so". Nur bei schlichtem Text.'] },
+      { t: 'Einstellungen (Schieberegler-Symbol)', p: [
+        'Schrift: Serife, Klar, Mono. Größe: 15 bis 26. Breite: Schmal, Mittel, Breit. Schreibmaschine: die aktuelle Zeile bleibt in der Mitte. Zeilen-Fokus: alles außer der aktuellen Zeile tritt zurück. Tastenklang: ein leiser Klick pro Taste. Autokorrektur: an oder aus (wirkt auf die Gerätetastatur).'
+      ] },
+      { t: 'Suchen & Ersetzen', p: ['Im offenen Text: ein Suchwort, ein Ersatz, Anzahl der Treffer. Vor dem Ersetzen wird der alte Stand eingefroren — nichts geht verloren.'] },
+      { t: 'Stände einfrieren', p: ['„Stand einfrieren" legt eine Kopie des jetzigen Textes ab (bis zu 20 je Text). Unter „Frühere Stände" kann ich jeden ansehen, zurückholen (das Jetzige wird dabei selbst eingefroren) oder vergessen.'], b: 'Vor einem großen Umbau friere ich ein. Gefällt mir die neue Fassung nicht, hole ich den Stand von gestern zurück — der Umbau bleibt als eigener Stand erhalten.' },
+      { t: 'Die Kerze', p: ['„Kerze anzünden": 10, 20 oder 45 Minuten. Oben brennt eine kleine Kerze herunter. Am Ende klingt eine Glocke und VANI sagt, wie viele Wörter in der Zeit entstanden sind. Schließen des Schreibraums bläst sie aus.'] },
+      { t: 'Teilen', p: ['Schickt Titel und Text als Text weiter — an Notizen, WhatsApp, Mail, die Zwischenablage. Was das Gerät anbietet, steht im Teilen-Menü.'] },
+      { t: 'Verknüpfen & einordnen', p: ['Zeigt, wohin [[Verweise]] im Text führen, welche Texte hierher zeigen, und öffnet die Beziehungen. Von hier geht es auch direkt zu „Zu Heft, Projekt oder Cluster hinzufügen".'] },
+      { t: 'Klang im Schreibraum', p: ['Das Lautsprecher-Symbol oben öffnet das Mischpult als kleine Überlagerung — ohne den Text zu verlassen.'] }
+    ]
+  },
+  {
+    id: 'format', titel: 'Text formatieren', icon: 'stift', raum: 'blaetter',
+    kurz: 'Die Formatleiste: fett, Überschrift, Liste, Farbe, Ausrichtung.',
+    abschnitte: [
+      { t: 'Die Leiste', p: ['B fett · I kursiv · U unterstrichen · S durchgestrichen · Ü Überschrift · ¶ normaler Absatz · • Liste · 1. Liste · ❝ Zitat · Ausrichtung links, mittig, rechts, Blocksatz · A Textfarbe · ▰ Markierfarbe · Größe (11 bis 64).'] },
+      { t: 'So geht es', s: ['Text markieren.', 'Knopf tippen.', 'Fertig — gespeichert wird von selbst.'], b: 'Eine Zeile markieren → Ü → sie ist eine Überschrift. Nochmal ¶ → wieder normaler Text.' },
+      { t: 'Woher die Formatleiste kommt', p: ['Blätter und Szenen: im Schreibraum unter Einstellungen „Aa · Text formatieren". Heftseiten: der Knopf „Text formatieren" in den Seitenwerkzeugen oben rechts auf der Seite.'] },
+      { t: 'Einfügen von anderswo', p: ['Eingefügter Text wird entschärft: Schrift, Farbe, Listen und Überschriften bleiben, fremde Skripte oder seltsame Reste nicht. Ist das Eingefügte länger als eine Heftseite, läuft es automatisch auf die nächsten Seiten weiter.'] }
+    ]
+  },
+  {
+    id: 'hefte', titel: 'Hefte', icon: 'hefte', raum: 'hefte',
+    kurz: 'Echte Hefte mit Seiten, Zetteln, Fotos und Kritzeleien.',
+    abschnitte: [
+      { t: 'Das Regal', p: ['Jedes Heft ist ein Deckel im Regal. Plus legt ein neues an. Lange halten öffnet das Heft-Menü. „Ins Regal stellen" archiviert ein Heft (es rückt nach unten unter „Im Regal"), „Zurück auf den Tisch" holt es wieder.'] },
+      { t: 'Umschlag & Papier gestalten', p: ['Grundfarbe aus der Palette oder frei, Zweitton, Buchband, Muster (Schlicht, Leinen, Diagonal, Punkte, Rahmen, Wellen) und Papier (Liniert, Breite Linien, Kariert, Punktraster, Blanko). Die Vorschau zeigt alles sofort; „Abbrechen" nimmt alles zurück.'] },
+      { t: 'Seiten oder Rolle', p: ['Oben im Heft: „Seiten" blättert Seite für Seite (Pfeile links/rechts), „Rolle" zeigt alle Seiten untereinander zum Durchscrollen. Beides ist dasselbe Heft.'] },
+      { t: 'Schreiben auf der Seite', p: ['Direkt auf das Papier tippen und schreiben. Ist die Seite voll, geht es automatisch auf der nächsten weiter („Im Heft automatisch weiterblättern" in den Feinheiten — standardmäßig an). Der Knopf „Automatisch auf die nächste Seite" in den Seitenwerkzeugen schaltet es um.'] },
+      { t: 'Seitenwerkzeuge (oben rechts auf der Seite)', p: ['Zettel ankleben · Foto einkleben · Kritzeln · Text formatieren · Mehr (Im Schreibraum öffnen, Hinzufügen & verbinden, Als loses Blatt herausnehmen, Seite herausreißen).'] },
+      { t: 'Zettel', p: ['Kleine farbige Notizzettel auf der Seite. Ziehen verschiebt, der Griff unten rechts ändert die Größe, Tippen macht ihn beschreibbar. Lange halten: Andere Farbe, Befestigung (Tesa, Reißzwecke, lose aufgelegt), Etwas drehen, Abmachen.'], b: 'Eine Figurenbeschreibung als gelber Zettel schräg an den Rand der Seite — mit Tesa. Die Seite selbst bleibt frei für die Szene.' },
+      { t: 'Fotos', p: ['„Foto einkleben" legt ein Bild auf die Seite, leicht schräg wie eingeklebt. Es lässt sich genauso ziehen, drehen, vergrößern und befestigen wie ein Zettel.'] },
+      { t: 'Kritzeln', p: ['„Kritzeln" legt eine Zeichenfläche über die Seite: zwölf Farben plus eine eigene, stufenlose Stiftdicke, ein Radierer, Stiftdruck wird berücksichtigt, der letzte Strich lässt sich zurücknehmen. Die Kritzelei bleibt auf der Seite liegen und lässt sich später weiterzeichnen.'] },
+      { t: 'Seiten bewegen', p: ['„Als loses Blatt herausnehmen" macht aus einer Seite wieder ein Blatt im Stapel. Umgekehrt legt „In ein Heft legen …" ein Blatt als Seite an eine Stelle meiner Wahl.'] },
+      { t: 'Hefte und Projekte', p: ['Ein Heft kann zu einem Projekt gehören („Einem Projekt zuordnen" im Heft-Menü). Es erscheint dann im Projekt unter „Hefte am Projekt". „Als Kapitel in ein Projekt kopieren" macht aus allen Seiten Szenen in einem neuen Kapitel — das Heft bleibt, wie es ist.'] },
+      { t: 'Verbrennen', p: ['„Heft verbrennen" legt das Heft samt Seiten in den Papierkorb. Von dort kommt es mit allem zurück, auch mit Zetteln und Fotos.'] }
+    ]
+  },
+  {
+    id: 'projekte', titel: 'Projekte', icon: 'projekte', raum: 'projekte',
+    kurz: 'Für Größeres: Kapitel, Szenen auf der Pinnwand, Leseansicht.',
+    abschnitte: [
+      { t: 'Ein Projekt anlegen', p: ['Name, Art (Roman, Erzählung, Sammlung, Gedichte, Welt, Anderes) und ein Wortziel, das ich auch leer lassen darf. Es beginnt mit „Kapitel 1".'] },
+      { t: 'Kapitel', p: ['Jedes Kapitel ist eine Pinnwand mit Szenenkarten. Im Kapitel-Menü: Umbenennen, Nach oben, Nach unten, Kapitel löschen. „Neues Kapitel" steht unten.'] },
+      { t: 'Szenen', p: ['Jede Szene ist eine Karte. Tippen öffnet den Schreibraum. Der Punkt unten links ist der Status: Funke → Entwurf → Steht (einfach weitertippen). Der Dreh-Knopf zeigt die Rückseite: Platz für Zweifel, Ideen, Alternativen — nur für mich.'] },
+      { t: 'Szenen verschieben', p: ['Am Touchscreen: Karte kurz halten, bis sie sich hebt, dann ziehen — in diesem oder in ein anderes Kapitel, vor oder hinter eine andere Karte. Mit der Maus: einfach ziehen. „In anderes Kapitel …" im Menü geht auch ohne Ziehen.'] },
+      { t: 'Szenen-Menü (lange halten)', p: ['Umbenennen · Andere Farbe · Duplizieren („Fassung 2") · In anderes Kapitel … · Teilen · Szene löschen.'], b: 'Eine Szene in zwei Richtungen probieren: Duplizieren → in der Fassung 2 anders weiterschreiben → die schlechtere später löschen oder als Rückseiten-Notiz behalten.' },
+      { t: 'Leseansicht', p: ['Das Buch-Symbol zeigt das ganze Projekt am Stück wie ein Manuskript: Kapitelüberschriften, Szenen durch Sternchen getrennt, Gesamtwörter. „Kopieren" legt alles in die Zwischenablage, „Als Datei" gibt eine .txt heraus.'] },
+      { t: 'Wortziel', p: ['Mit Wortziel zeigen Karte und Kopf einen Fortschrittsbalken. Das Ziel lässt sich im Projekt-Menü jederzeit ändern (0 = keins).'] },
+      { t: 'Hefte am Projekt', p: ['Unten im Projekt liegen Hefte, die dazugehören. „Heft dazulegen" ordnet ein vorhandenes zu oder legt ein neues an. Ein Tipp auf das Heft öffnet es.'] }
+    ]
+  },
+  {
+    id: 'cluster', titel: 'Cluster', icon: 'cluster', raum: 'cluster',
+    kurz: 'Bretter zum Denken: Blasen und Fäden dazwischen.',
+    abschnitte: [
+      { t: 'Bretter', p: ['Ein Brett ist eine unendliche Fläche. Plus legt eines an, lange halten auf einer Brettkarte: Umbenennen, Brett löschen.'] },
+      { t: 'Blasen', p: ['Doppelt auf die Fläche tippen setzt eine Blase genau dort. Das Plus setzt eine in die Mitte. Tippen macht die Blase beschreibbar, Ziehen verschiebt sie. Lange halten: Andere Farbe (vier Töne und neutral), Im Schreibraum öffnen, Verbindungen ansehen, Blase zerplatzen.'] },
+      { t: 'Fäden spannen', p: ['Der Verbinden-Knopf schaltet den Faden-Modus an. Zwei Blasen antippen — ein Faden spannt sich. Ein Tipp auf den Faden: Beschriften oder Lösen. Dieselben zwei Blasen noch einmal: der Faden löst sich.'], b: 'Blase „Hafen" und Blase „Tante Ruth" → Faden → beschriftet mit „wohnt dort seit 1987".' },
+      { t: 'Schieben und zoomen', p: ['Mit einem Finger (oder der Maus) die Fläche schieben, mit zwei Fingern kneifen zum Zoomen. Die Lupen-Knöpfe zoomen schrittweise, der Prozent-Knopf setzt auf 100 % zurück. Die Ansicht merkt sich das Brett.'] },
+      { t: 'Dinge aufs Brett legen', p: ['Schnipsel, Blätter, Seiten, Szenen, Hefte und Goodnotes-Archive lassen sich über „Hinzufügen & verbinden → Auf ein Cluster-Brett legen" als Blase ablegen. Die Blase zeigt einen kleinen Quellen-Knopf zurück zum Original.'] }
+    ]
+  },
+  {
+    id: 'woerter', titel: 'Wörter', icon: 'woerter', raum: 'woerter',
+    kurz: 'Wortkisten, Schütteln und Funken.',
+    abschnitte: [
+      { t: 'Wortkisten', p: ['Kleine Sammlungen: Synonyme, Lieblingsverben, Figurenwörter, Wörter für einen Vibe. „＋ Neue Kiste" legt eine an. „Alle Wörter" zeigt den ganzen Schrank, „Lose Wörter" alles ohne Kiste. Das Kisten-Menü: Name, Notiz & Farbe ändern · Nur Kiste löschen (die Wörter bleiben lose) · Kiste und ihre Wörter löschen.'] },
+      { t: 'Wörter hinzufügen', p: ['Das Feld nimmt mehrere Wörter auf einmal — durch Zeilenumbruch, Komma oder Semikolon getrennt. Strg/⌘ + Enter oder das Plus fügt hinzu. Doppelte werden still übersprungen, Wörter werden auf 160 Zeichen begrenzt, höchstens 500 auf einmal.'], b: 'Kiste „Wörter für Licht": flirren, Lichtsaum, seidenmatt, Splittergold — in einer Zeile mit Kommas eingeben, einmal Strg+Enter.' },
+      { t: 'Suchen, sortieren, Favoriten', p: ['Die Suche filtert innerhalb der gewählten Kiste. Sortierung: zuletzt, A–Z, älteste. Im Wortzettel („Wortzettel bearbeiten") gibt es „Oben anheften" — angeheftete Wörter stehen in jeder Sortierung oben, dazu Platz für eine Notiz. Das Wort-Menü: Damit schreiben · Wortzettel bearbeiten · In eine andere Kiste verschieben · In eine Kiste kopieren · Aus der Sammlung nehmen.'] },
+      { t: 'Schütteln', p: ['„Schütteln" greift drei zufällige Wörter aus der aktuellen Auswahl auf die Bühne. Ein Knopf daneben macht daraus sofort ein Blatt zum Losschreiben.'] },
+      { t: 'Funken', p: ['Unten im Raum dieselben Funkenarten wie Zuhause: Szene, Wer · Wo · Aber, Frage, Form, Satz. „Merken" legt einen Funken in die Funkeln.'] },
+      { t: 'Saatworte', p: ['Beim ersten Start liegen ein paar Saatworte im Schrank — zum Wegwerfen oder Behalten.'] }
+    ]
+  },
+  {
+    id: 'klang', titel: 'Klang', icon: 'klang', raum: 'klang',
+    kurz: 'Atmosphäre zum Schreiben — alles errechnet, nichts geladen.',
+    abschnitte: [
+      { t: 'Was der Klang ist', p: ['22 Klangebenen, die VANI selbst erzeugt — kein Download, kein Internet: Wetter (Regen ans Fenster, Regen aufs Dach, Platzregen, Fernes Gewitter, Wind ums Haus, Schneesturm), Wasser (Meeresbrandung, Bach, Tropfen nach dem Regen), Feuer (Kaminfeuer, Kerzenflackern), Natur (Blätterrascheln, Grillen, Vogelmorgen, Möwen, Eule, Zikaden), Nah & warm (Katzenschnurren, Herzschlag, Uhrenticken, Altes Haus), Orte (Café-Gemurmel, Zugfahrt, Glocken in der Ferne).'] },
+      { t: 'Mischen', p: ['Jede Ebene hat einen Regler. Ein Tipp auf den Namen schaltet sie an (halbe Stärke) oder aus. Mehrere Ebenen zusammen ergeben eine Mischung. Unten: Gesamtlautstärke.'] },
+      { t: 'Szenen', p: ['Zwölf fertige Szenen (Sturmnacht am Leuchtturm, Am Lagerfeuer, Schreibzimmer, Nachtzug, Café am Regentag, Sommernacht, Nach dem Regen, Morgen am Meer, Wintermorgen, Tiefe Nacht, Altes Haus im August, Bibliothek). „Mischung merken" macht aus meiner eigenen Mischung eine Szene mit Namen. Lange halten auf einer eigenen Szene entfernt sie. „Stille" macht alles aus.'], b: 'Regen ans Fenster 45 %, Kaminfeuer 30 %, Uhrenticken 45 % → „Mischung merken" → „Novemberabend".' },
+      { t: 'Wenn es stumm bleibt', p: ['Browser erlauben Klang erst nach einer Berührung. Die Statuszeile sagt, was los ist. „Ton prüfen" spielt einen hellen Prüfton. „Klang neu wecken" baut den Klang frisch auf — das hilft vor allem auf dem iPad, wenn die App lange im Hintergrund war oder ein Anruf dazwischenkam.'], tipp: 'Auf dem iPad schaltet das System den Klang nach langem Hintergrund manchmal stumm. Ein Tipp irgendwo in der App oder „Klang neu wecken" holt ihn zurück. Das ist eine Grenze des iPads, nicht von VANI.' },
+      { t: 'Im Schreibraum', p: ['Das Lautsprecher-Symbol öffnet das Mischpult kompakt über dem Text. Läuft Klang, leuchtet das Symbol. Am Ende einer Kerze grüßt VANI passend zur Mischung („Der Regen fällt weiter.").'] }
+    ]
+  },
+  {
+    id: 'faden', titel: 'Faden', icon: 'faden', raum: 'faden',
+    kurz: 'Alles, was je an Vani ging — und weitergeht.',
+    abschnitte: [
+      { t: 'Was der Faden ist', p: ['Der Faden ist der alte Chat, als ich noch an „Vani" geschrieben habe, bevor es VANI gab. Er liegt verschlüsselt bereit und kommt erst mit dem Passwort in die App. Bis dahin ist der Raum nicht in der Leiste.'] },
+      { t: 'Hereinholen', s: ['Feinheiten → „Den Faden holen" → „Faden hereinholen".', 'Das Passwort eingeben (wort-wort-zahl-wort-wort).', 'Warten — dann öffnet sich der Faden, und der Raum steht ab jetzt in der Leiste.'], p: ['Das muss nur einmal je Gerät geschehen. Was schon da ist, wird nicht doppelt geholt.'] },
+      { t: 'Weiterschreiben', p: ['Unten ist ein Feld „Weiter im Faden …". Der Faden ist fortsetzbar — neue Zeilen landen am Ende mit Uhrzeit. Das ist absichtlich nicht der Standard-Weg (dafür sind die Schnipsel da), aber er bleibt offen.'] },
+      { t: 'Tipp auf eine Zeile', p: ['Kopieren · Als Blatt herauslösen · Löschen.'] },
+      { t: 'Wiederfinden', p: ['Die große Suche findet auch im Faden (eigener Filter-Chip „Faden"). Ein Treffer springt genau an die Stelle und leuchtet kurz auf. Unter „Wieder aufgetaucht" erscheinen alte Fadenzeilen als „Aus dem Faden".'] }
+    ]
+  },
+  {
+    id: 'goodnotes', titel: 'Goodnotes', icon: 'buchzu', raum: 'goodnotes',
+    kurz: 'Ein stilles Archiv für ganze Notizbücher.',
+    abschnitte: [
+      { t: 'Was das Archiv ist', p: ['Importierte Notizbücher bleiben als ganze Originaldateien in diesem einen Raum. Sie erzeugen keine Schnipsel, Blätter oder Suchtreffer anderswo. Der Raum erscheint erst in der Leiste, wenn das erste Notizbuch drin liegt.'] },
+      { t: 'Hereinholen', p: ['Feinheiten → „Goodnotes hereinholen" → PDF, Goodnotes oder ZIP wählen (auch Bilder). Mehrere auf einmal gehen. Doppelte Dateien werden erkannt und nicht zweimal abgelegt. Sehr große Dateien (über 250 MB) oder zu wenig Speicherplatz werden abgelehnt.'], tipp: 'Am schönsten: in Goodnotes „Exportieren → PDF → Reduziert" mit Handschrifterkennung. Dann ist das PDF später durchsuchbar.' },
+      { t: 'Öffnen und ordnen', p: ['Ein Tipp öffnet PDFs und Bilder direkt in VANI. Goodnotes-Originale und ZIP-Pakete bleiben verwahrt und lassen sich über „Original" wieder herausgeben. Lange halten: Titel, Stichwörter & Notiz · Hinzufügen & verbinden · Original herausgeben · In den Papierkorb.'] },
+      { t: 'Mit anderen Geräten', p: ['Bei eingeschaltetem Sync reisen Titel und Notizen mit. Die großen Originaldateien nur, wenn in den Feinheiten „Goodnotes-Originaldateien mitsenden" an ist.'] },
+      { t: 'Ehrliche Grenze', p: ['Das ist ein Archivimport, kein Live-Abgleich mit Goodnotes in beide Richtungen.'] }
+    ]
+  },
+  {
+    id: 'verbinden', titel: 'Verbinden & verwandeln', icon: 'verbinden', raum: '',
+    kurz: 'Wie Dinge zusammenfinden und ihre Form wechseln.',
+    abschnitte: [
+      { t: 'Doppelte Klammern', p: ['[[Titel]] im Text verweist auf einen anderen Text (oder ein Wort in der Kiste). Der Verweis ist anklickbar. Unter „Verknüpfen & einordnen" im Schreibraum steht, wohin ein Text führt und wer auf ihn zeigt.'], b: 'In einer Szene: „… sie wohnte am [[Hafen]]." — ein Tipp auf „Hafen" öffnet das Blatt mit diesem Titel.' },
+      { t: 'Beziehungen', p: ['Zwei Dinge lassen sich bewusst verbinden, mit einer Art: gehört dazu, inspiriert, erklärt, widerspricht, spiegelt, Fortsetzung von, Figur / Ort. „Verbindungen ansehen" zeigt alle Beziehungen eines Dings; jede lässt sich trennen. Beziehungen gelten für Blätter, Seiten, Szenen, Hefte, Projekte, Blasen, Schnipsel, Wörter, Funken und Goodnotes.'] },
+      { t: 'Das Menü „Hinzufügen & verbinden"', p: ['Je nach Ding bietet es an: Auf eine Heftseite kleben (Schnipsel), Als Seite in ein Heft legen (Blatt), Mit Tesa auf eine Heftseite kleben — Original bleibt (Blatt), Einem Projekt zuordnen / Aus dem Projekt lösen (Heft), Als Kapitel in ein Projekt kopieren (Heft), Auf ein Cluster-Brett legen, Mit etwas verbinden.'] },
+      { t: 'Verwandeln', p: ['Schnipsel können Blatt, Heftseite, Szene, Blase oder Wort werden. Seiten können loses Blatt werden, Blätter können Seite werden. Funken werden zu Blättern. Wörter aus der Bühne werden zu Blättern. Nichts davon kopiert heimlich — entweder wandert das Ding, oder es steht ausdrücklich „Original bleibt".'] },
+      { t: 'Was beim Löschen mitgeht', p: ['Wird ein Projekt, Heft, Brett oder eine Seite gelöscht, gehen Kinder (Kapitel, Szenen, Seiten, Zettel, Blasen, Fäden) und Beziehungen gemeinsam in den Papierkorb — und kommen beim Zurückholen gemeinsam wieder, an ihren Platz.'] }
+    ]
+  },
+  {
+    id: 'suche', titel: 'Suchen & wiederfinden', icon: 'suche', raum: 'suche',
+    kurz: 'Ein Feld, alles. Mit Nachsicht bei Tippfehlern.',
+    abschnitte: [
+      { t: 'Die große Suche', p: ['Unten in der Leiste oder Strg/⌘ + K. Ab zwei Zeichen wird gesucht — in Titeln, Texten und Notizen aller Räume. Treffer sind nach Art gruppiert (Schnipsel, Blätter, Heftseiten, Szenen, Hefte, Projekte, Blasen, Zettel, Wortkisten, Wörter, Faden, Funken, Klang-Szenen) und zeigen die Fundstelle mit Umfeld.'] },
+      { t: 'Filter', p: ['Die Chips unter dem Feld beschränken auf eine Art. Dann werden statt 6 bis zu 40 Treffer je Gruppe gezeigt.'] },
+      { t: 'Ähnlich', p: ['Ab fünf Zeichen findet die Suche auch Wörter mit einem Buchstaben Unterschied und zeigt sie mit „(ähnlich)". Umlaute und ß sind egal: „strasse" findet „Straße".'] },
+      { t: 'Zuletzt', p: ['Ohne Eingabe zeigt die Suche die letzten Suchen und die zuletzt angefassten Texte.'] },
+      { t: 'Wiederfinden ohne Suchen', p: ['Zuhause unter „Wieder aufgetaucht" und „Weiterschreiben". Im Heft über die Rolle. Im Projekt über die Leseansicht. In der Funkenkiste und den Wortkisten über deren eigene Suche. Auf der freien Schnipsel-Fläche über „Auf der Fläche suchen".'] }
+    ]
+  },
+  {
+    id: 'feinheiten', titel: 'Feinheiten', icon: 'feinheiten', raum: 'feinheiten',
+    kurz: 'Stimmung, Räume, Zahlen, Papierkorb und alles Grundsätzliche.',
+    abschnitte: [
+      { t: 'Stimmung', p: ['Fünf Themen: Papier (warm, hell), Tinte (dunkel), Kerze (dunkel, warm), Nebel (kühl, hell), Weiß (reinweiß). Gilt für die ganze App und färbt auch die Leiste oben am Gerät.'] },
+      { t: 'Schreiben', p: ['Tagesziel in Wörtern (leer = keins). Automatisches Weiterblättern in Heften an/aus. Schrift, Größe und Fokus stelle ich direkt im Schreibraum ein.'] },
+      { t: 'Räume', p: ['Jeder Raum lässt sich ein- und ausblenden und mit den Pfeilen sortieren. Zuhause bleibt immer. Ausgeblendete Räume behalten ihre Inhalte.'] },
+      { t: 'Zahlen', p: ['Die letzten 14 Tage als Balken, Wörter insgesamt, heute, Tage in Folge, und wie viele Schnipsel, Blätter, Seiten und Szenen es gibt.'] },
+      { t: 'Papierkorb', p: ['Gelöschtes liegt hier mindestens 30 Tage. „Zurückholen" bringt ein Bündel mit allem zurück, was dazugehörte. „Endgültig leeren" ist die eine Stelle, an der Löschen wirklich löscht — mit Nachfrage.'] },
+      { t: 'Frisch anfangen', p: ['„Zählungen auf null" setzt Wörter pro Tag, Strähne und Schreibfeuer zurück. Texte, Hefte, Projekte und der Faden bleiben unangetastet.'] },
+      { t: 'Frisch durchatmen', p: ['Ganz unten: die App neu laden. Hilft, wenn etwas hakt — es geht nichts verloren.'] }
+    ]
+  },
+  {
+    id: 'sichern', titel: 'Sichern & zurückholen', icon: 'teilen', raum: 'feinheiten',
+    kurz: 'Eine Datei mit allem drin — und wie sie zurückkommt.',
+    abschnitte: [
+      { t: 'Alles sichern', p: ['Feinheiten → „Alles sichern". VANI packt Texte, Hefte, Projekte, Fotos, Einstellungen und Zählungen in eine einzige Datei (.vani) und bietet sie zum Teilen oder Speichern an — in „Dateien", an die Mail, in eine Cloud meiner Wahl. Zuhause erinnert mich leise, wenn die letzte Sicherung lange her ist.'], tipp: 'Vor großen Aufräumaktionen, vor einem Gerätewechsel und ab und zu einfach so.' },
+      { t: 'Sicherung einlesen', p: ['„Sicherung einlesen" öffnet die Datei. Zwei Wege: „Dazulegen" (nichts geht verloren, Vorhandenes bleibt) oder „Alles ersetzen" (mit Nachfrage). Eingelesene Texte zählen nicht als heute geschrieben.'] },
+      { t: 'Nur Texte kopieren', p: ['Legt alle Texte als einfachen Text in die Zwischenablage — Projekte mit Kapiteln, Hefte mit Seiten und Zetteln, Schnipsel mit Datum. Zum Einfügen irgendwo anders.'] },
+      { t: 'Die kleinen Rettungen', p: ['Direkt nach dem Löschen: „Rückgängig" unten im Hinweis. Später: Papierkorb in den Feinheiten. Für Textfassungen: eingefrorene Stände im Schreibraum.'] },
+      { t: 'Wenn das Gerät keine Dateien öffnen darf', p: ['Manche Schul-iPads lassen keine Dateiauswahl zu. Dann helfen: der Faden kommt ohnehin ohne Datei (mit Passwort), Texte gehen über Teilen und die Zwischenablage hinaus, und der Sync überträgt alles ohne Datei — siehe „Mehrere Geräte".'] }
+    ]
+  },
+  {
+    id: 'profile', titel: 'Profile & Türen', icon: 'feinheiten', raum: 'feinheiten',
+    kurz: 'Ein Passwort vor meinem Bestand, mehrere Personen auf einem Gerät.',
+    abschnitte: [
+      { t: 'Die Tür', p: ['Beim ersten Start fragt VANI „Wem gehört dieses VANI?" — Name und Passwort. Danach steht diese Tür vor meinem Bestand. Das ist kein Internetkonto: das Passwort wird nie irgendwohin geschickt, es schützt nur hier auf dem Gerät.'] },
+      { t: 'Mehrere Profile', p: ['„Neues Profil auf diesem Gerät" legt einen völlig getrennten Bestand an — für meine Cousine zum Beispiel. Jedes Profil hat eigene Texte, eigene Einstellungen und einen eigenen Sync-Bereich. „Profil wechseln oder anlegen" in den Feinheiten.'] },
+      { t: 'Sperren', p: ['„Automatisch sperren": nie, nach 2, 10 oder 30 Minuten im Hintergrund. Danach braucht es das Passwort wieder.'] },
+      { t: 'Passwort ändern', p: ['In den Feinheiten unter „Mein Profil". Altes Passwort, neues zweimal.'] },
+      { t: 'Ehrlich gesagt', p: ['Ein vergessenes Profil-Passwort lässt sich nicht zurücksetzen — es gibt keinen Server, der es kennt. Darum: Passwort merken, und ab und zu „Alles sichern". Mit einer Sicherung lässt sich der Bestand in ein neues Profil einlesen.'] }
+    ]
+  },
+  {
+    id: 'geraete', titel: 'Mehrere Geräte', icon: 'verbinden', raum: 'feinheiten',
+    kurz: 'iPad, Laptop und Handy halten sich gegenseitig aktuell — verschlüsselt.',
+    abschnitte: [
+      { t: 'Der private Bereich', p: ['Ein Bereich ist mein verschlüsselter Stapel auf einem Sync-Dienst. Der Dienst sieht nur Geheimtext; den Schlüssel haben nur meine Geräte. Ohne Bereich bleibt jedes Gerät für sich — das ist der Standard.'] },
+      { t: 'Anlegen', s: ['Feinheiten → „iPad ↔ Laptop ↔ weitere Geräte" → „Neuen privaten Bereich".', 'Einen Namen geben. Die Adresse des Dienstes ist vorausgefüllt.', 'Fertig — alles, was auf diesem Gerät liegt, nimmt der Bereich mit.'] },
+      { t: 'Ein zweites Gerät koppeln', s: ['Auf dem ersten Gerät: „Weiteres Gerät koppeln" → der Kopplungscode (VANI1-…) wird kopiert.', 'Den Code zum zweiten Gerät bringen — Nachricht an mich selbst, Mail, egal.', 'Dort: „Mit Bereich verbinden" → Code einfügen → „Beides zusammenlegen" oder „Diesen Gerätebestand ersetzen".'], p: ['Der Code ist wie ein Hausschlüssel: wer ihn hat, sieht den Bereich. Nur an eigene Geräte geben.'], b: 'Auf dem iPad Bereich anlegen, Code per WhatsApp an mich schicken, am Laptop einfügen. Ab da schreibe ich am Laptop weiter, was ich am iPad angefangen habe.' },
+      { t: 'Was mitreist', p: ['Texte, Hefte, Seiten, Zettel, Projekte, Szenen, Bretter, Blasen, Wörter, Funken, Beziehungen, Fotos, Kritzeleien, Einstellungen und Zählungen. Goodnotes-Originale nur, wenn „Goodnotes-Originaldateien mitsenden" an ist.'] },
+      { t: 'Gleichzeitig und offline', p: ['Offline schreiben ist in Ordnung — Änderungen warten und gehen beim nächsten Netz weiter. Schreiben zwei Geräte gleichzeitig am selben Text, werden die Änderungen zusammengeführt, nicht überschrieben.'] },
+      { t: 'Status', p: ['Synchron, arbeitet, offline, nur hier — die Karte in den Feinheiten sagt es in Worten. „Jetzt abgleichen" stößt einen Abgleich an. „Gerät trennen" nimmt nur dieses Gerät aus dem Bereich; Inhalte bleiben hier, der Bereich und die anderen Geräte bleiben unberührt.'] },
+      { t: 'Zwei Personen, zwei Bereiche', p: ['Jede Person legt ihren eigenen Bereich an. Nur gleiche Kopplungscodes führen zum gleichen Bestand.'] }
+    ]
+  },
+  {
+    id: 'installation', titel: 'Geräte, Installation & Updates', icon: 'wieder', raum: 'feinheiten',
+    kurz: 'Wie VANI aufs iPad, aufs Handy und auf den Laptop kommt — und wie es aktuell bleibt.',
+    abschnitte: [
+      { t: 'iPad und iPhone', s: ['Die VANI-Adresse in Safari öffnen.', 'Teilen-Symbol (Viereck mit Pfeil) → „Zum Home-Bildschirm".', 'Ab jetzt über das Icon starten — Vollbild, ohne Safari-Leiste, offline.'], p: ['Kein App Store nötig. Das geht auch auf einem Schul-iPad, solange Safari Webseiten öffnen darf.'] },
+      { t: 'Android-Handy', s: ['Adresse in Chrome öffnen.', 'Menü (drei Punkte) → „Zum Startbildschirm hinzufügen" oder „App installieren".'] },
+      { t: 'Windows-Laptop', p: ['Entweder die Adresse im Browser öffnen (Chrome, Edge: dort gibt es „App installieren" in der Adressleiste) — oder die Desktop-App: VANI-x64-Setup.exe installiert sie, VANI-x64-Portable.exe läuft ohne Installation.'] },
+      { t: 'Updates hinter demselben Icon', p: ['Ein Icon genügt für immer. Solange die Adresse gleich bleibt, ersetzen neue Fassungen die App still hinter demselben Icon — ich muss nie wieder „Zum Home-Bildschirm" wählen. Beim Start holt VANI sich im Hintergrund die neue Fassung; unten erscheint dann „Eine neue Fassung liegt bereit → Neu laden". Oder: Feinheiten → „VANI jetzt aktualisieren".'], b: 'Am Laptop wurde etwas an VANI gebaut und veröffentlicht. Am iPad öffne ich VANI, tippe in den Feinheiten auf „VANI jetzt aktualisieren" — fertig. Meine Texte bleiben, wo sie sind.' },
+      { t: 'Desktop-App aktualisieren', p: ['Die Windows-App aktualisiert sich noch nicht selbst. Eine neue Setup-Datei einfach über die alte installieren — Inhalte bleiben.'] },
+      { t: 'Offline', p: ['Nach dem ersten Öffnen läuft VANI komplett ohne Internet. Internet braucht es nur für Updates, für den Sync und zum Hereinholen des Fadens.'] },
+      { t: 'Wenn das alte Icon weg soll', p: ['Icon lange halten → „App entfernen". Zeigt es kein Minus, ist das iPad verwaltet: Einstellungen → Bildschirmzeit → Beschränkungen → Apps löschen → Erlauben, oder die Verwaltung fragen. Vorher sichern, falls Inhalte am alten Icon hängen.'] }
+    ]
+  },
+  {
+    id: 'tasten', titel: 'Tasten & Gesten', icon: 'feinheiten', raum: '',
+    kurz: 'Die wenigen Griffe, die überall gelten.',
+    abschnitte: [
+      { t: 'Tastatur', p: ['Strg/⌘ + K — Suche. Escape — schließt Fenster, Menüs, den Schreibraum und die Suche (immer nur die oberste Lage). Enter — bestätigt einzeilige Eingaben. Strg/⌘ + Enter — Wörter in die Kiste legen.'] },
+      { t: 'Finger und Maus', p: ['Tippen öffnet. Lange halten (oder Rechtsklick) öffnet das Menü. Ziehen verschiebt Zettel, Fotos, Blasen, freie Schnipsel. Szenenkarten: kurz halten, bis sie sich heben, dann ziehen. Doppeltipp auf ein Brett setzt eine Blase. Zwei Finger kneifen zoomt das Brett. Wischen auf einem Zettel-Griff ändert die Größe.'] }
+    ]
+  },
+  {
+    id: 'woerterbuch', titel: 'Kleines Wörterbuch', icon: 'lesen', raum: '',
+    kurz: 'Die Begriffe, wie VANI sie meint.',
+    abschnitte: [
+      { t: 'Schnipsel', p: ['Ein kurzer Gedanke an mich selbst, im Chat mit mir.'] },
+      { t: 'Blatt', p: ['Ein einzelner Text im Stapel, ohne Heft und ohne Projekt.'] },
+      { t: 'Heft, Seite, Zettel', p: ['Ein Heft hat Seiten; auf Seiten kleben Zettel, Fotos und Kritzeleien.'] },
+      { t: 'Projekt, Kapitel, Szene', p: ['Ein Projekt ist das Große; es hat Kapitel; Kapitel haben Szenen als Karten.'] },
+      { t: 'Brett, Blase, Faden (im Cluster)', p: ['Ein Brett ist eine Denkfläche, Blasen sind Gedanken darauf, Fäden verbinden Blasen.'] },
+      { t: 'Faden (der Raum)', p: ['Der alte Chat an Vani — verschlüsselt, mit Passwort hereinzuholen.'] },
+      { t: 'Funke, Funkeln, Funkenkiste', p: ['Ein Funke ist ein Schreibanstoß. Gemerkte Funken heißen Funkeln. Meine eigenen liegen in der Funkenkiste.'] },
+      { t: 'Wortkiste', p: ['Eine kleine Wortsammlung mit Namen.'] },
+      { t: 'Stand', p: ['Eine eingefrorene Fassung eines Textes.'] },
+      { t: 'Kerze', p: ['Ein Schreib-Sprint mit Zeit: 10, 20 oder 45 Minuten.'] },
+      { t: 'Schreibfeuer, Strähne', p: ['Die Wörter von heute und die Tage in Folge, an denen ich geschrieben habe.'] },
+      { t: 'Stimmung', p: ['Das Farbthema der App.'] },
+      { t: 'Profil, Tür', p: ['Ein Bestand auf dem Gerät mit eigenem Passwort.'] },
+      { t: 'Bereich, Kopplungscode', p: ['Der verschlüsselte Sync-Stapel und der Schlüssel dazu.'] },
+      { t: 'Papierkorb', p: ['Wo Gelöschtes mindestens 30 Tage wartet.'] }
+    ]
+  },
+  {
+    id: 'fragen', titel: 'Fragen, die ich mir gestellt habe', icon: 'fund', raum: '',
+    kurz: 'Kurze Antworten auf das, was mir selbst nicht sofort klar war.',
+    abschnitte: [
+      { t: 'Ist das alles privat?', p: ['Ja. Alles liegt auf meinem Gerät. Kein Konto, keine Cloud, keine Auswertung. Nur wenn ich selbst einen Sync-Bereich anlege, geht verschlüsselter Text zu einem Dienst — und auch dann kann niemand außer meinen Geräten hineinsehen.'] },
+      { t: 'Brauche ich Internet?', p: ['Nein. Nur für Updates, Sync und das einmalige Hereinholen des Fadens.'] },
+      { t: 'Warum sehe ich am Laptop nichts vom iPad?', p: ['Weil jedes Gerät für sich arbeitet, bis ich es kopple. Siehe „Mehrere Geräte".'] },
+      { t: 'Wo ist mein Text hin?', p: ['Suche (Strg/⌘ + K). Papierkorb in den Feinheiten. Frühere Stände im Schreibraum. Zuhause unter „Weiterschreiben".'] },
+      { t: 'Warum ist der Klang stumm?', p: ['Einmal irgendwo tippen, dann „Ton prüfen" oder „Klang neu wecken". Auf dem iPad ist das eine Systemgrenze.'] },
+      { t: 'Wie bekomme ich Texte heraus?', p: ['Teilen (im Schreibraum, im Blatt-Menü, in der Szene), Leseansicht „Kopieren" oder „Als Datei", Feinheiten „Nur Texte kopieren", „Alles sichern" für alles mit Bildern.'] },
+      { t: 'Wie lösche ich wirklich?', p: ['Löschen legt in den Papierkorb. Erst „Endgültig leeren" in den Feinheiten löscht wirklich.'] },
+      { t: 'Was ist mit der Desktop-App?', p: ['Dieselbe App in einem eigenen Fenster, mit sicher verwahrtem Sync-Geheimnis. Updates über eine neue Setup-Datei.'] },
+      { t: 'Passwort vergessen?', p: ['Lässt sich nicht zurücksetzen — es gibt keinen Server dafür. Darum sichern. Mit einer Sicherung geht es in ein neues Profil.'] },
+      { t: 'Was ist mit Spotify?', p: ['Gibt es nicht. Der Klang in VANI kommt ganz aus VANI.'] }
+    ]
+  }
+];
+
+/* Pure Suche über die Anleitung: liefert Kapitel mit nur den passenden Abschnitten. */
+function anleitungSuche(q) {
+  const n = normalisiere(String(q || '').trim());
+  if (!n) return ANLEITUNG.map((k) => ({ kapitel: k, abschnitte: k.abschnitte }));
+  const passt = (s) => normalisiere([s.t, ...(s.p || []), ...(s.s || []), s.b || '', s.tipp || ''].join(' ')).includes(n);
+  const raus = [];
+  for (const k of ANLEITUNG) {
+    const kapitelPasst = normalisiere(k.titel + ' ' + (k.kurz || '')).includes(n);
+    const treffer = k.abschnitte.filter(passt);
+    if (kapitelPasst && !treffer.length) raus.push({ kapitel: k, abschnitte: k.abschnitte });
+    else if (treffer.length) raus.push({ kapitel: k, abschnitte: treffer });
+  }
+  return raus;
+}
+
+/* Markiert das Gesuchte im bereits entschärften Text. */
+function anleitungHervorheben(text, q) {
+  const sicher = esc(text);
+  const roh = String(q || '').trim();
+  if (roh.length < 2) return sicher;
+  const muster = new RegExp(esc(roh).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+  return sicher.replace(muster, (m) => '<mark>' + m + '</mark>');
+}
+
+let _anleitung = null;
+function schliesseAnleitung() {
+  if (!_anleitung) return;
+  document.removeEventListener('keydown', _anleitung.taste, true);
+  _anleitung.bogen.remove();
+  _anleitung = null;
+}
+
+function oeffneAnleitung(kapitelId) {
+  if (_anleitung) schliesseAnleitung();
+  const suchfeld = el('input', { type: 'search', placeholder: 'In der Anleitung suchen …', 'aria-label': 'In der Anleitung suchen' });
+  const kapitelnav = el('nav', { class: 'anleitung-nav', 'aria-label': 'Kapitel' });
+  const inhalt = el('div', { class: 'anleitung-inhalt' });
+  const zaehler = el('span', { class: 'anleitung-zaehler' });
+  const kopf = el('div', { class: 'anleitung-kopf' },
+    el('div', { class: 'anleitung-titelzeile' },
+      el('span', { class: 'anleitung-marke' }, 'V'),
+      el('h1', {}, 'Die Anleitung', el('small', {}, 'alles, was VANI kann — von mir aufgeschrieben')),
+      el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Anleitung zumachen', onclick: () => schliesseAnleitung() })),
+    el('div', { class: 'anleitung-suchzeile' }, el('span', { html: ik('suche'), style: 'display:flex;color:var(--blass)' }), suchfeld, zaehler));
+  const bogen = el('div', { class: 'anleitung-bogen', role: 'dialog', 'aria-label': 'Die Anleitung' }, kopf, el('div', { class: 'anleitung-koerper' }, kapitelnav, inhalt));
+
+  const springe = (id) => {
+    const ziel = inhalt.querySelector('[data-kapitel="' + id + '"]');
+    if (ziel) ziel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  const raumAuf = (k) => {
+    schliesseAnleitung();
+    if (k.raum === 'suche') { oeffneSuche(); return; }
+    location.hash = '#/' + (k.raum || '');
+  };
+
+  function baue() {
+    const q = suchfeld.value.trim();
+    const funde = anleitungSuche(q);
+    kapitelnav.innerHTML = ''; inhalt.innerHTML = '';
+    for (const { kapitel } of funde) {
+      kapitelnav.append(el('button', { class: 'anleitung-navknopf', onclick: () => springe(kapitel.id) },
+        el('span', { html: ik(kapitel.icon || 'lesen'), style: 'display:flex' }), kapitel.titel));
+    }
+    let abschnitte = 0;
+    for (const { kapitel, abschnitte: liste } of funde) {
+      const block = el('section', { class: 'anleitung-kapitel', 'data-kapitel': kapitel.id });
+      block.append(el('div', { class: 'anleitung-kapitelkopf' },
+        el('span', { class: 'anleitung-kapitelicon', html: ik(kapitel.icon || 'lesen') }),
+        el('h2', { html: anleitungHervorheben(kapitel.titel, q) }),
+        kapitel.raum !== '' || kapitel.id === 'zuhause'
+          ? el('button', { class: 'knopf zart anleitung-springen', onclick: () => raumAuf(kapitel) }, el('span', { html: ik('rechts'), style: 'display:flex' }), 'Aufschlagen')
+          : null));
+      if (kapitel.kurz) block.append(el('p', { class: 'anleitung-kurz', html: anleitungHervorheben(kapitel.kurz, q) }));
+      for (const a of liste) {
+        abschnitte++;
+        const art = el('article', { class: 'anleitung-abschnitt' }, el('h3', { html: anleitungHervorheben(a.t, q) }));
+        for (const p of a.p || []) art.append(el('p', { html: anleitungHervorheben(p, q) }));
+        if (a.s && a.s.length) art.append(el('ol', {}, a.s.map((s) => el('li', { html: anleitungHervorheben(s, q) }))));
+        if (a.b) art.append(el('div', { class: 'anleitung-beispiel' }, el('b', {}, 'Beispiel'), el('span', { html: anleitungHervorheben(a.b, q) })));
+        if (a.tipp) art.append(el('div', { class: 'anleitung-tipp' }, el('b', {}, 'Merke'), el('span', { html: anleitungHervorheben(a.tipp, q) })));
+        block.append(art);
+      }
+      inhalt.append(block);
+    }
+    if (!funde.length) inhalt.append(el('div', { class: 'leer' }, 'Dazu steht nichts in der Anleitung.', el('div', { class: 'klein' }, 'Vielleicht heißt es hier anders — die Suche in der Leiste findet dafür alles, was ich geschrieben habe.')));
+    zaehler.textContent = q ? (abschnitte === 1 ? '1 Stelle' : abschnitte + ' Stellen') : '';
+  }
+  suchfeld.addEventListener('input', entprellt(baue, 90));
+  const taste = (e) => { if (e.key === 'Escape') { e.stopPropagation(); e.preventDefault(); schliesseAnleitung(); } };
+  document.addEventListener('keydown', taste, true);
+  document.body.append(bogen);
+  _anleitung = { bogen, taste };
+  baue();
+  if (kapitelId) requestAnimationFrame(() => springe(kapitelId));
 }
 
 /* ================================================================

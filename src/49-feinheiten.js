@@ -41,8 +41,17 @@ async function vorhandenenSyncBereichKoppeln() {
 }
 
 RENDER.feinheiten = function (haupt) {
-  haupt.append(raumkopf('Feinheiten'));
+  haupt.append(raumkopf('Feinheiten', null,
+    el('button', { class: 'rundknopf zart', html: ik('lesen'), title: 'Die Anleitung aufschlagen', onclick: () => oeffneAnleitung() })));
   const inhalt = el('div', { class: 'inhalt' });
+
+  /* Die Anleitung zuerst — sie erklärt alles andere. */
+  inhalt.append(el('button', { class: 'karte anleitung-karte', onclick: () => oeffneAnleitung() },
+    el('span', { class: 'anleitung-karte-icon', html: ik('lesen') }),
+    el('span', { class: 'anleitung-karte-text' },
+      el('b', {}, 'Die Anleitung'),
+      el('small', {}, 'Alles, was VANI kann — Raum für Raum, durchsuchbar, mit Beispielen. Von mir aufgeschrieben.')),
+    el('span', { class: 'anleitung-karte-pfeil', html: ik('rechts') })));
 
   /* Thema */
   const THEMA_INFO = [
