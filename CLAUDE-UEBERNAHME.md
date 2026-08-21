@@ -710,7 +710,7 @@ zweiten normalen lokalen Bestand.
 
 - Profile sind weiterhin lokale Passwort-Türen pro Gerät.
 - Passwörter werden nicht übertragen und nicht serverseitig gespeichert.
-- Sarah und Kevin erhalten getrennte Profile und getrennte private Bereiche.
+- Beide Personen erhalten getrennte Profile und getrennte private Bereiche.
 - Nur Geräte mit demselben Kopplungscode teilen denselben Inhalt.
 - GitHub-PWA, Handy und Desktop verwenden alle den Sites-/v1-Tresor im Hintergrund.
 - Offlineänderungen warten lokal und werden später konfliktarm zusammengeführt.

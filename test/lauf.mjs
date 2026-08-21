@@ -257,19 +257,19 @@ test('funkeDesTages ist heute stabil, neuerFunke liefert immer etwas', async () 
 const beispiel = [
   '17.05.25, 17:55 - Nachrichten und Anrufe sind Ende-zu-Ende-verschlüsselt. Nur Personen…',
   '17.05.25, 17:55 - Du hast diese Gruppe erstellt',
-  '17.05.25, 17:58 - Sarah E.: Hi',
-  '19.05.25, 13:57 - Sarah E.: ABSTIMMUNG:',
+  '17.05.25, 17:58 - A. Beispiel: Hi',
+  '19.05.25, 13:57 - A. Beispiel: ABSTIMMUNG:',
   'Are you mad?',
   'OPTION: Ja (‎1 Stimme)',
   '',
-  '20.05.25, 16:45 - Sarah E.: Erste Zeile',
+  '20.05.25, 16:45 - A. Beispiel: Erste Zeile',
   'zweite Zeile ohne Kopf',
   'dritte Zeile',
-  '05.06.25, 16:46 - Sarah E.: ‎IMG-20231119-WA0000.jpg (Datei angehängt)',
-  '22.06.25, 17:26 - Sarah E.: ‎DOC-20250622-WA0000. (Datei angehängt)',
-  '05.03.26, 18:14 - Sarah E.: Boller-Wagen. <Diese Nachricht wurde bearbeitet.>',
-  '20.08.26, 21:05 - Sarah E.: ',
-  '31.12.25, 23:59 - Sarah E.: Silvester!'
+  '05.06.25, 16:46 - A. Beispiel: ‎IMG-20231119-WA0000.jpg (Datei angehängt)',
+  '22.06.25, 17:26 - A. Beispiel: ‎DOC-20250622-WA0000. (Datei angehängt)',
+  '05.03.26, 18:14 - A. Beispiel: Boller-Wagen. <Diese Nachricht wurde bearbeitet.>',
+  '20.08.26, 21:05 - A. Beispiel: ',
+  '31.12.25, 23:59 - A. Beispiel: Silvester!'
 ].join('\n');
 
 test('parseWhatsApp: Systemzeilen raus, Mehrzeiler bleiben ganz', () => {

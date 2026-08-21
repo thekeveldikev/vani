@@ -23,7 +23,7 @@ Daten verschiedener Web-Adressen vollständig.
 5. Erst prüfen, ob alles da ist. Dann darf das alte Icon entfernt werden.
 
 Ab diesem Umzug bleibt dasselbe Icon. Neue Web-Fassungen kommen automatisch
-hinter diesem Icon an; notfalls **Feinheiten → Nach neuer Fassung sehen**.
+hinter diesem Icon an; notfalls **Feinheiten → VANI jetzt aktualisieren**.
 
 Falls versehentlich einmal die frühere Sites-App benutzt wurde, bleibt ein bewusster
 Rettungszugang erhalten. Er wird nur zum Sichern oder Abgleichen alter lokaler Daten
@@ -45,13 +45,15 @@ lesen. Darum nur direkt auf das eigene oder wirklich vertraute Gerät kopieren.
 
 Profile und Bereich sind getrennt: Auf jedem neuen Gerät wird zunächst eine lokale
 Passwort-Tür angelegt. Danach verbindet der persönliche Kopplungscode genau diesen
-Bestand. Sarah und Kevin verwenden unterschiedliche Codes und bleiben vollständig
+Bestand. Beide Personen verwenden unterschiedliche Codes und bleiben vollständig
 getrennt.
 
 ## Windows
 
-- Normal installieren: `VANI-5.1.0-x64-Setup.exe` doppelklicken.
-- Ohne Installation testen: `VANI-5.1.0-x64-Portable.exe` öffnen.
+- Normal installieren: `VANI-5.2.1-x64-Setup.exe` doppelklicken.
+- Ohne Installation testen: `VANI-5.2.1-x64-Portable.exe` öffnen.
+- Die Dateien liegen im Ordner `release`. Bei einer neuen Fassung trägt die Datei
+  eine höhere Versionsnummer im Namen — immer die neueste nehmen.
 - Eine spätere Setup-Datei einfach über die alte Fassung installieren. Die
   Programm-ID bleibt gleich und die eigenen Inhalte bleiben im Benutzerprofil.
 - Beim Deinstallieren lässt VANI die persönlichen Daten absichtlich stehen.

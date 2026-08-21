@@ -197,7 +197,7 @@ src, nicht dauerhaft nur in diese Dateien.
 
 ### Warum
 
-Sarah und Kevin sollen dieselbe App nutzen können, ohne lokale Notizen zu vermischen.
+Zwei Personen sollen dieselbe App nutzen können, ohne lokale Notizen zu vermischen.
 Die Lösung ist absichtlich kein serverseitiges Benutzerkonto. Ein Profil ist eine
 lokale, passwortgeschützte Tür; Mehrgeräte-Sync wird separat gekoppelt.
 

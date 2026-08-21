@@ -66,6 +66,20 @@ test('Profilvertrag: veröffentlichter Code enthält keine angeforderten Nutzerp
   assert.match(profil, /AES-GCM/);
 });
 
+/* Das Repo ist öffentlich. Echte Vornamen aus dem Gespräch gehören weder in den
+   ausgelieferten Code noch in Testdaten — auch nicht als WhatsApp-Beispielzeile. */
+test('Privatsphärenvertrag: keine echten Vornamen im ausgelieferten Code und in Testdaten', () => {
+  const dateien = [
+    'src/29-profile.js', 'src/30-core.js', 'src/34-inhalt.js', 'src/42c-faden.js',
+    'src/49-feinheiten.js', 'src/52-anleitung.js', 'test/lauf.mjs', 'test/kern-edge.mjs',
+    'werkzeug/faden-parser.mjs', 'index.html'
+  ];
+  for (const d of dateien) {
+    if (!existsSync(join(wurzel, d))) continue;
+    assert.doesNotMatch(lies(d), /(?<![A-Za-zÄÖÜäöü])Sarah(?![A-Za-zÄÖÜäöü])/i, d + ' enthält einen echten Vornamen');
+  }
+});
+
 test('Rich-Toolbar-Regressionsvertrag: sichtbarer Titel wird gebunden, kein freier Bezeichner bleibt', () => {
   const rich = lies('src/35-richtext.js');
   assert.match(rich, /class: 'format-knopf', title: titel, 'aria-label': titel/);
