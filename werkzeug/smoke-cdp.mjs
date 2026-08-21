@@ -18,7 +18,9 @@ function sende(method, params = {}) {
   const nr = ++id;
   ws.send(JSON.stringify({ id: nr, method, params }));
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => { offen.delete(nr); reject(new Error(method + ' antwortete 20 Sekunden lang nicht')); }, 20000);
+    /* Die UI-Prüfung wartet bis zu 48×350 ms auf die Autopaginierung; unter Last
+       (z. B. parallel laufender Installer-Bau) reicht eine kurze Frist nicht. */
+    const timer = setTimeout(() => { offen.delete(nr); reject(new Error(method + ' antwortete 90 Sekunden lang nicht')); }, 90000);
     offen.set(nr, { resolve, reject, timer });
   });
 }
