@@ -3,7 +3,26 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.2.0';
+const APP_VERSION = '5.2.1';
+/* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
+   die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
+   verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
+const VANI_HAUPTADRESSE = 'https://thekeveldikev.github.io/vani/';
+
+function vaniAdresseArt(standort = location) {
+  const protokoll = String(standort && standort.protocol || '');
+  const origin = String(standort && standort.origin || '');
+  const host = String(standort && standort.hostname || '');
+  const suche = String(standort && standort.search || '');
+  if (protokoll === 'vani:') return 'desktop';
+  if (/^https?:$/.test(protokoll) && /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(host)) return 'lokal';
+  try {
+    if (new URL(VANI_HAUPTADRESSE).origin === origin && /^\/vani(?:\/|$)/.test(String(standort.pathname || '/'))) return 'haupt';
+  } catch (e) {}
+  if (host === 'vani-schreibzuhause.craftkey.chatgpt.site' && new URLSearchParams(suche).get('rettung') === '1') return 'rettung';
+  if (host === 'vani-schreibzuhause.craftkey.chatgpt.site') return 'dienst';
+  return 'andere';
+}
 const $ = (s, w) => (w || document).querySelector(s);
 const $$ = (s, w) => [...(w || document).querySelectorAll(s)];
 const uid = () => (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function')

@@ -46,6 +46,20 @@ Die warme, taktile, deutsche Schreibhaus-Metapher blieb dabei absichtlich erhalt
 
 ## 3. Chronologie
 
+### 3.0 Nachtrag VANI 5.2.1 – eine sichtbare App, ein unsichtbarer Tresor
+
+Nach Claudes VANI 5.2.0 wurden die zwei öffentlichen App-Adressen wieder
+vereinheitlicht:
+
+- https://thekeveldikev.github.io/vani/ ist die einzige sichtbare Web-App;
+- Claude kann normale Updates durch einen getesteten Push auf origin/main ausliefern;
+- der Sites-Host bleibt ausschließlich Ende-zu-Ende-verschlüsselter v1-Sync;
+- normale Sites-Startseitenbesuche führen zur GitHub-App;
+- ein alter Sites-Service-Worker wird stillgelegt und seine Caches werden entfernt;
+- ein bewusster Rettungsmodus hält alte Sites-Origin-Daten sicher erreichbar;
+- Profile bleiben lokal, private Bereiche bleiben pro Person getrennt;
+- Desktop, iPad, Handy und Browser verwenden weiterhin denselben Sync-Tresor.
+
 ### 3.1 Commit d4ecb8e – VANI 5
 
 Dieser Commit brachte den großen strukturellen Ausbau:

@@ -62,8 +62,8 @@ function syncSaubereConfig(c) {
       !/^[A-Za-z0-9_-]{40,180}$/.test(c.token || '') || !/^[A-Za-z0-9_-]{40,80}$/.test(c.key || '')) return null;
   return { v: 1, name: String(c.name || 'Mein Bereich').slice(0, 80), server, vault: c.vault, token: c.token, key: c.key };
 }
-/* Der öffentliche VANI-Sync-Dienst. Wird vorgeschlagen, wo die App selbst keinen
-   Dienst mitbringt — als reine Seite auf GitHub Pages oder aus einer Datei. */
+/* Der unsichtbare öffentliche VANI-Sync-Dienst. Die sichtbare App hat genau
+   eine andere, feste Adresse; nur die verschlüsselten Pakete gehen hierhin. */
 const SYNC_STANDARD_DIENST = 'https://vani-schreibzuhause.craftkey.chatgpt.site';
 async function syncStandardServer() {
   try {
@@ -74,11 +74,8 @@ async function syncStandardServer() {
     }
   } catch (e) {}
   const origin = String(location.origin || '');
-  const host = String(location.hostname || '');
   const lokal = /^http:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(origin);
-  const reineSeite = /\.github\.io$/i.test(host) || /\.pages\.dev$/i.test(host);
   if (lokal) return origin;
-  if (location.protocol === 'https:' && !reineSeite) return origin;
   return SYNC_STANDARD_DIENST;
 }
 async function syncLadeConfig() {

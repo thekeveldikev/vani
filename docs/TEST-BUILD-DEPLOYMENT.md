@@ -219,17 +219,17 @@ Der Befehl baut Web und danach:
 - x64-Portable;
 - win-unpacked.
 
-Aktuelle VANI-5.1-Artefakte:
+Aktuelle VANI-5.2.1-Artefakte:
 
 | Datei | Größe | SHA-256 |
 |---|---:|---|
-| release\VANI-5.1.0-x64-Setup.exe | 105.140.989 Bytes | AE52D2A5153C536B11804119967CAF19A5A2F969842ADA582EF9D80119D2E3A2 |
-| release\VANI-5.1.0-x64-Portable.exe | 104.905.168 Bytes | 28E480AEC5ECD365AEECD3C895F5DB15C6825DDB9DFB53C06351AFCCCC22117B |
+| release\VANI-5.2.1-x64-Setup.exe | 105.157.126 Bytes | 5E85F3F20EB810767077B967B3602622980F03162B4D899FB90DBEDDC437124C |
+| release\VANI-5.2.1-x64-Portable.exe | 104.921.304 Bytes | D6E70CD6D671E62143421F95BEFEB88D9D5B2B31851FF78D93A20AF57EBBA39D |
 
 Hashes neu berechnen:
 
-    Get-FileHash .\release\VANI-5.1.0-x64-Setup.exe -Algorithm SHA256
-    Get-FileHash .\release\VANI-5.1.0-x64-Portable.exe -Algorithm SHA256
+    Get-FileHash .\release\VANI-5.2.1-x64-Setup.exe -Algorithm SHA256
+    Get-FileHash .\release\VANI-5.2.1-x64-Portable.exe -Algorithm SHA256
 
 Bei einer neuen Version Dateinamen entsprechend anpassen. Niemals alte Hashwerte für
 neu gebaute Dateien wiederverwenden.
@@ -262,16 +262,19 @@ Der Smoke-Test:
 - legt Wortkiste und Wörter an;
 - prüft Wortnotizsuche;
 - prüft Wortkistenoberfläche;
+- prüft, dass die Desktop-App genau eine sichtbare GitHub-Adresse und den
+  unsichtbaren Sites-Synctresor verwendet;
 - prüft Desktopbreite gegen Overflow;
 - prüft Rich-Sanitizing;
 - kann release/desktop-smoke.png erzeugen.
 
 Letzter erfolgreicher Lauf:
 
-- Appversion 5.1.0;
+- Appversion 5.2.1;
 - acht Rich-Seiten;
 - vollständiger Text;
 - Wortkisten-UI und Suche vorhanden;
+- Ein-Adress-Karte und Syncserver-Vorgabe korrekt;
 - kein ungeklärter Überlauf.
 
 Der Beispielprozess darf nur beendet werden, wenn seine PID aus genau diesem
@@ -321,7 +324,8 @@ Berechtigung. Die App soll nur die richtige Anleitung geben.
 
 ### Bestehendes Produktionsziel
 
-- URL: https://vani-schreibzuhause.craftkey.chatgpt.site
+- sichtbare Haupt-App: https://thekeveldikev.github.io/vani/
+- Sync-/Backend-Host: https://vani-schreibzuhause.craftkey.chatgpt.site
 - Projekt-ID: appgprj_6a8786eb79448191acff5186595d06ec
 - Konfiguration: hosting\.openai\hosting.json
 - Bindings: D1 DB, R2 FILES
@@ -336,12 +340,12 @@ Berechtigung. Die App soll nur die richtige Anleitung geben.
 4. Hostingtests und Lint ausführen.
 5. hosting/public durch den vorgesehenen Build kopieren lassen.
 6. Prüfen, dass hosting/.openai/hosting.json die bestehende Projekt-ID trägt.
-7. Mit der in der aktuellen Arbeitsumgebung vorgesehenen Sites-Hostingfunktion eine
-   **neue Version des bestehenden Projekts** speichern.
+7. Nur wenn Worker, v1, D1/R2 oder Rettungsmodus geändert wurden: mit der
+   Sites-Hostingfunktion eine **neue Version des bestehenden Projekts** speichern.
 8. Diese Version öffentlich deployen.
-9. URL mit Cache-Busting öffnen und HTTP 200 prüfen.
-10. sichtbare Appversion und das neue Feature prüfen.
-11. vorhandenes Home-Bildschirm-Icon auf Update testen.
+9. Sites-Startseite ohne Weiterleitung folgen prüfen: sie muss zur GitHub-App zeigen.
+10. /v1/health muss weiterhin den Sync-Dienst melden.
+11. Der bewusste Rettungsmodus muss die aktuelle App ohne Service-Worker liefern.
 12. Deploymentversion und Quellcommit dokumentieren.
 
 Keine zweite Site anlegen. Keine D1-/R2-Bindings umbenennen. Keine persönlichen
@@ -351,16 +355,17 @@ Inhalte nach hosting/public kopieren.
 
 Mindestens:
 
-    Invoke-WebRequest "https://vani-schreibzuhause.craftkey.chatgpt.site/?pruefung=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())" -UseBasicParsing
+    Invoke-WebRequest "https://thekeveldikev.github.io/vani/?pruefung=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())" -UseBasicParsing
     Invoke-WebRequest "https://vani-schreibzuhause.craftkey.chatgpt.site/v1/health" -UseBasicParsing
 
 Danach im Browser:
 
-- App öffnet ohne Serverfehler;
+- GitHub-App öffnet ohne Serverfehler;
 - Profilgate erscheint;
 - Version stimmt;
 - Update hinter altem Icon;
 - Health meldet vani-sync v1;
+- Sites-Startseite ist keine zweite App;
 - keine echte Nutzersynchronisation als Test missbrauchen.
 
 ## 14. Git-Ablauf
@@ -379,18 +384,15 @@ Nach Änderungen:
 Nur zum Auftrag gehörende Dateien stagen. Bestehende Nutzeränderungen nicht
 überschreiben oder zurücksetzen.
 
-Beim Schreiben dieser Übergabe galt:
+Ab VANI 5.2.1 ist origin/main die einzige Web-App-Quelle. Ein Push aktualisiert
+GitHub Pages (https://thekeveldikev.github.io/vani/) und damit iPad, Handy und
+Browser-PWA. Die Sites-Adresse ist nur der Sync-Hintergrund; sie wird nicht bei jedem
+UI-Update deployt.
 
-- lokal main: zwei Produktcommits vor origin/main;
-- GitHub ist veraltet;
-- öffentliche Sites-App ist dennoch VANI 5.1.
-
-Seit dem 21. August 2026 (VANI 5.2.0, siehe CLAUDE-UEBERNAHME.md §11): origin/main
-ist wieder auf dem lokalen Stand; GitHub Pages (https://thekeveldikev.github.io/vani/)
-liefert die aktuelle Fassung; die Sites-Adresse wartet auf ein Codex-Deployment.
 Ein Push zu origin/main ist und bleibt eine externe Veröffentlichung — nur nach
 Nutzerfreigabe. Nach einem Push kurz prüfen, dass Pages gebaut hat (GitHub-API
-`/repos/<owner>/vani/pages/builds/latest` oder die Seite mit Cache-Busting laden).
+`/repos/thekeveldikev/vani/pages/builds/latest` oder die Seite mit Cache-Busting
+laden).
 
 Ein Push zu origin/main ist eine externe Veröffentlichung und soll nur nach
 entsprechender Nutzerfreigabe erfolgen. Kein git reset --hard und kein Checkout über

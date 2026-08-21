@@ -11,7 +11,7 @@ test("Hosting-Build enthält die echte VANI-PWA statt des Starters", async () =>
     readFile(new URL("worker/index.ts", root), "utf8"),
     readFile(new URL(".openai/hosting.json", root), "utf8"),
   ]);
-  assert.match(index, /const APP_VERSION = '5\.2\.0'/);
+  assert.match(index, /const APP_VERSION = '5\.2\.1'/);
   assert.match(index, /Privater Bereich/);
   assert.match(index, /Wem gehört dieses VANI/);
   assert.match(index, /Funkenkiste/);
@@ -32,4 +32,7 @@ test("Hosting-Worker trennt Metadaten und verschlüsselte Dateiblöcke", async (
   assert.match(worker, /timing|function gleich/);
   assert.match(worker, /zu_viele_anfragen/);
   assert.match(worker, /24 \* 1024 \* 1024/);
+  assert.match(worker, /VANI_HAUPTADRESSE = "https:\/\/thekeveldikev\.github\.io\/vani\/"/);
+  assert.match(worker, /url\.searchParams\.get\("rettung"\) !== "1"/);
+  assert.match(worker, /self\.registration\.unregister/);
 });

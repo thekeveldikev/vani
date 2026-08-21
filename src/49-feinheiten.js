@@ -40,6 +40,79 @@ async function vorhandenenSyncBereichKoppeln() {
   catch (e) { toast((e && e.message) || 'Der Kopplungscode ließ sich nicht verbinden.', 5000); }
 }
 
+async function kopiereVaniAdresse() {
+  try { await navigator.clipboard.writeText(VANI_HAUPTADRESSE); toast('Die einzige VANI-Adresse ist kopiert.'); }
+  catch (e) { await teileText(VANI_HAUPTADRESSE); }
+}
+
+async function kopiereSyncKopplungscode() {
+  if (!syncIstVerbunden()) return false;
+  if (!await frage('Der Kopplungscode öffnet deinen ganzen privaten Bereich. Nur auf einem eigenen oder wirklich vertrauten Gerät verwenden.', { ja: 'Code kopieren' })) return false;
+  const code = syncKopplungscode();
+  try { await navigator.clipboard.writeText(code); toast('Kopplungscode kopiert.'); }
+  catch (e) { await teileText(code); }
+  return true;
+}
+
+function vaniHauptadresseKnopf(text = 'VANI öffnen') {
+  return el('a', {
+    class: 'knopf voll', href: VANI_HAUPTADRESSE, target: '_blank',
+    rel: 'noopener noreferrer'
+  }, el('span', { html: ik('rechts'), style: 'display:flex' }), text);
+}
+
+function vaniAdresskarte() {
+  const art = vaniAdresseArt();
+  if (art === 'lokal') return null;
+  if (art === 'haupt') {
+    return el('div', { class: 'karte hauptadresse-karte richtig' },
+      el('span', { class: 'hauptadresse-siegel', html: ik('zuhause') }),
+      el('div', { class: 'hauptadresse-text' },
+        el('b', {}, 'Hier bist du richtig — das ist VANI.'),
+        el('p', {}, 'Diese eine Adresse ist für iPad, Handy und Browser. Updates kommen hier hinter demselben Icon an. Der verschlüsselte Tresor arbeitet unsichtbar im Hintergrund.'),
+        el('code', {}, VANI_HAUPTADRESSE)),
+      el('div', { class: 'fussreihe hauptadresse-aktionen' },
+        el('button', { class: 'knopf', onclick: () => kopiereVaniAdresse() }, 'Adresse kopieren')));
+  }
+  if (art === 'desktop') {
+    return el('div', { class: 'karte hauptadresse-karte desktop' },
+      el('span', { class: 'hauptadresse-siegel', html: ik('verbinden') }),
+      el('div', { class: 'hauptadresse-text' },
+        el('b', {}, 'Desktop und Web gehören zusammen.'),
+        el('p', {}, 'Die Desktop-App koppelt sich mit demselben privaten Bereich. Im Browser gibt es nur diese eine VANI-Adresse:'),
+        el('code', {}, VANI_HAUPTADRESSE)),
+      el('div', { class: 'fussreihe hauptadresse-aktionen' },
+        vaniHauptadresseKnopf('Web-App öffnen'),
+        el('button', { class: 'knopf', onclick: () => kopiereVaniAdresse() }, 'Adresse kopieren')));
+  }
+  if (art === 'rettung' || art === 'dienst') {
+    const verbunden = syncIstVerbunden();
+    return el('div', { class: 'karte hauptadresse-karte umzug' },
+      el('span', { class: 'hauptadresse-siegel', html: ik('wieder') }),
+      el('div', { class: 'hauptadresse-text' },
+        el('b', {}, 'Rettungsmodus der früheren zweiten Adresse'),
+        el('p', {}, 'Hier kannst du einen alten lokalen Bestand noch sichern oder vollständig abgleichen. Danach öffnest du das eine offizielle VANI auf GitHub. Nichts wird automatisch gelöscht.'),
+        el('code', {}, VANI_HAUPTADRESSE)),
+      el('ol', { class: 'hauptadresse-schritte' },
+        el('li', {}, 'Zuerst eine Sicherung erzeugen.'),
+        el('li', {}, verbunden ? 'Jetzt abgleichen und den Kopplungscode kopieren.' : 'Einen privaten Bereich anlegen oder später die Sicherung einlesen.'),
+        el('li', {}, 'Die Hauptadresse öffnen und dort einmal zum Home-Bildschirm hinzufügen.')),
+      el('div', { class: 'fussreihe hauptadresse-aktionen' },
+        el('button', { class: 'knopf', onclick: () => sichereAlles() }, '1 · Alles sichern'),
+        verbunden
+          ? el('button', { class: 'knopf', onclick: async () => { toast('Gleiche vollständig ab …'); await syncJetzt(); await kopiereSyncKopplungscode(); } }, '2 · Abgleichen & Code')
+          : el('button', { class: 'knopf', onclick: () => neuerSyncBereich() }, '2 · Bereich anlegen'),
+        vaniHauptadresseKnopf('3 · Hauptadresse öffnen')));
+  }
+  return el('div', { class: 'karte hauptadresse-karte umzug' },
+    el('span', { class: 'hauptadresse-siegel', html: ik('zuhause') }),
+    el('div', { class: 'hauptadresse-text' },
+      el('b', {}, 'Das ist eine Vorschau, nicht deine feste VANI-Adresse.'),
+      el('p', {}, 'Für den normalen Alltag, Updates und dein Home-Bildschirm-Icon bitte immer die eine Hauptadresse benutzen.'),
+      el('code', {}, VANI_HAUPTADRESSE)),
+    el('div', { class: 'fussreihe hauptadresse-aktionen' }, vaniHauptadresseKnopf('Hauptadresse öffnen')));
+}
+
 RENDER.feinheiten = function (haupt) {
   haupt.append(raumkopf('Feinheiten', null,
     el('button', { class: 'rundknopf zart', html: ik('lesen'), title: 'Die Anleitung aufschlagen', onclick: () => oeffneAnleitung() })));
@@ -52,6 +125,10 @@ RENDER.feinheiten = function (haupt) {
       el('b', {}, 'Die Anleitung'),
       el('small', {}, 'Alles, was VANI kann — Raum für Raum, durchsuchbar, mit Beispielen. Von mir aufgeschrieben.')),
     el('span', { class: 'anleitung-karte-pfeil', html: ik('rechts') })));
+
+  /* Eine sichtbare App-Adresse; der Sites-Host ist nur noch Sync-Hintergrund. */
+  const adresskarte = vaniAdresskarte();
+  if (adresskarte) inhalt.append(el('div', { class: 'abschnitt hauptadresse-abschnitt' }, el('h2', {}, 'Dein einziges VANI'), adresskarte));
 
   /* Thema */
   const THEMA_INFO = [
@@ -284,12 +361,8 @@ RENDER.feinheiten = function (haupt) {
             el('span', {}, 'Der Kopplungscode ist wie ein Hausschlüssel. Schicke ihn nur direkt an ein Gerät, das in genau diesen Bereich gehört.')),
           el('div', { class: 'fussreihe' },
             el('button', { class: 'knopf voll', onclick: async () => { toast('Gleiche ab …'); await syncJetzt(); zeichne(); } }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Jetzt abgleichen'),
-            el('button', { class: 'knopf', onclick: async () => {
-              if (!await frage('Der Kopplungscode öffnet deinen ganzen privaten Bereich. Nur auf einem eigenen oder wirklich vertrauten Gerät verwenden.', { ja: 'Code kopieren' })) return;
-              const code = syncKopplungscode();
-              try { await navigator.clipboard.writeText(code); toast('Kopplungscode kopiert.'); }
-              catch (e) { await teileText(code); }
-            } }, el('span', { html: ik('verbinden'), style: 'display:flex' }), 'Weiteres Gerät koppeln'),
+            el('button', { class: 'knopf', onclick: () => kopiereSyncKopplungscode() },
+              el('span', { html: ik('verbinden'), style: 'display:flex' }), 'Weiteres Gerät koppeln'),
             el('button', { class: 'knopf zart', onclick: async () => {
               if (!await frage('Nur dieses Gerät vom Bereich trennen? Die Inhalte bleiben hier erhalten; die anderen Geräte und der Bereich bleiben unberührt.', { ja: 'Dieses Gerät trennen' })) return;
               await syncTrennen(); toast('Dieses Gerät arbeitet wieder nur für sich.'); zeichne();

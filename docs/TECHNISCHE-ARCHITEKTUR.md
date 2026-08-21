@@ -6,9 +6,9 @@
 ## 1. Architektur in einem Satz
 
 VANI ist eine lokal-first Einseiten-Web-App, deren modulare Quellen zu einem
-selbstenthaltenen Webartefakt gebaut werden; dieselbe App läuft als PWA, in einer
-gehärteten Electron-Hülle und auf Sites, während ein optionaler Ende-zu-Ende-
-verschlüsselter Yjs-Sync Geräte verbindet.
+selbstenthaltenen Webartefakt gebaut werden; GitHub Pages ist die einzige sichtbare
+PWA, Electron die Desktop-Hülle und Sites ausschließlich der optionale
+Ende-zu-Ende-verschlüsselte Yjs-Sync-Hintergrund.
 
 ## 2. Schichten
 
@@ -21,7 +21,7 @@ verschlüsselter Yjs-Sync Geräte verbindet.
        |
        +-- Electron                Desktop-Hülle, lokales Protokoll, safeStorage
        |
-       +-- hosting/public          Sites-Kopie der gebauten Web-App
+       +-- hosting/public          Notfall-/Rettungskopie, nicht zweite Haupt-App
                |
                +-- Worker + D1/R2  statische Auslieferung und verschlüsselter Sync
 
@@ -458,12 +458,21 @@ hosting/.openai/hosting.json bindet:
 - D1-Binding DB;
 - R2-Binding FILES.
 
-hosting/scripts/copy-vani.mjs kopiert das gebaute Root-Artefakt. Der Vinext/Next-Teil
-stellt eine Hülle/Fallbackroute bereit; hosting/worker/index.ts fängt Sync-API und
-statische VANI-Dateien direkt ab.
+hosting/scripts/copy-vani.mjs kopiert das gebaute Root-Artefakt nur für Tests und den
+bewussten Rettungsmodus. hosting/worker/index.ts besitzt drei Aufgaben:
 
-Die bestehende Projekt-ID muss bei Updates erhalten bleiben. Ein neues Sites-Projekt
-würde eine zweite URL und gegebenenfalls ein zweites Home-Bildschirm-Produkt erzeugen.
+- /v1 als verschlüsselten Sync-Dienst bedienen;
+- normale Besuche der Sites-Startseite zur einzigen GitHub-App leiten;
+- einen alten Sites-Service-Worker stilllegen und Caches räumen.
+
+Die einzige installierbare Web-App liegt auf
+https://thekeveldikev.github.io/vani/. Sites ist nicht ihre zweite
+Veröffentlichungsquelle. Dadurch können Claude und Codex normale Web-Updates per
+GitHub-Push ausliefern. Ein Sites-Deployment ist nur bei Worker-, Protokoll-,
+D1-/R2- oder Rettungsänderungen nötig.
+
+Die bestehende Projekt-ID und die D1-/R2-Bindings müssen erhalten bleiben. Ein neues
+Sites-Projekt würde den verschlüsselten Tresor aufteilen.
 
 ## 12. Router und Räume
 

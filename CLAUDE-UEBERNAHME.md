@@ -1,6 +1,6 @@
-# VANI 5.1 — vollständige Übergabe an Claude
+# VANI 5.2.1 — vollständige Übergabe an Claude
 
-> **Stand:** 21. August 2026, nach Abschluss von VANI 5.1
+> **Stand:** 21. August 2026, nach Vereinheitlichung von App, Updates und Sync
 > **Arbeitsverzeichnis:** `C:\Users\kevin\VANI`
 > **Diese Datei zuerst lesen.** Sie ist der Einstiegspunkt in die gesamte Übergabemappe.
 
@@ -27,39 +27,38 @@ die ergänzenden Dokumente sollen verhindern, dass Claude:
 
 ### Aktueller Produktstand
 
-- App-Version: **5.1.0**
-- Lokaler Git-HEAD: **`0301606` — `VANI 5.1: persönliche Wortkisten`**
-- Vorheriger großer Codex-Commit: **`d4ecb8e` — `VANI 5: Profile, Rich-Text, Hefte, Klang und Updates`**
+- App-Version: **5.2.1**
+- Letzter Claude-Produktcommit vor der Vereinheitlichung: **`9506fb3` — `VANI 5.2.0: die Anleitung in der App`**
+- Persönliche Wortkisten: **`0301606`**
+- Großer Codex-Ausbau: **`d4ecb8e`**
 - Letzter Stand vor Codex / letzter Claude-basierter Commit: **`af63ec0`**
-- Öffentliche App: **https://vani-schreibzuhause.craftkey.chatgpt.site**
+- Einzige sichtbare Web-App: **https://thekeveldikev.github.io/vani/**
+- Unsichtbarer verschlüsselter Sync-Dienst: **https://vani-schreibzuhause.craftkey.chatgpt.site/v1**
 - Sites-Projekt-ID: **`appgprj_6a8786eb79448191acff5186595d06ec`**
-- Zuletzt öffentlich gespeicherte Sites-Version: **Version 3**
-- Sites-Quellcommit für VANI 5.1: **`15719d9e213c4c6ad05c3d62957437250d6779d9`**
-- Windows-Setup: `C:\Users\kevin\VANI\release\VANI-5.1.0-x64-Setup.exe`
-- Windows Portable: `C:\Users\kevin\VANI\release\VANI-5.1.0-x64-Portable.exe`
+- Die Sites-Startseite ist keine zweite App mehr; sie führt zur GitHub-App.
+- Windows-Setup: `C:\Users\kevin\VANI\release\VANI-5.2.1-x64-Setup.exe`
+- Windows Portable: `C:\Users\kevin\VANI\release\VANI-5.2.1-x64-Portable.exe`
 
 ### Git-Warnung
 
-Die lokale Branch `main` enthält **zwei Produktcommits plus den
-Übergabedokumentationscommit vor `origin/main`**. GitHub steht noch auf `af63ec0`.
-Diese lokalen Commits wurden nicht zu GitHub gepusht. Die öffentliche Sites-App
-wurde dagegen separat aus dem Hosting-Teilbaum veröffentlicht und ist bereits auf
-VANI 5.1.
+GitHub Pages ist die kanonische Web-App und soll bei normalen Claude-/Codex-Änderungen
+über `origin/main` aktualisiert werden. Sites wird nur noch bei Änderungen am
+Sync-Worker, D1/R2 oder am Rettungsweg deployt. Claude kann damit fast alle normalen
+App-Updates ohne Sites-Werkzeug veröffentlichen.
 
-Claude muss deshalb bei der Übernahme **den lokalen HEAD als Wahrheit** behandeln.
-Kein Reset auf `origin/main`, kein Checkout der alten GitHub-Fassung und kein
-Überschreiben der lokalen Commits.
+Vor jeder Arbeit trotzdem lokalen HEAD, `origin/main` und vorhandene Änderungen
+prüfen. Kein Reset und kein Überschreiben fremder Arbeit.
 
 ### Qualitätsstand
 
-- `npm test`: **69/69 bestanden**
+- `npm test`: **mindestens 77/77 vor VANI 5.2.1; aktuelle Zahl nach Tests beachten**
 - `hosting/npm test`: **2/2 bestanden**
 - `hosting/npm run lint`: **sauber**
 - Windows-Paket wurde real gestartet und per CDP-Smoke-Test geprüft
 - Rich-Text-Autopaginierung: 850 Testwörter → 8 Seiten, kein Textverlust
 - Wortkisten: echte UI-, Such-, Daten- und Layoutprüfung bestanden
 - Desktopbreite und 390-Pixel-Handybreite: kein ungewollter Seitenüberlauf
-- Öffentliche App: HTTP 200, VANI 5.1 und Wortkisten-Code bestätigt
+- Einzige App-Adresse und Sync-Health werden nach jedem Deployment getrennt geprüft
 - Keine ungeklärten Testfehler
 
 ## 2. Weitere Übergabedokumente
@@ -643,7 +642,7 @@ Qualitätsstand: `npm test` 77/77, Hosting 2/2, Lint sauber, paketierter Desktop
 auf 5.2.0 bestanden, Browser-Verifikation von Anleitung, Formatleiste, Escape und
 Weiß-Thema.
 
-### Veröffentlichung — ehrlich beschrieben
+### Historischer Veröffentlichungs-Zwischenstand vor VANI 5.2.1
 
 - **GitHub / GitHub Pages:** `origin/main` wurde nach Nutzerfreigabe auf den lokalen
   Stand gepusht. `https://thekeveldikev.github.io/vani/` (Pages, Branch `main`,
@@ -659,7 +658,7 @@ Weiß-Thema.
 - Windows: `release/VANI-5.2.0-x64-Setup.exe` und `…-Portable.exe` lokal gebaut,
   nicht öffentlich verteilt.
 
-### Kopierfertiger Codex-Auftrag für das Sites-Update
+### Historischer Codex-Auftrag — nach Abschnitt 12 nicht mehr verwenden
 
     Arbeite in C:\Users\kevin\VANI. Der lokale Stand main = origin/main ist VANI
     5.2.0 und vollständig getestet (npm test 77/77, hosting npm test 2/2, lint sauber,
@@ -671,3 +670,57 @@ Weiß-Thema.
     hosting/.openai/hosting.json) speichern und öffentlich deployen. Keine zweite Site,
     keine Bindings ändern. Danach mit Cache-Busting prüfen, dass APP_VERSION 5.2.0
     ausgeliefert wird, und mir die Deploymentversion nennen.
+
+## 12. Verbindlicher Ein-Adress-Stand ab VANI 5.2.1
+
+Dieser Abschnitt ersetzt die Veröffentlichungsannahmen aus Abschnitt 11, soweit sie
+sich widersprechen.
+
+### Eine App, ein Icon
+
+Die einzige sichtbare und installierbare Web-App ist:
+
+    https://thekeveldikev.github.io/vani/
+
+Hier hängen iPad, iPhone, Android und Browser-PWA. Web-Updates werden nach Tests auf
+origin/main gepusht und kommen über den Service Worker hinter demselben Icon an.
+Claude kann diesen normalen Weg vollständig bedienen.
+
+### Sites ist kein zweites VANI mehr
+
+Die Adresse:
+
+    https://vani-schreibzuhause.craftkey.chatgpt.site
+
+ist ausschließlich Infrastruktur:
+
+- /v1 bleibt der Ende-zu-Ende-verschlüsselte Sync-Dienst;
+- normale Besuche der Startseite werden zur einzigen GitHub-App geleitet;
+- der frühere Sites-Service-Worker wird stillgelegt und seine Caches werden entfernt;
+- ein absichtlicher Rettungsmodus kann alte, nur unter dieser Origin vorhandene
+  lokale Daten noch öffnen, sichern oder synchronisieren;
+- die Rettungsfassung darf nicht neu zum Home-Bildschirm hinzugefügt werden.
+
+Dadurch gibt es für Nutzer keine zweite App, keine zweite Updatequelle und keinen
+zweiten normalen lokalen Bestand.
+
+### Profile, Accounts und Mehrgeräte-Sync
+
+- Profile sind weiterhin lokale Passwort-Türen pro Gerät.
+- Passwörter werden nicht übertragen und nicht serverseitig gespeichert.
+- Sarah und Kevin erhalten getrennte Profile und getrennte private Bereiche.
+- Nur Geräte mit demselben Kopplungscode teilen denselben Inhalt.
+- GitHub-PWA, Handy und Desktop verwenden alle den Sites-/v1-Tresor im Hintergrund.
+- Offlineänderungen warten lokal und werden später konfliktarm zusammengeführt.
+- Der Desktop bleibt eine eigene Hülle; sein Programmupdate braucht weiterhin eine
+  neue Setup-Datei, seine Inhalte synchronisieren dennoch live.
+
+### Wann Claude Sites braucht
+
+Bei normalen Änderungen an Oberfläche, Schreiben, Heften, Suche, Klang, Anleitung,
+Profilclient oder PWA braucht Claude Sites nicht. Bauen, testen und origin/main
+pushen genügt.
+
+Nur wenn hosting/worker, das v1-Protokoll, D1/R2, Serverlimits oder der Rettungsweg
+verändert werden, muss Codex das bestehende Sites-Projekt neu deployen. Das ist
+selten und kein Teil jedes App-Updates.

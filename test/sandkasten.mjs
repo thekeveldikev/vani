@@ -54,7 +54,7 @@ export function baueSandkasten() {
     console, setTimeout, clearTimeout, setInterval, clearInterval,
     queueMicrotask, Promise, JSON, Math, Date, Array, Object, String, Number,
     RegExp, Map, Set, Infinity, NaN, undefined, crypto: webcrypto,
-    TextEncoder, TextDecoder, Uint8Array, ArrayBuffer, DataView, Blob, URL,
+    TextEncoder, TextDecoder, Uint8Array, ArrayBuffer, DataView, Blob, URL, URLSearchParams,
     atob, btoa,
     indexedDB: fakeIndexedDB(),
     localStorage: (() => { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) }; })(),
@@ -66,7 +66,7 @@ export function baueSandkasten() {
     },
     window: { addEventListener() {}, removeEventListener() {} },
     navigator: {},
-    location: { hash: '', search: '', protocol: 'file:' }
+    location: { hash: '', search: '', protocol: 'file:', origin: 'null', hostname: '', pathname: '/' }
   };
   kontext.globalThis = kontext;
   vm.createContext(kontext);
@@ -76,7 +76,7 @@ export function baueSandkasten() {
   /* Top-Level-const/let landen im lexikalischen Scope, nicht am Global —
      hier holen wir alles heraus, was die Prüfungen brauchen. */
   const exporte = vm.runInContext(
-    '({ worte, uid, D, dbPut, dbGet, dbDel, dbAlle, esc, entprellt, tagKey, fmtDatum, fmtZeit, vorZeit, zufall, normalisiere, fastGleich, teileText, klugeZeichen, pruefeSicherung, saubererSyncMarker, sauberesDokument, uebernehmeEinstellungen, begrenze, freieSchnipselPosition, freieFlaechenGrenzen, seitenUmbruch, verbindeDocs, trenneDocs, beziehungenFuer, blattInHeft, seiteZuBlatt, merkeFadenZiel, findeWiederEchos, wiederFunde, eigeneFunken, goodnotesArt, goodnotesFingerabdruck, blobsGleich, formatBytes, profilSaubererName, profilSaubereRegistry, profilGleich, profilErstelle, profilPruefePasswort, profilLadeRegistry, richReinerText, richAusText, sauberesRichHTML, heftDeckelDaten, wortkisten, wortlisteAusText, woerterInKiste, fuegeWoerterHinzu, wortInKiste, loescheWortkiste, wortZufallsgriff, saubereMischung, mischungAnwenden, audioUnterstuetzt, audioZustand, audioNeuStarten, audioFreigeben, audioProbe, audioLautheitsKurve, neueWerkbank, IK, SAATWORTE, FUNKEN, FUNKE_FRAGEN, FUNKE_FORMEN, FUNKE_SAETZE, ALLE_RAEUME, speichereEinst, speichereStats, THEMEN, positioniere, leseLetzteSuchen, ANLEITUNG, anleitungSuche, anleitungHervorheben, syncStandardServer, SYNC_STANDARD_DIENST })',
+    '({ worte, uid, D, dbPut, dbGet, dbDel, dbAlle, esc, entprellt, tagKey, fmtDatum, fmtZeit, vorZeit, zufall, normalisiere, fastGleich, teileText, klugeZeichen, pruefeSicherung, saubererSyncMarker, sauberesDokument, uebernehmeEinstellungen, begrenze, freieSchnipselPosition, freieFlaechenGrenzen, seitenUmbruch, verbindeDocs, trenneDocs, beziehungenFuer, blattInHeft, seiteZuBlatt, merkeFadenZiel, findeWiederEchos, wiederFunde, eigeneFunken, goodnotesArt, goodnotesFingerabdruck, blobsGleich, formatBytes, profilSaubererName, profilSaubereRegistry, profilGleich, profilErstelle, profilPruefePasswort, profilLadeRegistry, richReinerText, richAusText, sauberesRichHTML, heftDeckelDaten, wortkisten, wortlisteAusText, woerterInKiste, fuegeWoerterHinzu, wortInKiste, loescheWortkiste, wortZufallsgriff, saubereMischung, mischungAnwenden, audioUnterstuetzt, audioZustand, audioNeuStarten, audioFreigeben, audioProbe, audioLautheitsKurve, neueWerkbank, IK, SAATWORTE, FUNKEN, FUNKE_FRAGEN, FUNKE_FORMEN, FUNKE_SAETZE, ALLE_RAEUME, speichereEinst, speichereStats, THEMEN, positioniere, leseLetzteSuchen, ANLEITUNG, anleitungSuche, anleitungHervorheben, syncStandardServer, SYNC_STANDARD_DIENST, VANI_HAUPTADRESSE, vaniAdresseArt })',
     kontext);
   Object.assign(kontext, exporte);
   return kontext;

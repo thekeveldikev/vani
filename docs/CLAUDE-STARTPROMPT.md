@@ -58,11 +58,17 @@ Wichtige Regeln:
 - Kein git reset --hard, kein Überschreiben fremder Änderungen.
 - Nicht zu GitHub pushen und nicht öffentlich deployen, solange ich es nicht für die
   konkrete Änderung freigegeben habe.
-- Für ein Sites-Update immer das bestehende Projekt verwenden:
-  URL: https://vani-schreibzuhause.craftkey.chatgpt.site
+- Die einzige sichtbare/installierbare Web-App ist:
+  https://thekeveldikev.github.io/vani/
+  Normale Web-Updates werden nach Freigabe über origin/main veröffentlicht; dafür
+  brauchst du kein Sites-Werkzeug.
+- Sites ist ausschließlich der unsichtbare verschlüsselte Sync-Hintergrund. Nur bei
+  Änderungen an hosting/worker, v1, D1/R2 oder Rettungsmodus braucht es ein
+  Sites-Update. Dann immer das bestehende Projekt verwenden:
+  Backend: https://vani-schreibzuhause.craftkey.chatgpt.site
   Projekt-ID: appgprj_6a8786eb79448191acff5186595d06ec
   Konfiguration: C:\Users\kevin\VANI\hosting\.openai\hosting.json
-  Lege für ein normales Update keine zweite Site an.
+  Lege keine zweite Site und keine zweite sichtbare App an.
 - Die Desktop-App hat Electron und Windows-Setup/Portable. Der öffentliche native
   Auto-Updatefeed ist noch nicht konfiguriert; behaupte nicht, er sei fertig.
 - Goodnotes ist ein stiller Archivimport, kein echter Live-Zweiwegesync.
@@ -72,16 +78,17 @@ Wichtige Regeln:
 
 Aktueller verifizierter Qualitätsstand vor deiner nächsten Änderung:
 
-- Appversion 5.1.0
-- npm test: 69/69
+- Appversion mindestens 5.2.1
+- npm test: 77/77 einschließlich der Ein-Adress-Erweiterung; aktuelle Suite komplett ausführen
 - Hostingtests: 2/2
 - Hostinglint: sauber
 - paketierter Windows-CDP-Smoke: bestanden
 - Rich-Autopaginierung: 850 Wörter auf 8 Seiten, kein Textverlust
 - Wortkisten-UI, Suche und Responsive-Layout: bestanden
 
-Die öffentliche App ist bereits VANI 5.1, obwohl GitHub noch zurückliegt. Lokale
-Git-Historie, öffentliche Sites-Historie und Windows-Releases sind getrennte Dinge.
+GitHub Pages ist die einzige Web-App. Sites bewahrt nur verschlüsselte Syncpakete und
+leitet normale Startseitenbesuche zur GitHub-App. Windows-Releases bleiben ein
+getrennter nativer Auslieferungsweg.
 
 Arbeitsweise für meine nächste Aufgabe:
 

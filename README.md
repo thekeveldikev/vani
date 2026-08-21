@@ -40,9 +40,18 @@ Schnipsel auf Seiten oder Cluster und Hefte in Projekte gelegt werden.
 
 ## Aufs iPad
 
-1. Die gehostete Adresse einmal in Safari öffnen
+Die **eine offizielle Web-App-Adresse** ist:
+
+    https://thekeveldikev.github.io/vani/
+
+1. Diese Adresse einmal in Safari öffnen
 2. Teilen → **„Zum Home-Bildschirm"**
 3. Ab dann: eigenes Icon, Vollbild ohne Safari-Leisten, komplett offline
+
+Die technische Sites-Adresse ist keine zweite App mehr. Sie bewahrt nur
+Ende-zu-Ende-verschlüsselte Sync-Pakete auf und leitet normale Besuche zur
+offiziellen Adresse weiter. Dadurch kann Claude Web-Updates weiterhin einfach über
+GitHub veröffentlichen, während iPad, Handy und Desktop trotzdem synchron bleiben.
 
 **Wichtig:** Vor einem Umzug oder Entfernen und regelmäßig über **Feinheiten →
 Alles sichern** eine `.vani`-Datei erzeugen. Eine Synchronisation ist bequem,

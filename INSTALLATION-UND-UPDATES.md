@@ -1,5 +1,14 @@
 # VANI installieren, umziehen und aktualisieren
 
+## Die eine feste Adresse
+
+Für iPad, Handy und Laptop-Browser gilt nur:
+
+    https://thekeveldikev.github.io/vani/
+
+Die Sites-Adresse ist ausschließlich der unsichtbare verschlüsselte Sync-Tresor.
+Sie ist keine zweite installierbare VANI-App mehr.
+
 ## Für deine Cousine: einmal sicher auf die feste Adresse umziehen
 
 Wenn ihr bisher eine Vorschau- oder alte Adresse benutzt habt, ist **ein letzter
@@ -8,13 +17,17 @@ Daten verschiedener Web-Adressen vollständig.
 
 1. Im alten VANI: **Feinheiten → Alles sichern**. Die `.vani`-Datei in „Dateien“
    aufheben.
-2. Die feste neue VANI-Adresse in Safari öffnen.
+2. https://thekeveldikev.github.io/vani/ in Safari öffnen.
 3. Teilen → **Zum Home-Bildschirm**.
 4. Im neuen VANI: **Feinheiten → Sicherung einlesen** und die Datei wählen.
 5. Erst prüfen, ob alles da ist. Dann darf das alte Icon entfernt werden.
 
 Ab diesem Umzug bleibt dasselbe Icon. Neue Web-Fassungen kommen automatisch
 hinter diesem Icon an; notfalls **Feinheiten → Nach neuer Fassung sehen**.
+
+Falls versehentlich einmal die frühere Sites-App benutzt wurde, bleibt ein bewusster
+Rettungszugang erhalten. Er wird nur zum Sichern oder Abgleichen alter lokaler Daten
+verwendet; im Alltag niemals als zweites Icon installieren.
 
 ## Getrennte Personen, getrennte Bereiche
 
@@ -27,6 +40,11 @@ hinter diesem Icon an; notfalls **Feinheiten → Nach neuer Fassung sehen**.
 
 Der Kopplungscode ist ein Hausschlüssel. Wer ihn hat, kann den ganzen Bereich
 lesen. Darum nur direkt auf das eigene oder wirklich vertraute Gerät kopieren.
+
+Profile und Bereich sind getrennt: Auf jedem neuen Gerät wird zunächst eine lokale
+Passwort-Tür angelegt. Danach verbindet der persönliche Kopplungscode genau diesen
+Bestand. Sarah und Kevin verwenden unterschiedliche Codes und bleiben vollständig
+getrennt.
 
 ## Windows
 

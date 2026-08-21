@@ -1214,6 +1214,40 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 .anleitung-karte-text small { font-size: 13px; color: var(--blass); line-height: 1.45; }
 .anleitung-karte-pfeil { display: flex; color: var(--blass); flex: none; }
 
+/* Eine einzige App-Adresse, plus ein sicherer Rettungsweg für den alten Host. */
+.hauptadresse-abschnitt { margin-top: 2px; }
+.hauptadresse-karte {
+  position: relative; display: grid; grid-template-columns: 52px minmax(0, 1fr);
+  gap: 4px 14px; overflow: hidden; padding: 19px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--karte) 94%, var(--akzent)), var(--karte));
+}
+.hauptadresse-karte::after {
+  content: ""; position: absolute; inset: 0 0 auto; height: 3px;
+  background: linear-gradient(90deg, var(--akzent), var(--gold)); opacity: .72;
+}
+.hauptadresse-karte.umzug::after { background: linear-gradient(90deg, #ad704f, var(--gold)); }
+.hauptadresse-siegel {
+  grid-row: 1 / span 3; width: 46px; height: 46px; display: grid; place-items: center;
+  border-radius: 50%; color: var(--papier); background: var(--akzent);
+  box-shadow: 0 5px 15px color-mix(in srgb, var(--akzent) 24%, transparent);
+}
+.hauptadresse-siegel svg { width: 21px; height: 21px; }
+.hauptadresse-karte.umzug .hauptadresse-siegel { background: #8c5b42; }
+.hauptadresse-text { min-width: 0; }
+.hauptadresse-text b { font: 600 18px/1.3 ui-serif, "New York", Georgia, serif; }
+.hauptadresse-text p { margin: 5px 0 9px; color: var(--blass); font-size: 13.5px; line-height: 1.55; }
+.hauptadresse-text code {
+  display: block; overflow: hidden; padding: 8px 10px; border-radius: 9px;
+  color: var(--tinte); background: var(--hg2); box-shadow: inset 0 0 0 1px var(--linie);
+  font: 11.5px/1.35 ui-monospace, SFMono-Regular, Consolas, monospace; text-overflow: ellipsis;
+}
+.hauptadresse-schritte {
+  grid-column: 2; margin: 8px 0 2px 18px; color: var(--blass);
+  font-size: 13px; line-height: 1.55;
+}
+.hauptadresse-aktionen { grid-column: 2; margin-top: 10px; }
+.hauptadresse-aktionen a { text-decoration: none; }
+
 @media (max-width: 760px) {
   .anleitung-koerper { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
   .anleitung-nav { flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 10px 16px; gap: 6px; scrollbar-width: none; }
@@ -1221,4 +1255,8 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
   .anleitung-navknopf { flex: none; white-space: nowrap; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
   .anleitung-kopf, .anleitung-inhalt { padding-left: 16px; padding-right: 16px; }
   .anleitung-kapitelkopf h2 { font-size: 21px; }
+  .hauptadresse-karte { grid-template-columns: 42px minmax(0, 1fr); gap: 6px 11px; padding: 16px; }
+  .hauptadresse-siegel { width: 39px; height: 39px; }
+  .hauptadresse-schritte, .hauptadresse-aktionen { grid-column: 1 / -1; }
+  .hauptadresse-aktionen .knopf { flex: 1 1 150px; justify-content: center; }
 }

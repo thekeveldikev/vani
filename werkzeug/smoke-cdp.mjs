@@ -95,11 +95,17 @@ const uiPruefung = await sende('Runtime.evaluate', {
     const wortSuche = woerterInKiste(wortkiste.id, 'wasser');
     location.hash = '#/woerter'; zeichne();
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const wortkistenUI = document.querySelectorAll('.wortkiste-mini').length >= 3 && !!document.querySelector('.wortkisten-arbeit');
+    const wortkistenUeberlauf = document.documentElement.scrollWidth <= innerWidth + 1;
+    location.hash = '#/feinheiten'; zeichne();
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const adresskarte = !!document.querySelector('.hauptadresse-karte.desktop') &&
+      document.querySelector('.hauptadresse-karte')?.textContent.includes('Desktop und Web gehören zusammen');
+    const adressUeberlauf = document.documentElement.scrollWidth <= innerWidth + 1;
     return { heft:heft.id, seiten:seiten.length, rich:seiten.every((s) => s.format === 'rich'), textVollstaendig:gesamt === erwartet,
       eigeneFunken:eigeneFunken().length, ueberlauf:document.documentElement.scrollWidth <= innerWidth + 1,
       editorPasst, wortkisten:wortkisten().length, woerter:woerterInKiste(wortkiste.id).length, wortSuche:wortSuche.length,
-      wortkistenUI:document.querySelectorAll('.wortkiste-mini').length >= 3 && !!document.querySelector('.wortkisten-arbeit'),
-      wortkistenUeberlauf:document.documentElement.scrollWidth <= innerWidth + 1,
+      wortkistenUI, wortkistenUeberlauf, adresskarte, adressUeberlauf,
       sauber:!sauberesRichHTML('<b onclick="x()">gut</b><script>boese()</script>').includes('onclick') };
   })()`, returnByValue: true, awaitPromise: true
 });
@@ -107,7 +113,8 @@ if (uiPruefung.exceptionDetails) throw new Error(uiPruefung.exceptionDetails.exc
 if (!uiPruefung.result || !uiPruefung.result.value) throw new Error('UI-Prüfung gab kein Ergebnis zurück');
 if (uiPruefung.result.value.seiten < 2 || !uiPruefung.result.value.rich || !uiPruefung.result.value.textVollstaendig ||
     !uiPruefung.result.value.ueberlauf || !uiPruefung.result.value.editorPasst || !uiPruefung.result.value.sauber ||
-    uiPruefung.result.value.woerter < 4 || uiPruefung.result.value.wortSuche < 1 || !uiPruefung.result.value.wortkistenUI || !uiPruefung.result.value.wortkistenUeberlauf) {
+    uiPruefung.result.value.woerter < 4 || uiPruefung.result.value.wortSuche < 1 || !uiPruefung.result.value.wortkistenUI ||
+    !uiPruefung.result.value.wortkistenUeberlauf || !uiPruefung.result.value.adresskarte || !uiPruefung.result.value.adressUeberlauf) {
   throw new Error('UI-Regressionsprüfung fehlgeschlagen: ' + JSON.stringify(uiPruefung.result.value));
 }
 const auswertung = await sende('Runtime.evaluate', {

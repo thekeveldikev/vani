@@ -11,6 +11,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="VANI">
 <meta name="theme-color" content="#efe7d8">
+<link rel="canonical" href="https://thekeveldikev.github.io/vani/">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" href="icons/icon-192.png">
@@ -1232,6 +1233,40 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 .anleitung-karte-text small { font-size: 13px; color: var(--blass); line-height: 1.45; }
 .anleitung-karte-pfeil { display: flex; color: var(--blass); flex: none; }
 
+/* Eine einzige App-Adresse, plus ein sicherer Rettungsweg für den alten Host. */
+.hauptadresse-abschnitt { margin-top: 2px; }
+.hauptadresse-karte {
+  position: relative; display: grid; grid-template-columns: 52px minmax(0, 1fr);
+  gap: 4px 14px; overflow: hidden; padding: 19px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--karte) 94%, var(--akzent)), var(--karte));
+}
+.hauptadresse-karte::after {
+  content: ""; position: absolute; inset: 0 0 auto; height: 3px;
+  background: linear-gradient(90deg, var(--akzent), var(--gold)); opacity: .72;
+}
+.hauptadresse-karte.umzug::after { background: linear-gradient(90deg, #ad704f, var(--gold)); }
+.hauptadresse-siegel {
+  grid-row: 1 / span 3; width: 46px; height: 46px; display: grid; place-items: center;
+  border-radius: 50%; color: var(--papier); background: var(--akzent);
+  box-shadow: 0 5px 15px color-mix(in srgb, var(--akzent) 24%, transparent);
+}
+.hauptadresse-siegel svg { width: 21px; height: 21px; }
+.hauptadresse-karte.umzug .hauptadresse-siegel { background: #8c5b42; }
+.hauptadresse-text { min-width: 0; }
+.hauptadresse-text b { font: 600 18px/1.3 ui-serif, "New York", Georgia, serif; }
+.hauptadresse-text p { margin: 5px 0 9px; color: var(--blass); font-size: 13.5px; line-height: 1.55; }
+.hauptadresse-text code {
+  display: block; overflow: hidden; padding: 8px 10px; border-radius: 9px;
+  color: var(--tinte); background: var(--hg2); box-shadow: inset 0 0 0 1px var(--linie);
+  font: 11.5px/1.35 ui-monospace, SFMono-Regular, Consolas, monospace; text-overflow: ellipsis;
+}
+.hauptadresse-schritte {
+  grid-column: 2; margin: 8px 0 2px 18px; color: var(--blass);
+  font-size: 13px; line-height: 1.55;
+}
+.hauptadresse-aktionen { grid-column: 2; margin-top: 10px; }
+.hauptadresse-aktionen a { text-decoration: none; }
+
 @media (max-width: 760px) {
   .anleitung-koerper { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
   .anleitung-nav { flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 10px 16px; gap: 6px; scrollbar-width: none; }
@@ -1239,6 +1274,10 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
   .anleitung-navknopf { flex: none; white-space: nowrap; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
   .anleitung-kopf, .anleitung-inhalt { padding-left: 16px; padding-right: 16px; }
   .anleitung-kapitelkopf h2 { font-size: 21px; }
+  .hauptadresse-karte { grid-template-columns: 42px minmax(0, 1fr); gap: 6px 11px; padding: 16px; }
+  .hauptadresse-siegel { width: 39px; height: 39px; }
+  .hauptadresse-schritte, .hauptadresse-aktionen { grid-column: 1 / -1; }
+  .hauptadresse-aktionen .knopf { flex: 1 1 150px; justify-content: center; }
 }
 
 </style>
@@ -1267,7 +1306,26 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.2.0';
+const APP_VERSION = '5.2.1';
+/* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
+   die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
+   verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
+const VANI_HAUPTADRESSE = 'https://thekeveldikev.github.io/vani/';
+
+function vaniAdresseArt(standort = location) {
+  const protokoll = String(standort && standort.protocol || '');
+  const origin = String(standort && standort.origin || '');
+  const host = String(standort && standort.hostname || '');
+  const suche = String(standort && standort.search || '');
+  if (protokoll === 'vani:') return 'desktop';
+  if (/^https?:$/.test(protokoll) && /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(host)) return 'lokal';
+  try {
+    if (new URL(VANI_HAUPTADRESSE).origin === origin && /^\/vani(?:\/|$)/.test(String(standort.pathname || '/'))) return 'haupt';
+  } catch (e) {}
+  if (host === 'vani-schreibzuhause.craftkey.chatgpt.site' && new URLSearchParams(suche).get('rettung') === '1') return 'rettung';
+  if (host === 'vani-schreibzuhause.craftkey.chatgpt.site') return 'dienst';
+  return 'andere';
+}
 const $ = (s, w) => (w || document).querySelector(s);
 const $$ = (s, w) => [...(w || document).querySelectorAll(s)];
 const uid = () => (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function')
@@ -2367,8 +2425,8 @@ function syncSaubereConfig(c) {
       !/^[A-Za-z0-9_-]{40,180}$/.test(c.token || '') || !/^[A-Za-z0-9_-]{40,80}$/.test(c.key || '')) return null;
   return { v: 1, name: String(c.name || 'Mein Bereich').slice(0, 80), server, vault: c.vault, token: c.token, key: c.key };
 }
-/* Der öffentliche VANI-Sync-Dienst. Wird vorgeschlagen, wo die App selbst keinen
-   Dienst mitbringt — als reine Seite auf GitHub Pages oder aus einer Datei. */
+/* Der unsichtbare öffentliche VANI-Sync-Dienst. Die sichtbare App hat genau
+   eine andere, feste Adresse; nur die verschlüsselten Pakete gehen hierhin. */
 const SYNC_STANDARD_DIENST = 'https://vani-schreibzuhause.craftkey.chatgpt.site';
 async function syncStandardServer() {
   try {
@@ -2379,11 +2437,8 @@ async function syncStandardServer() {
     }
   } catch (e) {}
   const origin = String(location.origin || '');
-  const host = String(location.hostname || '');
   const lokal = /^http:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(origin);
-  const reineSeite = /\.github\.io$/i.test(host) || /\.pages\.dev$/i.test(host);
   if (lokal) return origin;
-  if (location.protocol === 'https:' && !reineSeite) return origin;
   return SYNC_STANDARD_DIENST;
 }
 async function syncLadeConfig() {
@@ -6839,6 +6894,79 @@ async function vorhandenenSyncBereichKoppeln() {
   catch (e) { toast((e && e.message) || 'Der Kopplungscode ließ sich nicht verbinden.', 5000); }
 }
 
+async function kopiereVaniAdresse() {
+  try { await navigator.clipboard.writeText(VANI_HAUPTADRESSE); toast('Die einzige VANI-Adresse ist kopiert.'); }
+  catch (e) { await teileText(VANI_HAUPTADRESSE); }
+}
+
+async function kopiereSyncKopplungscode() {
+  if (!syncIstVerbunden()) return false;
+  if (!await frage('Der Kopplungscode öffnet deinen ganzen privaten Bereich. Nur auf einem eigenen oder wirklich vertrauten Gerät verwenden.', { ja: 'Code kopieren' })) return false;
+  const code = syncKopplungscode();
+  try { await navigator.clipboard.writeText(code); toast('Kopplungscode kopiert.'); }
+  catch (e) { await teileText(code); }
+  return true;
+}
+
+function vaniHauptadresseKnopf(text = 'VANI öffnen') {
+  return el('a', {
+    class: 'knopf voll', href: VANI_HAUPTADRESSE, target: '_blank',
+    rel: 'noopener noreferrer'
+  }, el('span', { html: ik('rechts'), style: 'display:flex' }), text);
+}
+
+function vaniAdresskarte() {
+  const art = vaniAdresseArt();
+  if (art === 'lokal') return null;
+  if (art === 'haupt') {
+    return el('div', { class: 'karte hauptadresse-karte richtig' },
+      el('span', { class: 'hauptadresse-siegel', html: ik('zuhause') }),
+      el('div', { class: 'hauptadresse-text' },
+        el('b', {}, 'Hier bist du richtig — das ist VANI.'),
+        el('p', {}, 'Diese eine Adresse ist für iPad, Handy und Browser. Updates kommen hier hinter demselben Icon an. Der verschlüsselte Tresor arbeitet unsichtbar im Hintergrund.'),
+        el('code', {}, VANI_HAUPTADRESSE)),
+      el('div', { class: 'fussreihe hauptadresse-aktionen' },
+        el('button', { class: 'knopf', onclick: () => kopiereVaniAdresse() }, 'Adresse kopieren')));
+  }
+  if (art === 'desktop') {
+    return el('div', { class: 'karte hauptadresse-karte desktop' },
+      el('span', { class: 'hauptadresse-siegel', html: ik('verbinden') }),
+      el('div', { class: 'hauptadresse-text' },
+        el('b', {}, 'Desktop und Web gehören zusammen.'),
+        el('p', {}, 'Die Desktop-App koppelt sich mit demselben privaten Bereich. Im Browser gibt es nur diese eine VANI-Adresse:'),
+        el('code', {}, VANI_HAUPTADRESSE)),
+      el('div', { class: 'fussreihe hauptadresse-aktionen' },
+        vaniHauptadresseKnopf('Web-App öffnen'),
+        el('button', { class: 'knopf', onclick: () => kopiereVaniAdresse() }, 'Adresse kopieren')));
+  }
+  if (art === 'rettung' || art === 'dienst') {
+    const verbunden = syncIstVerbunden();
+    return el('div', { class: 'karte hauptadresse-karte umzug' },
+      el('span', { class: 'hauptadresse-siegel', html: ik('wieder') }),
+      el('div', { class: 'hauptadresse-text' },
+        el('b', {}, 'Rettungsmodus der früheren zweiten Adresse'),
+        el('p', {}, 'Hier kannst du einen alten lokalen Bestand noch sichern oder vollständig abgleichen. Danach öffnest du das eine offizielle VANI auf GitHub. Nichts wird automatisch gelöscht.'),
+        el('code', {}, VANI_HAUPTADRESSE)),
+      el('ol', { class: 'hauptadresse-schritte' },
+        el('li', {}, 'Zuerst eine Sicherung erzeugen.'),
+        el('li', {}, verbunden ? 'Jetzt abgleichen und den Kopplungscode kopieren.' : 'Einen privaten Bereich anlegen oder später die Sicherung einlesen.'),
+        el('li', {}, 'Die Hauptadresse öffnen und dort einmal zum Home-Bildschirm hinzufügen.')),
+      el('div', { class: 'fussreihe hauptadresse-aktionen' },
+        el('button', { class: 'knopf', onclick: () => sichereAlles() }, '1 · Alles sichern'),
+        verbunden
+          ? el('button', { class: 'knopf', onclick: async () => { toast('Gleiche vollständig ab …'); await syncJetzt(); await kopiereSyncKopplungscode(); } }, '2 · Abgleichen & Code')
+          : el('button', { class: 'knopf', onclick: () => neuerSyncBereich() }, '2 · Bereich anlegen'),
+        vaniHauptadresseKnopf('3 · Hauptadresse öffnen')));
+  }
+  return el('div', { class: 'karte hauptadresse-karte umzug' },
+    el('span', { class: 'hauptadresse-siegel', html: ik('zuhause') }),
+    el('div', { class: 'hauptadresse-text' },
+      el('b', {}, 'Das ist eine Vorschau, nicht deine feste VANI-Adresse.'),
+      el('p', {}, 'Für den normalen Alltag, Updates und dein Home-Bildschirm-Icon bitte immer die eine Hauptadresse benutzen.'),
+      el('code', {}, VANI_HAUPTADRESSE)),
+    el('div', { class: 'fussreihe hauptadresse-aktionen' }, vaniHauptadresseKnopf('Hauptadresse öffnen')));
+}
+
 RENDER.feinheiten = function (haupt) {
   haupt.append(raumkopf('Feinheiten', null,
     el('button', { class: 'rundknopf zart', html: ik('lesen'), title: 'Die Anleitung aufschlagen', onclick: () => oeffneAnleitung() })));
@@ -6851,6 +6979,10 @@ RENDER.feinheiten = function (haupt) {
       el('b', {}, 'Die Anleitung'),
       el('small', {}, 'Alles, was VANI kann — Raum für Raum, durchsuchbar, mit Beispielen. Von mir aufgeschrieben.')),
     el('span', { class: 'anleitung-karte-pfeil', html: ik('rechts') })));
+
+  /* Eine sichtbare App-Adresse; der Sites-Host ist nur noch Sync-Hintergrund. */
+  const adresskarte = vaniAdresskarte();
+  if (adresskarte) inhalt.append(el('div', { class: 'abschnitt hauptadresse-abschnitt' }, el('h2', {}, 'Dein einziges VANI'), adresskarte));
 
   /* Thema */
   const THEMA_INFO = [
@@ -7083,12 +7215,8 @@ RENDER.feinheiten = function (haupt) {
             el('span', {}, 'Der Kopplungscode ist wie ein Hausschlüssel. Schicke ihn nur direkt an ein Gerät, das in genau diesen Bereich gehört.')),
           el('div', { class: 'fussreihe' },
             el('button', { class: 'knopf voll', onclick: async () => { toast('Gleiche ab …'); await syncJetzt(); zeichne(); } }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Jetzt abgleichen'),
-            el('button', { class: 'knopf', onclick: async () => {
-              if (!await frage('Der Kopplungscode öffnet deinen ganzen privaten Bereich. Nur auf einem eigenen oder wirklich vertrauten Gerät verwenden.', { ja: 'Code kopieren' })) return;
-              const code = syncKopplungscode();
-              try { await navigator.clipboard.writeText(code); toast('Kopplungscode kopiert.'); }
-              catch (e) { await teileText(code); }
-            } }, el('span', { html: ik('verbinden'), style: 'display:flex' }), 'Weiteres Gerät koppeln'),
+            el('button', { class: 'knopf', onclick: () => kopiereSyncKopplungscode() },
+              el('span', { html: ik('verbinden'), style: 'display:flex' }), 'Weiteres Gerät koppeln'),
             el('button', { class: 'knopf zart', onclick: async () => {
               if (!await frage('Nur dieses Gerät vom Bereich trennen? Die Inhalte bleiben hier erhalten; die anderen Geräte und der Bereich bleiben unberührt.', { ja: 'Dieses Gerät trennen' })) return;
               await syncTrennen(); toast('Dieses Gerät arbeitet wieder nur für sich.'); zeichne();
@@ -8648,8 +8776,8 @@ const ANLEITUNG = [
     id: 'geraete', titel: 'Mehrere Geräte', icon: 'verbinden', raum: 'feinheiten',
     kurz: 'iPad, Laptop und Handy halten sich gegenseitig aktuell — verschlüsselt.',
     abschnitte: [
-      { t: 'Der private Bereich', p: ['Ein Bereich ist mein verschlüsselter Stapel auf einem Sync-Dienst. Der Dienst sieht nur Geheimtext; den Schlüssel haben nur meine Geräte. Ohne Bereich bleibt jedes Gerät für sich — das ist der Standard.'] },
-      { t: 'Anlegen', s: ['Feinheiten → „iPad ↔ Laptop ↔ weitere Geräte" → „Neuen privaten Bereich".', 'Einen Namen geben. Die Adresse des Dienstes ist vorausgefüllt.', 'Fertig — alles, was auf diesem Gerät liegt, nimmt der Bereich mit.'] },
+      { t: 'Der private Bereich', p: ['Ein Bereich ist mein verschlüsselter Stapel in VANIs unsichtbarem Tresor. Der Tresor sieht nur Geheimtext; den Schlüssel haben nur meine Geräte. Ohne Bereich bleibt jedes Gerät für sich — das ist der Standard. Die Tresoradresse muss ich im Alltag nie öffnen.'] },
+      { t: 'Anlegen', s: ['Feinheiten → „iPad ↔ Laptop ↔ weitere Geräte" → „Neuen privaten Bereich".', 'Einen Namen geben. Der richtige VANI-Tresor ist bereits vorausgefüllt.', 'Fertig — alles, was auf diesem Gerät liegt, nimmt der Bereich mit.'] },
       { t: 'Ein zweites Gerät koppeln', s: ['Auf dem ersten Gerät: „Weiteres Gerät koppeln" → der Kopplungscode (VANI1-…) wird kopiert.', 'Den Code zum zweiten Gerät bringen — Nachricht an mich selbst, Mail, egal.', 'Dort: „Mit Bereich verbinden" → Code einfügen → „Beides zusammenlegen" oder „Diesen Gerätebestand ersetzen".'], p: ['Der Code ist wie ein Hausschlüssel: wer ihn hat, sieht den Bereich. Nur an eigene Geräte geben.'], b: 'Auf dem iPad Bereich anlegen, Code per WhatsApp an mich schicken, am Laptop einfügen. Ab da schreibe ich am Laptop weiter, was ich am iPad angefangen habe.' },
       { t: 'Was mitreist', p: ['Texte, Hefte, Seiten, Zettel, Projekte, Szenen, Bretter, Blasen, Wörter, Funken, Beziehungen, Fotos, Kritzeleien, Einstellungen und Zählungen. Goodnotes-Originale nur, wenn „Goodnotes-Originaldateien mitsenden" an ist.'] },
       { t: 'Gleichzeitig und offline', p: ['Offline schreiben ist in Ordnung — Änderungen warten und gehen beim nächsten Netz weiter. Schreiben zwei Geräte gleichzeitig am selben Text, werden die Änderungen zusammengeführt, nicht überschrieben.'] },
@@ -8661,10 +8789,11 @@ const ANLEITUNG = [
     id: 'installation', titel: 'Geräte, Installation & Updates', icon: 'wieder', raum: 'feinheiten',
     kurz: 'Wie VANI aufs iPad, aufs Handy und auf den Laptop kommt — und wie es aktuell bleibt.',
     abschnitte: [
-      { t: 'iPad und iPhone', s: ['Die VANI-Adresse in Safari öffnen.', 'Teilen-Symbol (Viereck mit Pfeil) → „Zum Home-Bildschirm".', 'Ab jetzt über das Icon starten — Vollbild, ohne Safari-Leiste, offline.'], p: ['Kein App Store nötig. Das geht auch auf einem Schul-iPad, solange Safari Webseiten öffnen darf.'] },
-      { t: 'Android-Handy', s: ['Adresse in Chrome öffnen.', 'Menü (drei Punkte) → „Zum Startbildschirm hinzufügen" oder „App installieren".'] },
-      { t: 'Windows-Laptop', p: ['Entweder die Adresse im Browser öffnen (Chrome, Edge: dort gibt es „App installieren" in der Adressleiste) — oder die Desktop-App: VANI-x64-Setup.exe installiert sie, VANI-x64-Portable.exe läuft ohne Installation.'] },
-      { t: 'Updates hinter demselben Icon', p: ['Ein Icon genügt für immer. Solange die Adresse gleich bleibt, ersetzen neue Fassungen die App still hinter demselben Icon — ich muss nie wieder „Zum Home-Bildschirm" wählen. Beim Start holt VANI sich im Hintergrund die neue Fassung; unten erscheint dann „Eine neue Fassung liegt bereit → Neu laden". Oder: Feinheiten → „VANI jetzt aktualisieren".'], b: 'Am Laptop wurde etwas an VANI gebaut und veröffentlicht. Am iPad öffne ich VANI, tippe in den Feinheiten auf „VANI jetzt aktualisieren" — fertig. Meine Texte bleiben, wo sie sind.' },
+      { t: 'Eine einzige Web-Adresse', p: ['Für iPad, iPhone, Android und Laptop-Browser gibt es genau ein sichtbares VANI: https://thekeveldikev.github.io/vani/ — andere technische Adressen sind keine zweite App und müssen nicht geöffnet oder installiert werden.'] },
+      { t: 'iPad und iPhone', s: ['https://thekeveldikev.github.io/vani/ in Safari öffnen.', 'Teilen-Symbol (Viereck mit Pfeil) → „Zum Home-Bildschirm".', 'Ab jetzt über dieses eine Icon starten — Vollbild, ohne Safari-Leiste, offline.'], p: ['Kein App Store nötig. Das geht auch auf einem Schul-iPad, solange Safari Webseiten öffnen darf.'] },
+      { t: 'Android-Handy', s: ['https://thekeveldikev.github.io/vani/ in Chrome öffnen.', 'Menü (drei Punkte) → „Zum Startbildschirm hinzufügen" oder „App installieren".'] },
+      { t: 'Windows-Laptop', p: ['Entweder https://thekeveldikev.github.io/vani/ im Browser öffnen (Chrome, Edge: dort gibt es „App installieren" in der Adressleiste) — oder die Desktop-App: VANI-x64-Setup.exe installiert sie, VANI-x64-Portable.exe läuft ohne Installation.'] },
+      { t: 'Updates hinter demselben Icon', p: ['Ein Icon genügt für immer. Änderungen, die Claude oder Codex auf GitHub veröffentlichen, ersetzen die App hinter diesem Icon — ich muss nie wieder „Zum Home-Bildschirm" wählen. Beim Start holt VANI sich im Hintergrund die neue Fassung; unten erscheint dann „Eine neue Fassung liegt bereit → Neu laden". Oder: Feinheiten → „VANI jetzt aktualisieren".'], b: 'Claude hat etwas an VANI gebaut und auf GitHub veröffentlicht. Am iPad öffne ich mein einziges VANI-Icon, tippe in den Feinheiten auf „VANI jetzt aktualisieren" — fertig. Meine Texte bleiben, wo sie sind.' },
       { t: 'Desktop-App aktualisieren', p: ['Die Windows-App aktualisiert sich noch nicht selbst. Eine neue Setup-Datei einfach über die alte installieren — Inhalte bleiben.'] },
       { t: 'Offline', p: ['Nach dem ersten Öffnen läuft VANI komplett ohne Internet. Internet braucht es nur für Updates, für den Sync und zum Hereinholen des Fadens.'] },
       { t: 'Wenn das alte Icon weg soll', p: ['Icon lange halten → „App entfernen". Zeigt es kein Minus, ist das iPad verwaltet: Einstellungen → Bildschirmzeit → Beschränkungen → Apps löschen → Erlauben, oder die Verwaltung fragen. Vorher sichern, falls Inhalte am alten Icon hängen.'] }
@@ -8910,6 +9039,11 @@ async function sucheAppUpdate(neuLaden = false) {
   setzeThema(D.einst.thema);
   baueLeiste();
   zeichne();
+  if (vaniAdresseArt() === 'rettung') {
+    setTimeout(() => toastMitAktion('Du bist im Rettungsmodus der früheren zweiten Adresse.', 'Sicher umziehen', () => {
+      location.hash = '#/feinheiten'; zeichne();
+    }, 20000), 900);
+  }
   if (typeof profilStarteAutosperre === 'function') profilStarteAutosperre();
 
   /* Der Start wird nicht vom Netz blockiert: Erst ist alles lokal da, dann

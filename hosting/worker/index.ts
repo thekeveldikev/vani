@@ -14,6 +14,7 @@ interface ExecutionContext { waitUntil(promise: Promise<unknown>): void; passThr
 const ID_RE = /^[A-Za-z0-9_-]{20,100}$/;
 const TOKEN_RE = /^[A-Za-z0-9_-]{40,180}$/;
 const B64_RE = /^[A-Za-z0-9_-]+$/;
+const VANI_HAUPTADRESSE = "https://thekeveldikev.github.io/vani/";
 const VANI_DATEIEN = new Set(["/index.html", "/manifest.json", "/sw.js", "/faden.enc", "/robots.txt"]);
 const rate = new Map<string, { seit: number; zahl: number }>();
 let schemaBereit: Promise<void> | null = null;
@@ -172,6 +173,44 @@ const worker = {
     const url = new URL(request.url);
     const apiAntwort = await api(request, env, url);
     if (apiAntwort) return apiAntwort;
+    /* Sites ist ab VANI 5.2.1 ausschließlich der verschlüsselte Hintergrund.
+       Seine frühere App-Startseite erzeugt keinen zweiten lokalen Datenbestand
+       mehr. Ein bewusst aufgerufener Rettungsmodus lässt alte Origin-Daten noch
+       sichern, ohne sich erneut als PWA zu installieren. */
+    if (url.pathname === "/" || url.pathname === "/index.html") {
+      if (url.searchParams.get("rettung") !== "1") {
+        return new Response(null, {
+          status: 302,
+          headers: {
+            Location: VANI_HAUPTADRESSE,
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Referrer-Policy": "no-referrer",
+          },
+        });
+      }
+      const antwort = await env.ASSETS.fetch(new Request(new URL("/index.html", request.url), request));
+      const headers = new Headers(antwort.headers);
+      headers.set("Cache-Control", "no-store");
+      headers.set("X-Robots-Tag", "noindex, nofollow");
+      headers.set("X-Content-Type-Options", "nosniff");
+      headers.set("Referrer-Policy", "no-referrer");
+      return new Response(antwort.body, { status: antwort.status, headers });
+    }
+    if (url.pathname === "/sw.js") {
+      const stilllegung = [
+        "self.addEventListener('install',e=>e.waitUntil(self.skipWaiting()));",
+        "self.addEventListener('activate',e=>e.waitUntil(Promise.all([caches.keys().then(k=>Promise.all(k.map(x=>caches.delete(x)))),self.registration.unregister(),self.clients.claim()])));",
+      ].join("\n");
+      return new Response(stilllegung, {
+        headers: {
+          "Content-Type": "text/javascript; charset=utf-8",
+          "Cache-Control": "no-store",
+          "Service-Worker-Allowed": "/",
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    }
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];
       return handleImageOptimization(request, {
@@ -179,7 +218,7 @@ const worker = {
         transformImage: async (b, { width, format, quality }) => (await env.IMAGES.input(b).transform(width > 0 ? { width } : {}).output({ format, quality })).response(),
       }, allowedWidths);
     }
-    const statik = url.pathname === "/" ? "/index.html" : url.pathname;
+    const statik = url.pathname;
     if (VANI_DATEIEN.has(statik) || statik.startsWith("/icons/")) {
       const antwort = await env.ASSETS.fetch(new Request(new URL(statik, request.url), request));
       const headers = new Headers(antwort.headers);

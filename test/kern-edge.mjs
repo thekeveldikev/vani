@@ -411,16 +411,30 @@ test('Anleitung: vollständig, eindeutig, durchsuchbar — jeder Raum der Leiste
   assert.equal(k.anleitungHervorheben('a.b(c)', '.b'), 'a<mark>.b</mark>(c)');
 });
 
-test('Sync-Dienst: auf einer reinen Seite wird der öffentliche Dienst vorgeschlagen, sonst die eigene Adresse', async () => {
+test('Eine App-Adresse: GitHub ist sichtbar, Sites nur Tresor, Desktop bleibt eigenständig', async () => {
   const k = baueSandkasten();
-  const setze = (protocol, origin, hostname) => { k.location.protocol = protocol; k.location.origin = origin; k.location.hostname = hostname; };
-  setze('https:', 'https://jemand.github.io', 'jemand.github.io');
+  const setze = (protocol, origin, hostname, pathname = '/', search = '') => {
+    Object.assign(k.location, { protocol, origin, hostname, pathname, search });
+  };
+  setze('https:', 'https://thekeveldikev.github.io', 'thekeveldikev.github.io', '/vani/');
+  assert.equal(k.vaniAdresseArt(), 'haupt');
   assert.equal(await k.syncStandardServer(), k.SYNC_STANDARD_DIENST);
-  setze('https:', 'https://vani.example.org', 'vani.example.org');
-  assert.equal(await k.syncStandardServer(), 'https://vani.example.org');
+  assert.equal(k.VANI_HAUPTADRESSE, 'https://thekeveldikev.github.io/vani/');
+
+  setze('https:', 'https://vani-schreibzuhause.craftkey.chatgpt.site', 'vani-schreibzuhause.craftkey.chatgpt.site');
+  assert.equal(k.vaniAdresseArt(), 'dienst');
+  assert.equal(await k.syncStandardServer(), k.SYNC_STANDARD_DIENST);
+  setze('https:', 'https://vani-schreibzuhause.craftkey.chatgpt.site', 'vani-schreibzuhause.craftkey.chatgpt.site', '/', '?rettung=1&kein-sw=1');
+  assert.equal(k.vaniAdresseArt(), 'rettung');
+
   setze('http:', 'http://localhost:4321', 'localhost');
+  assert.equal(k.vaniAdresseArt(), 'lokal');
   assert.equal(await k.syncStandardServer(), 'http://localhost:4321');
-  setze('file:', 'null', '');
+
+  setze('vani:', 'null', 'app');
+  assert.equal(k.vaniAdresseArt(), 'desktop');
+  setze('file:', 'null', '', '/');
+  assert.equal(k.vaniAdresseArt(), 'andere');
   assert.equal(await k.syncStandardServer(), k.SYNC_STANDARD_DIENST);
   assert.match(k.SYNC_STANDARD_DIENST, /^https:\/\//);
 });

@@ -24,6 +24,7 @@ test('PWA-Vertrag: stabile Identität, Versionen und Offline-Kern passen zusamme
   const appVersion = lies('src/30-core.js').match(/APP_VERSION\s*=\s*'([^']+)'/)[1];
   const swVersion = lies('sw.js').match(/VERSION\s*=\s*'([^']+)'/)[1];
   assert.equal(swVersion, appVersion);
+  assert.match(lies('src/00-head.html'), /rel="canonical" href="https:\/\/thekeveldikev\.github\.io\/vani\/"/);
   for (const pfad of lies('sw.js').match(/'\.\/[^']+'/g).map((s) => s.slice(3, -1)).filter(Boolean)) {
     if (pfad === '') continue;
     assert.ok(existsSync(join(wurzel, pfad)), 'Offline-Datei fehlt: ' + pfad);
@@ -53,6 +54,8 @@ test('Update- und Klangvertrag: ein Icon bleibt stabil und iOS bekommt eine Medi
   assert.match(audio, /createObjectURL/);
   assert.match(audio, /ctx\.state === 'interrupted'/);
   assert.match(lies('src/49-feinheiten.js'), /Ein Icon genügt für immer/);
+  assert.match(lies('src/49-feinheiten.js'), /Hier bist du richtig — das ist VANI/);
+  assert.match(lies('src/49-feinheiten.js'), /Rettungsmodus der früheren zweiten Adresse/);
 });
 
 test('Profilvertrag: veröffentlichter Code enthält keine angeforderten Nutzerpasswörter', () => {

@@ -94,6 +94,11 @@ async function sucheAppUpdate(neuLaden = false) {
   setzeThema(D.einst.thema);
   baueLeiste();
   zeichne();
+  if (vaniAdresseArt() === 'rettung') {
+    setTimeout(() => toastMitAktion('Du bist im Rettungsmodus der früheren zweiten Adresse.', 'Sicher umziehen', () => {
+      location.hash = '#/feinheiten'; zeichne();
+    }, 20000), 900);
+  }
   if (typeof profilStarteAutosperre === 'function') profilStarteAutosperre();
 
   /* Der Start wird nicht vom Netz blockiert: Erst ist alles lokal da, dann
