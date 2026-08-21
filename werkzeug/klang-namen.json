@@ -1,0 +1,332 @@
+{
+ "daemmerung": {
+  "name": "Landdämmerung",
+  "kat": "Draußen",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "waldmorgen": {
+  "name": "Waldmorgen",
+  "kat": "Draußen",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "herbstvoegel": {
+  "name": "Herbstvögel",
+  "kat": "Draußen",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "abendvoegel": {
+  "name": "Abendamseln",
+  "kat": "Draußen",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "starenschwarm": {
+  "name": "Starenschwarm",
+  "kat": "Draußen",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "wiese": {
+  "name": "Schafe auf der Wiese",
+  "kat": "Draußen",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "dschungel": {
+  "name": "Dschungelnacht",
+  "kat": "Draußen",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "weide": {
+  "name": "Kühe auf der Weide",
+  "kat": "Draußen",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "lagerfeuer": {
+  "name": "Lagerfeuer",
+  "kat": "Feuer",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "muehle": {
+  "name": "Alte Mühle",
+  "kat": "Innen",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "uhrwerk": {
+  "name": "Altes Uhrwerk",
+  "kat": "Innen",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "schreibbuero": {
+  "name": "Schreibmaschinenbüro",
+  "kat": "Innen",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "kuhstall": {
+  "name": "Stall bei Nacht",
+  "kat": "Innen",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "wirtshaus": {
+  "name": "Wirtshaus am Samstag",
+  "kat": "Orte",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "stadt": {
+  "name": "Stadt von oben",
+  "kat": "Orte",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "markt": {
+  "name": "Marktgemurmel",
+  "kat": "Orte",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "basar": {
+  "name": "Straßen von Beirut",
+  "kat": "Orte",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "promenade": {
+  "name": "Promenade mit Glocken",
+  "kat": "Orte",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "schulhof": {
+  "name": "Schulhof",
+  "kat": "Orte",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "covent": {
+  "name": "Markthalle im Morgen",
+  "kat": "Orte",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "bahnhof": {
+  "name": "Bahnhof Helsinki",
+  "kat": "Reise",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "dampfzug": {
+  "name": "Dampfzug",
+  "kat": "Reise",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "frachter": {
+  "name": "Frachtschiff",
+  "kat": "Reise",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "motorboot": {
+  "name": "Boot auf dem Wasser",
+  "kat": "Reise",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "flughafen": {
+  "name": "Flughafenhalle",
+  "kat": "Reise",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "windmuehle": {
+  "name": "Windmühle",
+  "kat": "Draußen",
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ "regen_sanft": {
+  "name": "Sanfter Regen",
+  "kat": "Wetter",
+  "quelle": "Nature Sounds / Sound Therapy (CC0)"
+ },
+ "regen_stark": {
+  "name": "Regen mit Donner",
+  "kat": "Wetter",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "donner_fern": {
+  "name": "Ferner Donner",
+  "kat": "Wetter",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "wind_sanft": {
+  "name": "Sanfter Wind",
+  "kat": "Wetter",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "wind_mittel": {
+  "name": "Pfeifender Wind",
+  "kat": "Wetter",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "wind_stark": {
+  "name": "Starker Wind",
+  "kat": "Wetter",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "wind_heulen": {
+  "name": "Heulender Wind",
+  "kat": "Wetter",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "meer_ruhig": {
+  "name": "Meer und Möwen",
+  "kat": "Wasser",
+  "quelle": "Nature Sounds / Sound Therapy (CC0)"
+ },
+ "meer_sturm": {
+  "name": "Sturm auf See",
+  "kat": "Wasser",
+  "quelle": "Nature Sounds / Sound Therapy (CC0)"
+ },
+ "brandung": {
+  "name": "Brandung",
+  "kat": "Wasser",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "bach": {
+  "name": "Bach",
+  "kat": "Wasser",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "bach_grillen": {
+  "name": "Bach mit Grillen",
+  "kat": "Wasser",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "wasserfall": {
+  "name": "Wasserfall",
+  "kat": "Wasser",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "stream_voegel": {
+  "name": "Bach mit Vögeln",
+  "kat": "Wasser",
+  "quelle": "Nature Sounds / Sound Therapy (CC0)"
+ },
+ "unterwasser": {
+  "name": "Unter Wasser",
+  "kat": "Wasser",
+  "quelle": "SSE Library: AMBIENCE (CC0)"
+ },
+ "kamin": {
+  "name": "Kaminfeuer",
+  "kat": "Feuer",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "wald_voegel": {
+  "name": "Wald mit Vögeln",
+  "kat": "Natur",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "wald_regen": {
+  "name": "Wald im Regen",
+  "kat": "Natur",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "sumpf_nacht": {
+  "name": "Sumpf bei Nacht",
+  "kat": "Natur",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "grillen": {
+  "name": "Grillen",
+  "kat": "Natur",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "grillen_teich": {
+  "name": "Grillen am Teich",
+  "kat": "Natur",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "grillen_fern": {
+  "name": "Grillen nah und fern",
+  "kat": "Natur",
+  "quelle": "GOLD TAPE: Ambience (CC0)"
+ },
+ "dschungel_nacht": {
+  "name": "Dschungel bei Nacht",
+  "kat": "Natur",
+  "quelle": "SSE Library: AMBIENCE (CC0)"
+ },
+ "dschungel_tag": {
+  "name": "Dschungel am Tag",
+  "kat": "Natur",
+  "quelle": "SSE Library: AMBIENCE (CC0)"
+ },
+ "restaurant": {
+  "name": "Volles Restaurant",
+  "kat": "Orte",
+  "quelle": "GOLD TAPE: Ambience (CC0)"
+ },
+ "cafe": {
+  "name": "Café",
+  "kat": "Orte",
+  "quelle": "SSE Library: AMBIENCE (CC0)"
+ },
+ "restaurant_ruhig": {
+  "name": "Ruhiges Lokal",
+  "kat": "Orte",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "hotelhalle": {
+  "name": "Hotelhalle",
+  "kat": "Orte",
+  "quelle": "SSE Library: AMBIENCE (CC0)"
+ },
+ "markt_marrakesch": {
+  "name": "Markt in Marrakesch",
+  "kat": "Orte",
+  "quelle": "SSE Library: AMBIENCE (CC0)"
+ },
+ "strasse_china": {
+  "name": "Straße in China",
+  "kat": "Orte",
+  "quelle": "GOLD TAPE: Ambience (CC0)"
+ },
+ "schulflur": {
+  "name": "Schulflur",
+  "kat": "Orte",
+  "quelle": "SSE Library: AMBIENCE (CC0)"
+ },
+ "buero": {
+  "name": "Büro mit Telefonen",
+  "kat": "Innen",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "fabrik": {
+  "name": "Große Fabrik",
+  "kat": "Innen",
+  "quelle": "GOLD TAPE: Ambience (CC0)"
+ },
+ "werkstatt": {
+  "name": "Werkstatt",
+  "kat": "Innen",
+  "quelle": "SSE Library: AMBIENCE (CC0)"
+ },
+ "ubahn": {
+  "name": "U-Bahn",
+  "kat": "Reise",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "ubahnhof": {
+  "name": "U-Bahnhof",
+  "kat": "Reise",
+  "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
+ },
+ "bahnhofshalle": {
+  "name": "Bahnhofshalle",
+  "kat": "Reise",
+  "quelle": "GOLD TAPE: Ambience (CC0)"
+ },
+ "verkehr": {
+  "name": "Verkehr",
+  "kat": "Reise",
+  "quelle": "GOLD TAPE: Ambience (CC0)"
+ },
+ "tunnel": {
+  "name": "Verkehr im Tunnel",
+  "kat": "Reise",
+  "quelle": "GOLD TAPE: Ambience (CC0)"
+ },
+ "flughafen_klein": {
+  "name": "Kleiner Flugplatz",
+  "kat": "Reise",
+  "quelle": "GOLD TAPE: Ambience (CC0)"
+ }
+}

@@ -359,3 +359,35 @@ test('Welle-2-Vertrag: Manuskript, Bretter und die kleinen Griffe sind verdrahte
   assert.match(lies('src/30-core.js'), /ArrowDown' \|\| e\.key === 'ArrowUp'/, 'Menüs mit der Tastatur');
   assert.match(lies('src/42b-blaetter.js'), /blattsuche/, 'Blätter lassen sich durchsuchen');
 });
+
+test('Klangkatalog: jede Aufnahme hat Namen, Kategorie und ehrliche Herkunft', () => {
+  if (!existsSync(join(wurzel, 'klang', 'katalog.json'))) return;   /* ohne Aufnahmen läuft die App auch */
+  const katalog = JSON.parse(lies('klang/katalog.json'));
+  const namen = JSON.parse(lies('werkzeug/klang-namen.json'));
+  assert.ok(Array.isArray(katalog) && katalog.length >= 10, 'der Fundus soll etwas hergeben');
+  const ids = new Set();
+  for (const k of katalog) {
+    assert.match(k.id, /^[a-z0-9_-]{1,40}$/, 'Kennung: ' + k.id);
+    assert.ok(!ids.has(k.id), 'doppelte Kennung: ' + k.id);
+    ids.add(k.id);
+    assert.equal(k.datei, k.id + '.opus');
+    assert.ok(existsSync(join(wurzel, 'klang', k.datei)), 'Datei fehlt: ' + k.datei);
+    assert.ok(k.name && k.name.length <= 60, 'Name: ' + k.id);
+    assert.ok(k.kat && k.kat.length <= 30, 'Kategorie: ' + k.id);
+    assert.ok(k.quelle && k.quelle.length > 5, 'Herkunft fehlt bei ' + k.id);
+    assert.ok(k.mb > 0.05 && k.mb < 5, 'Größe außer der Reihe bei ' + k.id + ': ' + k.mb + ' MB');
+    assert.ok(namen[k.id], k.id + ' fehlt in werkzeug/klang-namen.json');
+  }
+  /* Der ganze Fundus muss klein bleiben — er wird bei Bedarf geladen, aber
+     er liegt auch im Repo und in der Desktop-App. */
+  const gesamt = katalog.reduce((n, k) => n + k.mb, 0);
+  assert.ok(gesamt < 60, 'Der Fundus ist auf ' + gesamt.toFixed(1) + ' MB gewachsen — das wird zu schwer.');
+});
+
+test('Klangvertrag: der Fundus liegt neben der App und reist in die Desktop-Fassung mit', () => {
+  const paket = JSON.parse(lies('package.json'));
+  assert.ok(paket.build.files.includes('klang/**'), 'ohne diesen Eintrag fehlen der Desktop-App alle Aufnahmen');
+  assert.match(lies('hosting/scripts/copy-vani.mjs'), /'klang'/, 'auch die gehostete Fassung braucht sie');
+  /* Das Werkzeug, das den Katalog schreibt, muss vorhanden und lesbar sein. */
+  assert.ok(existsSync(join(wurzel, 'werkzeug', 'klang-katalog.mjs')));
+});

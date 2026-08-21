@@ -1,75 +1,11 @@
 [
  {
-  "id": "abendvoegel",
-  "name": "Abendamseln",
-  "kat": "Draußen",
-  "datei": "abendvoegel.opus",
-  "mb": 0.41,
-  "quelle": "BBC Sound Effects (RemArc, privat)"
- },
- {
-  "id": "dschungel",
-  "name": "Dschungelnacht",
-  "kat": "Draußen",
-  "datei": "dschungel.opus",
-  "mb": 0.45,
-  "quelle": "BBC Sound Effects (RemArc, privat)"
- },
- {
-  "id": "herbstvoegel",
-  "name": "Herbstvögel",
-  "kat": "Draußen",
-  "datei": "herbstvoegel.opus",
-  "mb": 0.44,
-  "quelle": "BBC Sound Effects (RemArc, privat)"
- },
- {
-  "id": "weide",
-  "name": "Kühe auf der Weide",
-  "kat": "Draußen",
-  "datei": "weide.opus",
-  "mb": 0.41,
-  "quelle": "BBC Sound Effects (RemArc, privat)"
- },
- {
-  "id": "daemmerung",
-  "name": "Landdämmerung",
-  "kat": "Draußen",
-  "datei": "daemmerung.opus",
-  "mb": 0.47,
-  "quelle": "BBC Sound Effects (RemArc, privat)"
- },
- {
-  "id": "wiese",
-  "name": "Schafe auf der Wiese",
-  "kat": "Draußen",
-  "datei": "wiese.opus",
-  "mb": 0.49,
-  "quelle": "BBC Sound Effects (RemArc, privat)"
- },
- {
-  "id": "starenschwarm",
-  "name": "Starenschwarm",
-  "kat": "Draußen",
-  "datei": "starenschwarm.opus",
-  "mb": 0.41,
-  "quelle": "BBC Sound Effects (RemArc, privat)"
- },
- {
-  "id": "waldmorgen",
-  "name": "Waldmorgen",
-  "kat": "Draußen",
-  "datei": "waldmorgen.opus",
-  "mb": 0.5,
-  "quelle": "BBC Sound Effects (RemArc, privat)"
- },
- {
-  "id": "windmuehle",
-  "name": "Windmühle",
-  "kat": "Draußen",
-  "datei": "windmuehle.opus",
-  "mb": 0.38,
-  "quelle": "BBC Sound Effects (RemArc, privat)"
+  "id": "regen_sanft",
+  "name": "Sanfter Regen",
+  "kat": "Wetter",
+  "datei": "regen_sanft.opus",
+  "mb": 0.48,
+  "quelle": "Nature Sounds / Sound Therapy (CC0)"
  },
  {
   "id": "lagerfeuer",
@@ -77,31 +13,119 @@
   "kat": "Feuer",
   "datei": "lagerfeuer.opus",
   "mb": 0.58,
-  "quelle": "BBC Sound Effects (RemArc, privat)"
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
-  "id": "muehle",
-  "name": "Alte Mühle",
-  "kat": "Innen",
-  "datei": "muehle.opus",
-  "mb": 0.39,
-  "quelle": "BBC Sound Effects (RemArc, privat)"
+  "id": "abendvoegel",
+  "name": "Abendamseln",
+  "kat": "Draußen",
+  "datei": "abendvoegel.opus",
+  "mb": 0.41,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
-  "id": "uhrwerk",
-  "name": "Altes Uhrwerk",
-  "kat": "Innen",
-  "datei": "uhrwerk.opus",
-  "mb": 0.39,
-  "quelle": "BBC Sound Effects (RemArc, privat)"
+  "id": "dschungel",
+  "name": "Dschungelnacht",
+  "kat": "Draußen",
+  "datei": "dschungel.opus",
+  "mb": 0.45,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
-  "id": "schreibbuero",
-  "name": "Schreibmaschinenbüro",
-  "kat": "Innen",
-  "datei": "schreibbuero.opus",
-  "mb": 0.46,
-  "quelle": "BBC Sound Effects (RemArc, privat)"
+  "id": "herbstvoegel",
+  "name": "Herbstvögel",
+  "kat": "Draußen",
+  "datei": "herbstvoegel.opus",
+  "mb": 0.44,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "weide",
+  "name": "Kühe auf der Weide",
+  "kat": "Draußen",
+  "datei": "weide.opus",
+  "mb": 0.41,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "daemmerung",
+  "name": "Landdämmerung",
+  "kat": "Draußen",
+  "datei": "daemmerung.opus",
+  "mb": 0.47,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "wiese",
+  "name": "Schafe auf der Wiese",
+  "kat": "Draußen",
+  "datei": "wiese.opus",
+  "mb": 0.49,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "starenschwarm",
+  "name": "Starenschwarm",
+  "kat": "Draußen",
+  "datei": "starenschwarm.opus",
+  "mb": 0.41,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "waldmorgen",
+  "name": "Waldmorgen",
+  "kat": "Draußen",
+  "datei": "waldmorgen.opus",
+  "mb": 0.5,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "windmuehle",
+  "name": "Windmühle",
+  "kat": "Draußen",
+  "datei": "windmuehle.opus",
+  "mb": 0.38,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "markt",
+  "name": "Marktgemurmel",
+  "kat": "Orte",
+  "datei": "markt.opus",
+  "mb": 0.37,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "covent",
+  "name": "Markthalle im Morgen",
+  "kat": "Orte",
+  "datei": "covent.opus",
+  "mb": 0.36,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "promenade",
+  "name": "Promenade mit Glocken",
+  "kat": "Orte",
+  "datei": "promenade.opus",
+  "mb": 0.41,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "schulhof",
+  "name": "Schulhof",
+  "kat": "Orte",
+  "datei": "schulhof.opus",
+  "mb": 0.45,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "stadt",
+  "name": "Stadt von oben",
+  "kat": "Orte",
+  "datei": "stadt.opus",
+  "mb": 0.45,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "basar",
@@ -109,6 +133,78 @@
   "kat": "Orte",
   "datei": "basar.opus",
   "mb": 0.36,
-  "quelle": "BBC Sound Effects (RemArc, privat)"
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "wirtshaus",
+  "name": "Wirtshaus am Samstag",
+  "kat": "Orte",
+  "datei": "wirtshaus.opus",
+  "mb": 0.35,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "muehle",
+  "name": "Alte Mühle",
+  "kat": "Innen",
+  "datei": "muehle.opus",
+  "mb": 0.39,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "uhrwerk",
+  "name": "Altes Uhrwerk",
+  "kat": "Innen",
+  "datei": "uhrwerk.opus",
+  "mb": 0.39,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "schreibbuero",
+  "name": "Schreibmaschinenbüro",
+  "kat": "Innen",
+  "datei": "schreibbuero.opus",
+  "mb": 0.46,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "kuhstall",
+  "name": "Stall bei Nacht",
+  "kat": "Innen",
+  "datei": "kuhstall.opus",
+  "mb": 0.42,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "bahnhof",
+  "name": "Bahnhof Helsinki",
+  "kat": "Reise",
+  "datei": "bahnhof.opus",
+  "mb": 0.42,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "motorboot",
+  "name": "Boot auf dem Wasser",
+  "kat": "Reise",
+  "datei": "motorboot.opus",
+  "mb": 0.4,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "dampfzug",
+  "name": "Dampfzug",
+  "kat": "Reise",
+  "datei": "dampfzug.opus",
+  "mb": 0.42,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
+ },
+ {
+  "id": "frachter",
+  "name": "Frachtschiff",
+  "kat": "Reise",
+  "datei": "frachter.opus",
+  "mb": 0.34,
+  "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  }
 ]

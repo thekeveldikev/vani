@@ -1,6 +1,6 @@
 {
   "name": "vani",
-  "version": "5.7.0",
+  "version": "5.7.1",
   "private": true,
   "description": "VANI – ein privates Zuhause zum Schreiben, auf iPad und Desktop.",
   "main": "desktop/main.cjs",
@@ -44,6 +44,7 @@
       "manifest.json",
       "sw.js",
       "faden.enc",
+      "klang/**",
       "node_modules/electron-updater/**",
       "node_modules/builder-util-runtime/**",
       "node_modules/lazy-val/**",
