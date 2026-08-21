@@ -1,10 +1,39 @@
-import { cpSync, mkdirSync } from 'node:fs';
+import { cpSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const hosting = join(dirname(fileURLToPath(import.meta.url)), '..');
 const wurzel = join(hosting, '..');
 const publicDir = join(hosting, 'public');
+const hauptadresse = 'https://thekeveldikev.github.io/vani/';
 mkdirSync(join(publicDir, 'icons'), { recursive: true });
-for (const name of ['index.html', 'manifest.json', 'sw.js', 'faden.enc', 'robots.txt']) cpSync(join(wurzel, name), join(publicDir, name));
+for (const name of ['manifest.json', 'faden.enc', 'robots.txt']) cpSync(join(wurzel, name), join(publicDir, name));
+/* Der frühere Sites-Origin bleibt für die verschlüsselten Pakete erhalten, ist
+   aber keine zweite installierbare App mehr. Die echte App liegt als bewusst
+   aufrufbarer Rettungsraum am selben Origin, damit alte IndexedDB-Inhalte nicht
+   durch den Umzug verloren gehen. */
+cpSync(join(wurzel, 'index.html'), join(publicDir, 'rettung.html'));
 cpSync(join(wurzel, 'icons'), join(publicDir, 'icons'), { recursive: true, force: true });
+
+const umzug = `<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><meta http-equiv="cache-control" content="no-store">
+<title>VANI ist umgezogen</title><style>
+:root{color-scheme:light;background:#f5efe3;color:#29251f;font:17px/1.55 ui-rounded,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px}.karte{width:min(620px,100%);padding:clamp(26px,6vw,54px);border:1px solid #d8cab4;border-radius:28px;background:#fffdf7;box-shadow:0 24px 70px #513d2222}h1{font:700 clamp(34px,8vw,58px)/1.05 Georgia,serif;margin:0 0 20px}p{margin:12px 0}.adresse{display:block;overflow-wrap:anywhere;padding:12px 14px;border-radius:12px;background:#eee5d6}.aktionen{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:10px 18px;border:1px solid #29251f;border-radius:999px;color:inherit;text-decoration:none;font-weight:700}.haupt{background:#29251f;color:#fff}small{display:block;margin-top:22px;color:#6f6557}
+</style></head><body><main class="karte"><h1>VANI hat jetzt ein einziges Zuhause.</h1>
+<p>Diese frühere zweite Adresse ist nur noch der unsichtbare, verschlüsselte Sync-Tresor.</p>
+<strong class="adresse">${hauptadresse}</strong>
+<div class="aktionen"><a class="haupt" href="${hauptadresse}">VANI öffnen</a><a href="./rettung.html?rettung=1&amp;kein-sw=1">Alten Bestand retten</a></div>
+<small>Du wirst gleich automatisch weitergeleitet. Wenn hier noch ungesicherte alte Notizen liegen, wähle vorher „Alten Bestand retten“.</small></main>
+<script>Promise.all([('serviceWorker'in navigator?navigator.serviceWorker.getRegistrations().then(r=>Promise.all(r.map(x=>x.unregister()))):0),('caches'in window?caches.keys().then(k=>Promise.all(k.map(x=>caches.delete(x)))):0)]).finally(()=>setTimeout(()=>location.replace(${JSON.stringify(hauptadresse)}),5000));</script>
+</body></html>`;
+
+const stilllegung = `self.addEventListener('install',e=>e.waitUntil(self.skipWaiting()));
+self.addEventListener('activate',e=>e.waitUntil(Promise.all([
+  caches.keys().then(k=>Promise.all(k.map(x=>caches.delete(x)))),
+  self.registration.unregister(),
+  self.clients.claim()
+])));`;
+
+writeFileSync(join(publicDir, 'index.html'), umzug);
+writeFileSync(join(publicDir, 'sw.js'), stilllegung);

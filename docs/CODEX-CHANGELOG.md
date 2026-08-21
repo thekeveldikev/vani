@@ -57,6 +57,8 @@ vereinheitlicht:
 - normale Sites-Startseitenbesuche führen zur GitHub-App;
 - ein alter Sites-Service-Worker wird stillgelegt und seine Caches werden entfernt;
 - ein bewusster Rettungsmodus hält alte Sites-Origin-Daten sicher erreichbar;
+- eine statische Umzugsseite und ein statischer Stilllegungs-Worker decken auch
+  Sites' Asset-vor-Worker-Auslieferung ab;
 - Profile bleiben lokal, private Bereiche bleiben pro Person getrennt;
 - Desktop, iPad, Handy und Browser verwenden weiterhin denselben Sync-Tresor.
 

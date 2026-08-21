@@ -458,12 +458,19 @@ hosting/.openai/hosting.json bindet:
 - D1-Binding DB;
 - R2-Binding FILES.
 
-hosting/scripts/copy-vani.mjs kopiert das gebaute Root-Artefakt nur für Tests und den
-bewussten Rettungsmodus. hosting/worker/index.ts besitzt drei Aufgaben:
+hosting/scripts/copy-vani.mjs legt eine kleine Umzugsseite als `public/index.html`,
+die echte App als `public/rettung.html` und einen stilllegenden Service Worker als
+`public/sw.js` ab. Das ist nötig, weil Sites vorhandene statische Dateien vor dem
+Worker ausliefern kann. hosting/worker/index.ts besitzt zusätzlich drei Aufgaben:
 
 - /v1 als verschlüsselten Sync-Dienst bedienen;
 - normale Besuche der Sites-Startseite zur einzigen GitHub-App leiten;
 - einen alten Sites-Service-Worker stilllegen und Caches räumen.
+
+Der bewusst verborgene Rettungsweg lautet
+`/rettung.html?rettung=1&kein-sw=1`. Er bleibt auf demselben Origin, damit ein alter
+lokaler IndexedDB-Bestand geöffnet werden kann, ist aber keine installierbare zweite
+App.
 
 Die einzige installierbare Web-App liegt auf
 https://thekeveldikev.github.io/vani/. Sites ist nicht ihre zweite

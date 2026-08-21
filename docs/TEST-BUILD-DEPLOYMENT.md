@@ -343,9 +343,11 @@ Berechtigung. Die App soll nur die richtige Anleitung geben.
 7. Nur wenn Worker, v1, D1/R2 oder Rettungsmodus geändert wurden: mit der
    Sites-Hostingfunktion eine **neue Version des bestehenden Projekts** speichern.
 8. Diese Version öffentlich deployen.
-9. Sites-Startseite ohne Weiterleitung folgen prüfen: sie muss zur GitHub-App zeigen.
+9. Sites-Startseite prüfen: sie muss nur eine Umzugsseite sein und automatisch zur
+   GitHub-App führen; sie darf kein PWA-Manifest einbinden.
 10. /v1/health muss weiterhin den Sync-Dienst melden.
-11. Der bewusste Rettungsmodus muss die aktuelle App ohne Service-Worker liefern.
+11. `/rettung.html?rettung=1&kein-sw=1` muss die aktuelle App liefern; `/sw.js`
+    muss den früheren Service Worker abmelden und darf keinen Fetch-Handler besitzen.
 12. Deploymentversion und Quellcommit dokumentieren.
 
 Keine zweite Site anlegen. Keine D1-/R2-Bindings umbenennen. Keine persönlichen
@@ -357,6 +359,7 @@ Mindestens:
 
     Invoke-WebRequest "https://thekeveldikev.github.io/vani/?pruefung=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())" -UseBasicParsing
     Invoke-WebRequest "https://vani-schreibzuhause.craftkey.chatgpt.site/v1/health" -UseBasicParsing
+    Invoke-WebRequest "https://vani-schreibzuhause.craftkey.chatgpt.site/rettung.html?rettung=1&kein-sw=1" -UseBasicParsing
 
 Danach im Browser:
 

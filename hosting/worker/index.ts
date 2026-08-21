@@ -15,7 +15,7 @@ const ID_RE = /^[A-Za-z0-9_-]{20,100}$/;
 const TOKEN_RE = /^[A-Za-z0-9_-]{40,180}$/;
 const B64_RE = /^[A-Za-z0-9_-]+$/;
 const VANI_HAUPTADRESSE = "https://thekeveldikev.github.io/vani/";
-const VANI_DATEIEN = new Set(["/index.html", "/manifest.json", "/sw.js", "/faden.enc", "/robots.txt"]);
+const VANI_DATEIEN = new Set(["/index.html", "/rettung.html", "/manifest.json", "/sw.js", "/faden.enc", "/robots.txt"]);
 const rate = new Map<string, { seit: number; zahl: number }>();
 let schemaBereit: Promise<void> | null = null;
 
@@ -178,18 +178,18 @@ const worker = {
        mehr. Ein bewusst aufgerufener Rettungsmodus lässt alte Origin-Daten noch
        sichern, ohne sich erneut als PWA zu installieren. */
     if (url.pathname === "/" || url.pathname === "/index.html") {
-      if (url.searchParams.get("rettung") !== "1") {
-        return new Response(null, {
-          status: 302,
-          headers: {
-            Location: VANI_HAUPTADRESSE,
-            "Cache-Control": "no-store",
-            "X-Content-Type-Options": "nosniff",
-            "Referrer-Policy": "no-referrer",
-          },
-        });
-      }
-      const antwort = await env.ASSETS.fetch(new Request(new URL("/index.html", request.url), request));
+      return new Response(null, {
+        status: 302,
+        headers: {
+          Location: VANI_HAUPTADRESSE,
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+          "Referrer-Policy": "no-referrer",
+        },
+      });
+    }
+    if (url.pathname === "/rettung.html") {
+      const antwort = await env.ASSETS.fetch(new Request(new URL("/rettung.html", request.url), request));
       const headers = new Headers(antwort.headers);
       headers.set("Cache-Control", "no-store");
       headers.set("X-Robots-Tag", "noindex, nofollow");

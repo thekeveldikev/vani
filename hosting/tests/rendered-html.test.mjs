@@ -4,18 +4,26 @@ import test from "node:test";
 
 const root = new URL("../", import.meta.url);
 
-test("Hosting-Build enthält die echte VANI-PWA statt des Starters", async () => {
-  const [index, manifest, worker, hosting] = await Promise.all([
+test("Hosting-Build enthält Umzugsseite, Rettungsraum und keinen zweiten Service Worker", async () => {
+  const [index, rettung, serviceWorker, manifest, worker, hosting] = await Promise.all([
     readFile(new URL("public/index.html", root), "utf8"),
+    readFile(new URL("public/rettung.html", root), "utf8"),
+    readFile(new URL("public/sw.js", root), "utf8"),
     readFile(new URL("public/manifest.json", root), "utf8"),
     readFile(new URL("worker/index.ts", root), "utf8"),
     readFile(new URL(".openai/hosting.json", root), "utf8"),
   ]);
-  assert.match(index, /const APP_VERSION = '5\.2\.1'/);
-  assert.match(index, /Privater Bereich/);
-  assert.match(index, /Wem gehört dieses VANI/);
-  assert.match(index, /Funkenkiste/);
-  assert.match(index, /richTeileFuerHoehe/);
+  assert.match(index, /VANI hat jetzt ein einziges Zuhause/);
+  assert.match(index, /https:\/\/thekeveldikev\.github\.io\/vani\//);
+  assert.match(index, /rettung\.html\?rettung=1&amp;kein-sw=1/);
+  assert.doesNotMatch(index, /rel=["']manifest["']/);
+  assert.match(rettung, /const APP_VERSION = '5\.2\.1'/);
+  assert.match(rettung, /Privater Bereich/);
+  assert.match(rettung, /Wem gehört dieses VANI/);
+  assert.match(rettung, /Funkenkiste/);
+  assert.match(rettung, /richTeileFuerHoehe/);
+  assert.match(serviceWorker, /self\.registration\.unregister/);
+  assert.doesNotMatch(serviceWorker, /fetch/);
   assert.equal(JSON.parse(manifest).id, "./");
   assert.equal(JSON.parse(hosting).d1, "DB");
   assert.equal(JSON.parse(hosting).r2, "FILES");
@@ -33,6 +41,6 @@ test("Hosting-Worker trennt Metadaten und verschlüsselte Dateiblöcke", async (
   assert.match(worker, /zu_viele_anfragen/);
   assert.match(worker, /24 \* 1024 \* 1024/);
   assert.match(worker, /VANI_HAUPTADRESSE = "https:\/\/thekeveldikev\.github\.io\/vani\/"/);
-  assert.match(worker, /url\.searchParams\.get\("rettung"\) !== "1"/);
+  assert.match(worker, /url\.pathname === "\/rettung\.html"/);
   assert.match(worker, /self\.registration\.unregister/);
 });

@@ -699,6 +699,8 @@ ist ausschließlich Infrastruktur:
 - der frühere Sites-Service-Worker wird stillgelegt und seine Caches werden entfernt;
 - ein absichtlicher Rettungsmodus kann alte, nur unter dieser Origin vorhandene
   lokale Daten noch öffnen, sichern oder synchronisieren;
+- sein genauer Pfad ist
+  `https://vani-schreibzuhause.craftkey.chatgpt.site/rettung.html?rettung=1&kein-sw=1`;
 - die Rettungsfassung darf nicht neu zum Home-Bildschirm hinzugefügt werden.
 
 Dadurch gibt es für Nutzer keine zweite App, keine zweite Updatequelle und keinen

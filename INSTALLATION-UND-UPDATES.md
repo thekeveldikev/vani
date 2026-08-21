@@ -29,6 +29,8 @@ Falls versehentlich einmal die frühere Sites-App benutzt wurde, bleibt ein bewu
 Rettungszugang erhalten. Er wird nur zum Sichern oder Abgleichen alter lokaler Daten
 verwendet; im Alltag niemals als zweites Icon installieren.
 
+    https://vani-schreibzuhause.craftkey.chatgpt.site/rettung.html?rettung=1&kein-sw=1
+
 ## Getrennte Personen, getrennte Bereiche
 
 - Deine Cousine wählt auf ihrem iPad: **Feinheiten → iPad ↔ Laptop → Neuen
