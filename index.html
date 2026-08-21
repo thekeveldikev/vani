@@ -1340,6 +1340,32 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 .papierseite.fluss .stitel:placeholder-shown { display: none; }
 .papierseite.fluss:focus-within .stitel:placeholder-shown { display: block; }
 
+/* ================================================================
+   Papier: die Schrift sitzt auf der Linie
+   ================================================================
+   Nachgemessen: bei 17,5px Schrift in 32px Zeilenhöhe liegt die Grundlinie
+   22px unter der Oberkante der Zeile. Die Linie gehört also auf 23px und
+   von da an alle 32px. Das Muster liegt auf der Schreibfläche, nicht auf der
+   Seite — nur dort kennt es den Rhythmus der Zeilen.
+   Formatierter Text hat wechselnde Zeilenhöhen (Überschriften, Listen) und
+   kann keinem festen Linienraster folgen; dort bleibt das Papier ruhig. */
+.papierseite.liniert .schreibflaeche { background-position-y: 24px; }
+.papierseite.breit .schreibflaeche { background-position-y: 28px; }
+
+.papierseite.kariert { background-image: none; }
+.papierseite.kariert .schreibflaeche:not(.rich-editor) {
+  background-image: linear-gradient(var(--linie) 1px, transparent 1px), linear-gradient(90deg, var(--linie) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: 0 23px, 0 23px;
+}
+.papierseite.punkte { background-image: none; }
+.papierseite.punkte .schreibflaeche:not(.rich-editor) {
+  background-image: radial-gradient(var(--linie) 1px, transparent 1.25px);
+  background-size: 32px 32px;
+  background-position: 0 7px;
+}
+.papierseite .rich-editor { background-image: none; }
+
 </style>
 </head>
 <body>
@@ -1366,7 +1392,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.4.0';
+const APP_VERSION = '5.4.1';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */

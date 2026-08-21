@@ -206,3 +206,32 @@ test('Heftvertrag: drei Ansichten, und "Am Stück" ist überall erlaubt', () => 
   assert.match(hefte, /async function textHereinholen/);
   assert.match(lies('src/10-style.css'), /\.papierseite\.fluss/);
 });
+
+test('Papiervertrag: das Raster hat denselben Takt wie die Zeilen und liegt bei der Schrift', () => {
+  const css = lies('src/10-style.css');
+  const zeilenhoehe = Number((css.match(/\.schreibflaeche \{[^}]*line-height:\s*([\d.]+)px/) || [])[1]);
+  assert.equal(zeilenhoehe, 32, 'Zeilenhöhe der Schreibfläche');
+  /* Liniert und breit: ein Zyklus ist genau eine Zeile hoch. */
+  const liniert = (css.match(/\.papierseite\.liniert \.schreibflaeche \{[\s\S]*?\}/) || [''])[0];
+  assert.match(liniert, /transparent 31px, var\(--linie\) 31px, var\(--linie\) 32px/);
+  const breit = (css.match(/\.papierseite\.breit \.schreibflaeche \{[^}]*\}/) || [''])[0];
+  assert.match(breit, /transparent 39px, var\(--linie\) 39px, var\(--linie\) 40px/);
+  assert.match(breit, /line-height:\s*40px/, 'breite Linien brauchen ihre eigene Zeilenhöhe');
+  /* Die gemessenen Grundlinien: 22px bei 32er Zeilen, 26px bei 40er Zeilen.
+     Die Linie gehört einen Punkt darunter — sonst schwebt die Schrift. */
+  assert.match(css, /\.papierseite\.liniert \.schreibflaeche \{ background-position-y: 24px; \}/);
+  assert.match(css, /\.papierseite\.breit \.schreibflaeche \{ background-position-y: 28px; \}/);
+  /* Kästchen und Punkte liegen auf der Schreibfläche, nicht auf der ganzen Seite:
+     nur dort kennen sie den Zeilenrhythmus. */
+  for (const art of ['kariert', 'punkte']) {
+    assert.ok(css.includes('.papierseite.' + art + ' { background-image: none; }'),
+      art + ': das Muster darf nicht auf der ganzen Seite liegen');
+    const anfang = css.indexOf('.papierseite.' + art + ' .schreibflaeche:not(.rich-editor) {');
+    assert.ok(anfang > 0, art + ': Muster fehlt auf der Schreibfläche');
+    const block = css.slice(anfang, css.indexOf('}', anfang));
+    assert.match(block, /background-size:\s*32px 32px/, art + ': Rasterweite muss der Zeilenhöhe entsprechen');
+    assert.match(block, /background-position:/, art + ': das Muster braucht seine Ausrichtung an der Grundlinie');
+  }
+  /* Formatierter Text hat wechselnde Zeilenhöhen und darf kein Raster erben. */
+  assert.match(css, /\.papierseite \.rich-editor \{ background-image: none; \}/);
+});

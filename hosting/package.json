@@ -1,6 +1,6 @@
 {
   "name": "vani-hosting",
-  "version": "5.4.0",
+  "version": "5.4.1",
   "private": true,
   "engines": {
     "node": ">=22.13.0"
