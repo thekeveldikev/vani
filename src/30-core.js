@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.5.0';
+const APP_VERSION = '5.6.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -235,7 +235,11 @@ const IK = {
   ausMitte: '<path d="M4 6h16M7.5 10.5h9M4 15h16M7.5 19.5h9"/>',
   ausRechts: '<path d="M4 6h16M11 10.5h9M4 15h16M11 19.5h9"/>',
   ausBlock: '<path d="M4 6h16M4 10.5h16M4 15h16M4 19.5h16"/>',
-  radierer: '<path d="m9 20-4.5-4.5a2 2 0 0 1 0-2.8l8-8a2 2 0 0 1 2.8 0l3.2 3.2a2 2 0 0 1 0 2.8L12.5 17"/><path d="M9 20h10"/><path d="m8.5 9.5 6 6"/>'
+  radierer: '<path d="m9 20-4.5-4.5a2 2 0 0 1 0-2.8l8-8a2 2 0 0 1 2.8 0l3.2 3.2a2 2 0 0 1 0 2.8L12.5 17"/><path d="M9 20h10"/><path d="m8.5 9.5 6 6"/>',
+  inhalt: '<path d="M5 6h3M11 6h8M5 12h3M11 12h8M5 18h3M11 18h8"/>',
+  lesezeichen: '<path d="M7 4h10v16l-5-3.5L7 20V4Z"/>',
+  vorlesen: '<path d="M5 10v4h3l4 3.5v-11L8 10H5Z"/><path d="M15.5 9.5a3.5 3.5 0 0 1 0 5"/><path d="M18 7a7 7 0 0 1 0 10"/>',
+  figur: '<circle cx="12" cy="8" r="3.5"/><path d="M5.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/>'
 };
 function ik(name, kl) { return `<svg class="ik${kl ? ' ' + kl : ''}" viewBox="0 0 24 24" aria-hidden="true">${IK[name] || ''}</svg>`; }
 
@@ -382,7 +386,7 @@ function sauberesDokument(quelle) {
     if (k === '__proto__' || k === 'prototype' || k === 'constructor') continue;
     d[k] = v;
   }
-  for (const k of ['text', 'rich', 'titel', 'notiz', 'schlagworte', 'dateiname', 'dateityp', 'art', 'vibe', 'farbe', 'farbe2', 'band', 'muster', 'papier', 'ansicht', 'format', 'befestigung', 'label']) {
+  for (const k of ['text', 'rich', 'titel', 'notiz', 'schlagworte', 'dateiname', 'dateityp', 'art', 'vibe', 'farbe', 'farbe2', 'band', 'muster', 'papier', 'papierfarbe', 'ansicht', 'format', 'befestigung', 'label', 'schrift', 'lesezeichen']) {
     if (d[k] != null) d[k] = String(d[k]).slice(0, k === 'text' || k === 'rich' || k === 'notiz' ? 10000000 : 1000);
   }
   for (const k of ['parent', 'projekt', 'projektRef', 'von', 'zu', 'bild', 'skizze', 'datei', 'quelle', 'fingerabdruck', '_geraet']) {
@@ -394,6 +398,10 @@ function sauberesDokument(quelle) {
   if (d.muster && !['leinen', 'diagonal', 'punkte', 'rahmen', 'welle', 'schlicht'].includes(d.muster)) d.muster = 'schlicht';
   if (d.papier && !['liniert', 'kariert', 'blank', 'punkte', 'breit'].includes(d.papier)) d.papier = 'liniert';
   if (d.ansicht && !['seiten', 'rolle', 'fluss'].includes(d.ansicht)) d.ansicht = 'seiten';
+  if (d.papierfarbe && !['hell', 'weiss', 'creme', 'kraft', 'nacht'].includes(d.papierfarbe)) d.papierfarbe = 'hell';
+  if (d.rand != null) d.rand = d.rand === true;
+  if (d.gepinnt != null) d.gepinnt = d.gepinnt === true;
+  if (d.schrift && !['hand', 'klar', 'serif'].includes(d.schrift)) d.schrift = 'hand';
   if (d.format && !['plain', 'rich'].includes(d.format)) d.format = 'plain';
   if (d.befestigung && !['tesa', 'pin', 'lose'].includes(d.befestigung)) d.befestigung = 'tesa';
   if (d.favorit != null) d.favorit = d.favorit === true;
@@ -803,7 +811,7 @@ function oeffneDoc(d) {
   else if (d.typ === 'heft') location.hash = '#/heft/' + d.id;
   else if (d.typ === 'seite') { sessionStorage.setItem('zielSeite', d.id); location.hash = '#/heft/' + d.parent; }
   else if (d.typ === 'projekt') location.hash = '#/projekt/' + d.id;
-  else if (d.typ === 'kapitel') location.hash = '#/projekt/' + d.parent;
+  else if (d.typ === 'kapitel' || d.typ === 'figur') location.hash = '#/projekt/' + d.parent;
   else if (d.typ === 'szene') { location.hash = '#/projekt/' + d.projekt; setTimeout(() => oeffneSchreibraum(d.id), 80); }
   else if (d.typ === 'board') location.hash = '#/brett/' + d.id;
   else if (d.typ === 'blase') location.hash = '#/brett/' + d.parent;
@@ -818,3 +826,74 @@ document.addEventListener('click', (e) => {
   if (ziel) oeffneDoc(ziel);
   else toast('„' + v.dataset.ziel + '" gibt es noch nicht. Vielleicht bald.');
 });
+
+/* ----- Schlagworte: #wort im Text, über alles gezählt ----- */
+function schlagwortIndex(docs, max = 40) {
+  const zaehl = new Map();
+  const re = /(^|\s)#([\wäöüÄÖÜß-]{2,30})/g;
+  for (const d of docs) {
+    if (!d || typeof d.text !== 'string' || d.typ === 'goodnote') continue;
+    const gesehen = new Set();
+    let m;
+    re.lastIndex = 0;
+    while ((m = re.exec(d.text))) {
+      const w = m[2].toLowerCase();
+      if (gesehen.has(w)) continue;
+      gesehen.add(w);
+      zaehl.set(w, (zaehl.get(w) || 0) + 1);
+    }
+  }
+  return [...zaehl.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'de')).slice(0, Math.max(0, max)).map(([wort, anzahl]) => ({ wort, anzahl }));
+}
+
+/* ----- Startauftrag aus der Adresse: geteilter Text oder Schnellstart -----
+   Android kann Text nach VANI teilen; das Home-Icon kann mit „Neuer Schnipsel"
+   aufgehen. Beides kommt als Suchteil der Adresse an und wird sofort wieder
+   entfernt — die Adresse bleibt die eine Hauptadresse. */
+function startAuftrag(search) {
+  let q;
+  try { q = new URLSearchParams(String(search || '')); } catch (e) { return null; }
+  const titel = String(q.get('titel') || '').trim().slice(0, 500);
+  const text = String(q.get('text') || '').trim().slice(0, 200000);
+  const url = String(q.get('url') || '').trim().slice(0, 2000);
+  if (titel || text || url) {
+    const teile = [];
+    if (titel && titel !== text) teile.push(titel);
+    if (text) teile.push(text);
+    if (url && !text.includes(url)) teile.push(url);
+    return { art: 'geteilt', text: teile.join('\n') };
+  }
+  const neu = String(q.get('neu') || '').trim();
+  if (['schnipsel', 'blatt', 'suche'].includes(neu)) return { art: 'neu', was: neu };
+  return null;
+}
+
+/* ----- Jahresraster: 7 Reihen × Wochen, wie ein Kalender aus Punkten ----- */
+function jahresRaster(tage, wochen = 53, jetzt = Date.now()) {
+  const n = Number(wochen);
+  wochen = Math.max(1, Math.min(60, Number.isFinite(n) ? Math.round(n) : 53));
+  const quelle = tage && typeof tage === 'object' ? tage : {};
+  const heute = new Date(jetzt); heute.setHours(0, 0, 0, 0);
+  /* Montag als Wochenanfang */
+  const wochentag = (heute.getDay() + 6) % 7;
+  const ende = new Date(heute); ende.setDate(heute.getDate() + (6 - wochentag));
+  const start = new Date(ende); start.setDate(ende.getDate() - wochen * 7 + 1);
+  const spalten = [];
+  let max = 0;
+  const d = new Date(start);
+  for (let w = 0; w < wochen; w++) {
+    const spalte = [];
+    for (let t = 0; t < 7; t++) {
+      const k = tagKey(d);
+      const n = d > heute ? null : Math.max(0, Math.round(Number(quelle[k]) || 0));
+      if (n) max = Math.max(max, n);
+      spalte.push({ tag: k, worte: n, heute: k === tagKey(heute) });
+      d.setDate(d.getDate() + 1);
+    }
+    spalten.push(spalte);
+  }
+  for (const sp of spalten) for (const z of sp) {
+    z.stufe = z.worte === null ? -1 : z.worte === 0 ? 0 : z.worte >= max * .66 ? 3 : z.worte >= max * .33 ? 2 : 1;
+  }
+  return { spalten, max, von: tagKey(start), bis: tagKey(ende) };
+}

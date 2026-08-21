@@ -234,8 +234,20 @@ RENDER.feinheiten = function (haupt) {
     const n = anzahl(typ);
     return el('div', { class: 'z' }, el('b', {}, String(n)), el('span', {}, n === 1 ? einzahl : mehrzahl));
   });
+  /* Ein Jahr aus Punkten: jeder Tag ein Kästchen, je dunkler, desto mehr Wörter. */
+  const rasterWochen = (typeof innerWidth === 'number' && innerWidth < 620) ? 26 : 53;
+  const raster = jahresRaster(D.stats.tage, rasterWochen);
+  const jahr = el('div', { class: 'jahresraster', role: 'img', 'aria-label': 'Schreibtage der letzten ' + rasterWochen + ' Wochen' });
+  for (const spalte of raster.spalten) {
+    const sp = el('div', { class: 'jr-woche' });
+    for (const z of spalte) sp.append(el('i', { class: 'jr-tag stufe-' + z.stufe + (z.heute ? ' heute' : ''), title: z.worte === null ? '' : z.tag + ' · ' + z.worte + (z.worte === 1 ? ' Wort' : ' Wörter') }));
+    jahr.append(sp);
+  }
+  const schreibtage = Object.values(D.stats.tage).filter((v) => v > 0).length;
   inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Zahlen'),
     el('div', { class: 'karte' },
+      el('div', { class: 'jahresraster-kopf' }, el('span', {}, rasterWochen === 53 ? 'Das letzte Jahr' : 'Das letzte halbe Jahr'), el('span', { class: 'jr-legende' }, schreibtage + (schreibtage === 1 ? ' Schreibtag' : ' Schreibtage') + ' insgesamt')),
+      jahr,
       balken,
       el('div', { class: 'zahlenreihe' },
         el('div', { class: 'z' }, el('b', {}, gesamt.toLocaleString('de-DE')), el('span', {}, 'Wörter insgesamt')),

@@ -150,6 +150,7 @@ RENDER.projekt = function (haupt, pid) {
         (() => { const d = heftDeckelDaten(h); return el('span', { class: 'mini-deckel muster-' + d.muster, style: d.style }); })(), el('span', {}, h.titel),
         el('small', {}, kinder(h.id, 'seite').length + ' S.'))) : el('span', { class: 'projekt-hefte-leer' }, 'Noch kein Heft liegt daneben.')));
   inhalt.append(heftband);
+  inhalt.append(baueFigurenUndOrte(p));
 
   inhalt.append(el('button', {
     class: 'plusskarte', style: 'width:100%;margin-top:22px', onclick: async () => {
@@ -162,6 +163,61 @@ RENDER.projekt = function (haupt, pid) {
 
   haupt.append(inhalt);
 };
+
+/* ----- Figuren & Orte: die Welt eines Projekts -----
+   Jeder Eintrag ist ein Dokument vom Typ „figur" mit Name, Art und Notiz.
+   [[Name]] im Text springt direkt hierher, weil der Name der Titel ist. */
+const FIGUR_ARTEN = [['figur', 'Figur'], ['ort', 'Ort'], ['ding', 'Ding'], ['sonst', 'Anderes']];
+function figurenVon(p) { return kinder(p.id, 'figur'); }
+function figurVorkommen(p, name) {
+  const n = normalisiere(String(name || '').trim());
+  if (!n) return 0;
+  let z = 0;
+  for (const d of D.docs.values()) if (d.typ === 'szene' && d.projekt === p.id && normalisiere(d.text || '').includes(n)) z++;
+  return z;
+}
+async function figurAnlegenOderAendern(p, alt) {
+  const name = await eingabe({ titel: alt ? 'Heißt jetzt …' : 'Wer oder was kommt dazu?', wert: alt ? alt.titel : '', platzhalter: 'Name der Figur, des Ortes, des Dings' });
+  if (name === null || (!alt && !name)) return null;
+  const art = await menue(FIGUR_ARTEN.map(([w, t]) => ({ text: t, wert: w, icon: w === 'figur' ? 'figur' : w === 'ort' ? 'zuhause' : 'wuerfel' })), 'Was ist es?');
+  if (!art) return null;
+  const notiz = await eingabe({ titel: 'Was ich darüber weiß', wert: alt ? alt.notiz || '' : '', platzhalter: 'Alter, Geruch, Geheimnis, was auf dem Tisch liegt …', mehrzeilig: true, ok: alt ? 'So bleibt es' : 'Aufnehmen' });
+  if (notiz === null) return null;
+  if (alt) { alt.titel = name || alt.titel; alt.art = art; alt.notiz = notiz; speichere(alt); return alt; }
+  return neuDoc('figur', { parent: p.id, projekt: p.id, titel: name, art, notiz, ord: figurenVon(p).length });
+}
+function baueFigurenUndOrte(p) {
+  const liste = figurenVon(p).sort((a, b) => (FIGUR_ARTEN.findIndex((x) => x[0] === a.art) - FIGUR_ARTEN.findIndex((x) => x[0] === b.art)) || (a.titel || '').localeCompare(b.titel || '', 'de'));
+  const band = el('div', { class: 'figurenband' });
+  for (const f of liste) {
+    const vorkommen = figurVorkommen(p, f.titel);
+    const chip = el('button', { class: 'figurchip art-' + (f.art || 'figur'), title: f.notiz || '' },
+      el('span', { class: 'figur-icon', html: ik(f.art === 'ort' ? 'zuhause' : f.art === 'figur' ? 'figur' : 'wuerfel') }),
+      el('span', { class: 'figur-name' }, f.titel || 'Ohne Namen'),
+      vorkommen ? el('small', {}, String(vorkommen)) : null);
+    chip.addEventListener('click', async () => {
+      const wahl = await menue([
+        f.notiz ? { text: (f.notiz.length > 60 ? f.notiz.slice(0, 60) + '…' : f.notiz), wert: '_lesen' } : null,
+        { text: 'Ändern', icon: 'stift', wert: 'aendern' },
+        vorkommen ? { text: 'Wo kommt „' + f.titel + '" vor? (' + vorkommen + ')', icon: 'suche', wert: 'suche' } : null,
+        { text: 'Verbindungen ansehen', icon: 'verbinden', wert: 'bezug' },
+        { text: 'Entfernen', icon: 'muell', wert: 'weg', rot: true }
+      ], f.titel);
+      if (wahl === '_lesen') zeigeTextFund({ titel: f.titel, text: f.notiz, typ: 'figur' });
+      else if (wahl === 'aendern') { if (await figurAnlegenOderAendern(p, f)) zeichne(); }
+      else if (wahl === 'suche') { oeffneSuche(); setTimeout(() => { const feld = $('.suchbogen input'); if (feld) { feld.value = f.titel; feld.dispatchEvent(new Event('input', { bubbles: true })); } }, 120); }
+      else if (wahl === 'bezug') zeigeBeziehungen(f);
+      else if (wahl === 'weg' && await frage('„' + f.titel + '" aus Figuren & Orten nehmen?', { ja: 'Entfernen', gefahr: true })) { await loesche(f.id); zeichne(); }
+    });
+    band.append(chip);
+  }
+  if (!liste.length) band.append(el('span', { class: 'projekt-hefte-leer' }, 'Noch niemand und nirgends. Wer tritt auf, wo spielt es?'));
+  return el('div', { class: 'projekt-figuren' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('figur') }), 'FIGUREN & ORTE', el('span', { class: 'rest' }),
+      el('button', { class: 'knopf zart', onclick: async () => { if (await figurAnlegenOderAendern(p)) zeichne(); } }, '+ Dazu')),
+    el('div', { class: 'projekt-figuren-hinweis' }, 'Mit [[Name]] im Text springt man hierher. Die kleine Zahl sagt, in wie vielen Szenen der Name vorkommt.'),
+    band);
+}
 
 function baueKapitel(k, p) {
   const szenen = kinder(k.id, 'szene');
@@ -398,7 +454,8 @@ function zeigeLeseansicht(p) {
 
   const bogen = el('div', { class: 'lesebogen' }, innen);
   const leiste = el('div', { class: 'schwebeleiste' },
-    el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Leseansicht schließen', onclick: () => { bogen.remove(); leiste.remove(); } }),
+    el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Leseansicht schließen', onclick: () => { if (typeof vorlesenStopp === 'function') vorlesenStopp(); bogen.remove(); leiste.remove(); } }),
+    el('button', { class: 'rundknopf zart vorlese-knopf', html: ik('vorlesen'), title: 'Vorlesen lassen', onclick: (e) => vorlesen(gesamt, e.currentTarget) }),
     el('button', {
       class: 'knopf', onclick: async () => {
         try { await navigator.clipboard.writeText(gesamt); toast('Alles in der Zwischenablage.'); }

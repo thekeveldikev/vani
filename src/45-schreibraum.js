@@ -4,6 +4,51 @@
 
 let _sr = null;
 
+/* ----- Vorlesen: die Stimme des Geräts, ganz ohne Netz -----
+   Gut zum Gegenlesen: Was holpert, hört man, bevor man es sieht. */
+let _vorleser = null;
+function vorlesenMoeglich() { return typeof speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined'; }
+function vorlesenLaeuft() { return !!(_vorleser && vorlesenMoeglich() && speechSynthesis.speaking); }
+function vorlesenStopp() {
+  if (vorlesenMoeglich()) { try { speechSynthesis.cancel(); } catch (e) {} }
+  _vorleser = null;
+  document.body.classList.remove('liest-vor');
+  $$('.vorlese-knopf.an').forEach((k) => k.classList.remove('an'));
+}
+function vorlesen(text, knopf) {
+  if (!vorlesenMoeglich()) { toast('Dieses Gerät kann noch nicht vorlesen.'); return false; }
+  if (vorlesenLaeuft()) { vorlesenStopp(); return false; }
+  const rein = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!rein) { toast('Da steht noch nichts zum Vorlesen.'); return false; }
+  try { speechSynthesis.cancel(); } catch (e) {}
+  /* Lange Texte in Stücke: manche Geräte brechen bei langen Äußerungen ab. */
+  const stuecke = rein.match(/[^.!?…]+[.!?…]+["“”»«)]?|[^.!?…]+$/g) || [rein];
+  const bloecke = [];
+  let puffer = '';
+  for (const st of stuecke) {
+    if ((puffer + st).length > 700 && puffer) { bloecke.push(puffer.trim()); puffer = ''; }
+    puffer += st + ' ';
+  }
+  if (puffer.trim()) bloecke.push(puffer.trim());
+  const stimmen = (speechSynthesis.getVoices() || []);
+  const deutsch = stimmen.find((v) => /^de[-_]/i.test(v.lang) && /siri|anna|petra|markus|google|natural|premium/i.test(v.name)) || stimmen.find((v) => /^de[-_]/i.test(v.lang)) || null;
+  _vorleser = { bloecke, i: 0 };
+  document.body.classList.add('liest-vor');
+  if (knopf) knopf.classList.add('an');
+  const weiter = () => {
+    if (!_vorleser || _vorleser.i >= _vorleser.bloecke.length) { vorlesenStopp(); return; }
+    const u = new SpeechSynthesisUtterance(_vorleser.bloecke[_vorleser.i++]);
+    u.lang = deutsch ? deutsch.lang : 'de-DE';
+    if (deutsch) u.voice = deutsch;
+    u.rate = begrenze(D.einst.vorleseTempo, .6, 1.4, .95);
+    u.onend = weiter;
+    u.onerror = () => vorlesenStopp();
+    try { speechSynthesis.speak(u); } catch (e) { vorlesenStopp(); }
+  };
+  weiter();
+  return true;
+}
+
 function oeffneSchreibraum(docId) {
   if (_sr) schliesseSchreibraum();
   const doc = D.docs.get(docId);
@@ -32,12 +77,16 @@ function oeffneSchreibraum(docId) {
   const mitte = el('div', { class: 'sr-mitte' }, spalte);
 
   const klangKnopf = el('button', { class: 'rundknopf zart' + (klangAktiv() ? ' klang-an' : ''), html: ik('klang'), title: 'Klang öffnen', onclick: () => { oeffneMischpult(); } });
+  const vorleseKnopf = el('button', { class: 'rundknopf zart vorlese-knopf', html: ik('vorlesen'), title: 'Vorlesen lassen (nochmal tippen: Stopp)', onclick: (e) => {
+    vorlesen((doc.titel ? doc.titel + '. ' : '') + srAktuellerText(), e.currentTarget);
+  } });
 
   const kopf = el('div', { class: 'sr-kopf' },
     el('button', { class: 'knopf', onclick: () => schliesseSchreibraum(true) }, el('span', { html: ik('haken'), style: 'display:flex' }), 'Fertig'),
     titel,
     kerzenhalter,
     worteAnzeige,
+    vorleseKnopf,
     klangKnopf,
     el('button', { class: 'rundknopf zart', html: ik('feinheiten'), title: 'Schreibraum einstellen', onclick: () => srEinstellungen() })
   );
@@ -135,6 +184,7 @@ function srSetzeText(text) {
 
 function schliesseSchreibraum(zurueck) {
   if (!_sr) return;
+  if (typeof vorlesenStopp === 'function') vorlesenStopp();
   _sr.sichern && _sr.sichern.sofort();
   document.removeEventListener('selectionchange', _sr.spiegelBeiAuswahl);
   if (_sr.sprint) beendeSprint(true);
@@ -233,6 +283,7 @@ function srEinstellungen() {
     zeileFuer('Tastenklang', wahl([[true, 'An'], [false, 'Aus']], s.tastenklang, (v) => { s.tastenklang = v; })),
     zeileFuer('„Kluge Zeichen"', wahl([[true, 'An'], [false, 'Aus']], s.ersetzungen, (v) => { s.ersetzungen = v; })),
     zeileFuer('Autokorrektur', wahl([[true, 'An'], [false, 'Aus']], s.autokorrektur, (v) => { s.autokorrektur = v; })),
+    zeileFuer('Vorlesetempo', wahl([[.8, 'Ruhig'], [.95, 'Normal'], [1.15, 'Zügig']], begrenze(s.vorleseTempo, .6, 1.4, .95), (v) => { s.vorleseTempo = v; })),
     el('div', { class: 'reihe', style: 'justify-content:flex-start;flex-wrap:wrap;gap:8px' },
       el('button', { class: 'knopf', onclick: () => { zu(); sucheErsetze(); } }, el('span', { html: ik('suche'), style: 'display:flex' }), 'Suchen & Ersetzen'),
       el('button', { class: 'knopf', onclick: () => { zu(); friereEin(); } }, el('span', { html: ik('frieren'), style: 'display:flex' }), 'Stand einfrieren'),

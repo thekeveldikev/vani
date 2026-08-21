@@ -468,3 +468,86 @@ test('Kritzeln: Striche landen genau dort, wo gezeichnet wurde — in jeder Brei
   assert.doesNotThrow(() => k.kritzelZeichneStrich(ctx, { punkte: [] }, 100));
   assert.doesNotThrow(() => k.kritzelZeichneStrich(ctx, {}, 100));
 });
+
+test('Funken: groß, eindeutig, und jede Art liefert etwas Brauchbares', async () => {
+  const k = baueSandkasten();
+  const listen = { FUNKEN: k.FUNKEN, FUNKE_WER: k.FUNKE_WER, FUNKE_WO: k.FUNKE_WO, FUNKE_ABER: k.FUNKE_ABER, FUNKE_FRAGEN: k.FUNKE_FRAGEN, FUNKE_FORMEN: k.FUNKE_FORMEN, FUNKE_SAETZE: k.FUNKE_SAETZE, FUNKE_FIGUREN: k.FUNKE_FIGUREN, FUNKE_WENDUNGEN: k.FUNKE_WENDUNGEN };
+  const mindest = { FUNKEN: 150, FUNKE_WER: 36, FUNKE_WO: 36, FUNKE_ABER: 36, FUNKE_FRAGEN: 36, FUNKE_FORMEN: 36, FUNKE_SAETZE: 36, FUNKE_FIGUREN: 24, FUNKE_WENDUNGEN: 20 };
+  for (const [name, liste] of Object.entries(listen)) {
+    const arr = roh(liste);
+    assert.ok(arr.length >= mindest[name], name + ' hat nur ' + arr.length);
+    assert.equal(new Set(arr.map((x) => x.trim().toLowerCase())).size, arr.length, name + ' enthält Dubletten');
+    for (const x of arr) assert.ok(typeof x === 'string' && x.trim().length >= 12 && x.length <= 400, name + ': ' + x);
+  }
+  /* Wer · Wo · Aber muss grammatisch zusammenpassen: Komma-Enden, „aber"-Anfang. */
+  for (const w of roh(k.FUNKE_WER)) assert.ok(w.endsWith(','), 'Wer endet mit Komma: ' + w);
+  for (const w of roh(k.FUNKE_WO)) assert.ok(w.endsWith(','), 'Wo endet mit Komma: ' + w);
+  for (const w of roh(k.FUNKE_ABER)) assert.ok(/^aber /.test(w), 'Aber beginnt mit aber: ' + w);
+  const arten = roh(k.FUNKE_ARTEN).map((a) => a[0]);
+  assert.deepEqual(arten, ['szene', 'kombi', 'figur', 'wendung', 'frage', 'form', 'satz']);
+  for (const art of arten) {
+    const f = art === 'kombi' ? k.neuerFunke(true) : k.neuerFunke(false, art);
+    assert.ok(typeof f === 'string' && f.length > 10, 'Art ohne Funke: ' + art);
+  }
+});
+
+test('Schlagworte: über alles gezählt, je Dokument einmal, Archiv bleibt draußen', async () => {
+  const k = baueSandkasten();
+  const docs = [
+    { typ: 'schnipsel', text: 'Heute #Regen und #regen und #Nacht' },
+    { typ: 'blatt', text: '#nacht\nZeile mit #Feuer' },
+    { typ: 'goodnote', text: '#geheim' },
+    { typ: 'szene', text: 'kein#schlagwort hier, aber #a zu kurz, #Feuer ja' },
+    { typ: 'seite', text: null }, null
+  ];
+  const idx = roh(k.schlagwortIndex(docs));
+  assert.deepEqual(idx.map((x) => x.wort + ':' + x.anzahl), ['feuer:2', 'nacht:2', 'regen:1']);
+  assert.equal(roh(k.schlagwortIndex(docs, 1)).length, 1);
+  assert.deepEqual(roh(k.schlagwortIndex([])), []);
+});
+
+test('Startauftrag: geteilter Text wird ein Schnipsel, Schnellstarts sind bekannt, Unsinn bleibt null', async () => {
+  const k = baueSandkasten();
+  assert.deepEqual(roh(k.startAuftrag('?titel=Ein%20Titel&text=Der%20Text&url=https%3A%2F%2Fbeispiel.de')), { art: 'geteilt', text: 'Ein Titel\nDer Text\nhttps://beispiel.de' });
+  assert.deepEqual(roh(k.startAuftrag('?text=nur%20Text')), { art: 'geteilt', text: 'nur Text' });
+  assert.deepEqual(roh(k.startAuftrag('?titel=Gleich&text=Gleich')), { art: 'geteilt', text: 'Gleich' });
+  assert.deepEqual(roh(k.startAuftrag('?neu=blatt')), { art: 'neu', was: 'blatt' });
+  assert.equal(k.startAuftrag('?neu=raketen'), null);
+  assert.equal(k.startAuftrag('?kein-sw'), null);
+  assert.equal(k.startAuftrag(''), null);
+  assert.equal(k.startAuftrag(null), null);
+  const lang = k.startAuftrag('?text=' + encodeURIComponent('x'.repeat(300000)));
+  assert.equal(lang.text.length, 200000, 'geteilter Text wird begrenzt');
+});
+
+test('Jahresraster: Wochen × 7, Zukunft leer, Stufen nach Maximum, heute markiert', async () => {
+  const k = baueSandkasten();
+  const jetzt = new Date(2026, 7, 21, 12).getTime(); /* ein Freitag */
+  const tage = { '2026-08-21': 300, '2026-08-20': 100, '2026-08-19': 10, '2025-01-01': 5000 };
+  const r = roh(k.jahresRaster(tage, 53, jetzt));
+  assert.equal(r.spalten.length, 53);
+  assert.ok(r.spalten.every((sp) => sp.length === 7));
+  assert.equal(r.max, 300, 'Werte außerhalb des Fensters zählen nicht');
+  const letzte = r.spalten[52];
+  assert.equal(letzte.filter((z) => z.worte === null).length, 2, 'Samstag und Sonntag liegen in der Zukunft');
+  const heute = letzte.find((z) => z.heute);
+  assert.ok(heute && heute.stufe === 3 && heute.tag === '2026-08-21');
+  assert.equal(letzte.find((z) => z.tag === '2026-08-20').stufe, 2);
+  assert.equal(letzte.find((z) => z.tag === '2026-08-19').stufe, 1);
+  assert.equal(roh(k.jahresRaster(null, 0, jetzt)).spalten.length, 1, 'mindestens eine Woche');
+  assert.equal(roh(k.jahresRaster({ '2026-08-21': 'kaputt' }, 2, jetzt)).max, 0);
+});
+
+test('Hefte: Papierfarbe, Rand, Zettelschrift und Anpinnen überleben die Sanitisierung nur in erlaubter Form', async () => {
+  const k = baueSandkasten();
+  const h = k.sauberesDokument({ id: 'h', typ: 'heft', titel: 'H', papierfarbe: 'neon', rand: 'ja', gepinnt: 1, angelegt: 1, geaendert: 1 });
+  assert.equal(h.papierfarbe, 'hell'); assert.equal(h.rand, false); assert.equal(h.gepinnt, false);
+  const h2 = k.sauberesDokument({ id: 'h2', typ: 'heft', titel: 'H', papierfarbe: 'nacht', rand: true, lesezeichen: 's1', angelegt: 1, geaendert: 1 });
+  assert.equal(h2.papierfarbe, 'nacht'); assert.equal(h2.rand, true); assert.equal(h2.lesezeichen, 's1');
+  const z = k.sauberesDokument({ id: 'z', typ: 'zettel', schrift: 'comic', farbe: 'lila', angelegt: 1, geaendert: 1 });
+  assert.equal(z.schrift, 'hand'); assert.equal(z.farbe, 'lila');
+  assert.equal(k.papierKlassen({ papier: 'kariert', papierfarbe: 'kraft', rand: true }, ' fluss'), 'papierseite kariert papierfarbe-kraft mit-rand fluss');
+  assert.equal(k.papierKlassen({}), 'papierseite liniert papierfarbe-hell');
+  assert.deepEqual(roh(k.PAPIERFARBEN).map((x) => x[0]), ['hell', 'weiss', 'creme', 'kraft', 'nacht']);
+  assert.equal(roh(k.ZETTELFARBEN).length, 8);
+});

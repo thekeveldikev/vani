@@ -94,6 +94,21 @@ async function sucheAppUpdate(neuLaden = false) {
   setzeThema(D.einst.thema);
   baueLeiste();
   zeichne();
+
+  /* Geteilter Text (Android „Teilen → VANI") oder ein Schnellstart vom Icon */
+  const auftrag = startAuftrag(location.search);
+  if (auftrag) {
+    try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}
+    if (auftrag.art === 'geteilt' && auftrag.text) {
+      neuDoc('schnipsel', { text: auftrag.text });
+      location.hash = '#/schnipsel';
+      setTimeout(() => toast('Angekommen — liegt in den Schnipseln.', 3600), 400);
+    } else if (auftrag.art === 'neu') {
+      if (auftrag.was === 'schnipsel') { location.hash = '#/schnipsel'; setTimeout(() => { const f = $('.schreibzeile textarea'); if (f) f.focus(); }, 300); }
+      else if (auftrag.was === 'blatt') { location.hash = '#/blaetter'; setTimeout(() => { const b = blattAusText('', ''); oeffneSchreibraum(b.id); }, 200); }
+      else if (auftrag.was === 'suche') setTimeout(() => oeffneSuche(), 200);
+    }
+  }
   if (vaniAdresseArt() === 'rettung') {
     setTimeout(() => toastMitAktion('Du bist im Rettungsmodus der früheren zweiten Adresse.', 'Sicher umziehen', () => {
       location.hash = '#/feinheiten'; zeichne();

@@ -44,7 +44,7 @@ const ANLEITUNG = [
         'Ist kein Wort geschrieben, glimmt noch Glut von neulich oder es ist kalt. Ein Satz genügt.'
       ], tipp: 'Ein Tagesziel in Wörtern stelle ich in den Feinheiten ein. Dann zeigt die Karte einen Balken, und im Schreibraum klingt eine Glocke, wenn es erreicht ist.' },
       { t: 'Der Funke', p: [
-        'Ein Schreibanstoß. Die Knöpfe wechseln die Art: Szene (ein Bild), Wer · Wo · Aber (eine zusammengewürfelte Ausgangslage), Frage, Form (eine Schreibübung), Satz (ein erster Satz) und Meine (meine eigene Funkenkiste).',
+        'Ein Schreibanstoß. Die Knöpfe wechseln die Art: Szene (ein Bild), Wer · Wo · Aber (eine zusammengewürfelte Ausgangslage aus über sechzigtausend Möglichkeiten), Figur (jemand, der auftreten könnte), Wendung (was jetzt passiert), Frage, Form (eine Schreibübung), Satz (ein erster Satz) und Meine (meine eigene Funkenkiste). Über vierhundert Funken liegen bereit.',
         '„Anderer" würfelt neu. „Merken" legt den Funken in die Funkeln, damit er irgendwann unter „Wieder aufgetaucht" zurückkommt. „Dem nachgehen" legt sofort ein Blatt mit dem Funken an und öffnet den Schreibraum.'
       ], b: 'Wer · Wo · Aber: „Die letzte Leuchtturmwärterin, in einem Hotel, dessen Zimmernummern sich jede Nacht ändern, aber heute klopft es zweimal."' },
       { t: 'Eigene Funken', p: ['„+ Eigener" fängt einen gehörten Satz, ein Bild, eine Frage oder nur einen Vibe ein — mit kurzer Stimmungsnotiz. Die Funkenkiste sammelt sie, ist durchsuchbar, jeder Funke lässt sich ändern, verbinden oder vergessen und direkt zu einem Blatt machen.'] },
@@ -77,7 +77,7 @@ const ANLEITUNG = [
     abschnitte: [
       { t: 'Der Stapel', p: ['Blätter sind einzelne Texte ohne Drumherum. Das Plus legt ein neues an und öffnet sofort den Schreibraum. Jede Karte zeigt Titel (oder die erste Zeile), eine Probe und die Wörterzahl.'] },
       { t: 'Sortieren', p: ['Ab zwei Blättern erscheinen Knöpfe: Zuletzt, Älteste zuerst, A–Z. Die Wahl bleibt gespeichert.'] },
-      { t: 'Das Menü (lange halten)', p: ['Umbenennen · Teilen · Duplizieren (eine „Abschrift") · In ein Heft legen … · Hinzufügen & verbinden · Löschen.'], b: 'Ein Blatt ist fertig gedacht → lange halten → „In ein Heft legen …" → Heft wählen, Stelle wählen (ganz vorne, nach Seite 3, am Ende). Das Blatt ist jetzt eine Seite.' },
+      { t: 'Das Menü (lange halten)', p: ['Oben anpinnen · Umbenennen · Vorlesen lassen · Teilen · Duplizieren (eine „Abschrift") · In ein Heft legen … · Hinzufügen & verbinden · Löschen. Angepinnte Blätter liegen in jeder Sortierung oben und tragen eine goldene Nadel.'], b: 'Ein Blatt ist fertig gedacht → lange halten → „In ein Heft legen …" → Heft wählen, Stelle wählen (ganz vorne, nach Seite 3, am Ende). Das Blatt ist jetzt eine Seite.' },
       { t: 'Formatiert oder schlicht', p: ['Ein Blatt ist zuerst schlichter Text. Im Schreibraum unter den Einstellungen steht „Aa · Text formatieren" — danach gibt es eine Formatleiste mit fett, kursiv, Überschriften, Listen, Farben und Ausrichtung. Zurück zu schlicht gibt es nicht — aber der schlichte Text bleibt immer mitgespeichert, für Suche, Zählung und Sicherung.'] }
     ]
   },
@@ -97,6 +97,7 @@ const ANLEITUNG = [
       { t: 'Die Kerze', p: ['„Kerze anzünden": 10, 20 oder 45 Minuten. Oben brennt eine kleine Kerze herunter. Am Ende klingt eine Glocke und VANI sagt, wie viele Wörter in der Zeit entstanden sind. Schließen des Schreibraums bläst sie aus.'] },
       { t: 'Teilen', p: ['Schickt Titel und Text als Text weiter — an Notizen, WhatsApp, Mail, die Zwischenablage. Was das Gerät anbietet, steht im Teilen-Menü.'] },
       { t: 'Verknüpfen & einordnen', p: ['Zeigt, wohin [[Verweise]] im Text führen, welche Texte hierher zeigen, und öffnet die Beziehungen. Von hier geht es auch direkt zu „Zu Heft, Projekt oder Cluster hinzufügen".'] },
+      { t: 'Vorlesen lassen', p: ['Das Vorlese-Symbol oben liest den Text mit der Stimme des Geräts vor — ganz ohne Internet. Noch einmal tippen stoppt. Gut zum Gegenlesen: Was holpert, hört man, bevor man es sieht. Das Tempo (ruhig, normal, zügig) steht in den Schreibraum-Einstellungen. Auch Blätter (im Menü) und die Leseansicht eines Projekts lesen vor.'], tipp: 'Auf manchen Geräten ist die deutsche Stimme erst nach dem ersten Mal richtig geladen — einmal stoppen und neu starten hilft.' },
       { t: 'Klang im Schreibraum', p: ['Das Lautsprecher-Symbol oben öffnet das Mischpult als kleine Überlagerung — ohne den Text zu verlassen.'] }
     ]
   },
@@ -115,7 +116,11 @@ const ANLEITUNG = [
     kurz: 'Echte Hefte mit Seiten, Zetteln, Fotos und Kritzeleien.',
     abschnitte: [
       { t: 'Das Regal', p: ['Jedes Heft ist ein Deckel im Regal. Plus legt ein neues an. Lange halten öffnet das Heft-Menü. „Ins Regal stellen" archiviert ein Heft (es rückt nach unten unter „Im Regal"), „Zurück auf den Tisch" holt es wieder.'] },
-      { t: 'Umschlag & Papier gestalten', p: ['Grundfarbe aus der Palette oder frei, Zweitton, Buchband, Muster (Schlicht, Leinen, Diagonal, Punkte, Rahmen, Wellen) und Papier (Liniert, Breite Linien, Kariert, Punktraster, Blanko). Die Vorschau zeigt alles sofort; „Abbrechen" nimmt alles zurück.'] },
+      { t: 'Umschlag & Papier gestalten', p: ['Grundfarbe aus der Palette oder frei, Zweitton, Buchband, Muster (Schlicht, Leinen, Diagonal, Punkte, Rahmen, Wellen), Papier (Liniert, Breite Linien, Kariert, Punktraster, Blanko), Papierfarbe (Hell, Weiß, Creme, Kraft, Nacht) und eine Randlinie wie im Schulheft. Die Vorschau zeigt alles sofort; „Abbrechen" nimmt alles zurück.'], b: 'Ein Tagebuch-Heft: Papier Kraft, Randlinie an, Band dunkelrot. Ein Nachtheft: Papierfarbe Nacht — helle Schrift auf dunklem Papier.' },
+      { t: 'Inhalt, Lesezeichen, Seiten ordnen', p: [
+        'Das Listen-Symbol oben im Heft öffnet den Inhalt: jede Seite mit Titel oder erster Zeile, Wörterzahl und Angeklebtem. Ein Tipp springt hin — in jeder Ansicht.',
+        'Im Seiten-Menü (drei Punkte auf dem Papier): „Lesezeichen hierher" — das Heft öffnet sich beim nächsten Mal auf dieser Seite. „Seite nach vorn" und „Seite nach hinten" ordnen um. „Seite verdoppeln" legt eine Abschrift mit allen Zetteln direkt dahinter.'
+      ] },
       { t: 'Drei Ansichten', p: [
         'Oben im Heft stehen drei Knöpfe. „Seiten" blättert Seite für Seite (Pfeile links/rechts). „Rolle" zeigt alle Seiten untereinander, jede mit eigenem Rand und Seitenzahl. „Am Stück" macht aus dem ganzen Heft eine einzige lange Seite — ohne Kanten, ohne Umbruch, ohne Seitenzahlen.',
         'Es bleibt immer dasselbe Heft, nur anders angeschaut. Umschalten ändert nichts am Text.'
@@ -130,7 +135,7 @@ const ANLEITUNG = [
         'Von links nach rechts: 📌 Nadel = Zettel ankleben · Kamera = Foto einkleben · Stift = Kritzeln · Aa = Text formatieren · drei Punkte = Mehr (Im Schreibraum öffnen, Hinzufügen & verbinden, Als loses Blatt herausnehmen, Seite herausreißen).',
         'Der Zettel hat also einen eigenen Knopf und steckt in keinem Menü.'
       ], tipp: 'Wenn ich diese Knöpfe nicht sehe: In den Feinheiten auf „VANI jetzt aktualisieren" tippen. Dann ist die neueste Fassung da.' },
-      { t: 'Zettel', p: ['Kleine farbige Notizzettel auf der Seite. Ziehen verschiebt, der Griff unten rechts ändert die Größe, Tippen macht ihn beschreibbar. Lange halten: Andere Farbe, Befestigung (Tesa, Reißzwecke, lose aufgelegt), Etwas drehen, Abmachen.'], b: 'Eine Figurenbeschreibung als gelber Zettel schräg an den Rand der Seite — mit Tesa. Die Seite selbst bleibt frei für die Szene.' },
+      { t: 'Zettel', p: ['Kleine farbige Notizzettel auf der Seite. Ziehen verschiebt, der Griff unten rechts ändert die Größe, Tippen macht ihn beschreibbar. Lange halten: Andere Farbe (acht Töne), Schrift (Handschrift, Klar, Serife), Form (schmal, normal, breit), Befestigung (Tesa, Reißzwecke, lose aufgelegt), Etwas drehen, Gerade rücken, Abmachen.'], b: 'Eine Figurenbeschreibung als gelber Zettel schräg an den Rand der Seite — mit Tesa. Die Seite selbst bleibt frei für die Szene.' },
       { t: 'Fotos', p: ['„Foto einkleben" legt ein Bild auf die Seite, leicht schräg wie eingeklebt. Es lässt sich genauso ziehen, drehen, vergrößern und befestigen wie ein Zettel.'] },
       { t: 'Kritzeln', p: [
         '„Kritzeln" legt eine Zeichenfläche über die Seite. Die Werkzeugleiste schwebt oben: zwölf Farben plus eine eigene, stufenlose Stiftdicke, Radierer, ein Schritt zurück, ein Schritt wieder vor, alles löschen, Abbrechen und Fertig.',
@@ -162,7 +167,12 @@ const ANLEITUNG = [
       { t: 'Szenen-Menü (lange halten)', p: ['Umbenennen · Andere Farbe · Duplizieren („Fassung 2") · In anderes Kapitel … · Teilen · Szene löschen.'], b: 'Eine Szene in zwei Richtungen probieren: Duplizieren → in der Fassung 2 anders weiterschreiben → die schlechtere später löschen oder als Rückseiten-Notiz behalten.' },
       { t: 'Leseansicht', p: ['Das Buch-Symbol zeigt das ganze Projekt am Stück wie ein Manuskript: Kapitelüberschriften, Szenen durch Sternchen getrennt, Gesamtwörter. „Kopieren" legt alles in die Zwischenablage, „Als Datei" gibt eine .txt heraus.'] },
       { t: 'Wortziel', p: ['Mit Wortziel zeigen Karte und Kopf einen Fortschrittsbalken. Das Ziel lässt sich im Projekt-Menü jederzeit ändern (0 = keins).'] },
-      { t: 'Hefte am Projekt', p: ['Unten im Projekt liegen Hefte, die dazugehören. „Heft dazulegen" ordnet ein vorhandenes zu oder legt ein neues an. Ein Tipp auf das Heft öffnet es.'] }
+      { t: 'Hefte am Projekt', p: ['Unten im Projekt liegen Hefte, die dazugehören. „Heft dazulegen" ordnet ein vorhandenes zu oder legt ein neues an. Ein Tipp auf das Heft öffnet es.'] },
+      { t: 'Figuren & Orte', p: [
+        'Die Welt des Projekts: Wer tritt auf, wo spielt es, welches Ding trägt die Geschichte. „+ Dazu" fragt Name, Art (Figur, Ort, Ding, Anderes) und eine Notiz — Alter, Geruch, Geheimnis, was auf dem Tisch liegt.',
+        'Die kleine Zahl am Namen sagt, in wie vielen Szenen er vorkommt. Ein Tipp: Notiz lesen, Ändern, „Wo kommt … vor?", Verbindungen, Entfernen.',
+        'Das Beste: [[Name]] in doppelten Klammern im Text springt direkt zur Figur — weil der Name ihr Titel ist.'
+      ], b: 'Figur „Tante Ruth", Ort „Der Hafen", Ding „Das rote Auto". In der Szene steht: „Sie wartete am [[Der Hafen]], wie jeden Sonntag." Ein Tipp auf den Namen, und ich lese meine Notiz.' }
     ]
   },
   {
@@ -239,7 +249,7 @@ const ANLEITUNG = [
       { t: 'Die große Suche', p: ['Unten in der Leiste oder Strg/⌘ + K. Ab zwei Zeichen wird gesucht — in Titeln, Texten und Notizen aller Räume. Treffer sind nach Art gruppiert (Schnipsel, Blätter, Heftseiten, Szenen, Hefte, Projekte, Blasen, Zettel, Wortkisten, Wörter, Faden, Funken, Klang-Szenen) und zeigen die Fundstelle mit Umfeld.'] },
       { t: 'Filter', p: ['Die Chips unter dem Feld beschränken auf eine Art. Dann werden statt 6 bis zu 40 Treffer je Gruppe gezeigt.'] },
       { t: 'Ähnlich', p: ['Ab fünf Zeichen findet die Suche auch Wörter mit einem Buchstaben Unterschied und zeigt sie mit „(ähnlich)". Umlaute und ß sind egal: „strasse" findet „Straße".'] },
-      { t: 'Zuletzt', p: ['Ohne Eingabe zeigt die Suche die letzten Suchen und die zuletzt angefassten Texte.'] },
+      { t: 'Zuletzt und Schlagworte', p: ['Ohne Eingabe zeigt die Suche die letzten Suchen, die zuletzt angefassten Texte und alle Schlagworte: jedes #wort, das irgendwo im Text steht, mit der Zahl der Orte. Ein Tipp sucht danach.'], b: 'In drei Schnipseln steht #sommer. Die Suche zeigt „#sommer 3" — ein Tipp, alle drei sind da.' },
       { t: 'Wiederfinden ohne Suchen', p: ['Zuhause unter „Wieder aufgetaucht" und „Weiterschreiben". Im Heft über die Rolle. Im Projekt über die Leseansicht. In der Funkenkiste und den Wortkisten über deren eigene Suche. Auf der freien Schnipsel-Fläche über „Auf der Fläche suchen".'] }
     ]
   },
@@ -250,7 +260,7 @@ const ANLEITUNG = [
       { t: 'Stimmung', p: ['Fünf Themen: Papier (warm, hell), Tinte (dunkel), Kerze (dunkel, warm), Nebel (kühl, hell), Weiß (reinweiß). Gilt für die ganze App und färbt auch die Leiste oben am Gerät.'] },
       { t: 'Schreiben', p: ['Tagesziel in Wörtern (leer = keins). Automatisches Weiterblättern in Heften an/aus. Schrift, Größe und Fokus stelle ich direkt im Schreibraum ein.'] },
       { t: 'Räume', p: ['Jeder Raum lässt sich ein- und ausblenden und mit den Pfeilen sortieren. Zuhause bleibt immer. Ausgeblendete Räume behalten ihre Inhalte.'] },
-      { t: 'Zahlen', p: ['Die letzten 14 Tage als Balken, Wörter insgesamt, heute, Tage in Folge, und wie viele Schnipsel, Blätter, Seiten und Szenen es gibt.'] },
+      { t: 'Zahlen', p: ['Ein Jahr aus Punkten: jeder Tag ein Kästchen, je dunkler, desto mehr Wörter — so sieht man Strähnen und Pausen auf einen Blick. Darunter die letzten Tage als Balken, Wörter insgesamt, heute, Tage in Folge, und wie viele Schnipsel, Blätter, Seiten und Szenen es gibt.'] },
       { t: 'Papierkorb', p: ['Gelöschtes liegt hier mindestens 30 Tage. „Zurückholen" bringt ein Bündel mit allem zurück, was dazugehörte. „Endgültig leeren" ist die eine Stelle, an der Löschen wirklich löscht — mit Nachfrage.'] },
       { t: 'Frisch anfangen', p: ['„Zählungen auf null" setzt Wörter pro Tag, Strähne und Schreibfeuer zurück. Texte, Hefte, Projekte und der Faden bleiben unangetastet.'] },
       { t: 'Frisch durchatmen', p: ['Ganz unten: die App neu laden. Hilft, wenn etwas hakt — es geht nichts verloren.'] }
@@ -300,6 +310,11 @@ const ANLEITUNG = [
       { t: 'Android-Handy', s: ['https://thekeveldikev.github.io/vani/ in Chrome öffnen.', 'Menü (drei Punkte) → „Zum Startbildschirm hinzufügen" oder „App installieren".'] },
       { t: 'Windows-Laptop', p: ['Entweder https://thekeveldikev.github.io/vani/ im Browser öffnen (Chrome, Edge: dort gibt es „App installieren" in der Adressleiste) — oder die Desktop-App: VANI-x64-Setup.exe installiert sie, VANI-x64-Portable.exe läuft ohne Installation.'] },
       { t: 'Updates hinter demselben Icon', p: ['Ein Icon genügt für immer. Änderungen, die Claude oder Codex auf GitHub veröffentlichen, ersetzen die App hinter diesem Icon — ich muss nie wieder „Zum Home-Bildschirm" wählen. Beim Start holt VANI sich im Hintergrund die neue Fassung; unten erscheint dann „Eine neue Fassung liegt bereit → Neu laden". Oder: Feinheiten → „VANI jetzt aktualisieren".'], b: 'Claude hat etwas an VANI gebaut und auf GitHub veröffentlicht. Am iPad öffne ich mein einziges VANI-Icon, tippe in den Feinheiten auf „VANI jetzt aktualisieren" — fertig. Meine Texte bleiben, wo sie sind.' },
+      { t: 'Teilen nach VANI und Schnellstarts (Android)', p: [
+        'Auf einem Android-Handy taucht VANI im Teilen-Menü anderer Apps auf: Text markieren → Teilen → VANI. Der Text landet als Schnipsel — ohne Kopieren und Einfügen.',
+        'Das Icon lange halten zeigt Schnellstarts: Neuer Schnipsel, Neues Blatt, Suchen.',
+        'Auf dem iPhone und iPad gibt es diese beiden Wege nicht — Apple erlaubt sie Web-Apps nicht. Dort bleibt Kopieren und Einfügen.'
+      ] },
       { t: 'Desktop-App aktualisieren', p: ['Die Windows-App aktualisiert sich noch nicht selbst. Eine neue Setup-Datei einfach über die alte installieren — Inhalte bleiben.'] },
       { t: 'Offline', p: ['Nach dem ersten Öffnen läuft VANI komplett ohne Internet. Internet braucht es nur für Updates, für den Sync und zum Hereinholen des Fadens.'] },
       { t: 'Wenn das alte Icon weg soll', p: ['Icon lange halten → „App entfernen". Zeigt es kein Minus, ist das iPad verwaltet: Einstellungen → Bildschirmzeit → Beschränkungen → Apps löschen → Erlauben, oder die Verwaltung fragen. Vorher sichern, falls Inhalte am alten Icon hängen.'] }

@@ -909,3 +909,68 @@ Nach jeder Layoutänderung bei 375 px **und** 820 px nachmessen: kein seitli
 per `:hover` erreichbar. Vier Vertragstests halten das fest.
 
 Qualitätsstand: `npm test` 90/90, Hosting 2/2, Lint sauber.
+
+## 16. Welle 1 (21. August 2026, VANI 5.6.0)
+
+Nutzerauftrag: Brainstorm plus sofortige Umsetzung der ersten Welle, Bugfixing,
+mehr Looks für Hefte und Zettel, viel mehr Funken. Umgesetzt:
+
+### Funken
+
+`src/34-inhalt.js`: FUNKEN 70→163, WER/WO/ABER je 16→40 (64.000 Kombinationen),
+FRAGEN/FORMEN/SÄTZE je 10→40, neu `FUNKE_FIGUREN` (30) und `FUNKE_WENDUNGEN` (25).
+`FUNKE_ARTEN` ist die eine Quelle für Zuhause und Wörter. Test prüft Mindestmengen,
+Eindeutigkeit und die Grammatik der Wer·Wo·Aber-Teile (Komma-Enden, aber-Anfang).
+
+### Hefte und Zettel
+
+- `heft.papierfarbe` (hell|weiss|creme|kraft|nacht) und `heft.rand` (Randlinie),
+  im Atelier wählbar; `papierKlassen(heft, extra)` baut die Klassen für Seite und
+  Flussbogen. Sanitizer-Whitelist erweitert.
+- `heftInhalt(heft, wohin)`: Seitenliste mit Titel/erster Zeile, Wörtern, Angeklebtem,
+  Lesezeichen; Knopf im Heftkopf (Icon `inhalt`). Springt in jeder Ansicht über
+  `sessionStorage.zielSeite`, das jetzt zentral über `zielAufnehmen()` genau einmal
+  eingelöst wird (vorher folgte die Anzeige einer verschobenen Seite nicht).
+- Seiten-Menü: Lesezeichen hierher (öffnet das Heft beim nächsten Mal dort, nur
+  wenn in dieser Sitzung noch keine Seite gemerkt ist), Seite nach vorn/hinten,
+  Seite verdoppeln (mit Zetteln, ohne Fotos/Kritzelei).
+- Zettel: `ZETTELFARBEN` (8), `zettel.schrift` (hand|klar|serif), Form
+  (schmal/normal/breit = pos.w 22/30/46), „Gerade rücken“.
+
+### Projekte: Figuren & Orte
+
+Neuer Typ `figur` (parent = Projekt, Felder titel/art/notiz/ord). `baueFigurenUndOrte`
+zeigt Chips mit Vorkommenszählung in Szenen; `[[Name]]` springt über
+`findeNachTitel` automatisch hin; `oeffneDoc` öffnet das Projekt; Suche hat die
+Gruppe „Figuren & Orte“; `docIcon` kennt `figur`. Papierkorb: Figuren hängen am
+Projekt und gehen mit ihm in den Korb und zurück (über `_nachfahren`).
+
+### Vorlesen
+
+`vorlesen(text, knopf)` / `vorlesenStopp()` in `src/45-schreibraum.js` über
+`speechSynthesis`: deutsche Stimme bevorzugt, lange Texte in ~700-Zeichen-Stücke
+(WebKit bricht lange Äußerungen ab), Tempo `D.einst.vorleseTempo`. Knöpfe im
+Schreibraum, im Blatt-Menü und in der Leseansicht. Schließen stoppt.
+
+### Suche, Zahlen, Blätter, Boot
+
+- `schlagwortIndex(docs, max)` (30-core): #wort über alles, je Dokument einmal,
+  Goodnotes ausgenommen; Wolke im Leerzustand der Suche.
+- `jahresRaster(tage, wochen, jetzt)` (30-core): 7×Wochen, Montag-Start, Zukunft
+  null, Stufen relativ zum Maximum im Fenster; Rendering in den Feinheiten (53 bzw.
+  26 Wochen unter 620px). Der Test fand sofort einen Randfall: `wochen = 0` fiel auf
+  53 zurück — behoben.
+- Blätter: `gepinnt` (Sanitizer: boolean), oben in jeder Sortierung.
+- `startAuftrag(search)` (30-core) + Boot: `manifest.json` bekommt `share_target`
+  (GET, ./) und `shortcuts`; id/start_url/scope bleiben `./` (Vertragstest). Geteilter
+  Text wird Schnipsel, die Adresse wird per `history.replaceState` wieder sauber.
+  iOS unterstützt beides für Web-Apps nicht — die Anleitung sagt das.
+
+Qualitätsstand: `npm test` 97/97, Hosting 2/2, Lint sauber.
+
+### Ideen für spätere Wellen (nicht umgesetzt)
+
+Zeitstrahl-Raum (alles nach Tagen), Zettel-Checklisten, Bilder auf Brettern,
+Brett-Export als Bild, Szenen-Wortziele, Projekt-Export als Markdown/ZIP,
+Schreibsitzungs-Protokoll, app-weite Schrift- und Akzentwahl, Reime/Wörter-Werkzeug,
+Klang-Einschlaftimer, Zufallsfund-Knopf, Zitate-Sammlung, Spotify (Desktop).

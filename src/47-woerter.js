@@ -377,7 +377,7 @@ RENDER.woerter = function (haupt) {
   const funkeText = el('div', { class: 'funke-text', style: 'min-height:54px' }, funke);
   const arten = el('div', { class: 'funke-arten' });
   const ziehe = () => { funke = funkeArt === 'kombi' ? neuerFunke(true) : neuerFunke(false, funkeArt); funkeText.textContent = funke; };
-  for (const [id, name] of [['szene', 'Szene'], ['kombi', 'Wer · Wo · Aber'], ['frage', 'Frage'], ['form', 'Form'], ['satz', 'Satz']]) arten.append(el('button', {
+  for (const [id, name] of FUNKE_ARTEN) arten.append(el('button', {
     class: id === funkeArt ? 'an' : '', onclick: (e) => { funkeArt = id; $$('button', arten).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); ziehe(); }
   }, name));
   inhalt.append(el('div', { class: 'karte wortkisten-funken' },

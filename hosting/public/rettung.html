@@ -1416,6 +1416,80 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
   #toasts { bottom: calc(env(safe-area-inset-bottom) + 78px); }
 }
 
+/* ================================================================
+   Welle 1: Papierfarben, Randlinie, Zettel-Looks, Figuren & Orte,
+   Schlagworte, Jahresraster, Vorlesen, angepinnte Blätter
+   ================================================================ */
+
+/* Papierfarben — hell ist das bisherige Papier */
+.papierseite.papierfarbe-weiss, .fluss-bogen.papierfarbe-weiss { background-color: #fffefb; }
+.papierseite.papierfarbe-creme, .fluss-bogen.papierfarbe-creme { background-color: #f7ecd2; }
+.papierseite.papierfarbe-kraft, .fluss-bogen.papierfarbe-kraft { background-color: #d9c3a0; }
+.papierseite.papierfarbe-kraft .schreibflaeche, .papierseite.papierfarbe-kraft .stitel { color: #2c2216; }
+.papierseite.papierfarbe-nacht, .fluss-bogen.papierfarbe-nacht { background-color: #26221d; }
+.papierseite.papierfarbe-nacht .schreibflaeche, .papierseite.papierfarbe-nacht .stitel, .papierseite.papierfarbe-nacht .rich-editor { color: #ece3d1; }
+.papierseite.papierfarbe-nacht .stitel::placeholder, .papierseite.papierfarbe-nacht .schreibflaeche::placeholder { color: #9c9080; }
+.papierseite.papierfarbe-nacht.liniert .schreibflaeche, .papierseite.papierfarbe-nacht.breit .schreibflaeche { background-image: repeating-linear-gradient(transparent, transparent 31px, rgba(255,255,255,.13) 31px, rgba(255,255,255,.13) 32px); }
+.papierseite.papierfarbe-nacht.breit .schreibflaeche { background-image: repeating-linear-gradient(transparent, transparent 39px, rgba(255,255,255,.13) 39px, rgba(255,255,255,.13) 40px); }
+.papierseite.papierfarbe-nacht .seitenwerkzeuge .rundknopf { background: #3a342c; color: #ece3d1; }
+.papierseite.fluss.papierfarbe-nacht, .papierseite.fluss.papierfarbe-kraft, .papierseite.fluss.papierfarbe-creme, .papierseite.fluss.papierfarbe-weiss { background-color: transparent; }
+
+/* Randlinie wie im Schulheft */
+.papierseite.mit-rand::after { content: ""; position: absolute; top: 0; bottom: 0; left: 30px; width: 1px; background: rgba(176, 85, 47, .42); pointer-events: none; }
+.papierseite.mit-rand .schreibflaeche, .papierseite.mit-rand .stitel { padding-left: 10px; }
+.papierseite.papierfarbe-nacht.mit-rand::after { background: rgba(217, 138, 84, .5); }
+@media (max-width: 700px) { .papierseite.mit-rand::after { left: 14px; } }
+
+/* Papierfarben-Wahl im Atelier */
+.papierfarben button { padding: 6px 12px; border-radius: 100px; box-shadow: inset 0 0 0 1px var(--linie); font-size: 13px; color: var(--tinte); }
+.papierfarben button.an { box-shadow: 0 0 0 2px var(--akzent); }
+.papierfarben .papierfarbe-hell { background: #f8f3e7; } .papierfarben .papierfarbe-weiss { background: #fffefb; }
+.papierfarben .papierfarbe-creme { background: #f7ecd2; } .papierfarben .papierfarbe-kraft { background: #d9c3a0; color: #2c2216; }
+.papierfarben .papierfarbe-nacht { background: #26221d; color: #ece3d1; }
+
+/* Zettel: mehr Farben, mehr Schriften */
+.zettel.orange { background: #f7d9a6; } .zettel.lila { background: #e0d2ee; }
+.zettel.weiss { background: #fbfaf4; } .zettel.grau { background: #e3e1dc; }
+.zettel.schrift-klar textarea { font-family: ui-rounded, -apple-system, "Segoe UI", system-ui, sans-serif; font-size: 14px; line-height: 1.45; }
+.zettel.schrift-serif textarea { font-family: ui-serif, "New York", Georgia, serif; font-size: 15px; line-height: 1.45; }
+
+/* Figuren & Orte */
+.projekt-figuren { margin-top: 26px; }
+.projekt-figuren-hinweis { font-size: 12.5px; color: var(--blass); margin: -4px 0 10px; }
+.figurenband { display: flex; flex-wrap: wrap; gap: 8px; }
+.figurchip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px 7px 9px; border-radius: 100px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 14px; color: var(--tinte); max-width: 100%; }
+.figurchip .figur-icon { display: flex; color: var(--akzent2); } .figurchip .figur-icon svg.ik { width: 16px; height: 16px; }
+.figurchip.art-ort .figur-icon { color: var(--akzent); } .figurchip.art-ding .figur-icon, .figurchip.art-sonst .figur-icon { color: var(--gold); }
+.figurchip .figur-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.figurchip small { font-size: 11px; color: var(--blass); padding: 1px 6px; border-radius: 100px; background: var(--papier); }
+.figurchip:active { transform: scale(.97); }
+
+/* Schlagwortwolke in der Suche */
+.schlagwortwolke { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 14px 12px; }
+.schlagwortchip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 100px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 13px; color: var(--akzent); }
+.schlagwortchip small { font-size: 10.5px; color: var(--blass); }
+
+/* Jahresraster */
+.jahresraster-kopf { display: flex; justify-content: space-between; font-size: 13px; color: var(--blass); margin-bottom: 8px; }
+.jahresraster { display: flex; gap: 3px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+.jahresraster::-webkit-scrollbar { display: none; }
+.jr-woche { display: flex; flex-direction: column; gap: 3px; flex: none; }
+.jr-tag { display: block; width: 11px; height: 11px; border-radius: 3px; background: var(--linie); }
+.jr-tag.stufe--1 { background: transparent; }
+.jr-tag.stufe-1 { background: color-mix(in srgb, var(--akzent) 35%, var(--karte)); }
+.jr-tag.stufe-2 { background: color-mix(in srgb, var(--akzent) 65%, var(--karte)); }
+.jr-tag.stufe-3 { background: var(--akzent); }
+.jr-tag.heute { box-shadow: 0 0 0 1.5px var(--akzent2); }
+
+/* Vorlesen */
+.vorlese-knopf.an { color: var(--papier); background: var(--akzent2); animation: sync-atmen 1.6s ease-in-out infinite; }
+
+/* Angepinnte Blätter */
+.blattkarte { position: relative; }
+.blattkarte.gepinnt { box-shadow: 0 2px 10px var(--schein), inset 0 0 0 1.5px var(--gold); }
+.blatt-nadel { position: absolute; top: 8px; right: 10px; display: flex; color: var(--gold); }
+.blatt-nadel svg.ik { width: 15px; height: 15px; }
+
 </style>
 </head>
 <body>
@@ -1442,7 +1516,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.5.0';
+const APP_VERSION = '5.6.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -1674,7 +1748,11 @@ const IK = {
   ausMitte: '<path d="M4 6h16M7.5 10.5h9M4 15h16M7.5 19.5h9"/>',
   ausRechts: '<path d="M4 6h16M11 10.5h9M4 15h16M11 19.5h9"/>',
   ausBlock: '<path d="M4 6h16M4 10.5h16M4 15h16M4 19.5h16"/>',
-  radierer: '<path d="m9 20-4.5-4.5a2 2 0 0 1 0-2.8l8-8a2 2 0 0 1 2.8 0l3.2 3.2a2 2 0 0 1 0 2.8L12.5 17"/><path d="M9 20h10"/><path d="m8.5 9.5 6 6"/>'
+  radierer: '<path d="m9 20-4.5-4.5a2 2 0 0 1 0-2.8l8-8a2 2 0 0 1 2.8 0l3.2 3.2a2 2 0 0 1 0 2.8L12.5 17"/><path d="M9 20h10"/><path d="m8.5 9.5 6 6"/>',
+  inhalt: '<path d="M5 6h3M11 6h8M5 12h3M11 12h8M5 18h3M11 18h8"/>',
+  lesezeichen: '<path d="M7 4h10v16l-5-3.5L7 20V4Z"/>',
+  vorlesen: '<path d="M5 10v4h3l4 3.5v-11L8 10H5Z"/><path d="M15.5 9.5a3.5 3.5 0 0 1 0 5"/><path d="M18 7a7 7 0 0 1 0 10"/>',
+  figur: '<circle cx="12" cy="8" r="3.5"/><path d="M5.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/>'
 };
 function ik(name, kl) { return `<svg class="ik${kl ? ' ' + kl : ''}" viewBox="0 0 24 24" aria-hidden="true">${IK[name] || ''}</svg>`; }
 
@@ -1821,7 +1899,7 @@ function sauberesDokument(quelle) {
     if (k === '__proto__' || k === 'prototype' || k === 'constructor') continue;
     d[k] = v;
   }
-  for (const k of ['text', 'rich', 'titel', 'notiz', 'schlagworte', 'dateiname', 'dateityp', 'art', 'vibe', 'farbe', 'farbe2', 'band', 'muster', 'papier', 'ansicht', 'format', 'befestigung', 'label']) {
+  for (const k of ['text', 'rich', 'titel', 'notiz', 'schlagworte', 'dateiname', 'dateityp', 'art', 'vibe', 'farbe', 'farbe2', 'band', 'muster', 'papier', 'papierfarbe', 'ansicht', 'format', 'befestigung', 'label', 'schrift', 'lesezeichen']) {
     if (d[k] != null) d[k] = String(d[k]).slice(0, k === 'text' || k === 'rich' || k === 'notiz' ? 10000000 : 1000);
   }
   for (const k of ['parent', 'projekt', 'projektRef', 'von', 'zu', 'bild', 'skizze', 'datei', 'quelle', 'fingerabdruck', '_geraet']) {
@@ -1833,6 +1911,10 @@ function sauberesDokument(quelle) {
   if (d.muster && !['leinen', 'diagonal', 'punkte', 'rahmen', 'welle', 'schlicht'].includes(d.muster)) d.muster = 'schlicht';
   if (d.papier && !['liniert', 'kariert', 'blank', 'punkte', 'breit'].includes(d.papier)) d.papier = 'liniert';
   if (d.ansicht && !['seiten', 'rolle', 'fluss'].includes(d.ansicht)) d.ansicht = 'seiten';
+  if (d.papierfarbe && !['hell', 'weiss', 'creme', 'kraft', 'nacht'].includes(d.papierfarbe)) d.papierfarbe = 'hell';
+  if (d.rand != null) d.rand = d.rand === true;
+  if (d.gepinnt != null) d.gepinnt = d.gepinnt === true;
+  if (d.schrift && !['hand', 'klar', 'serif'].includes(d.schrift)) d.schrift = 'hand';
   if (d.format && !['plain', 'rich'].includes(d.format)) d.format = 'plain';
   if (d.befestigung && !['tesa', 'pin', 'lose'].includes(d.befestigung)) d.befestigung = 'tesa';
   if (d.favorit != null) d.favorit = d.favorit === true;
@@ -2242,7 +2324,7 @@ function oeffneDoc(d) {
   else if (d.typ === 'heft') location.hash = '#/heft/' + d.id;
   else if (d.typ === 'seite') { sessionStorage.setItem('zielSeite', d.id); location.hash = '#/heft/' + d.parent; }
   else if (d.typ === 'projekt') location.hash = '#/projekt/' + d.id;
-  else if (d.typ === 'kapitel') location.hash = '#/projekt/' + d.parent;
+  else if (d.typ === 'kapitel' || d.typ === 'figur') location.hash = '#/projekt/' + d.parent;
   else if (d.typ === 'szene') { location.hash = '#/projekt/' + d.projekt; setTimeout(() => oeffneSchreibraum(d.id), 80); }
   else if (d.typ === 'board') location.hash = '#/brett/' + d.id;
   else if (d.typ === 'blase') location.hash = '#/brett/' + d.parent;
@@ -2257,6 +2339,77 @@ document.addEventListener('click', (e) => {
   if (ziel) oeffneDoc(ziel);
   else toast('„' + v.dataset.ziel + '" gibt es noch nicht. Vielleicht bald.');
 });
+
+/* ----- Schlagworte: #wort im Text, über alles gezählt ----- */
+function schlagwortIndex(docs, max = 40) {
+  const zaehl = new Map();
+  const re = /(^|\s)#([\wäöüÄÖÜß-]{2,30})/g;
+  for (const d of docs) {
+    if (!d || typeof d.text !== 'string' || d.typ === 'goodnote') continue;
+    const gesehen = new Set();
+    let m;
+    re.lastIndex = 0;
+    while ((m = re.exec(d.text))) {
+      const w = m[2].toLowerCase();
+      if (gesehen.has(w)) continue;
+      gesehen.add(w);
+      zaehl.set(w, (zaehl.get(w) || 0) + 1);
+    }
+  }
+  return [...zaehl.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'de')).slice(0, Math.max(0, max)).map(([wort, anzahl]) => ({ wort, anzahl }));
+}
+
+/* ----- Startauftrag aus der Adresse: geteilter Text oder Schnellstart -----
+   Android kann Text nach VANI teilen; das Home-Icon kann mit „Neuer Schnipsel"
+   aufgehen. Beides kommt als Suchteil der Adresse an und wird sofort wieder
+   entfernt — die Adresse bleibt die eine Hauptadresse. */
+function startAuftrag(search) {
+  let q;
+  try { q = new URLSearchParams(String(search || '')); } catch (e) { return null; }
+  const titel = String(q.get('titel') || '').trim().slice(0, 500);
+  const text = String(q.get('text') || '').trim().slice(0, 200000);
+  const url = String(q.get('url') || '').trim().slice(0, 2000);
+  if (titel || text || url) {
+    const teile = [];
+    if (titel && titel !== text) teile.push(titel);
+    if (text) teile.push(text);
+    if (url && !text.includes(url)) teile.push(url);
+    return { art: 'geteilt', text: teile.join('\n') };
+  }
+  const neu = String(q.get('neu') || '').trim();
+  if (['schnipsel', 'blatt', 'suche'].includes(neu)) return { art: 'neu', was: neu };
+  return null;
+}
+
+/* ----- Jahresraster: 7 Reihen × Wochen, wie ein Kalender aus Punkten ----- */
+function jahresRaster(tage, wochen = 53, jetzt = Date.now()) {
+  const n = Number(wochen);
+  wochen = Math.max(1, Math.min(60, Number.isFinite(n) ? Math.round(n) : 53));
+  const quelle = tage && typeof tage === 'object' ? tage : {};
+  const heute = new Date(jetzt); heute.setHours(0, 0, 0, 0);
+  /* Montag als Wochenanfang */
+  const wochentag = (heute.getDay() + 6) % 7;
+  const ende = new Date(heute); ende.setDate(heute.getDate() + (6 - wochentag));
+  const start = new Date(ende); start.setDate(ende.getDate() - wochen * 7 + 1);
+  const spalten = [];
+  let max = 0;
+  const d = new Date(start);
+  for (let w = 0; w < wochen; w++) {
+    const spalte = [];
+    for (let t = 0; t < 7; t++) {
+      const k = tagKey(d);
+      const n = d > heute ? null : Math.max(0, Math.round(Number(quelle[k]) || 0));
+      if (n) max = Math.max(max, n);
+      spalte.push({ tag: k, worte: n, heute: k === tagKey(heute) });
+      d.setDate(d.getDate() + 1);
+    }
+    spalten.push(spalte);
+  }
+  for (const sp of spalten) for (const z of sp) {
+    z.stufe = z.worte === null ? -1 : z.worte === 0 ? 0 : z.worte >= max * .66 ? 3 : z.worte >= max * .33 ? 2 : 1;
+  }
+  return { spalten, max, von: tagKey(start), bis: tagKey(ende) };
+}
 
 /* ================================================================
    VANI — lokale Profile: eine Tür pro Mensch, ein eigener Datenraum
@@ -3286,7 +3439,97 @@ const FUNKEN = [
   'Jemand erhält eine Rechnung für eine Reise, die nie stattgefunden hat.',
   'Der letzte Satz steht fest. Nur die Geschichte weigert sich, dorthin zu gehen.',
   'Eine Freundschaft beginnt mit einem gestohlenen Gegenstand und endet mit seiner Rückgabe.',
-  'Am Bahnsteig verabschieden sich zwei Menschen. Nur einer weiß, dass der Zug nicht existiert.'
+  'Am Bahnsteig verabschieden sich zwei Menschen. Nur einer weiß, dass der Zug nicht existiert.',
+  'Die Nachbarin grüßt jeden Morgen mit einem anderen Namen. Heute mit deinem.',
+  'In einer Schublade liegt ein Schlüsselbund mit Schlüsseln zu Häusern, die man nie betreten hat. Einer davon wird warm.',
+  'Der Wetterbericht im Radio beschreibt seit Tagen ein Wetter, das nur in deiner Straße herrscht.',
+  'Eine Frau bekommt einen Anruf von sich selbst. Die Stimme klingt älter und ruhiger.',
+  'Ein Kind sammelt Schatten. In einer Streichholzschachtel liegt der, den es am liebsten mag.',
+  'Jemand kauft auf dem Flohmarkt ein Fotoalbum und erkennt auf der letzten Seite die eigene Küche.',
+  'Der Leuchtturm ist seit Jahren stillgelegt. Trotzdem sieht man ihn jede Nacht einmal kreisen.',
+  'Jemand schreibt Briefe an den Menschen, der nach ihm in die Wohnung zieht.',
+  'Die Stadt hat eine Straße, die nur in eine Richtung existiert. Zurück gibt es sie nicht.',
+  'Das Kind fragt: „Was war vor dem Anfang?" Die Großmutter antwortet erstaunlich genau.',
+  'Ein Mann findet in seinem Mantel eine Kinokarte für einen Film, der erst nächste Woche anläuft.',
+  'Im Treppenhaus steht seit Wochen ein Stuhl. Niemand hat ihn hingestellt. Niemand trägt ihn weg.',
+  'Eine Bäckerin kennt jeden Kunden am Geruch. Heute kommt einer, der nach nichts riecht.',
+  'Zwei Menschen teilen sich ein Haus, aber nie dieselbe Tageszeit.',
+  'Das Radio spielt ein Lied, das nur deine Familie kennt. Es wurde nie aufgenommen.',
+  'Jemand schreibt seit Jahren an der Entschuldigung für etwas, das noch nicht passiert ist.',
+  'Nach dem Umzug hängen in der neuen Wohnung schon Vorhänge. In genau deiner Lieblingsfarbe.',
+  'Ein Dorf feiert jeden Sommer die Rückkehr von jemandem, der nie weggegangen ist.',
+  'Die Uhr auf dem Bahnhof geht nach. Nur für Menschen, die zu früh sind.',
+  'Jemand hört auf dem Dachboden ein Geräusch, das sich wie das eigene Lachen von früher anhört.',
+  'Der Briefkasten enthält einen Brief, der an dich adressiert ist — in deiner eigenen, kindlichen Handschrift.',
+  'Eine Tür in der Wohnung führt manchmal in den Flur, manchmal in einen Garten, den es nicht gibt.',
+  'Ein Arzt diagnostiziert Heimweh nach einem Ort, an dem der Patient nie war.',
+  'Der Hund erkennt auf der Straße jemanden wieder, den du nicht kennst. Er ist außer sich vor Freude.',
+  'Jede Nacht steht ein weiteres Möbelstück im Garten. Alle aus demselben Kinderzimmer.',
+  'Jemand hat seit zwanzig Jahren dieselbe Nummer im Handy, ohne je anzurufen. Heute klingelt sie.',
+  'Das Schwimmbad hat eine Bahn, in der man langsamer altert. Die Warteliste ist lang.',
+  'Ein Fremder bittet dich, ihm seinen eigenen Namen zu sagen.',
+  'Eine Frau führt Buch über alle Sätze, die sie nicht gesagt hat. Heute ist das Heft voll.',
+  'Im Schnee vor dem Haus liegt ein Brief. Die Tinte ist noch feucht.',
+  'Ein Koch kann Erinnerungen kochen. Ein Gast bestellt eine, die er vergessen möchte.',
+  'Die alte Telefonzelle am Ende der Straße nimmt nur Gespräche an, die nie geführt wurden.',
+  'Jemand wacht in einem Zimmer auf, das genauso aussieht wie sein eigenes — nur spiegelverkehrt.',
+  'Die Kinder im Haus spielen ein Spiel, dessen Regeln niemand erklären kann. Die Erwachsenen kennen es von früher.',
+  'Auf dem Friedhof steht ein Grabstein mit einem Datum in der Zukunft.',
+  'Eine Schneiderin näht für jemanden einen Mantel, der erst passen wird, wenn er verziehen hat.',
+  'Der Mieter über dir geht jede Nacht um drei dieselbe Strecke. Heute zählst du seine Schritte mit: Es ist deine Wohnung.',
+  'Ein Musiker spielt auf der Straße ein Lied, das du vor Jahren geträumt hast.',
+  'Jemand hat das gesamte Leben in Listen aufgeschrieben. Nur ein Tag fehlt.',
+  'Die Brücke ist gesperrt — für alle, die noch wissen, warum sie sie überqueren wollen.',
+  'Im Antiquariat liegt dein Tagebuch. Mit einem Vorwort von jemand anderem.',
+  'Ein Mann erhält eine Postkarte aus einer Stadt, die erst gebaut wird.',
+  'Jede Familie im Dorf hat denselben Gegenstand versteckt. Niemand weiß, was er bedeutet.',
+  'Eine Frau erkennt auf einem Gemälde ihren Garten. Das Bild ist dreihundert Jahre alt.',
+  'Ein Kind verspricht, etwas erst zu erzählen, „wenn es sicher ist". Jahre später ruft es an.',
+  'Das letzte Blatt am Baum fällt nicht. Die Leute kommen schon von weit her, um es anzusehen.',
+  'Jemand bekommt eine Einladung zu seiner eigenen Abschiedsfeier. Er hat nicht vor zu gehen.',
+  'Die Wohnung schrumpft jede Nacht ein kleines Stück. Erst merkt es niemand.',
+  'Ein Paar trifft sich jeden Tag zum ersten Mal. Nur einer von beiden weiß es.',
+  'Ein Junge findet im Wald ein Klavier. Es ist gestimmt.',
+  'Die Fähre legt ab, obwohl kein Wasser da ist.',
+  'Jemand versteckt einen Brief im Buch einer Bibliothek. Zwanzig Jahre später steht dort eine Antwort.',
+  'Die Mutter erzählt ein Märchen, das sie sich ausdenkt. Am nächsten Tag steht es in der Zeitung.',
+  'In einem Haus klingelt es immer einmal zu viel.',
+  'Eine Stadt, in der man tauschen kann: ein Jahr Erinnerung gegen ein Jahr Zukunft.',
+  'Der Weg zur Schule ist heute zehn Minuten länger. Die Straßen sind dieselben.',
+  'Ein Mann bewahrt die letzten Worte seiner Großmutter auf einem Kassettenband. Heute spult das Band von allein zurück.',
+  'Ein Boot treibt den Fluss hinauf.',
+  'Jemand sieht zum ersten Mal das Meer — und erkennt es wieder.',
+  'Das Kind zeichnet jeden Tag dasselbe Haus. Heute hat es ein Fenster mehr.',
+  'Eine Lehrerin bekommt einen Aufsatz zurück, den sie selbst als Kind geschrieben hat.',
+  'Eine Telefonnummer, die auf allen Zetteln der Stadt auftaucht, aber niemand wählt sie.',
+  'Ein Mann behauptet, der Regen in dieser Stadt sei jedes Mal derselbe Regen.',
+  'Eine Ärztin kann hören, wie alt eine Lüge ist.',
+  'Zwei Schwestern streiten seit dreißig Jahren über eine Geschichte, die keine von beiden erlebt hat.',
+  'Die Stadt baut einen Bahnhof für einen Zug, der erst in fünfzig Jahren kommt.',
+  'Das Mietshaus hat eine Wohnung zu viel. Alle tun, als hätten sie es nie bemerkt.',
+  'Jemand lernt eine Sprache, die nur noch ein Mensch spricht. Heute treffen sie sich.',
+  'Ein Hochzeitsfoto, auf dem jedes Jahr eine Person mehr zu sehen ist.',
+  'Der Wind bringt Zettel. Auf jedem steht ein Satz, den du heute noch sagen wirst.',
+  'Ein Nachtportier führt ein Gästebuch für die, die nie angekommen sind.',
+  'Die Schule hat einen Raum, der nur einmal im Jahr aufgeschlossen wird. Niemand spricht darüber, was drin ist.',
+  'Jemand erbt ein Haus mit der Auflage, darin jeden Abend ein Fenster zu öffnen. Welches, steht nicht dabei.',
+  'Eine Frau verkauft Abschiede. Gute Ware, sagt sie, die reicht ein Leben lang.',
+  'Der letzte Gast im Café bleibt sitzen, als wüsste er, dass das Licht sonst ausgeht.',
+  'Ein Kind hat einen Zwilling, den nur die Fotos zeigen.',
+  'Der Nachbar ist tot, aber sein Garten wird jeden Abend gegossen.',
+  'In einer Stadt kann man nachts die Gedanken der anderen an den Fenstern lesen. Nur deine Scheibe bleibt leer.',
+  'Jemand restauriert alte Filme und findet in jedem dieselbe Frau im Hintergrund.',
+  'Ein Mann geht jeden Tag denselben Weg — und jeden Tag ist ein Haus weniger da.',
+  'Du findest die Liste deiner Wünsche von vor zehn Jahren. Alle sind abgehakt. Von fremder Hand.',
+  'Die Katze bringt jeden Morgen einen Gegenstand aus einem Haus, das du nicht kennst.',
+  'Eine Stadt, in der niemand die Uhrzeit kennt, aber alle pünktlich sind.',
+  'Jemand spricht im Schlaf einen Namen. Am Morgen steht er an der Tür.',
+  'Nach dem Brand liegt im Schutt ein Zimmer, das unversehrt ist. Es gehörte zu keinem Haus.',
+  'Ein Bergdorf feiert den Tag, an dem das Tal zurückkam.',
+  'Der Briefträger bringt Briefe aus, die erst morgen geschrieben werden. Er hält sich an die Regeln.',
+  'Jemand rettet einen Fremden vor dem Ertrinken. Der Fremde sagt: „Nicht schon wieder."',
+  'Ein Dorf ohne Spiegel. Ein Gast bringt einen mit.',
+  'Jeden Geburtstag liegt ein Stein vor der Tür. Heute ist er warm.'
 ];
 const FUNKE_WER = [
   'Eine Frau, die Karten für Orte zeichnet, die es nicht mehr gibt,',
@@ -3304,7 +3547,31 @@ const FUNKE_WER = [
   'Die jüngste Person in einer sehr alten Familie,',
   'Ein Polizist, der den eigenen Vermisstenfall bearbeitet,',
   'Eine Musikerin, die jedes Lied nur einmal spielen kann,',
-  'Jemand, der fremde letzte Sätze sammelt,'
+  'Jemand, der fremde letzte Sätze sammelt,',
+  'Ein Uhrmacher, der seit Jahren keine Uhr mehr repariert, aber jeden Tag den Laden öffnet,',
+  'Eine Sängerin, die ihre Stimme verloren hat und jetzt Briefe für andere schreibt,',
+  'Ein Junge, der jede Nacht dasselbe Haus träumt,',
+  'Die Frau, die den Schnee vom letzten Winter aufbewahrt,',
+  'Ein Gärtner, der nur Pflanzen zieht, die es nicht mehr gibt,',
+  'Der Mann mit den drei Pässen, die alle auf verschiedene Namen lauten,',
+  'Eine Bibliothekarin, die Bücher nach dem Geruch ihrer Leser ordnet,',
+  'Ein Kind, das nie lügt und deshalb niemand glaubt,',
+  'Eine Zugschaffnerin, die die Namen aller Fahrgäste kennt — auch der schlafenden,',
+  'Ein alter Fischer, der nur noch nach Dingen fischt, die jemand verloren hat,',
+  'Eine Apothekerin, die Gegenmittel für Erinnerungen mischt,',
+  'Der Junge vom Leuchtturm, der noch nie auf dem Festland war,',
+  'Eine Taxifahrerin, die nur Menschen mitnimmt, die nicht wissen, wohin,',
+  'Der Mann, der Briefe zurückbringt, die nie hätten abgeschickt werden dürfen,',
+  'Eine Frau, die den Garten ihrer Kindheit Stück für Stück zurückkauft,',
+  'Ein Kartograf, der Orte einzeichnet, bevor sie entstehen,',
+  'Ein Mädchen, das Gespräche sammelt wie andere Briefmarken,',
+  'Der letzte Mensch, der die alte Ortssprache spricht,',
+  'Ein Vater, der seiner Tochter jeden Abend eine andere Version derselben Geschichte erzählt,',
+  'Eine Frau, die für fremde Menschen die Wohnungen ausräumt und dabei ihr eigenes Leben findet,',
+  'Ein Hotelportier, der die Gäste nach ihren Träumen fragt,',
+  'Ein Mann, der die Zeit nach Gerüchen einteilt,',
+  'Eine Tänzerin, die sich nur noch bewegt, wenn niemand hinsieht,',
+  'Ein Kind, das glaubt, der Regen falle nur für es allein,'
 ];
 const FUNKE_WO = [
   'in einem Haus, das nachts die Zimmer tauscht,',
@@ -3322,7 +3589,31 @@ const FUNKE_WO = [
   'in einem Tunnel unter schwarzem Wasser,',
   'in einem roten Buch voller fremder Handschriften,',
   'auf einem Friedhof, auf dem ein Grab zu viel steht,',
-  'in einem Auto, das seit Jahren am selben Straßenrand wartet,'
+  'in einem Auto, das seit Jahren am selben Straßenrand wartet,',
+  'in einem Café, in dem jeder Tisch eine andere Jahreszeit hat,',
+  'auf dem Dachboden eines Hauses, das nächste Woche abgerissen wird,',
+  'in einer Kleinstadt, in der nachts alle Straßenlaternen in eine Richtung zeigen,',
+  'im Wartezimmer eines Arztes, der nie kommt,',
+  'auf einer Insel, die nur bei Ebbe existiert,',
+  'in der letzten Nacht vor dem Umzug,',
+  'im Schwimmbad nach Betriebsschluss,',
+  'in einem Zug, der seit Stunden an derselben Stelle steht,',
+  'auf einer Hochzeit, zu der niemand eingeladen wurde,',
+  'in einer Wohnung, in der noch die Möbel des Vormieters stehen,',
+  'am Rand eines Dorfes, das sich selbst vergessen hat,',
+  'in einem Kino, das nur einen Film zeigt — seit vierzig Jahren,',
+  'an einem Strand im November,',
+  'in einem Krankenhausflur um vier Uhr morgens,',
+  'auf dem Spielplatz, auf dem man selbst Kind war,',
+  'im Flur einer Schule, in den Sommerferien,',
+  'in einer Gärtnerei, in der die Pflanzen flüstern, wenn es regnet,',
+  'in einem Lagerhaus voller unabgeholter Pakete,',
+  'in einer Nacht, in der der Strom in der ganzen Stadt ausfällt,',
+  'in der Wohnung über dem Laden, der die ganze Nacht offen hat,',
+  'auf einer Brücke, die seit Jahren gesperrt ist,',
+  'in einem Hinterhof mit einem Baum, den niemand gepflanzt hat,',
+  'in einem Zimmer, das man nur durch einen Schrank betritt,',
+  'am Fenster, an dem schon die Großmutter stand,'
 ];
 const FUNKE_ABER = [
   'aber jemand hat die Wahrheit zuerst erzählt.',
@@ -3340,7 +3631,31 @@ const FUNKE_ABER = [
   'aber beide haben denselben Traum verschwiegen.',
   'aber der letzte Satz wurde von jemand anderem geschrieben.',
   'aber die Tür war die ganze Zeit offen.',
-  'aber diesmal kommt eine Antwort.'
+  'aber diesmal kommt eine Antwort.',
+  'aber jemand hat alle Uhren im Haus um eine Stunde vorgestellt.',
+  'aber die Person, auf die gewartet wird, sitzt längst mit am Tisch.',
+  'aber im Brief fehlt genau der Satz, auf den es ankäme.',
+  'aber der Hund will nicht über die Schwelle.',
+  'aber draußen fällt Schnee, obwohl niemand das erklären kann.',
+  'aber der Spiegel zeigt den Raum ohne die Person davor.',
+  'aber der Fremde weiß Dinge, die nur die Familie weiß.',
+  'aber die Landkarte hat seit heute einen neuen Ort.',
+  'aber die Stimme am Telefon kennt den Kosenamen aus der Kindheit.',
+  'aber das Foto zeigt die Szene aus einem Winkel, aus dem niemand fotografiert haben kann.',
+  'aber das Licht geht aus, wenn jemand die Wahrheit sagt.',
+  'aber die Wohnung riecht nach dem Essen, das es morgen geben wird.',
+  'aber in der Schublade liegt der eigene Abschiedsbrief — ungeschrieben.',
+  'aber der Zug fährt heute in die andere Richtung.',
+  'aber das Kind nennt den Besucher beim Namen.',
+  'aber der Schnee bleibt nur auf einem einzigen Dach liegen.',
+  'aber der Schlüssel passt in jede Tür der Straße.',
+  'aber jemand hat das Ende der Geschichte schon auf die Wand geschrieben.',
+  'aber das Meer zieht sich zurück und kommt nicht wieder.',
+  'aber alle im Raum haben dieselbe Narbe.',
+  'aber der erste Satz des Briefes ist der letzte, den jemand je gesagt hat.',
+  'aber die Nachbarn stellen heute alle Stühle auf die Straße.',
+  'aber der Baum vor dem Fenster trägt Früchte mitten im Januar.',
+  'aber das Klavier spielt, wenn niemand im Zimmer ist.'
 ];
 const FUNKE_FRAGEN = [
   'Welche Wahrheit würde diese Figur nur einem Fremden sagen?',
@@ -3352,7 +3667,37 @@ const FUNKE_FRAGEN = [
   'Was will jemand unbedingt zurückgeben — und warum geht es nicht?',
   'Welche Tür würde deine Figur niemals freiwillig öffnen?',
   'Wer fehlt in dieser Szene, ist aber in jedem Satz spürbar?',
-  'Was geschieht fünf Minuten nach dem vermeintlichen Ende?'
+  'Was geschieht fünf Minuten nach dem vermeintlichen Ende?',
+  'Was sagt die Hauptfigur nur, wenn sie glaubt, niemand hört zu?',
+  'Wem gehört der Gegenstand, der in dieser Szene am meisten Platz einnimmt?',
+  'Welche Lüge erzählt sich die Figur selbst so oft, dass sie inzwischen stimmt?',
+  'Was würde passieren, wenn in dieser Szene niemand spricht?',
+  'Welches Geräusch gehört zu dieser Szene und wird nie erwähnt?',
+  'Was hat die Figur heute schon getan, bevor die Geschichte beginnt?',
+  'Welche Frage darf in dieser Familie nicht gestellt werden?',
+  'Was weiß der Leser, das die Figur nicht wissen darf?',
+  'Welcher Raum im Haus wird nie beschrieben — und warum?',
+  'Was tut die Figur mit den Händen, während sie zuhört?',
+  'Welchen Satz hat sie schon zu oft gehört?',
+  'Was liegt in der Jackentasche — und seit wann?',
+  'Wenn die Szene ein Wetter wäre: welches?',
+  'Wer hat den Tisch gedeckt, an dem jetzt gestritten wird?',
+  'Was war das letzte Geschenk, das die Figur jemandem gemacht hat?',
+  'Welches Lied würde laufen, wenn das hier ein Film wäre — und wer hat es ausgesucht?',
+  'Was würde die Figur als Allererstes retten, wenn es brennt?',
+  'Welche Angewohnheit hat die Figur von ihrer Mutter, ohne es zu merken?',
+  'Was wäre, wenn der Nebensatz die Hauptsache ist?',
+  'Welche Tür in dieser Geschichte wurde noch nie geöffnet?',
+  'Was schmeckt die Figur, während sie das liest?',
+  'Warum heute? Warum nicht gestern oder nie?',
+  'Was ist in dieser Geschichte teurer als Geld?',
+  'Wer beobachtet die Szene, ohne darin vorzukommen?',
+  'Was hätte die Figur mit zehn Jahren über diesen Moment gesagt?',
+  'Welcher Gegenstand in der Szene ist kaputt — und wer weiß davon?',
+  'Was ist das Letzte, was die Figur vor dem Einschlafen denkt?',
+  'Wie riecht der Ort, an dem sie sich sicher fühlt?',
+  'Was verschweigt die Erzählstimme — nicht die Figur?',
+  'Was wäre der Titel dieser Szene, wenn ihn die Nebenfigur wählen dürfte?'
 ];
 const FUNKE_FORMEN = [
   'Schreib nur den ersten und den letzten Satz einer Szene. Lass den Weg dazwischen noch dunkel.',
@@ -3364,7 +3709,37 @@ const FUNKE_FORMEN = [
   'Schreib einen Abschied, in dem niemand geht.',
   'Beginne mit: „Ich wusste damals noch nicht, dass …" — und streich den Satz später wieder.',
   'Schreib eine Szene rückwärts: vom letzten Bild bis zum ersten Blick.',
-  'Lass den Hintergrund die Wahrheit erzählen, während vorne gelogen wird.'
+  'Lass den Hintergrund die Wahrheit erzählen, während vorne gelogen wird.',
+  'Schreib eine Szene nur aus dem, was auf dem Tisch liegt.',
+  'Erzähl ein ganzes Jahr in zwölf Sätzen — einer pro Monat.',
+  'Beschreibe eine Person nur über das, was sie in der Tasche hat.',
+  'Schreib einen Dialog, in dem beide über etwas anderes reden, als sie meinen.',
+  'Lass die Szene beim Abwasch spielen. Die Wahrheit kommt mit dem letzten Teller.',
+  'Schreib einen Brief, der nie abgeschickt wird — und die Antwort, die trotzdem kommt.',
+  'Erzähl den Moment aus der Sicht des Zimmers.',
+  'Schreib eine Liste von zehn Dingen, die in der Wohnung fehlen. Die zehnte ist eine Person.',
+  'Beschreibe einen Streit nur über Gegenstände, die dabei bewegt werden.',
+  'Schreib einen Text, in dem jeder Satz ein Wort weniger hat als der vorige.',
+  'Erzähl eine Begegnung zweimal: einmal aus Sicht dessen, der bleibt, einmal aus Sicht dessen, der geht.',
+  'Schreib eine Szene, die nur aus Fragen besteht.',
+  'Lass eine Nebenfigur die ganze Szene tragen. Die Hauptfigur kommt nicht vor.',
+  'Schreib einen Absatz, in dem ein Gefühl nicht genannt, aber in jedem Satz spürbar ist.',
+  'Beschreibe den Heimweg, als wäre es das letzte Mal.',
+  'Schreib ein Gespräch, das nur aus dem besteht, was auf Zettel geschrieben wird.',
+  'Erzähl vom ersten Schnee — aber ohne das Wort Schnee.',
+  'Schreib eine Gebrauchsanweisung für etwas, das man nicht erklären kann.',
+  'Schreib eine Szene, die mit einem Geruch beginnt und mit einem Geräusch endet.',
+  'Beschreibe deinen Lieblingsort so, dass man ihn nicht wiedererkennt.',
+  'Schreib einen Nachruf auf etwas, das nicht sterben kann.',
+  'Erzähl die Geschichte in Nachrichten, die sich zwei Menschen schicken. Einer antwortet nicht mehr.',
+  'Schreib eine Szene mit genau drei Sätzen — der mittlere verändert alles.',
+  'Lass eine Figur etwas erklären, was sie selbst nicht versteht.',
+  'Schreib eine Seite, auf der das Wort „ich" nicht vorkommt.',
+  'Erzähl einen Tag nur über die Türen, die geöffnet und geschlossen werden.',
+  'Schreib die Szene als Wetterbericht.',
+  'Schreib einen Text, der mit dem letzten Wort des vorigen Textes beginnt.',
+  'Beschreibe eine Hand. Nur eine Hand. Bis man den ganzen Menschen kennt.',
+  'Schreib eine Szene, in der jemand etwas zurückbekommt, das er nie verloren hat.'
 ];
 const FUNKE_SAETZE = [
   '„Sag mir nur, warum du das Licht angelassen hast."',
@@ -3376,12 +3751,106 @@ const FUNKE_SAETZE = [
   '„Du warst schon einmal hier", sagte das Kind.',
   'Als die Musik aufhörte, hörten sie das Klopfen.',
   'Er lächelte so, als wäre dies eine gute Nachricht.',
-  'Die Geschichte kannte den Weg, auch wenn ich ihn nicht kannte.'
+  'Die Geschichte kannte den Weg, auch wenn ich ihn nicht kannte.',
+  'Das Haus hatte die Angewohnheit, nachts ein wenig weiter vom Fluss wegzurücken.',
+  'Sie hatte sich das Ende so oft vorgestellt, dass es keinen Platz mehr dafür gab.',
+  'Der Brief war in seiner Handschrift, aber er hatte ihn nie geschrieben.',
+  'Am Morgen nach dem Sturm stand das Boot im Garten, als hätte es immer dort gestanden.',
+  'Niemand hatte ihr gesagt, dass man das Vergessen üben muss.',
+  '„Bleib", sagte er, und meinte: „Geh, bevor ich es noch einmal sage."',
+  'Die Stadt roch nach dem Regen, der erst morgen fallen würde.',
+  'Er zählte die Stufen, wie er es als Kind getan hatte, und kam auf eine mehr.',
+  'Es war die Sorte Stille, die man nur hört, wenn man sie bricht.',
+  'Ihr Großvater hatte ihr beigebracht, wie man wartet. Nicht, wie man aufhört damit.',
+  'Der Schlüssel lag noch unter der Matte, aber die Tür war nicht mehr da.',
+  'Sie sprachen über das Wetter, wie man über Tote spricht.',
+  'Das Foto war unscharf, nur die Hand am Rand nicht.',
+  'Es gibt Nächte, in denen die Wohnung größer ist als tagsüber.',
+  'Er hatte gelernt, dass ein Satz zu viel schlimmer ist als einer zu wenig — und sagte trotzdem den einen.',
+  'Das letzte Mal, dass sie gelacht hatte, war am Telefon gewesen, mit jemandem, der nicht mehr anrief.',
+  'Der Zug fuhr ein, und für einen Moment sah jeder auf dem Bahnsteig aus, als würde er erwartet.',
+  'Im Flur roch es nach dem Kuchen, den es heute nicht gegeben hatte.',
+  'Sie faltete den Brief so, wie man jemanden umarmt, den man nicht mehr anfassen darf.',
+  'Draußen wurde es hell, ohne dass jemand es erlaubt hätte.',
+  'Er war kein schlechter Mensch. Er war nur immer im falschen Zimmer.',
+  'Manche Häuser vergessen die Menschen, die darin gewohnt haben. Dieses nicht.',
+  'Das Lied lief, und sie wusste nicht mehr, ob sie es kannte oder ob es sie kannte.',
+  'Seit dem Winter sagten sie sich nur noch die Dinge, die man auch einer Katze sagt.',
+  'Der Garten hatte in diesem Jahr beschlossen, nichts zu tragen.',
+  'Er kam zurück wie ein Wort, das man zu lange gesucht hat: plötzlich und zu spät.',
+  'In ihrem Kalender stand für heute nur ein Name, den sie nicht kannte.',
+  'Das Meer war an diesem Morgen so ruhig, als hätte es etwas beschlossen.',
+  'Sie hatte den Koffer gepackt, bevor sie wusste, wohin.',
+  'Es war kein Abschied. Es war nur das erste Mal, dass keiner von beiden zurückblieb.'
 ];
+const FUNKE_FIGUREN = [
+  'Jemand, der jeden Morgen denselben Satz übt, für einen Anruf, den er nie tätigt.',
+  'Eine Frau, die alle Geburtstage ihrer Straße kennt, aber nicht ihren eigenen.',
+  'Ein Mann, der Menschen nur nach ihrem Gang erkennt — und seine Tochter heute nicht erkennt.',
+  'Ein Kind, das Erwachsene tröstet, ohne zu wissen, warum sie traurig sind.',
+  'Eine Ärztin, die ihre Patienten an der Handschrift ihrer Rezepte wiedererkennt — Jahrzehnte später.',
+  'Jemand, der nie nein sagen konnte und heute zum ersten Mal möchte.',
+  'Ein alter Mann, der noch immer Briefe an eine Adresse schreibt, die es nicht mehr gibt.',
+  'Eine Busfahrerin, die jede Haltestelle mit einem anderen Satz ansagt.',
+  'Ein Junge, der vorgibt, taub zu sein, um endlich in Ruhe zuzuhören.',
+  'Eine Frau, die in jeder Wohnung, in der sie je wohnte, einen Gegenstand versteckt hat.',
+  'Ein Koch, der nur kocht, was er gerade fühlt, und keine Speisekarte hat.',
+  'Die Schwester, die immer schon da war, wenn etwas passierte — zu oft, um Zufall zu sein.',
+  'Ein Nachtwächter, der Angst im Dunkeln hat.',
+  'Eine Frau, die Flaschenpost sammelt und alle Briefe beantwortet.',
+  'Der Mann, der die Straßen der Stadt so gut kennt, dass er sich absichtlich verläuft.',
+  'Ein Mädchen, das Gedichte für Haustiere schreibt, die gestorben sind.',
+  'Ein Vater, der seinen Kindern das Lügen beibringt, damit sie es erkennen.',
+  'Eine Schauspielerin, die nur eine Rolle spielen kann: sich selbst, als sie jünger war.',
+  'Jemand, der mit Gegenständen spricht und ihnen zuhört.',
+  'Ein Mann, der nie ein Foto von sich machen ließ — bis heute.',
+  'Eine Frau, die Träume nicht behält, sondern sie weiterverschenkt.',
+  'Ein Postbote, der jeden Brief einmal ans Ohr hält.',
+  'Ein Kind, das Wörter sammelt, die Erwachsene nur einmal sagen.',
+  'Die Nachbarin, die jeden Tag einen Stuhl auf den Balkon stellt, für jemanden, der nicht kommt.',
+  'Ein Musiker, der seine Lieder nicht aufschreibt, weil sie dann sterben, sagt er.',
+  'Eine Archivarin, die Briefe liest, die nie angekommen sind — und manchmal antwortet.',
+  'Jemand, der so lange auf Reisen war, dass ihn die Stadt nicht wiedererkennt.',
+  'Ein Lehrer, der seine Schüler nach zwanzig Jahren einzeln besucht, um etwas zurückzunehmen.',
+  'Eine Frau, die zu jeder Mahlzeit für eine Person zu viel deckt — und genau weiß, für wen.',
+  'Ein Junge, der sein Heimweh in einer Schachtel aufbewahrt und nur sonntags hineinsieht.'
+];
+const FUNKE_WENDUNGEN = [
+  'Die Person, auf die gewartet wird, ist die ganze Zeit schon im Haus.',
+  'Der Brief war an jemand anderen adressiert. Der Inhalt stimmt trotzdem.',
+  'Sie hatte Recht. Das war das Schlimmste daran.',
+  'Das Geräusch kam nicht von draußen.',
+  'Der Fremde kennt das Ende der Geschichte — weil er sie schon einmal erzählt hat.',
+  'Es war kein Zufall. Es war ein Versprechen von vor zwanzig Jahren.',
+  'Der Anruf kam aus der eigenen Wohnung.',
+  'Die Lüge stellte sich als die einzige Wahrheit heraus, an die sich alle halten konnten.',
+  'Das Haus wurde verkauft — an die Person, die es einst angezündet hatte.',
+  'Die Schwester war nie verschwunden. Sie wurde nur nie gesucht.',
+  'Es regnet — aber nur auf der Straße, in der sie wohnt.',
+  'Der Schlüssel passt. Die Wohnung gehört jemand anderem.',
+  'Er war gar nicht gekommen, um sich zu entschuldigen. Er war gekommen, um es noch einmal zu tun.',
+  'Das Foto war kein Beweis. Es war eine Einladung.',
+  'Die Nachricht war dreißig Jahre alt — und trotzdem für heute gemeint.',
+  'Der Hund hat sie nicht beschützt. Er hat sie bewacht.',
+  'Das Versprechen wurde gehalten. Nur an die falsche Person.',
+  'Die Tür war nie abgeschlossen. Niemand hatte es je versucht.',
+  'Sie wollte nicht gehen. Sie wollte, dass man sie bittet zu bleiben.',
+  'Er fand die Antwort — in einem Brief, den er selbst geschrieben hatte.',
+  'Der Zug hatte Verspätung, weil jemand auf den Gleisen stand. Es war die Person, die sie besuchen wollte.',
+  'Das Kind hatte die ganze Zeit die Wahrheit gesagt.',
+  'Die beiden hatten sich nie getroffen. Sie erinnerten sich nur an dieselbe Geschichte.',
+  'Das Licht im Nachbarhaus brennt, weil jemand auf sie wartet — seit Jahren.',
+  'Es war nicht ihr Name auf dem Grabstein. Es war ihre Handschrift.'
+];
+
+/* Die Arten, die es gibt — eine Quelle fuer Zuhause, Woerter und Tests. */
+const FUNKE_ARTEN = [['szene', 'Szene'], ['kombi', 'Wer · Wo · Aber'], ['figur', 'Figur'], ['wendung', 'Wendung'], ['frage', 'Frage'], ['form', 'Form'], ['satz', 'Satz']];
 function neuerFunke(kombi, art) {
   if (art === 'frage') return zufall(FUNKE_FRAGEN);
   if (art === 'form') return zufall(FUNKE_FORMEN);
   if (art === 'satz') return zufall(FUNKE_SAETZE);
+  if (art === 'figur') return zufall(FUNKE_FIGUREN);
+  if (art === 'wendung') return zufall(FUNKE_WENDUNGEN);
   if (kombi) return zufall(FUNKE_WER) + ' ' + zufall(FUNKE_WO) + ' ' + zufall(FUNKE_ABER);
   return zufall(FUNKEN);
 }
@@ -3508,7 +3977,7 @@ function docName(d) {
   return (d.titel || (d.text || '').trim().split('\n')[0] || ({ seite: 'Heftseite', blase: 'Blase', faden: 'Fadenstück', goodnote: 'Goodnotes-Notizbuch' }[d.typ]) || d.typ).slice(0, 80);
 }
 function docIcon(d) {
-  return ({ schnipsel: 'schnipsel', blatt: 'blatt', seite: 'hefte', heft: 'hefte', projekt: 'projekte', kapitel: 'projekte', szene: 'projekte', board: 'cluster', blase: 'cluster', wort: 'woerter', wortkiste: 'woerter', faden: 'faden', funkeln: 'wieder', goodnote: 'buchzu' }[d && d.typ]) || 'verbinden';
+  return ({ schnipsel: 'schnipsel', blatt: 'blatt', seite: 'hefte', heft: 'hefte', projekt: 'projekte', kapitel: 'projekte', szene: 'projekte', board: 'cluster', blase: 'cluster', wort: 'woerter', wortkiste: 'woerter', faden: 'faden', funkeln: 'wieder', goodnote: 'buchzu', figur: 'figur' }[d && d.typ]) || 'verbinden';
 }
 
 function waehleDokument(auslassenId, titel = 'Womit verbinden?') {
@@ -3984,7 +4453,7 @@ RENDER.zuhause = function (haupt) {
   const funkeText = el('div', { class: 'funke-text' }, funkeAktuell);
   const funkeArten = el('div', { class: 'funke-arten' });
   let merkeFunkeKnopf = null;
-  const artDaten = [['szene', 'Szene'], ['kombi', 'Wer · Wo · Aber'], ['frage', 'Frage'], ['form', 'Form'], ['satz', 'Satz'], ['eigene', 'Meine']];
+  const artDaten = [...FUNKE_ARTEN, ['eigene', 'Meine']];
   const zieheFunke = () => {
     if (funkeArt === 'eigene') {
       const meine = eigeneFunken(); funkeAktuell = meine.length ? zufall(meine).text : 'Deine Funkenkiste ist noch leer. Fang den ersten Satz ein.';
@@ -4430,6 +4899,8 @@ RENDER.blaetter = function (haupt) {
   const alle = vomTyp('blatt');
   if (sortierung === 'az') alle.sort((a, b) => (a.titel || a.text || '').localeCompare(b.titel || b.text || '', 'de'));
   else if (sortierung === 'aeltest') alle.sort((a, b) => a.angelegt - b.angelegt);
+  /* Angepinnte Blätter liegen oben — in jeder Sortierung. */
+  alle.sort((a, b) => Number(!!b.gepinnt) - Number(!!a.gepinnt));
 
   if (alle.length > 1) {
     const wahl = el('div', { class: 'wahlgruppe', style: 'margin-bottom:12px' });
@@ -4450,21 +4921,28 @@ RENDER.blaetter = function (haupt) {
   for (const b of alle) {
     const worteZahl = worte(b.text);
     const erste = (b.text || '').trim().split('\n')[0] || '';
-    const karte = el('button', { class: 'karte blattkarte', onclick: () => oeffneSchreibraum(b.id) },
+    const karte = el('button', { class: 'karte blattkarte' + (b.gepinnt ? ' gepinnt' : ''), onclick: () => oeffneSchreibraum(b.id) },
+      b.gepinnt ? el('span', { class: 'blatt-nadel', html: ik('pin') }) : null,
       el('div', { class: 'btitel serif' }, b.titel || erste.slice(0, 60) || 'Ohne Titel'),
       el('div', { class: 'bprobe' }, (b.text || '').trim().replace(/\s+/g, ' ').slice(0, 140) || 'Noch leer.'),
       el('div', { class: 'bfuss' }, (worteZahl ? worteZahl + ' Wörter · ' : '') + vorZeit(b.geaendert))
     );
     langdruck(karte, async () => {
       const wahl = await menue([
+        { text: b.gepinnt ? 'Losmachen' : 'Oben anpinnen', icon: 'pin', wert: 'pin' },
         { text: 'Umbenennen', icon: 'stift', wert: 'name' },
+        { text: 'Vorlesen lassen', icon: 'vorlesen', wert: 'vorlesen' },
         { text: 'Teilen', icon: 'teilen', wert: 'teilen' },
         { text: 'Duplizieren', icon: 'wandel', wert: 'doppel' },
         { text: 'In ein Heft legen …', icon: 'hefte', wert: 'heft' },
         { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
         { text: 'Löschen', icon: 'muell', wert: 'weg', rot: true }
       ], b.titel || 'Blatt');
-      if (wahl === 'name') {
+      if (wahl === 'pin') {
+        b.gepinnt = !b.gepinnt; speichereStill(b); zeichne();
+      } else if (wahl === 'vorlesen') {
+        vorlesen((b.titel ? b.titel + '. ' : '') + (b.text || ''));
+      } else if (wahl === 'name') {
         const neu = await eingabe({ titel: 'Das Blatt heißt jetzt …', wert: b.titel });
         if (neu !== null) { b.titel = neu; speichereStill(b); zeichne(); }
       } else if (wahl === 'teilen') {
@@ -4785,6 +5263,11 @@ function heftDeckelDaten(h) {
   return { farbe, farbe2, band, muster, style: '--heft1:' + farbe + ';--heft2:' + farbe2 + ';--heftband:' + band };
 }
 
+const PAPIERFARBEN = [['hell', 'Hell'], ['weiss', 'Weiß'], ['creme', 'Creme'], ['kraft', 'Kraft'], ['nacht', 'Nacht']];
+function papierKlassen(heft, extra = '') {
+  return 'papierseite ' + (heft.papier || 'liniert') + ' papierfarbe-' + (heft.papierfarbe || 'hell') + (heft.rand ? ' mit-rand' : '') + extra;
+}
+
 async function heftGestalten(h, danach) {
   const vorschau = el('div', { class: 'heftdeckel heft-vorschau' }, el('div', { class: 'htitel' }, h.titel));
   const farben = el('div', { class: 'heft-farben' });
@@ -4806,15 +5289,24 @@ async function heftGestalten(h, danach) {
   for (const [id, name] of [['liniert', 'Liniert'], ['breit', 'Breite Linien'], ['kariert', 'Kariert'], ['punkte', 'Punktraster'], ['blank', 'Blanko']]) papier.append(el('button', {
     class: (h.papier || 'liniert') === id ? 'an' : '', onclick: (e) => { h.papier = id; $$('button', papier).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); }
   }, name));
+  /* Papierfarbe und Randlinie: wie das Heft innen aussieht */
+  const papierfarbe = el('div', { class: 'wahlgruppe papierfarben', style: 'flex-wrap:wrap' });
+  for (const [id, name] of PAPIERFARBEN) papierfarbe.append(el('button', {
+    class: 'papierfarbe-' + id + ((h.papierfarbe || 'hell') === id ? ' an' : ''), title: name,
+    onclick: (e) => { h.papierfarbe = id; $$('button', papierfarbe).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); }
+  }, name));
+  const rand = el('button', { class: 'schalter' + (h.rand ? ' an' : ''), onclick: (e) => { h.rand = !h.rand; e.currentTarget.classList.toggle('an', h.rand); } }, el('i'));
   let behalten = false;
   const kasten = el('div', { class: 'modal heft-atelier' }, el('h2', {}, 'Heft gestalten'), vorschau,
     el('div', { class: 'einstellgruppe' }, el('b', {}, 'Grundfarbe'), farben,
       el('div', { class: 'heft-freifarben' }, el('label', {}, 'Grundton ', frei), el('label', {}, 'Zweitton ', zweit), el('label', {}, 'Band ', band))),
     el('div', { class: 'einstellgruppe' }, el('b', {}, 'Muster'), muster),
     el('div', { class: 'einstellgruppe' }, el('b', {}, 'Papier'), papier),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Papierfarbe'), papierfarbe),
+    el('div', { class: 'einstellgruppe einstellzeile' }, el('span', { class: 'ename' }, 'Randlinie', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Eine Linie am linken Rand wie im Schulheft — Platz für Notizen.')), rand),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
       el('button', { class: 'knopf voll', onclick: () => { behalten = true; speichere(h); zu(); if (danach) danach(); } }, 'So bleibt es')));
-  const alt = { farbe: h.farbe, farbe2: h.farbe2, band: h.band, muster: h.muster, papier: h.papier };
+  const alt = { farbe: h.farbe, farbe2: h.farbe2, band: h.band, muster: h.muster, papier: h.papier, papierfarbe: h.papierfarbe, rand: h.rand };
   const zu = zeigeDeck(kasten, () => { if (!behalten) { Object.assign(h, alt); if (danach) danach(); } });
   aktualisiere();
 }
@@ -4982,12 +5474,34 @@ RENDER.heft = function (haupt, heftId) {
   }
 
   let idx = Math.min(seiten.length - 1, parseInt(sessionStorage.getItem('heftSeite:' + heftId) || '0', 10) || 0);
-  const ziel = sessionStorage.getItem('zielSeite');
-  if (ziel) {
-    sessionStorage.removeItem('zielSeite');
-    const zi = seiten.findIndex((s) => s.id === ziel);
-    if (zi >= 0) idx = zi;
+  /* Das Lesezeichen öffnet das Heft dort, wo ich zuletzt „hierher" gesagt habe —
+     nur beim ersten Öffnen in dieser Sitzung, danach zählt die letzte Seite. */
+  if (!sessionStorage.getItem('heftSeite:' + heftId) && heft.lesezeichen) {
+    const li = seiten.findIndex((s) => s.id === heft.lesezeichen);
+    if (li >= 0) idx = li;
   }
+  /* Ein Sprungziel (Inhalt, Suche, verschobene oder verdoppelte Seite) wird
+     genau einmal eingelöst — in jeder Ansicht, und ohne später nachzuwirken. */
+  let springZu = null;
+  const zielAufnehmen = () => {
+    const z = sessionStorage.getItem('zielSeite');
+    if (!z) return null;
+    sessionStorage.removeItem('zielSeite');
+    return z;
+  };
+  const ziel = zielAufnehmen();
+  if (ziel) {
+    const zi = seiten.findIndex((s) => s.id === ziel);
+    if (zi >= 0) { idx = zi; springZu = ziel; }
+  }
+  const scrolleZuZiel = () => {
+    if (!springZu) return;
+    requestAnimationFrame(() => {
+      const z = halter.querySelector('[data-seite="' + springZu + '"]');
+      if (z) z.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      springZu = null;
+    });
+  };
 
   haupt.append(el('div', { class: 'kopf' },
     zurueckknopf('#/hefte'),
@@ -4996,6 +5510,9 @@ RENDER.heft = function (haupt, heftId) {
       el('button', { class: (heft.ansicht || 'seiten') === 'seiten' ? 'an' : '', title: 'Einzelne Seiten', onclick: () => { heft.ansicht = 'seiten'; speichere(heft); zeichne(); } }, 'Seiten'),
       el('button', { class: heft.ansicht === 'rolle' ? 'an' : '', title: 'Seite für Seite untereinander', onclick: () => { heft.ansicht = 'rolle'; speichere(heft); zeichne(); } }, 'Rolle'),
       el('button', { class: heft.ansicht === 'fluss' ? 'an' : '', title: 'Eine einzige lange Seite, ohne Umbruch', onclick: () => { heft.ansicht = 'fluss'; speichere(heft); zeichne(); } }, 'Am Stück')),
+    el('button', { class: 'rundknopf zart', html: ik('inhalt'), title: 'Inhalt: alle Seiten', onclick: () => heftInhalt(heft, (seite) => {
+      sessionStorage.setItem('zielSeite', seite.id); zeichne();
+    }) }),
     el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Heft-Menü', onclick: () => heftMenue(heft, () => zeichne()) })
   ));
 
@@ -5007,6 +5524,7 @@ RENDER.heft = function (haupt, heftId) {
 
   function zeigeRolle() {
     seiten = kinder(heft.id, 'seite');
+    { const z = zielAufnehmen(); if (z) springZu = z; }
     halter.className = 'heftrolle'; fuss.style.display = 'none'; halter.innerHTML = '';
     for (let i = 0; i < seiten.length; i++) {
       const seite = seiten[i];
@@ -5019,6 +5537,7 @@ RENDER.heft = function (haupt, heftId) {
       heft.geaendert = Date.now(); speichereStill(heft); zeigeRolle();
       requestAnimationFrame(() => { const letzte = halter.lastElementChild && halter.lastElementChild.previousElementSibling; if (letzte) letzte.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
     } }, el('span', { html: ik('plus'), style: 'display:flex' }), 'Neue Seite darunter'));
+    scrolleZuZiel();
   }
 
   /* Am Stück: alles Geschriebene auf einer einzigen langen Seite. Kein Umbruch,
@@ -5026,8 +5545,9 @@ RENDER.heft = function (haupt, heftId) {
      Textmengen aus anderen Apps. */
   function zeigeFluss() {
     seiten = kinder(heft.id, 'seite');
+    { const z = zielAufnehmen(); if (z) springZu = z; }
     halter.className = 'heftfluss'; fuss.style.display = 'none'; halter.innerHTML = '';
-    const bogen = el('div', { class: 'fluss-bogen ' + (heft.papier || 'liniert') });
+    const bogen = el('div', { class: 'fluss-bogen ' + (heft.papier || 'liniert') + ' papierfarbe-' + (heft.papierfarbe || 'hell') });
     /* Ein Werkzeug für die ganze lange Seite. Es wirkt auf das Stück, in dem
        gerade geschrieben wird — sonst auf das letzte. */
     const aktuellesStueck = () => {
@@ -5046,6 +5566,7 @@ RENDER.heft = function (haupt, heftId) {
       neuDoc('seite', { parent: heft.id, ord: kinder(heft.id, 'seite').length, titel: '', text: '' });
       heft.geaendert = Date.now(); speichereStill(heft); zeigeFluss();
     } }, el('span', { html: ik('plus'), style: 'display:flex' }), 'Noch ein Stück anfügen'));
+    scrolleZuZiel();
   }
 
   function zeigeSeite() {
@@ -5057,6 +5578,7 @@ RENDER.heft = function (haupt, heftId) {
       seiten = kinder(heft.id, 'seite');
       idx = 0;
     }
+    { const z = zielAufnehmen(); if (z) { const zi = seiten.findIndex((s) => s.id === z); if (zi >= 0) idx = zi; } }
     idx = Math.max(0, Math.min(idx, seiten.length - 1));
     sessionStorage.setItem('heftSeite:' + heftId, String(idx));
     const seite = seiten[idx];
@@ -5123,6 +5645,24 @@ RENDER.heft = function (haupt, heftId) {
   else zeigeSeite();
 };
 
+/* Das Inhaltsverzeichnis: jede Seite mit Titel oder erster Zeile, Wörtern und
+   Lesezeichen. Ein Tipp springt hin — in jeder Ansicht. */
+function heftInhalt(heft, wohin) {
+  const seiten = kinder(heft.id, 'seite');
+  return menue(seiten.map((s, i) => {
+    const erste = (s.titel || (s.text || '').trim().split('\n').find((z) => z.trim()) || '').trim();
+    const w = worte(s.text);
+    const anlagen = kinder(s.id).length;
+    return {
+      text: (i + 1) + ' · ' + (erste ? erste.slice(0, 44) : 'Leere Seite') + (w ? '  —  ' + w + ' W.' : '') + (anlagen ? ' · ' + anlagen + ' angeklebt' : ''),
+      icon: heft.lesezeichen === s.id ? 'lesezeichen' : (s.skizze ? 'stift' : null), wert: s.id
+    };
+  }), 'Inhalt · ' + seiten.length + (seiten.length === 1 ? ' Seite' : ' Seiten')).then((id) => {
+    const seite = id && D.docs.get(id);
+    if (seite && wohin) wohin(seite);
+  });
+}
+
 /* Eine Werkzeugreihe, zwei Verwendungen: fest an einer Seite oder oben an der
    langen Seite. ziel() sagt beim Antippen, welches Stück gerade gemeint ist. */
 function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
@@ -5160,13 +5700,43 @@ function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
     el('button', {
       class: 'rundknopf', title: 'Mehr', html: ik('mehr'), onclick: async () => {
         const z = ziel(); if (!z) return;
+        const geschwister = kinder(z.heft.id, 'seite');
+        const i = geschwister.findIndex((x) => x.id === z.seite.id);
+        const istLesezeichen = z.heft.lesezeichen === z.seite.id;
         const wahl = await menue([
           { text: 'Im Schreibraum öffnen', icon: 'stift', wert: 'sr' },
+          { text: istLesezeichen ? 'Lesezeichen entfernen' : 'Lesezeichen hierher', icon: 'lesezeichen', wert: 'lesezeichen' },
+          i > 0 ? { text: 'Seite nach vorn', icon: 'auf', wert: 'vor' } : null,
+          i < geschwister.length - 1 ? { text: 'Seite nach hinten', icon: 'ab', wert: 'zurueck' } : null,
+          { text: 'Seite verdoppeln', icon: 'wandel', wert: 'doppel' },
           { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
           { text: 'Als loses Blatt herausnehmen', icon: 'blatt', wert: 'blatt' },
           { text: 'Seite herausreißen', icon: 'muell', wert: 'weg', rot: true }
-        ]);
+        ], 'Seite ' + (i + 1) + ' von ' + geschwister.length);
         if (wahl === 'sr') oeffneSchreibraum(z.seite.id);
+        else if (wahl === 'lesezeichen') {
+          if (istLesezeichen) delete z.heft.lesezeichen; else z.heft.lesezeichen = z.seite.id;
+          speichereStill(z.heft);
+          toast(istLesezeichen ? 'Lesezeichen entfernt.' : 'Lesezeichen liegt auf Seite ' + (i + 1) + '. Das Heft öffnet sich hier.');
+          if (neuZeichnen) neuZeichnen();
+        } else if (wahl === 'vor' || wahl === 'zurueck') {
+          const j = wahl === 'vor' ? i - 1 : i + 1;
+          geschwister.forEach((x, n) => { x.ord = n; });
+          [geschwister[i].ord, geschwister[j].ord] = [j, i];
+          geschwister.forEach((x) => speichereStill(x));
+          sessionStorage.setItem('zielSeite', z.seite.id);
+          if (neuZeichnen) neuZeichnen();
+        } else if (wahl === 'doppel') {
+          geschwister.forEach((x, n) => { x.ord = n >= i + 1 ? n + 1 : n; speichereStill(x); });
+          const kopie = neuDoc('seite', { parent: z.heft.id, ord: i + 1, titel: z.seite.titel ? z.seite.titel + ' (Abschrift)' : '', text: z.seite.text || '', rich: z.seite.rich || '', format: z.seite.format || 'plain' });
+          for (const a of kinder(z.seite.id)) {
+            if (a.typ !== 'zettel') continue;
+            neuDoc('zettel', { parent: kopie.id, text: a.text, farbe: a.farbe, schrift: a.schrift, befestigung: a.befestigung, pos: Object.assign({}, a.pos) });
+          }
+          sessionStorage.setItem('zielSeite', kopie.id);
+          toast('Verdoppelt. Fotos und Kritzeleien bleiben beim Original.');
+          if (neuZeichnen) neuZeichnen();
+        }
         else if (wahl === 'dazu') await hinzufuegenMenue(z.seite);
         else if (wahl === 'blatt') {
           seiteZuBlatt(z.seite); toast('Liegt jetzt wieder bei den Blättern.');
@@ -5182,7 +5752,7 @@ function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
 }
 
 function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
-  const blatt = el('div', { class: 'papierseite ' + (heft.papier || 'liniert') + (optionen.fluss ? ' fluss' : ''), 'data-seite': seite.id });
+  const blatt = el('div', { class: papierKlassen(heft, optionen.fluss ? ' fluss' : ''), 'data-seite': seite.id });
 
   /* Werkzeuge: auf einer einzelnen Seite oben rechts auf dem Papier. In der
      Ansicht „Am Stück" gibt es sie nur einmal ganz oben — dort ist alles eine
@@ -5343,14 +5913,25 @@ function anlageGesten(elem, a, blatt, neuBauen) {
   langdruck(elem, async () => {
     const wahl = await menue([
       a.typ === 'zettel' ? { text: 'Andere Farbe', icon: 'farbe', wert: 'farbe' } : null,
+      a.typ === 'zettel' ? { text: 'Schrift: ' + ({ hand: 'Handschrift', klar: 'Klar', serif: 'Serife' }[a.schrift || 'hand']), icon: 'stift', wert: 'schrift' } : null,
+      a.typ === 'zettel' ? { text: 'Form: ' + (a.pos.w <= 24 ? 'schmal' : a.pos.w >= 44 ? 'breit' : 'normal'), icon: 'wandel', wert: 'form' } : null,
       { text: 'Befestigung: ' + ({ tesa: 'Tesa', pin: 'Reißzwecke', lose: 'lose aufgelegt' }[a.befestigung || 'tesa']), icon: 'pin', wert: 'befestigung' },
       { text: 'Etwas drehen', icon: 'drehen', wert: 'drehen' },
+      { text: 'Gerade rücken', icon: 'ausBlock', wert: 'gerade' },
       { text: 'Abmachen', icon: 'muell', wert: 'weg', rot: true }
     ]);
     if (wahl === 'farbe') {
-      const folge = ['gelb', 'rosa', 'blau', 'gruen'];
-      a.farbe = folge[(folge.indexOf(a.farbe) + 1) % folge.length];
+      a.farbe = ZETTELFARBEN[(ZETTELFARBEN.indexOf(a.farbe) + 1) % ZETTELFARBEN.length];
       speichereStill(a); neuBauen();
+    } else if (wahl === 'schrift') {
+      a.schrift = { hand: 'klar', klar: 'serif', serif: 'hand' }[a.schrift || 'hand'];
+      speichereStill(a); neuBauen();
+    } else if (wahl === 'form') {
+      a.pos.w = a.pos.w <= 24 ? 30 : a.pos.w >= 44 ? 22 : 46;
+      speichereStill(a); neuBauen();
+    } else if (wahl === 'gerade') {
+      a.pos.rot = 0; speichereStill(a);
+      elem.style.transform = 'rotate(0deg)';
     } else if (wahl === 'befestigung') {
       a.befestigung = { tesa: 'pin', pin: 'lose', lose: 'tesa' }[a.befestigung || 'tesa']; speichereStill(a); neuBauen();
     } else if (wahl === 'drehen') {
@@ -5366,10 +5947,11 @@ function anlageGesten(elem, a, blatt, neuBauen) {
   });
 }
 
+const ZETTELFARBEN = ['gelb', 'rosa', 'blau', 'gruen', 'orange', 'lila', 'weiss', 'grau'];
 function baueZettel(a, blatt, neuBauen) {
   const halter = el('div', { class: 'anlage befestigung-' + (a.befestigung || 'tesa') });
   positioniere(halter, a);
-  const z = el('div', { class: 'zettel ' + (a.farbe || 'gelb') });
+  const z = el('div', { class: 'zettel ' + (ZETTELFARBEN.includes(a.farbe) ? a.farbe : 'gelb') + ' schrift-' + (a.schrift || 'hand') });
   const ta = el('textarea', { placeholder: '…', rows: 1 });
   ta.value = a.text || '';
   autogrow(ta);
@@ -5783,6 +6365,7 @@ RENDER.projekt = function (haupt, pid) {
         (() => { const d = heftDeckelDaten(h); return el('span', { class: 'mini-deckel muster-' + d.muster, style: d.style }); })(), el('span', {}, h.titel),
         el('small', {}, kinder(h.id, 'seite').length + ' S.'))) : el('span', { class: 'projekt-hefte-leer' }, 'Noch kein Heft liegt daneben.')));
   inhalt.append(heftband);
+  inhalt.append(baueFigurenUndOrte(p));
 
   inhalt.append(el('button', {
     class: 'plusskarte', style: 'width:100%;margin-top:22px', onclick: async () => {
@@ -5795,6 +6378,61 @@ RENDER.projekt = function (haupt, pid) {
 
   haupt.append(inhalt);
 };
+
+/* ----- Figuren & Orte: die Welt eines Projekts -----
+   Jeder Eintrag ist ein Dokument vom Typ „figur" mit Name, Art und Notiz.
+   [[Name]] im Text springt direkt hierher, weil der Name der Titel ist. */
+const FIGUR_ARTEN = [['figur', 'Figur'], ['ort', 'Ort'], ['ding', 'Ding'], ['sonst', 'Anderes']];
+function figurenVon(p) { return kinder(p.id, 'figur'); }
+function figurVorkommen(p, name) {
+  const n = normalisiere(String(name || '').trim());
+  if (!n) return 0;
+  let z = 0;
+  for (const d of D.docs.values()) if (d.typ === 'szene' && d.projekt === p.id && normalisiere(d.text || '').includes(n)) z++;
+  return z;
+}
+async function figurAnlegenOderAendern(p, alt) {
+  const name = await eingabe({ titel: alt ? 'Heißt jetzt …' : 'Wer oder was kommt dazu?', wert: alt ? alt.titel : '', platzhalter: 'Name der Figur, des Ortes, des Dings' });
+  if (name === null || (!alt && !name)) return null;
+  const art = await menue(FIGUR_ARTEN.map(([w, t]) => ({ text: t, wert: w, icon: w === 'figur' ? 'figur' : w === 'ort' ? 'zuhause' : 'wuerfel' })), 'Was ist es?');
+  if (!art) return null;
+  const notiz = await eingabe({ titel: 'Was ich darüber weiß', wert: alt ? alt.notiz || '' : '', platzhalter: 'Alter, Geruch, Geheimnis, was auf dem Tisch liegt …', mehrzeilig: true, ok: alt ? 'So bleibt es' : 'Aufnehmen' });
+  if (notiz === null) return null;
+  if (alt) { alt.titel = name || alt.titel; alt.art = art; alt.notiz = notiz; speichere(alt); return alt; }
+  return neuDoc('figur', { parent: p.id, projekt: p.id, titel: name, art, notiz, ord: figurenVon(p).length });
+}
+function baueFigurenUndOrte(p) {
+  const liste = figurenVon(p).sort((a, b) => (FIGUR_ARTEN.findIndex((x) => x[0] === a.art) - FIGUR_ARTEN.findIndex((x) => x[0] === b.art)) || (a.titel || '').localeCompare(b.titel || '', 'de'));
+  const band = el('div', { class: 'figurenband' });
+  for (const f of liste) {
+    const vorkommen = figurVorkommen(p, f.titel);
+    const chip = el('button', { class: 'figurchip art-' + (f.art || 'figur'), title: f.notiz || '' },
+      el('span', { class: 'figur-icon', html: ik(f.art === 'ort' ? 'zuhause' : f.art === 'figur' ? 'figur' : 'wuerfel') }),
+      el('span', { class: 'figur-name' }, f.titel || 'Ohne Namen'),
+      vorkommen ? el('small', {}, String(vorkommen)) : null);
+    chip.addEventListener('click', async () => {
+      const wahl = await menue([
+        f.notiz ? { text: (f.notiz.length > 60 ? f.notiz.slice(0, 60) + '…' : f.notiz), wert: '_lesen' } : null,
+        { text: 'Ändern', icon: 'stift', wert: 'aendern' },
+        vorkommen ? { text: 'Wo kommt „' + f.titel + '" vor? (' + vorkommen + ')', icon: 'suche', wert: 'suche' } : null,
+        { text: 'Verbindungen ansehen', icon: 'verbinden', wert: 'bezug' },
+        { text: 'Entfernen', icon: 'muell', wert: 'weg', rot: true }
+      ], f.titel);
+      if (wahl === '_lesen') zeigeTextFund({ titel: f.titel, text: f.notiz, typ: 'figur' });
+      else if (wahl === 'aendern') { if (await figurAnlegenOderAendern(p, f)) zeichne(); }
+      else if (wahl === 'suche') { oeffneSuche(); setTimeout(() => { const feld = $('.suchbogen input'); if (feld) { feld.value = f.titel; feld.dispatchEvent(new Event('input', { bubbles: true })); } }, 120); }
+      else if (wahl === 'bezug') zeigeBeziehungen(f);
+      else if (wahl === 'weg' && await frage('„' + f.titel + '" aus Figuren & Orten nehmen?', { ja: 'Entfernen', gefahr: true })) { await loesche(f.id); zeichne(); }
+    });
+    band.append(chip);
+  }
+  if (!liste.length) band.append(el('span', { class: 'projekt-hefte-leer' }, 'Noch niemand und nirgends. Wer tritt auf, wo spielt es?'));
+  return el('div', { class: 'projekt-figuren' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('figur') }), 'FIGUREN & ORTE', el('span', { class: 'rest' }),
+      el('button', { class: 'knopf zart', onclick: async () => { if (await figurAnlegenOderAendern(p)) zeichne(); } }, '+ Dazu')),
+    el('div', { class: 'projekt-figuren-hinweis' }, 'Mit [[Name]] im Text springt man hierher. Die kleine Zahl sagt, in wie vielen Szenen der Name vorkommt.'),
+    band);
+}
 
 function baueKapitel(k, p) {
   const szenen = kinder(k.id, 'szene');
@@ -6031,7 +6669,8 @@ function zeigeLeseansicht(p) {
 
   const bogen = el('div', { class: 'lesebogen' }, innen);
   const leiste = el('div', { class: 'schwebeleiste' },
-    el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Leseansicht schließen', onclick: () => { bogen.remove(); leiste.remove(); } }),
+    el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Leseansicht schließen', onclick: () => { if (typeof vorlesenStopp === 'function') vorlesenStopp(); bogen.remove(); leiste.remove(); } }),
+    el('button', { class: 'rundknopf zart vorlese-knopf', html: ik('vorlesen'), title: 'Vorlesen lassen', onclick: (e) => vorlesen(gesamt, e.currentTarget) }),
     el('button', {
       class: 'knopf', onclick: async () => {
         try { await navigator.clipboard.writeText(gesamt); toast('Alles in der Zwischenablage.'); }
@@ -6048,6 +6687,51 @@ function zeigeLeseansicht(p) {
    ================================================================ */
 
 let _sr = null;
+
+/* ----- Vorlesen: die Stimme des Geräts, ganz ohne Netz -----
+   Gut zum Gegenlesen: Was holpert, hört man, bevor man es sieht. */
+let _vorleser = null;
+function vorlesenMoeglich() { return typeof speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined'; }
+function vorlesenLaeuft() { return !!(_vorleser && vorlesenMoeglich() && speechSynthesis.speaking); }
+function vorlesenStopp() {
+  if (vorlesenMoeglich()) { try { speechSynthesis.cancel(); } catch (e) {} }
+  _vorleser = null;
+  document.body.classList.remove('liest-vor');
+  $$('.vorlese-knopf.an').forEach((k) => k.classList.remove('an'));
+}
+function vorlesen(text, knopf) {
+  if (!vorlesenMoeglich()) { toast('Dieses Gerät kann noch nicht vorlesen.'); return false; }
+  if (vorlesenLaeuft()) { vorlesenStopp(); return false; }
+  const rein = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!rein) { toast('Da steht noch nichts zum Vorlesen.'); return false; }
+  try { speechSynthesis.cancel(); } catch (e) {}
+  /* Lange Texte in Stücke: manche Geräte brechen bei langen Äußerungen ab. */
+  const stuecke = rein.match(/[^.!?…]+[.!?…]+["“”»«)]?|[^.!?…]+$/g) || [rein];
+  const bloecke = [];
+  let puffer = '';
+  for (const st of stuecke) {
+    if ((puffer + st).length > 700 && puffer) { bloecke.push(puffer.trim()); puffer = ''; }
+    puffer += st + ' ';
+  }
+  if (puffer.trim()) bloecke.push(puffer.trim());
+  const stimmen = (speechSynthesis.getVoices() || []);
+  const deutsch = stimmen.find((v) => /^de[-_]/i.test(v.lang) && /siri|anna|petra|markus|google|natural|premium/i.test(v.name)) || stimmen.find((v) => /^de[-_]/i.test(v.lang)) || null;
+  _vorleser = { bloecke, i: 0 };
+  document.body.classList.add('liest-vor');
+  if (knopf) knopf.classList.add('an');
+  const weiter = () => {
+    if (!_vorleser || _vorleser.i >= _vorleser.bloecke.length) { vorlesenStopp(); return; }
+    const u = new SpeechSynthesisUtterance(_vorleser.bloecke[_vorleser.i++]);
+    u.lang = deutsch ? deutsch.lang : 'de-DE';
+    if (deutsch) u.voice = deutsch;
+    u.rate = begrenze(D.einst.vorleseTempo, .6, 1.4, .95);
+    u.onend = weiter;
+    u.onerror = () => vorlesenStopp();
+    try { speechSynthesis.speak(u); } catch (e) { vorlesenStopp(); }
+  };
+  weiter();
+  return true;
+}
 
 function oeffneSchreibraum(docId) {
   if (_sr) schliesseSchreibraum();
@@ -6077,12 +6761,16 @@ function oeffneSchreibraum(docId) {
   const mitte = el('div', { class: 'sr-mitte' }, spalte);
 
   const klangKnopf = el('button', { class: 'rundknopf zart' + (klangAktiv() ? ' klang-an' : ''), html: ik('klang'), title: 'Klang öffnen', onclick: () => { oeffneMischpult(); } });
+  const vorleseKnopf = el('button', { class: 'rundknopf zart vorlese-knopf', html: ik('vorlesen'), title: 'Vorlesen lassen (nochmal tippen: Stopp)', onclick: (e) => {
+    vorlesen((doc.titel ? doc.titel + '. ' : '') + srAktuellerText(), e.currentTarget);
+  } });
 
   const kopf = el('div', { class: 'sr-kopf' },
     el('button', { class: 'knopf', onclick: () => schliesseSchreibraum(true) }, el('span', { html: ik('haken'), style: 'display:flex' }), 'Fertig'),
     titel,
     kerzenhalter,
     worteAnzeige,
+    vorleseKnopf,
     klangKnopf,
     el('button', { class: 'rundknopf zart', html: ik('feinheiten'), title: 'Schreibraum einstellen', onclick: () => srEinstellungen() })
   );
@@ -6180,6 +6868,7 @@ function srSetzeText(text) {
 
 function schliesseSchreibraum(zurueck) {
   if (!_sr) return;
+  if (typeof vorlesenStopp === 'function') vorlesenStopp();
   _sr.sichern && _sr.sichern.sofort();
   document.removeEventListener('selectionchange', _sr.spiegelBeiAuswahl);
   if (_sr.sprint) beendeSprint(true);
@@ -6278,6 +6967,7 @@ function srEinstellungen() {
     zeileFuer('Tastenklang', wahl([[true, 'An'], [false, 'Aus']], s.tastenklang, (v) => { s.tastenklang = v; })),
     zeileFuer('„Kluge Zeichen"', wahl([[true, 'An'], [false, 'Aus']], s.ersetzungen, (v) => { s.ersetzungen = v; })),
     zeileFuer('Autokorrektur', wahl([[true, 'An'], [false, 'Aus']], s.autokorrektur, (v) => { s.autokorrektur = v; })),
+    zeileFuer('Vorlesetempo', wahl([[.8, 'Ruhig'], [.95, 'Normal'], [1.15, 'Zügig']], begrenze(s.vorleseTempo, .6, 1.4, .95), (v) => { s.vorleseTempo = v; })),
     el('div', { class: 'reihe', style: 'justify-content:flex-start;flex-wrap:wrap;gap:8px' },
       el('button', { class: 'knopf', onclick: () => { zu(); sucheErsetze(); } }, el('span', { html: ik('suche'), style: 'display:flex' }), 'Suchen & Ersetzen'),
       el('button', { class: 'knopf', onclick: () => { zu(); friereEin(); } }, el('span', { html: ik('frieren'), style: 'display:flex' }), 'Stand einfrieren'),
@@ -7136,7 +7826,7 @@ RENDER.woerter = function (haupt) {
   const funkeText = el('div', { class: 'funke-text', style: 'min-height:54px' }, funke);
   const arten = el('div', { class: 'funke-arten' });
   const ziehe = () => { funke = funkeArt === 'kombi' ? neuerFunke(true) : neuerFunke(false, funkeArt); funkeText.textContent = funke; };
-  for (const [id, name] of [['szene', 'Szene'], ['kombi', 'Wer · Wo · Aber'], ['frage', 'Frage'], ['form', 'Form'], ['satz', 'Satz']]) arten.append(el('button', {
+  for (const [id, name] of FUNKE_ARTEN) arten.append(el('button', {
     class: id === funkeArt ? 'an' : '', onclick: (e) => { funkeArt = id; $$('button', arten).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); ziehe(); }
   }, name));
   inhalt.append(el('div', { class: 'karte wortkisten-funken' },
@@ -7161,6 +7851,7 @@ const SUCH_GRUPPEN = [
   ['blatt', 'Blätter', 'blatt'],
   ['seite', 'Heftseiten', 'hefte'],
   ['szene', 'Szenen', 'projekte'],
+  ['figur', 'Figuren & Orte', 'projekte'],
   ['heft', 'Hefte', 'hefte'],
   ['projekt', 'Projekte', 'projekte'],
   ['blase', 'Blasen', 'cluster'],
@@ -7237,7 +7928,15 @@ function oeffneSuche() {
       treffer.append(el('div', { class: 'gruppe' }, 'ZULETZT ANGEFASST'));
       for (const d of frisch) treffer.append(eintrag(d, esc((d.text || '').replace(/\s+/g, ' ').slice(0, 70))));
     }
-    if (!letzte.length && !frisch.length) {
+    /* Schlagworte: alles, was irgendwo mit # markiert wurde — ein Tipp sucht danach. */
+    const worte = schlagwortIndex([...D.docs.values()], 30);
+    if (worte.length) {
+      treffer.append(el('div', { class: 'gruppe' }, 'SCHLAGWORTE'));
+      const wolke = el('div', { class: 'schlagwortwolke' });
+      for (const { wort, anzahl } of worte) wolke.append(el('button', { class: 'schlagwortchip', onclick: () => { feld.value = '#' + wort; suche(); } }, '#' + wort, el('small', {}, String(anzahl))));
+      treffer.append(wolke);
+    }
+    if (!letzte.length && !frisch.length && !worte.length) {
       treffer.append(el('div', { style: 'padding:22px;text-align:center;color:var(--blass);font-style:italic;font-family:ui-serif,Georgia,serif' },
         'Alles, was du je geschrieben hast, liegt hier drin.'));
     }
@@ -7542,8 +8241,20 @@ RENDER.feinheiten = function (haupt) {
     const n = anzahl(typ);
     return el('div', { class: 'z' }, el('b', {}, String(n)), el('span', {}, n === 1 ? einzahl : mehrzahl));
   });
+  /* Ein Jahr aus Punkten: jeder Tag ein Kästchen, je dunkler, desto mehr Wörter. */
+  const rasterWochen = (typeof innerWidth === 'number' && innerWidth < 620) ? 26 : 53;
+  const raster = jahresRaster(D.stats.tage, rasterWochen);
+  const jahr = el('div', { class: 'jahresraster', role: 'img', 'aria-label': 'Schreibtage der letzten ' + rasterWochen + ' Wochen' });
+  for (const spalte of raster.spalten) {
+    const sp = el('div', { class: 'jr-woche' });
+    for (const z of spalte) sp.append(el('i', { class: 'jr-tag stufe-' + z.stufe + (z.heute ? ' heute' : ''), title: z.worte === null ? '' : z.tag + ' · ' + z.worte + (z.worte === 1 ? ' Wort' : ' Wörter') }));
+    jahr.append(sp);
+  }
+  const schreibtage = Object.values(D.stats.tage).filter((v) => v > 0).length;
   inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Zahlen'),
     el('div', { class: 'karte' },
+      el('div', { class: 'jahresraster-kopf' }, el('span', {}, rasterWochen === 53 ? 'Das letzte Jahr' : 'Das letzte halbe Jahr'), el('span', { class: 'jr-legende' }, schreibtage + (schreibtage === 1 ? ' Schreibtag' : ' Schreibtage') + ' insgesamt')),
+      jahr,
       balken,
       el('div', { class: 'zahlenreihe' },
         el('div', { class: 'z' }, el('b', {}, gesamt.toLocaleString('de-DE')), el('span', {}, 'Wörter insgesamt')),
@@ -9049,7 +9760,7 @@ const ANLEITUNG = [
         'Ist kein Wort geschrieben, glimmt noch Glut von neulich oder es ist kalt. Ein Satz genügt.'
       ], tipp: 'Ein Tagesziel in Wörtern stelle ich in den Feinheiten ein. Dann zeigt die Karte einen Balken, und im Schreibraum klingt eine Glocke, wenn es erreicht ist.' },
       { t: 'Der Funke', p: [
-        'Ein Schreibanstoß. Die Knöpfe wechseln die Art: Szene (ein Bild), Wer · Wo · Aber (eine zusammengewürfelte Ausgangslage), Frage, Form (eine Schreibübung), Satz (ein erster Satz) und Meine (meine eigene Funkenkiste).',
+        'Ein Schreibanstoß. Die Knöpfe wechseln die Art: Szene (ein Bild), Wer · Wo · Aber (eine zusammengewürfelte Ausgangslage aus über sechzigtausend Möglichkeiten), Figur (jemand, der auftreten könnte), Wendung (was jetzt passiert), Frage, Form (eine Schreibübung), Satz (ein erster Satz) und Meine (meine eigene Funkenkiste). Über vierhundert Funken liegen bereit.',
         '„Anderer" würfelt neu. „Merken" legt den Funken in die Funkeln, damit er irgendwann unter „Wieder aufgetaucht" zurückkommt. „Dem nachgehen" legt sofort ein Blatt mit dem Funken an und öffnet den Schreibraum.'
       ], b: 'Wer · Wo · Aber: „Die letzte Leuchtturmwärterin, in einem Hotel, dessen Zimmernummern sich jede Nacht ändern, aber heute klopft es zweimal."' },
       { t: 'Eigene Funken', p: ['„+ Eigener" fängt einen gehörten Satz, ein Bild, eine Frage oder nur einen Vibe ein — mit kurzer Stimmungsnotiz. Die Funkenkiste sammelt sie, ist durchsuchbar, jeder Funke lässt sich ändern, verbinden oder vergessen und direkt zu einem Blatt machen.'] },
@@ -9082,7 +9793,7 @@ const ANLEITUNG = [
     abschnitte: [
       { t: 'Der Stapel', p: ['Blätter sind einzelne Texte ohne Drumherum. Das Plus legt ein neues an und öffnet sofort den Schreibraum. Jede Karte zeigt Titel (oder die erste Zeile), eine Probe und die Wörterzahl.'] },
       { t: 'Sortieren', p: ['Ab zwei Blättern erscheinen Knöpfe: Zuletzt, Älteste zuerst, A–Z. Die Wahl bleibt gespeichert.'] },
-      { t: 'Das Menü (lange halten)', p: ['Umbenennen · Teilen · Duplizieren (eine „Abschrift") · In ein Heft legen … · Hinzufügen & verbinden · Löschen.'], b: 'Ein Blatt ist fertig gedacht → lange halten → „In ein Heft legen …" → Heft wählen, Stelle wählen (ganz vorne, nach Seite 3, am Ende). Das Blatt ist jetzt eine Seite.' },
+      { t: 'Das Menü (lange halten)', p: ['Oben anpinnen · Umbenennen · Vorlesen lassen · Teilen · Duplizieren (eine „Abschrift") · In ein Heft legen … · Hinzufügen & verbinden · Löschen. Angepinnte Blätter liegen in jeder Sortierung oben und tragen eine goldene Nadel.'], b: 'Ein Blatt ist fertig gedacht → lange halten → „In ein Heft legen …" → Heft wählen, Stelle wählen (ganz vorne, nach Seite 3, am Ende). Das Blatt ist jetzt eine Seite.' },
       { t: 'Formatiert oder schlicht', p: ['Ein Blatt ist zuerst schlichter Text. Im Schreibraum unter den Einstellungen steht „Aa · Text formatieren" — danach gibt es eine Formatleiste mit fett, kursiv, Überschriften, Listen, Farben und Ausrichtung. Zurück zu schlicht gibt es nicht — aber der schlichte Text bleibt immer mitgespeichert, für Suche, Zählung und Sicherung.'] }
     ]
   },
@@ -9102,6 +9813,7 @@ const ANLEITUNG = [
       { t: 'Die Kerze', p: ['„Kerze anzünden": 10, 20 oder 45 Minuten. Oben brennt eine kleine Kerze herunter. Am Ende klingt eine Glocke und VANI sagt, wie viele Wörter in der Zeit entstanden sind. Schließen des Schreibraums bläst sie aus.'] },
       { t: 'Teilen', p: ['Schickt Titel und Text als Text weiter — an Notizen, WhatsApp, Mail, die Zwischenablage. Was das Gerät anbietet, steht im Teilen-Menü.'] },
       { t: 'Verknüpfen & einordnen', p: ['Zeigt, wohin [[Verweise]] im Text führen, welche Texte hierher zeigen, und öffnet die Beziehungen. Von hier geht es auch direkt zu „Zu Heft, Projekt oder Cluster hinzufügen".'] },
+      { t: 'Vorlesen lassen', p: ['Das Vorlese-Symbol oben liest den Text mit der Stimme des Geräts vor — ganz ohne Internet. Noch einmal tippen stoppt. Gut zum Gegenlesen: Was holpert, hört man, bevor man es sieht. Das Tempo (ruhig, normal, zügig) steht in den Schreibraum-Einstellungen. Auch Blätter (im Menü) und die Leseansicht eines Projekts lesen vor.'], tipp: 'Auf manchen Geräten ist die deutsche Stimme erst nach dem ersten Mal richtig geladen — einmal stoppen und neu starten hilft.' },
       { t: 'Klang im Schreibraum', p: ['Das Lautsprecher-Symbol oben öffnet das Mischpult als kleine Überlagerung — ohne den Text zu verlassen.'] }
     ]
   },
@@ -9120,7 +9832,11 @@ const ANLEITUNG = [
     kurz: 'Echte Hefte mit Seiten, Zetteln, Fotos und Kritzeleien.',
     abschnitte: [
       { t: 'Das Regal', p: ['Jedes Heft ist ein Deckel im Regal. Plus legt ein neues an. Lange halten öffnet das Heft-Menü. „Ins Regal stellen" archiviert ein Heft (es rückt nach unten unter „Im Regal"), „Zurück auf den Tisch" holt es wieder.'] },
-      { t: 'Umschlag & Papier gestalten', p: ['Grundfarbe aus der Palette oder frei, Zweitton, Buchband, Muster (Schlicht, Leinen, Diagonal, Punkte, Rahmen, Wellen) und Papier (Liniert, Breite Linien, Kariert, Punktraster, Blanko). Die Vorschau zeigt alles sofort; „Abbrechen" nimmt alles zurück.'] },
+      { t: 'Umschlag & Papier gestalten', p: ['Grundfarbe aus der Palette oder frei, Zweitton, Buchband, Muster (Schlicht, Leinen, Diagonal, Punkte, Rahmen, Wellen), Papier (Liniert, Breite Linien, Kariert, Punktraster, Blanko), Papierfarbe (Hell, Weiß, Creme, Kraft, Nacht) und eine Randlinie wie im Schulheft. Die Vorschau zeigt alles sofort; „Abbrechen" nimmt alles zurück.'], b: 'Ein Tagebuch-Heft: Papier Kraft, Randlinie an, Band dunkelrot. Ein Nachtheft: Papierfarbe Nacht — helle Schrift auf dunklem Papier.' },
+      { t: 'Inhalt, Lesezeichen, Seiten ordnen', p: [
+        'Das Listen-Symbol oben im Heft öffnet den Inhalt: jede Seite mit Titel oder erster Zeile, Wörterzahl und Angeklebtem. Ein Tipp springt hin — in jeder Ansicht.',
+        'Im Seiten-Menü (drei Punkte auf dem Papier): „Lesezeichen hierher" — das Heft öffnet sich beim nächsten Mal auf dieser Seite. „Seite nach vorn" und „Seite nach hinten" ordnen um. „Seite verdoppeln" legt eine Abschrift mit allen Zetteln direkt dahinter.'
+      ] },
       { t: 'Drei Ansichten', p: [
         'Oben im Heft stehen drei Knöpfe. „Seiten" blättert Seite für Seite (Pfeile links/rechts). „Rolle" zeigt alle Seiten untereinander, jede mit eigenem Rand und Seitenzahl. „Am Stück" macht aus dem ganzen Heft eine einzige lange Seite — ohne Kanten, ohne Umbruch, ohne Seitenzahlen.',
         'Es bleibt immer dasselbe Heft, nur anders angeschaut. Umschalten ändert nichts am Text.'
@@ -9135,7 +9851,7 @@ const ANLEITUNG = [
         'Von links nach rechts: 📌 Nadel = Zettel ankleben · Kamera = Foto einkleben · Stift = Kritzeln · Aa = Text formatieren · drei Punkte = Mehr (Im Schreibraum öffnen, Hinzufügen & verbinden, Als loses Blatt herausnehmen, Seite herausreißen).',
         'Der Zettel hat also einen eigenen Knopf und steckt in keinem Menü.'
       ], tipp: 'Wenn ich diese Knöpfe nicht sehe: In den Feinheiten auf „VANI jetzt aktualisieren" tippen. Dann ist die neueste Fassung da.' },
-      { t: 'Zettel', p: ['Kleine farbige Notizzettel auf der Seite. Ziehen verschiebt, der Griff unten rechts ändert die Größe, Tippen macht ihn beschreibbar. Lange halten: Andere Farbe, Befestigung (Tesa, Reißzwecke, lose aufgelegt), Etwas drehen, Abmachen.'], b: 'Eine Figurenbeschreibung als gelber Zettel schräg an den Rand der Seite — mit Tesa. Die Seite selbst bleibt frei für die Szene.' },
+      { t: 'Zettel', p: ['Kleine farbige Notizzettel auf der Seite. Ziehen verschiebt, der Griff unten rechts ändert die Größe, Tippen macht ihn beschreibbar. Lange halten: Andere Farbe (acht Töne), Schrift (Handschrift, Klar, Serife), Form (schmal, normal, breit), Befestigung (Tesa, Reißzwecke, lose aufgelegt), Etwas drehen, Gerade rücken, Abmachen.'], b: 'Eine Figurenbeschreibung als gelber Zettel schräg an den Rand der Seite — mit Tesa. Die Seite selbst bleibt frei für die Szene.' },
       { t: 'Fotos', p: ['„Foto einkleben" legt ein Bild auf die Seite, leicht schräg wie eingeklebt. Es lässt sich genauso ziehen, drehen, vergrößern und befestigen wie ein Zettel.'] },
       { t: 'Kritzeln', p: [
         '„Kritzeln" legt eine Zeichenfläche über die Seite. Die Werkzeugleiste schwebt oben: zwölf Farben plus eine eigene, stufenlose Stiftdicke, Radierer, ein Schritt zurück, ein Schritt wieder vor, alles löschen, Abbrechen und Fertig.',
@@ -9167,7 +9883,12 @@ const ANLEITUNG = [
       { t: 'Szenen-Menü (lange halten)', p: ['Umbenennen · Andere Farbe · Duplizieren („Fassung 2") · In anderes Kapitel … · Teilen · Szene löschen.'], b: 'Eine Szene in zwei Richtungen probieren: Duplizieren → in der Fassung 2 anders weiterschreiben → die schlechtere später löschen oder als Rückseiten-Notiz behalten.' },
       { t: 'Leseansicht', p: ['Das Buch-Symbol zeigt das ganze Projekt am Stück wie ein Manuskript: Kapitelüberschriften, Szenen durch Sternchen getrennt, Gesamtwörter. „Kopieren" legt alles in die Zwischenablage, „Als Datei" gibt eine .txt heraus.'] },
       { t: 'Wortziel', p: ['Mit Wortziel zeigen Karte und Kopf einen Fortschrittsbalken. Das Ziel lässt sich im Projekt-Menü jederzeit ändern (0 = keins).'] },
-      { t: 'Hefte am Projekt', p: ['Unten im Projekt liegen Hefte, die dazugehören. „Heft dazulegen" ordnet ein vorhandenes zu oder legt ein neues an. Ein Tipp auf das Heft öffnet es.'] }
+      { t: 'Hefte am Projekt', p: ['Unten im Projekt liegen Hefte, die dazugehören. „Heft dazulegen" ordnet ein vorhandenes zu oder legt ein neues an. Ein Tipp auf das Heft öffnet es.'] },
+      { t: 'Figuren & Orte', p: [
+        'Die Welt des Projekts: Wer tritt auf, wo spielt es, welches Ding trägt die Geschichte. „+ Dazu" fragt Name, Art (Figur, Ort, Ding, Anderes) und eine Notiz — Alter, Geruch, Geheimnis, was auf dem Tisch liegt.',
+        'Die kleine Zahl am Namen sagt, in wie vielen Szenen er vorkommt. Ein Tipp: Notiz lesen, Ändern, „Wo kommt … vor?", Verbindungen, Entfernen.',
+        'Das Beste: [[Name]] in doppelten Klammern im Text springt direkt zur Figur — weil der Name ihr Titel ist.'
+      ], b: 'Figur „Tante Ruth", Ort „Der Hafen", Ding „Das rote Auto". In der Szene steht: „Sie wartete am [[Der Hafen]], wie jeden Sonntag." Ein Tipp auf den Namen, und ich lese meine Notiz.' }
     ]
   },
   {
@@ -9244,7 +9965,7 @@ const ANLEITUNG = [
       { t: 'Die große Suche', p: ['Unten in der Leiste oder Strg/⌘ + K. Ab zwei Zeichen wird gesucht — in Titeln, Texten und Notizen aller Räume. Treffer sind nach Art gruppiert (Schnipsel, Blätter, Heftseiten, Szenen, Hefte, Projekte, Blasen, Zettel, Wortkisten, Wörter, Faden, Funken, Klang-Szenen) und zeigen die Fundstelle mit Umfeld.'] },
       { t: 'Filter', p: ['Die Chips unter dem Feld beschränken auf eine Art. Dann werden statt 6 bis zu 40 Treffer je Gruppe gezeigt.'] },
       { t: 'Ähnlich', p: ['Ab fünf Zeichen findet die Suche auch Wörter mit einem Buchstaben Unterschied und zeigt sie mit „(ähnlich)". Umlaute und ß sind egal: „strasse" findet „Straße".'] },
-      { t: 'Zuletzt', p: ['Ohne Eingabe zeigt die Suche die letzten Suchen und die zuletzt angefassten Texte.'] },
+      { t: 'Zuletzt und Schlagworte', p: ['Ohne Eingabe zeigt die Suche die letzten Suchen, die zuletzt angefassten Texte und alle Schlagworte: jedes #wort, das irgendwo im Text steht, mit der Zahl der Orte. Ein Tipp sucht danach.'], b: 'In drei Schnipseln steht #sommer. Die Suche zeigt „#sommer 3" — ein Tipp, alle drei sind da.' },
       { t: 'Wiederfinden ohne Suchen', p: ['Zuhause unter „Wieder aufgetaucht" und „Weiterschreiben". Im Heft über die Rolle. Im Projekt über die Leseansicht. In der Funkenkiste und den Wortkisten über deren eigene Suche. Auf der freien Schnipsel-Fläche über „Auf der Fläche suchen".'] }
     ]
   },
@@ -9255,7 +9976,7 @@ const ANLEITUNG = [
       { t: 'Stimmung', p: ['Fünf Themen: Papier (warm, hell), Tinte (dunkel), Kerze (dunkel, warm), Nebel (kühl, hell), Weiß (reinweiß). Gilt für die ganze App und färbt auch die Leiste oben am Gerät.'] },
       { t: 'Schreiben', p: ['Tagesziel in Wörtern (leer = keins). Automatisches Weiterblättern in Heften an/aus. Schrift, Größe und Fokus stelle ich direkt im Schreibraum ein.'] },
       { t: 'Räume', p: ['Jeder Raum lässt sich ein- und ausblenden und mit den Pfeilen sortieren. Zuhause bleibt immer. Ausgeblendete Räume behalten ihre Inhalte.'] },
-      { t: 'Zahlen', p: ['Die letzten 14 Tage als Balken, Wörter insgesamt, heute, Tage in Folge, und wie viele Schnipsel, Blätter, Seiten und Szenen es gibt.'] },
+      { t: 'Zahlen', p: ['Ein Jahr aus Punkten: jeder Tag ein Kästchen, je dunkler, desto mehr Wörter — so sieht man Strähnen und Pausen auf einen Blick. Darunter die letzten Tage als Balken, Wörter insgesamt, heute, Tage in Folge, und wie viele Schnipsel, Blätter, Seiten und Szenen es gibt.'] },
       { t: 'Papierkorb', p: ['Gelöschtes liegt hier mindestens 30 Tage. „Zurückholen" bringt ein Bündel mit allem zurück, was dazugehörte. „Endgültig leeren" ist die eine Stelle, an der Löschen wirklich löscht — mit Nachfrage.'] },
       { t: 'Frisch anfangen', p: ['„Zählungen auf null" setzt Wörter pro Tag, Strähne und Schreibfeuer zurück. Texte, Hefte, Projekte und der Faden bleiben unangetastet.'] },
       { t: 'Frisch durchatmen', p: ['Ganz unten: die App neu laden. Hilft, wenn etwas hakt — es geht nichts verloren.'] }
@@ -9305,6 +10026,11 @@ const ANLEITUNG = [
       { t: 'Android-Handy', s: ['https://thekeveldikev.github.io/vani/ in Chrome öffnen.', 'Menü (drei Punkte) → „Zum Startbildschirm hinzufügen" oder „App installieren".'] },
       { t: 'Windows-Laptop', p: ['Entweder https://thekeveldikev.github.io/vani/ im Browser öffnen (Chrome, Edge: dort gibt es „App installieren" in der Adressleiste) — oder die Desktop-App: VANI-x64-Setup.exe installiert sie, VANI-x64-Portable.exe läuft ohne Installation.'] },
       { t: 'Updates hinter demselben Icon', p: ['Ein Icon genügt für immer. Änderungen, die Claude oder Codex auf GitHub veröffentlichen, ersetzen die App hinter diesem Icon — ich muss nie wieder „Zum Home-Bildschirm" wählen. Beim Start holt VANI sich im Hintergrund die neue Fassung; unten erscheint dann „Eine neue Fassung liegt bereit → Neu laden". Oder: Feinheiten → „VANI jetzt aktualisieren".'], b: 'Claude hat etwas an VANI gebaut und auf GitHub veröffentlicht. Am iPad öffne ich mein einziges VANI-Icon, tippe in den Feinheiten auf „VANI jetzt aktualisieren" — fertig. Meine Texte bleiben, wo sie sind.' },
+      { t: 'Teilen nach VANI und Schnellstarts (Android)', p: [
+        'Auf einem Android-Handy taucht VANI im Teilen-Menü anderer Apps auf: Text markieren → Teilen → VANI. Der Text landet als Schnipsel — ohne Kopieren und Einfügen.',
+        'Das Icon lange halten zeigt Schnellstarts: Neuer Schnipsel, Neues Blatt, Suchen.',
+        'Auf dem iPhone und iPad gibt es diese beiden Wege nicht — Apple erlaubt sie Web-Apps nicht. Dort bleibt Kopieren und Einfügen.'
+      ] },
       { t: 'Desktop-App aktualisieren', p: ['Die Windows-App aktualisiert sich noch nicht selbst. Eine neue Setup-Datei einfach über die alte installieren — Inhalte bleiben.'] },
       { t: 'Offline', p: ['Nach dem ersten Öffnen läuft VANI komplett ohne Internet. Internet braucht es nur für Updates, für den Sync und zum Hereinholen des Fadens.'] },
       { t: 'Wenn das alte Icon weg soll', p: ['Icon lange halten → „App entfernen". Zeigt es kein Minus, ist das iPad verwaltet: Einstellungen → Bildschirmzeit → Beschränkungen → Apps löschen → Erlauben, oder die Verwaltung fragen. Vorher sichern, falls Inhalte am alten Icon hängen.'] }
@@ -9550,6 +10276,21 @@ async function sucheAppUpdate(neuLaden = false) {
   setzeThema(D.einst.thema);
   baueLeiste();
   zeichne();
+
+  /* Geteilter Text (Android „Teilen → VANI") oder ein Schnellstart vom Icon */
+  const auftrag = startAuftrag(location.search);
+  if (auftrag) {
+    try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}
+    if (auftrag.art === 'geteilt' && auftrag.text) {
+      neuDoc('schnipsel', { text: auftrag.text });
+      location.hash = '#/schnipsel';
+      setTimeout(() => toast('Angekommen — liegt in den Schnipseln.', 3600), 400);
+    } else if (auftrag.art === 'neu') {
+      if (auftrag.was === 'schnipsel') { location.hash = '#/schnipsel'; setTimeout(() => { const f = $('.schreibzeile textarea'); if (f) f.focus(); }, 300); }
+      else if (auftrag.was === 'blatt') { location.hash = '#/blaetter'; setTimeout(() => { const b = blattAusText('', ''); oeffneSchreibraum(b.id); }, 200); }
+      else if (auftrag.was === 'suche') setTimeout(() => oeffneSuche(), 200);
+    }
+  }
   if (vaniAdresseArt() === 'rettung') {
     setTimeout(() => toastMitAktion('Du bist im Rettungsmodus der früheren zweiten Adresse.', 'Sicher umziehen', () => {
       location.hash = '#/feinheiten'; zeichne();

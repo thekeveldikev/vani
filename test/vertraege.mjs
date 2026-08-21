@@ -286,3 +286,34 @@ test('Am-Stück-Vertrag: die Werkzeuge stehen einmal oben, nicht bei jedem Stüc
   assert.doesNotMatch(lies('src/10-style.css'), /\.papierseite\.fluss:hover \.seitenwerkzeuge/,
     'nichts Notwendiges darf nur bei Mauszeiger erscheinen');
 });
+
+test('Teilen-Vertrag: Android kann nach VANI teilen, die PWA-Identität bleibt trotzdem stabil', () => {
+  const m = JSON.parse(lies('manifest.json'));
+  assert.equal(m.id, './'); assert.equal(m.start_url, './'); assert.equal(m.scope, './');
+  assert.equal(m.share_target.action, './');
+  assert.equal(m.share_target.method, 'GET');
+  assert.deepEqual(m.share_target.params, { title: 'titel', text: 'text', url: 'url' });
+  assert.ok(Array.isArray(m.shortcuts) && m.shortcuts.length >= 2);
+  for (const s of m.shortcuts) assert.match(s.url, /^\.\/\?neu=(schnipsel|blatt|suche)$/);
+  assert.match(lies('src/60-boot.js'), /startAuftrag\(location\.search\)/);
+  assert.match(lies('src/60-boot.js'), /history\.replaceState/, 'die Adresse wird nach dem Auftrag wieder sauber');
+});
+
+test('Welle-1-Vertrag: Inhalt, Lesezeichen, Seitenordnung, Figuren, Vorlesen und Schlagworte sind verdrahtet', () => {
+  const hefte = lies('src/43-hefte.js');
+  for (const s of ['function heftInhalt', "'Lesezeichen hierher'", "'Seite nach vorn'", "'Seite nach hinten'", "'Seite verdoppeln'", 'heft.lesezeichen', 'function papierKlassen', "'Gerade rücken'", 'ZETTELFARBEN']) {
+    assert.ok(hefte.includes(s), 'Hefte: fehlt ' + s);
+  }
+  const projekte = lies('src/44-projekte.js');
+  for (const s of ['function baueFigurenUndOrte', "neuDoc('figur'", 'figurVorkommen', 'FIGUR_ARTEN']) assert.ok(projekte.includes(s), 'Projekte: fehlt ' + s);
+  assert.match(lies('src/30-core.js'), /d\.typ === 'kapitel' \|\| d\.typ === 'figur'/, 'Figuren öffnen ihr Projekt');
+  assert.match(lies('src/48-suche.js'), /\['figur', 'Figuren & Orte', 'projekte'\]/);
+  assert.match(lies('src/48-suche.js'), /schlagwortIndex\(/);
+  const sr = lies('src/45-schreibraum.js');
+  for (const s of ['function vorlesen(', 'function vorlesenStopp', 'speechSynthesis', 'vorleseKnopf']) assert.ok(sr.includes(s), 'Schreibraum: fehlt ' + s);
+  assert.match(lies('src/44-projekte.js'), /vorlesen\(gesamt/, 'Leseansicht liest vor');
+  assert.match(lies('src/42b-blaetter.js'), /Oben anpinnen/);
+  assert.match(lies('src/49-feinheiten.js'), /jahresRaster\(D\.stats\.tage/);
+  assert.match(lies('src/41-zuhause.js'), /\.\.\.FUNKE_ARTEN/, 'Zuhause kennt alle Funkenarten');
+  assert.match(lies('src/47-woerter.js'), /of FUNKE_ARTEN\)/, 'Wörter kennt alle Funkenarten');
+});

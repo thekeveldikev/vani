@@ -21,6 +21,8 @@ RENDER.blaetter = function (haupt) {
   const alle = vomTyp('blatt');
   if (sortierung === 'az') alle.sort((a, b) => (a.titel || a.text || '').localeCompare(b.titel || b.text || '', 'de'));
   else if (sortierung === 'aeltest') alle.sort((a, b) => a.angelegt - b.angelegt);
+  /* Angepinnte Blätter liegen oben — in jeder Sortierung. */
+  alle.sort((a, b) => Number(!!b.gepinnt) - Number(!!a.gepinnt));
 
   if (alle.length > 1) {
     const wahl = el('div', { class: 'wahlgruppe', style: 'margin-bottom:12px' });
@@ -41,21 +43,28 @@ RENDER.blaetter = function (haupt) {
   for (const b of alle) {
     const worteZahl = worte(b.text);
     const erste = (b.text || '').trim().split('\n')[0] || '';
-    const karte = el('button', { class: 'karte blattkarte', onclick: () => oeffneSchreibraum(b.id) },
+    const karte = el('button', { class: 'karte blattkarte' + (b.gepinnt ? ' gepinnt' : ''), onclick: () => oeffneSchreibraum(b.id) },
+      b.gepinnt ? el('span', { class: 'blatt-nadel', html: ik('pin') }) : null,
       el('div', { class: 'btitel serif' }, b.titel || erste.slice(0, 60) || 'Ohne Titel'),
       el('div', { class: 'bprobe' }, (b.text || '').trim().replace(/\s+/g, ' ').slice(0, 140) || 'Noch leer.'),
       el('div', { class: 'bfuss' }, (worteZahl ? worteZahl + ' Wörter · ' : '') + vorZeit(b.geaendert))
     );
     langdruck(karte, async () => {
       const wahl = await menue([
+        { text: b.gepinnt ? 'Losmachen' : 'Oben anpinnen', icon: 'pin', wert: 'pin' },
         { text: 'Umbenennen', icon: 'stift', wert: 'name' },
+        { text: 'Vorlesen lassen', icon: 'vorlesen', wert: 'vorlesen' },
         { text: 'Teilen', icon: 'teilen', wert: 'teilen' },
         { text: 'Duplizieren', icon: 'wandel', wert: 'doppel' },
         { text: 'In ein Heft legen …', icon: 'hefte', wert: 'heft' },
         { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
         { text: 'Löschen', icon: 'muell', wert: 'weg', rot: true }
       ], b.titel || 'Blatt');
-      if (wahl === 'name') {
+      if (wahl === 'pin') {
+        b.gepinnt = !b.gepinnt; speichereStill(b); zeichne();
+      } else if (wahl === 'vorlesen') {
+        vorlesen((b.titel ? b.titel + '. ' : '') + (b.text || ''));
+      } else if (wahl === 'name') {
         const neu = await eingabe({ titel: 'Das Blatt heißt jetzt …', wert: b.titel });
         if (neu !== null) { b.titel = neu; speichereStill(b); zeichne(); }
       } else if (wahl === 'teilen') {

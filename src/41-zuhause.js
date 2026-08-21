@@ -195,7 +195,7 @@ RENDER.zuhause = function (haupt) {
   const funkeText = el('div', { class: 'funke-text' }, funkeAktuell);
   const funkeArten = el('div', { class: 'funke-arten' });
   let merkeFunkeKnopf = null;
-  const artDaten = [['szene', 'Szene'], ['kombi', 'Wer · Wo · Aber'], ['frage', 'Frage'], ['form', 'Form'], ['satz', 'Satz'], ['eigene', 'Meine']];
+  const artDaten = [...FUNKE_ARTEN, ['eigene', 'Meine']];
   const zieheFunke = () => {
     if (funkeArt === 'eigene') {
       const meine = eigeneFunken(); funkeAktuell = meine.length ? zufall(meine).text : 'Deine Funkenkiste ist noch leer. Fang den ersten Satz ein.';

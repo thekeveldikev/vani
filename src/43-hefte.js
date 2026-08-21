@@ -10,6 +10,11 @@ function heftDeckelDaten(h) {
   return { farbe, farbe2, band, muster, style: '--heft1:' + farbe + ';--heft2:' + farbe2 + ';--heftband:' + band };
 }
 
+const PAPIERFARBEN = [['hell', 'Hell'], ['weiss', 'Weiß'], ['creme', 'Creme'], ['kraft', 'Kraft'], ['nacht', 'Nacht']];
+function papierKlassen(heft, extra = '') {
+  return 'papierseite ' + (heft.papier || 'liniert') + ' papierfarbe-' + (heft.papierfarbe || 'hell') + (heft.rand ? ' mit-rand' : '') + extra;
+}
+
 async function heftGestalten(h, danach) {
   const vorschau = el('div', { class: 'heftdeckel heft-vorschau' }, el('div', { class: 'htitel' }, h.titel));
   const farben = el('div', { class: 'heft-farben' });
@@ -31,15 +36,24 @@ async function heftGestalten(h, danach) {
   for (const [id, name] of [['liniert', 'Liniert'], ['breit', 'Breite Linien'], ['kariert', 'Kariert'], ['punkte', 'Punktraster'], ['blank', 'Blanko']]) papier.append(el('button', {
     class: (h.papier || 'liniert') === id ? 'an' : '', onclick: (e) => { h.papier = id; $$('button', papier).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); }
   }, name));
+  /* Papierfarbe und Randlinie: wie das Heft innen aussieht */
+  const papierfarbe = el('div', { class: 'wahlgruppe papierfarben', style: 'flex-wrap:wrap' });
+  for (const [id, name] of PAPIERFARBEN) papierfarbe.append(el('button', {
+    class: 'papierfarbe-' + id + ((h.papierfarbe || 'hell') === id ? ' an' : ''), title: name,
+    onclick: (e) => { h.papierfarbe = id; $$('button', papierfarbe).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); }
+  }, name));
+  const rand = el('button', { class: 'schalter' + (h.rand ? ' an' : ''), onclick: (e) => { h.rand = !h.rand; e.currentTarget.classList.toggle('an', h.rand); } }, el('i'));
   let behalten = false;
   const kasten = el('div', { class: 'modal heft-atelier' }, el('h2', {}, 'Heft gestalten'), vorschau,
     el('div', { class: 'einstellgruppe' }, el('b', {}, 'Grundfarbe'), farben,
       el('div', { class: 'heft-freifarben' }, el('label', {}, 'Grundton ', frei), el('label', {}, 'Zweitton ', zweit), el('label', {}, 'Band ', band))),
     el('div', { class: 'einstellgruppe' }, el('b', {}, 'Muster'), muster),
     el('div', { class: 'einstellgruppe' }, el('b', {}, 'Papier'), papier),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Papierfarbe'), papierfarbe),
+    el('div', { class: 'einstellgruppe einstellzeile' }, el('span', { class: 'ename' }, 'Randlinie', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Eine Linie am linken Rand wie im Schulheft — Platz für Notizen.')), rand),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
       el('button', { class: 'knopf voll', onclick: () => { behalten = true; speichere(h); zu(); if (danach) danach(); } }, 'So bleibt es')));
-  const alt = { farbe: h.farbe, farbe2: h.farbe2, band: h.band, muster: h.muster, papier: h.papier };
+  const alt = { farbe: h.farbe, farbe2: h.farbe2, band: h.band, muster: h.muster, papier: h.papier, papierfarbe: h.papierfarbe, rand: h.rand };
   const zu = zeigeDeck(kasten, () => { if (!behalten) { Object.assign(h, alt); if (danach) danach(); } });
   aktualisiere();
 }
@@ -207,12 +221,34 @@ RENDER.heft = function (haupt, heftId) {
   }
 
   let idx = Math.min(seiten.length - 1, parseInt(sessionStorage.getItem('heftSeite:' + heftId) || '0', 10) || 0);
-  const ziel = sessionStorage.getItem('zielSeite');
-  if (ziel) {
-    sessionStorage.removeItem('zielSeite');
-    const zi = seiten.findIndex((s) => s.id === ziel);
-    if (zi >= 0) idx = zi;
+  /* Das Lesezeichen öffnet das Heft dort, wo ich zuletzt „hierher" gesagt habe —
+     nur beim ersten Öffnen in dieser Sitzung, danach zählt die letzte Seite. */
+  if (!sessionStorage.getItem('heftSeite:' + heftId) && heft.lesezeichen) {
+    const li = seiten.findIndex((s) => s.id === heft.lesezeichen);
+    if (li >= 0) idx = li;
   }
+  /* Ein Sprungziel (Inhalt, Suche, verschobene oder verdoppelte Seite) wird
+     genau einmal eingelöst — in jeder Ansicht, und ohne später nachzuwirken. */
+  let springZu = null;
+  const zielAufnehmen = () => {
+    const z = sessionStorage.getItem('zielSeite');
+    if (!z) return null;
+    sessionStorage.removeItem('zielSeite');
+    return z;
+  };
+  const ziel = zielAufnehmen();
+  if (ziel) {
+    const zi = seiten.findIndex((s) => s.id === ziel);
+    if (zi >= 0) { idx = zi; springZu = ziel; }
+  }
+  const scrolleZuZiel = () => {
+    if (!springZu) return;
+    requestAnimationFrame(() => {
+      const z = halter.querySelector('[data-seite="' + springZu + '"]');
+      if (z) z.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      springZu = null;
+    });
+  };
 
   haupt.append(el('div', { class: 'kopf' },
     zurueckknopf('#/hefte'),
@@ -221,6 +257,9 @@ RENDER.heft = function (haupt, heftId) {
       el('button', { class: (heft.ansicht || 'seiten') === 'seiten' ? 'an' : '', title: 'Einzelne Seiten', onclick: () => { heft.ansicht = 'seiten'; speichere(heft); zeichne(); } }, 'Seiten'),
       el('button', { class: heft.ansicht === 'rolle' ? 'an' : '', title: 'Seite für Seite untereinander', onclick: () => { heft.ansicht = 'rolle'; speichere(heft); zeichne(); } }, 'Rolle'),
       el('button', { class: heft.ansicht === 'fluss' ? 'an' : '', title: 'Eine einzige lange Seite, ohne Umbruch', onclick: () => { heft.ansicht = 'fluss'; speichere(heft); zeichne(); } }, 'Am Stück')),
+    el('button', { class: 'rundknopf zart', html: ik('inhalt'), title: 'Inhalt: alle Seiten', onclick: () => heftInhalt(heft, (seite) => {
+      sessionStorage.setItem('zielSeite', seite.id); zeichne();
+    }) }),
     el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Heft-Menü', onclick: () => heftMenue(heft, () => zeichne()) })
   ));
 
@@ -232,6 +271,7 @@ RENDER.heft = function (haupt, heftId) {
 
   function zeigeRolle() {
     seiten = kinder(heft.id, 'seite');
+    { const z = zielAufnehmen(); if (z) springZu = z; }
     halter.className = 'heftrolle'; fuss.style.display = 'none'; halter.innerHTML = '';
     for (let i = 0; i < seiten.length; i++) {
       const seite = seiten[i];
@@ -244,6 +284,7 @@ RENDER.heft = function (haupt, heftId) {
       heft.geaendert = Date.now(); speichereStill(heft); zeigeRolle();
       requestAnimationFrame(() => { const letzte = halter.lastElementChild && halter.lastElementChild.previousElementSibling; if (letzte) letzte.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
     } }, el('span', { html: ik('plus'), style: 'display:flex' }), 'Neue Seite darunter'));
+    scrolleZuZiel();
   }
 
   /* Am Stück: alles Geschriebene auf einer einzigen langen Seite. Kein Umbruch,
@@ -251,8 +292,9 @@ RENDER.heft = function (haupt, heftId) {
      Textmengen aus anderen Apps. */
   function zeigeFluss() {
     seiten = kinder(heft.id, 'seite');
+    { const z = zielAufnehmen(); if (z) springZu = z; }
     halter.className = 'heftfluss'; fuss.style.display = 'none'; halter.innerHTML = '';
-    const bogen = el('div', { class: 'fluss-bogen ' + (heft.papier || 'liniert') });
+    const bogen = el('div', { class: 'fluss-bogen ' + (heft.papier || 'liniert') + ' papierfarbe-' + (heft.papierfarbe || 'hell') });
     /* Ein Werkzeug für die ganze lange Seite. Es wirkt auf das Stück, in dem
        gerade geschrieben wird — sonst auf das letzte. */
     const aktuellesStueck = () => {
@@ -271,6 +313,7 @@ RENDER.heft = function (haupt, heftId) {
       neuDoc('seite', { parent: heft.id, ord: kinder(heft.id, 'seite').length, titel: '', text: '' });
       heft.geaendert = Date.now(); speichereStill(heft); zeigeFluss();
     } }, el('span', { html: ik('plus'), style: 'display:flex' }), 'Noch ein Stück anfügen'));
+    scrolleZuZiel();
   }
 
   function zeigeSeite() {
@@ -282,6 +325,7 @@ RENDER.heft = function (haupt, heftId) {
       seiten = kinder(heft.id, 'seite');
       idx = 0;
     }
+    { const z = zielAufnehmen(); if (z) { const zi = seiten.findIndex((s) => s.id === z); if (zi >= 0) idx = zi; } }
     idx = Math.max(0, Math.min(idx, seiten.length - 1));
     sessionStorage.setItem('heftSeite:' + heftId, String(idx));
     const seite = seiten[idx];
@@ -348,6 +392,24 @@ RENDER.heft = function (haupt, heftId) {
   else zeigeSeite();
 };
 
+/* Das Inhaltsverzeichnis: jede Seite mit Titel oder erster Zeile, Wörtern und
+   Lesezeichen. Ein Tipp springt hin — in jeder Ansicht. */
+function heftInhalt(heft, wohin) {
+  const seiten = kinder(heft.id, 'seite');
+  return menue(seiten.map((s, i) => {
+    const erste = (s.titel || (s.text || '').trim().split('\n').find((z) => z.trim()) || '').trim();
+    const w = worte(s.text);
+    const anlagen = kinder(s.id).length;
+    return {
+      text: (i + 1) + ' · ' + (erste ? erste.slice(0, 44) : 'Leere Seite') + (w ? '  —  ' + w + ' W.' : '') + (anlagen ? ' · ' + anlagen + ' angeklebt' : ''),
+      icon: heft.lesezeichen === s.id ? 'lesezeichen' : (s.skizze ? 'stift' : null), wert: s.id
+    };
+  }), 'Inhalt · ' + seiten.length + (seiten.length === 1 ? ' Seite' : ' Seiten')).then((id) => {
+    const seite = id && D.docs.get(id);
+    if (seite && wohin) wohin(seite);
+  });
+}
+
 /* Eine Werkzeugreihe, zwei Verwendungen: fest an einer Seite oder oben an der
    langen Seite. ziel() sagt beim Antippen, welches Stück gerade gemeint ist. */
 function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
@@ -385,13 +447,43 @@ function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
     el('button', {
       class: 'rundknopf', title: 'Mehr', html: ik('mehr'), onclick: async () => {
         const z = ziel(); if (!z) return;
+        const geschwister = kinder(z.heft.id, 'seite');
+        const i = geschwister.findIndex((x) => x.id === z.seite.id);
+        const istLesezeichen = z.heft.lesezeichen === z.seite.id;
         const wahl = await menue([
           { text: 'Im Schreibraum öffnen', icon: 'stift', wert: 'sr' },
+          { text: istLesezeichen ? 'Lesezeichen entfernen' : 'Lesezeichen hierher', icon: 'lesezeichen', wert: 'lesezeichen' },
+          i > 0 ? { text: 'Seite nach vorn', icon: 'auf', wert: 'vor' } : null,
+          i < geschwister.length - 1 ? { text: 'Seite nach hinten', icon: 'ab', wert: 'zurueck' } : null,
+          { text: 'Seite verdoppeln', icon: 'wandel', wert: 'doppel' },
           { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
           { text: 'Als loses Blatt herausnehmen', icon: 'blatt', wert: 'blatt' },
           { text: 'Seite herausreißen', icon: 'muell', wert: 'weg', rot: true }
-        ]);
+        ], 'Seite ' + (i + 1) + ' von ' + geschwister.length);
         if (wahl === 'sr') oeffneSchreibraum(z.seite.id);
+        else if (wahl === 'lesezeichen') {
+          if (istLesezeichen) delete z.heft.lesezeichen; else z.heft.lesezeichen = z.seite.id;
+          speichereStill(z.heft);
+          toast(istLesezeichen ? 'Lesezeichen entfernt.' : 'Lesezeichen liegt auf Seite ' + (i + 1) + '. Das Heft öffnet sich hier.');
+          if (neuZeichnen) neuZeichnen();
+        } else if (wahl === 'vor' || wahl === 'zurueck') {
+          const j = wahl === 'vor' ? i - 1 : i + 1;
+          geschwister.forEach((x, n) => { x.ord = n; });
+          [geschwister[i].ord, geschwister[j].ord] = [j, i];
+          geschwister.forEach((x) => speichereStill(x));
+          sessionStorage.setItem('zielSeite', z.seite.id);
+          if (neuZeichnen) neuZeichnen();
+        } else if (wahl === 'doppel') {
+          geschwister.forEach((x, n) => { x.ord = n >= i + 1 ? n + 1 : n; speichereStill(x); });
+          const kopie = neuDoc('seite', { parent: z.heft.id, ord: i + 1, titel: z.seite.titel ? z.seite.titel + ' (Abschrift)' : '', text: z.seite.text || '', rich: z.seite.rich || '', format: z.seite.format || 'plain' });
+          for (const a of kinder(z.seite.id)) {
+            if (a.typ !== 'zettel') continue;
+            neuDoc('zettel', { parent: kopie.id, text: a.text, farbe: a.farbe, schrift: a.schrift, befestigung: a.befestigung, pos: Object.assign({}, a.pos) });
+          }
+          sessionStorage.setItem('zielSeite', kopie.id);
+          toast('Verdoppelt. Fotos und Kritzeleien bleiben beim Original.');
+          if (neuZeichnen) neuZeichnen();
+        }
         else if (wahl === 'dazu') await hinzufuegenMenue(z.seite);
         else if (wahl === 'blatt') {
           seiteZuBlatt(z.seite); toast('Liegt jetzt wieder bei den Blättern.');
@@ -407,7 +499,7 @@ function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
 }
 
 function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
-  const blatt = el('div', { class: 'papierseite ' + (heft.papier || 'liniert') + (optionen.fluss ? ' fluss' : ''), 'data-seite': seite.id });
+  const blatt = el('div', { class: papierKlassen(heft, optionen.fluss ? ' fluss' : ''), 'data-seite': seite.id });
 
   /* Werkzeuge: auf einer einzelnen Seite oben rechts auf dem Papier. In der
      Ansicht „Am Stück" gibt es sie nur einmal ganz oben — dort ist alles eine
@@ -568,14 +660,25 @@ function anlageGesten(elem, a, blatt, neuBauen) {
   langdruck(elem, async () => {
     const wahl = await menue([
       a.typ === 'zettel' ? { text: 'Andere Farbe', icon: 'farbe', wert: 'farbe' } : null,
+      a.typ === 'zettel' ? { text: 'Schrift: ' + ({ hand: 'Handschrift', klar: 'Klar', serif: 'Serife' }[a.schrift || 'hand']), icon: 'stift', wert: 'schrift' } : null,
+      a.typ === 'zettel' ? { text: 'Form: ' + (a.pos.w <= 24 ? 'schmal' : a.pos.w >= 44 ? 'breit' : 'normal'), icon: 'wandel', wert: 'form' } : null,
       { text: 'Befestigung: ' + ({ tesa: 'Tesa', pin: 'Reißzwecke', lose: 'lose aufgelegt' }[a.befestigung || 'tesa']), icon: 'pin', wert: 'befestigung' },
       { text: 'Etwas drehen', icon: 'drehen', wert: 'drehen' },
+      { text: 'Gerade rücken', icon: 'ausBlock', wert: 'gerade' },
       { text: 'Abmachen', icon: 'muell', wert: 'weg', rot: true }
     ]);
     if (wahl === 'farbe') {
-      const folge = ['gelb', 'rosa', 'blau', 'gruen'];
-      a.farbe = folge[(folge.indexOf(a.farbe) + 1) % folge.length];
+      a.farbe = ZETTELFARBEN[(ZETTELFARBEN.indexOf(a.farbe) + 1) % ZETTELFARBEN.length];
       speichereStill(a); neuBauen();
+    } else if (wahl === 'schrift') {
+      a.schrift = { hand: 'klar', klar: 'serif', serif: 'hand' }[a.schrift || 'hand'];
+      speichereStill(a); neuBauen();
+    } else if (wahl === 'form') {
+      a.pos.w = a.pos.w <= 24 ? 30 : a.pos.w >= 44 ? 22 : 46;
+      speichereStill(a); neuBauen();
+    } else if (wahl === 'gerade') {
+      a.pos.rot = 0; speichereStill(a);
+      elem.style.transform = 'rotate(0deg)';
     } else if (wahl === 'befestigung') {
       a.befestigung = { tesa: 'pin', pin: 'lose', lose: 'tesa' }[a.befestigung || 'tesa']; speichereStill(a); neuBauen();
     } else if (wahl === 'drehen') {
@@ -591,10 +694,11 @@ function anlageGesten(elem, a, blatt, neuBauen) {
   });
 }
 
+const ZETTELFARBEN = ['gelb', 'rosa', 'blau', 'gruen', 'orange', 'lila', 'weiss', 'grau'];
 function baueZettel(a, blatt, neuBauen) {
   const halter = el('div', { class: 'anlage befestigung-' + (a.befestigung || 'tesa') });
   positioniere(halter, a);
-  const z = el('div', { class: 'zettel ' + (a.farbe || 'gelb') });
+  const z = el('div', { class: 'zettel ' + (ZETTELFARBEN.includes(a.farbe) ? a.farbe : 'gelb') + ' schrift-' + (a.schrift || 'hand') });
   const ta = el('textarea', { placeholder: '…', rows: 1 });
   ta.value = a.text || '';
   autogrow(ta);

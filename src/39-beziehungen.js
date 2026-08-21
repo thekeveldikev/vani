@@ -8,7 +8,7 @@ function docName(d) {
   return (d.titel || (d.text || '').trim().split('\n')[0] || ({ seite: 'Heftseite', blase: 'Blase', faden: 'Fadenstück', goodnote: 'Goodnotes-Notizbuch' }[d.typ]) || d.typ).slice(0, 80);
 }
 function docIcon(d) {
-  return ({ schnipsel: 'schnipsel', blatt: 'blatt', seite: 'hefte', heft: 'hefte', projekt: 'projekte', kapitel: 'projekte', szene: 'projekte', board: 'cluster', blase: 'cluster', wort: 'woerter', wortkiste: 'woerter', faden: 'faden', funkeln: 'wieder', goodnote: 'buchzu' }[d && d.typ]) || 'verbinden';
+  return ({ schnipsel: 'schnipsel', blatt: 'blatt', seite: 'hefte', heft: 'hefte', projekt: 'projekte', kapitel: 'projekte', szene: 'projekte', board: 'cluster', blase: 'cluster', wort: 'woerter', wortkiste: 'woerter', faden: 'faden', funkeln: 'wieder', goodnote: 'buchzu', figur: 'figur' }[d && d.typ]) || 'verbinden';
 }
 
 function waehleDokument(auslassenId, titel = 'Womit verbinden?') {

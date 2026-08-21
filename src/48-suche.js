@@ -8,6 +8,7 @@ const SUCH_GRUPPEN = [
   ['blatt', 'Blätter', 'blatt'],
   ['seite', 'Heftseiten', 'hefte'],
   ['szene', 'Szenen', 'projekte'],
+  ['figur', 'Figuren & Orte', 'projekte'],
   ['heft', 'Hefte', 'hefte'],
   ['projekt', 'Projekte', 'projekte'],
   ['blase', 'Blasen', 'cluster'],
@@ -84,7 +85,15 @@ function oeffneSuche() {
       treffer.append(el('div', { class: 'gruppe' }, 'ZULETZT ANGEFASST'));
       for (const d of frisch) treffer.append(eintrag(d, esc((d.text || '').replace(/\s+/g, ' ').slice(0, 70))));
     }
-    if (!letzte.length && !frisch.length) {
+    /* Schlagworte: alles, was irgendwo mit # markiert wurde — ein Tipp sucht danach. */
+    const worte = schlagwortIndex([...D.docs.values()], 30);
+    if (worte.length) {
+      treffer.append(el('div', { class: 'gruppe' }, 'SCHLAGWORTE'));
+      const wolke = el('div', { class: 'schlagwortwolke' });
+      for (const { wort, anzahl } of worte) wolke.append(el('button', { class: 'schlagwortchip', onclick: () => { feld.value = '#' + wort; suche(); } }, '#' + wort, el('small', {}, String(anzahl))));
+      treffer.append(wolke);
+    }
+    if (!letzte.length && !frisch.length && !worte.length) {
       treffer.append(el('div', { style: 'padding:22px;text-align:center;color:var(--blass);font-style:italic;font-family:ui-serif,Georgia,serif' },
         'Alles, was du je geschrieben hast, liegt hier drin.'));
     }
