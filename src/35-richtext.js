@@ -4,11 +4,17 @@
 
 const RICH_TAGS = new Set(['DIV', 'P', 'BR', 'B', 'STRONG', 'I', 'EM', 'U', 'S', 'UL', 'OL', 'LI', 'BLOCKQUOTE', 'H1', 'H2', 'H3', 'SPAN']);
 
+/* Ein losgel\u00f6stes Element wird nie gesetzt \u2014 dort liefert innerText keine
+   Zeilenumbr\u00fcche, und aus zwei Abs\u00e4tzen w\u00fcrde ein zusammengeklebtes Wort.
+   Darum werden Zeilen- und Blockenden vorher zu echten Umbr\u00fcchen. */
 function richReinerText(html) {
   html = String(html || '').slice(0, 10000000);
   if (typeof document !== 'undefined' && document.createElement) {
-    const d = document.createElement('div'); d.innerHTML = html;
-    return (d.innerText || d.textContent || '').replace(/\u00a0/g, ' ');
+    const d = document.createElement('div');
+    d.innerHTML = html
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/(?:p|div|li|h[1-6]|blockquote|tr|section|article|figcaption|dd|dt|pre)\s*>/gi, '\n');
+    return (d.textContent || '').replace(/\u00a0/g, ' ');
   }
   return html.replace(/<script[\s\S]*?<\/script\s*>/gi, '').replace(/<style[\s\S]*?<\/style\s*>/gi, '')
     .replace(/<br\s*\/?>/gi, '\n').replace(/<\/(?:p|div|li|h[1-3]|blockquote)>/gi, '\n').replace(/<[^>]+>/g, '')
@@ -52,6 +58,72 @@ function sauberesRichHTML(html) {
     if (teile.length) node.setAttribute('style', teile.join(';'));
   }
   return vorlage.innerHTML.slice(0, 10000000);
+}
+
+/* Aus fremdem HTML wird ruhiger VANI-Text.
+   Was bleibt: Absätze, Zeilen, Überschriften, Listen, Zitate, fett/kursiv/
+   unterstrichen/durchgestrichen. Was draußen bleibt: fremde Schriftgrößen
+   (12pt wird sonst zu winzigen 12px), fremde Textfarben (schwarz auf dunklem
+   Papier ist unlesbar), fremde Hintergründe und Ausrichtungen.
+   Was gerettet wird: Tabellenzellen und Abschnitte werden getrennt, statt zu
+   „Zelle AZelle B" zu verschmelzen. */
+function einfuegeHTML(html, maxBloecke = 20000) {
+  if (typeof document === 'undefined' || !document.createElement) return richAusText(richReinerText(html));
+  const vorlage = document.createElement('template');
+  vorlage.innerHTML = String(html || '').slice(0, 10000000)
+    .replace(/<script[\s\S]*?<\/script\s*>/gi, '').replace(/<style[\s\S]*?<\/style\s*>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '');
+  const INLINE = { B: 'b', STRONG: 'b', I: 'i', EM: 'i', U: 'u', S: 's', STRIKE: 's', DEL: 's' };
+  const BLOCK = new Set(['P', 'DIV', 'SECTION', 'ARTICLE', 'HEADER', 'FOOTER', 'MAIN', 'ASIDE', 'NAV',
+    'FIGURE', 'FIGCAPTION', 'ADDRESS', 'PRE', 'DL', 'DT', 'DD', 'TABLE', 'THEAD', 'TBODY', 'TFOOT',
+    'TR', 'UL', 'OL', 'FORM', 'FIELDSET', 'HR', 'CAPTION']);
+  const bloecke = [];
+  let jetzt = { tag: 'p', html: '' };
+  const ablegen = () => {
+    const inhalt = jetzt.html.replace(/&nbsp;/g, ' ').replace(/[ \t ]+/g, ' ').trim();
+    if (inhalt && bloecke.length < maxBloecke) bloecke.push({ tag: jetzt.tag, inhalt });
+    jetzt = { tag: 'p', html: '' };
+  };
+  const lauf = (knoten, tiefe) => {
+    if (tiefe > 80 || bloecke.length >= maxBloecke) return;
+    for (const k of knoten.childNodes) {
+      if (k.nodeType === 3) { jetzt.html += esc(k.nodeValue || ''); continue; }
+      if (k.nodeType !== 1) continue;
+      const name = k.tagName;
+      if (name === 'BR') { ablegen(); continue; }
+      if (name === 'TD' || name === 'TH') { lauf(k, tiefe + 1); jetzt.html += ' '; continue; }
+      if (name === 'LI') { ablegen(); jetzt.tag = 'li'; lauf(k, tiefe + 1); ablegen(); continue; }
+      if (/^H[1-6]$/.test(name)) { ablegen(); jetzt.tag = 'h' + Math.min(3, Number(name[1]) || 3); lauf(k, tiefe + 1); ablegen(); continue; }
+      if (name === 'BLOCKQUOTE') { ablegen(); jetzt.tag = 'blockquote'; lauf(k, tiefe + 1); ablegen(); continue; }
+      if (INLINE[name]) { jetzt.html += '<' + INLINE[name] + '>'; lauf(k, tiefe + 1); jetzt.html += '</' + INLINE[name] + '>'; continue; }
+      if (BLOCK.has(name)) { ablegen(); lauf(k, tiefe + 1); ablegen(); continue; }
+      lauf(k, tiefe + 1); /* span, a, font und alles Unbekannte: nur auspacken */
+    }
+  };
+  lauf(vorlage.content, 0);
+  ablegen();
+
+  const raus = [];
+  for (let i = 0; i < bloecke.length; i++) {
+    if (bloecke[i].tag !== 'li') { raus.push('<' + bloecke[i].tag + '>' + bloecke[i].inhalt + '</' + bloecke[i].tag + '>'); continue; }
+    const punkte = [];
+    while (i < bloecke.length && bloecke[i].tag === 'li') { punkte.push('<li>' + bloecke[i].inhalt + '</li>'); i++; }
+    i--;
+    raus.push('<ul>' + punkte.join('') + '</ul>');
+  }
+  return sauberesRichHTML(raus.join(''));
+}
+
+/* Reiner Text von außen wird zu ruhigen Absätzen, ohne Leerzeilenwüsten. */
+function einfuegeAusText(text) {
+  const zeilen = String(text || '').replace(/\r\n?/g, '\n').split('\n');
+  const raus = [];
+  for (const z of zeilen) {
+    const sauber = z.replace(/[ \t ]+/g, ' ').trim();
+    if (sauber) raus.push('<p>' + esc(sauber) + '</p>');
+    else if (raus.length && raus[raus.length - 1] !== '<p><br></p>') raus.push('<p><br></p>');
+  }
+  return sauberesRichHTML(raus.join(''));
 }
 
 function richBefehl(editor, befehl, wert) {
@@ -149,10 +221,15 @@ function baueRichEditor(doc, optionen = {}) {
   }, optionen.warten || 400, true);
   editor.addEventListener('input', () => { sichern(); if (optionen.beiInput) optionen.beiInput(doc, editor, startWorte); });
   editor.addEventListener('paste', (e) => {
-    const html = e.clipboardData && e.clipboardData.getData('text/html');
-    if (!html) return;
+    if (!e.clipboardData) return;
+    const html = e.clipboardData.getData('text/html');
+    const roh = e.clipboardData.getData('text/plain');
+    if (!html && !roh) return;
     e.preventDefault();
-    richBefehl(editor, 'insertHTML', sauberesRichHTML(html));
+    const fertig = html ? einfuegeHTML(html) : einfuegeAusText(roh);
+    if (!fertig.trim()) return;
+    richBefehl(editor, 'insertHTML', fertig);
+    editor.dispatchEvent(new Event('input', { bubbles: true }));
   });
   return { editor, leiste: baueFormatleiste(editor, () => editor.dispatchEvent(new Event('input', { bubbles: true })), !!optionen.kompakt), sichern };
 }

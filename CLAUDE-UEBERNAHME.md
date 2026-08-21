@@ -793,3 +793,63 @@ privates Repo bräuchte GitHub Pro; das wurde dem Nutzer als Weg A angeboten und
 vorerst nicht gewählt.
 
 Qualitätsstand: `npm test` 82/82, Hosting 2/2, Lint sauber.
+
+## 14. Stand nach der dritten Claude-Runde (21. August 2026, VANI 5.4.0)
+
+### Einfügen aus fremden Apps (Goodnotes, PDF, Notizen)
+
+Der Nutzer meldete „seltsame Formatierungsdinge“ beim Kopieren aus Goodnotes.
+Reproduziert mit echtem Zwischenablage-HTML; vier Ursachen:
+
+1. `sauberesRichHTML` behält `color`, `background-color` und `font-size`. Aus
+   `12.0pt` wurde `12px` (winzig), aus `rgb(0,0,0)` schwarzer Text, der auf dem
+   dunklen Papier der Themen Tinte und Kerze unlesbar ist, dazu weiße Kästen.
+2. Nicht erlaubte Elemente wurden durch ihren `textContent` ersetzt — aus einer
+   Tabelle wurde „Zelle AZelle B“, aus `<section><h4>` ein zusammengeklebtes Wort.
+3. Ohne `text/html` griff gar kein Filter.
+4. `richReinerText` arbeitet auf einem **losgelösten** `div`; dort liefert
+   `innerText` keine Zeilenumbrüche. Der Klartextspiegel jeder formatierten Seite
+   klebte damit zusammen — sichtbar in Suche, Export und Wortzählung.
+
+Neu in `src/35-richtext.js`: `einfuegeHTML()` und `einfuegeAusText()` bauen fremdes
+HTML in ruhige Blöcke um (Absätze, Überschriften h1–h3, Listen, Zitate, b/i/u/s),
+trennen Tabellenzellen und Abschnitte und lassen fremde Größen, Farben,
+Hintergründe und Ausrichtungen draußen. `richReinerText` setzt Zeilen selbst.
+
+### Dritte Heftansicht „Am Stück“
+
+`heft.ansicht` kennt jetzt `fluss` (Sanitizer erweitert). `zeigeFluss()` rendert
+alle Seiten in einem `.fluss-bogen` ohne Seitenkanten, ohne Seitenzahlen und ohne
+automatischen Umbruch; Werkzeuge und leere Titelzeilen treten zurück, bis das
+Stück den Fokus hat. Gedacht für Lesen und für große Textmengen von außen.
+
+### `textHereinholen()`
+
+Heft-Menü → „Text aus einer anderen App hereinholen“: ein Einfügefeld, das den
+Filter benutzt und den Inhalt als Seite ablegt. Notwendig, weil ein verwaltetes
+iPad die Dateiauswahl für alles außer Goodnotes-Dateien sperrt — Einsetzen geht
+immer.
+
+### Systematischer Dialogfehler
+
+`zeigeDeck(kasten, () => res(null))` löst beim Schließen `null` aus. Wer erst
+`zu()` ruft und danach `res(wert)`, verliert sein Ergebnis still. Betroffen war
+`eigenerFunkeAnlegen` in `src/41-zuhause.js`: die Funkenkiste frischte nach dem
+Anlegen nicht auf, und Zuhause wechselte nicht auf „Meine“. Ein Vertragstest
+prüft die Reihenfolge jetzt in allen Dialogdateien.
+
+### Berührung statt Maus
+
+Ein `:hover`-only-Zustand hätte die Seitenwerkzeuge auf dem iPad unerreichbar
+gemacht. Regel: nichts, was man braucht, darf nur per Hover erscheinen.
+Nachgemessen: alle fünf Werkzeuge sind in allen drei Ansichten bei 375 px und
+820 px sichtbar, groß genug und antippbar, ohne seitlichen Überlauf.
+
+### Anleitung
+
+Der Nutzer suchte „Zettel ankleben“ in den drei Punkten der Kopfzeile. Es gibt
+zwei Mal drei Punkte: Kopfzeile = Heft-Menü, auf dem Papier = Seiten-Menü. Die
+Anleitung nennt die fünf Werkzeuge jetzt einzeln und sagt ausdrücklich, dass sie
+auf dem Papier sitzen.
+
+Qualitätsstand: `npm test` 85/85, Hosting 2/2, Lint sauber.

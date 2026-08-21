@@ -85,7 +85,7 @@ function eigenerFunkeAnlegen(alt) {
           const t = text.value.trim(); if (!t) { meldung.textContent = 'Der Funke braucht wenigstens ein Wort.'; return; }
           const doc = alt || neuDoc('funkeln', { quelle: 'eigen' });
           doc.text = t; doc.vibe = vibe.value.trim().slice(0, 80); doc.art = art.value; doc.quelle = 'eigen'; speichere(doc);
-          zu(); toast(alt ? 'Der Funke ist klarer.' : 'In deiner Funkenkiste.'); res(doc);
+          res(doc); zu(); toast(alt ? 'Der Funke ist klarer.' : 'In deiner Funkenkiste.');
         } }, 'In die Funkenkiste')));
     const zu = zeigeDeck(kasten, () => res(null));
     setTimeout(() => text.focus(), 60);

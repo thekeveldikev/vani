@@ -168,3 +168,41 @@ test('Fadenvertrag: die verschlüsselte Fadendatei liegt nicht mehr öffentlich 
   assert.match(lies('src/49-feinheiten.js'), /async function fadenPaketHolen/);
   assert.match(lies('src/49-feinheiten.js'), /Fadendatei von Hand wählen/);
 });
+
+test('Dialogvertrag: ein Fenster meldet sein Ergebnis, bevor es zugeht', () => {
+  /* zeigeDeck(kasten, () => res(null)) löst beim Schließen null aus. Wer erst
+     zu() ruft und danach res(wert), verliert sein Ergebnis still. */
+  for (const datei of ['src/30-core.js', 'src/39-beziehungen.js', 'src/41-zuhause.js', 'src/43-hefte.js', 'src/47-woerter.js']) {
+    lies(datei).split('\n').forEach((zeile, i) => {
+      if (/\berledigt\b/.test(zeile)) return;
+      const zuStelle = zeile.indexOf('zu();');
+      if (zuStelle < 0) return;
+      const treffer = /\b(?:res|resolve)\(/.exec(zeile);
+      if (!treffer || /\b(?:res|resolve)\(null\)/.test(zeile.slice(treffer.index))) return;
+      assert.ok(treffer.index < zuStelle,
+        datei + ':' + (i + 1) + ' schließt das Fenster, bevor es sein Ergebnis meldet');
+    });
+  }
+});
+
+test('Einfügevertrag: fremde Schriftgrößen, Farben und Hintergründe bleiben draußen', () => {
+  const rt = lies('src/35-richtext.js');
+  assert.match(rt, /function einfuegeHTML/);
+  assert.match(rt, /function einfuegeAusText/);
+  assert.match(rt, /einfuegeHTML\(html\) : einfuegeAusText\(roh\)/, 'der Einfügefilter muss im paste-Ereignis hängen');
+  /* Der Klartextspiegel braucht echte Zeilen, sonst kleben Absätze zusammen. */
+  const reiner = (rt.match(/function richReinerText[\s\S]*?\n\}/) || [''])[0];
+  assert.match(reiner, /<br/, 'richReinerText muss Zeilenumbrüche selbst setzen');
+  assert.match(reiner, /blockquote/, 'richReinerText muss Blockenden zu Zeilen machen');
+  assert.doesNotMatch(reiner, /innerText/, 'innerText liefert an einem losgelösten Element keine Zeilen');
+});
+
+test('Heftvertrag: drei Ansichten, und "Am Stück" ist überall erlaubt', () => {
+  assert.match(lies('src/30-core.js'), /\['seiten', 'rolle', 'fluss'\]/);
+  const hefte = lies('src/43-hefte.js');
+  assert.match(hefte, /function zeigeFluss/);
+  assert.match(hefte, /'Am Stück'/);
+  assert.match(hefte, /heft\.ansicht === 'fluss'\) zeigeFluss\(\)/);
+  assert.match(hefte, /async function textHereinholen/);
+  assert.match(lies('src/10-style.css'), /\.papierseite\.fluss/);
+});

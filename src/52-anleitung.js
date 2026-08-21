@@ -116,12 +116,36 @@ const ANLEITUNG = [
     abschnitte: [
       { t: 'Das Regal', p: ['Jedes Heft ist ein Deckel im Regal. Plus legt ein neues an. Lange halten öffnet das Heft-Menü. „Ins Regal stellen" archiviert ein Heft (es rückt nach unten unter „Im Regal"), „Zurück auf den Tisch" holt es wieder.'] },
       { t: 'Umschlag & Papier gestalten', p: ['Grundfarbe aus der Palette oder frei, Zweitton, Buchband, Muster (Schlicht, Leinen, Diagonal, Punkte, Rahmen, Wellen) und Papier (Liniert, Breite Linien, Kariert, Punktraster, Blanko). Die Vorschau zeigt alles sofort; „Abbrechen" nimmt alles zurück.'] },
-      { t: 'Seiten oder Rolle', p: ['Oben im Heft: „Seiten" blättert Seite für Seite (Pfeile links/rechts), „Rolle" zeigt alle Seiten untereinander zum Durchscrollen. Beides ist dasselbe Heft.'] },
+      { t: 'Drei Ansichten', p: [
+        'Oben im Heft stehen drei Knöpfe. „Seiten" blättert Seite für Seite (Pfeile links/rechts). „Rolle" zeigt alle Seiten untereinander, jede mit eigenem Rand und Seitenzahl. „Am Stück" macht aus dem ganzen Heft eine einzige lange Seite — ohne Kanten, ohne Umbruch, ohne Seitenzahlen.',
+        'Es bleibt immer dasselbe Heft, nur anders angeschaut. Umschalten ändert nichts am Text.'
+      ], b: 'Zum Lesen und für lange Texte aus anderen Apps nehme ich „Am Stück". Zum Schreiben mit Zetteln und Fotos „Seiten".' },
+      { t: 'Am Stück: die lange Seite', p: [
+        'In dieser Ansicht wird nicht automatisch umgebrochen. Text läuft einfach weiter, so lang er will. Die Werkzeuge und die Titelzeile treten zurück, bis ich in ein Stück hineintippe — dann sind sie wieder da.',
+        '„Noch ein Stück anfügen" unten hängt hinten etwas Neues an.'
+      ] },
       { t: 'Schreiben auf der Seite', p: ['Direkt auf das Papier tippen und schreiben. Ist die Seite voll, geht es automatisch auf der nächsten weiter („Im Heft automatisch weiterblättern" in den Feinheiten — standardmäßig an). Der Knopf „Automatisch auf die nächste Seite" in den Seitenwerkzeugen schaltet es um.'] },
-      { t: 'Seitenwerkzeuge (oben rechts auf der Seite)', p: ['Zettel ankleben · Foto einkleben · Kritzeln · Text formatieren · Mehr (Im Schreibraum öffnen, Hinzufügen & verbinden, Als loses Blatt herausnehmen, Seite herausreißen).'] },
+      { t: 'Die fünf Werkzeuge auf dem Papier', p: [
+        'Wichtig: Sie sitzen oben rechts **auf dem Papier selbst**, nicht in der Kopfzeile darüber. Es gibt zwei Mal „drei Punkte" — die in der Kopfzeile öffnen das Heft-Menü, die auf dem Papier das Seiten-Menü.',
+        'Von links nach rechts: 📌 Nadel = Zettel ankleben · Kamera = Foto einkleben · Stift = Kritzeln · Aa = Text formatieren · drei Punkte = Mehr (Im Schreibraum öffnen, Hinzufügen & verbinden, Als loses Blatt herausnehmen, Seite herausreißen).',
+        'Der Zettel hat also einen eigenen Knopf und steckt in keinem Menü.'
+      ], tipp: 'Wenn ich diese Knöpfe nicht sehe: In den Feinheiten auf „VANI jetzt aktualisieren" tippen. Dann ist die neueste Fassung da.' },
       { t: 'Zettel', p: ['Kleine farbige Notizzettel auf der Seite. Ziehen verschiebt, der Griff unten rechts ändert die Größe, Tippen macht ihn beschreibbar. Lange halten: Andere Farbe, Befestigung (Tesa, Reißzwecke, lose aufgelegt), Etwas drehen, Abmachen.'], b: 'Eine Figurenbeschreibung als gelber Zettel schräg an den Rand der Seite — mit Tesa. Die Seite selbst bleibt frei für die Szene.' },
       { t: 'Fotos', p: ['„Foto einkleben" legt ein Bild auf die Seite, leicht schräg wie eingeklebt. Es lässt sich genauso ziehen, drehen, vergrößern und befestigen wie ein Zettel.'] },
-      { t: 'Kritzeln', p: ['„Kritzeln" legt eine Zeichenfläche über die Seite: zwölf Farben plus eine eigene, stufenlose Stiftdicke, ein Radierer, Stiftdruck wird berücksichtigt, der letzte Strich lässt sich zurücknehmen. Die Kritzelei bleibt auf der Seite liegen und lässt sich später weiterzeichnen.'] },
+      { t: 'Kritzeln', p: [
+        '„Kritzeln" legt eine Zeichenfläche über die Seite. Die Werkzeugleiste schwebt oben: zwölf Farben plus eine eigene, stufenlose Stiftdicke, Radierer, ein Schritt zurück, ein Schritt wieder vor, alles löschen, Abbrechen und Fertig.',
+        'Was gezeichnet wird, sitzt genau unter dem Stift — in der Dicke, die eingestellt ist. Ein echter Stift wird druckempfindlich geführt, ein Finger zeichnet gleichmäßig.',
+        '„Zurück" und „Wieder vor" gehen über beliebig viele Striche. Auch „Alles löschen" lässt sich mit dem Pfeil zurückholen. Erst „Fertig" schreibt die Zeichnung auf die Seite, „Abbrechen" verwirft sie.'
+      ], b: 'Eine Skizze anfangen, drei Striche zurücknehmen, weiterzeichnen — und wenn gar nichts gefällt: Alles löschen, oder gleich Abbrechen.' },
+      { t: 'Text aus einer anderen App hereinholen', p: [
+        'Heft-Menü (die drei Punkte in der Kopfzeile) → „Text aus einer anderen App hereinholen". Es öffnet sich ein ruhiges Feld: dort einsetzen, fertig.',
+        'VANI nimmt dabei die fremden Schriftgrößen, Textfarben und Hintergründe heraus — die machen den Text sonst winzig oder auf dunklem Papier unlesbar. Absätze, Überschriften, Listen, fett und kursiv bleiben. Tabellenzellen werden getrennt, statt zu einem Wortsalat zu verkleben.'
+      ], s: [
+        'In Goodnotes alles markieren und kopieren.',
+        'In VANI das Heft öffnen → drei Punkte in der Kopfzeile → „Text aus einer anderen App hereinholen".',
+        'In das Feld einsetzen. Unten steht, wie viele Wörter bereitliegen.',
+        '„Hereinholen" — der Text liegt als Seite im Heft.'
+      ], tipp: 'Das ist der Weg, wenn ein verwaltetes iPad keine Dateien auswählen lässt. Einsetzen geht immer.' },
       { t: 'Seiten bewegen', p: ['„Als loses Blatt herausnehmen" macht aus einer Seite wieder ein Blatt im Stapel. Umgekehrt legt „In ein Heft legen …" ein Blatt als Seite an eine Stelle meiner Wahl.'] },
       { t: 'Hefte und Projekte', p: ['Ein Heft kann zu einem Projekt gehören („Einem Projekt zuordnen" im Heft-Menü). Es erscheint dann im Projekt unter „Hefte am Projekt". „Als Kapitel in ein Projekt kopieren" macht aus allen Seiten Szenen in einem neuen Kapitel — das Heft bleibt, wie es ist.'] },
       { t: 'Verbrennen', p: ['„Heft verbrennen" legt das Heft samt Seiten in den Papierkorb. Von dort kommt es mit allem zurück, auch mit Zetteln und Fotos.'] }

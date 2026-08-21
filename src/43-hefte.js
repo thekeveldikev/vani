@@ -96,12 +96,73 @@ RENDER.hefte = function (haupt) {
   haupt.append(inhalt);
 };
 
+/* ----- Text von außen hereinholen -----
+   Auf einem verwalteten iPad lässt sich oft keine Datei auswählen. Kopieren und
+   Einfügen geht immer. Hier landet alles in einem ruhigen Feld, wird von fremden
+   Schriftgrößen, Farben und Hintergründen befreit und danach als Seite abgelegt. */
+async function textHereinholen(heft, danach) {
+  const feld = el('div', {
+    class: 'rich-editor text einfuegefeld', contenteditable: 'true', role: 'textbox',
+    'aria-multiline': 'true', 'data-placeholder': 'Hier hinein einfügen — ⌘V oder lange tippen und „Einsetzen".'
+  });
+  const zaehler = el('div', { class: 'einfuege-zaehler' }, 'Noch nichts eingesetzt.');
+  const messen = () => {
+    const w = worte(richReinerText(feld.innerHTML));
+    zaehler.textContent = w ? (w === 1 ? 'Ein Wort bereit.' : w.toLocaleString('de-DE') + ' Wörter bereit.') : 'Noch nichts eingesetzt.';
+  };
+  feld.addEventListener('paste', (e) => {
+    if (!e.clipboardData) return;
+    const html = e.clipboardData.getData('text/html');
+    const roh = e.clipboardData.getData('text/plain');
+    if (!html && !roh) return;
+    e.preventDefault();
+    richBefehl(feld, 'insertHTML', html ? einfuegeHTML(html) : einfuegeAusText(roh));
+    setTimeout(messen, 0);
+  });
+  feld.addEventListener('input', messen);
+
+  return new Promise((res) => {
+    const kasten = el('div', { class: 'modal einfuege-modal' },
+      el('div', { class: 'kartenkopf' }, el('span', { html: ik('runter') }), 'TEXT HEREINHOLEN'),
+      el('h2', {}, 'Aus einer anderen App in „' + heft.titel + '"'),
+      el('p', { class: 'einfuege-hinweis' }, 'In Goodnotes alles markieren und kopieren, dann hier einsetzen. VANI nimmt die fremden Schriftgrößen, Farben und Hintergründe heraus und behält Absätze, Überschriften, Listen und Hervorhebungen.'),
+      feld, zaehler,
+      el('div', { class: 'reihe' },
+        el('button', { class: 'knopf zart', onclick: () => { res(null); zu(); } }, 'Abbrechen'),
+        el('button', { class: 'knopf voll', onclick: () => {
+          const rich = sauberesRichHTML(feld.innerHTML);
+          const text = richReinerText(rich).replace(/\n{3,}/g, '\n\n').trim();
+          if (!text) { toast('Da ist noch nichts zum Hereinholen.'); return; }
+          const seiten = kinder(heft.id, 'seite');
+          const letzte = seiten[seiten.length - 1];
+          const zielIstLeer = letzte && !(letzte.text || '').trim() && !kinder(letzte.id).length;
+          let seite;
+          if (zielIstLeer) {
+            seite = letzte;
+            seite.rich = rich; seite.text = text; seite.format = 'rich';
+            speichere(seite);
+          } else {
+            seite = neuDoc('seite', { parent: heft.id, ord: seiten.length, titel: '', text, rich, format: 'rich' });
+          }
+          D.stats.letzte[seite.id] = worte(text); speichereStats();
+          heft.geaendert = Date.now(); speichereStill(heft);
+          res(seite);
+          zu();
+          toast(worte(text).toLocaleString('de-DE') + ' Wörter sind angekommen. In der Ansicht „Am Stück" liegt alles auf einer langen Seite.', 5200);
+          if (danach) danach();
+        } }, 'Hereinholen')));
+    const zu = zeigeDeck(kasten, () => res(null));
+    setTimeout(() => feld.focus(), 80);
+  });
+}
+
 async function heftMenue(h, danach) {
   const wahl = await menue([
     { text: 'Umbenennen', icon: 'stift', wert: 'name' },
     { text: 'Umschlag & Papier gestalten', icon: 'farbe', wert: 'gestalten' },
-    { text: 'Ansicht: ' + ((h.ansicht || 'seiten') === 'rolle' ? 'durchgehend scrollen' : 'einzelne Seiten'), icon: 'lesen', wert: 'ansicht' },
+    { text: 'Ansicht: ' + ({ rolle: 'Seiten untereinander', fluss: 'eine lange Seite am Stück' }[h.ansicht] || 'einzelne Seiten'), icon: 'lesen', wert: 'ansicht' },
     { text: h.projektRef ? 'Projekt-Zuordnung ändern' : 'Einem Projekt zuordnen', icon: 'projekte', wert: 'projekt' },
+    { text: 'Text aus einer anderen App hereinholen', icon: 'runter', wert: 'einfuegen' },
     { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
     h.archiv ? { text: 'Zurück auf den Tisch', icon: 'archiv', wert: 'zurueck' } : { text: 'Ins Regal stellen', icon: 'archiv', wert: 'archiv' },
     { text: 'Heft verbrennen', icon: 'muell', wert: 'weg', rot: true }
@@ -112,7 +173,9 @@ async function heftMenue(h, danach) {
   } else if (wahl === 'gestalten') {
     await heftGestalten(h, danach); return;
   } else if (wahl === 'ansicht') {
-    h.ansicht = (h.ansicht || 'seiten') === 'rolle' ? 'seiten' : 'rolle'; speichere(h);
+    h.ansicht = { seiten: 'rolle', rolle: 'fluss' }[h.ansicht || 'seiten'] || 'seiten'; speichere(h);
+  } else if (wahl === 'einfuegen') {
+    await textHereinholen(h, danach); return;
   } else if (wahl === 'projekt') {
     await ordneHeftProjektZu(h);
   } else if (wahl === 'dazu') {
@@ -156,7 +219,8 @@ RENDER.heft = function (haupt, heftId) {
     el('h1', {}, heft.titel),
     el('div', { class: 'heft-ansichtswahl', role: 'group', 'aria-label': 'Heftansicht' },
       el('button', { class: (heft.ansicht || 'seiten') === 'seiten' ? 'an' : '', title: 'Einzelne Seiten', onclick: () => { heft.ansicht = 'seiten'; speichere(heft); zeichne(); } }, 'Seiten'),
-      el('button', { class: heft.ansicht === 'rolle' ? 'an' : '', title: 'Durchgehend scrollen', onclick: () => { heft.ansicht = 'rolle'; speichere(heft); zeichne(); } }, 'Rolle')),
+      el('button', { class: heft.ansicht === 'rolle' ? 'an' : '', title: 'Seite für Seite untereinander', onclick: () => { heft.ansicht = 'rolle'; speichere(heft); zeichne(); } }, 'Rolle'),
+      el('button', { class: heft.ansicht === 'fluss' ? 'an' : '', title: 'Eine einzige lange Seite, ohne Umbruch', onclick: () => { heft.ansicht = 'fluss'; speichere(heft); zeichne(); } }, 'Am Stück')),
     el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Heft-Menü', onclick: () => heftMenue(heft, () => zeichne()) })
   ));
 
@@ -180,6 +244,21 @@ RENDER.heft = function (haupt, heftId) {
       heft.geaendert = Date.now(); speichereStill(heft); zeigeRolle();
       requestAnimationFrame(() => { const letzte = halter.lastElementChild && halter.lastElementChild.previousElementSibling; if (letzte) letzte.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
     } }, el('span', { html: ik('plus'), style: 'display:flex' }), 'Neue Seite darunter'));
+  }
+
+  /* Am Stück: alles Geschriebene auf einer einzigen langen Seite. Kein Umbruch,
+     keine Seitenkanten dazwischen — zum Lesen und zum Hineinschütten großer
+     Textmengen aus anderen Apps. */
+  function zeigeFluss() {
+    seiten = kinder(heft.id, 'seite');
+    halter.className = 'heftfluss'; fuss.style.display = 'none'; halter.innerHTML = '';
+    const bogen = el('div', { class: 'fluss-bogen ' + (heft.papier || 'liniert') });
+    for (const seite of seiten) bogen.append(baueSeite(seite, heft, zeigeFluss, { fluss: true }));
+    halter.append(bogen);
+    halter.append(el('button', { class: 'plusskarte rollen-plus', onclick: () => {
+      neuDoc('seite', { parent: heft.id, ord: kinder(heft.id, 'seite').length, titel: '', text: '' });
+      heft.geaendert = Date.now(); speichereStill(heft); zeigeFluss();
+    } }, el('span', { html: ik('plus'), style: 'display:flex' }), 'Noch ein Stück anfügen'));
   }
 
   function zeigeSeite() {
@@ -252,11 +331,13 @@ RENDER.heft = function (haupt, heftId) {
       }, 'Auto weiter ' + (D.einst.autoSeitenwechsel !== false ? 'an' : 'aus'))
     );
   }
-  if (heft.ansicht === 'rolle') zeigeRolle(); else zeigeSeite();
+  if (heft.ansicht === 'rolle') zeigeRolle();
+  else if (heft.ansicht === 'fluss') zeigeFluss();
+  else zeigeSeite();
 };
 
 function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
-  const blatt = el('div', { class: 'papierseite ' + (heft.papier || 'liniert') });
+  const blatt = el('div', { class: 'papierseite ' + (heft.papier || 'liniert') + (optionen.fluss ? ' fluss' : '') });
 
   /* Werkzeuge oben rechts */
   const werkzeuge = el('div', { class: 'seitenwerkzeuge' },
@@ -309,7 +390,7 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
   if (seite.format === 'rich') {
     const rp = baueRichEditor(seite, { class: 'schreibflaeche', platzhalter: 'Hier darf alles stehen.', kompakt: true });
     text = rp.editor; formatleiste = rp.leiste;
-    if (optionen.rolle) text.classList.add('rollen-rich');
+    if (optionen.rolle || optionen.fluss) text.classList.add('rollen-rich');
     if (optionen.autoWeiter) {
       text.classList.add('auto-weiter');
       let richBlaettert = false;

@@ -1293,6 +1293,53 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 .kritzel-werkzeug[disabled] { pointer-events: none; }
 .kritzel-trenner { width: 1px; height: 22px; background: var(--linie); flex: none; }
 
+/* ----- Am Stück: ein einziger langer Bogen statt einzelner Seiten ----- */
+.heftfluss { max-width: 840px; margin: 8px auto 70px; }
+.fluss-bogen {
+  position: relative; border-radius: 4px; background: var(--papier);
+  box-shadow: 0 4px 18px var(--schein), 0 1px 3px var(--schein);
+  overflow: hidden; padding: 10px 0 24px;
+}
+.fluss-bogen.kariert { background-image: linear-gradient(var(--linie) 1px, transparent 1px), linear-gradient(90deg, var(--linie) 1px, transparent 1px); background-size: 26px 26px; }
+.fluss-bogen.punkte { background-image: radial-gradient(var(--linie) 1px, transparent 1.25px); background-size: 23px 23px; }
+.papierseite.fluss {
+  min-height: 0; box-shadow: none; border-radius: 0; background: none;
+  background-image: none; padding: 8px 38px 4px; overflow: visible; animation: none;
+}
+.papierseite.fluss .schreibflaeche { min-height: 0; }
+.papierseite.fluss .stitel { margin-top: 12px; }
+.papierseite.fluss .stitel:placeholder-shown { opacity: .4; }
+/* Niemals per Hover verstecken: ein iPad kennt kein Hover, die Werkzeuge
+   wären dort unerreichbar. Sie treten nur zurück, bleiben aber antippbar. */
+.papierseite.fluss .seitenwerkzeuge { opacity: .55; transition: opacity .18s ease; }
+.papierseite.fluss:focus-within .seitenwerkzeuge, .papierseite.fluss .seitenwerkzeuge:hover { opacity: 1; }
+.papierseite.fluss + .papierseite.fluss::before {
+  content: ""; position: absolute; left: 38px; right: 38px; top: 0; height: 1px;
+  background: var(--linie); opacity: .35;
+}
+@media (max-width: 700px) {
+  .papierseite.fluss { padding-inline: 17px; }
+  .papierseite.fluss + .papierseite.fluss::before { left: 17px; right: 17px; }
+}
+
+/* ----- Einfügefeld für große Textmengen aus anderen Apps ----- */
+.einfuege-modal { width: min(680px, calc(100vw - 36px)); }
+.einfuege-hinweis { font-size: 13.5px; color: var(--blass); line-height: 1.6; margin-bottom: 12px; }
+.einfuegefeld {
+  min-height: 220px; max-height: 46dvh; overflow-y: auto; padding: 14px 16px;
+  border-radius: 12px; background: var(--papier); box-shadow: inset 0 0 0 1px var(--linie);
+  font-size: 16px; line-height: 1.65;
+}
+.einfuege-zaehler { margin-top: 9px; font-size: 13px; color: var(--blass); font-style: italic; }
+
+/* In der langen Seite ruhen Werkzeuge und leere Titelzeilen, bis man
+   wirklich in diesem Stück schreibt — sonst wäre es keine Seite, sondern
+   eine Liste von Kästen. */
+.papierseite.fluss .formatleiste { display: none; }
+.papierseite.fluss:focus-within .formatleiste { display: flex; }
+.papierseite.fluss .stitel:placeholder-shown { display: none; }
+.papierseite.fluss:focus-within .stitel:placeholder-shown { display: block; }
+
 </style>
 </head>
 <body>
@@ -1319,7 +1366,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.3.0';
+const APP_VERSION = '5.4.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -1709,7 +1756,7 @@ function sauberesDokument(quelle) {
   if (d.band && !/^#[0-9a-f]{6}$/i.test(d.band)) d.band = '';
   if (d.muster && !['leinen', 'diagonal', 'punkte', 'rahmen', 'welle', 'schlicht'].includes(d.muster)) d.muster = 'schlicht';
   if (d.papier && !['liniert', 'kariert', 'blank', 'punkte', 'breit'].includes(d.papier)) d.papier = 'liniert';
-  if (d.ansicht && !['seiten', 'rolle'].includes(d.ansicht)) d.ansicht = 'seiten';
+  if (d.ansicht && !['seiten', 'rolle', 'fluss'].includes(d.ansicht)) d.ansicht = 'seiten';
   if (d.format && !['plain', 'rich'].includes(d.format)) d.format = 'plain';
   if (d.befestigung && !['tesa', 'pin', 'lose'].includes(d.befestigung)) d.befestigung = 'tesa';
   if (d.favorit != null) d.favorit = d.favorit === true;
@@ -2831,11 +2878,17 @@ try {
 
 const RICH_TAGS = new Set(['DIV', 'P', 'BR', 'B', 'STRONG', 'I', 'EM', 'U', 'S', 'UL', 'OL', 'LI', 'BLOCKQUOTE', 'H1', 'H2', 'H3', 'SPAN']);
 
+/* Ein losgel\u00f6stes Element wird nie gesetzt \u2014 dort liefert innerText keine
+   Zeilenumbr\u00fcche, und aus zwei Abs\u00e4tzen w\u00fcrde ein zusammengeklebtes Wort.
+   Darum werden Zeilen- und Blockenden vorher zu echten Umbr\u00fcchen. */
 function richReinerText(html) {
   html = String(html || '').slice(0, 10000000);
   if (typeof document !== 'undefined' && document.createElement) {
-    const d = document.createElement('div'); d.innerHTML = html;
-    return (d.innerText || d.textContent || '').replace(/\u00a0/g, ' ');
+    const d = document.createElement('div');
+    d.innerHTML = html
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/(?:p|div|li|h[1-6]|blockquote|tr|section|article|figcaption|dd|dt|pre)\s*>/gi, '\n');
+    return (d.textContent || '').replace(/\u00a0/g, ' ');
   }
   return html.replace(/<script[\s\S]*?<\/script\s*>/gi, '').replace(/<style[\s\S]*?<\/style\s*>/gi, '')
     .replace(/<br\s*\/?>/gi, '\n').replace(/<\/(?:p|div|li|h[1-3]|blockquote)>/gi, '\n').replace(/<[^>]+>/g, '')
@@ -2879,6 +2932,72 @@ function sauberesRichHTML(html) {
     if (teile.length) node.setAttribute('style', teile.join(';'));
   }
   return vorlage.innerHTML.slice(0, 10000000);
+}
+
+/* Aus fremdem HTML wird ruhiger VANI-Text.
+   Was bleibt: Absätze, Zeilen, Überschriften, Listen, Zitate, fett/kursiv/
+   unterstrichen/durchgestrichen. Was draußen bleibt: fremde Schriftgrößen
+   (12pt wird sonst zu winzigen 12px), fremde Textfarben (schwarz auf dunklem
+   Papier ist unlesbar), fremde Hintergründe und Ausrichtungen.
+   Was gerettet wird: Tabellenzellen und Abschnitte werden getrennt, statt zu
+   „Zelle AZelle B" zu verschmelzen. */
+function einfuegeHTML(html, maxBloecke = 20000) {
+  if (typeof document === 'undefined' || !document.createElement) return richAusText(richReinerText(html));
+  const vorlage = document.createElement('template');
+  vorlage.innerHTML = String(html || '').slice(0, 10000000)
+    .replace(/<script[\s\S]*?<\/script\s*>/gi, '').replace(/<style[\s\S]*?<\/style\s*>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '');
+  const INLINE = { B: 'b', STRONG: 'b', I: 'i', EM: 'i', U: 'u', S: 's', STRIKE: 's', DEL: 's' };
+  const BLOCK = new Set(['P', 'DIV', 'SECTION', 'ARTICLE', 'HEADER', 'FOOTER', 'MAIN', 'ASIDE', 'NAV',
+    'FIGURE', 'FIGCAPTION', 'ADDRESS', 'PRE', 'DL', 'DT', 'DD', 'TABLE', 'THEAD', 'TBODY', 'TFOOT',
+    'TR', 'UL', 'OL', 'FORM', 'FIELDSET', 'HR', 'CAPTION']);
+  const bloecke = [];
+  let jetzt = { tag: 'p', html: '' };
+  const ablegen = () => {
+    const inhalt = jetzt.html.replace(/&nbsp;/g, ' ').replace(/[ \t ]+/g, ' ').trim();
+    if (inhalt && bloecke.length < maxBloecke) bloecke.push({ tag: jetzt.tag, inhalt });
+    jetzt = { tag: 'p', html: '' };
+  };
+  const lauf = (knoten, tiefe) => {
+    if (tiefe > 80 || bloecke.length >= maxBloecke) return;
+    for (const k of knoten.childNodes) {
+      if (k.nodeType === 3) { jetzt.html += esc(k.nodeValue || ''); continue; }
+      if (k.nodeType !== 1) continue;
+      const name = k.tagName;
+      if (name === 'BR') { ablegen(); continue; }
+      if (name === 'TD' || name === 'TH') { lauf(k, tiefe + 1); jetzt.html += ' '; continue; }
+      if (name === 'LI') { ablegen(); jetzt.tag = 'li'; lauf(k, tiefe + 1); ablegen(); continue; }
+      if (/^H[1-6]$/.test(name)) { ablegen(); jetzt.tag = 'h' + Math.min(3, Number(name[1]) || 3); lauf(k, tiefe + 1); ablegen(); continue; }
+      if (name === 'BLOCKQUOTE') { ablegen(); jetzt.tag = 'blockquote'; lauf(k, tiefe + 1); ablegen(); continue; }
+      if (INLINE[name]) { jetzt.html += '<' + INLINE[name] + '>'; lauf(k, tiefe + 1); jetzt.html += '</' + INLINE[name] + '>'; continue; }
+      if (BLOCK.has(name)) { ablegen(); lauf(k, tiefe + 1); ablegen(); continue; }
+      lauf(k, tiefe + 1); /* span, a, font und alles Unbekannte: nur auspacken */
+    }
+  };
+  lauf(vorlage.content, 0);
+  ablegen();
+
+  const raus = [];
+  for (let i = 0; i < bloecke.length; i++) {
+    if (bloecke[i].tag !== 'li') { raus.push('<' + bloecke[i].tag + '>' + bloecke[i].inhalt + '</' + bloecke[i].tag + '>'); continue; }
+    const punkte = [];
+    while (i < bloecke.length && bloecke[i].tag === 'li') { punkte.push('<li>' + bloecke[i].inhalt + '</li>'); i++; }
+    i--;
+    raus.push('<ul>' + punkte.join('') + '</ul>');
+  }
+  return sauberesRichHTML(raus.join(''));
+}
+
+/* Reiner Text von außen wird zu ruhigen Absätzen, ohne Leerzeilenwüsten. */
+function einfuegeAusText(text) {
+  const zeilen = String(text || '').replace(/\r\n?/g, '\n').split('\n');
+  const raus = [];
+  for (const z of zeilen) {
+    const sauber = z.replace(/[ \t ]+/g, ' ').trim();
+    if (sauber) raus.push('<p>' + esc(sauber) + '</p>');
+    else if (raus.length && raus[raus.length - 1] !== '<p><br></p>') raus.push('<p><br></p>');
+  }
+  return sauberesRichHTML(raus.join(''));
 }
 
 function richBefehl(editor, befehl, wert) {
@@ -2976,10 +3095,15 @@ function baueRichEditor(doc, optionen = {}) {
   }, optionen.warten || 400, true);
   editor.addEventListener('input', () => { sichern(); if (optionen.beiInput) optionen.beiInput(doc, editor, startWorte); });
   editor.addEventListener('paste', (e) => {
-    const html = e.clipboardData && e.clipboardData.getData('text/html');
-    if (!html) return;
+    if (!e.clipboardData) return;
+    const html = e.clipboardData.getData('text/html');
+    const roh = e.clipboardData.getData('text/plain');
+    if (!html && !roh) return;
     e.preventDefault();
-    richBefehl(editor, 'insertHTML', sauberesRichHTML(html));
+    const fertig = html ? einfuegeHTML(html) : einfuegeAusText(roh);
+    if (!fertig.trim()) return;
+    richBefehl(editor, 'insertHTML', fertig);
+    editor.dispatchEvent(new Event('input', { bubbles: true }));
   });
   return { editor, leiste: baueFormatleiste(editor, () => editor.dispatchEvent(new Event('input', { bubbles: true })), !!optionen.kompakt), sichern };
 }
@@ -3670,7 +3794,7 @@ function eigenerFunkeAnlegen(alt) {
           const t = text.value.trim(); if (!t) { meldung.textContent = 'Der Funke braucht wenigstens ein Wort.'; return; }
           const doc = alt || neuDoc('funkeln', { quelle: 'eigen' });
           doc.text = t; doc.vibe = vibe.value.trim().slice(0, 80); doc.art = art.value; doc.quelle = 'eigen'; speichere(doc);
-          zu(); toast(alt ? 'Der Funke ist klarer.' : 'In deiner Funkenkiste.'); res(doc);
+          res(doc); zu(); toast(alt ? 'Der Funke ist klarer.' : 'In deiner Funkenkiste.');
         } }, 'In die Funkenkiste')));
     const zu = zeigeDeck(kasten, () => res(null));
     setTimeout(() => text.focus(), 60);
@@ -4667,12 +4791,73 @@ RENDER.hefte = function (haupt) {
   haupt.append(inhalt);
 };
 
+/* ----- Text von außen hereinholen -----
+   Auf einem verwalteten iPad lässt sich oft keine Datei auswählen. Kopieren und
+   Einfügen geht immer. Hier landet alles in einem ruhigen Feld, wird von fremden
+   Schriftgrößen, Farben und Hintergründen befreit und danach als Seite abgelegt. */
+async function textHereinholen(heft, danach) {
+  const feld = el('div', {
+    class: 'rich-editor text einfuegefeld', contenteditable: 'true', role: 'textbox',
+    'aria-multiline': 'true', 'data-placeholder': 'Hier hinein einfügen — ⌘V oder lange tippen und „Einsetzen".'
+  });
+  const zaehler = el('div', { class: 'einfuege-zaehler' }, 'Noch nichts eingesetzt.');
+  const messen = () => {
+    const w = worte(richReinerText(feld.innerHTML));
+    zaehler.textContent = w ? (w === 1 ? 'Ein Wort bereit.' : w.toLocaleString('de-DE') + ' Wörter bereit.') : 'Noch nichts eingesetzt.';
+  };
+  feld.addEventListener('paste', (e) => {
+    if (!e.clipboardData) return;
+    const html = e.clipboardData.getData('text/html');
+    const roh = e.clipboardData.getData('text/plain');
+    if (!html && !roh) return;
+    e.preventDefault();
+    richBefehl(feld, 'insertHTML', html ? einfuegeHTML(html) : einfuegeAusText(roh));
+    setTimeout(messen, 0);
+  });
+  feld.addEventListener('input', messen);
+
+  return new Promise((res) => {
+    const kasten = el('div', { class: 'modal einfuege-modal' },
+      el('div', { class: 'kartenkopf' }, el('span', { html: ik('runter') }), 'TEXT HEREINHOLEN'),
+      el('h2', {}, 'Aus einer anderen App in „' + heft.titel + '"'),
+      el('p', { class: 'einfuege-hinweis' }, 'In Goodnotes alles markieren und kopieren, dann hier einsetzen. VANI nimmt die fremden Schriftgrößen, Farben und Hintergründe heraus und behält Absätze, Überschriften, Listen und Hervorhebungen.'),
+      feld, zaehler,
+      el('div', { class: 'reihe' },
+        el('button', { class: 'knopf zart', onclick: () => { res(null); zu(); } }, 'Abbrechen'),
+        el('button', { class: 'knopf voll', onclick: () => {
+          const rich = sauberesRichHTML(feld.innerHTML);
+          const text = richReinerText(rich).replace(/\n{3,}/g, '\n\n').trim();
+          if (!text) { toast('Da ist noch nichts zum Hereinholen.'); return; }
+          const seiten = kinder(heft.id, 'seite');
+          const letzte = seiten[seiten.length - 1];
+          const zielIstLeer = letzte && !(letzte.text || '').trim() && !kinder(letzte.id).length;
+          let seite;
+          if (zielIstLeer) {
+            seite = letzte;
+            seite.rich = rich; seite.text = text; seite.format = 'rich';
+            speichere(seite);
+          } else {
+            seite = neuDoc('seite', { parent: heft.id, ord: seiten.length, titel: '', text, rich, format: 'rich' });
+          }
+          D.stats.letzte[seite.id] = worte(text); speichereStats();
+          heft.geaendert = Date.now(); speichereStill(heft);
+          res(seite);
+          zu();
+          toast(worte(text).toLocaleString('de-DE') + ' Wörter sind angekommen. In der Ansicht „Am Stück" liegt alles auf einer langen Seite.', 5200);
+          if (danach) danach();
+        } }, 'Hereinholen')));
+    const zu = zeigeDeck(kasten, () => res(null));
+    setTimeout(() => feld.focus(), 80);
+  });
+}
+
 async function heftMenue(h, danach) {
   const wahl = await menue([
     { text: 'Umbenennen', icon: 'stift', wert: 'name' },
     { text: 'Umschlag & Papier gestalten', icon: 'farbe', wert: 'gestalten' },
-    { text: 'Ansicht: ' + ((h.ansicht || 'seiten') === 'rolle' ? 'durchgehend scrollen' : 'einzelne Seiten'), icon: 'lesen', wert: 'ansicht' },
+    { text: 'Ansicht: ' + ({ rolle: 'Seiten untereinander', fluss: 'eine lange Seite am Stück' }[h.ansicht] || 'einzelne Seiten'), icon: 'lesen', wert: 'ansicht' },
     { text: h.projektRef ? 'Projekt-Zuordnung ändern' : 'Einem Projekt zuordnen', icon: 'projekte', wert: 'projekt' },
+    { text: 'Text aus einer anderen App hereinholen', icon: 'runter', wert: 'einfuegen' },
     { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
     h.archiv ? { text: 'Zurück auf den Tisch', icon: 'archiv', wert: 'zurueck' } : { text: 'Ins Regal stellen', icon: 'archiv', wert: 'archiv' },
     { text: 'Heft verbrennen', icon: 'muell', wert: 'weg', rot: true }
@@ -4683,7 +4868,9 @@ async function heftMenue(h, danach) {
   } else if (wahl === 'gestalten') {
     await heftGestalten(h, danach); return;
   } else if (wahl === 'ansicht') {
-    h.ansicht = (h.ansicht || 'seiten') === 'rolle' ? 'seiten' : 'rolle'; speichere(h);
+    h.ansicht = { seiten: 'rolle', rolle: 'fluss' }[h.ansicht || 'seiten'] || 'seiten'; speichere(h);
+  } else if (wahl === 'einfuegen') {
+    await textHereinholen(h, danach); return;
   } else if (wahl === 'projekt') {
     await ordneHeftProjektZu(h);
   } else if (wahl === 'dazu') {
@@ -4727,7 +4914,8 @@ RENDER.heft = function (haupt, heftId) {
     el('h1', {}, heft.titel),
     el('div', { class: 'heft-ansichtswahl', role: 'group', 'aria-label': 'Heftansicht' },
       el('button', { class: (heft.ansicht || 'seiten') === 'seiten' ? 'an' : '', title: 'Einzelne Seiten', onclick: () => { heft.ansicht = 'seiten'; speichere(heft); zeichne(); } }, 'Seiten'),
-      el('button', { class: heft.ansicht === 'rolle' ? 'an' : '', title: 'Durchgehend scrollen', onclick: () => { heft.ansicht = 'rolle'; speichere(heft); zeichne(); } }, 'Rolle')),
+      el('button', { class: heft.ansicht === 'rolle' ? 'an' : '', title: 'Seite für Seite untereinander', onclick: () => { heft.ansicht = 'rolle'; speichere(heft); zeichne(); } }, 'Rolle'),
+      el('button', { class: heft.ansicht === 'fluss' ? 'an' : '', title: 'Eine einzige lange Seite, ohne Umbruch', onclick: () => { heft.ansicht = 'fluss'; speichere(heft); zeichne(); } }, 'Am Stück')),
     el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Heft-Menü', onclick: () => heftMenue(heft, () => zeichne()) })
   ));
 
@@ -4751,6 +4939,21 @@ RENDER.heft = function (haupt, heftId) {
       heft.geaendert = Date.now(); speichereStill(heft); zeigeRolle();
       requestAnimationFrame(() => { const letzte = halter.lastElementChild && halter.lastElementChild.previousElementSibling; if (letzte) letzte.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
     } }, el('span', { html: ik('plus'), style: 'display:flex' }), 'Neue Seite darunter'));
+  }
+
+  /* Am Stück: alles Geschriebene auf einer einzigen langen Seite. Kein Umbruch,
+     keine Seitenkanten dazwischen — zum Lesen und zum Hineinschütten großer
+     Textmengen aus anderen Apps. */
+  function zeigeFluss() {
+    seiten = kinder(heft.id, 'seite');
+    halter.className = 'heftfluss'; fuss.style.display = 'none'; halter.innerHTML = '';
+    const bogen = el('div', { class: 'fluss-bogen ' + (heft.papier || 'liniert') });
+    for (const seite of seiten) bogen.append(baueSeite(seite, heft, zeigeFluss, { fluss: true }));
+    halter.append(bogen);
+    halter.append(el('button', { class: 'plusskarte rollen-plus', onclick: () => {
+      neuDoc('seite', { parent: heft.id, ord: kinder(heft.id, 'seite').length, titel: '', text: '' });
+      heft.geaendert = Date.now(); speichereStill(heft); zeigeFluss();
+    } }, el('span', { html: ik('plus'), style: 'display:flex' }), 'Noch ein Stück anfügen'));
   }
 
   function zeigeSeite() {
@@ -4823,11 +5026,13 @@ RENDER.heft = function (haupt, heftId) {
       }, 'Auto weiter ' + (D.einst.autoSeitenwechsel !== false ? 'an' : 'aus'))
     );
   }
-  if (heft.ansicht === 'rolle') zeigeRolle(); else zeigeSeite();
+  if (heft.ansicht === 'rolle') zeigeRolle();
+  else if (heft.ansicht === 'fluss') zeigeFluss();
+  else zeigeSeite();
 };
 
 function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
-  const blatt = el('div', { class: 'papierseite ' + (heft.papier || 'liniert') });
+  const blatt = el('div', { class: 'papierseite ' + (heft.papier || 'liniert') + (optionen.fluss ? ' fluss' : '') });
 
   /* Werkzeuge oben rechts */
   const werkzeuge = el('div', { class: 'seitenwerkzeuge' },
@@ -4880,7 +5085,7 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
   if (seite.format === 'rich') {
     const rp = baueRichEditor(seite, { class: 'schreibflaeche', platzhalter: 'Hier darf alles stehen.', kompakt: true });
     text = rp.editor; formatleiste = rp.leiste;
-    if (optionen.rolle) text.classList.add('rollen-rich');
+    if (optionen.rolle || optionen.fluss) text.classList.add('rollen-rich');
     if (optionen.autoWeiter) {
       text.classList.add('auto-weiter');
       let richBlaettert = false;
@@ -8800,12 +9005,36 @@ const ANLEITUNG = [
     abschnitte: [
       { t: 'Das Regal', p: ['Jedes Heft ist ein Deckel im Regal. Plus legt ein neues an. Lange halten öffnet das Heft-Menü. „Ins Regal stellen" archiviert ein Heft (es rückt nach unten unter „Im Regal"), „Zurück auf den Tisch" holt es wieder.'] },
       { t: 'Umschlag & Papier gestalten', p: ['Grundfarbe aus der Palette oder frei, Zweitton, Buchband, Muster (Schlicht, Leinen, Diagonal, Punkte, Rahmen, Wellen) und Papier (Liniert, Breite Linien, Kariert, Punktraster, Blanko). Die Vorschau zeigt alles sofort; „Abbrechen" nimmt alles zurück.'] },
-      { t: 'Seiten oder Rolle', p: ['Oben im Heft: „Seiten" blättert Seite für Seite (Pfeile links/rechts), „Rolle" zeigt alle Seiten untereinander zum Durchscrollen. Beides ist dasselbe Heft.'] },
+      { t: 'Drei Ansichten', p: [
+        'Oben im Heft stehen drei Knöpfe. „Seiten" blättert Seite für Seite (Pfeile links/rechts). „Rolle" zeigt alle Seiten untereinander, jede mit eigenem Rand und Seitenzahl. „Am Stück" macht aus dem ganzen Heft eine einzige lange Seite — ohne Kanten, ohne Umbruch, ohne Seitenzahlen.',
+        'Es bleibt immer dasselbe Heft, nur anders angeschaut. Umschalten ändert nichts am Text.'
+      ], b: 'Zum Lesen und für lange Texte aus anderen Apps nehme ich „Am Stück". Zum Schreiben mit Zetteln und Fotos „Seiten".' },
+      { t: 'Am Stück: die lange Seite', p: [
+        'In dieser Ansicht wird nicht automatisch umgebrochen. Text läuft einfach weiter, so lang er will. Die Werkzeuge und die Titelzeile treten zurück, bis ich in ein Stück hineintippe — dann sind sie wieder da.',
+        '„Noch ein Stück anfügen" unten hängt hinten etwas Neues an.'
+      ] },
       { t: 'Schreiben auf der Seite', p: ['Direkt auf das Papier tippen und schreiben. Ist die Seite voll, geht es automatisch auf der nächsten weiter („Im Heft automatisch weiterblättern" in den Feinheiten — standardmäßig an). Der Knopf „Automatisch auf die nächste Seite" in den Seitenwerkzeugen schaltet es um.'] },
-      { t: 'Seitenwerkzeuge (oben rechts auf der Seite)', p: ['Zettel ankleben · Foto einkleben · Kritzeln · Text formatieren · Mehr (Im Schreibraum öffnen, Hinzufügen & verbinden, Als loses Blatt herausnehmen, Seite herausreißen).'] },
+      { t: 'Die fünf Werkzeuge auf dem Papier', p: [
+        'Wichtig: Sie sitzen oben rechts **auf dem Papier selbst**, nicht in der Kopfzeile darüber. Es gibt zwei Mal „drei Punkte" — die in der Kopfzeile öffnen das Heft-Menü, die auf dem Papier das Seiten-Menü.',
+        'Von links nach rechts: 📌 Nadel = Zettel ankleben · Kamera = Foto einkleben · Stift = Kritzeln · Aa = Text formatieren · drei Punkte = Mehr (Im Schreibraum öffnen, Hinzufügen & verbinden, Als loses Blatt herausnehmen, Seite herausreißen).',
+        'Der Zettel hat also einen eigenen Knopf und steckt in keinem Menü.'
+      ], tipp: 'Wenn ich diese Knöpfe nicht sehe: In den Feinheiten auf „VANI jetzt aktualisieren" tippen. Dann ist die neueste Fassung da.' },
       { t: 'Zettel', p: ['Kleine farbige Notizzettel auf der Seite. Ziehen verschiebt, der Griff unten rechts ändert die Größe, Tippen macht ihn beschreibbar. Lange halten: Andere Farbe, Befestigung (Tesa, Reißzwecke, lose aufgelegt), Etwas drehen, Abmachen.'], b: 'Eine Figurenbeschreibung als gelber Zettel schräg an den Rand der Seite — mit Tesa. Die Seite selbst bleibt frei für die Szene.' },
       { t: 'Fotos', p: ['„Foto einkleben" legt ein Bild auf die Seite, leicht schräg wie eingeklebt. Es lässt sich genauso ziehen, drehen, vergrößern und befestigen wie ein Zettel.'] },
-      { t: 'Kritzeln', p: ['„Kritzeln" legt eine Zeichenfläche über die Seite: zwölf Farben plus eine eigene, stufenlose Stiftdicke, ein Radierer, Stiftdruck wird berücksichtigt, der letzte Strich lässt sich zurücknehmen. Die Kritzelei bleibt auf der Seite liegen und lässt sich später weiterzeichnen.'] },
+      { t: 'Kritzeln', p: [
+        '„Kritzeln" legt eine Zeichenfläche über die Seite. Die Werkzeugleiste schwebt oben: zwölf Farben plus eine eigene, stufenlose Stiftdicke, Radierer, ein Schritt zurück, ein Schritt wieder vor, alles löschen, Abbrechen und Fertig.',
+        'Was gezeichnet wird, sitzt genau unter dem Stift — in der Dicke, die eingestellt ist. Ein echter Stift wird druckempfindlich geführt, ein Finger zeichnet gleichmäßig.',
+        '„Zurück" und „Wieder vor" gehen über beliebig viele Striche. Auch „Alles löschen" lässt sich mit dem Pfeil zurückholen. Erst „Fertig" schreibt die Zeichnung auf die Seite, „Abbrechen" verwirft sie.'
+      ], b: 'Eine Skizze anfangen, drei Striche zurücknehmen, weiterzeichnen — und wenn gar nichts gefällt: Alles löschen, oder gleich Abbrechen.' },
+      { t: 'Text aus einer anderen App hereinholen', p: [
+        'Heft-Menü (die drei Punkte in der Kopfzeile) → „Text aus einer anderen App hereinholen". Es öffnet sich ein ruhiges Feld: dort einsetzen, fertig.',
+        'VANI nimmt dabei die fremden Schriftgrößen, Textfarben und Hintergründe heraus — die machen den Text sonst winzig oder auf dunklem Papier unlesbar. Absätze, Überschriften, Listen, fett und kursiv bleiben. Tabellenzellen werden getrennt, statt zu einem Wortsalat zu verkleben.'
+      ], s: [
+        'In Goodnotes alles markieren und kopieren.',
+        'In VANI das Heft öffnen → drei Punkte in der Kopfzeile → „Text aus einer anderen App hereinholen".',
+        'In das Feld einsetzen. Unten steht, wie viele Wörter bereitliegen.',
+        '„Hereinholen" — der Text liegt als Seite im Heft.'
+      ], tipp: 'Das ist der Weg, wenn ein verwaltetes iPad keine Dateien auswählen lässt. Einsetzen geht immer.' },
       { t: 'Seiten bewegen', p: ['„Als loses Blatt herausnehmen" macht aus einer Seite wieder ein Blatt im Stapel. Umgekehrt legt „In ein Heft legen …" ein Blatt als Seite an eine Stelle meiner Wahl.'] },
       { t: 'Hefte und Projekte', p: ['Ein Heft kann zu einem Projekt gehören („Einem Projekt zuordnen" im Heft-Menü). Es erscheint dann im Projekt unter „Hefte am Projekt". „Als Kapitel in ein Projekt kopieren" macht aus allen Seiten Szenen in einem neuen Kapitel — das Heft bleibt, wie es ist.'] },
       { t: 'Verbrennen', p: ['„Heft verbrennen" legt das Heft samt Seiten in den Papierkorb. Von dort kommt es mit allem zurück, auch mit Zetteln und Fotos.'] }
