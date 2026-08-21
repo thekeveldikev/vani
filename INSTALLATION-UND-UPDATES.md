@@ -31,6 +31,20 @@ verwendet; im Alltag niemals als zweites Icon installieren.
 
     https://vani-schreibzuhause.craftkey.chatgpt.site/rettung.html?rettung=1&kein-sw=1
 
+## Der alte Faden
+
+Die verschlüsselte Fadendatei liegt seit VANI 5.3.0 **nicht mehr öffentlich im
+Netz**. Sie war zwar verschlüsselt, aber für jeden herunterladbar. Der Faden kommt
+jetzt so auf ein neues Gerät:
+
+1. **Auf einem gekoppelten Gerät:** gar nichts tun — der Faden reist über den
+   privaten Bereich automatisch mit.
+2. **Auf dem Windows-Rechner:** die Desktop-App bringt die Datei mit. Dort einmal
+   **Feinheiten → Den Faden holen** mit dem Passwort. Von dort verteilt der private
+   Bereich ihn an alle anderen Geräte.
+3. **Notfalls:** die Datei `faden.enc` aus dem VANI-Ordner von Hand wählen — VANI
+   bietet das an, wenn es die Datei nicht selbst findet.
+
 ## Getrennte Personen, getrennte Bereiche
 
 - Deine Cousine wählt auf ihrem iPad: **Feinheiten → iPad ↔ Laptop → Neuen

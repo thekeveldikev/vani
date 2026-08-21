@@ -417,13 +417,19 @@ html[data-thema="tinte"] .menue button.rot, html[data-thema="kerze"] .menue butt
 /* Kritzeln */
 .skizzenbild { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 .skizzenbild img { width: 100%; height: 100%; object-fit: contain; object-position: top left; }
-.kritzelflaeche { position: absolute; inset: 0; z-index: 9; touch-action: none; }
+/* Eine Leinwand ist ein ersetztes Element: ohne feste Anzeigegröße zeigt sie sich
+   in ihrer Attributgröße. Auf einem Retina-iPad wäre sie sonst doppelt so groß wie
+   das Papier — und jeder Strich säße versetzt und zu dick. */
+.kritzelflaeche { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 9; touch-action: none; }
+/* Schwebt über der Seite, statt sie schmaler zu schieben: nur so entsteht die
+   Zeichnung in genau der Breite, in der die Seite sie danach auch zeigt. */
 .kritzelleiste {
-  position: sticky; top: calc(env(safe-area-inset-top) + 8px); z-index: 30;
+  position: fixed; top: calc(env(safe-area-inset-top) + 10px); left: 50%; transform: translateX(-50%);
+  z-index: 95;
   display: flex; gap: 9px; align-items: center; justify-content: center;
   background: var(--karte); border-radius: 100px; padding: 8px 14px;
-  box-shadow: 0 4px 16px var(--schein), inset 0 0 0 1px var(--linie);
-  width: fit-content; margin: 0 auto 10px;
+  box-shadow: 0 8px 26px rgba(0,0,0,.22), inset 0 0 0 1px var(--linie);
+  width: fit-content;
 }
 .stiftfarbe { width: 30px; height: 30px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
 .stiftfarbe.an { box-shadow: 0 0 0 3px var(--akzent); }
@@ -1260,3 +1266,10 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
   .hauptadresse-schritte, .hauptadresse-aktionen { grid-column: 1 / -1; }
   .hauptadresse-aktionen .knopf { flex: 1 1 150px; justify-content: center; }
 }
+
+/* ----- Kritzelwerkzeuge: Radierer, Schritte, Alles löschen ----- */
+.kritzelleiste { max-width: calc(100vw - 32px); }
+.kritzel-werkzeug { width: 34px; height: 34px; flex: none; }
+.kritzel-werkzeug.an { background: var(--akzent); color: var(--papier); }
+.kritzel-werkzeug[disabled] { pointer-events: none; }
+.kritzel-trenner { width: 1px; height: 22px; background: var(--linie); flex: none; }

@@ -726,3 +726,70 @@ pushen genügt.
 Nur wenn hosting/worker, das v1-Protokoll, D1/R2, Serverlimits oder der Rettungsweg
 verändert werden, muss Codex das bestehende Sites-Projekt neu deployen. Das ist
 selten und kein Teil jedes App-Updates.
+
+## 13. Stand nach der zweiten Claude-Runde (21. August 2026, VANI 5.3.0)
+
+### Kritzeln: gezeichnet ist jetzt gleich gezeichnet
+
+Der Nutzer meldete, Striche erscheinen „versetzt, zu dick, komisch“. Zwei echte
+Ursachen, beide reproduziert:
+
+1. **Eine `<canvas>` ist ein ersetztes Element.** Mit `position:absolute; inset:0`
+   und `width:auto` zeigt sie sich in ihrer **Attributgröße**, nicht gedehnt. Weil
+   `canvas.width = breite * dpr` gesetzt wurde, war die Fläche auf einem Retina-iPad
+   **doppelt so groß** wie das Papier — jeder Strich saß versetzt und zu dick.
+   Fix: `.kritzelflaeche` bekommt `width:100%; height:100%`.
+2. **Die Werkzeugleiste floß im Layout mit** (`position:sticky`, in `.inhalt`
+   eingehängt). Gemessen wurde 523px, danach war die Seite 508px breit und 134px
+   tiefer. Fix: die Leiste hängt an `document.body` und ist `position:fixed`.
+
+Zusätzlich neu aufgebaut: Striche werden als **auf die Breite normierte Punktfolgen**
+gespeichert statt nur als Pixel. Daraus folgt ohne Bildspeicher:
+
+- **Rutschfestigkeit:** eine Layoutänderung verschiebt nichts mehr (ResizeObserver).
+- **Mehrfaches Zurück und Wiederherstellen** statt eines einzigen Undo-Schritts.
+- **Alles löschen** als eigener Eintrag in der Strichliste — auch das ist rückgängig.
+- **Abbrechen** neben Fertig; vorher konnte man eine Zeichnung nicht verwerfen.
+- Stiftdruck nur noch bei echtem Stift (`pointerType === 'pen'`), Radiererbreite
+   hängt an der eingestellten Dicke statt an einem festen Mindestwert.
+
+Verifiziert im Browser: Linie bei y=99,5 statt 100 (reine Kantenglättung),
+gespeichertes Bild exakt 523×667 = Papiergröße, Strich überlebt einen Breitenwechsel
+von 508 auf 361 Pixel an derselben relativen Stelle.
+
+### Weiterer echter Fund
+
+`blatt.append(skizzenbild, titel, formatleiste, text, werkzeuge)` — bei einer nicht
+formatierten Seite ist `formatleiste` `null`, und die native `append`-Methode setzt
+dafür den sichtbaren **Text „null“** auf jede schlichte Heftseite. Jetzt mit
+`.filter(Boolean)`. Der `el()`-Helfer filtert selbst; native `append`-Aufrufe nicht.
+
+### Faden nicht mehr öffentlich (Nutzerentscheidung „Weg B“)
+
+`faden.enc` (549 KB persönlicher Chat, verschlüsselt) lag öffentlich abrufbar auf
+GitHub Pages. Jetzt: aus der Git-Verwaltung genommen, in `.gitignore`, aus dem
+Service-Worker-Kern und aus `hosting/scripts/copy-vani.mjs` entfernt.
+
+**Wichtig:** Die Datei aus dem Offline-Kern zu nehmen ist Pflicht — `cache.addAll`
+scheitert an einer fehlenden Datei und hätte die gesamte Offline-Installation
+zerstört.
+
+Wege zum Faden bleiben: gekoppelter Sync-Bereich, die Desktop-App (bündelt
+`faden.enc` weiter über `package.json` → `files`) und `fadenPaketHolen()` mit
+Dateiauswahl von Hand. Die Datei bleibt lokal im Arbeitsverzeichnis liegen.
+
+### Privatsphäre im öffentlichen Repo
+
+Echte Vornamen standen in `test/lauf.mjs` (WhatsApp-Beispielzeilen) und in drei
+Dokumenten — entgegen Regel 3.3. Entfernt; ein Vertragstest hält ausgelieferten
+Code und Testdaten dauerhaft frei davon.
+
+### Warum das Repo öffentlich bleibt
+
+Nicht wegen des Syncs — der Tresor akzeptiert jede Herkunft
+(`Access-Control-Allow-Origin: *`) und funktioniert auch aus der Desktop-App ohne
+Webadresse. Öffentlich ist allein die Bedingung für kostenlose GitHub Pages. Ein
+privates Repo bräuchte GitHub Pro; das wurde dem Nutzer als Weg A angeboten und
+vorerst nicht gewählt.
+
+Qualitätsstand: `npm test` 82/82, Hosting 2/2, Lint sauber.

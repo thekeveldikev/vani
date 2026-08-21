@@ -1,5 +1,5 @@
 /* VANI Service Worker — Seiten frisch aus dem Netz, offline aus dem sicheren Cache. */
-const VERSION = '5.2.1';
+const VERSION = '5.3.0';
 const CACHE = 'vani-v5-' + VERSION;
 const KERN = [
   './',
@@ -7,8 +7,7 @@ const KERN = [
   './manifest.json',
   './icons/icon-180.png',
   './icons/icon-192.png',
-  './icons/icon-512.png',
-  './faden.enc'
+  './icons/icon-512.png'
 ];
 
 self.addEventListener('install', (e) => {

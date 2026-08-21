@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.2.1';
+const APP_VERSION = '5.3.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -234,7 +234,8 @@ const IK = {
   ausLinks: '<path d="M4 6h16M4 10.5h9M4 15h16M4 19.5h9"/>',
   ausMitte: '<path d="M4 6h16M7.5 10.5h9M4 15h16M7.5 19.5h9"/>',
   ausRechts: '<path d="M4 6h16M11 10.5h9M4 15h16M11 19.5h9"/>',
-  ausBlock: '<path d="M4 6h16M4 10.5h16M4 15h16M4 19.5h16"/>'
+  ausBlock: '<path d="M4 6h16M4 10.5h16M4 15h16M4 19.5h16"/>',
+  radierer: '<path d="m9 20-4.5-4.5a2 2 0 0 1 0-2.8l8-8a2 2 0 0 1 2.8 0l3.2 3.2a2 2 0 0 1 0 2.8L12.5 17"/><path d="M9 20h10"/><path d="m8.5 9.5 6 6"/>'
 };
 function ik(name, kl) { return `<svg class="ik${kl ? ' ' + kl : ''}" viewBox="0 0 24 24" aria-hidden="true">${IK[name] || ''}</svg>`; }
 

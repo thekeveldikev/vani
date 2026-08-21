@@ -438,3 +438,33 @@ test('Eine App-Adresse: GitHub ist sichtbar, Sites nur Tresor, Desktop bleibt ei
   assert.equal(await k.syncStandardServer(), k.SYNC_STANDARD_DIENST);
   assert.match(k.SYNC_STANDARD_DIENST, /^https:\/\//);
 });
+
+test('Kritzeln: Striche landen genau dort, wo gezeichnet wurde — in jeder Breite', async () => {
+  const k = baueSandkasten();
+  const gemalt = [];
+  const ctx = {
+    globalCompositeOperation: '', strokeStyle: '', fillStyle: '', lineWidth: 0, lineCap: '', lineJoin: '',
+    beginPath() {}, moveTo(x, y) { gemalt.push(['von', x, y]); }, lineTo(x, y) { gemalt.push(['nach', x, y]); },
+    stroke() { gemalt.push(['breite', this.lineWidth]); }, arc(x, y, r) { gemalt.push(['punkt', x, y, r]); }, fill() {}
+  };
+  /* Punkte liegen auf die Breite normiert vor: dieselbe Zeichnung, zwei Breiten. */
+  const strich = { farbe: '#123456', radierer: false, punkte: [{ x: .25, y: .5, w: .01 }, { x: .75, y: .5, w: .01 }] };
+  k.kritzelZeichneStrich(ctx, strich, 400);
+  assert.deepEqual(gemalt.filter((g) => g[0] !== 'breite'), [['von', 100, 200], ['nach', 300, 200]]);
+  assert.deepEqual(gemalt.find((g) => g[0] === 'breite'), ['breite', 4]);
+  gemalt.length = 0;
+  k.kritzelZeichneStrich(ctx, strich, 800);
+  assert.deepEqual(gemalt.filter((g) => g[0] !== 'breite'), [['von', 200, 400], ['nach', 600, 400]],
+    'doppelte Breite verschiebt den Strich proportional, nicht willkürlich');
+  assert.deepEqual(gemalt.find((g) => g[0] === 'breite'), ['breite', 8]);
+  /* Ein einzelner Tipp ist ein Punkt, kein verlorener Strich. */
+  gemalt.length = 0;
+  k.kritzelZeichneStrich(ctx, { farbe: '#000', punkte: [{ x: .5, y: .25, w: .02 }] }, 200);
+  assert.deepEqual(gemalt, [['punkt', 100, 50, 2]]);
+  /* Der Radierer nimmt weg, statt zu übermalen. */
+  k.kritzelZeichneStrich(ctx, { radierer: true, punkte: [{ x: .1, y: .1, w: .01 }, { x: .2, y: .2, w: .01 }] }, 100);
+  assert.equal(ctx.globalCompositeOperation, 'destination-out');
+  /* Kaputte Striche werfen nicht. */
+  assert.doesNotThrow(() => k.kritzelZeichneStrich(ctx, { punkte: [] }, 100));
+  assert.doesNotThrow(() => k.kritzelZeichneStrich(ctx, {}, 100));
+});

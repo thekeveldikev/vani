@@ -373,7 +373,9 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
     skizzenbild.append(img);
   }
 
-  blatt.append(skizzenbild, titel, formatleiste, text, werkzeuge);
+  /* Ohne Filter macht die native append-Methode aus einem fehlenden Element
+     den sichtbaren Text „null" — auf jeder schlichten Heftseite. */
+  blatt.append(...[skizzenbild, titel, formatleiste, text, werkzeuge].filter(Boolean));
 
   /* Angeklebtes */
   function baueAnlagen() {
@@ -503,119 +505,239 @@ function baueFoto(a, blatt, neuBauen) {
 
 /* ----- Kritzeln ----- */
 const STIFTFARBEN = ['#2c251c', '#6a5742', '#b0552f', '#cb6b62', '#d08b31', '#b8923f', '#5f7752', '#2f7c72', '#41597a', '#5c6fb3', '#765187', '#a34f77'];
-async function starteKritzeln(blatt, seite) {
-  if ($('.kritzelflaeche', blatt)) return;
-  const r = blatt.getBoundingClientRect();
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
-  const canvas = el('canvas', { class: 'kritzelflaeche' });
-  canvas.width = Math.round(r.width * dpr);
-  canvas.height = Math.round(r.height * dpr);
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
+/* ----- Kritzeln -----
+   Ein Strich ist eine Folge von Punkten, nicht nur eine Spur Pixel. Die Punkte
+   liegen auf die Breite normiert vor. Dadurch landet jeder Strich exakt unter
+   dem Stift — auch wenn sich das Layout danach noch verschiebt — und
+   Rückgängig, Wiederholen und Alles löschen brauchen keinen Bildspeicher. */
+function kritzelZeichneStrich(ctx, s, breite) {
+  const p = s.punkte || [];
+  if (!p.length) return;
+  ctx.globalCompositeOperation = s.radierer ? 'destination-out' : 'source-over';
+  ctx.strokeStyle = s.farbe || '#000';
+  ctx.fillStyle = s.farbe || '#000';
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-
-  if (seite.skizze) {
-    const url = await bildURL(seite.skizze);
-    if (url) {
-      const alt = new Image();
-      await new Promise((res) => { alt.onload = res; alt.onerror = res; alt.src = url; });
-      try { ctx.drawImage(alt, 0, 0, r.width, alt.height / alt.width * r.width); } catch (e) {}
-    }
+  if (p.length === 1) {
+    ctx.beginPath();
+    ctx.arc(p[0].x * breite, p[0].y * breite, Math.max(.35, p[0].w * breite / 2), 0, Math.PI * 2);
+    ctx.fill();
+    return;
   }
-  const altesBild = $('.skizzenbild', blatt);
-  if (altesBild) altesBild.style.display = 'none';
+  for (let i = 1; i < p.length; i++) {
+    ctx.lineWidth = Math.max(.4, p[i].w * breite);
+    ctx.beginPath();
+    ctx.moveTo(p[i - 1].x * breite, p[i - 1].y * breite);
+    ctx.lineTo(p[i].x * breite, p[i].y * breite);
+    ctx.stroke();
+  }
+}
+
+async function starteKritzeln(blatt, seite) {
+  if ($('.kritzelflaeche', blatt)) return;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const canvas = el('canvas', { class: 'kritzelflaeche' });
+  const ctx = canvas.getContext('2d');
 
   let farbe = /^#[0-9a-f]{6}$/i.test(D.einst.stiftFarbe || '') ? D.einst.stiftFarbe : (D.einst.thema === 'tinte' || D.einst.thema === 'kerze' ? '#eae0cd' : STIFTFARBEN[0]);
   let dicke = begrenze(D.einst.stiftDicke, 1, 24, 3.5);
   let radierer = false;
+  let striche = [];
+  let zurueckgelegt = [];
+  let basis = null;
+  let breite = 0, hoehe = 0;
   let strich = null;
-  let letzterStand = null;
+
+  const altesBild = $('.skizzenbild', blatt);
+  if (altesBild) altesBild.style.display = 'none';
+
+  /* Der Stift folgt immer der wirklichen Zeichenfläche, nie einer alten Messung. */
+  function messen() {
+    const cr = canvas.getBoundingClientRect();
+    const b = Math.max(1, Math.round(cr.width)), h = Math.max(1, Math.round(cr.height));
+    if (b === breite && h === hoehe) return false;
+    breite = b; hoehe = h;
+    canvas.width = Math.round(b * dpr);
+    canvas.height = Math.round(h * dpr);
+    return true;
+  }
+  function punktAus(e) {
+    const cr = canvas.getBoundingClientRect();
+    const skalaX = cr.width ? breite / cr.width : 1;
+    const skalaY = cr.height ? hoehe / cr.height : 1;
+    return { x: (e.clientX - cr.left) * skalaX / breite, y: (e.clientY - cr.top) * skalaY / breite };
+  }
+  function strichbreite(e) {
+    if (radierer) return Math.max(8, dicke * 3.4) / breite;
+    const druck = e && e.pointerType === 'pen' && e.pressure > 0 ? e.pressure : .5;
+    return dicke * (.72 + druck * .56) / breite;
+  }
+  function alleszeichnen() {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, breite, hoehe);
+    ctx.globalCompositeOperation = 'source-over';
+    if (basis) {
+      try { ctx.drawImage(basis, 0, 0, breite, basis.height / basis.width * breite); } catch (e) {}
+    }
+    for (const s of striche) {
+      if (s.leeren) { ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, breite, hoehe); continue; }
+      kritzelZeichneStrich(ctx, s, breite);
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+  function knoepfeAuffrischen() {
+    zurueckKnopf.disabled = !striche.length;
+    vorKnopf.disabled = !zurueckgelegt.length;
+    zurueckKnopf.style.opacity = striche.length ? '' : '.35';
+    vorKnopf.style.opacity = zurueckgelegt.length ? '' : '.35';
+  }
 
   canvas.addEventListener('pointerdown', (e) => {
+    if (e.button != null && e.button > 0) return;
     try { canvas.setPointerCapture(e.pointerId); } catch (x) {}
-    try { letzterStand = ctx.getImageData(0, 0, canvas.width, canvas.height); } catch (x) { letzterStand = null; }
-    strich = { x: e.offsetX, y: e.offsetY };
+    const p = punktAus(e);
+    strich = { farbe, radierer, punkte: [{ x: p.x, y: p.y, w: strichbreite(e) }] };
+    striche.push(strich);
+    zurueckgelegt = [];
+    kritzelZeichneStrich(ctx, strich, breite);
+    ctx.globalCompositeOperation = 'source-over';
+    knoepfeAuffrischen();
     e.preventDefault();
   });
   canvas.addEventListener('pointermove', (e) => {
     if (!strich) return;
     const punkte = (e.getCoalescedEvents && e.getCoalescedEvents().length ? e.getCoalescedEvents() : [e]);
-    for (const p of punkte) {
-      const cr = canvas.getBoundingClientRect();
-      const x = p.clientX - cr.left, y = p.clientY - cr.top;
-      const druck = p.pressure && p.pressure > 0 ? p.pressure : .5;
-      ctx.globalCompositeOperation = radierer ? 'destination-out' : 'source-over';
-      ctx.strokeStyle = farbe;
-      ctx.lineWidth = radierer ? Math.max(20, dicke * 4) : dicke * (.55 + druck * .9);
+    ctx.globalCompositeOperation = strich.radierer ? 'destination-out' : 'source-over';
+    ctx.strokeStyle = strich.farbe;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    for (const roh of punkte) {
+      const p = punktAus(roh);
+      const w = strichbreite(roh.pressure != null ? roh : e);
+      const vorher = strich.punkte[strich.punkte.length - 1];
+      if (Math.abs(p.x - vorher.x) * breite < .35 && Math.abs(p.y - vorher.y) * breite < .35) continue;
+      ctx.lineWidth = Math.max(.4, w * breite);
       ctx.beginPath();
-      ctx.moveTo(strich.x, strich.y);
-      ctx.lineTo(x, y);
+      ctx.moveTo(vorher.x * breite, vorher.y * breite);
+      ctx.lineTo(p.x * breite, p.y * breite);
       ctx.stroke();
-      strich = { x, y };
+      strich.punkte.push({ x: p.x, y: p.y, w });
     }
+    ctx.globalCompositeOperation = 'source-over';
   });
   const strichEnde = () => { strich = null; };
   canvas.addEventListener('pointerup', strichEnde);
   canvas.addEventListener('pointercancel', strichEnde);
 
+  /* Werkzeuge */
   const eigeneFarbe = el('input', { type: 'color', value: farbe, title: 'Eigene Stiftfarbe', 'aria-label': 'Eigene Stiftfarbe' });
   const dickeRegler = el('input', { type: 'range', min: '1', max: '18', step: '.5', value: String(dicke), title: 'Stiftdicke', 'aria-label': 'Stiftdicke' });
   const dickeProbe = el('span', { class: 'stift-dicke-probe', style: 'width:' + dicke + 'px;height:' + dicke + 'px;background:' + farbe });
-  eigeneFarbe.addEventListener('input', () => {
-    farbe = eigeneFarbe.value; D.einst.stiftFarbe = farbe; speichereEinst(); radierer = false;
-    dickeProbe.style.background = farbe; $$('.stiftfarbe', leiste).forEach((x) => x.classList.remove('an')); radierKnopf.classList.remove('an');
-  });
+  const stiftWaehlen = (f, knopf) => {
+    farbe = f; eigeneFarbe.value = f; D.einst.stiftFarbe = f; speichereEinst();
+    radierer = false; radierKnopf.classList.remove('an');
+    dickeProbe.style.background = f;
+    $$('.stiftfarbe', leiste).forEach((k) => k.classList.toggle('an', k === knopf));
+  };
+  eigeneFarbe.addEventListener('input', () => stiftWaehlen(eigeneFarbe.value, null));
   dickeRegler.addEventListener('input', () => {
     dicke = Number(dickeRegler.value); D.einst.stiftDicke = dicke; speichereEinst();
     dickeProbe.style.width = dicke + 'px'; dickeProbe.style.height = dicke + 'px';
   });
-  const leiste = el('div', { class: 'kritzelleiste' },
-    STIFTFARBEN.map((f) =>
-      el('button', {
-        class: 'stiftfarbe' + (f === farbe ? ' an' : ''), style: 'background:' + f, onclick: (e) => {
-          farbe = f; eigeneFarbe.value = f; D.einst.stiftFarbe = f; speichereEinst(); radierer = false; dickeProbe.style.background = f;
-          $$('.stiftfarbe', leiste).forEach((k) => k.classList.toggle('an', k === e.currentTarget));
-          radierKnopf.classList.remove('an');
-        }
-      })
-    ),
-    el('label', { class: 'stift-eigen', title: 'Eigene Farbe' }, '＋', eigeneFarbe),
-    el('label', { class: 'stift-dicke' }, dickeProbe, dickeRegler),
-    (() => {
-      const k = el('button', {
-        class: 'rundknopf', style: 'width:34px;height:34px', html: ik('kreuz'), title: 'Radierer', onclick: () => {
-          radierer = !radierer;
-          k.classList.toggle('an', radierer);
-          if (radierer) $$('.stiftfarbe', leiste).forEach((x) => x.classList.remove('an'));
-          k.style.background = radierer ? 'var(--akzent)' : '';
-          k.style.color = radierer ? 'var(--papier)' : '';
-        }
-      });
-      return k;
-    })(),
-    el('button', { class: 'rundknopf', style: 'width:34px;height:34px', title: 'Letzten Strich rückgängig', html: ik('zurueck'), onclick: () => {
-      if (!letzterStand) { toast('Noch kein Strich zum Rückgängigmachen.'); return; }
-      try { ctx.putImageData(letzterStand, 0, 0); letzterStand = null; } catch (e) {}
-    } }),
-    el('button', {
-      class: 'knopf voll', style: 'padding:7px 14px', onclick: async () => {
-        seite.skizze = await speichereKritzelei(canvas, seite.skizze);
-        speichere(seite);
-        leiste.remove();
-        canvas.remove();
-        if (altesBild) {
-          altesBild.style.display = '';
-          altesBild.innerHTML = '';
+
+  const radierKnopf = el('button', {
+    class: 'rundknopf kritzel-werkzeug', html: ik('radierer'), title: 'Radierer', onclick: () => {
+      radierer = !radierer;
+      radierKnopf.classList.toggle('an', radierer);
+      if (radierer) $$('.stiftfarbe', leiste).forEach((x) => x.classList.remove('an'));
+    }
+  });
+  const zurueckKnopf = el('button', {
+    class: 'rundknopf kritzel-werkzeug', html: ik('zurueck'), title: 'Einen Schritt zurück', onclick: () => {
+      if (!striche.length) return;
+      zurueckgelegt.push(striche.pop());
+      alleszeichnen(); knoepfeAuffrischen();
+    }
+  });
+  const vorKnopf = el('button', {
+    class: 'rundknopf kritzel-werkzeug', html: ik('rechts'), title: 'Schritt wiederherstellen', onclick: () => {
+      if (!zurueckgelegt.length) return;
+      striche.push(zurueckgelegt.pop());
+      alleszeichnen(); knoepfeAuffrischen();
+    }
+  });
+  const leerKnopf = el('button', {
+    class: 'rundknopf kritzel-werkzeug', html: ik('muell'), title: 'Alles löschen', onclick: async () => {
+      if (!striche.length && !basis) { toast('Hier ist noch nichts.'); return; }
+      if (!await frage('Die ganze Zeichnung von dieser Seite nehmen?', { ja: 'Alles löschen', gefahr: true })) return;
+      striche.push({ leeren: true });
+      zurueckgelegt = [];
+      alleszeichnen(); knoepfeAuffrischen();
+      toast('Weg. Der Pfeil zurück holt es wieder.');
+    }
+  });
+
+  const aufraeumen = () => {
+    try { beobachter.disconnect(); } catch (e) {}
+    window.removeEventListener('resize', beiGroesse);
+    leiste.remove(); canvas.remove();
+  };
+  const fertigKnopf = el('button', {
+    class: 'knopf voll', style: 'padding:7px 14px', onclick: async () => {
+      const leer = !striche.length && !basis;
+      seite.skizze = leer ? seite.skizze : await speichereKritzelei(canvas, seite.skizze);
+      speichere(seite);
+      aufraeumen();
+      if (altesBild) {
+        altesBild.style.display = '';
+        altesBild.innerHTML = '';
+        if (seite.skizze) {
           const img = el('img', { alt: '' });
           setzeBild(img, seite.skizze);
           altesBild.append(img);
         }
       }
-    }, 'Fertig')
-  );
-  const radierKnopf = leiste.children[STIFTFARBEN.length + 2];
+    }
+  }, 'Fertig');
+  const abbrechenKnopf = el('button', {
+    class: 'knopf zart', style: 'padding:7px 14px', onclick: async () => {
+      if (striche.length && !await frage('Diese Zeichnung verwerfen? Der Stand von vorher bleibt.', { ja: 'Verwerfen', gefahr: true })) return;
+      aufraeumen();
+      if (altesBild) altesBild.style.display = '';
+    }
+  }, 'Abbrechen');
 
-  blatt.closest('.inhalt').prepend(leiste);
+  const leiste = el('div', { class: 'kritzelleiste' },
+    STIFTFARBEN.map((f) => {
+      const k = el('button', { class: 'stiftfarbe' + (f === farbe ? ' an' : ''), style: 'background:' + f, title: 'Stiftfarbe', onclick: () => stiftWaehlen(f, k) });
+      return k;
+    }),
+    el('label', { class: 'stift-eigen', title: 'Eigene Farbe' }, '＋', eigeneFarbe),
+    el('label', { class: 'stift-dicke' }, dickeProbe, dickeRegler),
+    radierKnopf,
+    el('span', { class: 'kritzel-trenner' }),
+    zurueckKnopf, vorKnopf, leerKnopf,
+    el('span', { class: 'kritzel-trenner' }),
+    abbrechenKnopf, fertigKnopf
+  );
+
+  /* Erst einbauen, dann messen — die Leiste verändert das Layout der Seite. */
   blatt.append(canvas);
+  document.body.append(leiste);
+  messen();
+  knoepfeAuffrischen();
+
+  const beiGroesse = () => { if (messen()) alleszeichnen(); };
+  window.addEventListener('resize', beiGroesse);
+  const beobachter = typeof ResizeObserver === 'function' ? new ResizeObserver(beiGroesse) : { observe() {}, disconnect() {} };
+  try { beobachter.observe(canvas); } catch (e) {}
+
+  if (seite.skizze) {
+    const url = await bildURL(seite.skizze);
+    if (url && canvas.isConnected) {
+      const alt = new Image();
+      await new Promise((res) => { alt.onload = res; alt.onerror = res; alt.src = url; });
+      if (alt.width && alt.height) basis = alt;
+    }
+  }
+  if (canvas.isConnected) { messen(); alleszeichnen(); }
 }

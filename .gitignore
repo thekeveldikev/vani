@@ -1,6 +1,7 @@
 artifact.html
 *.vani
-!faden.enc
+# Der verschluesselte Faden bleibt lokal und gehoert nicht ins oeffentliche Repo.
+faden.enc
 node_modules/
 release/
 vani-sync-data/

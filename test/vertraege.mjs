@@ -140,3 +140,31 @@ test('Anleitungsvertrag: im Build nach dem Klang und vor dem Boot, aus den Feinh
   assert.match(lies('src/49-feinheiten.js'), /oeffneAnleitung\(\)/);
   assert.match(lies('src/52-anleitung.js'), /function schliesseAnleitung/);
 });
+
+test('Kritzelvertrag: die Leinwand bekommt eine feste Anzeigegröße und die Leiste schiebt nichts', () => {
+  const css = lies('src/10-style.css');
+  const flaeche = (css.match(/\.kritzelflaeche \{[^}]*\}/) || [''])[0];
+  assert.match(flaeche, /width:\s*100%/, 'ohne feste Anzeigegröße zeigt sich eine Leinwand in Attributgröße');
+  assert.match(flaeche, /height:\s*100%/);
+  const leiste = (css.match(/\.kritzelleiste \{[^}]*\}/) || [''])[0];
+  assert.match(leiste, /position:\s*fixed/, 'eine mitfließende Leiste macht die Seite schmaler als die Zeichnung');
+  const hefte = lies('src/43-hefte.js');
+  assert.match(hefte, /document\.body\.append\(leiste\)/);
+  for (const werkzeug of ['Radierer', 'Einen Schritt zurück', 'Schritt wiederherstellen', 'Alles löschen', 'Abbrechen']) {
+    assert.ok(hefte.includes(werkzeug), 'Zeichenwerkzeug fehlt: ' + werkzeug);
+  }
+});
+
+test('Seitenvertrag: fehlende Teile werden gefiltert, nie als Text „null" eingesetzt', () => {
+  const hefte = lies('src/43-hefte.js');
+  assert.match(hefte, /blatt\.append\(\.\.\.\[skizzenbild, titel, formatleiste, text, werkzeuge\]\.filter\(Boolean\)\)/);
+  assert.doesNotMatch(hefte, /blatt\.append\(skizzenbild, titel, formatleiste/);
+});
+
+test('Fadenvertrag: die verschlüsselte Fadendatei liegt nicht mehr öffentlich im Offline-Kern', () => {
+  assert.doesNotMatch(lies('sw.js'), /faden\.enc/, 'sonst scheitert die Offline-Installation an einer fehlenden Datei');
+  assert.doesNotMatch(lies('hosting/scripts/copy-vani.mjs'), /faden\.enc/);
+  assert.match(lies('.gitignore'), /^faden\.enc$/m, 'die Fadendatei bleibt lokal');
+  assert.match(lies('src/49-feinheiten.js'), /async function fadenPaketHolen/);
+  assert.match(lies('src/49-feinheiten.js'), /Fadendatei von Hand wählen/);
+});

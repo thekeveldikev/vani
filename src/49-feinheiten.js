@@ -388,7 +388,7 @@ RENDER.feinheiten = function (haupt) {
   inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Den Faden holen'),
     el('div', { class: 'karte' },
       el('div', { style: 'font-size:14px;color:var(--blass);line-height:1.6;margin-bottom:14px' },
-        'Der alte Chat liegt verschlüsselt bereit. Einmal das Passwort eingeben, dann ist er hier — danach brauchst du das nie wieder.'),
+        'Der alte Chat kommt verschlüsselt herein: auf einem gekoppelten Gerät von selbst über deinen privaten Bereich, sonst einmal mit Passwort aus der Desktop-App oder der Fadendatei.'),
       el('button', { class: 'knopf voll', onclick: () => holeFaden() },
         el('span', { html: ik('faden'), style: 'display:flex' }), 'Faden hereinholen'))));
 
@@ -585,17 +585,47 @@ async function teileDatei(name, inhalt, typ = 'text/plain') {
   }
 }
 
-/* ----- Faden entschluesseln und einlesen ----- */
+/* ----- Faden entschluesseln und einlesen -----
+   Die verschlüsselte Fadendatei liegt bewusst nicht mehr öffentlich im Netz.
+   Sie kommt aus der Desktop-App, die sie mitbringt, oder wird einmal von Hand
+   gewählt. Auf schon gekoppelten Geräten reist der Faden über den Tresor. */
+async function fadenPaketHolen() {
+  try {
+    const antwort = await fetch('faden.enc', { cache: 'no-store' });
+    if (antwort.ok) return await antwort.json();
+  } catch (e) {}
+  const wahl = await menue([
+    { text: 'Fadendatei von Hand wählen', icon: 'runter', wert: 'datei' },
+    { text: 'Doch nicht', icon: 'kreuz', wert: null }
+  ], 'Der Faden liegt auf diesem Gerät nicht bereit');
+  if (wahl !== 'datei') {
+    toast('Auf gekoppelten Geräten kommt der Faden über deinen privaten Bereich mit.', 5200);
+    return null;
+  }
+  return new Promise((res) => {
+    const inp = el('input', { type: 'file', accept: '.enc,.json,application/json', style: 'display:none' });
+    document.body.append(inp);
+    let fertig = false;
+    inp.addEventListener('change', async () => {
+      fertig = true;
+      const datei = inp.files && inp.files[0];
+      inp.remove();
+      if (!datei) return res(null);
+      if (datei.size > 200 * 1024 * 1024) { toast('Diese Datei ist zu groß für den Faden.'); return res(null); }
+      try { res(JSON.parse(await datei.text())); }
+      catch (e) { toast('Das ist keine Fadendatei.'); res(null); }
+    });
+    inp.addEventListener('cancel', () => { if (!fertig) { inp.remove(); res(null); } });
+    inp.click();
+  });
+}
+
 async function holeFaden() {
   const passwort = await eingabe({ titel: 'Das Passwort für den Faden', platzhalter: 'wort-wort-zahl-wort-wort', ok: 'Holen' });
   if (!passwort) return;
   toast('Hole den Faden …', 4000);
-  let paket;
-  try {
-    const antwort = await fetch('faden.enc', { cache: 'no-store' });
-    if (!antwort.ok) throw new Error('nicht da');
-    paket = await antwort.json();
-  } catch (e) { toast('Der Faden liegt hier nicht bereit.'); return; }
+  let paket = await fadenPaketHolen();
+  if (!paket) return;
   let klartext;
   try {
     const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
