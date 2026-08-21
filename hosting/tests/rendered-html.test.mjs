@@ -17,7 +17,7 @@ test("Hosting-Build enthält Umzugsseite, Rettungsraum und keinen zweiten Servic
   assert.match(index, /https:\/\/thekeveldikev\.github\.io\/vani\//);
   assert.match(index, /rettung\.html\?rettung=1&amp;kein-sw=1/);
   assert.doesNotMatch(index, /rel=["']manifest["']/);
-  assert.match(rettung, /const APP_VERSION = '5\.4\.2'/);
+  assert.match(rettung, /const APP_VERSION = '5\.5\.0'/);
   assert.match(rettung, /Privater Bereich/);
   assert.match(rettung, /Wem gehört dieses VANI/);
   assert.match(rettung, /Funkenkiste/);

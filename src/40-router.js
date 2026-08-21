@@ -38,12 +38,16 @@ function baueLeiste() {
   const l = $('#leiste');
   l.innerHTML = '';
   l.append(el('div', { class: 'wortmarke' }, 'V'));
+  /* Die Räume liegen in einer eigenen Rolle. Am Handy schiebt sich nur sie zur
+     Seite — Suche und Feinheiten bleiben immer sichtbar und erreichbar. */
+  const rolle = el('div', { class: 'raumrolle' });
   for (const r of aktiveRaeume()) {
-    l.append(el('button', {
+    rolle.append(el('button', {
       class: 'lknopf', 'data-raum': r.id,
       onclick: () => { location.hash = '#/' + (r.id === 'zuhause' ? '' : r.id); }
     }, el('span', { html: ik(r.icon), style: 'display:flex' }), el('span', {}, r.name)));
   }
+  l.append(rolle);
   l.append(el('div', { class: 'luecke' }));
   l.append(el('button', { class: 'lknopf', onclick: () => oeffneSuche() },
     el('span', { html: ik('suche'), style: 'display:flex' }), el('span', {}, 'Suche')));

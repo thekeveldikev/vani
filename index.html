@@ -2,7 +2,7 @@
 <html lang="de" data-thema="papier">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no, interactive-widget=resizes-content">
 <title>VANI</title>
 <meta name="description" content="VANI — ein Zuhause zum Schreiben. Offline, überall.">
 <meta name="robots" content="noindex, nofollow">
@@ -101,9 +101,11 @@ html[data-thema="nebel"] {
 
 /* ----- Grund ----- */
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html { height: 100%; }
+html { height: 100%; overflow: hidden; }
 body {
   height: 100%;
+  overflow: hidden;
+  position: relative;
   font-family: ui-rounded, -apple-system, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
   font-size: 17px;
   color: var(--tinte);
@@ -138,7 +140,11 @@ html[data-thema="kerze"] body::before {
 /* ----- Gerüst ----- */
 #app {
   display: grid; grid-template-columns: 86px 1fr;
+  /* Die sichtbare Hoehe, nicht die theoretische: sonst laesst sich die Seite
+     um die Hoehe der Adressleiste schieben, die Leiste rutscht nach oben und
+     unten klafft eine Luecke. --vvh kommt aus dem visualViewport. */
   height: 100dvh;
+  height: var(--vvh, 100dvh);
   padding-left: env(safe-area-inset-left);
 }
 #raum { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; position: relative; min-width: 0; }
@@ -214,8 +220,10 @@ html[data-thema="kerze"] body::before {
 /* ----- Deck: Modale, Menüs, Overlays ----- */
 #deck:empty { display: none; }
 .schleier {
-  position: fixed; inset: 0; z-index: 100; background: var(--deck);
+  position: fixed; inset: 0; bottom: auto; z-index: 100; background: var(--deck);
+  height: 100dvh; height: var(--vvh, 100dvh);
   display: flex; align-items: center; justify-content: center;
+  padding: 16px;
   animation: einblenden .18s ease;
 }
 @keyframes einblenden { from { opacity: 0; } }
@@ -223,7 +231,7 @@ html[data-thema="kerze"] body::before {
 .modal {
   background: var(--papier); border-radius: 20px; padding: 22px;
   width: min(430px, calc(100vw - 48px));
-  max-height: 82dvh; overflow-y: auto;
+  max-height: min(82dvh, calc(var(--vvh, 100dvh) - 32px)); overflow-y: auto;
   box-shadow: 0 12px 44px rgba(0,0,0,.3);
   animation: hochkommen .2s ease;
 }
@@ -237,7 +245,7 @@ html[data-thema="kerze"] body::before {
 .menue {
   background: var(--papier); border-radius: 17px; padding: 7px;
   width: min(330px, calc(100vw - 48px));
-  max-height: 76dvh; overflow-y: auto;
+  max-height: min(76dvh, calc(var(--vvh, 100dvh) - 32px)); overflow-y: auto;
   box-shadow: 0 12px 44px rgba(0,0,0,.3);
   animation: hochkommen .2s ease;
 }
@@ -308,7 +316,7 @@ html[data-thema="tinte"] .menue button.rot, html[data-thema="kerze"] .menue butt
 /* ================================================================
    Schnipsel
    ================================================================ */
-.schnipsel-raum { display: flex; flex-direction: column; height: 100%; height: min(100%, var(--vvh, 100dvh)); }
+.schnipsel-raum { display: flex; flex-direction: column; height: 100%; }
 .schnipsel-lauf { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 4px 20px 12px; display: flex; flex-direction: column; }
 .schnipsel-lauf .innen { max-width: 760px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; }
 .datumstrenner { align-self: center; font-size: 12px; color: var(--blass); background: var(--hg2); padding: 4px 13px; border-radius: 100px; margin: 16px 0 8px; }
@@ -1309,10 +1317,13 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 .papierseite.fluss .schreibflaeche { min-height: 0; }
 .papierseite.fluss .stitel { margin-top: 12px; }
 .papierseite.fluss .stitel:placeholder-shown { opacity: .4; }
-/* Niemals per Hover verstecken: ein iPad kennt kein Hover, die Werkzeuge
-   wären dort unerreichbar. Sie treten nur zurück, bleiben aber antippbar. */
-.papierseite.fluss .seitenwerkzeuge { opacity: .55; transition: opacity .18s ease; }
-.papierseite.fluss:focus-within .seitenwerkzeuge, .papierseite.fluss .seitenwerkzeuge:hover { opacity: 1; }
+/* Eine Werkzeugreihe für die ganze lange Seite, oben rechts und beim Scrollen
+   in Reichweite. Niemals per Hover verstecken — ein iPad kennt kein Hover. */
+.fluss-werkzeuge {
+  position: sticky; top: 8px; float: right; right: auto;
+  margin: 0 12px 0 0; z-index: 8;
+}
+.fluss-bogen { padding-top: 4px; }
 .papierseite.fluss + .papierseite.fluss::before {
   content: ""; position: absolute; left: 38px; right: 38px; top: 0; height: 1px;
   background: var(--linie); opacity: .35;
@@ -1366,6 +1377,45 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 }
 .papierseite .schreibflaeche.rich-editor { background-image: none; }
 
+/* ================================================================
+   Handy: alles bleibt sichtbar und antippbar
+   ================================================================ */
+
+/* Die Räume liegen in einer eigenen Rolle. */
+.raumrolle { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; }
+
+/* Tagesbalken müssen schrumpfen dürfen — sonst wird die Hälfte abgeschnitten. */
+.statistikbalken .tag { min-width: 0; }
+.statistikbalken .tag b { overflow: hidden; }
+
+@media (max-width: 620px) {
+  /* Die Leiste selbst scrollt nicht mehr: nur die Räume schieben sich. Suche
+     und Feinheiten stehen fest am Rand und sind immer erreichbar.
+     min-width: 0 ist entscheidend — ein Grid-Element wächst sonst mit seinem
+     Inhalt über den Bildschirm hinaus, statt sich zu begrenzen. */
+  #leiste { overflow: visible; justify-content: flex-start; gap: 0; min-width: 0; max-width: 100%; }
+  .raumrolle {
+    flex-direction: row; flex: 1; min-width: 0; width: auto;
+    overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 22px), transparent 100%);
+  }
+  .raumrolle::-webkit-scrollbar { display: none; }
+  .raumrolle .lknopf { flex: none; }
+  #leiste > .lknopf { flex: none; box-shadow: -1px 0 0 var(--linie); }
+
+  /* Alle Funkenarten sichtbar statt versteckt hinter einem Seitwärtsschub. */
+  .funke-arten { flex-wrap: wrap; overflow-x: visible; }
+
+  /* Klangnamen sind Schalter — sie brauchen eine Fläche, die ein Finger trifft. */
+  .klangzeile .klangname { min-height: 40px; display: flex; align-items: center; }
+  .statistikbalken { gap: 3px; }
+  .statistikbalken .tag i { max-width: 18px; }
+
+  /* Toasts gehören über die Leiste, nicht dahinter. */
+  #toasts { bottom: calc(env(safe-area-inset-bottom) + 78px); }
+}
+
 </style>
 </head>
 <body>
@@ -1392,7 +1442,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.4.2';
+const APP_VERSION = '5.5.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -3695,12 +3745,16 @@ function baueLeiste() {
   const l = $('#leiste');
   l.innerHTML = '';
   l.append(el('div', { class: 'wortmarke' }, 'V'));
+  /* Die Räume liegen in einer eigenen Rolle. Am Handy schiebt sich nur sie zur
+     Seite — Suche und Feinheiten bleiben immer sichtbar und erreichbar. */
+  const rolle = el('div', { class: 'raumrolle' });
   for (const r of aktiveRaeume()) {
-    l.append(el('button', {
+    rolle.append(el('button', {
       class: 'lknopf', 'data-raum': r.id,
       onclick: () => { location.hash = '#/' + (r.id === 'zuhause' ? '' : r.id); }
     }, el('span', { html: ik(r.icon), style: 'display:flex' }), el('span', {}, r.name)));
   }
+  l.append(rolle);
   l.append(el('div', { class: 'luecke' }));
   l.append(el('button', { class: 'lknopf', onclick: () => oeffneSuche() },
     el('span', { html: ik('suche'), style: 'display:flex' }), el('span', {}, 'Suche')));
@@ -4974,6 +5028,18 @@ RENDER.heft = function (haupt, heftId) {
     seiten = kinder(heft.id, 'seite');
     halter.className = 'heftfluss'; fuss.style.display = 'none'; halter.innerHTML = '';
     const bogen = el('div', { class: 'fluss-bogen ' + (heft.papier || 'liniert') });
+    /* Ein Werkzeug für die ganze lange Seite. Es wirkt auf das Stück, in dem
+       gerade geschrieben wird — sonst auf das letzte. */
+    const aktuellesStueck = () => {
+      const aktiv = document.activeElement && document.activeElement.closest
+        ? document.activeElement.closest('.papierseite.fluss')
+        : null;
+      const blatt = (aktiv && bogen.contains(aktiv)) ? aktiv : $$('.papierseite.fluss', bogen).pop();
+      if (!blatt) return null;
+      const seite = D.docs.get(blatt.dataset.seite);
+      return seite ? { seite, blatt, heft } : null;
+    };
+    bogen.append(seitenWerkzeuge(aktuellesStueck, { neuZeichnen: zeigeFluss, klasse: 'fluss-werkzeuge' }));
     for (const seite of seiten) bogen.append(baueSeite(seite, heft, zeigeFluss, { fluss: true }));
     halter.append(bogen);
     halter.append(el('button', { class: 'plusskarte rollen-plus', onclick: () => {
@@ -5057,51 +5123,72 @@ RENDER.heft = function (haupt, heftId) {
   else zeigeSeite();
 };
 
-function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
-  const blatt = el('div', { class: 'papierseite ' + (heft.papier || 'liniert') + (optionen.fluss ? ' fluss' : '') });
-
-  /* Werkzeuge oben rechts */
-  const werkzeuge = el('div', { class: 'seitenwerkzeuge' },
+/* Eine Werkzeugreihe, zwei Verwendungen: fest an einer Seite oder oben an der
+   langen Seite. ziel() sagt beim Antippen, welches Stück gerade gemeint ist. */
+function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
+  const auffrischen = () => { if (frisch) frisch(); else if (neuZeichnen) neuZeichnen(); };
+  return el('div', { class: 'seitenwerkzeuge' + (klasse ? ' ' + klasse : '') },
     el('button', {
       class: 'rundknopf', title: 'Zettel ankleben', html: ik('pin'), onclick: () => {
-        neuDoc('zettel', { parent: seite.id, text: '', farbe: zufall(['gelb', 'rosa', 'blau', 'gruen']), pos: { x: 8 + Math.random() * 40, y: 6 + Math.random() * 20, rot: -4 + Math.random() * 8, w: 30 } });
-        baueAnlagen();
+        const z = ziel(); if (!z) return;
+        neuDoc('zettel', { parent: z.seite.id, text: '', farbe: zufall(['gelb', 'rosa', 'blau', 'gruen']), pos: { x: 8 + Math.random() * 40, y: 6 + Math.random() * 20, rot: -4 + Math.random() * 8, w: 30 } });
+        auffrischen();
       }
     }),
     el('button', {
       class: 'rundknopf', title: 'Foto einkleben', html: ik('kamera'), onclick: async () => {
+        const z = ziel(); if (!z) return;
         const bild = await waehleBild();
         if (!bild) return;
-        neuDoc('foto', { parent: seite.id, bild: bild.id, pos: { x: 12 + Math.random() * 35, y: 8 + Math.random() * 20, rot: -3 + Math.random() * 6, w: 42 } });
-        baueAnlagen();
+        neuDoc('foto', { parent: z.seite.id, bild: bild.id, pos: { x: 12 + Math.random() * 35, y: 8 + Math.random() * 20, rot: -3 + Math.random() * 6, w: 42 } });
+        auffrischen();
       }
     }),
-    el('button', { class: 'rundknopf', title: 'Kritzeln', html: ik('stift'), onclick: () => starteKritzeln(blatt, seite) }),
-    el('button', { class: 'rundknopf format-seite-knopf', title: seite.format === 'rich' ? 'Formatleiste ist geöffnet' : 'Text formatieren', onclick: () => {
-      if (seite.format !== 'rich') { seite.format = 'rich'; seite.rich = richAusText(seite.text || ''); speichere(seite); neuZeichnen(); }
-      else { const leiste = $('.formatleiste', blatt); if (leiste) leiste.classList.toggle('eingeklappt'); }
+    el('button', { class: 'rundknopf', title: 'Kritzeln', html: ik('stift'), onclick: () => {
+      const z = ziel(); if (z) starteKritzeln(z.blatt, z.seite);
+    } }),
+    el('button', { class: 'rundknopf format-seite-knopf', title: 'Text formatieren', onclick: () => {
+      const z = ziel(); if (!z) return;
+      if (z.seite.format !== 'rich') {
+        z.seite.format = 'rich'; z.seite.rich = richAusText(z.seite.text || ''); speichere(z.seite);
+        if (neuZeichnen) neuZeichnen();
+      } else {
+        const leiste = $('.formatleiste', z.blatt);
+        if (leiste) leiste.classList.toggle('eingeklappt');
+      }
     } }, 'Aa'),
     el('button', {
       class: 'rundknopf', title: 'Mehr', html: ik('mehr'), onclick: async () => {
+        const z = ziel(); if (!z) return;
         const wahl = await menue([
           { text: 'Im Schreibraum öffnen', icon: 'stift', wert: 'sr' },
           { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
           { text: 'Als loses Blatt herausnehmen', icon: 'blatt', wert: 'blatt' },
           { text: 'Seite herausreißen', icon: 'muell', wert: 'weg', rot: true }
         ]);
-        if (wahl === 'sr') oeffneSchreibraum(seite.id);
-        else if (wahl === 'dazu') await hinzufuegenMenue(seite);
+        if (wahl === 'sr') oeffneSchreibraum(z.seite.id);
+        else if (wahl === 'dazu') await hinzufuegenMenue(z.seite);
         else if (wahl === 'blatt') {
-          seiteZuBlatt(seite); toast('Liegt jetzt wieder bei den Blättern.'); neuZeichnen();
-        }
-        else if (wahl === 'weg' && await frage('Diese Seite herausreißen? Alles darauf geht mit.', { ja: 'Herausreißen', gefahr: true })) {
-          await loesche(seite.id);
-          kinder(heft.id, 'seite').forEach((s, i) => { s.ord = i; speichereStill(s); });
-          neuZeichnen();
+          seiteZuBlatt(z.seite); toast('Liegt jetzt wieder bei den Blättern.');
+          if (neuZeichnen) neuZeichnen();
+        } else if (wahl === 'weg' && await frage('Diese Seite herausreißen? Alles darauf geht mit.', { ja: 'Herausreißen', gefahr: true })) {
+          await loesche(z.seite.id);
+          kinder(z.heft.id, 'seite').forEach((x, i) => { x.ord = i; speichereStill(x); });
+          if (neuZeichnen) neuZeichnen();
         }
       }
     })
   );
+}
+
+function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
+  const blatt = el('div', { class: 'papierseite ' + (heft.papier || 'liniert') + (optionen.fluss ? ' fluss' : ''), 'data-seite': seite.id });
+
+  /* Werkzeuge: auf einer einzelnen Seite oben rechts auf dem Papier. In der
+     Ansicht „Am Stück" gibt es sie nur einmal ganz oben — dort ist alles eine
+     einzige lange Seite, und eine Werkzeugreihe je Stück wäre bloß Lärm. */
+  const werkzeuge = optionen.fluss ? null : seitenWerkzeuge(
+    () => ({ seite, blatt, heft }), { neuZeichnen, frisch: () => baueAnlagen() });
 
   /* Titel + Text */
   const titel = el('input', { class: 'stitel serif', type: 'text', value: seite.titel || '', placeholder: 'Überschrift, wenn du magst' });
@@ -7434,7 +7521,10 @@ RENDER.feinheiten = function (haupt) {
   const gesamt = Object.values(D.stats.tage).reduce((a, b) => a + b, 0);
   const balken = el('div', { class: 'statistikbalken' });
   const werte = [];
-  for (let i = 13; i >= 0; i--) {
+  /* Vierzehn Tage passen auf ein Handy nicht lesbar nebeneinander. Dort sieben —
+     lieber weniger Tage, die man erkennt, als vierzehn abgeschnittene. */
+  const tage = (typeof innerWidth === 'number' && innerWidth < 620) ? 7 : 14;
+  for (let i = tage - 1; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i);
     werte.push({ k: tagKey(d), w: D.stats.tage[tagKey(d)] || 0, d });
   }

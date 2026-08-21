@@ -253,6 +253,18 @@ RENDER.heft = function (haupt, heftId) {
     seiten = kinder(heft.id, 'seite');
     halter.className = 'heftfluss'; fuss.style.display = 'none'; halter.innerHTML = '';
     const bogen = el('div', { class: 'fluss-bogen ' + (heft.papier || 'liniert') });
+    /* Ein Werkzeug für die ganze lange Seite. Es wirkt auf das Stück, in dem
+       gerade geschrieben wird — sonst auf das letzte. */
+    const aktuellesStueck = () => {
+      const aktiv = document.activeElement && document.activeElement.closest
+        ? document.activeElement.closest('.papierseite.fluss')
+        : null;
+      const blatt = (aktiv && bogen.contains(aktiv)) ? aktiv : $$('.papierseite.fluss', bogen).pop();
+      if (!blatt) return null;
+      const seite = D.docs.get(blatt.dataset.seite);
+      return seite ? { seite, blatt, heft } : null;
+    };
+    bogen.append(seitenWerkzeuge(aktuellesStueck, { neuZeichnen: zeigeFluss, klasse: 'fluss-werkzeuge' }));
     for (const seite of seiten) bogen.append(baueSeite(seite, heft, zeigeFluss, { fluss: true }));
     halter.append(bogen);
     halter.append(el('button', { class: 'plusskarte rollen-plus', onclick: () => {
@@ -336,51 +348,72 @@ RENDER.heft = function (haupt, heftId) {
   else zeigeSeite();
 };
 
-function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
-  const blatt = el('div', { class: 'papierseite ' + (heft.papier || 'liniert') + (optionen.fluss ? ' fluss' : '') });
-
-  /* Werkzeuge oben rechts */
-  const werkzeuge = el('div', { class: 'seitenwerkzeuge' },
+/* Eine Werkzeugreihe, zwei Verwendungen: fest an einer Seite oder oben an der
+   langen Seite. ziel() sagt beim Antippen, welches Stück gerade gemeint ist. */
+function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
+  const auffrischen = () => { if (frisch) frisch(); else if (neuZeichnen) neuZeichnen(); };
+  return el('div', { class: 'seitenwerkzeuge' + (klasse ? ' ' + klasse : '') },
     el('button', {
       class: 'rundknopf', title: 'Zettel ankleben', html: ik('pin'), onclick: () => {
-        neuDoc('zettel', { parent: seite.id, text: '', farbe: zufall(['gelb', 'rosa', 'blau', 'gruen']), pos: { x: 8 + Math.random() * 40, y: 6 + Math.random() * 20, rot: -4 + Math.random() * 8, w: 30 } });
-        baueAnlagen();
+        const z = ziel(); if (!z) return;
+        neuDoc('zettel', { parent: z.seite.id, text: '', farbe: zufall(['gelb', 'rosa', 'blau', 'gruen']), pos: { x: 8 + Math.random() * 40, y: 6 + Math.random() * 20, rot: -4 + Math.random() * 8, w: 30 } });
+        auffrischen();
       }
     }),
     el('button', {
       class: 'rundknopf', title: 'Foto einkleben', html: ik('kamera'), onclick: async () => {
+        const z = ziel(); if (!z) return;
         const bild = await waehleBild();
         if (!bild) return;
-        neuDoc('foto', { parent: seite.id, bild: bild.id, pos: { x: 12 + Math.random() * 35, y: 8 + Math.random() * 20, rot: -3 + Math.random() * 6, w: 42 } });
-        baueAnlagen();
+        neuDoc('foto', { parent: z.seite.id, bild: bild.id, pos: { x: 12 + Math.random() * 35, y: 8 + Math.random() * 20, rot: -3 + Math.random() * 6, w: 42 } });
+        auffrischen();
       }
     }),
-    el('button', { class: 'rundknopf', title: 'Kritzeln', html: ik('stift'), onclick: () => starteKritzeln(blatt, seite) }),
-    el('button', { class: 'rundknopf format-seite-knopf', title: seite.format === 'rich' ? 'Formatleiste ist geöffnet' : 'Text formatieren', onclick: () => {
-      if (seite.format !== 'rich') { seite.format = 'rich'; seite.rich = richAusText(seite.text || ''); speichere(seite); neuZeichnen(); }
-      else { const leiste = $('.formatleiste', blatt); if (leiste) leiste.classList.toggle('eingeklappt'); }
+    el('button', { class: 'rundknopf', title: 'Kritzeln', html: ik('stift'), onclick: () => {
+      const z = ziel(); if (z) starteKritzeln(z.blatt, z.seite);
+    } }),
+    el('button', { class: 'rundknopf format-seite-knopf', title: 'Text formatieren', onclick: () => {
+      const z = ziel(); if (!z) return;
+      if (z.seite.format !== 'rich') {
+        z.seite.format = 'rich'; z.seite.rich = richAusText(z.seite.text || ''); speichere(z.seite);
+        if (neuZeichnen) neuZeichnen();
+      } else {
+        const leiste = $('.formatleiste', z.blatt);
+        if (leiste) leiste.classList.toggle('eingeklappt');
+      }
     } }, 'Aa'),
     el('button', {
       class: 'rundknopf', title: 'Mehr', html: ik('mehr'), onclick: async () => {
+        const z = ziel(); if (!z) return;
         const wahl = await menue([
           { text: 'Im Schreibraum öffnen', icon: 'stift', wert: 'sr' },
           { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
           { text: 'Als loses Blatt herausnehmen', icon: 'blatt', wert: 'blatt' },
           { text: 'Seite herausreißen', icon: 'muell', wert: 'weg', rot: true }
         ]);
-        if (wahl === 'sr') oeffneSchreibraum(seite.id);
-        else if (wahl === 'dazu') await hinzufuegenMenue(seite);
+        if (wahl === 'sr') oeffneSchreibraum(z.seite.id);
+        else if (wahl === 'dazu') await hinzufuegenMenue(z.seite);
         else if (wahl === 'blatt') {
-          seiteZuBlatt(seite); toast('Liegt jetzt wieder bei den Blättern.'); neuZeichnen();
-        }
-        else if (wahl === 'weg' && await frage('Diese Seite herausreißen? Alles darauf geht mit.', { ja: 'Herausreißen', gefahr: true })) {
-          await loesche(seite.id);
-          kinder(heft.id, 'seite').forEach((s, i) => { s.ord = i; speichereStill(s); });
-          neuZeichnen();
+          seiteZuBlatt(z.seite); toast('Liegt jetzt wieder bei den Blättern.');
+          if (neuZeichnen) neuZeichnen();
+        } else if (wahl === 'weg' && await frage('Diese Seite herausreißen? Alles darauf geht mit.', { ja: 'Herausreißen', gefahr: true })) {
+          await loesche(z.seite.id);
+          kinder(z.heft.id, 'seite').forEach((x, i) => { x.ord = i; speichereStill(x); });
+          if (neuZeichnen) neuZeichnen();
         }
       }
     })
   );
+}
+
+function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
+  const blatt = el('div', { class: 'papierseite ' + (heft.papier || 'liniert') + (optionen.fluss ? ' fluss' : ''), 'data-seite': seite.id });
+
+  /* Werkzeuge: auf einer einzelnen Seite oben rechts auf dem Papier. In der
+     Ansicht „Am Stück" gibt es sie nur einmal ganz oben — dort ist alles eine
+     einzige lange Seite, und eine Werkzeugreihe je Stück wäre bloß Lärm. */
+  const werkzeuge = optionen.fluss ? null : seitenWerkzeuge(
+    () => ({ seite, blatt, heft }), { neuZeichnen, frisch: () => baueAnlagen() });
 
   /* Titel + Text */
   const titel = el('input', { class: 'stitel serif', type: 'text', value: seite.titel || '', placeholder: 'Überschrift, wenn du magst' });

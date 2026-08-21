@@ -853,3 +853,59 @@ Anleitung nennt die fünf Werkzeuge jetzt einzeln und sagt ausdrücklich, dass s
 auf dem Papier sitzen.
 
 Qualitätsstand: `npm test` 85/85, Hosting 2/2, Lint sauber.
+
+## 15. Handy-Runde (21. August 2026, VANI 5.5.0)
+
+Der Nutzer meldete vom Android-Zweithandy: „Tabs rutschen nach oben, komischer
+Platz von unten“, „beim Faden holen kam kein Eingabefeld“, dazu „viele
+Layoutfehler“. Alles reproduziert und an der Wurzel behoben.
+
+### Die Seite selbst durfte scrollen
+
+`html`/`body` waren `height: 100%` (großer Viewport), `#app` aber `100dvh`
+(sichtbarer Viewport). Differenz = Höhe der Adressleiste → die ganze Seite ließ
+sich schieben, die untere Leiste wanderte nach oben, darunter klaffte eine Lücke.
+Jetzt: `html`/`body` mit `overflow: hidden`, `#app` an `--vvh` (visualViewport).
+Einziger Scrollbereich ist `#raum`.
+
+### Die Tastatur verdeckte die Eingabe
+
+Ohne `interactive-widget=resizes-content` legt Chrome die Tastatur über die Seite,
+ohne das Layout zu verkleinern. Ein mittig zentrierter Dialog stand damit hinter
+der Tastatur — sichtbar blieb nur die Überschrift, das Feld nicht. Daher „kein
+Eingabefeld“ beim Faden. Meta ergänzt; `.schleier`, `.modal` und `.menue` messen
+sich zusätzlich an `--vvh`. Nachgemessen mit simulierter Tastatur (492 px):
+Passwortfeld bei 227–271, Leiste über der Tastatur.
+
+### Suche und Feinheiten waren unerreichbar
+
+`#leiste` ist ein Grid-Element ohne `min-width: 0` und wuchs auf 582 px bei
+375 px Bildschirm. Suche (511) und Feinheiten (574) lagen damit außerhalb; die
+Leiste war zwar seitlich scrollbar, das aber sieht niemand. **Das ist die
+wahrscheinlichste Ursache für die Nutzermeldung „viele Funktionen fehlen“.**
+Jetzt liegen die Räume in `.raumrolle` (scrollt, mit Verlaufmaske), Suche und
+Feinheiten stehen fest daneben und sind immer antippbar.
+
+### Weitere Handy-Funde
+
+- Statistik: 14 Tagesbalken passen nicht auf 375 px und wurden abgeschnitten
+  (`min-width: auto` verhinderte das Schrumpfen). Auf schmalen Geräten jetzt
+  sieben Tage — lieber weniger, die man liest.
+- Funkenarten lagen hinter einem unsichtbaren Seitwärtsschub; jetzt umbrechend.
+- Klangnamen waren 21 px hohe Schaltflächen; jetzt mindestens 40 px.
+- Toasts erschienen hinter der unteren Leiste.
+
+### „Am Stück“: eine Werkzeugreihe statt vieler
+
+Jedes Stück brachte seine eigene Werkzeugreihe mit — in einer durchgehenden
+Seite bloß Lärm. `seitenWerkzeuge(ziel, ...)` ist jetzt eine gemeinsame Funktion;
+im Fluss hängt sie einmal oben am Bogen und wirkt auf das Stück mit dem Fokus,
+sonst auf das letzte.
+
+### Regel für künftige Arbeit
+
+Nach jeder Layoutänderung bei 375 px **und** 820 px nachmessen: kein seitlicher
+Überlauf, jedes Bedienelement per `elementFromPoint` wirklich treffbar, nichts nur
+per `:hover` erreichbar. Vier Vertragstests halten das fest.
+
+Qualitätsstand: `npm test` 90/90, Hosting 2/2, Lint sauber.

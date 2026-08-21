@@ -236,3 +236,53 @@ test('Papiervertrag: das Raster hat denselben Takt wie die Zeilen und liegt bei 
   /* Die Regel muss so spezifisch sein wie die Linienregel, sonst gewinnt die Linie. */
   assert.match(css, /\.papierseite \.schreibflaeche\.rich-editor \{ background-image: none; \}/);
 });
+
+test('Handyvertrag: nur der Raum scrollt, die Leiste bleibt unten und die Tastatur verdeckt nichts', () => {
+  const kopf = lies('src/00-head.html');
+  assert.match(kopf, /interactive-widget=resizes-content/,
+    'ohne diese Angabe legt sich die Tastatur über die Seite, statt sie zu verkleinern');
+  const css = lies('src/10-style.css');
+  /* Die Seite selbst darf nie scrollen — sonst rutscht die Leiste nach oben
+     und unten klafft die Höhe der Adressleiste. */
+  assert.match(css, /html \{ height: 100%; overflow: hidden; \}/);
+  const body = (css.match(/^body \{[^}]*\}/m) || [''])[0];
+  assert.match(body, /overflow: hidden/);
+  /* Das Gerüst misst sich am sichtbaren Bereich, nicht am theoretischen. */
+  const app = (css.match(/#app \{[\s\S]*?\}/) || [''])[0];
+  assert.match(app, /height: var\(--vvh, 100dvh\)/);
+  assert.match(lies('src/60-boot.js'), /visualViewport/, '--vvh muss gepflegt werden');
+  /* Fenster mitten im Sichtbaren, nicht hinter der Tastatur. */
+  const schleier = (css.match(/\.schleier \{[\s\S]*?\}/) || [''])[0];
+  assert.match(schleier, /var\(--vvh, 100dvh\)/);
+  /* Ein Grid-Element wächst ohne min-width mit seinem Inhalt über den Rand. */
+  assert.match(css, /#leiste \{[^}]*min-width: 0/);
+});
+
+test('Leistenvertrag: Suche und Feinheiten stehen außerhalb der scrollenden Räume', () => {
+  const router = lies('src/40-router.js');
+  assert.match(router, /class: 'raumrolle'/, 'die Räume brauchen eine eigene Rolle');
+  const rolleAnfang = router.indexOf("const rolle = el('div', { class: 'raumrolle' })");
+  const rolleEnde = router.indexOf('l.append(rolle)');
+  const sucheStelle = router.indexOf('oeffneSuche()');
+  const feinStelle = router.indexOf("'data-raum': 'feinheiten'");
+  assert.ok(rolleAnfang > 0 && rolleEnde > rolleAnfang, 'Rolle wird angelegt und eingehängt');
+  assert.ok(sucheStelle > rolleEnde, 'die Suche gehört nicht in die scrollende Rolle');
+  assert.ok(feinStelle > rolleEnde, 'die Feinheiten gehören nicht in die scrollende Rolle');
+  assert.match(lies('src/10-style.css'), /\.raumrolle \{[^}]*flex-direction: column/, 'am Rechner bleibt es eine Spalte');
+});
+
+test('Zahlenvertrag: auf schmalen Geräten weniger Tage statt abgeschnittener Balken', () => {
+  const fein = lies('src/49-feinheiten.js');
+  assert.match(fein, /innerWidth < 620\) \? 7 : 14/);
+  assert.match(fein, /for \(let i = tage - 1; i >= 0; i--\)/);
+});
+
+test('Am-Stück-Vertrag: die Werkzeuge stehen einmal oben, nicht bei jedem Stück', () => {
+  const hefte = lies('src/43-hefte.js');
+  assert.match(hefte, /function seitenWerkzeuge\(ziel/, 'eine gemeinsame Werkzeugreihe');
+  assert.match(hefte, /optionen\.fluss \? null : seitenWerkzeuge/, 'im Fluss keine Reihe je Stück');
+  assert.match(hefte, /klasse: 'fluss-werkzeuge'/, 'dafür eine einzige oben am Bogen');
+  assert.match(hefte, /aktuellesStueck/, 'sie muss wissen, welches Stück gemeint ist');
+  assert.doesNotMatch(lies('src/10-style.css'), /\.papierseite\.fluss:hover \.seitenwerkzeuge/,
+    'nichts Notwendiges darf nur bei Mauszeiger erscheinen');
+});

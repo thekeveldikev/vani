@@ -213,7 +213,10 @@ RENDER.feinheiten = function (haupt) {
   const gesamt = Object.values(D.stats.tage).reduce((a, b) => a + b, 0);
   const balken = el('div', { class: 'statistikbalken' });
   const werte = [];
-  for (let i = 13; i >= 0; i--) {
+  /* Vierzehn Tage passen auf ein Handy nicht lesbar nebeneinander. Dort sieben —
+     lieber weniger Tage, die man erkennt, als vierzehn abgeschnittene. */
+  const tage = (typeof innerWidth === 'number' && innerWidth < 620) ? 7 : 14;
+  for (let i = tage - 1; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i);
     werte.push({ k: tagKey(d), w: D.stats.tage[tagKey(d)] || 0, d });
   }
