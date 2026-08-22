@@ -128,3 +128,14 @@ Geräten** und reisen verschlüsselt über den privaten Bereich — nie über da
 
 Große Bücher (über 20 MB) brauchen über den Bereich etwas; 300 MB ist die Grenze
 je Datei.
+
+### Der Bücherkoffer (für das iPad ohne Dateiauswahl)
+
+Wenn kein Weg zu den Dateien führt: Die Bücher können **verschlüsselt neben der
+App** liegen — als Bücherkoffer (`buecher/koffer.json` und `buch-NN.enc`). Ohne
+Passwort ist das Rauschen. Auf dem iPad: Schreibtisch → Bücherstapel → „Aus dem
+Bücherkoffer (Passwort)" → Passwort eingeben → die Bücher liegen auf dem Tisch
+und reisen von dort über den privaten Bereich auf Handy und Laptop. Danach darf
+der Koffer aus dem Repo verschwinden. Packen: `node werkzeug/buecherkoffer.mjs
+<Ordner-mit-PDFs>` — das Werkzeug zeigt das Passwort einmal an; es steht
+nirgends sonst.

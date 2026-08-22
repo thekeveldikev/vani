@@ -300,6 +300,14 @@ RENDER.zuhause = function (haupt) {
     zeichneFunde(); gitter.append(karte);
   }
 
+  /* Weiterlesen, wo ich war */
+  const buch = typeof lesestapelBuecher === 'function' ? lesestapelBuecher().find((b) => b.zuletzt && Date.now() - b.zuletzt < 14 * 86400000 && b.seiten && b.seite < b.seiten) : null;
+  if (buch) {
+    const img = el('img', { alt: '' }); if (buch.bild) setzeBild(img, buch.bild);
+    inhalt.append(el('button', { class: 'karte weiterlesen-karte', onclick: () => buchOeffnen(buch) }, img,
+      el('span', {}, el('b', {}, 'Weiterlesen: ' + (buch.titel || 'Buch')), el('small', {}, 'Seite ' + buch.seite + ' von ' + buch.seiten + ' · ' + buchFortschritt(buch.seite, buch.seiten) + ' %'))));
+  }
+
   /* Die Tür zum Schreibtisch */
   inhalt.append(el('button', { class: 'karte desk-tuer', onclick: () => { location.hash = '#/schreibtisch'; } },
     el('span', { html: ik('schreibtisch'), style: 'display:flex' }),

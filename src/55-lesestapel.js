@@ -60,7 +60,7 @@ async function buchAuflegenAusBlob(blob, name, { datei = null } = {}) {
   const seiten = dok.numPages;
   let titel = String(name || 'Buch').replace(/\.pdf$/i, '');
   /* Dateinamen von Tauschbörsen tragen Klammerzusätze — die braucht kein Titel. */
-  titel = titel.replace(/\s*\((?:[^()]*(?:z-lib|1lib|library|epdf)[^()]*)\)\s*/gi, ' ').replace(/^\[[^\]]*\]\s*•?\s*/, '').replace(/\s+/g, ' ').trim();
+  titel = titel.replace(/\s*\((?:[^()]*(?:z-lib|1lib|library|epdf)[^()]*)\)\s*/gi, ' ').replace(/\s*\[[^\]]*\]\s*•?\s*/g, ' ').replace(/\s+/g, ' ').trim();
   let autor = '';
   try {
     const meta = await dok.getMetadata();
@@ -141,6 +141,77 @@ async function buecherAusOrdner() {
   if (n) { toast(n === 1 ? 'Liegt auf dem Tisch.' : n + ' Bücher liegen auf dem Tisch.'); zeichne(); }
 }
 
+/* ----- Der Bücherkoffer: verschlüsselte PDFs neben der App, mit Passwort ----- */
+async function buecherkofferListe() {
+  try { const a = await fetch('buecher/koffer.json', { cache: 'no-store' }); if (!a.ok) return null; const k = await a.json(); return Array.isArray(k.buecher) ? k : null; } catch (e) { return null; }
+}
+async function kofferEntschluesseln(bytes, passwort, runden = 200000) {
+  const u = new Uint8Array(bytes);
+  const magie = new TextDecoder().decode(u.slice(0, 9));
+  if (magie !== 'VANIBUCH1') throw new Error('Das ist keine Kofferdatei.');
+  const salz = u.slice(9, 25), iv = u.slice(25, 37), chiffrat = u.slice(37);
+  const grund = await crypto.subtle.importKey('raw', new TextEncoder().encode(passwort), 'PBKDF2', false, ['deriveKey']);
+  const schluessel = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: salz, iterations: runden, hash: 'SHA-256' }, grund, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+  return new Blob([await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, schluessel, chiffrat)], { type: 'application/pdf' });
+}
+function passwortFragen(titel, hinweis) {
+  return new Promise((res) => {
+    let fertig = false;
+    const feld = el('input', { type: 'password', class: 'koffer-passwort', placeholder: 'Passwort', autocomplete: 'off' });
+    const kasten = el('div', { class: 'modal' }, el('h2', {}, titel), hinweis ? el('div', { class: 'stickerblock-hinweis' }, hinweis) : null, feld,
+      el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'), el('button', { class: 'knopf voll', onclick: () => { fertig = true; const v = feld.value; zu(); res(v || null); } }, 'Öffnen')));
+    feld.addEventListener('keydown', (e) => { if (e.key === 'Enter') { fertig = true; const v = feld.value; zu(); res(v || null); } });
+    const zu = zeigeDeck(kasten, () => { if (!fertig) res(null); });
+    setTimeout(() => feld.focus(), 60);
+  });
+}
+async function buecherkofferHolen() {
+  const koffer = await buecherkofferListe();
+  if (!koffer || !koffer.buecher.length) { toast('Gerade liegt kein Bücherkoffer neben der App.', 3600); return; }
+  const da = new Set(lesestapelBuecher().map((b) => (b.titel || '').toLowerCase()));
+  const passwort = await passwortFragen('Der Bücherkoffer', koffer.buecher.length + ' Bücher, verschlüsselt. Das Passwort bleibt hier auf dem Gerät; die Bücher landen in deinem eigenen Vorrat.');
+  if (!passwort) return;
+  let n = 0, fehl = 0;
+  for (const b of koffer.buecher) {
+    if (da.has(String(b.name || '').toLowerCase())) continue;
+    toast('Hole „' + (b.name || b.datei) + '" …', 2400);
+    try {
+      const a = await fetch('buecher/' + b.datei, { cache: 'no-store' });
+      if (!a.ok) throw new Error('HTTP ' + a.status);
+      const blob = await kofferEntschluesseln(await a.arrayBuffer(), passwort, koffer.runden || 200000);
+      await buchAuflegenAusBlob(blob, (b.name || 'Buch') + '.pdf'); n++;
+    } catch (e) {
+      fehl++;
+      if (/OperationError|decrypt/i.test(String(e && (e.name + ' ' + e.message)))) { toast('Das Passwort passt nicht.', 4200); return; }
+      toast((b.name || b.datei) + ': ' + (e && e.message ? e.message : 'ging nicht'), 3600);
+    }
+  }
+  if (n) { toast(n === 1 ? 'Ein Buch liegt auf dem Tisch.' : n + ' Bücher liegen auf dem Tisch.', 4200); zeichne(); }
+  else if (!fehl) toast('Alles aus dem Koffer liegt schon auf dem Tisch.');
+}
+
+/* Randnotizen je Seite: kleine Dokumente am Buch. */
+function buchNotizen(b, seite) {
+  return vomTyp('buchnotiz').filter((n) => n.parent === b.id && (seite == null || n.seite === seite)).sort((x, y) => (x.seite || 0) - (y.seite || 0) || (x.angelegt || 0) - (y.angelegt || 0));
+}
+/* Lesestatistik: Seiten je Tag. */
+function buchSeiteGelesen(b) {
+  const k = tagKey();
+  const st = b.statistik && typeof b.statistik === 'object' ? b.statistik : {};
+  st[k] = (Number(st[k]) || 0) + 1;
+  /* nur die letzten 60 Tage behalten */
+  const keys = Object.keys(st).sort();
+  while (keys.length > 60) delete st[keys.shift()];
+  b.statistik = st;
+}
+function buchStatistikWorte(b) {
+  const st = b.statistik || {};
+  const heute = Number(st[tagKey()]) || 0, gestern = Number(st[tagKey(Date.now() - 86400000)]) || 0;
+  const woche = Object.entries(st).filter(([k]) => Date.now() - new Date(k).getTime() < 7 * 86400000).reduce((n, [, v]) => n + (Number(v) || 0), 0);
+  if (!heute && !gestern && !woche) return '';
+  return (heute ? heute + ' Seiten heute' : gestern ? gestern + ' Seiten gestern' : '') + (woche ? (heute || gestern ? ' · ' : '') + woche + ' diese Woche' : '');
+}
+
 /* Der Lesestapel als Fenster: Cover, Fortschritt, Auflegen. */
 function lesestapelZeigen() {
   const buecher = lesestapelBuecher();
@@ -153,7 +224,7 @@ function lesestapelZeigen() {
       el('div', { class: 'lesestapel-titel' }, b.titel || 'Buch'),
       b.autor ? el('div', { class: 'lesestapel-autor' }, b.autor) : null,
       el('div', { class: 'lesestapel-balken' }, el('i', { style: 'width:' + buchFortschritt(b.seite, b.seiten) + '%' })),
-      el('div', { class: 'lesestapel-stand' }, b.seiten ? 'Seite ' + (b.seite || 1) + ' von ' + b.seiten : ''));
+      el('div', { class: 'lesestapel-stand' }, (b.seiten ? 'Seite ' + (b.seite || 1) + ' von ' + b.seiten : '') + (buchStatistikWorte(b) ? ' · ' + buchStatistikWorte(b) : '')));
     langdruck(k, async () => {
       const wahl = await menue([
         { text: 'Umbenennen', icon: 'stift', wert: 'name' },
@@ -178,6 +249,7 @@ function lesestapelZeigen() {
       el('button', { class: 'knopf voll', onclick: () => { zu(); buecherAuflegenPerDatei(); } }, el('span', { html: ik('plus'), style: 'display:flex' }), 'PDF auflegen'),
       vomTyp('goodnote').some((d) => d.art === 'pdf') ? el('button', { class: 'knopf', onclick: () => { zu(); buchAusGoodnotesArchiv(); } }, 'Aus dem Goodnotes-Archiv') : null,
       desk ? el('button', { class: 'knopf', onclick: () => { zu(); buecherAusOrdner(); } }, 'Aus dem Bücherordner') : null,
+      el('button', { class: 'knopf', title: 'Verschlüsselte Bücher neben der App, mit Passwort', onclick: () => { zu(); buecherkofferHolen(); } }, 'Aus dem Bücherkoffer (Passwort)'),
       el('span', { class: 'rest' }),
       el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen')));
   const zu = zeigeDeck(kasten);
@@ -214,6 +286,9 @@ async function buchOeffnen(b) {
     el('button', { class: 'rundknopf zart', html: ik('gliederung'), title: 'Inhalt', onclick: () => leserGliederung() }),
     el('button', { class: 'rundknopf zart lese-zeichen', html: ik('lesezeichen'), title: 'Lesezeichen', onclick: () => leserLesezeichen() }),
     el('button', { class: 'rundknopf zart', html: ik('teilen'), title: 'Zitat kopieren / als Schnipsel', onclick: () => leserZitat() }),
+    el('button', { class: 'rundknopf zart lese-notiz-knopf', html: ik('pin'), title: 'Randnotiz zu dieser Seite', onclick: () => leserNotizen() }),
+    el('button', { class: 'rundknopf zart', html: ik('suche'), title: 'Im Buch suchen', onclick: () => leserSuche() }),
+    el('button', { class: 'rundknopf zart', html: ik('vorlesen'), title: 'Diese Seite vorlesen lassen', onclick: (ev) => leserVorlesen(ev.currentTarget) }),
     el('button', { class: 'rundknopf zart', html: ik('feinheiten'), title: 'Leseeinstellungen', onclick: () => leserEinstellungen() }));
   const fuss = el('div', { class: 'lese-fuss' }, el('button', { class: 'rundknopf zart', html: ik('zurueck'), title: 'Zurückblättern', onclick: () => blaettere(-1) }), balken, stand, el('button', { class: 'rundknopf zart', html: ik('rechts'), title: 'Weiterblättern', onclick: () => blaettere(1) }));
   raum.append(kopf, buehne, fuss);
@@ -273,6 +348,10 @@ async function buchOeffnen(b) {
     stand.textContent = seiten.join('–') + ' / ' + b.seiten + ' · ' + buchFortschritt(seiten[seiten.length - 1], b.seiten) + ' %';
     balken.value = String(leser.seite);
     kopf.querySelector('.lese-zeichen').classList.toggle('an', (b.lesezeichen || []).includes(leser.seite));
+    const lzf = (b.lesezeichenFarben || {})[leser.seite];
+    kopf.querySelector('.lese-zeichen').style.background = (b.lesezeichen || []).includes(leser.seite) && lzf ? lzf : '';
+    kopf.querySelector('.lese-notiz-knopf').classList.toggle('hat-notiz', buchNotizen(b, leser.seite).length > 0);
+    if (richtung && leser.seite !== leser.letzteGezaehlt) { leser.letzteGezaehlt = leser.seite; buchSeiteGelesen(b); }
     b.seite = leser.seite; b.zuletzt = Date.now(); speichereStill(b);
     /* Nächste Seiten vorab malen */
     for (const n of [leser.seite + 1, leser.seite + 2, leser.seite - 1]) if (n >= 1 && n <= b.seiten) maleSeite(n, breite, hoehe).catch(() => {});
@@ -358,10 +437,19 @@ async function leserLesezeichen() {
   const hier = lz.includes(l.seite);
   const wahl = await menue([
     { text: hier ? 'Lesezeichen von Seite ' + l.seite + ' entfernen' : 'Lesezeichen auf Seite ' + l.seite, icon: 'lesezeichen', wert: 'hier' },
-    ...lz.filter((n) => n !== l.seite).sort((a, c) => a - c).map((n) => ({ text: 'Zu Seite ' + n, icon: 'rechts', wert: 'zu:' + n }))
+    ...lz.filter((n) => n !== l.seite).sort((a, c) => a - c).map((n) => ({ text: 'Zu Seite ' + n + ((b.lesezeichenFarben || {})[n] ? ' ●' : ''), icon: 'rechts', wert: 'zu:' + n }))
   ], 'Lesezeichen');
   if (!wahl) return;
-  if (wahl === 'hier') { b.lesezeichen = hier ? lz.filter((n) => n !== l.seite) : [...lz, l.seite].slice(-200); speichere(b); l.zeige(0); }
+  if (wahl === 'hier') {
+    if (hier) { b.lesezeichen = lz.filter((n) => n !== l.seite); if (b.lesezeichenFarben) delete b.lesezeichenFarben[l.seite]; }
+    else {
+      const farbe = await menue([['#c0533f', 'Rot'], ['#d9a441', 'Gelb'], ['#5f7752', 'Grün'], ['#41597a', 'Blau'], ['#765187', 'Lila']].map(([f, n]) => ({ text: n, icon: 'lesezeichen', wert: f })), 'Welche Farbe?');
+      if (!farbe) return;
+      b.lesezeichen = [...lz, l.seite].slice(-200);
+      b.lesezeichenFarben = Object.assign({}, b.lesezeichenFarben || {}, { [l.seite]: farbe });
+    }
+    speichere(b); l.zeige(0);
+  }
   else if (wahl.startsWith('zu:')) { l.seite = Number(wahl.slice(3)); l.zeige(0); }
 }
 async function leserZitat() {
@@ -397,4 +485,74 @@ function leserEinstellungen() {
     el('div', { class: 'stickerblock-hinweis', style: 'margin-top:8px' }, 'Diese Einstellungen bleiben an diesem Gerät — Helligkeit ist Gerätesache. Seite, Lesezeichen und Stapel reisen mit.'),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
   const zu = zeigeDeck(kasten);
+}
+
+/* Randnotizen: zu jeder Seite beliebig viele kleine Zettel. */
+async function leserNotizen() {
+  if (!_leser) return;
+  const l = _leser, b = l.b;
+  const liste = el('div', { class: 'lese-notizen' });
+  const bauen = () => {
+    liste.innerHTML = '';
+    const hier = buchNotizen(b, l.seite);
+    for (const n of hier) {
+      const k = el('div', { class: 'lese-notiz' }, n.text, el('small', {}, ' · ' + fmtDatum(n.angelegt)));
+      langdruck(k, async () => { if (await frage('Diese Randnotiz wegnehmen?', { ja: 'Wegnehmen', gefahr: true })) { await loesche(n.id, true); bauen(); l.zeige(0); } });
+      liste.append(k);
+    }
+    if (!hier.length) liste.append(el('div', { class: 'leer klein' }, 'Noch keine Notiz zu Seite ' + l.seite + '.'));
+  };
+  bauen();
+  const alle = buchNotizen(b);
+  const feld = el('textarea', { rows: 3, placeholder: 'Was mir zu dieser Seite einfällt …' });
+  const kasten = el('div', { class: 'modal' },
+    el('h2', {}, 'Randnotizen · Seite ' + l.seite),
+    liste, feld,
+    el('div', { class: 'reihe', style: 'justify-content:space-between;flex-wrap:wrap;gap:8px' },
+      alle.length > 1 ? el('button', { class: 'knopf zart klein', onclick: async () => {
+        const w = await menue(alle.map((n) => ({ text: 'S. ' + n.seite + ': ' + (n.text || '').slice(0, 60), icon: 'pin', wert: String(n.seite) })), 'Alle Randnotizen in diesem Buch');
+        if (w) { zu(); l.seite = Number(w); l.zeige(0); }
+      } }, 'Alle ' + alle.length + ' Notizen') : el('span'),
+      el('span', { style: 'display:flex;gap:8px' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen'),
+        el('button', { class: 'knopf voll', onclick: () => { const t = feld.value.trim(); if (!t) return; neuDoc('buchnotiz', { parent: b.id, seite: l.seite, text: t }); feld.value = ''; bauen(); l.zeige(0); } }, 'Notiz dazu'))));
+  const zu = zeigeDeck(kasten);
+  setTimeout(() => feld.focus(), 60);
+}
+
+/* Im Buch suchen: Textebene aller Seiten, einmal gelesen, dann im Gedächtnis. */
+async function leserSuche() {
+  if (!_leser || !_leser.dok) return;
+  const l = _leser, b = l.b;
+  const frage_ = await eingabe({ titel: 'Im Buch suchen', platzhalter: 'ein Wort, ein Name, eine Wendung', ok: 'Suchen' });
+  if (!frage_) return;
+  const q = frage_.trim().toLowerCase();
+  if (!l.texte) l.texte = new Map();
+  const treffer = [];
+  toast('Lese das Buch durch …', 2500);
+  for (let n = 1; n <= b.seiten && treffer.length < 200; n++) {
+    let t = l.texte.get(n);
+    if (t == null) {
+      try { const tc = await (await l.dok.getPage(n)).getTextContent(); t = tc.items.map((i) => i.str).join(' ').replace(/\s+/g, ' '); } catch (e) { t = ''; }
+      l.texte.set(n, t);
+    }
+    const i = t.toLowerCase().indexOf(q);
+    if (i >= 0) treffer.push({ seite: n, vor: t.slice(Math.max(0, i - 60), i), mitte: t.slice(i, i + q.length), nach: t.slice(i + q.length, i + q.length + 70) });
+  }
+  if (!treffer.length) { toast('„' + frage_ + '" steht nicht in diesem Buch (oder es hat keine Textebene).', 4200); return; }
+  const liste = el('div', { class: 'buchsuche-treffer' }, treffer.map((t) => el('button', { onclick: () => { zu(); l.seite = t.seite; l.zeige(0); } },
+    el('small', {}, 'Seite ' + t.seite), '…' + t.vor, el('b', {}, t.mitte), t.nach + '…')));
+  const kasten = el('div', { class: 'modal gliederung-kasten' }, el('h2', {}, treffer.length + (treffer.length === 1 ? ' Treffer' : ' Treffer') + ' für „' + frage_ + '"'), liste,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Schließen')));
+  const zu = zeigeDeck(kasten);
+}
+
+/* Vorlesen: die Textebene der Seite mit der Stimme des Geräts. */
+async function leserVorlesen(knopf) {
+  if (!_leser || !_leser.dok) return;
+  if (typeof vorlesen !== 'function') { toast('Vorlesen gibt es auf diesem Gerät nicht.'); return; }
+  const l = _leser;
+  let text = '';
+  try { const tc = await (await l.dok.getPage(l.seite)).getTextContent(); text = tc.items.map((i) => i.str + (i.hasEOL ? ' ' : '')).join('').replace(/\s+/g, ' ').trim(); } catch (e) {}
+  if (!text) { toast('Diese Seite trägt keinen Text, den man vorlesen könnte.'); return; }
+  vorlesen(text, knopf);
 }

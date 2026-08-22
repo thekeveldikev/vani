@@ -530,152 +530,162 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .desk-tuer svg.ik { width: 30px; height: 30px; color: #e8b05a; }
 .desk-tuer b { display: block; font-family: ui-serif, "New York", Georgia, serif; font-size: 18px; }
 .desk-tuer small { color: #c9b48e; font-size: 13px; }
-.desk-szene { position: relative; min-height: calc(var(--vvh, 100dvh) - 2px); overflow: hidden; background: #0d0b0a; color: #e8d9b8; user-select: none; --lampe: .8; --unordnung: .7;
-  display: flex; flex-direction: column; }
-/* Fenster */
-.desk-fenster { position: relative; height: 44%; min-height: 250px; overflow: hidden; background: linear-gradient(#06070c, #0f1220 60%, #171a22); }
-.desk-nacht { position: absolute; inset: 0; }
-.desk-sterne { position: absolute; inset: 0; width: 100%; height: 100%; }
-.desk-garten { position: absolute; left: 0; right: 0; bottom: 0; height: 62%; }
-.desk-garten i { position: absolute; bottom: 0; display: block; background: #0a0d0a; }
-.desk-garten .baum { width: 34%; height: 100%; border-radius: 48% 52% 10% 10% / 70% 70% 10% 10%; background: radial-gradient(ellipse at 50% 30%, #111a12, #070a07 70%); filter: blur(.4px); transform-origin: bottom center; animation: baum-wiegt 9s ease-in-out infinite alternate; }
-.desk-garten .b1 { left: -8%; } .desk-garten .b2 { right: -6%; height: 86%; animation-delay: -4s; animation-duration: 11s; }
-.desk-garten .busch { height: 38%; width: 30%; border-radius: 50% 50% 0 0; background: radial-gradient(ellipse at 50% 40%, #141f14, #0a0f0a 75%); animation: baum-wiegt 7s ease-in-out infinite alternate; transform-origin: bottom center; }
-.desk-garten .s1 { left: 18%; } .desk-garten .s2 { left: 44%; height: 30%; animation-delay: -2s; } .desk-garten .s3 { right: 16%; height: 44%; animation-delay: -5s; }
-.desk-garten .gras { left: 0; right: 0; height: 12%; background: repeating-linear-gradient(90deg, #0b100b 0 3px, transparent 3px 7px), linear-gradient(#0d120d, #0a0d0a); }
-@keyframes baum-wiegt { from { transform: rotate(-.8deg) scaleX(1); } to { transform: rotate(.9deg) scaleX(1.02); } }
-.desk-regen { position: absolute; inset: 0; pointer-events: none; opacity: 0; background-image: repeating-linear-gradient(100deg, transparent 0 14px, rgba(200,215,240,.18) 14px 15px, transparent 15px 31px); background-size: 140px 180px; animation: regen-faellt .55s linear infinite; transition: opacity 1.2s; }
-.wetter-regen .desk-regen, .wetter-gewitter .desk-regen { opacity: .8; }
-.wetter-gewitter .desk-nacht::after { content: ""; position: absolute; inset: 0; background: #dfe6ff; opacity: 0; animation: wetterleuchten 9s ease-in-out infinite; }
-@keyframes regen-faellt { to { background-position: -30px 180px; } }
-@keyframes wetterleuchten { 0%, 91%, 100% { opacity: 0; } 92% { opacity: .5; } 93.5% { opacity: 0; } 95% { opacity: .25; } 96% { opacity: 0; } }
-.wetter-wind .desk-garten .baum, .wetter-wind .desk-garten .busch { animation-duration: 3.2s; }
-.wetter-grillen .desk-garten .busch { animation-duration: 5s; }
-.desk-nebel { position: absolute; left: 0; right: 0; bottom: 0; height: 45%; background: linear-gradient(transparent, rgba(140,150,160,.08)); pointer-events: none; }
-.desk-rahmen { position: absolute; inset: 0; box-shadow: inset 0 0 0 14px #1c140f, inset 0 0 0 17px #3a2a1f, inset 0 0 60px rgba(0,0,0,.55); pointer-events: none; }
-.desk-rahmen .sprosse { position: absolute; background: #1c140f; box-shadow: 0 0 0 1px #3a2a1f; }
-.desk-rahmen .sprosse.v { left: calc(50% - 6px); top: 0; bottom: 0; width: 12px; }
-.desk-rahmen .sprosse.h { top: calc(42% - 5px); left: 0; right: 0; height: 10px; }
-.desk-ranken { position: absolute; left: -4%; right: -4%; top: -10px; height: 90px; pointer-events: none;
-  background: radial-gradient(ellipse 30px 14px at 10% 30%, #10170f 60%, transparent 62%), radial-gradient(ellipse 22px 12px at 22% 60%, #0d140c 60%, transparent 62%), radial-gradient(ellipse 34px 16px at 86% 20%, #10170f 60%, transparent 62%), radial-gradient(ellipse 20px 10px at 94% 55%, #0d140c 60%, transparent 62%), radial-gradient(ellipse 18px 9px at 72% 28%, #0f160e 60%, transparent 62%); }
-.desk-fensterknopf { position: absolute; right: 26px; bottom: 22px; width: 38px; height: 38px; border-radius: 50%; background: rgba(20,16,12,.7); color: #e8c27a; display: grid; place-items: center; box-shadow: 0 0 0 1px rgba(232,194,122,.35); z-index: 3; }
+.desk-szene { position: relative; height: calc(var(--vvh, 100dvh) - 2px); min-height: 620px; overflow: hidden; background: #0d0b0a; color: #e8d9b8; user-select: none; --lampe: .8; --unordnung: .7; }
+.desk-malerei { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.desk-dinge { position: absolute; inset: 0; }
+.desk-fensterknopf { position: absolute; right: 30px; top: calc(44% - 58px); width: 38px; height: 38px; border-radius: 50%; background: rgba(20,16,12,.6); color: #e8c27a; display: grid; place-items: center; box-shadow: 0 0 0 1px rgba(232,194,122,.3); z-index: 3; }
 .desk-fensterknopf svg.ik { width: 20px; height: 20px; }
-/* Platte */
-.desk-platte { position: relative; flex: 1; min-height: 420px; overflow: visible; }
-.desk-holz { position: absolute; inset: 0; background: repeating-linear-gradient(92deg, rgba(0,0,0,.12) 0 2px, transparent 2px 9px, rgba(255,255,255,.02) 9px 10px, transparent 10px 40px), repeating-linear-gradient(88deg, transparent 0 80px, rgba(0,0,0,.08) 80px 83px, transparent 83px 190px), linear-gradient(175deg, #4a3222, #2f2016 45%, #1f1510); box-shadow: inset 0 30px 60px rgba(0,0,0,.55); }
-.holz-ebenholz .desk-holz { background: repeating-linear-gradient(92deg, rgba(255,255,255,.025) 0 2px, transparent 2px 12px), linear-gradient(175deg, #26201d, #151110 45%, #0c0a09); }
-.holz-kirsche .desk-holz { background: repeating-linear-gradient(92deg, rgba(0,0,0,.1) 0 2px, transparent 2px 9px), linear-gradient(175deg, #6e3a2a, #4b261b 45%, #2f1810); }
-.holz-eiche .desk-holz { background: repeating-linear-gradient(92deg, rgba(0,0,0,.1) 0 2px, transparent 2px 8px, rgba(255,255,255,.03) 8px 9px, transparent 9px 30px), linear-gradient(175deg, #7a5a3a, #5a3f28 45%, #3c2a1a); }
-.desk-flecken { position: absolute; inset: 0; pointer-events: none; opacity: calc(.4 + var(--unordnung) * .6);
-  background: radial-gradient(ellipse 60px 26px at 22% 62%, rgba(12,10,22,.55), transparent 70%), radial-gradient(ellipse 14px 10px at 25% 66%, rgba(12,10,22,.7), transparent 70%), radial-gradient(ellipse 8px 6px at 20% 58%, rgba(12,10,22,.8), transparent 70%),
-    radial-gradient(ellipse 40px 16px at 70% 40%, rgba(12,10,22,.35), transparent 70%), radial-gradient(ellipse 110px 40px at 60% 80%, rgba(255,255,255,.05), transparent 70%),
-    radial-gradient(ellipse 24px 20px at 84% 72%, rgba(240,225,180,.18), transparent 70%), radial-gradient(ellipse 10px 18px at 86% 68%, rgba(240,225,180,.22), transparent 70%),
-    repeating-linear-gradient(40deg, transparent 0 57px, rgba(255,255,255,.04) 57px 58px, transparent 58px 141px), repeating-linear-gradient(-25deg, transparent 0 93px, rgba(0,0,0,.12) 93px 94px); }
-.desk-lichtkegel { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 46% 42% at 22% 32%, rgba(255,190,90,calc(.42 * var(--lampe))), rgba(255,170,70,calc(.16 * var(--lampe))) 40%, transparent 72%), linear-gradient(rgba(0,0,0,calc(.55 - .45 * var(--lampe))), rgba(0,0,0,calc(.7 - .5 * var(--lampe)))); }
-.kerzen-an .desk-lichtkegel { background: radial-gradient(ellipse 46% 42% at 22% 32%, rgba(255,190,90,calc(.42 * var(--lampe))), rgba(255,170,70,calc(.16 * var(--lampe))) 40%, transparent 72%), radial-gradient(ellipse 30% 30% at 80% 12%, rgba(255,160,70,.22), transparent 70%), linear-gradient(rgba(0,0,0,calc(.55 - .45 * var(--lampe))), rgba(0,0,0,calc(.7 - .5 * var(--lampe)))); }
-/* Die Dinge */
-.desk-ding, .desk-ding-halter { position: absolute; z-index: 2; transform: rotate(var(--dreh, 0deg)); transition: transform .25s cubic-bezier(.2,.8,.2,1), filter .25s; filter: drop-shadow(0 6px 8px rgba(0,0,0,.55)); }
-.desk-ding:hover { transform: rotate(var(--dreh, 0deg)) translateY(-3px); filter: drop-shadow(0 10px 12px rgba(0,0,0,.6)) brightness(1.06); }
+/* Alle Dinge: Schatten auf die Platte, leichtes Heben beim Darüberfahren */
+.desk-ding, .desk-ding-halter { position: absolute; z-index: 2; transform: rotate(var(--dreh, 0deg)); transition: transform .25s cubic-bezier(.2,.8,.2,1), filter .25s; filter: drop-shadow(0 7px 9px rgba(0,0,0,.6)); text-align: left; }
+.desk-ding:hover { transform: rotate(var(--dreh, 0deg)) translateY(-3px); filter: drop-shadow(0 12px 14px rgba(0,0,0,.65)) brightness(1.06); }
 .desk-ding:active { transform: rotate(var(--dreh, 0deg)) scale(.98); }
-/* Lampe: oben links, mit Schirm */
-.desk-ding.lampe { left: 6%; top: -46px; width: 120px; height: 150px; filter: none; }
-.desk-ding.lampe .schirm { position: absolute; left: 10px; top: 0; width: 100px; height: 46px; border-radius: 8px 8px 50% 50% / 8px 8px 30% 30%; background: linear-gradient(#2a2320, #171311); box-shadow: inset 0 -6px 10px rgba(255,190,90,calc(.8 * var(--lampe))), 0 2px 6px rgba(0,0,0,.5); }
-.desk-ding.lampe .schirm::after { content: ""; position: absolute; left: 14px; right: 14px; top: 42px; height: 110px; clip-path: polygon(0 0, 100% 0, 160% 100%, -60% 100%); background: linear-gradient(rgba(255,200,110,calc(.32 * var(--lampe))), transparent); pointer-events: none; }
-.desk-ding.lampe::before { content: ""; position: absolute; left: 56px; top: 44px; width: 5px; height: 100px; background: linear-gradient(#3a302a, #1a1512); }
-/* Leuchter: rechts hinten */
-.desk-ding.leuchter { right: 4%; top: -62px; width: 150px; height: 150px; filter: none; }
-.leuchter-bild { position: relative; width: 150px; height: 150px; }
+.lampe-aus .desk-ding:not(.lampe):not(.leuchter) { filter: drop-shadow(0 7px 9px rgba(0,0,0,.6)) brightness(.62) saturate(.8); }
+/* ---- Die Lampe mit Zugschnur ---- */
+.desk-ding.lampe { left: 4%; top: calc(44% - 140px); width: 150px; height: 260px; filter: none; cursor: default; z-index: 3; }
+.desk-ding.lampe:hover, .desk-ding.lampe:active { transform: none; filter: none; }
+.desk-ding.lampe .arm { position: absolute; left: 18px; top: 128px; width: 7px; height: 120px; border-radius: 4px; background: linear-gradient(90deg, #2a231f, #5a4c42 45%, #1a1512); box-shadow: 1px 0 2px rgba(0,0,0,.5); }
+.desk-ding.lampe .arm::before { content: ""; position: absolute; left: -3px; top: -10px; width: 60px; height: 8px; border-radius: 4px; background: linear-gradient(#3a302a, #1a1512); transform: rotate(-18deg); transform-origin: left center; }
+.desk-ding.lampe .schirm { position: absolute; left: 20px; top: 88px; width: 118px; height: 54px; border-radius: 10px 10px 56% 56% / 10px 10px 36% 36%; cursor: pointer;
+  background: linear-gradient(175deg, #3a2f28, #1c1613 60%, #110d0b); box-shadow: inset 0 -8px 14px rgba(255,196,110,calc(.9 * var(--lampe))), inset 0 2px 0 rgba(255,255,255,.08), 0 3px 8px rgba(0,0,0,.55); }
+.desk-ding.lampe .schirm::before { content: ""; position: absolute; left: 6px; right: 6px; bottom: -2px; height: 10px; border-radius: 50%; background: radial-gradient(ellipse at 50% 50%, rgba(255,215,140,calc(.95 * var(--lampe))), rgba(255,190,100,calc(.4 * var(--lampe))) 60%, transparent 72%); }
+.desk-ding.lampe .schirm::after { content: ""; position: absolute; left: 4px; right: 4px; top: 50px; height: 230px; clip-path: polygon(0 0, 100% 0, 190% 100%, -90% 100%); background: linear-gradient(rgba(255,205,120,calc(.34 * var(--lampe))), rgba(255,190,100,calc(.08 * var(--lampe))) 55%, transparent); pointer-events: none; }
+.desk-ding.lampe.aus .schirm { box-shadow: inset 0 -6px 10px rgba(0,0,0,.5), inset 0 2px 0 rgba(255,255,255,.06), 0 3px 8px rgba(0,0,0,.55); }
+.desk-ding.lampe.aus .schirm::before { background: radial-gradient(ellipse at 50% 50%, #6a5a48, #3a3028 60%, transparent 72%); }
+.desk-ding.lampe.aus .schirm::after { display: none; }
+.desk-ding.lampe .schnur { position: absolute; left: 120px; top: 136px; width: 18px; height: 54px; display: flex; flex-direction: column; align-items: center; }
+.desk-ding.lampe .schnur .faden { flex: 1; width: 2px; background: linear-gradient(#d8cbb2, #a89a82); box-shadow: 0 0 1px rgba(0,0,0,.6); transform: scaleX(var(--dehnung, 1)); }
+.desk-ding.lampe .schnur .knauf { width: 14px; height: 20px; border-radius: 6px 6px 7px 7px / 5px 5px 9px 9px; background: linear-gradient(#e9c98a, #9c7a3a); box-shadow: 0 2px 4px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.4); cursor: grab; touch-action: none; transition: transform .15s; }
+.desk-ding.lampe.zieht .schnur .knauf { cursor: grabbing; transform: scaleX(1.1); }
+/* ---- Der Leuchter ---- */
+.desk-ding.leuchter { right: 2%; top: calc(44% - 112px); width: 170px; height: 150px; filter: drop-shadow(0 10px 10px rgba(0,0,0,.6)); }
+.leuchter-bild { width: 170px; height: 150px; position: relative; }
 .desk-leuchter-flammen { position: absolute; left: 0; top: 0; }
-.leuchter-fuss { position: absolute; left: 50%; top: 110px; width: 70px; height: 28px; margin-left: -35px; border-radius: 50% 50% 40% 40%; background: radial-gradient(ellipse at 50% 30%, #7a6036, #3a2c18 70%); box-shadow: 0 4px 8px rgba(0,0,0,.6); }
-.leuchter-fuss::before { content: ""; position: absolute; left: 50%; top: -44px; width: 8px; height: 46px; margin-left: -4px; background: linear-gradient(90deg, #3a2c18, #8a6d3c, #3a2c18); }
-.leuchter-fuss::after { content: ""; position: absolute; left: -22px; right: -22px; top: -14px; height: 6px; border-radius: 3px; background: linear-gradient(90deg, #3a2c18, #8a6d3c, #3a2c18); }
-/* Manuskripte: in der Mitte */
-.desk-ding.manuskript { left: 30%; top: 6%; width: min(220px, 30%); aspect-ratio: 3 / 4; }
-.desk-ding.manuskript.m2 { left: 37%; top: 10%; } .desk-ding.manuskript.m3 { left: 26%; top: 16%; }
-.manuskript-papier { width: 100%; height: 100%; padding: 14px 14px 10px; text-align: left; overflow: hidden; border-radius: 2px;
-  background: linear-gradient(170deg, #f6ecd6, #e9dcbf); color: #2c2218; font-family: ui-serif, "New York", Georgia, serif; font-size: 11px; line-height: 1.45; box-shadow: inset 0 0 30px rgba(120,90,40,.15); }
+/* ---- Standuhr ---- */
+.desk-ding.uhr { right: 22%; top: calc(44% - 150px); width: 54px; height: 170px; filter: drop-shadow(0 8px 10px rgba(0,0,0,.6)); }
+.uhr-gehaeuse { width: 54px; height: 170px; border-radius: 8px 8px 4px 4px; background: linear-gradient(90deg, #2a1b12, #4a2f1e 40%, #2a1b12); box-shadow: inset 0 0 0 2px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,220,160,.08), 0 2px 6px rgba(0,0,0,.6); position: relative; }
+.uhr-gehaeuse::before { content: ""; position: absolute; left: -4px; right: -4px; top: -6px; height: 10px; border-radius: 4px; background: linear-gradient(#5a3b26, #2a1b12); }
+.zifferblatt { position: absolute; left: 7px; top: 10px; width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle at 50% 45%, #f3e9d0, #d9caa6 80%); box-shadow: inset 0 0 0 2px #8a6d3c, inset 0 0 6px rgba(0,0,0,.3); }
+.zifferblatt::before { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: repeating-conic-gradient(from -1.5deg, rgba(60,40,20,.7) 0 3deg, transparent 3deg 30deg); -webkit-mask: radial-gradient(circle, transparent 62%, #000 63%, #000 72%, transparent 73%); mask: radial-gradient(circle, transparent 62%, #000 63%, #000 72%, transparent 73%); }
+.zeiger { position: absolute; left: 50%; bottom: 50%; width: 2px; background: #2c2218; transform-origin: bottom center; border-radius: 1px; }
+.zeiger.stunde { height: 10px; margin-left: -1px; width: 2.4px; } .zeiger.minute { height: 15px; margin-left: -.75px; width: 1.5px; }
+.achse { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%; background: #8a6d3c; }
+.pendelfenster { position: absolute; left: 12px; top: 60px; width: 30px; height: 92px; border-radius: 3px; background: linear-gradient(#120c08, #1c1410); box-shadow: inset 0 0 0 1px rgba(255,220,160,.12); overflow: hidden; }
+.pendel { position: absolute; left: 50%; top: -4px; width: 2px; height: 70px; margin-left: -1px; background: #c9a25a; transform-origin: top center; animation: pendelt 2s ease-in-out infinite alternate; }
+.pendel::after { content: ""; position: absolute; left: 50%; bottom: -10px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #f0d48a, #9c7a3a); box-shadow: 0 1px 2px rgba(0,0,0,.6); }
+@keyframes pendelt { from { transform: rotate(-14deg); } to { transform: rotate(14deg); } }
+/* ---- Zweiter Stuhl ---- */
+.desk-ding.stuhl { right: 0; top: calc(44% - 20px); width: 70px; height: 150px; --dreh: 0deg; filter: drop-shadow(-6px 8px 10px rgba(0,0,0,.55)); opacity: .92; }
+.stuhl-bild { position: relative; width: 70px; height: 150px; }
+.stuhl-bild .lehne { position: absolute; left: 14px; top: 0; width: 40px; height: 70px; border-radius: 12px 12px 2px 2px; background: linear-gradient(90deg, #2a1b12, #4a2f1e 35%, #2a1b12); box-shadow: inset 0 0 0 2px rgba(0,0,0,.3); }
+.stuhl-bild .lehne::before, .stuhl-bild .lehne::after { content: ""; position: absolute; top: 8px; bottom: 6px; width: 3px; background: rgba(0,0,0,.35); left: 12px; }
+.stuhl-bild .lehne::after { left: 25px; }
+.stuhl-bild .sitz { position: absolute; left: 4px; top: 66px; width: 62px; height: 22px; border-radius: 4px 4px 8px 8px; background: linear-gradient(#6e3b2e, #4c2419); box-shadow: inset 0 2px 0 rgba(255,255,255,.08), 0 2px 4px rgba(0,0,0,.5); }
+.stuhl-bild .bein { position: absolute; top: 86px; width: 6px; height: 64px; background: linear-gradient(90deg, #2a1b12, #4a2f1e, #2a1b12); }
+.stuhl-bild .b1 { left: 8px; } .stuhl-bild .b2 { left: 56px; }
+/* ---- Manuskripte ---- */
+.desk-ding.manuskript { left: 30%; top: calc(44% + 16px); width: min(220px, 28%); aspect-ratio: 3 / 4; }
+.desk-ding.manuskript.m2 { left: 37%; top: calc(44% + 44px); } .desk-ding.manuskript.m3 { left: 25%; top: calc(44% + 70px); }
+.manuskript-papier { position: relative; width: 100%; height: 100%; padding: 14px 14px 10px; text-align: left; overflow: hidden; border-radius: 2px;
+  background: linear-gradient(170deg, #f5ebd3, #e6d8ba), repeating-linear-gradient(transparent 0 21px, rgba(90,70,40,.08) 21px 22px); color: #2c2218; font-family: ui-serif, "New York", Georgia, serif; font-size: 11px; line-height: 1.45; box-shadow: inset 0 0 34px rgba(120,90,40,.18), inset 2px 0 0 rgba(180,60,40,.25); }
 .manuskript-papier b { display: block; font-size: 12.5px; margin-bottom: 5px; border-bottom: 1px solid rgba(60,40,20,.2); padding-bottom: 3px; }
 .manuskript-papier span { display: -webkit-box; -webkit-line-clamp: 9; -webkit-box-orient: vertical; overflow: hidden; }
+.manuskript-papier .korrektur { position: absolute; height: 2px; background: rgba(170,40,30,.55); transform: rotate(-1.5deg); }
+.manuskript-papier .k1 { left: 18%; right: 40%; top: 41%; } .manuskript-papier .k2 { left: 50%; right: 12%; top: 63%; transform: rotate(1deg); }
 .desk-ding.manuskript.leer .manuskript-papier { color: #7a6a52; font-style: italic; }
-/* Tintenfass & Federn */
-.desk-ding.tinte { left: 58%; top: 4%; width: 90px; height: 90px; }
-.tinte-bild { position: relative; width: 90px; height: 90px; }
-.tinte-bild .fass { position: absolute; left: 30px; bottom: 8px; width: 34px; height: 30px; border-radius: 6px 6px 10px 10px; background: linear-gradient(#1b1f3a, #0b0d1c); box-shadow: inset 0 0 0 2px rgba(255,255,255,.08), inset 0 10px 12px rgba(255,255,255,.08), 0 3px 6px rgba(0,0,0,.6); }
-.tinte-bild .fass::before { content: ""; position: absolute; left: 8px; top: -8px; width: 18px; height: 9px; border-radius: 4px 4px 0 0; background: #2b2f4f; }
-.tinte-bild .feder { position: absolute; width: 8px; height: 64px; border-radius: 50% 50% 10% 10%; background: linear-gradient(#e9dcc2, #cdbfa0); transform-origin: bottom; }
-.tinte-bild .feder.f1 { left: 44px; bottom: 20px; transform: rotate(22deg); } .tinte-bild .feder.f2 { left: 8px; bottom: 2px; transform: rotate(-70deg); background: linear-gradient(#c9b48e, #9d8663); height: 56px; }
-/* Bücherstapel */
-.desk-ding-halter.buecher { left: 3%; top: 46%; width: min(170px, 24%); }
+/* ---- Tintenfass & Federn ---- */
+.desk-ding.tinte { left: 58%; top: calc(44% + 10px); width: 96px; height: 96px; }
+.tinte-bild { position: relative; width: 96px; height: 96px; }
+.tinte-bild .fass { position: absolute; left: 30px; bottom: 8px; width: 38px; height: 34px; border-radius: 7px 7px 12px 12px; background: linear-gradient(90deg, #151a38, #0a0c1e 50%, #1a1f44); box-shadow: inset 0 0 0 2px rgba(255,255,255,.1), inset 0 10px 12px rgba(255,255,255,.07), 0 3px 6px rgba(0,0,0,.65); }
+.tinte-bild .fass::before { content: ""; position: absolute; left: 9px; top: -9px; width: 20px; height: 10px; border-radius: 4px 4px 0 0; background: linear-gradient(#3a3f66, #1a1f44); }
+.tinte-bild .fass-glanz { position: absolute; left: 36px; bottom: 16px; width: 6px; height: 20px; border-radius: 3px; background: rgba(255,255,255,.22); }
+.tinte-bild .feder { position: absolute; width: 9px; height: 66px; border-radius: 50% 50% 10% 10%; transform-origin: bottom; background: repeating-linear-gradient(100deg, #ecdfc5 0 1.5px, #cdbfa0 1.5px 3px), linear-gradient(#ecdfc5, #cdbfa0); }
+.tinte-bild .feder::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; margin-left: -.5px; background: rgba(90,70,40,.45); }
+.tinte-bild .feder.f1 { left: 46px; bottom: 22px; transform: rotate(22deg); } .tinte-bild .feder.f2 { left: 6px; bottom: 4px; transform: rotate(-70deg); height: 58px; filter: brightness(.85); }
+/* ---- Bücherstapel ---- */
+.desk-ding-halter.buecher { left: 3%; top: calc(44% + 150px); width: min(170px, 24%); }
 .buecher-stapel { position: relative; }
-.stapel-buch { position: relative; display: block; width: 100%; aspect-ratio: 3 / 4; margin-top: calc(-90% + 14px); transform: rotate(var(--dreh, 0deg)); border-radius: 2px 5px 5px 2px; overflow: hidden; box-shadow: 0 3px 5px rgba(0,0,0,.55), inset 2px 0 4px rgba(255,255,255,.12); background: #4a3a2a; }
+.stapel-buch { position: relative; display: block; width: 100%; aspect-ratio: 3 / 4; margin-top: calc(-90% + 14px); transform: rotate(var(--dreh, 0deg)); border-radius: 2px 5px 5px 2px; overflow: hidden; box-shadow: 0 3px 5px rgba(0,0,0,.6), inset 2px 0 4px rgba(255,255,255,.12); background: #4a3a2a; transition: transform .25s; }
 .stapel-buch:first-child { margin-top: 0; }
 .stapel-buch img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .stapel-buch.ohne-cover span { position: absolute; inset: 0; display: grid; place-items: center; padding: 10px; font-family: ui-serif, "New York", Georgia, serif; font-size: 13px; color: #f1e4c8; text-align: center; }
 .stapel-buch:hover { transform: rotate(var(--dreh, 0deg)) translateY(-6px); z-index: 2; }
 .stapel-fuss { display: block; margin-top: 8px; padding: 4px 10px; border-radius: 8px; background: rgba(255,230,180,.1); color: #e8c27a; font-size: 12px; letter-spacing: .04em; }
-/* Tasse */
-.desk-ding.tasse { right: 10%; top: 44%; width: 76px; height: 80px; }
-.tasse-bild { position: relative; width: 76px; height: 80px; }
-.tasse-bild::before { content: ""; position: absolute; left: 8px; top: 26px; width: 48px; height: 46px; border-radius: 6px 6px 18px 18px; background: linear-gradient(#d8cfc2, #a9a096); box-shadow: inset 0 -12px 14px rgba(0,0,0,.2), inset 0 2px 0 rgba(255,255,255,.4), 0 3px 6px rgba(0,0,0,.55); }
-.tasse-bild::after { content: ""; position: absolute; left: 12px; top: 28px; width: 40px; height: 8px; border-radius: 50%; background: #3b2a1c; }
-.tasse-bild .henkel { position: absolute; left: 52px; top: 34px; width: 18px; height: 24px; border: 6px solid #c7beb1; border-left: 0; border-radius: 0 14px 14px 0; }
-.tasse-bild .dampf { position: absolute; top: 8px; width: 6px; height: 20px; border-radius: 50%; background: rgba(255,255,255,.0); }
-.tasse.dampft .dampf { background: rgba(255,250,240,.35); animation: dampf-steigt 2.8s ease-in-out infinite; }
-.tasse-bild .d1 { left: 22px; } .tasse-bild .d2 { left: 36px; animation-delay: -1.3s !important; }
-@keyframes dampf-steigt { 0% { transform: translateY(6px) scaleX(1); opacity: 0; } 30% { opacity: .7; } 100% { transform: translateY(-16px) scaleX(1.6); opacity: 0; } }
-.tasse-zahl { position: absolute; left: 8px; top: 40px; width: 48px; text-align: center; font-size: 12px; color: #fff8ea; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
-/* Glas mit Fundstück */
-.desk-ding.glas { left: 24%; top: 56%; width: 50px; height: 70px; }
-.glas-bild { position: relative; width: 50px; height: 70px; }
-.glaskoerper { position: absolute; left: 4px; top: 10px; width: 42px; height: 56px; border-radius: 6px 6px 12px 12px; background: linear-gradient(90deg, rgba(255,255,255,.22), rgba(255,255,255,.06) 40%, rgba(255,255,255,.18)); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.35), 0 3px 6px rgba(0,0,0,.5); }
-.glaskoerper::before { content: ""; position: absolute; left: 8px; top: -8px; width: 26px; height: 10px; border-radius: 4px; background: #7a6a52; }
-.fundstueck { position: absolute; left: 18px; top: 40px; width: 14px; height: 16px; border-radius: 40% 60% 55% 45%; background: radial-gradient(circle at 40% 35%, #c9a25a, #6b4f25); }
-/* Brief */
-.desk-ding.brief { left: 9%; top: 82%; width: 92px; height: 62px; --dreh: -7deg; }
-.brief-bild { width: 92px; height: 62px; background: linear-gradient(#efe3c8, #dccba6); border-radius: 2px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,.55); }
-.brief-bild::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 0; border-left: 46px solid transparent; border-right: 46px solid transparent; border-top: 30px solid rgba(120,90,50,.22); }
-.brief-bild .siegel { position: absolute; left: 38px; top: 22px; width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #c8352b, #6e1710); box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+/* ---- Tasse ---- */
+.desk-ding.tasse { right: 10%; top: calc(44% + 150px); width: 76px; height: 84px; }
+.tasse-bild { position: relative; width: 76px; height: 84px; }
+.tasse-bild::before { content: ""; position: absolute; left: 8px; top: 28px; width: 48px; height: 48px; border-radius: 6px 6px 18px 18px; background: linear-gradient(90deg, #b9ada0, #e4dccf 40%, #b9ada0); box-shadow: inset 0 -12px 14px rgba(0,0,0,.18), inset 0 2px 0 rgba(255,255,255,.5), 0 3px 6px rgba(0,0,0,.6); }
+.tasse-bild::after { content: ""; position: absolute; left: 12px; top: 30px; width: 40px; height: 9px; border-radius: 50%; background: radial-gradient(ellipse at 50% 50%, #4a3322, #2a1a10); }
+.tasse-bild .henkel { position: absolute; left: 52px; top: 36px; width: 18px; height: 24px; border: 6px solid #cfc5b6; border-left: 0; border-radius: 0 14px 14px 0; }
+.tasse-bild .dampf { position: absolute; top: 8px; width: 6px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0); }
+.tasse.dampft .dampf { background: rgba(255,250,240,.38); animation: dampf-steigt 2.8s ease-in-out infinite; }
+.tasse-bild .d1 { left: 18px; } .tasse-bild .d2 { left: 30px; animation-delay: -1.3s !important; } .tasse-bild .d3 { left: 42px; animation-delay: -.7s !important; }
+@keyframes dampf-steigt { 0% { transform: translateY(8px) scaleX(1); opacity: 0; } 30% { opacity: .7; } 100% { transform: translateY(-18px) scaleX(1.7); opacity: 0; } }
+.tasse-zahl { position: absolute; left: 8px; top: 44px; width: 48px; text-align: center; font-size: 12px; color: #fff8ea; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+/* ---- Glas mit Fundstück ---- */
+.desk-ding.glas { left: 24%; top: calc(44% + 190px); width: 54px; height: 74px; }
+.glas-bild { position: relative; width: 54px; height: 74px; }
+.glaskoerper { position: absolute; left: 4px; top: 12px; width: 46px; height: 58px; border-radius: 7px 7px 13px 13px; background: linear-gradient(90deg, rgba(255,255,255,.26), rgba(255,255,255,.05) 35%, rgba(255,255,255,.02) 60%, rgba(255,255,255,.2)); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.38), inset 0 -6px 10px rgba(255,255,255,.08), 0 3px 6px rgba(0,0,0,.55); }
+.glas-deckel { position: absolute; left: 10px; top: 4px; width: 34px; height: 12px; border-radius: 4px; background: linear-gradient(#8a7a62, #5a4a36); box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.fundstueck { position: absolute; left: 20px; top: 44px; width: 14px; height: 16px; border-radius: 40% 60% 55% 45%; background: radial-gradient(circle at 40% 35%, #c9a25a, #6b4f25); }
+.fund-foto { position: absolute; left: 9px; top: 22px; width: 36px; height: 42px; object-fit: cover; border-radius: 4px 4px 9px 9px; opacity: .85; filter: sepia(.35) contrast(.9); }
+/* ---- Brief ---- */
+.desk-ding.brief { left: 9%; top: calc(44% + 310px); width: 96px; height: 64px; --dreh: -7deg; }
+.brief-bild { width: 96px; height: 64px; background: linear-gradient(#f0e4c9, #dccba6); border-radius: 2px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,.6); overflow: hidden; }
+.brief-bild::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 0; border-left: 48px solid transparent; border-right: 48px solid transparent; border-top: 32px solid rgba(120,90,50,.22); }
+.brief-bild .zeile { position: absolute; left: 10px; height: 1.5px; background: rgba(60,40,20,.35); transform: rotate(-1deg); }
+.brief-bild .z1 { top: 40px; width: 36px; } .brief-bild .z2 { top: 48px; width: 52px; }
+.brief-bild .siegel { position: absolute; left: 40px; top: 22px; width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #d13d31, #6e1710); box-shadow: 0 1px 2px rgba(0,0,0,.5); overflow: hidden; display: grid; place-items: center; }
+.brief-bild .siegel.eigen { width: 26px; height: 26px; left: 36px; top: 18px; background: #f7efe0; }
+.brief-bild .siegel img { width: 80%; height: 80%; object-fit: contain; }
 .desk-ding.brief.bereit .siegel { animation: siegel-pocht 1.6s ease-in-out infinite; box-shadow: 0 0 0 4px rgba(232,194,122,.35); }
 .desk-ding.brief.leer .brief-bild { opacity: .75; }
 @keyframes siegel-pocht { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-/* Karteikarten */
-.desk-ding.karten { right: 24%; top: 70%; width: 70px; height: 48px; --dreh: 4deg; }
+/* ---- Karteikarten, Lupe, Stummel, Notizbuch ---- */
+.desk-ding.karten { right: 24%; top: calc(44% + 270px); width: 70px; height: 48px; --dreh: 4deg; }
 .karten-bild { position: relative; width: 70px; height: 48px; }
-.karten-bild i { position: absolute; left: 0; top: 0; width: 64px; height: 40px; border-radius: 3px; background: repeating-linear-gradient(transparent 0 9px, rgba(120,140,200,.35) 9px 10px), #f5f0e0; box-shadow: 0 1px 3px rgba(0,0,0,.5); }
+.karten-bild i { position: absolute; left: 0; top: 0; width: 64px; height: 40px; border-radius: 3px; background: repeating-linear-gradient(transparent 0 9px, rgba(120,140,200,.35) 9px 10px), linear-gradient(#fbf6e8, #eee6d2); box-shadow: 0 1px 3px rgba(0,0,0,.55); }
+.karten-bild i:nth-child(1)::before { content: ""; position: absolute; left: 0; right: 0; top: 9px; height: 1px; background: rgba(200,80,80,.5); }
 .karten-bild i:nth-child(2) { transform: translate(3px, 3px) rotate(3deg); } .karten-bild i:nth-child(3) { transform: translate(6px, 6px) rotate(-2deg); }
-/* Lupe & Stummel */
-.desk-ding.lupe { right: 5%; top: 86%; width: 60px; height: 48px; --dreh: 30deg; }
-.lupe-bild { position: relative; width: 60px; height: 48px; }
-.lupe-bild .linse { position: absolute; left: 0; top: 6px; width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.45), rgba(200,220,255,.12) 60%); box-shadow: inset 0 0 0 4px #8a6d3c, 0 2px 4px rgba(0,0,0,.5); }
-.lupe-bild .griff { position: absolute; left: 32px; top: 24px; width: 26px; height: 7px; border-radius: 4px; background: #3a2a1c; transform: rotate(35deg); transform-origin: left center; }
-.desk-ding.stummel { left: 50%; top: 62%; width: 38px; height: 12px; --dreh: -18deg; }
-.stummel-bild { width: 38px; height: 10px; background: linear-gradient(90deg, #e9b45c 0 22px, #f1dfc0 22px 30px, #2b2520 30px); border-radius: 2px 50% 50% 2px / 2px 50% 50% 2px; box-shadow: 0 1px 3px rgba(0,0,0,.5); }
-/* Notizbuch */
-.desk-ding.notizbuch { right: 8%; top: 64%; width: 96px; height: 64px; --dreh: 6deg; }
-.notizbuch-bild { --heft1: #6f4334; width: 96px; height: 64px; border-radius: 3px 8px 8px 3px; background: linear-gradient(145deg, var(--heft1), color-mix(in srgb, var(--heft1) 70%, #000)); position: relative; box-shadow: 0 3px 6px rgba(0,0,0,.55), inset 6px 0 0 rgba(0,0,0,.25); }
-.notizbuch-bild .zettelchen { position: absolute; top: -6px; width: 18px; height: 12px; background: #f2d98a; box-shadow: 0 1px 2px rgba(0,0,0,.4); }
+.desk-ding.lupe { right: 5%; top: calc(44% + 330px); width: 62px; height: 50px; --dreh: 30deg; }
+.lupe-bild { position: relative; width: 62px; height: 50px; }
+.lupe-bild .linse { position: absolute; left: 0; top: 6px; width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.42), rgba(200,220,255,.14) 60%, rgba(255,255,255,.05)); box-shadow: inset 0 0 0 4px #8a6d3c, inset 0 0 0 5px rgba(255,230,170,.4), 0 2px 4px rgba(0,0,0,.55); }
+.lupe-bild .glanz { position: absolute; left: 9px; top: 12px; width: 9px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.55); transform: rotate(-30deg); }
+.lupe-bild .griff { position: absolute; left: 33px; top: 25px; width: 28px; height: 8px; border-radius: 4px; background: linear-gradient(#4a3622, #2a1c10); transform: rotate(35deg); transform-origin: left center; box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.desk-ding.stummel { left: 50%; top: calc(44% + 230px); width: 40px; height: 12px; --dreh: -18deg; }
+.stummel-bild { position: relative; width: 40px; height: 10px; }
+.stummel-bild .holz { position: absolute; left: 0; top: 0; width: 34px; height: 10px; border-radius: 2px 40% 40% 2px / 2px 50% 50% 2px; background: linear-gradient(#e9c36a, #c99a3d); box-shadow: 0 1px 3px rgba(0,0,0,.55); }
+.stummel-bild .holz::after { content: ""; position: absolute; right: 0; top: 1px; width: 9px; height: 8px; border-radius: 0 50% 50% 0; background: linear-gradient(90deg, #f1dfc0, #d8c49c); }
+.stummel-bild .mine { position: absolute; left: 34px; top: 3px; width: 6px; height: 4px; border-radius: 0 3px 3px 0; background: #2b2520; }
+.desk-ding.notizbuch { right: 8%; top: calc(44% + 220px); width: 96px; height: 66px; --dreh: 6deg; }
+.notizbuch-bild { --heft1: #6f4334; width: 96px; height: 66px; border-radius: 3px 8px 8px 3px; background: linear-gradient(145deg, var(--heft1), color-mix(in srgb, var(--heft1) 70%, #000)); position: relative; box-shadow: 0 3px 6px rgba(0,0,0,.6), inset 6px 0 0 rgba(0,0,0,.25); }
+.notizbuch-bild .zettelchen { position: absolute; top: -6px; width: 18px; height: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.4); }
 .notizbuch-bild .z1 { left: 18px; background: #f2d98a; } .notizbuch-bild .z2 { left: 42px; top: -9px; background: #f3cfd3; } .notizbuch-bild .z3 { left: 66px; background: #cadfea; }
-/* Verse */
+.notizbuch-bild .gummi { position: absolute; top: -2px; bottom: -2px; right: 14px; width: 6px; background: #2c251c; opacity: .9; border-radius: 2px; }
+/* ---- Verse ---- */
 .desk-vers { position: absolute; z-index: 1; font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 13px; color: rgba(235,220,190,.42); max-width: 220px; pointer-events: none; transform: rotate(var(--dreh, -4deg)); text-shadow: 0 1px 1px rgba(0,0,0,.4); }
-.desk-vers.v1 { left: 40%; top: 60%; --dreh: -6deg; } .desk-vers.v2 { left: 62%; top: 36%; --dreh: 3deg; } .desk-vers.v3 { left: 34%; top: 86%; --dreh: -2deg; }
-/* Schublade */
-.desk-schublade { position: absolute; left: 30%; right: 30%; bottom: 0; height: 34px; border-radius: 6px 6px 0 0; background: linear-gradient(#2c1f16, #1b120d); box-shadow: inset 0 2px 0 rgba(255,255,255,.08), 0 -2px 8px rgba(0,0,0,.4); z-index: 2; transition: transform .25s; }
+.desk-vers.v1 { left: 40%; top: calc(44% + 250px); --dreh: -6deg; } .desk-vers.v2 { left: 62%; top: calc(44% + 130px); --dreh: 3deg; } .desk-vers.v3 { left: 34%; top: calc(44% + 330px); --dreh: -2deg; }
+/* ---- Papierkorb, Schublade, Einrichten ---- */
+.desk-korb { position: absolute; left: 4%; bottom: 6px; width: 64px; height: 54px; z-index: 3; border-radius: 4px 4px 10px 10px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 3px, transparent 3px 6px), linear-gradient(#3a2c20, #1e160f); box-shadow: inset 0 0 0 1px rgba(255,220,160,.1), 0 3px 8px rgba(0,0,0,.6); filter: drop-shadow(0 4px 6px rgba(0,0,0,.5)); }
+.desk-korb .korbrand { position: absolute; left: -3px; right: -3px; top: -3px; height: 7px; border-radius: 4px; background: linear-gradient(#5a4530, #2a1f14); }
+.desk-korb .knuell { position: absolute; width: 22px; height: 20px; border-radius: 45% 55% 50% 50%; background: radial-gradient(circle at 35% 35%, #f3e9d4, #c9bda0 70%); box-shadow: inset -3px -3px 6px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.5); }
+.desk-korb .k1 { left: 6px; top: -10px; transform: rotate(-12deg); } .desk-korb .k2 { left: 26px; top: -14px; transform: rotate(18deg); } .desk-korb .k3 { left: 42px; top: -6px; transform: rotate(-30deg); width: 18px; height: 16px; }
+.desk-schublade { position: absolute; left: 30%; right: 30%; bottom: 0; height: 36px; border-radius: 6px 6px 0 0; background: linear-gradient(#2c1f16, #1b120d); box-shadow: inset 0 2px 0 rgba(255,255,255,.08), 0 -2px 8px rgba(0,0,0,.4); z-index: 3; transition: transform .25s; }
 .desk-schublade:hover { transform: translateY(-4px); }
-.desk-schublade .griffknauf { position: absolute; left: 50%; top: 50%; width: 34px; height: 10px; margin: -5px 0 0 -17px; border-radius: 5px; background: linear-gradient(#c9a25a, #7a5a2a); box-shadow: 0 1px 2px rgba(0,0,0,.6); }
+.desk-schublade .griffknauf { position: absolute; left: 50%; top: 50%; width: 36px; height: 10px; margin: -5px 0 0 -18px; border-radius: 5px; background: linear-gradient(#d9b463, #7a5a2a); box-shadow: 0 1px 2px rgba(0,0,0,.6); }
 .desk-einrichten { position: absolute; right: 12px; top: 12px; z-index: 4; background: rgba(20,16,12,.6); color: #e8c27a; }
-/* Unordnung: weniger Dinge bei wenig Unordnung */
-.desk-szene[style*="--unordnung:0"] .desk-vers, .desk-szene[style*="--unordnung:0."] .desk-vers { opacity: calc(var(--unordnung) * 2); }
 @media (max-width: 760px) {
-  .desk-fenster { height: 34%; min-height: 200px; }
-  .desk-ding.manuskript { width: 40%; left: 28%; top: 4%; } .desk-ding.manuskript.m2 { left: 34%; } .desk-ding.manuskript.m3 { left: 22%; top: 12%; }
-  .desk-ding.lampe { left: 2%; top: -50px; transform: scale(.8); }
-  .desk-ding.leuchter { right: -10px; top: -70px; transform: scale(.78); }
-  .desk-ding.tinte { left: 66%; top: 30%; transform: scale(.8); }
-  .desk-ding-halter.buecher { width: 30%; top: 52%; }
-  .desk-ding.tasse { right: 6%; top: 48%; transform: scale(.85); }
-  .desk-ding.glas { left: 36%; top: 60%; } .desk-ding.brief { top: 84%; left: 6%; }
-  .desk-ding.karten { right: 32%; top: 78%; } .desk-ding.lupe { right: 4%; top: 88%; } .desk-ding.stummel { left: 52%; top: 70%; } .desk-ding.notizbuch { right: 6%; top: 66%; transform: scale(.85); }
+  .desk-szene { min-height: 720px; }
+  .desk-ding.lampe { left: -6px; transform: scale(.78); transform-origin: top left; }
+  .desk-ding.leuchter { right: -16px; transform: scale(.72); transform-origin: top right; }
+  .desk-ding.uhr { right: 28%; transform: scale(.8); transform-origin: top; } .desk-ding.stuhl { display: none; }
+  .desk-ding.manuskript { width: 40%; left: 26%; } .desk-ding.manuskript.m2 { left: 32%; } .desk-ding.manuskript.m3 { left: 20%; }
+  .desk-ding.tinte { left: 68%; top: calc(44% + 90px); transform: scale(.8); }
+  .desk-ding-halter.buecher { width: 30%; top: calc(44% + 180px); }
+  .desk-ding.tasse { right: 4%; top: calc(44% + 180px); transform: scale(.85); }
+  .desk-ding.glas { left: 38%; top: calc(44% + 250px); } .desk-ding.brief { top: calc(44% + 330px); left: 6%; width: 80px; }
+  .desk-ding.karten { right: 30%; top: calc(44% + 320px); } .desk-ding.lupe { right: 4%; top: calc(44% + 340px); } .desk-ding.stummel { left: 54%; top: calc(44% + 280px); } .desk-ding.notizbuch { right: 6%; top: calc(44% + 250px); transform: scale(.85); }
   .desk-vers { font-size: 11px; max-width: 150px; }
+  .desk-korb { width: 50px; height: 44px; }
 }
 /* ===================== LESESTAPEL & LESEMODUS ===================== */
 .modal.lesestapel { width: min(760px, 96vw); max-height: 90dvh; overflow: auto; }
@@ -715,6 +725,21 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .lese-balken { flex: 1; accent-color: var(--akzent); }
 .lese-stand { font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; color: #c9b48e; }
 .modal.zitat-kasten textarea { width: 100%; font-size: 14px; line-height: 1.5; }
+.lese-kopf .rundknopf.hat-notiz::after { content: ""; position: absolute; right: 5px; top: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--akzent); }
+.lese-kopf .rundknopf { position: relative; }
+.buchsuche-treffer { display: grid; gap: 4px; max-height: 52dvh; overflow: auto; }
+.buchsuche-treffer button { text-align: left; padding: 8px 10px; border-radius: 9px; font-size: 14px; line-height: 1.4; }
+.buchsuche-treffer button:hover { background: var(--hg2); }
+.buchsuche-treffer b { color: var(--akzent); font-weight: 600; }
+.buchsuche-treffer small { display: block; color: var(--blass); font-size: 12px; }
+.lese-notizen { display: grid; gap: 8px; max-height: 40dvh; overflow: auto; margin: 6px 0; }
+.lese-notiz { padding: 8px 10px; border-radius: 10px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 14px; }
+.lese-notiz small { color: var(--blass); }
+.lesezeichen-farbe { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.koffer-passwort { width: 100%; padding: 11px 13px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 17px; }
+.weiterlesen-karte { display: flex; gap: 14px; align-items: center; width: 100%; text-align: left; margin-top: 12px; }
+.weiterlesen-karte img { width: 44px; height: 58px; object-fit: cover; border-radius: 2px 5px 5px 2px; box-shadow: 0 3px 8px var(--schein); }
+.weiterlesen-karte b { display: block; } .weiterlesen-karte small { color: var(--blass); }
 .modal.brief-kasten textarea { width: 100%; font-size: 16px; line-height: 1.55; font-family: ui-serif, "New York", Georgia, serif; }
 .brief-wann { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 14px; }
 .brief-wann select { padding: 6px 10px; border-radius: 10px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font: inherit; color: inherit; }
@@ -1816,7 +1841,12 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
    ================================================================ */
 
 /* Die Räume liegen in einer eigenen Rolle. */
-.raumrolle { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; }
+/* Die Räume rollen in ihrer eigenen Rolle — wird es eng, scrollt nur sie; Suche
+   und Feinheiten bleiben unten immer sichtbar. */
+.raumrolle { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.raumrolle::-webkit-scrollbar { display: none; }
+#leiste { min-height: 0; }
+#leiste .luecke { flex: 1 0 6px; }
 
 /* Tagesbalken müssen schrumpfen dürfen — sonst wird die Hälfte abgeschnitten. */
 .statistikbalken .tag { min-width: 0; }
@@ -2004,7 +2034,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.15.0';
+const APP_VERSION = '5.16.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -2474,6 +2504,11 @@ function sauberesDokument(quelle) {
     if (d.zuletzt != null) d.zuletzt = begrenze(d.zuletzt, 0, Date.now() + 86400000, 0);
     if (d.lesezeichen != null) d.lesezeichen = Array.isArray(d.lesezeichen) ? [...new Set(d.lesezeichen.map((n) => Math.round(Number(n))).filter((n) => Number.isFinite(n) && n >= 1 && n <= 100000))].slice(0, 200) : [];
   }
+  if (d.typ === 'buch') {
+    if (d.lesezeichenFarben != null) { const aus = {}; if (d.lesezeichenFarben && typeof d.lesezeichenFarben === 'object') for (const [k, v] of Object.entries(d.lesezeichenFarben).slice(0, 200)) if (/^\d{1,6}$/.test(k) && /^#[0-9a-f]{6}$/i.test(String(v))) aus[k] = v; d.lesezeichenFarben = aus; }
+    if (d.statistik != null) { const aus = {}; if (d.statistik && typeof d.statistik === 'object') for (const [k, v] of Object.entries(d.statistik).slice(-60)) if (/^\d{4}-\d{2}-\d{2}$/.test(k)) aus[k] = Math.round(begrenze(v, 0, 100000, 0)); d.statistik = aus; }
+  }
+  if (d.typ === 'buchnotiz' && d.seite != null) d.seite = Math.round(begrenze(d.seite, 1, 100000, 1));
   if (d.typ === 'brief') {
     if (d.oeffnen != null) d.oeffnen = begrenze(d.oeffnen, 0, 4102444800000, 0);
     if (d.versiegelt != null) d.versiegelt = d.versiegelt === true;
@@ -5323,6 +5358,14 @@ RENDER.zuhause = function (haupt) {
         el('button', { class: 'knopf zart', onclick: () => { ab = (ab + 3) % funde.length; zeichneFunde(); } }, 'Andere Funde')),
       regal);
     zeichneFunde(); gitter.append(karte);
+  }
+
+  /* Weiterlesen, wo ich war */
+  const buch = typeof lesestapelBuecher === 'function' ? lesestapelBuecher().find((b) => b.zuletzt && Date.now() - b.zuletzt < 14 * 86400000 && b.seiten && b.seite < b.seiten) : null;
+  if (buch) {
+    const img = el('img', { alt: '' }); if (buch.bild) setzeBild(img, buch.bild);
+    inhalt.append(el('button', { class: 'karte weiterlesen-karte', onclick: () => buchOeffnen(buch) }, img,
+      el('span', {}, el('b', {}, 'Weiterlesen: ' + (buch.titel || 'Buch')), el('small', {}, 'Seite ' + buch.seite + ' von ' + buch.seiten + ' · ' + buchFortschritt(buch.seite, buch.seiten) + ' %'))));
   }
 
   /* Die Tür zum Schreibtisch */
@@ -9199,6 +9242,7 @@ function beendeSprint(abgebrochen) {
   _sr.raum.classList.remove('kerze-brennt');
   if (sp.kerze) { if (abgebrochen) sp.kerze.ausblasen(); else setTimeout(() => sp.kerze.entfernen(), 4500); }
   if (!abgebrochen) {
+    if (typeof schreibtischWachsVerbrennen === 'function') schreibtischWachsVerbrennen(sp.minuten);
     const geschrieben = worte(srAktuellerText()) - sp.startWorte;
     glocke();
     const m = D.einst.mischung || {};
@@ -13827,11 +13871,16 @@ const ANLEITUNG = [
     kurz: 'Ein schwerer Tisch vor dem Nachtfenster — alles darauf tut etwas.',
     abschnitte: [
       { t: 'Was das ist', p: ['Kein Raum zum Einsortieren, sondern der Mittelpunkt. Dunkles Holz, eine Lampe mit bernsteinfarbenem Kegel (kein Deckenlicht, niemals), ein siebenarmiger Leuchter, das Fenster auf den verwilderten Garten bei Nacht, mit echter Mondphase. Nichts darauf ist Dekoration: jedes Ding ist ein Griff in mein Schreiben.'] },
+      { t: 'Die Lampe', p: ['Am Knauf der Zugschnur ziehen — sie dehnt sich mit, schnappt zurück und schaltet die Lampe an oder aus (ab etwa einem Drittel Zug). Ist sie aus, bleibt nur der Schein der Kerzen. Auf den Schirm tippen: heller oder dunkler in Stufen. Das Fenster weiß außerdem, wie spät es ist: Dämmerung am frühen Abend, tiefe Nacht, erstes Grau vor sechs, und ein grauer Tag — der Tisch bleibt ein Nachttisch, aber der Himmel lügt nicht. Und er kennt die Jahreszeit: Glühwürmchen im Sommer, fallende Blätter im Herbst, Schnee und kahle Bäume im Winter, Blüten im Frühling.'] },
+      { t: 'Leuchter, Uhr und der zweite Stuhl', p: ['Der Leuchter brennt wirklich ab: Jede Kerze, die ich im Schreibraum anzünde, nimmt den sieben Kerzen etwas Wachs — nach zwanzig Schreibstunden sind sie herunter, dann „neue aufstecken" als kleines Ritual. Die Standuhr zeigt die Zeit, antippen sagt, wie lange ich schon am Tisch sitze; wer mag, lässt sie ticken (Einrichten), zur vollen Stunde ein leiser Glockenschlag. Der zweite Stuhl ist der Faden — ein Gespräch am Tisch.'] },
+      { t: 'Der Papierkorb unterm Tisch', p: ['Links unten, mit zerknüllten Blättern: der Papierkorb. Antippen zeigt, was zuletzt hineinflog; eines „glätten" holt es zurück — an seinen alten Ort.'] },
       { t: 'Die Dinge', p: ['Die Manuskripte in der Mitte sind meine drei zuletzt bearbeiteten Texte — antippen schreibt weiter. Tintenfass und Feder: ein neues Blatt. Die Tasse: der Schreibtag (sie dampft, wenn ich heute geschrieben habe; die Zahl sind die Wörter). Das Glas mit dem Fundstück: der Funke des Tages. Der Brief: eine Zeitkapsel an mich selbst. Die Karteikarten: eine Wortkiste abfragen. Die Lupe: suchen. Der Bleistiftstummel: schnell einen Schnipsel. Das Notizbuch mit den Zetteln: mein letztes Heft. Der Bücherstapel: der Lesestapel. Die Lampe: heller oder dunkler. Der Leuchter: Schreibzeit anzünden — öffnet ein Blatt und die Kerze brennt. Das Fenster: die Grillen und der Wind des Nachtgartens (Klang); spielt im Klangraum Regen, regnet es vor dem Fenster, bei Gewitter wetterleuchtet es.'] },
       { t: 'Die Schublade', p: ['Unten am Tisch. Darin: drei Fundstücke aus meinen eigenen Texten (wie auf dem Zuhause, nur verstaut), eine winzige Lupe, Bindfaden (Cluster), getrocknete Blätter (die losen Blätter), Briefmarken (etwas hinausschicken), ein Schlüssel ohne Schloss (Feinheiten) — und ein Stück Metall unbekannter Herkunft: ein alter Schnipsel, der entweder bedeutungslos ist oder der Schlüssel zu einem ganzen Roman.'] },
       { t: 'Brief an mich', p: ['Ich schreibe, wähle „in einem Monat" (oder einer Woche, einem Jahr) — der Brief wird versiegelt und liegt auf dem Tisch. Vor dem Datum lässt er sich nicht öffnen. Ist es so weit, pocht das Siegel. Öffnen, lesen, antworten (wird ein neues Blatt) oder wegwerfen.'], b: 'Am Anfang eines Projekts einen Brief „in drei Monaten": was ich hoffe, was ich fürchte, wo ich stehen will.' },
       { t: 'Der Lesestapel', p: ['Bücher als PDF auf dem Tisch — sie liegen nur auf meinen Geräten und reisen verschlüsselt über den privaten Bereich, nie übers Netz, nie ins Repo. Das Cover malt VANI aus der ersten Seite (oder ich wähle eine andere). Antippen schlägt auf; lange halten: umbenennen, Cover, von vorn, vom Tisch nehmen.'] },
+      { t: 'Der Bücherkoffer', p: ['Liegt neben der App ein verschlüsselter Bücherkoffer, fragt „Aus dem Bücherkoffer (Passwort)" nach dem Passwort und legt die Bücher auf den Tisch — ohne Dateiauswahl, ohne Netz danach. Die Dateien im Koffer sind ohne Passwort Rauschen. Das Werkzeug dazu: `node werkzeug/buecherkoffer.mjs <Ordner>`.'] },
       { t: 'Bücher auflegen — drei Wege', s: ['„PDF auflegen" wählt Dateien — am Laptop, am Handy, überall, wo das Gerät Dateien öffnen darf.', 'Auf dem Schul-iPad: Bücher, die schon im Goodnotes-Archiv liegen, mit „Aus dem Goodnotes-Archiv" aufs Lesepult — oder am Handy auflegen, der private Bereich bringt sie aufs iPad.', 'In der Desktop-App: „Aus dem Bücherordner" — alles, was in „Dokumente/VANI-Bücher" oder im Ordner „buecher" neben der App liegt, mit einem Griff.'] },
+      { t: 'Randnotizen, Suche, Vorlesen', p: ['Oben im Lesemodus: die Stecknadel legt Randnotizen zu dieser Seite an (so viele ich will; ein Punkt am Knopf zeigt, dass hier welche liegen; „Alle Notizen" springt durch das Buch), die Lupe sucht im ganzen Buch (Textebene, Treffer mit Ausschnitt, antippen springt hin), das Vorlese-Symbol liest die Seite mit der Stimme des Geräts. Lesezeichen haben Farben. Der Lesestapel zeigt je Buch, wie viele Seiten ich heute, gestern, diese Woche gelesen habe; auf dem Zuhause steht „Weiterlesen", wenn ich ein Buch in den letzten zwei Wochen angefasst habe.'] },
       { t: 'Der Lesemodus', p: ['Wie in einem Lesegerät: Tippen rechts blättert vor, links zurück, Mitte zeigt die Leisten; Wischen geht auch, am Laptop die Pfeiltasten (Leertaste vor, Pos1/Ende). Der Schieber unten springt; oben: Inhalt (wenn das Buch eine Gliederung mitbringt), Lesezeichen (mehrere je Buch), Zitat (die Seite als Text — kopieren mit Quelle oder als Schnipsel) und Einstellungen.', 'Einstellungen bleiben am Gerät, weil Helligkeit Gerätesache ist: Helligkeit, Wärme, Nacht (Seiten invertiert), Doppelseite (wie es passt / immer / nie — auf dem iPad quer zwei Seiten, am Handy eine), Größe (ganze Seite / volle Breite), Blättern mit oder ohne Bewegung. Seite, Lesezeichen und Stapel reisen mit.'] },
       { t: 'Einrichten', p: ['Das Schieberegler-Symbol rechts oben: Holz (Ebenholz, Nussbaum, Kirsche, alte Eiche), Lampe, Leuchter an/aus, ob das Fenster auf den Klang hört, ob eigene Zeilen auf der Platte liegen, und wie viel Unordnung.'] }
     ]
@@ -14317,22 +14366,347 @@ function oeffneAnleitung(kapitelId) {
 }
 
 /* ================================================================
+   VANI — Die Malerei hinter dem Schreibtisch.
+
+   Ein einziges Canvas trägt die Szene: oben das Fenster mit Himmel, Gestirnen
+   und dem verwilderten Garten, unten die Platte aus altem Holz — Maserung,
+   Astlöcher, Kratzer, Tintenspritzer, Wachs, ein Kaffeering, die Stelle, an
+   der jahrelang die Hand gelegen hat. Alles Unbewegte wird einmal gemalt und
+   dann nur noch geblittet; bewegt sind Sterne, Mond, Garten (Parallaxe im
+   Wind), Regen als Tropfen statt Kachel (kein sichtbares Wiederholen), Nebel,
+   Wetterleuchten, und je nach Jahreszeit Glühwürmchen, fallende Blätter oder
+   Schnee. Das Fenster weiß, wie spät es ist: Dämmerung, Nacht, erstes Grau,
+   ein grauer Tag. Kein Deckenlicht — nur der Kegel der Lampe und der Schein
+   der Flammen, beide als weiche Verläufe ohne Kante (kerzeSchein).
+
+   Zufall mit Saat, damit der Tisch an einem Tag derselbe bleibt und nicht
+   bei jedem Zeichnen neu gewürfelt wird.
+   ================================================================ */
+
+/* Jahreszeit aus dem Monat. Pur. */
+function schreibtischJahreszeit(wann = Date.now()) {
+  const m = new Date(wann).getMonth();
+  return m <= 1 || m === 11 ? 'winter' : m <= 4 ? 'fruehling' : m <= 7 ? 'sommer' : 'herbst';
+}
+/* Himmel nach Stunde: 0 = tiefe Nacht, 1 = Tag; dazwischen Dämmerung. Pur. */
+function schreibtischTageslicht(wann = Date.now()) {
+  const d = new Date(wann); const h = d.getHours() + d.getMinutes() / 60;
+  if (h >= 21.5 || h < 4.5) return 0;
+  if (h < 6.5) return (h - 4.5) / 2 * .55;              /* erstes Grau */
+  if (h < 17) return .55;                               /* ein grauer Tag — der Tisch bleibt Nachttisch */
+  if (h < 19.5) return .55 - (h - 17) / 2.5 * .35;      /* Dämmerung */
+  return .2 - (h - 19.5) / 2 * .2;                      /* letzte Helle */
+}
+function schreibtischHimmelFarben(licht) {
+  /* Nacht → Tag: drei Stopps */
+  const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+  const nacht = [[4, 5, 12], [11, 14, 30], [22, 26, 38]];
+  const daemmer = [[28, 22, 48], [92, 54, 70], [150, 92, 70]];
+  const tag = [[120, 128, 140], [150, 156, 164], [172, 176, 180]];
+  const t = Math.max(0, Math.min(1, licht));
+  const a = t < .35 ? nacht : daemmer, b = t < .35 ? daemmer : tag, u = t < .35 ? t / .35 : (t - .35) / .65;
+  return [0, 1, 2].map((i) => 'rgb(' + mix(a[i], b[i], u).join(',') + ')');
+}
+
+function schreibtischMaler(canvas, optionen = {}) {
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const saatText = tagKey();
+  let saat = 17; for (const c of saatText) saat = (saat * 31 + c.charCodeAt(0)) >>> 0;
+  const zuf = kerzeZufall(saat);
+  const opt = Object.assign({ holz: 'nuss', lampe: .8, lampeAn: true, wetter: 'still', kerzen: true, unordnung: .7, fensterAnteil: .44 }, optionen);
+  let W = 0, H = 0, fensterH = 0, statisch = null, laeuft = false, t = 0, letzte = 0, blitz = 0, blitzWarte = 6 + zuf() * 10;
+  const jahreszeit = schreibtischJahreszeit();
+  const mond = mondphase();
+
+  /* Einmal gewürfelte Dinge */
+  const sterne = Array.from({ length: 90 }, () => ({ x: zuf(), y: zuf() * .72, r: .35 + zuf() * 1.3, ph: zuf() * 6.3, tw: .3 + zuf() * 1.2, warm: zuf() < .3 }));
+  const baeume = [
+    { x: -.1, w: .34, h: .82, tief: 0, ph: zuf() * 6 }, { x: .8, w: .32, h: .74, tief: 0, ph: zuf() * 6 },
+    { x: .24, w: .2, h: .52, tief: 1, ph: zuf() * 6 }, { x: .55, w: .18, h: .42, tief: 1, ph: zuf() * 6 }
+  ];
+  const buesche = Array.from({ length: 7 }, (_, i) => ({ x: i / 7 + zuf() * .08 - .02, w: .14 + zuf() * .12, h: .22 + zuf() * .2, ph: zuf() * 6 }));
+  const graeser = Array.from({ length: 140 }, () => ({ x: zuf(), h: .05 + zuf() * .09, ph: zuf() * 6, n: .6 + zuf() * .8 }));
+  const tropfen = Array.from({ length: 180 }, () => ({ x: zuf(), y: zuf(), l: .02 + zuf() * .03, v: .35 + zuf() * .5, a: .18 + zuf() * .3 }));
+  const glasTropfen = Array.from({ length: 14 }, () => ({ x: zuf(), y: zuf(), v: .01 + zuf() * .03, r: 1.5 + zuf() * 2 }));
+  const flocken = Array.from({ length: 120 }, () => ({ x: zuf(), y: zuf(), r: .8 + zuf() * 2.2, v: .02 + zuf() * .05, ph: zuf() * 6 }));
+  const blaetter = Array.from({ length: 22 }, () => ({ x: zuf(), y: zuf(), v: .05 + zuf() * .08, ph: zuf() * 6, rot: zuf() * 6, f: ['#a8562a', '#c8873a', '#8a4a22', '#d9a54a'][Math.floor(zuf() * 4)] }));
+  const wuermchen = Array.from({ length: 16 }, () => ({ x: .1 + zuf() * .8, y: .35 + zuf() * .5, ph: zuf() * 6, v: .3 + zuf() * .7 }));
+  const nebel = Array.from({ length: 5 }, (_, i) => ({ y: .55 + i * .09, v: .004 + zuf() * .006, ph: zuf() * 6 }));
+
+  /* Holz, Kratzer, Tinte — einmal gewürfelt, einmal gemalt */
+  const maser = Array.from({ length: 70 }, () => ({ y: zuf(), amp: 2 + zuf() * 6, f: 1 + zuf() * 3, ph: zuf() * 6, a: .05 + zuf() * .1, dick: .6 + zuf() * 1.6 }));
+  const aeste = Array.from({ length: 3 }, () => ({ x: .15 + zuf() * .7, y: .3 + zuf() * .6, rx: 10 + zuf() * 16, ry: 6 + zuf() * 8 }));
+  const kratzer = Array.from({ length: 26 }, () => ({ x: zuf(), y: zuf(), l: .03 + zuf() * .12, w: zuf() * 6.3, a: .05 + zuf() * .12 }));
+  const tinten = Array.from({ length: 7 }, () => ({ x: .1 + zuf() * .8, y: .15 + zuf() * .75, r: 3 + zuf() * 11, satelliten: Math.floor(zuf() * 7), ph: zuf() * 6 }));
+  const wachs = Array.from({ length: 9 }, () => ({ x: .72 + zuf() * .2, y: .12 + zuf() * .3, r: 2 + zuf() * 5 }));
+
+  function messen() {
+    const r = canvas.getBoundingClientRect();
+    const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
+    if (w === W && h === H) return false;
+    W = w; H = h; fensterH = Math.round(H * opt.fensterAnteil);
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    statisch = null;
+    return true;
+  }
+
+  /* ----- Das Unbewegte: Wand, Rahmen, Platte ----- */
+  function maleStatisch() {
+    const c = document.createElement('canvas'); c.width = canvas.width; c.height = canvas.height;
+    const g = c.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    /* Wand: dunkel, etwas Putz */
+    const wand = g.createLinearGradient(0, 0, 0, H);
+    wand.addColorStop(0, '#1a1411'); wand.addColorStop(1, '#0d0a08');
+    g.fillStyle = wand; g.fillRect(0, 0, W, H);
+    /* Platte */
+    const oben = fensterH + 10;
+    const toene = { nuss: ['#4e3524', '#32221a', '#1f1510'], ebenholz: ['#2a2421', '#171312', '#0c0a09'], kirsche: ['#73402d', '#4d281c', '#2e1810'], eiche: ['#7f5e3d', '#5b4129', '#3b2a1a'] }[opt.holz] || ['#4e3524', '#32221a', '#1f1510'];
+    const holz = g.createLinearGradient(0, oben, 0, H);
+    holz.addColorStop(0, toene[0]); holz.addColorStop(.45, toene[1]); holz.addColorStop(1, toene[2]);
+    g.fillStyle = holz; g.fillRect(0, oben, W, H - oben);
+    /* Vorderkante der Platte */
+    g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(0, oben, W, 6);
+    g.fillStyle = 'rgba(255,255,255,.06)'; g.fillRect(0, oben + 6, W, 1);
+    /* Maserung: lange Wellen, leicht gedreht */
+    g.save(); g.beginPath(); g.rect(0, oben, W, H - oben); g.clip();
+    g.lineCap = 'round';
+    for (const m of maser) {
+      const y0 = oben + m.y * (H - oben);
+      g.beginPath(); g.strokeStyle = 'rgba(0,0,0,' + m.a.toFixed(3) + ')'; g.lineWidth = m.dick;
+      for (let x = -10; x <= W + 10; x += 8) { const y = y0 + Math.sin(x / W * m.f * 6.28 + m.ph) * m.amp + Math.sin(x / 37 + m.ph) * 1.2; if (x < 0) g.moveTo(x, y); else g.lineTo(x, y); }
+      g.stroke();
+      g.beginPath(); g.strokeStyle = 'rgba(255,235,200,' + (m.a * .35).toFixed(3) + ')'; g.lineWidth = Math.max(.5, m.dick * .5);
+      for (let x = -10; x <= W + 10; x += 8) { const y = y0 + 2 + Math.sin(x / W * m.f * 6.28 + m.ph) * m.amp + Math.sin(x / 37 + m.ph) * 1.2; if (x < 0) g.moveTo(x, y); else g.lineTo(x, y); }
+      g.stroke();
+    }
+    /* Astlöcher */
+    for (const a of aeste) {
+      const ax = a.x * W, ay = oben + a.y * (H - oben);
+      for (let k = 5; k >= 1; k--) { g.beginPath(); g.ellipse(ax, ay, a.rx * k / 5, a.ry * k / 5, .2, 0, 6.29); g.strokeStyle = 'rgba(0,0,0,' + (.12 + k * .03).toFixed(2) + ')'; g.lineWidth = 1.2; g.stroke(); }
+      g.beginPath(); g.ellipse(ax, ay, a.rx * .25, a.ry * .25, .2, 0, 6.29); g.fillStyle = 'rgba(0,0,0,.55)'; g.fill();
+    }
+    /* Die Stelle, an der jahrelang die Hand lag: heller, glatter */
+    kerzeSchein(g, W * .52, oben + (H - oben) * .78, W * .16, (H - oben) * .2, [[0, 'rgba(255,225,170,.14)'], [1, 'rgba(255,225,170,0)']]);
+    /* Kratzer */
+    for (const k of kratzer) {
+      g.beginPath(); g.strokeStyle = 'rgba(255,240,210,' + k.a.toFixed(3) + ')'; g.lineWidth = .8;
+      const x0 = k.x * W, y0 = oben + k.y * (H - oben);
+      g.moveTo(x0, y0); g.lineTo(x0 + Math.cos(k.w) * k.l * W, y0 + Math.sin(k.w) * k.l * W * .4); g.stroke();
+    }
+    /* Tintenspritzer: Klecks mit Satelliten und ausgefransten Rändern */
+    for (const tn of tinten) {
+      const tx = tn.x * W, ty = oben + tn.y * (H - oben);
+      g.fillStyle = 'rgba(10,8,26,.62)';
+      g.beginPath();
+      for (let i = 0; i <= 24; i++) { const w = i / 24 * 6.283; const r = tn.r * (1 + .28 * Math.sin(w * 3 + tn.ph) + .18 * Math.sin(w * 7 + tn.ph * 2)); g.lineTo(tx + Math.cos(w) * r, ty + Math.sin(w) * r * .7); }
+      g.closePath(); g.fill();
+      for (let s = 0; s < tn.satelliten; s++) { const w = tn.ph + s * 1.9; const d = tn.r * (1.6 + s * .6); g.beginPath(); g.ellipse(tx + Math.cos(w) * d, ty + Math.sin(w) * d * .7, 1 + (s % 3), .8 + (s % 2), w, 0, 6.29); g.fill(); }
+    }
+    /* Wachs am Leuchter */
+    g.fillStyle = 'rgba(245,232,200,.85)';
+    for (const w of wachs) { g.beginPath(); g.ellipse(w.x * W, oben + w.y * (H - oben), w.r, w.r * .7, 0, 0, 6.29); g.fill(); }
+    /* Kaffeering unter der Tasse */
+    g.beginPath(); g.ellipse(W * .83, oben + (H - oben) * .52, 30, 14, 0, 0, 6.29); g.strokeStyle = 'rgba(70,40,15,.45)'; g.lineWidth = 3; g.stroke();
+    g.beginPath(); g.ellipse(W * .83, oben + (H - oben) * .52, 30, 14, 0, .4, 2.2); g.strokeStyle = 'rgba(70,40,15,.3)'; g.lineWidth = 6; g.stroke();
+    g.restore();
+    /* Fensterrahmen: schweres Holz mit Sprossen */
+    g.fillStyle = '#1a1210'; g.fillRect(0, 0, W, 16); g.fillRect(0, 0, 16, fensterH); g.fillRect(W - 16, 0, 16, fensterH); g.fillRect(0, fensterH - 12, W, 22);
+    g.fillStyle = '#3d2b20'; g.fillRect(16, 16, W - 32, 2); g.fillRect(16, 16, 2, fensterH - 28); g.fillRect(W - 18, 16, 2, fensterH - 28);
+    g.fillStyle = '#241912'; g.fillRect(W / 2 - 6, 16, 12, fensterH - 28); g.fillRect(16, fensterH * .42 - 5, W - 32, 10);
+    g.fillStyle = 'rgba(255,255,255,.07)'; g.fillRect(W / 2 + 4, 16, 1, fensterH - 28); g.fillRect(16, fensterH * .42 + 5, W - 32, 1);
+    /* Fensterbank */
+    const bank = g.createLinearGradient(0, fensterH + 8, 0, fensterH + 22);
+    bank.addColorStop(0, '#3a2a20'); bank.addColorStop(1, '#1a120d');
+    g.fillStyle = bank; g.fillRect(0, fensterH + 8, W, 14);
+    return c;
+  }
+
+  /* ----- Das Bewegte ----- */
+  function maleFenster(dt) {
+    const licht = schreibtischTageslicht();
+    const [h1, h2, h3] = schreibtischHimmelFarben(licht);
+    const sky = ctx.createLinearGradient(0, 0, 0, fensterH);
+    sky.addColorStop(0, h1); sky.addColorStop(.6, h2); sky.addColorStop(1, h3);
+    ctx.fillStyle = sky; ctx.fillRect(16, 16, W - 32, fensterH - 28);
+    ctx.save(); ctx.beginPath(); ctx.rect(16, 16, W - 32, fensterH - 28); ctx.clip();
+    const nacht = 1 - Math.min(1, licht / .45);
+    /* Sterne */
+    if (nacht > 0) for (const s of sterne) {
+      const a = nacht * (.3 + .5 * Math.abs(Math.sin(t * s.tw + s.ph)));
+      ctx.fillStyle = s.warm ? 'rgba(255,235,200,' + a.toFixed(2) + ')' : 'rgba(230,240,255,' + a.toFixed(2) + ')';
+      ctx.beginPath(); ctx.arc(16 + s.x * (W - 32), 16 + s.y * (fensterH - 28), s.r, 0, 6.29); ctx.fill();
+    }
+    /* Mond */
+    if (nacht > 0 || licht < .4) {
+      const mx = W * .72, my = fensterH * .2, mr = Math.min(24, W * .035);
+      ctx.save(); ctx.globalAlpha = Math.max(.35, nacht);
+      kerzeSchein(ctx, mx, my, mr * 5, mr * 5, [[0, 'rgba(255,246,220,.2)'], [1, 'rgba(255,246,220,0)']]);
+      ctx.fillStyle = '#f3ecd8'; ctx.beginPath(); ctx.arc(mx, my, mr, 0, 6.29); ctx.fill();
+      const hell = 1 - Math.abs(mond - .5) * 2;
+      ctx.fillStyle = h1; ctx.beginPath();
+      if (mond < .5) { ctx.arc(mx, my, mr, Math.PI / 2, -Math.PI / 2, false); ctx.ellipse(mx, my, mr * Math.abs(1 - 2 * hell), mr, 0, -Math.PI / 2, Math.PI / 2, hell > .5); }
+      else { ctx.arc(mx, my, mr, -Math.PI / 2, Math.PI / 2, false); ctx.ellipse(mx, my, mr * Math.abs(1 - 2 * hell), mr, 0, Math.PI / 2, -Math.PI / 2, hell > .5); }
+      ctx.closePath(); ctx.fill();
+      /* Mare: zwei dunklere Flecken */
+      ctx.fillStyle = 'rgba(120,110,90,.18)'; ctx.beginPath(); ctx.ellipse(mx - mr * .25, my - mr * .1, mr * .35, mr * .25, .4, 0, 6.29); ctx.fill(); ctx.beginPath(); ctx.ellipse(mx + mr * .3, my + mr * .3, mr * .2, mr * .18, 0, 0, 6.29); ctx.fill();
+      ctx.restore();
+    }
+    /* Wetterleuchten */
+    if (opt.wetter === 'gewitter') {
+      blitzWarte -= dt;
+      if (blitzWarte <= 0) { blitz = 1; blitzWarte = 5 + zuf() * 11; }
+      if (blitz > 0) { ctx.fillStyle = 'rgba(225,232,255,' + (blitz * .55).toFixed(2) + ')'; ctx.fillRect(16, 16, W - 32, fensterH - 28); blitz = Math.max(0, blitz - dt * 6 * (blitz > .6 ? 1 : 2.5)); }
+    }
+    /* Garten: hinten Bäume (dunkle Silhouetten mit Kronen), dann Büsche, dann Gras — alle wiegen sich */
+    const wind = opt.wetter === 'wind' || opt.wetter === 'gewitter' ? 2.4 : opt.wetter === 'regen' ? 1.4 : 1;
+    const boden = fensterH - 12;
+    const farbe = (tief) => nacht > .5 ? (tief ? '#0a0f0a' : '#0e150e') : (tief ? '#1d251c' : '#263125');
+    for (const b of baeume) {
+      const sway = Math.sin(t * .6 * wind + b.ph) * 3 * wind;
+      const bx = 16 + b.x * (W - 32), bw = b.w * (W - 32), bh = b.h * (fensterH - 40);
+      ctx.fillStyle = farbe(b.tief);
+      /* Stamm */
+      ctx.beginPath(); ctx.moveTo(bx + bw * .46, boden); ctx.lineTo(bx + bw * .44 + sway * .2, boden - bh * .45); ctx.lineTo(bx + bw * .56 + sway * .2, boden - bh * .45); ctx.lineTo(bx + bw * .54, boden); ctx.closePath(); ctx.fill();
+      /* Krone aus drei Wolken, im Winter kahl (nur Geäst) */
+      if (jahreszeit === 'winter') {
+        ctx.strokeStyle = farbe(b.tief); ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+        for (let k = 0; k < 7; k++) { const w = -1.3 + k * .43; ctx.beginPath(); ctx.moveTo(bx + bw * .5 + sway * .2, boden - bh * .45); ctx.quadraticCurveTo(bx + bw * .5 + Math.cos(w) * bw * .35 + sway * .5, boden - bh * (.45 + .3 * Math.abs(Math.sin(w))), bx + bw * .5 + Math.cos(w) * bw * .5 + sway, boden - bh * (.45 + .5 * Math.abs(Math.sin(w)) + .05)); ctx.stroke(); }
+      } else {
+        for (const [ox, oy, r] of [[.5, .75, .42], [.3, .6, .3], [.7, .62, .32], [.5, .92, .26]]) { ctx.beginPath(); ctx.ellipse(bx + bw * ox + sway, boden - bh * oy, bw * r, bh * r * .5, 0, 0, 6.29); ctx.fill(); }
+        if (jahreszeit === 'fruehling') { ctx.fillStyle = 'rgba(255,220,230,' + (nacht > .5 ? .12 : .3) + ')'; for (let k = 0; k < 14; k++) { ctx.beginPath(); ctx.arc(bx + bw * (.2 + ((k * 37) % 60) / 100) + sway, boden - bh * (.55 + ((k * 53) % 40) / 100), 1.4, 0, 6.29); ctx.fill(); } }
+      }
+    }
+    for (const s of buesche) {
+      const sway = Math.sin(t * .9 * wind + s.ph) * 2.2 * wind;
+      const sx = 16 + s.x * (W - 32), sw = s.w * (W - 32), sh = s.h * (fensterH - 40);
+      ctx.fillStyle = nacht > .5 ? '#0b120b' : '#1f2a1e';
+      ctx.beginPath(); ctx.ellipse(sx + sway, boden - sh * .35, sw * .5, sh * .5, 0, 0, 6.29); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(sx + sw * .3 + sway, boden - sh * .55, sw * .32, sh * .4, 0, 0, 6.29); ctx.fill();
+    }
+    /* Gras */
+    ctx.strokeStyle = nacht > .5 ? '#0c130c' : '#253024'; ctx.lineWidth = 1.2; ctx.lineCap = 'round';
+    for (const gr of graeser) {
+      const sway = Math.sin(t * 1.4 * wind + gr.ph) * 4 * wind * gr.n;
+      const gx = 16 + gr.x * (W - 32);
+      ctx.beginPath(); ctx.moveTo(gx, boden); ctx.quadraticCurveTo(gx + sway * .4, boden - gr.h * fensterH * .6, gx + sway, boden - gr.h * fensterH); ctx.stroke();
+    }
+    ctx.fillStyle = nacht > .5 ? '#080c08' : '#1a231a'; ctx.fillRect(16, boden, W - 32, 4);
+    /* Nebelbänder */
+    for (const n of nebel) {
+      const ny = n.y * fensterH; const nx = ((t * n.v * 60 + n.ph * 40) % (W + 300)) - 150;
+      kerzeSchein(ctx, nx, ny, 180, 18, [[0, 'rgba(150,160,170,' + (nacht > .5 ? .06 : .1) + ')'], [1, 'rgba(150,160,170,0)']]);
+    }
+    /* Jahreszeiten: Glühwürmchen (Sommer, Nacht), fallende Blätter (Herbst), Schnee (Winter) */
+    if (jahreszeit === 'sommer' && nacht > .6 && opt.wetter !== 'regen' && opt.wetter !== 'gewitter') {
+      for (const w of wuermchen) {
+        const a = Math.max(0, Math.sin(t * w.v * 2 + w.ph));
+        const wx = 16 + (w.x + Math.sin(t * .3 + w.ph) * .03) * (W - 32), wy = 16 + (w.y + Math.cos(t * .2 + w.ph) * .02) * (fensterH - 28);
+        kerzeSchein(ctx, wx, wy, 6, 6, [[0, 'rgba(210,255,140,' + (a * .9).toFixed(2) + ')'], [1, 'rgba(210,255,140,0)']]);
+      }
+    }
+    if (jahreszeit === 'herbst') {
+      for (const b of blaetter) {
+        b.y += b.v * dt * .5; b.x += Math.sin(t * 1.3 + b.ph) * .0015 * wind + .0006 * wind; b.rot += dt * 1.5;
+        if (b.y > 1.05) { b.y = -.05; b.x = zuf(); }
+        if (b.x > 1.05) b.x = -.05;
+        ctx.save(); ctx.translate(16 + b.x * (W - 32), 16 + b.y * (fensterH - 28)); ctx.rotate(b.rot);
+        ctx.fillStyle = b.f; ctx.globalAlpha = nacht > .5 ? .55 : .85; ctx.beginPath(); ctx.ellipse(0, 0, 4, 2.2, 0, 0, 6.29); ctx.fill(); ctx.restore();
+      }
+    }
+    if (jahreszeit === 'winter' && opt.wetter !== 'regen') {
+      for (const f of flocken) {
+        f.y += f.v * dt * .6; f.x += Math.sin(t * .8 + f.ph) * .0012 * wind;
+        if (f.y > 1.05) { f.y = -.03; f.x = zuf(); }
+        ctx.fillStyle = 'rgba(240,244,255,' + (nacht > .5 ? .7 : .85) + ')';
+        ctx.beginPath(); ctx.arc(16 + f.x * (W - 32), 16 + f.y * (fensterH - 28), f.r, 0, 6.29); ctx.fill();
+      }
+      ctx.fillStyle = 'rgba(235,240,250,.85)'; ctx.fillRect(16, boden - 3, W - 32, 7);
+    }
+    /* Regen: Tropfen, jeder für sich — keine Kachel, kein Wiederholen */
+    if (opt.wetter === 'regen' || opt.wetter === 'gewitter') {
+      const schraeg = opt.wetter === 'gewitter' ? .18 : .08;
+      ctx.strokeStyle = 'rgba(200,215,240,.5)'; ctx.lineWidth = 1;
+      for (const r of tropfen) {
+        r.y += r.v * dt * 1.6; r.x += schraeg * r.v * dt;
+        if (r.y > 1.05) { r.y = -.05; r.x = zuf(); } if (r.x > 1.05) r.x = -.05;
+        ctx.globalAlpha = r.a; ctx.beginPath();
+        ctx.moveTo(16 + r.x * (W - 32), 16 + r.y * (fensterH - 28)); ctx.lineTo(16 + (r.x + schraeg * r.l) * (W - 32), 16 + (r.y + r.l) * (fensterH - 28)); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      /* Tropfen, die an der Scheibe herunterlaufen */
+      for (const g of glasTropfen) {
+        g.y += g.v * dt * (.5 + g.r * .2); if (g.y > 1.02) { g.y = -.02; g.x = zuf(); }
+        const gx = 16 + g.x * (W - 32), gy = 16 + g.y * (fensterH - 28);
+        ctx.fillStyle = 'rgba(220,230,250,.35)'; ctx.beginPath(); ctx.ellipse(gx, gy, g.r, g.r * 1.5, 0, 0, 6.29); ctx.fill();
+        ctx.strokeStyle = 'rgba(220,230,250,.12)'; ctx.lineWidth = g.r * .9; ctx.beginPath(); ctx.moveTo(gx, gy - 40); ctx.lineTo(gx, gy); ctx.stroke();
+      }
+    }
+    /* Spiegelung der Flammen in der Scheibe, ganz zart */
+    if (opt.kerzen && nacht > .3) kerzeSchein(ctx, W * .86, fensterH * .55, 60, 40, [[0, 'rgba(255,170,80,' + (.06 * nacht).toFixed(3) + ')'], [1, 'rgba(255,170,80,0)']]);
+    /* Glasglanz */
+    const glanz = ctx.createLinearGradient(16, 16, W * .5, fensterH);
+    glanz.addColorStop(0, 'rgba(255,255,255,.05)'); glanz.addColorStop(.45, 'rgba(255,255,255,0)'); glanz.addColorStop(1, 'rgba(255,255,255,.03)');
+    ctx.fillStyle = glanz; ctx.fillRect(16, 16, W - 32, fensterH - 28);
+    ctx.restore();
+  }
+
+  function maleLicht() {
+    const oben = fensterH + 10;
+    /* Dunkelheit über der Platte, die Lampe frisst sie auf */
+    const an = opt.lampeAn ? opt.lampe : 0;
+    ctx.fillStyle = 'rgba(0,0,0,' + (.58 - .42 * an).toFixed(3) + ')'; ctx.fillRect(0, oben, W, H - oben);
+    if (an > 0) {
+      const flacker = 1 + .012 * Math.sin(t * 7.3) + .008 * Math.sin(t * 13.1);
+      kerzeSchein(ctx, W * .2, oben + (H - oben) * .3, W * .42 * flacker, (H - oben) * .62, [[0, 'rgba(255,196,110,' + (.5 * an).toFixed(3) + ')'], [.35, 'rgba(255,170,80,' + (.22 * an).toFixed(3) + ')'], [1, 'rgba(255,150,60,0)']]);
+      /* Lichtstreif an der Wand unter der Lampe */
+      kerzeSchein(ctx, W * .14, oben - 10, W * .1, 30, [[0, 'rgba(255,200,120,' + (.18 * an).toFixed(3) + ')'], [1, 'rgba(255,200,120,0)']]);
+    }
+    if (opt.kerzen) {
+      const fl = 1 + .1 * Math.sin(t * 9) + .06 * Math.sin(t * 17.3);
+      kerzeSchein(ctx, W * .88, oben + 20, W * .26 * fl, (H - oben) * .45, [[0, 'rgba(255,175,80,.26)'], [.5, 'rgba(255,150,60,.1)'], [1, 'rgba(255,140,50,0)']]);
+    }
+  }
+
+  function bild(jetzt) {
+    if (!laeuft) return;
+    const dt = Math.min(.05, (jetzt - letzte) / 1000 || .016); letzte = jetzt; t += dt;
+    if (messen() || !statisch) statisch = maleStatisch();
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(statisch, 0, 0);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    maleFenster(dt);
+    maleLicht();
+    requestAnimationFrame(bild);
+  }
+  return {
+    start() { if (laeuft) return; laeuft = true; letzte = performance.now(); requestAnimationFrame(bild); },
+    stopp() { laeuft = false; },
+    setze(neu) { Object.assign(opt, neu || {}); if ('holz' in (neu || {})) statisch = null; },
+    opt
+  };
+}
+
+/* ================================================================
    VANI — Der Schreibtisch.
 
    Kein Raum zum Einsortieren, sondern der Mittelpunkt: ein schwerer Tisch aus
    dunklem Holz vor einem hohen Fenster, dahinter fast völlige Nacht und ein
-   verwilderter Garten; auf dem Tisch eine Lampe mit bernsteinfarbenem Kegel,
-   ein siebenarmiger Leuchter, Tintenfass und Federn, offene Manuskripte,
-   Bücherstapel, eine Tasse, die schon längst gespült gehörte, ein Glas mit
-   einem Fundstück, ein Brief, Karteikarten, eine Lupe, ein Bleistiftstummel —
-   und eine Schublade voller Dinge, die kein vernünftiger Mensch aufbewahren
-   würde. Jedes Ding tut etwas. Nichts ist Dekoration: die Manuskripte sind die
-   zuletzt bearbeiteten Texte, die Bücher der Lesestapel, die Tasse der
-   Schreibtag, das Glas der Funke, der Brief eine Zeitkapsel an mich selbst.
+   verwilderter Garten; auf dem Tisch eine Lampe mit bernsteinfarbenem Kegel
+   und einer Zugschnur, ein siebenarmiger Leuchter, dessen Kerzen über Wochen
+   wirklich abbrennen, Tintenfass und Federn, offene Manuskripte, Bücherstapel,
+   eine Tasse, die schon längst gespült gehörte, ein Glas mit einem Fundstück,
+   ein Brief mit Siegel, Karteikarten, eine Lupe, ein Bleistiftstummel, eine
+   alte Standuhr, ein zweiter Stuhl — und unten der Papierkorb mit zerknüllten
+   Blättern und eine Schublade voller Dinge, die kein vernünftiger Mensch
+   aufbewahren würde. Jedes Ding tut etwas. Nichts ist Dekoration.
    Kein Deckenlicht. Niemals.
+
+   Das Gemalte (Fenster, Garten, Wetter, Platte, Licht) liegt in
+   54b-schreibtisch-malerei.js; hier stehen die Dinge und ihre Griffe.
    ================================================================ */
 
 const SCHREIBTISCH_HOELZER = [['ebenholz', 'Ebenholz'], ['nuss', 'Nussbaum'], ['kirsche', 'Kirsche'], ['eiche', 'Alte Eiche']];
+const LEUCHTER_STUNDEN = 20;   /* nach so vielen Schreibstunden sind die Kerzen herunter */
 
 /* Einrichtung des Tisches — pur, mit Vorgaben. */
 function saubererSchreibtisch(roh) {
@@ -14340,16 +14714,20 @@ function saubererSchreibtisch(roh) {
   return {
     holz: SCHREIBTISCH_HOELZER.some((h) => h[0] === q.holz) ? q.holz : 'nuss',
     lampe: begrenze(q.lampe, .25, 1, .8),
+    lampeAn: q.lampeAn !== false,
     kerzen: q.kerzen !== false,
     wetterFolgtKlang: q.wetterFolgtKlang !== false,
     unordnung: begrenze(q.unordnung, 0, 1, .7),
-    verse: q.verse !== false
+    verse: q.verse !== false,
+    uhrTickt: q.uhrTickt === true,
+    wachs: begrenze(q.wachs, 0, LEUCHTER_STUNDEN * 60, 0),         /* verbrannte Minuten */
+    kerzenGewechselt: begrenze(q.kerzenGewechselt, 0, 4102444800000, 0)
   };
 }
 
 /* Mondphase 0 … 1 (0 = Neumond, .5 = Vollmond), aus dem Datum. Pur. */
 function mondphase(wann = Date.now()) {
-  const bezug = Date.UTC(2000, 0, 6, 18, 14);      /* ein Neumond */
+  const bezug = Date.UTC(2000, 0, 6, 18, 14);
   const synodisch = 29.530588853 * 86400000;
   const t = ((wann - bezug) % synodisch + synodisch) % synodisch;
   return t / synodisch;
@@ -14358,17 +14736,35 @@ function mondphase(wann = Date.now()) {
 /* Brief an mich: offen, wenn das Öffnungsdatum erreicht ist. Pur. */
 function briefIstOffen(brief, jetzt = Date.now()) {
   if (!brief) return false;
-  const wann = Number(brief.oeffnen) || 0;
-  return wann <= jetzt;
+  return (Number(brief.oeffnen) || 0) <= jetzt;
+}
+
+/* Die Zugschnur: Feder mit Dämpfung. Pur, je Schritt. */
+function schnurSchritt(zustand, dt) {
+  const z = zustand;
+  const k = 70, d = 7;       /* Federhärte, Dämpfung */
+  const a = -k * z.x - d * z.v;
+  z.v += a * dt; z.x += z.v * dt;
+  if (Math.abs(z.x) < .3 && Math.abs(z.v) < 3) { z.x = 0; z.v = 0; }
+  return z;
+}
+
+/* Wie weit der Leuchter herunter ist: 0 frisch, 1 aufgebraucht. Pur. */
+function leuchterStand(wachsMinuten) {
+  return Math.max(0, Math.min(1, (Number(wachsMinuten) || 0) / (LEUCHTER_STUNDEN * 60)));
+}
+function schreibtischWachsVerbrennen(minuten) {
+  const e = saubererSchreibtisch(D.einst.schreibtisch);
+  e.wachs = Math.min(LEUCHTER_STUNDEN * 60, e.wachs + Math.max(0, Number(minuten) || 0));
+  D.einst.schreibtisch = e; speichereEinst();
 }
 
 /* Kurze eigene Zeilen für die „spontanen Verse" auf der Platte — aus den
    kuratierten Funden, nie aus allem. */
 function schreibtischVerse(max = 3) {
   if (typeof wiederFunde !== 'function') return [];
-  const funde = wiederFunde();
   const aus = [];
-  for (const f of funde) {
+  for (const f of wiederFunde()) {
     const zeile = (f.auszug || '').split('\n').map((z) => z.trim()).find((z) => z.length >= 12 && z.length <= 64);
     if (zeile && !aus.includes(zeile)) aus.push(zeile);
     if (aus.length >= max) break;
@@ -14376,38 +14772,51 @@ function schreibtischVerse(max = 3) {
   return aus;
 }
 
-/* ----- Die Dinge auf dem Tisch ----- */
-
 function schreibtischLetzteTexte(n = 3) {
   return [...D.docs.values()]
     .filter((d) => ['szene', 'blatt', 'seite'].includes(d.typ) && (d.text || '').trim().length > 0)
     .sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0)).slice(0, n);
 }
+async function schreibtischNeuesBlatt() { const b = blattAusText('', ''); oeffneSchreibraum(b.id); }
 
-async function schreibtischNeuesBlatt() {
-  const b = blattAusText('', '');
-  oeffneSchreibraum(b.id);
+/* Das Fundstück im Glas: ein eigenes Foto, jeden Tag ein anderes. */
+function schreibtischFundfoto() {
+  const bilder = [...D.docs.values()].filter((d) => d.bild && ['foto', 'schnipsel', 'brettbild'].includes(d.typ) && d.typ !== 'buch');
+  if (!bilder.length) return null;
+  let h = 0; for (const c of tagKey()) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return bilder[h % bilder.length];
 }
 
-/* Brief an mich — eine Zeitkapsel. */
+/* Brief an mich — eine Zeitkapsel, mit Siegel. */
 async function briefSchreiben() {
   const text = el('textarea', { rows: 7, placeholder: 'An die, die das in ein paar Wochen liest …', maxlength: '20000' });
   const wahl = el('select', {},
     el('option', { value: '7' }, 'in einer Woche'), el('option', { value: '30' }, 'in einem Monat'), el('option', { value: '90' }, 'in drei Monaten'),
     el('option', { value: '180' }, 'in einem halben Jahr'), el('option', { value: '365' }, 'in einem Jahr'));
   wahl.value = '30';
+  let siegel = null;
+  const siegelKnopf = el('button', { class: 'knopf zart klein', onclick: async () => {
+    const kiste = typeof stickerKiste === 'function' ? stickerKiste() : [];
+    const w = await menue([{ text: 'Rotes Wachs (klassisch)', icon: 'kreuz', wert: '_rot' }, ...(typeof STICKER_MITGEBRACHT !== 'undefined' ? STICKER_MITGEBRACHT.map((m) => ({ text: m.name, icon: 'sticker', wert: 'm:' + m.id })) : []), ...kiste.slice(0, 10).map((v, i) => ({ text: 'Sticker ' + (i + 1) + ' aus meiner Kiste', icon: 'archiv', wert: 'k:' + v.id })), { text: 'Neu zeichnen', icon: 'stift', wert: '_neu' }], 'Womit siegeln?');
+    if (!w) return;
+    if (w === '_rot') siegel = null;
+    else if (w === '_neu') { const n = await stickerZeichnen({ titel: 'Ein Siegel zeichnen', inKiste: true }); if (n) siegel = n.bild; }
+    else if (w.startsWith('m:')) { try { siegel = await stickerMitgebrachtBild(STICKER_MITGEBRACHT.find((m) => m.id === w.slice(2))); } catch (e) {} }
+    else { const v = D.docs.get(w.slice(2)); if (v) siegel = v.bild; }
+    siegelKnopf.textContent = siegel ? 'Siegel: eigenes Bild' : 'Siegel: rotes Wachs';
+  } }, 'Siegel: rotes Wachs');
   let fertig = false;
   return new Promise((res) => {
     const kasten = el('div', { class: 'modal brief-kasten' },
       el('h2', {}, 'Ein Brief an mich'),
       el('div', { class: 'stickerblock-hinweis' }, 'Er wird versiegelt und liegt auf dem Tisch, bis das Datum kommt. Dann erst lässt er sich öffnen.'),
       text,
-      el('label', { class: 'brief-wann' }, 'Öffnen ', wahl),
+      el('div', { class: 'brief-wann' }, el('span', {}, 'Öffnen '), wahl, el('span', { class: 'rest' }), siegelKnopf),
       el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
         el('button', { class: 'knopf voll', onclick: () => {
           const t = text.value.trim(); if (!t) { toast('Ein leerer Brief?'); return; }
           fertig = true;
-          const brief = neuDoc('brief', { text: t, oeffnen: Date.now() + Number(wahl.value) * 86400000, versiegelt: true });
+          const brief = neuDoc('brief', { text: t, oeffnen: Date.now() + Number(wahl.value) * 86400000, versiegelt: true, bild: siegel || undefined });
           zu(); toast('Versiegelt. Er wartet auf dem Tisch.'); res(brief);
         } }, 'Versiegeln')));
     const zu = zeigeDeck(kasten, () => { if (!fertig) res(null); });
@@ -14422,7 +14831,7 @@ async function briefeZeigen() {
   }));
   const wahl = await menue([...punkte, { text: 'Neuen Brief schreiben', icon: 'stift', wert: '_neu' }], briefe.length ? 'Briefe an mich' : 'Noch kein Brief auf dem Tisch');
   if (!wahl) return;
-  if (wahl === '_neu') { await briefSchreiben(); return; }
+  if (wahl === '_neu') { await briefSchreiben(); zeichne(); return; }
   const b = D.docs.get(wahl);
   if (!b) return;
   if (!briefIstOffen(b)) { toast('Noch versiegelt — bis ' + fmtDatum(b.oeffnen) + '. Geduld ist auch eine Schreibtugend.', 4200); return; }
@@ -14433,7 +14842,7 @@ async function briefeZeigen() {
     el('div', { class: 'reihe' },
       el('button', { class: 'knopf zart', onclick: async () => { if (await frage('Diesen Brief wegwerfen?', { ja: 'Wegwerfen', gefahr: true })) { await loesche(b.id); zu(); zeichne(); } } }, 'Wegwerfen'),
       el('button', { class: 'knopf', onclick: () => { zu(); const bl = blattAusText('Antwort auf einen Brief an mich', ''); oeffneSchreibraum(bl.id); } }, 'Antworten'),
-      el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
+      el('button', { class: 'knopf voll', onclick: () => { zu(); zeichne(); } }, 'Gut')));
   const zu = zeigeDeck(kasten);
 }
 
@@ -14443,7 +14852,7 @@ async function schubladeOeffnen() {
   const alte = vomTyp('schnipsel').filter((s) => Date.now() - s.angelegt > 14 * 86400000 && (s.text || '').trim());
   const metall = alte.length ? alte[Math.floor(Math.random() * alte.length)] : null;
   const wahl = await menue([
-    ...funde.map((f, i) => ({ text: '„' + (f.auszug.split('\n')[0] || '').slice(0, 60) + (f.auszug.length > 60 ? '…' : '') + '" — ' + f.art.toLowerCase(), icon: 'fund', wert: 'fund:' + f.doc.id })),
+    ...funde.map((f) => ({ text: '„' + (f.auszug.split('\n')[0] || '').slice(0, 60) + (f.auszug.length > 60 ? '…' : '') + '" — ' + f.art.toLowerCase(), icon: 'fund', wert: 'fund:' + f.doc.id })),
     { text: 'Eine winzige Lupe — suchen', icon: 'suche', wert: 'lupe' },
     { text: 'Bindfaden — wo alles zusammenhängt (Cluster)', icon: 'cluster', wert: 'faden' },
     { text: 'Getrocknete Blätter — die losen Blätter', icon: 'blatt', wert: 'blaetter' },
@@ -14456,41 +14865,47 @@ async function schubladeOeffnen() {
   if (wahl === 'lupe') { if (typeof oeffneSuche === 'function') oeffneSuche(); return; }
   if (wahl === 'faden') { location.hash = '#/cluster'; return; }
   if (wahl === 'blaetter') { location.hash = '#/blaetter'; return; }
-  if (wahl === 'marken') { location.hash = '#/feinheiten'; return; }
-  if (wahl === 'schluessel') { location.hash = '#/feinheiten'; return; }
+  if (wahl === 'marken' || wahl === 'schluessel') { location.hash = '#/feinheiten'; return; }
   if (wahl === 'metall' && metall) {
     await zeigeAnkunft('Ein Stück Metall unbekannter Herkunft', ['„' + (metall.text || '').slice(0, 300) + '"'], 'Schnipsel vom ' + fmtDatum(metall.angelegt) + ' — vielleicht bedeutungslos, vielleicht der Schlüssel zu einem ganzen Roman.', () => { location.hash = '#/schnipsel'; });
   }
 }
 
+/* Der Papierkorb unterm Tisch: zerknüllte Blätter glätten = zurückholen. */
+async function papierkorbAmTisch() {
+  const alle = (await dbAlle('papierkorb')).sort((a, b) => (b.wann || 0) - (a.wann || 0));
+  if (!alle.length) { toast('Der Papierkorb ist leer. Schön.'); return; }
+  const wahl = await menue([
+    ...alle.slice(0, 12).map((b) => ({ text: (b.name || b.typ || 'Etwas') + ' · ' + fmtDatum(b.wann) + (b.docs && b.docs.length > 1 ? ' · ' + b.docs.length + ' Teile' : ''), icon: 'blatt', wert: b.id })),
+    alle.length > 12 ? { text: '… und ' + (alle.length - 12) + ' mehr (in den Feinheiten)', icon: 'mehr', wert: '_mehr' } : null
+  ], 'Zerknüllt unterm Tisch — eines glätten?');
+  if (!wahl) return;
+  if (wahl === '_mehr') { location.hash = '#/feinheiten'; return; }
+  if (await holeZurueck(wahl)) { toast('Geglättet und zurückgelegt.'); zeichne(); }
+}
+
 /* Das Glas mit dem Fundstück: der Funke des Tages. */
 function schreibtischFunke() {
-  const saat = tagKey();
-  let h = 0; for (const c of saat) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  let h = 0; for (const c of tagKey()) h = (h * 31 + c.charCodeAt(0)) >>> 0;
   const arten = ['frage', 'form', 'satz', 'figur', 'wendung', 'kombi'];
   const art = arten[h % arten.length];
   return art === 'kombi' ? neuerFunke(true) : neuerFunke(false, art);
 }
-
 /* Die Tasse: der Schreibtag. */
 function schreibtischTag() {
   const heute = D.stats.tage[tagKey()] || 0;
   let serie = 0;
-  for (let i = 0; i < 400; i++) {
-    const k = tagKey(Date.now() - i * 86400000);
-    if ((D.stats.tage[k] || 0) > 0) serie++; else if (i > 0) break;
-  }
+  for (let i = 0; i < 400; i++) { const k = tagKey(Date.now() - i * 86400000); if ((D.stats.tage[k] || 0) > 0) serie++; else if (i > 0) break; }
   return { heute, serie };
 }
-
-/* Öffnet ein Dokument an seinem Ort. */
 function oeffneDokument(d) {
   if (!d) return;
   if (d.typ === 'szene' || d.typ === 'blatt') oeffneSchreibraum(d.id);
   else if (d.typ === 'seite') { sessionStorage.setItem('zielSeite', d.id); location.hash = '#/heft/' + d.parent; }
+  else if (d.typ === 'foto') { const s = D.docs.get(d.parent); if (s) { sessionStorage.setItem('zielSeite', s.id); location.hash = '#/heft/' + s.parent; } }
   else if (d.typ === 'schnipsel') location.hash = '#/schnipsel';
   else if (d.typ === 'faden') { if (typeof merkeFadenZiel === 'function') merkeFadenZiel(d.id); location.hash = '#/faden'; }
-  else if (d.typ === 'blase') location.hash = '#/brett/' + d.parent;
+  else if (d.typ === 'blase' || d.typ === 'brettbild') location.hash = '#/brett/' + d.parent;
   else if (d.typ === 'funkeln') location.hash = '#/woerter';
 }
 
@@ -14514,39 +14929,76 @@ async function nachtgartenKlang() {
   zeichne();
 }
 
-/* ----- Der siebenarmige Leuchter: sieben kleine Flammen auf Canvas ----- */
+/* Ein leiser Klick (Lampenzug) und ein Ticken (Uhr), beides synthetisch. */
+function schreibtischKlick(art) {
+  try {
+    const ctx = typeof audioCtxHolen === 'function' ? audioCtxHolen() : (window.__vaniKlick || (window.__vaniKlick = new (window.AudioContext || window.webkitAudioContext)()));
+    if (!ctx) return;
+    const t0 = ctx.currentTime;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = art === 'tick' ? 'square' : 'triangle';
+    o.frequency.setValueAtTime(art === 'tick' ? 1900 : 420, t0);
+    o.frequency.exponentialRampToValueAtTime(art === 'tick' ? 900 : 180, t0 + .04);
+    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(art === 'tick' ? .035 : .12, t0 + .004); g.gain.exponentialRampToValueAtTime(.0001, t0 + (art === 'tick' ? .05 : .12));
+    o.connect(g); g.connect(ctx.destination); o.start(t0); o.stop(t0 + .14);
+  } catch (e) {}
+}
+
+/* ----- Der siebenarmige Leuchter: Messingarme und sieben Flammen ----- */
 function baueLeuchter(einst) {
-  const W = 150, H = 120;
+  const W = 170, H = 150;
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   const c = el('canvas', { class: 'desk-leuchter-flammen', width: String(W * dpr), height: String(H * dpr) });
   c.style.width = W + 'px'; c.style.height = H + 'px';
   const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const arme = [[14, 40], [35, 28], [56, 18], [75, 10], [94, 18], [115, 28], [136, 40]];
+  const stand = leuchterStand(einst.wachs);
+  const arme = [[16, 46], [40, 32], [64, 20], [85, 12], [106, 20], [130, 32], [154, 46]];
+  /* Jede Kerze brennt ihr eigenes Tempo herunter — die mittlere am schnellsten */
+  const tempo = [.8, .95, 1.05, 1.25, 1.05, .95, .8];
+  const zuf = kerzeZufall(einst.kerzenGewechselt || 11);
+  const tropfen = arme.map(() => Array.from({ length: 3 }, () => ({ s: zuf() < .5 ? -1 : 1, h: zuf(), l: .3 + zuf() * .6 })));
   let phase = Math.random() * 10, laeuft = true, zug = 0;
-  const zeichne_ = (t) => {
+  const zeichne_ = () => {
     if (!c.isConnected) { laeuft = false; return; }
     phase += .016;
     ctx.clearRect(0, 0, W, H);
+    const fuss = 118;
+    /* Messing: Fuß, Schaft, geschwungene Arme */
+    const messing = (a, b) => { const g = ctx.createLinearGradient(0, a, 0, b); g.addColorStop(0, '#8a6a33'); g.addColorStop(.5, '#d9b463'); g.addColorStop(1, '#6b5024'); return g; };
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = messing(60, 120); ctx.lineWidth = 5;
+    arme.forEach(([x, y], i) => { if (i === 3) return; ctx.beginPath(); ctx.moveTo(85, fuss - 26); ctx.quadraticCurveTo(x + (85 - x) * .55, y + 52 - 18, x, y + 52); ctx.stroke(); });
+    ctx.strokeStyle = messing(40, 125); ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(85, fuss); ctx.lineTo(85, 60); ctx.stroke();
+    ctx.fillStyle = messing(fuss - 6, fuss + 16); ctx.beginPath(); ctx.ellipse(85, fuss + 8, 38, 11, 0, 0, 6.29); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(85, fuss + 12, 34, 7, 0, 0, 6.29); ctx.fill();
     arme.forEach(([x, y], i) => {
+      /* Tülle */
+      ctx.fillStyle = messing(y + 48, y + 60); ctx.beginPath(); ctx.ellipse(x, y + 53, 7, 3.2, 0, 0, 6.29); ctx.fill();
+      const voll = 26, hoehe = Math.max(5, voll * (1 - stand * tempo[i]));
+      const by = y + 52 - hoehe + 2;
+      /* Kerzenkörper mit Wachsläufen */
+      const kg = ctx.createLinearGradient(x - 4, 0, x + 4, 0); kg.addColorStop(0, '#d8c89c'); kg.addColorStop(.5, '#f3e7c6'); kg.addColorStop(1, '#cdbb8c');
+      ctx.fillStyle = kg; ctx.fillRect(x - 3.5, by, 7, y + 52 - by);
+      ctx.fillStyle = 'rgba(255,250,236,.9)';
+      for (const tr of tropfen[i]) { const ty = by + tr.h * (y + 52 - by); ctx.fillRect(x + tr.s * 3.2 - .7, ty, 1.4, (y + 52 - ty) * tr.l); }
+      ctx.fillStyle = 'rgba(120,90,40,.3)'; ctx.beginPath(); ctx.ellipse(x, by, 3.5, 1.4, 0, 0, 6.29); ctx.fill();
+      /* Flamme */
       const fl = 1 + .12 * Math.sin(phase * 8 + i * 1.7) + .06 * Math.sin(phase * 17 + i);
       const neig = Math.sin(phase * .9 + i) * .08 + zug * (i % 2 ? -1 : 1) * .2;
       const fh = 15 * fl, fw = 4.6;
-      const by = y + 52;
-      /* Kerzenkörper */
-      ctx.fillStyle = '#efe0bd'; ctx.fillRect(x - 3, by, 6, 22 + (i === 3 ? 4 : 0));
-      /* Schein */
-      kerzeSchein(ctx, x, by - fh * .5, 22, 26, [[0, 'rgba(255,170,70,' + (.25 * fl).toFixed(3) + ')'], [1, 'rgba(255,140,50,0)']]);
-      /* Flamme */
+      kerzeSchein(ctx, x, by - fh * .5, 24, 28, [[0, 'rgba(255,170,70,' + (.24 * fl).toFixed(3) + ')'], [1, 'rgba(255,140,50,0)']]);
+      ctx.strokeStyle = '#3b2e22'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(x, by); ctx.lineTo(x + neig * 2, by - 3); ctx.stroke();
       ctx.beginPath();
       const sx = x + neig * 14;
-      ctx.moveTo(x - fw * .2, by);
-      for (let k = 1; k <= 10; k++) { const u = k / 10; ctx.lineTo(sx * u + x * (1 - u) - fw * kerzeFlammenBreite(u) * .55, by - fh * u); }
-      for (let k = 10; k >= 1; k--) { const u = k / 10; ctx.lineTo(sx * u + x * (1 - u) + fw * kerzeFlammenBreite(u) * .55, by - fh * u); }
+      ctx.moveTo(x - fw * .2, by - 2);
+      for (let k = 1; k <= 10; k++) { const u = k / 10; ctx.lineTo(sx * u + x * (1 - u) - fw * kerzeFlammenBreite(u) * .55, by - 2 - fh * u); }
+      for (let k = 10; k >= 1; k--) { const u = k / 10; ctx.lineTo(sx * u + x * (1 - u) + fw * kerzeFlammenBreite(u) * .55, by - 2 - fh * u); }
       ctx.closePath();
       const g = ctx.createLinearGradient(0, by, 0, by - fh);
-      g.addColorStop(0, 'rgba(255,150,40,.9)'); g.addColorStop(.6, 'rgba(255,200,100,.95)'); g.addColorStop(1, 'rgba(255,245,210,.3)');
+      g.addColorStop(0, 'rgba(255,150,40,.92)'); g.addColorStop(.6, 'rgba(255,200,100,.95)'); g.addColorStop(1, 'rgba(255,245,210,.3)');
       ctx.fillStyle = g; ctx.fill();
-      ctx.fillStyle = 'rgba(255,252,230,.85)'; ctx.beginPath(); ctx.ellipse(x, by - fh * .3, 1.4, fh * .25, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(120,160,255,.35)'; ctx.beginPath(); ctx.ellipse(x, by - 3, 1.6, 1.2, 0, 0, 6.29); ctx.fill();
+      ctx.fillStyle = 'rgba(255,252,230,.85)'; ctx.beginPath(); ctx.ellipse(x, by - 2 - fh * .3, 1.4, fh * .25, 0, 0, 6.29); ctx.fill();
     });
     zug *= .94;
     if (laeuft) requestAnimationFrame(zeichne_);
@@ -14555,102 +15007,149 @@ function baueLeuchter(einst) {
   return { element: c, puste: (s = .5) => { zug += s; } };
 }
 
-/* Sterne hinterm Fenster: einmal gewürfelt, leicht flimmernd. */
-function baueSternenhimmel() {
-  const c = el('canvas', { class: 'desk-sterne' });
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
-  const zuf = kerzeZufall(tagKey().length * 131 + 7);
-  const sterne = Array.from({ length: 70 }, () => ({ x: zuf(), y: zuf() * .7, r: .4 + zuf() * 1.2, ph: zuf() * 6, tw: .4 + zuf() }));
-  let laeuft = true, t = 0;
-  const mond = mondphase();
-  const male = () => {
-    if (!c.isConnected) { laeuft = false; return; }
-    const cr = c.getBoundingClientRect();
-    if (c.width !== Math.round(cr.width * dpr)) { c.width = Math.round(cr.width * dpr); c.height = Math.round(cr.height * dpr); }
-    const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const W = cr.width, H = cr.height; t += .02;
-    ctx.clearRect(0, 0, W, H);
-    for (const s of sterne) {
-      const a = .35 + .45 * Math.abs(Math.sin(t * s.tw + s.ph));
-      ctx.fillStyle = 'rgba(255,248,220,' + a.toFixed(2) + ')';
-      ctx.beginPath(); ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2); ctx.fill();
-    }
-    /* Mond mit echter Phase: eine helle Scheibe, vom Schatten angeschnitten */
-    const mx = W * .74, my = H * .18, mr = Math.min(22, W * .04);
-    ctx.save();
-    kerzeSchein(ctx, mx, my, mr * 4, mr * 4, [[0, 'rgba(255,245,215,.18)'], [1, 'rgba(255,245,215,0)']]);
-    ctx.fillStyle = '#f4ecd6'; ctx.beginPath(); ctx.arc(mx, my, mr, 0, Math.PI * 2); ctx.fill();
-    /* Schatten: Terminator als Ellipse, Seite je nach Phase */
-    const p = mond; const hell = 1 - Math.abs(p - .5) * 2;   /* 0 neu, 1 voll */
-    ctx.fillStyle = '#1a1c26';
-    ctx.beginPath();
-    if (p < .5) { ctx.arc(mx, my, mr, Math.PI / 2, -Math.PI / 2, false); ctx.ellipse(mx, my, mr * Math.abs(1 - 2 * hell), mr, 0, -Math.PI / 2, Math.PI / 2, hell > .5); }
-    else { ctx.arc(mx, my, mr, -Math.PI / 2, Math.PI / 2, false); ctx.ellipse(mx, my, mr * Math.abs(1 - 2 * hell), mr, 0, Math.PI / 2, -Math.PI / 2, hell > .5); }
-    ctx.closePath(); ctx.fill();
-    ctx.restore();
-    if (laeuft) setTimeout(() => requestAnimationFrame(male), 120);
+/* ----- Die Lampe mit Zugschnur ----- */
+function baueLampe(szene, e, maler) {
+  const halter = el('div', { class: 'desk-ding lampe' + (e.lampeAn ? '' : ' aus'), title: 'Die Lampe: an der Schnur ziehen' });
+  const schirm = el('div', { class: 'schirm' });
+  const arm = el('i', { class: 'arm' });
+  const schnur = el('div', { class: 'schnur' }, el('i', { class: 'faden' }), el('b', { class: 'knauf' }));
+  halter.append(arm, schirm, schnur);
+  const RUHE = 54, MAX = 150, SCHWELLE = 46;
+  const zustand = { x: 0, v: 0 };   /* Auslenkung über Ruhe */
+  let zieht = null, raf = 0, letzte = 0, maxZug = 0;
+  const male = () => { schnur.style.height = (RUHE + zustand.x) + 'px'; schnur.style.setProperty('--dehnung', (1 + zustand.x / 260).toFixed(3)); };
+  const feder = (jetzt) => {
+    const dt = Math.min(.04, (jetzt - letzte) / 1000 || .016); letzte = jetzt;
+    schnurSchritt(zustand, dt); male();
+    if (zustand.x !== 0 || zustand.v !== 0) raf = requestAnimationFrame(feder); else raf = 0;
   };
-  requestAnimationFrame(male);
-  return c;
+  const umschalten = () => {
+    e.lampeAn = !e.lampeAn;
+    D.einst.schreibtisch = { ...e }; speichereEinst();
+    halter.classList.toggle('aus', !e.lampeAn);
+    szene.classList.toggle('lampe-aus', !e.lampeAn);
+    if (maler) maler.setze({ lampeAn: e.lampeAn });
+    schreibtischKlick('klick');
+  };
+  const knauf = schnur.querySelector('.knauf');
+  knauf.addEventListener('pointerdown', (ev) => {
+    ev.stopPropagation(); ev.preventDefault();
+    cancelAnimationFrame(raf); raf = 0;
+    zieht = { y0: ev.clientY, x0: zustand.x }; maxZug = 0; zustand.v = 0;
+    try { knauf.setPointerCapture(ev.pointerId); } catch (x) {}
+    halter.classList.add('zieht');
+  });
+  knauf.addEventListener('pointermove', (ev) => {
+    if (!zieht) return;
+    const roh = zieht.x0 + (ev.clientY - zieht.y0);
+    /* Die Schnur gibt nach, aber nicht unendlich — oben bleibt sie straff. */
+    zustand.x = roh < 0 ? roh * .15 : roh > MAX - RUHE ? (MAX - RUHE) + (roh - (MAX - RUHE)) * .12 : roh;
+    maxZug = Math.max(maxZug, zustand.x);
+    male();
+  });
+  const loslassen = () => {
+    if (!zieht) return;
+    zieht = null; halter.classList.remove('zieht');
+    if (maxZug >= SCHWELLE) { umschalten(); zustand.v = -260; } else zustand.v = -60;
+    letzte = performance.now(); raf = requestAnimationFrame(feder);
+  };
+  knauf.addEventListener('pointerup', loslassen); knauf.addEventListener('pointercancel', loslassen);
+  /* Der Schirm selbst: Helligkeit in Stufen */
+  schirm.addEventListener('click', () => {
+    if (!e.lampeAn) { umschalten(); return; }
+    const stufen = [.45, .65, .8, 1];
+    const i = stufen.findIndex((s) => Math.abs(s - e.lampe) < .01);
+    e.lampe = stufen[(i + 1) % stufen.length];
+    D.einst.schreibtisch = { ...e }; speichereEinst();
+    if (maler) maler.setze({ lampe: e.lampe });
+    szene.style.setProperty('--lampe', e.lampe);
+    toast(e.lampe >= 1 ? 'Hell.' : e.lampe >= .8 ? 'Warm.' : e.lampe >= .65 ? 'Gedämpft.' : 'Nur ein Schimmer.');
+  });
+  male();
+  return halter;
+}
+
+/* ----- Die Standuhr ----- */
+function baueUhr(e) {
+  const uhr = el('button', { class: 'desk-ding uhr', title: 'Die Standuhr' },
+    el('div', { class: 'uhr-gehaeuse' }, el('div', { class: 'zifferblatt' }, el('i', { class: 'zeiger stunde' }), el('i', { class: 'zeiger minute' }), el('i', { class: 'achse' })),
+      el('div', { class: 'pendelfenster' }, el('i', { class: 'pendel' }))));
+  const stelle = () => {
+    const d = new Date();
+    uhr.querySelector('.zeiger.stunde').style.transform = 'rotate(' + ((d.getHours() % 12) * 30 + d.getMinutes() * .5) + 'deg)';
+    uhr.querySelector('.zeiger.minute').style.transform = 'rotate(' + (d.getMinutes() * 6 + d.getSeconds() * .1) + 'deg)';
+  };
+  stelle();
+  let timer = setInterval(() => {
+    if (!uhr.isConnected) { clearInterval(timer); return; }
+    stelle();
+    const d = new Date();
+    if (e.uhrTickt) { schreibtischKlick('tick'); if (d.getMinutes() === 0 && d.getSeconds() === 0 && typeof glocke === 'function') glocke(); }
+  }, 1000);
+  uhr.addEventListener('click', () => {
+    const start = Number(sessionStorage.getItem('vani-session-start') || Date.now());
+    const min = Math.max(0, Math.round((Date.now() - start) / 60000));
+    const d = new Date();
+    toast(String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ' Uhr · ' + (min < 1 ? 'gerade erst gekommen' : min < 60 ? 'seit ' + min + ' Minuten am Tisch' : 'seit ' + Math.floor(min / 60) + ' Std. ' + (min % 60) + ' Min. am Tisch') + (e.uhrTickt ? '' : ' · tickt leise, wenn du es willst (Einrichten)'), 4200);
+  });
+  return uhr;
 }
 
 /* ----- Der Raum ----- */
 RENDER.schreibtisch = function (haupt) {
+  if (!sessionStorage.getItem('vani-session-start')) sessionStorage.setItem('vani-session-start', String(Date.now()));
   const e = saubererSchreibtisch(D.einst.schreibtisch);
   const wetter = e.wetterFolgtKlang ? schreibtischWetter() : 'still';
-  const szene = el('div', { class: 'desk-szene holz-' + e.holz + ' wetter-' + wetter + (e.kerzen ? ' kerzen-an' : ''), style: '--lampe:' + e.lampe + ';--unordnung:' + e.unordnung });
+  const szene = el('div', { class: 'desk-szene holz-' + e.holz + ' wetter-' + wetter + (e.kerzen ? ' kerzen-an' : '') + (e.lampeAn ? '' : ' lampe-aus'), style: '--lampe:' + e.lampe + ';--unordnung:' + e.unordnung });
+  const leinwand = el('canvas', { class: 'desk-malerei' });
+  const maler = schreibtischMaler(leinwand, { holz: e.holz, lampe: e.lampe, lampeAn: e.lampeAn, wetter, kerzen: e.kerzen, unordnung: e.unordnung });
+  const dinge = el('div', { class: 'desk-dinge' });
+  szene.append(leinwand, dinge);
 
-  /* Fenster */
-  const fenster = el('div', { class: 'desk-fenster' },
-    el('div', { class: 'desk-nacht' }, baueSternenhimmel()),
-    el('div', { class: 'desk-garten' }, el('i', { class: 'baum b1' }), el('i', { class: 'baum b2' }), el('i', { class: 'busch s1' }), el('i', { class: 'busch s2' }), el('i', { class: 'busch s3' }), el('i', { class: 'gras' })),
-    el('div', { class: 'desk-regen' }), el('div', { class: 'desk-nebel' }),
-    el('div', { class: 'desk-rahmen' }, el('i', { class: 'sprosse v' }), el('i', { class: 'sprosse h' })),
-    el('div', { class: 'desk-ranken' }),
-    el('button', { class: 'desk-fensterknopf', title: 'Der Nachtgarten: Grillen und Wind (Klang)', onclick: () => nachtgartenKlang() }, el('span', { html: ik('klang') })));
+  const ding = (klasse, titel, inhalt, onclick, stil) => el('button', { class: 'desk-ding ' + klasse, title: titel, 'aria-label': titel, onclick, style: stil || '' }, inhalt);
 
-  /* Tischplatte mit Dingen */
-  const platte = el('div', { class: 'desk-platte' }, el('div', { class: 'desk-holz' }), el('div', { class: 'desk-flecken' }), el('div', { class: 'desk-lichtkegel' }));
-  const ding = (klasse, titel, inhalt, onclick, stil) => {
-    const b = el('button', { class: 'desk-ding ' + klasse, title: titel, 'aria-label': titel, onclick, style: stil || '' }, inhalt);
-    return b;
-  };
+  /* Fensterknopf: Klang des Gartens */
+  dinge.append(el('button', { class: 'desk-fensterknopf', title: 'Der Nachtgarten: Grillen und Wind (Klang)', onclick: () => nachtgartenKlang() }, el('span', { html: ik('klang') })));
 
-  /* Lampe */
-  platte.append(ding('lampe', 'Die Lampe: heller oder dunkler', el('i', { class: 'schirm' }), () => {
-    const stufen = [.35, .55, .8, 1];
-    const i = stufen.findIndex((s) => Math.abs(s - e.lampe) < .01);
-    e.lampe = stufen[(i + 1) % stufen.length];
-    D.einst.schreibtisch = { ...e }; speichereEinst();
-    szene.style.setProperty('--lampe', e.lampe);
-    toast(e.lampe >= 1 ? 'Hell.' : e.lampe >= .8 ? 'Warm.' : e.lampe >= .55 ? 'Gedämpft.' : 'Fast nur noch die Kerzen.');
-  }));
+  /* Lampe mit Zugschnur */
+  dinge.append(baueLampe(szene, e, maler));
 
   /* Leuchter */
   let leuchter = null;
   if (e.kerzen) {
     leuchter = baueLeuchter(e);
-    platte.append(ding('leuchter', 'Der Leuchter: eine Kerze anzünden (Schreibzeit)', el('div', { class: 'leuchter-bild' }, leuchter.element, el('i', { class: 'leuchter-fuss' })), async () => {
+    const stand = leuchterStand(e.wachs);
+    dinge.append(ding('leuchter', stand >= 1 ? 'Die Kerzen sind herunter — neue aufstecken' : 'Der Leuchter: Schreibzeit anzünden (' + Math.round((1 - stand) * 100) + ' % Kerze)', el('div', { class: 'leuchter-bild' }, leuchter.element), async () => {
+      if (leuchterStand(e.wachs) >= 1) {
+        if (await frage('Die Kerzen sind nach ' + LEUCHTER_STUNDEN + ' Schreibstunden herunter. Neue aufstecken?', { ja: 'Neue Kerzen' })) { e.wachs = 0; e.kerzenGewechselt = Date.now(); D.einst.schreibtisch = { ...e }; speichereEinst(); toast('Sieben neue Kerzen. Frisch und weiß.'); zeichne(); }
+        return;
+      }
       const dauer = await menue([
-        { text: 'Eine kleine Kerze — 10 Minuten', wert: 10 }, { text: 'Eine mittlere — 20 Minuten', wert: 20 }, { text: 'Eine lange — 45 Minuten', wert: 45 }
-      ], 'Der Leuchter: Schreibzeit anzünden');
-      if (!dauer) return;
+        { text: 'Eine kleine Kerze — 10 Minuten', wert: 10 }, { text: 'Eine mittlere — 20 Minuten', wert: 20 }, { text: 'Eine lange — 45 Minuten', wert: 45 },
+        { text: 'Nur die Flammen ansehen', wert: 0 }
+      ], 'Der Leuchter — ' + Math.round((1 - leuchterStand(e.wachs)) * 100) + ' % Kerze übrig');
+      if (dauer === null || dauer === undefined) return;
+      if (!dauer) { leuchter.puste(1.2); return; }
       const b = blattAusText('', '');
       oeffneSchreibraum(b.id);
       setTimeout(() => starteSprint(dauer), 400);
     }));
   }
 
+  /* Standuhr und der zweite Stuhl */
+  dinge.append(baueUhr(e));
+  dinge.append(ding('stuhl', 'Der zweite Stuhl: der Faden — ein Gespräch am Tisch', el('div', { class: 'stuhl-bild' }, el('i', { class: 'lehne' }), el('i', { class: 'sitz' }), el('i', { class: 'bein b1' }), el('i', { class: 'bein b2' })), () => { location.hash = '#/faden'; }));
+
   /* Manuskripte: die letzten Texte */
   const letzte = schreibtischLetzteTexte(3);
   letzte.forEach((d, i) => {
     const text = (d.text || '').trim().slice(0, 420);
-    platte.append(ding('manuskript m' + (i + 1), 'Weiterschreiben: ' + (d.titel || text.slice(0, 30)), el('div', { class: 'manuskript-papier' }, el('b', {}, d.titel || (d.typ === 'seite' ? 'Heftseite' : d.typ === 'szene' ? 'Szene' : 'Blatt')), el('span', {}, text)), () => oeffneDokument(d), '--dreh:' + ((i * 7) % 9 - 4) + 'deg'));
+    dinge.append(ding('manuskript m' + (i + 1), 'Weiterschreiben: ' + (d.titel || text.slice(0, 30)), el('div', { class: 'manuskript-papier' }, el('b', {}, d.titel || (d.typ === 'seite' ? 'Heftseite' : d.typ === 'szene' ? 'Szene' : 'Blatt')), el('span', {}, text), el('i', { class: 'korrektur k1' }), el('i', { class: 'korrektur k2' })), () => oeffneDokument(d), '--dreh:' + ((i * 7) % 9 - 4) + 'deg'));
   });
-  if (!letzte.length) platte.append(ding('manuskript m1 leer', 'Ein leeres Blatt — anfangen', el('div', { class: 'manuskript-papier' }, el('b', {}, 'Noch nichts'), el('span', {}, 'Ein leeres Blatt. Das beste Versprechen, das es gibt.')), () => schreibtischNeuesBlatt()));
+  if (!letzte.length) dinge.append(ding('manuskript m1 leer', 'Ein leeres Blatt — anfangen', el('div', { class: 'manuskript-papier' }, el('b', {}, 'Noch nichts'), el('span', {}, 'Ein leeres Blatt. Das beste Versprechen, das es gibt.')), () => schreibtischNeuesBlatt()));
 
   /* Tintenfass & Feder */
-  platte.append(ding('tinte', 'Tintenfass und Feder: ein neues Blatt', el('div', { class: 'tinte-bild' }, el('i', { class: 'fass' }), el('i', { class: 'feder f1' }), el('i', { class: 'feder f2' })), () => schreibtischNeuesBlatt()));
+  dinge.append(ding('tinte', 'Tintenfass und Feder: ein neues Blatt', el('div', { class: 'tinte-bild' }, el('i', { class: 'fass' }), el('i', { class: 'fass-glanz' }), el('i', { class: 'feder f1' }), el('i', { class: 'feder f2' })), () => schreibtischNeuesBlatt()));
 
   /* Bücherstapel (Lesestapel) */
   const buecher = typeof lesestapelBuecher === 'function' ? lesestapelBuecher() : [];
@@ -14658,63 +15157,65 @@ RENDER.schreibtisch = function (haupt) {
   buecher.slice(0, 6).forEach((b, i) => {
     const img = el('img', { alt: b.titel || 'Buch', draggable: 'false' });
     if (b.bild) setzeBild(img, b.bild);
-    const buch = el('button', { class: 'stapel-buch' + (b.bild ? '' : ' ohne-cover'), title: (b.titel || 'Buch') + (b.seiten ? ' · Seite ' + (b.seite || 1) + ' von ' + b.seiten : ''), style: '--i:' + i + ';--dreh:' + ((i * 11) % 7 - 3) + 'deg', onclick: () => buchOeffnen(b) }, img, b.bild ? null : el('span', {}, b.titel || 'Buch'));
-    stapel.append(buch);
+    stapel.append(el('button', { class: 'stapel-buch' + (b.bild ? '' : ' ohne-cover'), title: (b.titel || 'Buch') + (b.seiten ? ' · Seite ' + (b.seite || 1) + ' von ' + b.seiten : ''), style: '--i:' + i + ';--dreh:' + ((i * 11) % 7 - 3) + 'deg', onclick: () => buchOeffnen(b) }, img, b.bild ? null : el('span', {}, b.titel || 'Buch')));
   });
   stapel.append(el('button', { class: 'stapel-fuss', title: 'Der Lesestapel: Bücher auflegen, ordnen', onclick: () => lesestapelZeigen() }, buecher.length ? (buecher.length > 6 ? '+' + (buecher.length - 6) + ' · ' : '') + 'Lesestapel' : 'Bücher auflegen'));
-  platte.append(el('div', { class: 'desk-ding-halter buecher' }, stapel));
+  dinge.append(el('div', { class: 'desk-ding-halter buecher' }, stapel));
 
   /* Tasse: der Schreibtag */
   const tag = schreibtischTag();
-  platte.append(ding('tasse' + (tag.heute > 0 ? ' dampft' : ''), 'Die Tasse: ' + (tag.heute ? tag.heute + ' Wörter heute' : 'heute noch nichts') + (tag.serie > 1 ? ' · ' + tag.serie + ' Tage in Folge' : ''), el('div', { class: 'tasse-bild' }, el('i', { class: 'dampf d1' }), el('i', { class: 'dampf d2' }), el('i', { class: 'henkel' }), el('span', { class: 'tasse-zahl' }, tag.heute ? String(tag.heute) : '')), () => {
+  dinge.append(ding('tasse' + (tag.heute > 0 ? ' dampft' : ''), 'Die Tasse: ' + (tag.heute ? tag.heute + ' Wörter heute' : 'heute noch nichts') + (tag.serie > 1 ? ' · ' + tag.serie + ' Tage in Folge' : ''), el('div', { class: 'tasse-bild' }, el('i', { class: 'dampf d1' }), el('i', { class: 'dampf d2' }), el('i', { class: 'dampf d3' }), el('i', { class: 'henkel' }), el('span', { class: 'tasse-zahl' }, tag.heute ? String(tag.heute) : '')), () => {
     toast(tag.heute ? tag.heute + ' Wörter heute' + (tag.serie > 1 ? ' — der ' + tag.serie + '. Tag in Folge.' : '.') : 'Heute noch nichts. Die Tasse wartet.', 3600);
   }));
 
-  /* Glas mit Fundstück: der Funke */
-  platte.append(ding('glas', 'Das Glas mit dem Fundstück: der Funke des Tages', el('div', { class: 'glas-bild' }, el('i', { class: 'glaskoerper' }), el('i', { class: 'fundstueck' })), async () => {
+  /* Glas mit Fundstück: ein eigenes Foto oder der Funke */
+  const fundfoto = schreibtischFundfoto();
+  const glasInhalt = el('div', { class: 'glas-bild' }, el('i', { class: 'glaskoerper' }), el('i', { class: 'glas-deckel' }));
+  if (fundfoto) { const img = el('img', { class: 'fund-foto', alt: '', draggable: 'false' }); setzeBild(img, fundfoto.bild); glasInhalt.append(img); }
+  else glasInhalt.append(el('i', { class: 'fundstueck' }));
+  dinge.append(ding('glas', fundfoto ? 'Das Glas: heute liegt ein Bild von dir darin — und der Funke des Tages' : 'Das Glas mit dem Fundstück: der Funke des Tages', glasInhalt, async () => {
     const f = schreibtischFunke();
-    const wahl = await menue([{ text: 'Damit schreiben', icon: 'stift', wert: 'schreiben' }, { text: 'Anderen Funken', icon: 'wuerfel', wert: 'neu' }], f);
+    const wahl = await menue([{ text: 'Damit schreiben', icon: 'stift', wert: 'schreiben' }, { text: 'Anderen Funken', icon: 'wuerfel', wert: 'neu' }, fundfoto ? { text: 'Das Bild ansehen, wo es herkommt', icon: 'kamera', wert: 'bild' } : null], f);
     if (wahl === 'schreiben') { const b = blattAusText('', f + '\n\n'); oeffneSchreibraum(b.id); }
     else if (wahl === 'neu') { const g = neuerFunke(Math.random() < .4); const w2 = await menue([{ text: 'Damit schreiben', icon: 'stift', wert: 'schreiben' }], g); if (w2) { const b = blattAusText('', g + '\n\n'); oeffneSchreibraum(b.id); } }
+    else if (wahl === 'bild' && fundfoto) oeffneDokument(fundfoto);
   }));
 
-  /* Brief */
+  /* Brief mit Siegel */
   const briefe = vomTyp('brief');
   const offenZumLesen = briefe.some((b) => briefIstOffen(b) && b.versiegelt);
-  platte.append(ding('brief' + (offenZumLesen ? ' bereit' : '') + (briefe.length ? '' : ' leer'), offenZumLesen ? 'Ein Brief an dich darf geöffnet werden' : 'Ein Brief an mich (Zeitkapsel)', el('div', { class: 'brief-bild' }, el('i', { class: 'siegel' })), () => briefeZeigen()));
+  const neuester = briefe.sort((a, b) => (b.angelegt || 0) - (a.angelegt || 0))[0];
+  const siegel = el('i', { class: 'siegel' });
+  if (neuester && neuester.bild) { const img = el('img', { alt: '', draggable: 'false' }); setzeBild(img, neuester.bild); siegel.append(img); siegel.classList.add('eigen'); }
+  dinge.append(ding('brief' + (offenZumLesen ? ' bereit' : '') + (briefe.length ? '' : ' leer'), offenZumLesen ? 'Ein Brief an dich darf geöffnet werden' : 'Ein Brief an mich (Zeitkapsel)', el('div', { class: 'brief-bild' }, el('i', { class: 'zeile z1' }), el('i', { class: 'zeile z2' }), siegel), () => briefeZeigen()));
 
-  /* Karteikarten */
-  platte.append(ding('karten', 'Karteikarten: eine Wortkiste abfragen', el('div', { class: 'karten-bild' }, el('i'), el('i'), el('i')), async () => {
+  /* Karteikarten, Lupe, Bleistiftstummel, Notizbuch */
+  dinge.append(ding('karten', 'Karteikarten: eine Wortkiste abfragen', el('div', { class: 'karten-bild' }, el('i'), el('i'), el('i')), async () => {
     const kisten = typeof wortkisten === 'function' ? wortkisten() : [];
     const wahl = await menue([{ text: 'Alle Wörter', icon: 'woerter', wert: 'alle' }, ...kisten.map((k) => ({ text: k.titel || 'Wortkiste', icon: 'woerter', wert: k.id }))], 'Welche Kiste abfragen?');
     if (wahl) wortkisteAbfragen(wahl, wahl === 'alle' ? 'Alle Wörter' : (D.docs.get(wahl) || {}).titel);
   }));
-
-  /* Lupe & Bleistiftstummel */
-  platte.append(ding('lupe', 'Die Lupe: suchen', el('div', { class: 'lupe-bild' }, el('i', { class: 'linse' }), el('i', { class: 'griff' })), () => { if (typeof oeffneSuche === 'function') oeffneSuche(); else location.hash = '#/suche'; }));
-  platte.append(ding('stummel', 'Der Bleistiftstummel: schnell einen Schnipsel', el('div', { class: 'stummel-bild' }), async () => {
+  dinge.append(ding('lupe', 'Die Lupe: suchen', el('div', { class: 'lupe-bild' }, el('i', { class: 'linse' }), el('i', { class: 'glanz' }), el('i', { class: 'griff' })), () => { if (typeof oeffneSuche === 'function') oeffneSuche(); else location.hash = '#/suche'; }));
+  dinge.append(ding('stummel', 'Der Bleistiftstummel: schnell einen Schnipsel', el('div', { class: 'stummel-bild' }, el('i', { class: 'holz' }), el('i', { class: 'mine' })), async () => {
     const t = await eingabe({ titel: 'Schnell notiert', platzhalter: 'ein Satz, ein Wort, ein Gedanke …', mehrzeilig: true, ok: 'Ablegen' });
     if (t) { neuDoc('schnipsel', { text: t }); toast('Liegt in den Schnipseln.'); }
   }));
-
-  /* Notizbuch mit Zetteln: das letzte Heft */
   const letztesHeft = vomTyp('heft').filter((h) => !h.archiv).sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0))[0];
-  if (letztesHeft) platte.append(ding('notizbuch', 'Das Notizbuch mit zu vielen Zetteln: ' + letztesHeft.titel, el('div', { class: 'notizbuch-bild', style: heftDeckelDaten(letztesHeft).style }, el('i', { class: 'zettelchen z1' }), el('i', { class: 'zettelchen z2' }), el('i', { class: 'zettelchen z3' })), () => { location.hash = '#/heft/' + letztesHeft.id; }));
+  if (letztesHeft) dinge.append(ding('notizbuch', 'Das Notizbuch mit zu vielen Zetteln: ' + letztesHeft.titel, el('div', { class: 'notizbuch-bild', style: heftDeckelDaten(letztesHeft).style }, el('i', { class: 'zettelchen z1' }), el('i', { class: 'zettelchen z2' }), el('i', { class: 'zettelchen z3' }), el('i', { class: 'gummi' })), () => { location.hash = '#/heft/' + letztesHeft.id; }));
 
   /* Verse auf der Platte */
-  if (e.verse) {
-    schreibtischVerse(3).forEach((v, i) => platte.append(el('div', { class: 'desk-vers v' + (i + 1) }, v)));
-  }
-  /* Schublade */
-  platte.append(el('button', { class: 'desk-schublade', title: 'Die Schublade', onclick: () => schubladeOeffnen() }, el('i', { class: 'griffknauf' })));
+  if (e.verse && e.unordnung > .2) schreibtischVerse(3).forEach((v, i) => dinge.append(el('div', { class: 'desk-vers v' + (i + 1) }, v)));
 
-  /* Einrichten */
-  const einrichten = el('button', { class: 'rundknopf zart desk-einrichten', html: ik('feinheiten'), title: 'Schreibtisch einrichten', onclick: () => schreibtischEinrichten(() => zeichne()) });
+  /* Papierkorb, Schublade, Einrichten */
+  dinge.append(el('button', { class: 'desk-korb', title: 'Der Papierkorb unterm Tisch', onclick: () => papierkorbAmTisch() }, el('i', { class: 'knuell k1' }), el('i', { class: 'knuell k2' }), el('i', { class: 'knuell k3' }), el('i', { class: 'korbrand' })));
+  dinge.append(el('button', { class: 'desk-schublade', title: 'Die Schublade', onclick: () => schubladeOeffnen() }, el('i', { class: 'griffknauf' })));
+  dinge.append(el('button', { class: 'rundknopf zart desk-einrichten', html: ik('feinheiten'), title: 'Schreibtisch einrichten', onclick: () => schreibtischEinrichten(() => zeichne()) }));
 
-  szene.append(fenster, platte, einrichten);
   haupt.append(szene);
-
-  /* Tippen irgendwo im Raum: die Flammen spüren es */
+  maler.start();
+  /* Aufhören, sobald der Raum weg ist */
+  const beobachter = new MutationObserver(() => { if (!szene.isConnected) { maler.stopp(); beobachter.disconnect(); } });
+  beobachter.observe(haupt, { childList: true });
   szene.addEventListener('pointerdown', () => { if (leuchter) leuchter.puste(.35); });
 };
 
@@ -14729,6 +15230,7 @@ function schreibtischEinrichten(danach) {
   const schalter = (lies, setze) => el('button', { class: 'schalter' + (lies() ? ' an' : ''), onclick: (ev) => { setze(!lies()); ev.currentTarget.classList.toggle('an', lies()); D.einst.schreibtisch = { ...e }; if (danach) danach(); } }, el('i'));
   const lampe = el('input', { type: 'range', min: '.25', max: '1', step: '.05', value: String(e.lampe) });
   lampe.addEventListener('input', () => { e.lampe = Number(lampe.value); D.einst.schreibtisch = { ...e }; const s = document.querySelector('.desk-szene'); if (s) s.style.setProperty('--lampe', e.lampe); });
+  lampe.addEventListener('change', () => { if (danach) danach(); });
   const unordnung = el('input', { type: 'range', min: '0', max: '1', step: '.1', value: String(e.unordnung) });
   unordnung.addEventListener('change', () => { e.unordnung = Number(unordnung.value); D.einst.schreibtisch = { ...e }; if (danach) danach(); });
   let behalten = false;
@@ -14736,9 +15238,10 @@ function schreibtischEinrichten(danach) {
   const kasten = el('div', { class: 'modal tisch-einrichten' },
     el('h2', {}, 'Den Schreibtisch einrichten'),
     el('div', { class: 'einstellgruppe' }, el('b', {}, 'Holz'), wahlgruppe(SCHREIBTISCH_HOELZER, () => e.holz, (v) => { e.holz = v; })),
-    zeile('Lampe', 'Kein Deckenlicht. Niemals. Nur dieser Kegel.', lampe),
-    zeile('Leuchter', 'Sieben Flammen — weniger wegen des Lichts als wegen der Gewissheit, dass wenigstens eine Sache sichtbar Zeit verbraucht.', schalter(() => e.kerzen, (v) => { e.kerzen = v; })),
-    zeile('Fenster hört auf den Klang', 'Spielt Regen, regnet es vor dem Fenster; spielen Grillen, raschelt der Garten.', schalter(() => e.wetterFolgtKlang, (v) => { e.wetterFolgtKlang = v; })),
+    zeile('Lampe', 'Kein Deckenlicht. Niemals. Nur dieser Kegel — an der Schnur ziehen schaltet sie.', lampe),
+    zeile('Leuchter', 'Sieben Flammen. Die Kerzen brennen über ' + LEUCHTER_STUNDEN + ' Schreibstunden wirklich herunter (' + Math.round((1 - leuchterStand(e.wachs)) * 100) + ' % übrig).', schalter(() => e.kerzen, (v) => { e.kerzen = v; })),
+    zeile('Die Uhr tickt', 'Ein leises Ticken, zur vollen Stunde ein Glockenschlag.', schalter(() => e.uhrTickt, (v) => { e.uhrTickt = v; })),
+    zeile('Fenster hört auf den Klang', 'Spielt Regen, regnet es vor dem Fenster; bei Gewitter wetterleuchtet es.', schalter(() => e.wetterFolgtKlang, (v) => { e.wetterFolgtKlang = v; })),
     zeile('Eigene Zeilen auf der Platte', 'Kurze Sätze aus meinen Funden, wie hingekritzelt.', schalter(() => e.verse, (v) => { e.verse = v; })),
     zeile('Unordnung', 'Wie viel auf dem Tisch liegt und wie schief.', unordnung),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => { D.einst.schreibtisch = alt; if (danach) danach(); zu(); } }, 'Zurück'),
@@ -14808,7 +15311,7 @@ async function buchAuflegenAusBlob(blob, name, { datei = null } = {}) {
   const seiten = dok.numPages;
   let titel = String(name || 'Buch').replace(/\.pdf$/i, '');
   /* Dateinamen von Tauschbörsen tragen Klammerzusätze — die braucht kein Titel. */
-  titel = titel.replace(/\s*\((?:[^()]*(?:z-lib|1lib|library|epdf)[^()]*)\)\s*/gi, ' ').replace(/^\[[^\]]*\]\s*•?\s*/, '').replace(/\s+/g, ' ').trim();
+  titel = titel.replace(/\s*\((?:[^()]*(?:z-lib|1lib|library|epdf)[^()]*)\)\s*/gi, ' ').replace(/\s*\[[^\]]*\]\s*•?\s*/g, ' ').replace(/\s+/g, ' ').trim();
   let autor = '';
   try {
     const meta = await dok.getMetadata();
@@ -14889,6 +15392,77 @@ async function buecherAusOrdner() {
   if (n) { toast(n === 1 ? 'Liegt auf dem Tisch.' : n + ' Bücher liegen auf dem Tisch.'); zeichne(); }
 }
 
+/* ----- Der Bücherkoffer: verschlüsselte PDFs neben der App, mit Passwort ----- */
+async function buecherkofferListe() {
+  try { const a = await fetch('buecher/koffer.json', { cache: 'no-store' }); if (!a.ok) return null; const k = await a.json(); return Array.isArray(k.buecher) ? k : null; } catch (e) { return null; }
+}
+async function kofferEntschluesseln(bytes, passwort, runden = 200000) {
+  const u = new Uint8Array(bytes);
+  const magie = new TextDecoder().decode(u.slice(0, 9));
+  if (magie !== 'VANIBUCH1') throw new Error('Das ist keine Kofferdatei.');
+  const salz = u.slice(9, 25), iv = u.slice(25, 37), chiffrat = u.slice(37);
+  const grund = await crypto.subtle.importKey('raw', new TextEncoder().encode(passwort), 'PBKDF2', false, ['deriveKey']);
+  const schluessel = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: salz, iterations: runden, hash: 'SHA-256' }, grund, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+  return new Blob([await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, schluessel, chiffrat)], { type: 'application/pdf' });
+}
+function passwortFragen(titel, hinweis) {
+  return new Promise((res) => {
+    let fertig = false;
+    const feld = el('input', { type: 'password', class: 'koffer-passwort', placeholder: 'Passwort', autocomplete: 'off' });
+    const kasten = el('div', { class: 'modal' }, el('h2', {}, titel), hinweis ? el('div', { class: 'stickerblock-hinweis' }, hinweis) : null, feld,
+      el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'), el('button', { class: 'knopf voll', onclick: () => { fertig = true; const v = feld.value; zu(); res(v || null); } }, 'Öffnen')));
+    feld.addEventListener('keydown', (e) => { if (e.key === 'Enter') { fertig = true; const v = feld.value; zu(); res(v || null); } });
+    const zu = zeigeDeck(kasten, () => { if (!fertig) res(null); });
+    setTimeout(() => feld.focus(), 60);
+  });
+}
+async function buecherkofferHolen() {
+  const koffer = await buecherkofferListe();
+  if (!koffer || !koffer.buecher.length) { toast('Gerade liegt kein Bücherkoffer neben der App.', 3600); return; }
+  const da = new Set(lesestapelBuecher().map((b) => (b.titel || '').toLowerCase()));
+  const passwort = await passwortFragen('Der Bücherkoffer', koffer.buecher.length + ' Bücher, verschlüsselt. Das Passwort bleibt hier auf dem Gerät; die Bücher landen in deinem eigenen Vorrat.');
+  if (!passwort) return;
+  let n = 0, fehl = 0;
+  for (const b of koffer.buecher) {
+    if (da.has(String(b.name || '').toLowerCase())) continue;
+    toast('Hole „' + (b.name || b.datei) + '" …', 2400);
+    try {
+      const a = await fetch('buecher/' + b.datei, { cache: 'no-store' });
+      if (!a.ok) throw new Error('HTTP ' + a.status);
+      const blob = await kofferEntschluesseln(await a.arrayBuffer(), passwort, koffer.runden || 200000);
+      await buchAuflegenAusBlob(blob, (b.name || 'Buch') + '.pdf'); n++;
+    } catch (e) {
+      fehl++;
+      if (/OperationError|decrypt/i.test(String(e && (e.name + ' ' + e.message)))) { toast('Das Passwort passt nicht.', 4200); return; }
+      toast((b.name || b.datei) + ': ' + (e && e.message ? e.message : 'ging nicht'), 3600);
+    }
+  }
+  if (n) { toast(n === 1 ? 'Ein Buch liegt auf dem Tisch.' : n + ' Bücher liegen auf dem Tisch.', 4200); zeichne(); }
+  else if (!fehl) toast('Alles aus dem Koffer liegt schon auf dem Tisch.');
+}
+
+/* Randnotizen je Seite: kleine Dokumente am Buch. */
+function buchNotizen(b, seite) {
+  return vomTyp('buchnotiz').filter((n) => n.parent === b.id && (seite == null || n.seite === seite)).sort((x, y) => (x.seite || 0) - (y.seite || 0) || (x.angelegt || 0) - (y.angelegt || 0));
+}
+/* Lesestatistik: Seiten je Tag. */
+function buchSeiteGelesen(b) {
+  const k = tagKey();
+  const st = b.statistik && typeof b.statistik === 'object' ? b.statistik : {};
+  st[k] = (Number(st[k]) || 0) + 1;
+  /* nur die letzten 60 Tage behalten */
+  const keys = Object.keys(st).sort();
+  while (keys.length > 60) delete st[keys.shift()];
+  b.statistik = st;
+}
+function buchStatistikWorte(b) {
+  const st = b.statistik || {};
+  const heute = Number(st[tagKey()]) || 0, gestern = Number(st[tagKey(Date.now() - 86400000)]) || 0;
+  const woche = Object.entries(st).filter(([k]) => Date.now() - new Date(k).getTime() < 7 * 86400000).reduce((n, [, v]) => n + (Number(v) || 0), 0);
+  if (!heute && !gestern && !woche) return '';
+  return (heute ? heute + ' Seiten heute' : gestern ? gestern + ' Seiten gestern' : '') + (woche ? (heute || gestern ? ' · ' : '') + woche + ' diese Woche' : '');
+}
+
 /* Der Lesestapel als Fenster: Cover, Fortschritt, Auflegen. */
 function lesestapelZeigen() {
   const buecher = lesestapelBuecher();
@@ -14901,7 +15475,7 @@ function lesestapelZeigen() {
       el('div', { class: 'lesestapel-titel' }, b.titel || 'Buch'),
       b.autor ? el('div', { class: 'lesestapel-autor' }, b.autor) : null,
       el('div', { class: 'lesestapel-balken' }, el('i', { style: 'width:' + buchFortschritt(b.seite, b.seiten) + '%' })),
-      el('div', { class: 'lesestapel-stand' }, b.seiten ? 'Seite ' + (b.seite || 1) + ' von ' + b.seiten : ''));
+      el('div', { class: 'lesestapel-stand' }, (b.seiten ? 'Seite ' + (b.seite || 1) + ' von ' + b.seiten : '') + (buchStatistikWorte(b) ? ' · ' + buchStatistikWorte(b) : '')));
     langdruck(k, async () => {
       const wahl = await menue([
         { text: 'Umbenennen', icon: 'stift', wert: 'name' },
@@ -14926,6 +15500,7 @@ function lesestapelZeigen() {
       el('button', { class: 'knopf voll', onclick: () => { zu(); buecherAuflegenPerDatei(); } }, el('span', { html: ik('plus'), style: 'display:flex' }), 'PDF auflegen'),
       vomTyp('goodnote').some((d) => d.art === 'pdf') ? el('button', { class: 'knopf', onclick: () => { zu(); buchAusGoodnotesArchiv(); } }, 'Aus dem Goodnotes-Archiv') : null,
       desk ? el('button', { class: 'knopf', onclick: () => { zu(); buecherAusOrdner(); } }, 'Aus dem Bücherordner') : null,
+      el('button', { class: 'knopf', title: 'Verschlüsselte Bücher neben der App, mit Passwort', onclick: () => { zu(); buecherkofferHolen(); } }, 'Aus dem Bücherkoffer (Passwort)'),
       el('span', { class: 'rest' }),
       el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen')));
   const zu = zeigeDeck(kasten);
@@ -14962,6 +15537,9 @@ async function buchOeffnen(b) {
     el('button', { class: 'rundknopf zart', html: ik('gliederung'), title: 'Inhalt', onclick: () => leserGliederung() }),
     el('button', { class: 'rundknopf zart lese-zeichen', html: ik('lesezeichen'), title: 'Lesezeichen', onclick: () => leserLesezeichen() }),
     el('button', { class: 'rundknopf zart', html: ik('teilen'), title: 'Zitat kopieren / als Schnipsel', onclick: () => leserZitat() }),
+    el('button', { class: 'rundknopf zart lese-notiz-knopf', html: ik('pin'), title: 'Randnotiz zu dieser Seite', onclick: () => leserNotizen() }),
+    el('button', { class: 'rundknopf zart', html: ik('suche'), title: 'Im Buch suchen', onclick: () => leserSuche() }),
+    el('button', { class: 'rundknopf zart', html: ik('vorlesen'), title: 'Diese Seite vorlesen lassen', onclick: (ev) => leserVorlesen(ev.currentTarget) }),
     el('button', { class: 'rundknopf zart', html: ik('feinheiten'), title: 'Leseeinstellungen', onclick: () => leserEinstellungen() }));
   const fuss = el('div', { class: 'lese-fuss' }, el('button', { class: 'rundknopf zart', html: ik('zurueck'), title: 'Zurückblättern', onclick: () => blaettere(-1) }), balken, stand, el('button', { class: 'rundknopf zart', html: ik('rechts'), title: 'Weiterblättern', onclick: () => blaettere(1) }));
   raum.append(kopf, buehne, fuss);
@@ -15021,6 +15599,10 @@ async function buchOeffnen(b) {
     stand.textContent = seiten.join('–') + ' / ' + b.seiten + ' · ' + buchFortschritt(seiten[seiten.length - 1], b.seiten) + ' %';
     balken.value = String(leser.seite);
     kopf.querySelector('.lese-zeichen').classList.toggle('an', (b.lesezeichen || []).includes(leser.seite));
+    const lzf = (b.lesezeichenFarben || {})[leser.seite];
+    kopf.querySelector('.lese-zeichen').style.background = (b.lesezeichen || []).includes(leser.seite) && lzf ? lzf : '';
+    kopf.querySelector('.lese-notiz-knopf').classList.toggle('hat-notiz', buchNotizen(b, leser.seite).length > 0);
+    if (richtung && leser.seite !== leser.letzteGezaehlt) { leser.letzteGezaehlt = leser.seite; buchSeiteGelesen(b); }
     b.seite = leser.seite; b.zuletzt = Date.now(); speichereStill(b);
     /* Nächste Seiten vorab malen */
     for (const n of [leser.seite + 1, leser.seite + 2, leser.seite - 1]) if (n >= 1 && n <= b.seiten) maleSeite(n, breite, hoehe).catch(() => {});
@@ -15106,10 +15688,19 @@ async function leserLesezeichen() {
   const hier = lz.includes(l.seite);
   const wahl = await menue([
     { text: hier ? 'Lesezeichen von Seite ' + l.seite + ' entfernen' : 'Lesezeichen auf Seite ' + l.seite, icon: 'lesezeichen', wert: 'hier' },
-    ...lz.filter((n) => n !== l.seite).sort((a, c) => a - c).map((n) => ({ text: 'Zu Seite ' + n, icon: 'rechts', wert: 'zu:' + n }))
+    ...lz.filter((n) => n !== l.seite).sort((a, c) => a - c).map((n) => ({ text: 'Zu Seite ' + n + ((b.lesezeichenFarben || {})[n] ? ' ●' : ''), icon: 'rechts', wert: 'zu:' + n }))
   ], 'Lesezeichen');
   if (!wahl) return;
-  if (wahl === 'hier') { b.lesezeichen = hier ? lz.filter((n) => n !== l.seite) : [...lz, l.seite].slice(-200); speichere(b); l.zeige(0); }
+  if (wahl === 'hier') {
+    if (hier) { b.lesezeichen = lz.filter((n) => n !== l.seite); if (b.lesezeichenFarben) delete b.lesezeichenFarben[l.seite]; }
+    else {
+      const farbe = await menue([['#c0533f', 'Rot'], ['#d9a441', 'Gelb'], ['#5f7752', 'Grün'], ['#41597a', 'Blau'], ['#765187', 'Lila']].map(([f, n]) => ({ text: n, icon: 'lesezeichen', wert: f })), 'Welche Farbe?');
+      if (!farbe) return;
+      b.lesezeichen = [...lz, l.seite].slice(-200);
+      b.lesezeichenFarben = Object.assign({}, b.lesezeichenFarben || {}, { [l.seite]: farbe });
+    }
+    speichere(b); l.zeige(0);
+  }
   else if (wahl.startsWith('zu:')) { l.seite = Number(wahl.slice(3)); l.zeige(0); }
 }
 async function leserZitat() {
@@ -15145,6 +15736,76 @@ function leserEinstellungen() {
     el('div', { class: 'stickerblock-hinweis', style: 'margin-top:8px' }, 'Diese Einstellungen bleiben an diesem Gerät — Helligkeit ist Gerätesache. Seite, Lesezeichen und Stapel reisen mit.'),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
   const zu = zeigeDeck(kasten);
+}
+
+/* Randnotizen: zu jeder Seite beliebig viele kleine Zettel. */
+async function leserNotizen() {
+  if (!_leser) return;
+  const l = _leser, b = l.b;
+  const liste = el('div', { class: 'lese-notizen' });
+  const bauen = () => {
+    liste.innerHTML = '';
+    const hier = buchNotizen(b, l.seite);
+    for (const n of hier) {
+      const k = el('div', { class: 'lese-notiz' }, n.text, el('small', {}, ' · ' + fmtDatum(n.angelegt)));
+      langdruck(k, async () => { if (await frage('Diese Randnotiz wegnehmen?', { ja: 'Wegnehmen', gefahr: true })) { await loesche(n.id, true); bauen(); l.zeige(0); } });
+      liste.append(k);
+    }
+    if (!hier.length) liste.append(el('div', { class: 'leer klein' }, 'Noch keine Notiz zu Seite ' + l.seite + '.'));
+  };
+  bauen();
+  const alle = buchNotizen(b);
+  const feld = el('textarea', { rows: 3, placeholder: 'Was mir zu dieser Seite einfällt …' });
+  const kasten = el('div', { class: 'modal' },
+    el('h2', {}, 'Randnotizen · Seite ' + l.seite),
+    liste, feld,
+    el('div', { class: 'reihe', style: 'justify-content:space-between;flex-wrap:wrap;gap:8px' },
+      alle.length > 1 ? el('button', { class: 'knopf zart klein', onclick: async () => {
+        const w = await menue(alle.map((n) => ({ text: 'S. ' + n.seite + ': ' + (n.text || '').slice(0, 60), icon: 'pin', wert: String(n.seite) })), 'Alle Randnotizen in diesem Buch');
+        if (w) { zu(); l.seite = Number(w); l.zeige(0); }
+      } }, 'Alle ' + alle.length + ' Notizen') : el('span'),
+      el('span', { style: 'display:flex;gap:8px' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen'),
+        el('button', { class: 'knopf voll', onclick: () => { const t = feld.value.trim(); if (!t) return; neuDoc('buchnotiz', { parent: b.id, seite: l.seite, text: t }); feld.value = ''; bauen(); l.zeige(0); } }, 'Notiz dazu'))));
+  const zu = zeigeDeck(kasten);
+  setTimeout(() => feld.focus(), 60);
+}
+
+/* Im Buch suchen: Textebene aller Seiten, einmal gelesen, dann im Gedächtnis. */
+async function leserSuche() {
+  if (!_leser || !_leser.dok) return;
+  const l = _leser, b = l.b;
+  const frage_ = await eingabe({ titel: 'Im Buch suchen', platzhalter: 'ein Wort, ein Name, eine Wendung', ok: 'Suchen' });
+  if (!frage_) return;
+  const q = frage_.trim().toLowerCase();
+  if (!l.texte) l.texte = new Map();
+  const treffer = [];
+  toast('Lese das Buch durch …', 2500);
+  for (let n = 1; n <= b.seiten && treffer.length < 200; n++) {
+    let t = l.texte.get(n);
+    if (t == null) {
+      try { const tc = await (await l.dok.getPage(n)).getTextContent(); t = tc.items.map((i) => i.str).join(' ').replace(/\s+/g, ' '); } catch (e) { t = ''; }
+      l.texte.set(n, t);
+    }
+    const i = t.toLowerCase().indexOf(q);
+    if (i >= 0) treffer.push({ seite: n, vor: t.slice(Math.max(0, i - 60), i), mitte: t.slice(i, i + q.length), nach: t.slice(i + q.length, i + q.length + 70) });
+  }
+  if (!treffer.length) { toast('„' + frage_ + '" steht nicht in diesem Buch (oder es hat keine Textebene).', 4200); return; }
+  const liste = el('div', { class: 'buchsuche-treffer' }, treffer.map((t) => el('button', { onclick: () => { zu(); l.seite = t.seite; l.zeige(0); } },
+    el('small', {}, 'Seite ' + t.seite), '…' + t.vor, el('b', {}, t.mitte), t.nach + '…')));
+  const kasten = el('div', { class: 'modal gliederung-kasten' }, el('h2', {}, treffer.length + (treffer.length === 1 ? ' Treffer' : ' Treffer') + ' für „' + frage_ + '"'), liste,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Schließen')));
+  const zu = zeigeDeck(kasten);
+}
+
+/* Vorlesen: die Textebene der Seite mit der Stimme des Geräts. */
+async function leserVorlesen(knopf) {
+  if (!_leser || !_leser.dok) return;
+  if (typeof vorlesen !== 'function') { toast('Vorlesen gibt es auf diesem Gerät nicht.'); return; }
+  const l = _leser;
+  let text = '';
+  try { const tc = await (await l.dok.getPage(l.seite)).getTextContent(); text = tc.items.map((i) => i.str + (i.hasEOL ? ' ' : '')).join('').replace(/\s+/g, ' ').trim(); } catch (e) {}
+  if (!text) { toast('Diese Seite trägt keinen Text, den man vorlesen könnte.'); return; }
+  vorlesen(text, knopf);
 }
 
 /* ================================================================

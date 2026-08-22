@@ -67,7 +67,20 @@ Bleistiftstummel, Notizbuch = letztes Heft, Schublade, Lesestapel mit
 PDF-Lesemodus (pdf.js), Einrichten (Holz, Lampe, Leuchter, Wetter, Verse,
 Unordnung).
 
-Weiter gedacht:
+Weiter gedacht — **umgesetzt in 5.16** (alles Folgende ist da: Tageszeit und
+Jahreszeiten hinterm Fenster, Standuhr mit Pendel/Ticken/Glockenschlag, Wachs,
+Fotos im Glas, Papierkorb unterm Tisch, zweiter Stuhl = Faden, Randnotizen,
+Textsuche, Vorlesen, Lesestatistik, farbige Lesezeichen, Weiterlesen auf dem
+Zuhause, Siegelwachs; Lampe mit Zugschnur; die Szene ist jetzt Malerei auf
+Canvas mit Regen als Tropfen statt Kachel). Noch offen aus der Liste: EPUB
+(eigener Renderer), „Lampe dimmt mit der Kerze" (der Schreibraum liegt ohnehin
+darüber). Neue Gedanken:
+- **Eine Motte um die Lampe** — selten, nur wenn die Lampe an ist und es Sommer
+  ist; sie kreist in Achten und verschwindet wieder.
+- **Der Tisch altert mit**: Kratzer und Kleckse wachsen mit den geschriebenen
+  Wörtern (aus den Statistiken, tagesstabil gewürfelt).
+- **Ein Wetterglas** (Goethe-Barometer) am Fenster: Stand aus dem Klang.
+- **Siegel per Stempel**: eigenes Siegelbild dauerhaft als Standard.
 - **Tageszeit hinterm Fenster**: Dämmerung ab 17 Uhr, tiefe Nacht ab 22,
   erstes Grau ab 5 — der Schreibtisch bleibt Nachttisch, aber das Fenster weiß,
   wie spät es ist.

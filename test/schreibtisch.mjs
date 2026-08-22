@@ -14,9 +14,10 @@ const roh = (x) => JSON.parse(JSON.stringify(x));
 
 test('saubererSchreibtisch: Vorgaben, Grenzen, nur bekannte Hölzer', async () => {
   const k = await frisch();
-  assert.deepEqual(roh(k.saubererSchreibtisch(undefined)), { holz: 'nuss', lampe: .8, kerzen: true, wetterFolgtKlang: true, unordnung: .7, verse: true });
-  const w = roh(k.saubererSchreibtisch({ holz: 'plastik', lampe: 9, kerzen: false, unordnung: -1, verse: 'ja' }));
+  assert.deepEqual(roh(k.saubererSchreibtisch(undefined)), { holz: 'nuss', lampe: .8, lampeAn: true, kerzen: true, wetterFolgtKlang: true, unordnung: .7, verse: true, uhrTickt: false, wachs: 0, kerzenGewechselt: 0 });
+  const w = roh(k.saubererSchreibtisch({ holz: 'plastik', lampe: 9, kerzen: false, unordnung: -1, verse: 'ja', wachs: 99999, lampeAn: false, uhrTickt: true }));
   assert.equal(w.holz, 'nuss'); assert.equal(w.lampe, 1); assert.equal(w.kerzen, false); assert.equal(w.unordnung, 0); assert.equal(w.verse, true);
+  assert.equal(w.wachs, 1200, 'Wachs endet bei zwanzig Stunden'); assert.equal(w.lampeAn, false); assert.equal(w.uhrTickt, true);
   assert.equal(roh(k.saubererSchreibtisch({ holz: 'ebenholz', lampe: .1 })).lampe, .25, 'nie ganz dunkel');
 });
 
@@ -42,6 +43,38 @@ test('briefIstOffen: erst wenn das Datum erreicht ist', async () => {
   assert.equal(k.briefIstOffen({ oeffnen: jetzt }, jetzt), true);
   assert.equal(k.briefIstOffen({}, jetzt), true, 'ohne Datum war er nie versiegelt');
   assert.equal(k.briefIstOffen(null, jetzt), false);
+});
+
+test('schnurSchritt: die Zugschnur federt zurück und kommt zur Ruhe', async () => {
+  const k = await frisch();
+  const z = { x: 80, v: 0 };
+  let schritte = 0, minX = 80;
+  while ((z.x !== 0 || z.v !== 0) && schritte < 2000) { k.schnurSchritt(z, 1 / 60); minX = Math.min(minX, z.x); schritte++; }
+  assert.equal(z.x, 0); assert.equal(z.v, 0);
+  assert.ok(schritte > 20 && schritte < 600, 'in ein paar Sekunden zur Ruhe: ' + schritte + ' Schritte');
+  assert.ok(minX < 0, 'sie schwingt einmal über die Ruhelage hinaus: ' + minX.toFixed(1));
+  assert.ok(minX > -80, 'aber gedämpft');
+});
+
+test('leuchterStand und Jahreszeit/Tageslicht/Himmel', async () => {
+  const k = await frisch();
+  assert.equal(k.leuchterStand(0), 0);
+  assert.equal(k.leuchterStand(600), .5);
+  assert.equal(k.leuchterStand(99999), 1);
+  assert.equal(k.leuchterStand('x'), 0);
+  assert.equal(k.schreibtischJahreszeit(Date.UTC(2026, 0, 15)), 'winter');
+  assert.equal(k.schreibtischJahreszeit(Date.UTC(2026, 3, 15)), 'fruehling');
+  assert.equal(k.schreibtischJahreszeit(Date.UTC(2026, 6, 15)), 'sommer');
+  assert.equal(k.schreibtischJahreszeit(Date.UTC(2026, 9, 15)), 'herbst');
+  assert.equal(k.schreibtischJahreszeit(Date.UTC(2026, 11, 15)), 'winter');
+  const um = (h) => { const d = new Date(2026, 5, 10, h, 0); return d.getTime(); };
+  assert.equal(k.schreibtischTageslicht(um(1)), 0, 'tiefe Nacht');
+  assert.equal(k.schreibtischTageslicht(um(12)), .55, 'grauer Tag');
+  assert.ok(k.schreibtischTageslicht(um(18)) < .55 && k.schreibtischTageslicht(um(18)) > .2, 'Dämmerung dazwischen');
+  assert.ok(k.schreibtischTageslicht(um(5)) > 0 && k.schreibtischTageslicht(um(5)) < .3, 'erstes Grau');
+  const n = roh(k.schreibtischHimmelFarben(0)), t = roh(k.schreibtischHimmelFarben(1));
+  assert.equal(n.length, 3); assert.match(n[0], /^rgb\(/); assert.notDeepEqual(n, t);
+  assert.equal(k.buchStatistikWorte({}), '');
 });
 
 test('buchFortschritt und saubereLeseEinstellung', async () => {

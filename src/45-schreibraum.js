@@ -489,6 +489,7 @@ function beendeSprint(abgebrochen) {
   _sr.raum.classList.remove('kerze-brennt');
   if (sp.kerze) { if (abgebrochen) sp.kerze.ausblasen(); else setTimeout(() => sp.kerze.entfernen(), 4500); }
   if (!abgebrochen) {
+    if (typeof schreibtischWachsVerbrennen === 'function') schreibtischWachsVerbrennen(sp.minuten);
     const geschrieben = worte(srAktuellerText()) - sp.startWorte;
     glocke();
     const m = D.einst.mischung || {};

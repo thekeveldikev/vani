@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync, statSync } from 'node:fs';
+import { readFileSync, existsSync, statSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
@@ -614,7 +614,7 @@ test('Atelier-Vertrag: das Atelier ist ein Fenster, Tisch und Regal lassen sich 
 test('Schreibtisch-Vertrag: ein eigener Raum, der Lesestapel liegt lokal, pdf.js reist mit', () => {
   assert.match(lies('src/40-router.js'), /\{ id: 'schreibtisch', name: 'Schreibtisch', icon: 'schreibtisch' \}/);
   const d = lies('src/54-schreibtisch.js');
-  for (const f of ['RENDER.schreibtisch', 'function saubererSchreibtisch', 'function mondphase', 'function briefIstOffen', 'function schubladeOeffnen', 'function baueLeuchter', 'function baueSternenhimmel', 'function schreibtischEinrichten']) assert.ok(d.includes(f), f);
+  for (const f of ['RENDER.schreibtisch', 'function saubererSchreibtisch', 'function mondphase', 'function briefIstOffen', 'function schubladeOeffnen', 'function baueLeuchter', 'function baueLampe', 'function baueUhr', 'function schreibtischEinrichten']) assert.ok(d.includes(f), f);
   const l = lies('src/55-lesestapel.js');
   for (const f of ['function pdfjsLaden', 'function buchAuflegenAusBlob', 'function buchOeffnen', 'function leserGliederung', 'function leserLesezeichen', 'function leserZitat', 'function leserEinstellungen', 'function buecherAusOrdner', 'function buchAusGoodnotesArchiv']) assert.ok(l.includes(f), f);
   /* pdf.js: als .js (nicht .mjs), sonst liefern Server es als octet-stream und das Modul lädt nicht */
@@ -625,7 +625,13 @@ test('Schreibtisch-Vertrag: ein eigener Raum, der Lesestapel liegt lokal, pdf.js
   /* Bücher liegen nur im Medienvorrat — nie als Dateien im Repo. */
   const dateien = lies('build.sh') + lies('werkzeug/build-web.mjs');
   assert.doesNotMatch(dateien, /\.pdf/, 'keine PDF im Build');
-  assert.ok(!existsSync(join(wurzel, 'buecher')), 'kein Bücherordner im Repo');
+  /* Ein Bücherkoffer darf da sein — aber nur verschlüsselt (.enc) plus Manifest, nie eine PDF. */
+  if (existsSync(join(wurzel, 'buecher'))) {
+    for (const f of readdirSync(join(wurzel, 'buecher'))) assert.ok(/\.enc$|^koffer\.json$/.test(f), 'nur Kofferdateien im Bücherordner: ' + f);
+  }
+  assert.match(lies('werkzeug/buecherkoffer.mjs'), /aes-256-gcm/);
+  assert.match(l, /function kofferEntschluesseln/);
+  assert.match(l, /magie !== 'VANIBUCH1'/);
   /* Leseeinstellungen bleiben am Gerät (localStorage), Seite/Lesezeichen am Dokument. */
   assert.match(l, /localStorage\.setItem\('vani-lese'/);
   assert.match(l, /b\.seite = leser\.seite; b\.zuletzt = Date\.now\(\); speichereStill\(b\);/);
@@ -643,6 +649,31 @@ test('Schreibtisch-Vertrag: ein eigener Raum, der Lesestapel liegt lokal, pdf.js
   const anl = lies('src/52-anleitung.js');
   assert.match(anl, /id: 'schreibtisch'/);
   for (const t of ['Die Schublade', 'Brief an mich', 'Der Lesestapel', 'Der Lesemodus']) assert.match(anl, new RegExp("t: '" + t + "'"), 'Anleitung: ' + t);
+});
+
+test('Malerei-Vertrag: Regen ohne Kachel, Schnur mit Feder, Leuchter brennt ab, Leiste rollt', () => {
+  const m = lies('src/54b-schreibtisch-malerei.js');
+  assert.match(m, /function schreibtischMaler/);
+  assert.match(m, /function schreibtischJahreszeit/);
+  assert.match(m, /function schreibtischTageslicht/);
+  /* Regen sind Tropfen mit eigener Lage — keine wiederholte Kachel. */
+  assert.match(m, /const tropfen = Array\.from/);
+  assert.doesNotMatch(lies('src/10-style.css'), /regen-faellt/, 'der gekachelte CSS-Regen darf nicht zurück');
+  const d = lies('src/54-schreibtisch.js');
+  assert.match(d, /function schnurSchritt/);
+  assert.match(d, /function baueLampe/);
+  assert.match(d, /if \(maxZug >= SCHWELLE\) \{ umschalten\(\);/, 'Zug über die Schwelle schaltet');
+  assert.match(d, /function leuchterStand/);
+  assert.match(d, /function schreibtischWachsVerbrennen/);
+  assert.match(lies('src/45-schreibraum.js'), /schreibtischWachsVerbrennen\(sp\.minuten\)/, 'jede Kerze im Schreibraum nimmt dem Leuchter Wachs');
+  assert.match(d, /function papierkorbAmTisch/);
+  assert.match(d, /function baueUhr/);
+  const css = lies('src/10-style.css');
+  assert.match(css, /\.raumrolle \{[^}]*overflow-y: auto;/, 'die Räume rollen, Suche und Feinheiten bleiben');
+  for (const datei of ['werkzeug/build-web.mjs', 'build.sh', 'test/sandkasten.mjs']) assert.match(lies(datei), /54b-schreibtisch-malerei\.js/, datei);
+  const lz = lies('src/55-lesestapel.js');
+  for (const f of ['function leserNotizen', 'function leserSuche', 'function leserVorlesen', 'function buecherkofferHolen', 'function buchSeiteGelesen']) assert.ok(lz.includes(f), f);
+  assert.match(lies('src/41-zuhause.js'), /weiterlesen-karte/);
 });
 
 test('Umzugs-Vertrag: die alte Adresse leitet nicht blind weiter', () => {

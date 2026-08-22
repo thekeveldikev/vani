@@ -511,152 +511,162 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .desk-tuer svg.ik { width: 30px; height: 30px; color: #e8b05a; }
 .desk-tuer b { display: block; font-family: ui-serif, "New York", Georgia, serif; font-size: 18px; }
 .desk-tuer small { color: #c9b48e; font-size: 13px; }
-.desk-szene { position: relative; min-height: calc(var(--vvh, 100dvh) - 2px); overflow: hidden; background: #0d0b0a; color: #e8d9b8; user-select: none; --lampe: .8; --unordnung: .7;
-  display: flex; flex-direction: column; }
-/* Fenster */
-.desk-fenster { position: relative; height: 44%; min-height: 250px; overflow: hidden; background: linear-gradient(#06070c, #0f1220 60%, #171a22); }
-.desk-nacht { position: absolute; inset: 0; }
-.desk-sterne { position: absolute; inset: 0; width: 100%; height: 100%; }
-.desk-garten { position: absolute; left: 0; right: 0; bottom: 0; height: 62%; }
-.desk-garten i { position: absolute; bottom: 0; display: block; background: #0a0d0a; }
-.desk-garten .baum { width: 34%; height: 100%; border-radius: 48% 52% 10% 10% / 70% 70% 10% 10%; background: radial-gradient(ellipse at 50% 30%, #111a12, #070a07 70%); filter: blur(.4px); transform-origin: bottom center; animation: baum-wiegt 9s ease-in-out infinite alternate; }
-.desk-garten .b1 { left: -8%; } .desk-garten .b2 { right: -6%; height: 86%; animation-delay: -4s; animation-duration: 11s; }
-.desk-garten .busch { height: 38%; width: 30%; border-radius: 50% 50% 0 0; background: radial-gradient(ellipse at 50% 40%, #141f14, #0a0f0a 75%); animation: baum-wiegt 7s ease-in-out infinite alternate; transform-origin: bottom center; }
-.desk-garten .s1 { left: 18%; } .desk-garten .s2 { left: 44%; height: 30%; animation-delay: -2s; } .desk-garten .s3 { right: 16%; height: 44%; animation-delay: -5s; }
-.desk-garten .gras { left: 0; right: 0; height: 12%; background: repeating-linear-gradient(90deg, #0b100b 0 3px, transparent 3px 7px), linear-gradient(#0d120d, #0a0d0a); }
-@keyframes baum-wiegt { from { transform: rotate(-.8deg) scaleX(1); } to { transform: rotate(.9deg) scaleX(1.02); } }
-.desk-regen { position: absolute; inset: 0; pointer-events: none; opacity: 0; background-image: repeating-linear-gradient(100deg, transparent 0 14px, rgba(200,215,240,.18) 14px 15px, transparent 15px 31px); background-size: 140px 180px; animation: regen-faellt .55s linear infinite; transition: opacity 1.2s; }
-.wetter-regen .desk-regen, .wetter-gewitter .desk-regen { opacity: .8; }
-.wetter-gewitter .desk-nacht::after { content: ""; position: absolute; inset: 0; background: #dfe6ff; opacity: 0; animation: wetterleuchten 9s ease-in-out infinite; }
-@keyframes regen-faellt { to { background-position: -30px 180px; } }
-@keyframes wetterleuchten { 0%, 91%, 100% { opacity: 0; } 92% { opacity: .5; } 93.5% { opacity: 0; } 95% { opacity: .25; } 96% { opacity: 0; } }
-.wetter-wind .desk-garten .baum, .wetter-wind .desk-garten .busch { animation-duration: 3.2s; }
-.wetter-grillen .desk-garten .busch { animation-duration: 5s; }
-.desk-nebel { position: absolute; left: 0; right: 0; bottom: 0; height: 45%; background: linear-gradient(transparent, rgba(140,150,160,.08)); pointer-events: none; }
-.desk-rahmen { position: absolute; inset: 0; box-shadow: inset 0 0 0 14px #1c140f, inset 0 0 0 17px #3a2a1f, inset 0 0 60px rgba(0,0,0,.55); pointer-events: none; }
-.desk-rahmen .sprosse { position: absolute; background: #1c140f; box-shadow: 0 0 0 1px #3a2a1f; }
-.desk-rahmen .sprosse.v { left: calc(50% - 6px); top: 0; bottom: 0; width: 12px; }
-.desk-rahmen .sprosse.h { top: calc(42% - 5px); left: 0; right: 0; height: 10px; }
-.desk-ranken { position: absolute; left: -4%; right: -4%; top: -10px; height: 90px; pointer-events: none;
-  background: radial-gradient(ellipse 30px 14px at 10% 30%, #10170f 60%, transparent 62%), radial-gradient(ellipse 22px 12px at 22% 60%, #0d140c 60%, transparent 62%), radial-gradient(ellipse 34px 16px at 86% 20%, #10170f 60%, transparent 62%), radial-gradient(ellipse 20px 10px at 94% 55%, #0d140c 60%, transparent 62%), radial-gradient(ellipse 18px 9px at 72% 28%, #0f160e 60%, transparent 62%); }
-.desk-fensterknopf { position: absolute; right: 26px; bottom: 22px; width: 38px; height: 38px; border-radius: 50%; background: rgba(20,16,12,.7); color: #e8c27a; display: grid; place-items: center; box-shadow: 0 0 0 1px rgba(232,194,122,.35); z-index: 3; }
+.desk-szene { position: relative; height: calc(var(--vvh, 100dvh) - 2px); min-height: 620px; overflow: hidden; background: #0d0b0a; color: #e8d9b8; user-select: none; --lampe: .8; --unordnung: .7; }
+.desk-malerei { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.desk-dinge { position: absolute; inset: 0; }
+.desk-fensterknopf { position: absolute; right: 30px; top: calc(44% - 58px); width: 38px; height: 38px; border-radius: 50%; background: rgba(20,16,12,.6); color: #e8c27a; display: grid; place-items: center; box-shadow: 0 0 0 1px rgba(232,194,122,.3); z-index: 3; }
 .desk-fensterknopf svg.ik { width: 20px; height: 20px; }
-/* Platte */
-.desk-platte { position: relative; flex: 1; min-height: 420px; overflow: visible; }
-.desk-holz { position: absolute; inset: 0; background: repeating-linear-gradient(92deg, rgba(0,0,0,.12) 0 2px, transparent 2px 9px, rgba(255,255,255,.02) 9px 10px, transparent 10px 40px), repeating-linear-gradient(88deg, transparent 0 80px, rgba(0,0,0,.08) 80px 83px, transparent 83px 190px), linear-gradient(175deg, #4a3222, #2f2016 45%, #1f1510); box-shadow: inset 0 30px 60px rgba(0,0,0,.55); }
-.holz-ebenholz .desk-holz { background: repeating-linear-gradient(92deg, rgba(255,255,255,.025) 0 2px, transparent 2px 12px), linear-gradient(175deg, #26201d, #151110 45%, #0c0a09); }
-.holz-kirsche .desk-holz { background: repeating-linear-gradient(92deg, rgba(0,0,0,.1) 0 2px, transparent 2px 9px), linear-gradient(175deg, #6e3a2a, #4b261b 45%, #2f1810); }
-.holz-eiche .desk-holz { background: repeating-linear-gradient(92deg, rgba(0,0,0,.1) 0 2px, transparent 2px 8px, rgba(255,255,255,.03) 8px 9px, transparent 9px 30px), linear-gradient(175deg, #7a5a3a, #5a3f28 45%, #3c2a1a); }
-.desk-flecken { position: absolute; inset: 0; pointer-events: none; opacity: calc(.4 + var(--unordnung) * .6);
-  background: radial-gradient(ellipse 60px 26px at 22% 62%, rgba(12,10,22,.55), transparent 70%), radial-gradient(ellipse 14px 10px at 25% 66%, rgba(12,10,22,.7), transparent 70%), radial-gradient(ellipse 8px 6px at 20% 58%, rgba(12,10,22,.8), transparent 70%),
-    radial-gradient(ellipse 40px 16px at 70% 40%, rgba(12,10,22,.35), transparent 70%), radial-gradient(ellipse 110px 40px at 60% 80%, rgba(255,255,255,.05), transparent 70%),
-    radial-gradient(ellipse 24px 20px at 84% 72%, rgba(240,225,180,.18), transparent 70%), radial-gradient(ellipse 10px 18px at 86% 68%, rgba(240,225,180,.22), transparent 70%),
-    repeating-linear-gradient(40deg, transparent 0 57px, rgba(255,255,255,.04) 57px 58px, transparent 58px 141px), repeating-linear-gradient(-25deg, transparent 0 93px, rgba(0,0,0,.12) 93px 94px); }
-.desk-lichtkegel { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 46% 42% at 22% 32%, rgba(255,190,90,calc(.42 * var(--lampe))), rgba(255,170,70,calc(.16 * var(--lampe))) 40%, transparent 72%), linear-gradient(rgba(0,0,0,calc(.55 - .45 * var(--lampe))), rgba(0,0,0,calc(.7 - .5 * var(--lampe)))); }
-.kerzen-an .desk-lichtkegel { background: radial-gradient(ellipse 46% 42% at 22% 32%, rgba(255,190,90,calc(.42 * var(--lampe))), rgba(255,170,70,calc(.16 * var(--lampe))) 40%, transparent 72%), radial-gradient(ellipse 30% 30% at 80% 12%, rgba(255,160,70,.22), transparent 70%), linear-gradient(rgba(0,0,0,calc(.55 - .45 * var(--lampe))), rgba(0,0,0,calc(.7 - .5 * var(--lampe)))); }
-/* Die Dinge */
-.desk-ding, .desk-ding-halter { position: absolute; z-index: 2; transform: rotate(var(--dreh, 0deg)); transition: transform .25s cubic-bezier(.2,.8,.2,1), filter .25s; filter: drop-shadow(0 6px 8px rgba(0,0,0,.55)); }
-.desk-ding:hover { transform: rotate(var(--dreh, 0deg)) translateY(-3px); filter: drop-shadow(0 10px 12px rgba(0,0,0,.6)) brightness(1.06); }
+/* Alle Dinge: Schatten auf die Platte, leichtes Heben beim Darüberfahren */
+.desk-ding, .desk-ding-halter { position: absolute; z-index: 2; transform: rotate(var(--dreh, 0deg)); transition: transform .25s cubic-bezier(.2,.8,.2,1), filter .25s; filter: drop-shadow(0 7px 9px rgba(0,0,0,.6)); text-align: left; }
+.desk-ding:hover { transform: rotate(var(--dreh, 0deg)) translateY(-3px); filter: drop-shadow(0 12px 14px rgba(0,0,0,.65)) brightness(1.06); }
 .desk-ding:active { transform: rotate(var(--dreh, 0deg)) scale(.98); }
-/* Lampe: oben links, mit Schirm */
-.desk-ding.lampe { left: 6%; top: -46px; width: 120px; height: 150px; filter: none; }
-.desk-ding.lampe .schirm { position: absolute; left: 10px; top: 0; width: 100px; height: 46px; border-radius: 8px 8px 50% 50% / 8px 8px 30% 30%; background: linear-gradient(#2a2320, #171311); box-shadow: inset 0 -6px 10px rgba(255,190,90,calc(.8 * var(--lampe))), 0 2px 6px rgba(0,0,0,.5); }
-.desk-ding.lampe .schirm::after { content: ""; position: absolute; left: 14px; right: 14px; top: 42px; height: 110px; clip-path: polygon(0 0, 100% 0, 160% 100%, -60% 100%); background: linear-gradient(rgba(255,200,110,calc(.32 * var(--lampe))), transparent); pointer-events: none; }
-.desk-ding.lampe::before { content: ""; position: absolute; left: 56px; top: 44px; width: 5px; height: 100px; background: linear-gradient(#3a302a, #1a1512); }
-/* Leuchter: rechts hinten */
-.desk-ding.leuchter { right: 4%; top: -62px; width: 150px; height: 150px; filter: none; }
-.leuchter-bild { position: relative; width: 150px; height: 150px; }
+.lampe-aus .desk-ding:not(.lampe):not(.leuchter) { filter: drop-shadow(0 7px 9px rgba(0,0,0,.6)) brightness(.62) saturate(.8); }
+/* ---- Die Lampe mit Zugschnur ---- */
+.desk-ding.lampe { left: 4%; top: calc(44% - 140px); width: 150px; height: 260px; filter: none; cursor: default; z-index: 3; }
+.desk-ding.lampe:hover, .desk-ding.lampe:active { transform: none; filter: none; }
+.desk-ding.lampe .arm { position: absolute; left: 18px; top: 128px; width: 7px; height: 120px; border-radius: 4px; background: linear-gradient(90deg, #2a231f, #5a4c42 45%, #1a1512); box-shadow: 1px 0 2px rgba(0,0,0,.5); }
+.desk-ding.lampe .arm::before { content: ""; position: absolute; left: -3px; top: -10px; width: 60px; height: 8px; border-radius: 4px; background: linear-gradient(#3a302a, #1a1512); transform: rotate(-18deg); transform-origin: left center; }
+.desk-ding.lampe .schirm { position: absolute; left: 20px; top: 88px; width: 118px; height: 54px; border-radius: 10px 10px 56% 56% / 10px 10px 36% 36%; cursor: pointer;
+  background: linear-gradient(175deg, #3a2f28, #1c1613 60%, #110d0b); box-shadow: inset 0 -8px 14px rgba(255,196,110,calc(.9 * var(--lampe))), inset 0 2px 0 rgba(255,255,255,.08), 0 3px 8px rgba(0,0,0,.55); }
+.desk-ding.lampe .schirm::before { content: ""; position: absolute; left: 6px; right: 6px; bottom: -2px; height: 10px; border-radius: 50%; background: radial-gradient(ellipse at 50% 50%, rgba(255,215,140,calc(.95 * var(--lampe))), rgba(255,190,100,calc(.4 * var(--lampe))) 60%, transparent 72%); }
+.desk-ding.lampe .schirm::after { content: ""; position: absolute; left: 4px; right: 4px; top: 50px; height: 230px; clip-path: polygon(0 0, 100% 0, 190% 100%, -90% 100%); background: linear-gradient(rgba(255,205,120,calc(.34 * var(--lampe))), rgba(255,190,100,calc(.08 * var(--lampe))) 55%, transparent); pointer-events: none; }
+.desk-ding.lampe.aus .schirm { box-shadow: inset 0 -6px 10px rgba(0,0,0,.5), inset 0 2px 0 rgba(255,255,255,.06), 0 3px 8px rgba(0,0,0,.55); }
+.desk-ding.lampe.aus .schirm::before { background: radial-gradient(ellipse at 50% 50%, #6a5a48, #3a3028 60%, transparent 72%); }
+.desk-ding.lampe.aus .schirm::after { display: none; }
+.desk-ding.lampe .schnur { position: absolute; left: 120px; top: 136px; width: 18px; height: 54px; display: flex; flex-direction: column; align-items: center; }
+.desk-ding.lampe .schnur .faden { flex: 1; width: 2px; background: linear-gradient(#d8cbb2, #a89a82); box-shadow: 0 0 1px rgba(0,0,0,.6); transform: scaleX(var(--dehnung, 1)); }
+.desk-ding.lampe .schnur .knauf { width: 14px; height: 20px; border-radius: 6px 6px 7px 7px / 5px 5px 9px 9px; background: linear-gradient(#e9c98a, #9c7a3a); box-shadow: 0 2px 4px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.4); cursor: grab; touch-action: none; transition: transform .15s; }
+.desk-ding.lampe.zieht .schnur .knauf { cursor: grabbing; transform: scaleX(1.1); }
+/* ---- Der Leuchter ---- */
+.desk-ding.leuchter { right: 2%; top: calc(44% - 112px); width: 170px; height: 150px; filter: drop-shadow(0 10px 10px rgba(0,0,0,.6)); }
+.leuchter-bild { width: 170px; height: 150px; position: relative; }
 .desk-leuchter-flammen { position: absolute; left: 0; top: 0; }
-.leuchter-fuss { position: absolute; left: 50%; top: 110px; width: 70px; height: 28px; margin-left: -35px; border-radius: 50% 50% 40% 40%; background: radial-gradient(ellipse at 50% 30%, #7a6036, #3a2c18 70%); box-shadow: 0 4px 8px rgba(0,0,0,.6); }
-.leuchter-fuss::before { content: ""; position: absolute; left: 50%; top: -44px; width: 8px; height: 46px; margin-left: -4px; background: linear-gradient(90deg, #3a2c18, #8a6d3c, #3a2c18); }
-.leuchter-fuss::after { content: ""; position: absolute; left: -22px; right: -22px; top: -14px; height: 6px; border-radius: 3px; background: linear-gradient(90deg, #3a2c18, #8a6d3c, #3a2c18); }
-/* Manuskripte: in der Mitte */
-.desk-ding.manuskript { left: 30%; top: 6%; width: min(220px, 30%); aspect-ratio: 3 / 4; }
-.desk-ding.manuskript.m2 { left: 37%; top: 10%; } .desk-ding.manuskript.m3 { left: 26%; top: 16%; }
-.manuskript-papier { width: 100%; height: 100%; padding: 14px 14px 10px; text-align: left; overflow: hidden; border-radius: 2px;
-  background: linear-gradient(170deg, #f6ecd6, #e9dcbf); color: #2c2218; font-family: ui-serif, "New York", Georgia, serif; font-size: 11px; line-height: 1.45; box-shadow: inset 0 0 30px rgba(120,90,40,.15); }
+/* ---- Standuhr ---- */
+.desk-ding.uhr { right: 22%; top: calc(44% - 150px); width: 54px; height: 170px; filter: drop-shadow(0 8px 10px rgba(0,0,0,.6)); }
+.uhr-gehaeuse { width: 54px; height: 170px; border-radius: 8px 8px 4px 4px; background: linear-gradient(90deg, #2a1b12, #4a2f1e 40%, #2a1b12); box-shadow: inset 0 0 0 2px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,220,160,.08), 0 2px 6px rgba(0,0,0,.6); position: relative; }
+.uhr-gehaeuse::before { content: ""; position: absolute; left: -4px; right: -4px; top: -6px; height: 10px; border-radius: 4px; background: linear-gradient(#5a3b26, #2a1b12); }
+.zifferblatt { position: absolute; left: 7px; top: 10px; width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle at 50% 45%, #f3e9d0, #d9caa6 80%); box-shadow: inset 0 0 0 2px #8a6d3c, inset 0 0 6px rgba(0,0,0,.3); }
+.zifferblatt::before { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: repeating-conic-gradient(from -1.5deg, rgba(60,40,20,.7) 0 3deg, transparent 3deg 30deg); -webkit-mask: radial-gradient(circle, transparent 62%, #000 63%, #000 72%, transparent 73%); mask: radial-gradient(circle, transparent 62%, #000 63%, #000 72%, transparent 73%); }
+.zeiger { position: absolute; left: 50%; bottom: 50%; width: 2px; background: #2c2218; transform-origin: bottom center; border-radius: 1px; }
+.zeiger.stunde { height: 10px; margin-left: -1px; width: 2.4px; } .zeiger.minute { height: 15px; margin-left: -.75px; width: 1.5px; }
+.achse { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%; background: #8a6d3c; }
+.pendelfenster { position: absolute; left: 12px; top: 60px; width: 30px; height: 92px; border-radius: 3px; background: linear-gradient(#120c08, #1c1410); box-shadow: inset 0 0 0 1px rgba(255,220,160,.12); overflow: hidden; }
+.pendel { position: absolute; left: 50%; top: -4px; width: 2px; height: 70px; margin-left: -1px; background: #c9a25a; transform-origin: top center; animation: pendelt 2s ease-in-out infinite alternate; }
+.pendel::after { content: ""; position: absolute; left: 50%; bottom: -10px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #f0d48a, #9c7a3a); box-shadow: 0 1px 2px rgba(0,0,0,.6); }
+@keyframes pendelt { from { transform: rotate(-14deg); } to { transform: rotate(14deg); } }
+/* ---- Zweiter Stuhl ---- */
+.desk-ding.stuhl { right: 0; top: calc(44% - 20px); width: 70px; height: 150px; --dreh: 0deg; filter: drop-shadow(-6px 8px 10px rgba(0,0,0,.55)); opacity: .92; }
+.stuhl-bild { position: relative; width: 70px; height: 150px; }
+.stuhl-bild .lehne { position: absolute; left: 14px; top: 0; width: 40px; height: 70px; border-radius: 12px 12px 2px 2px; background: linear-gradient(90deg, #2a1b12, #4a2f1e 35%, #2a1b12); box-shadow: inset 0 0 0 2px rgba(0,0,0,.3); }
+.stuhl-bild .lehne::before, .stuhl-bild .lehne::after { content: ""; position: absolute; top: 8px; bottom: 6px; width: 3px; background: rgba(0,0,0,.35); left: 12px; }
+.stuhl-bild .lehne::after { left: 25px; }
+.stuhl-bild .sitz { position: absolute; left: 4px; top: 66px; width: 62px; height: 22px; border-radius: 4px 4px 8px 8px; background: linear-gradient(#6e3b2e, #4c2419); box-shadow: inset 0 2px 0 rgba(255,255,255,.08), 0 2px 4px rgba(0,0,0,.5); }
+.stuhl-bild .bein { position: absolute; top: 86px; width: 6px; height: 64px; background: linear-gradient(90deg, #2a1b12, #4a2f1e, #2a1b12); }
+.stuhl-bild .b1 { left: 8px; } .stuhl-bild .b2 { left: 56px; }
+/* ---- Manuskripte ---- */
+.desk-ding.manuskript { left: 30%; top: calc(44% + 16px); width: min(220px, 28%); aspect-ratio: 3 / 4; }
+.desk-ding.manuskript.m2 { left: 37%; top: calc(44% + 44px); } .desk-ding.manuskript.m3 { left: 25%; top: calc(44% + 70px); }
+.manuskript-papier { position: relative; width: 100%; height: 100%; padding: 14px 14px 10px; text-align: left; overflow: hidden; border-radius: 2px;
+  background: linear-gradient(170deg, #f5ebd3, #e6d8ba), repeating-linear-gradient(transparent 0 21px, rgba(90,70,40,.08) 21px 22px); color: #2c2218; font-family: ui-serif, "New York", Georgia, serif; font-size: 11px; line-height: 1.45; box-shadow: inset 0 0 34px rgba(120,90,40,.18), inset 2px 0 0 rgba(180,60,40,.25); }
 .manuskript-papier b { display: block; font-size: 12.5px; margin-bottom: 5px; border-bottom: 1px solid rgba(60,40,20,.2); padding-bottom: 3px; }
 .manuskript-papier span { display: -webkit-box; -webkit-line-clamp: 9; -webkit-box-orient: vertical; overflow: hidden; }
+.manuskript-papier .korrektur { position: absolute; height: 2px; background: rgba(170,40,30,.55); transform: rotate(-1.5deg); }
+.manuskript-papier .k1 { left: 18%; right: 40%; top: 41%; } .manuskript-papier .k2 { left: 50%; right: 12%; top: 63%; transform: rotate(1deg); }
 .desk-ding.manuskript.leer .manuskript-papier { color: #7a6a52; font-style: italic; }
-/* Tintenfass & Federn */
-.desk-ding.tinte { left: 58%; top: 4%; width: 90px; height: 90px; }
-.tinte-bild { position: relative; width: 90px; height: 90px; }
-.tinte-bild .fass { position: absolute; left: 30px; bottom: 8px; width: 34px; height: 30px; border-radius: 6px 6px 10px 10px; background: linear-gradient(#1b1f3a, #0b0d1c); box-shadow: inset 0 0 0 2px rgba(255,255,255,.08), inset 0 10px 12px rgba(255,255,255,.08), 0 3px 6px rgba(0,0,0,.6); }
-.tinte-bild .fass::before { content: ""; position: absolute; left: 8px; top: -8px; width: 18px; height: 9px; border-radius: 4px 4px 0 0; background: #2b2f4f; }
-.tinte-bild .feder { position: absolute; width: 8px; height: 64px; border-radius: 50% 50% 10% 10%; background: linear-gradient(#e9dcc2, #cdbfa0); transform-origin: bottom; }
-.tinte-bild .feder.f1 { left: 44px; bottom: 20px; transform: rotate(22deg); } .tinte-bild .feder.f2 { left: 8px; bottom: 2px; transform: rotate(-70deg); background: linear-gradient(#c9b48e, #9d8663); height: 56px; }
-/* Bücherstapel */
-.desk-ding-halter.buecher { left: 3%; top: 46%; width: min(170px, 24%); }
+/* ---- Tintenfass & Federn ---- */
+.desk-ding.tinte { left: 58%; top: calc(44% + 10px); width: 96px; height: 96px; }
+.tinte-bild { position: relative; width: 96px; height: 96px; }
+.tinte-bild .fass { position: absolute; left: 30px; bottom: 8px; width: 38px; height: 34px; border-radius: 7px 7px 12px 12px; background: linear-gradient(90deg, #151a38, #0a0c1e 50%, #1a1f44); box-shadow: inset 0 0 0 2px rgba(255,255,255,.1), inset 0 10px 12px rgba(255,255,255,.07), 0 3px 6px rgba(0,0,0,.65); }
+.tinte-bild .fass::before { content: ""; position: absolute; left: 9px; top: -9px; width: 20px; height: 10px; border-radius: 4px 4px 0 0; background: linear-gradient(#3a3f66, #1a1f44); }
+.tinte-bild .fass-glanz { position: absolute; left: 36px; bottom: 16px; width: 6px; height: 20px; border-radius: 3px; background: rgba(255,255,255,.22); }
+.tinte-bild .feder { position: absolute; width: 9px; height: 66px; border-radius: 50% 50% 10% 10%; transform-origin: bottom; background: repeating-linear-gradient(100deg, #ecdfc5 0 1.5px, #cdbfa0 1.5px 3px), linear-gradient(#ecdfc5, #cdbfa0); }
+.tinte-bild .feder::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; margin-left: -.5px; background: rgba(90,70,40,.45); }
+.tinte-bild .feder.f1 { left: 46px; bottom: 22px; transform: rotate(22deg); } .tinte-bild .feder.f2 { left: 6px; bottom: 4px; transform: rotate(-70deg); height: 58px; filter: brightness(.85); }
+/* ---- Bücherstapel ---- */
+.desk-ding-halter.buecher { left: 3%; top: calc(44% + 150px); width: min(170px, 24%); }
 .buecher-stapel { position: relative; }
-.stapel-buch { position: relative; display: block; width: 100%; aspect-ratio: 3 / 4; margin-top: calc(-90% + 14px); transform: rotate(var(--dreh, 0deg)); border-radius: 2px 5px 5px 2px; overflow: hidden; box-shadow: 0 3px 5px rgba(0,0,0,.55), inset 2px 0 4px rgba(255,255,255,.12); background: #4a3a2a; }
+.stapel-buch { position: relative; display: block; width: 100%; aspect-ratio: 3 / 4; margin-top: calc(-90% + 14px); transform: rotate(var(--dreh, 0deg)); border-radius: 2px 5px 5px 2px; overflow: hidden; box-shadow: 0 3px 5px rgba(0,0,0,.6), inset 2px 0 4px rgba(255,255,255,.12); background: #4a3a2a; transition: transform .25s; }
 .stapel-buch:first-child { margin-top: 0; }
 .stapel-buch img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .stapel-buch.ohne-cover span { position: absolute; inset: 0; display: grid; place-items: center; padding: 10px; font-family: ui-serif, "New York", Georgia, serif; font-size: 13px; color: #f1e4c8; text-align: center; }
 .stapel-buch:hover { transform: rotate(var(--dreh, 0deg)) translateY(-6px); z-index: 2; }
 .stapel-fuss { display: block; margin-top: 8px; padding: 4px 10px; border-radius: 8px; background: rgba(255,230,180,.1); color: #e8c27a; font-size: 12px; letter-spacing: .04em; }
-/* Tasse */
-.desk-ding.tasse { right: 10%; top: 44%; width: 76px; height: 80px; }
-.tasse-bild { position: relative; width: 76px; height: 80px; }
-.tasse-bild::before { content: ""; position: absolute; left: 8px; top: 26px; width: 48px; height: 46px; border-radius: 6px 6px 18px 18px; background: linear-gradient(#d8cfc2, #a9a096); box-shadow: inset 0 -12px 14px rgba(0,0,0,.2), inset 0 2px 0 rgba(255,255,255,.4), 0 3px 6px rgba(0,0,0,.55); }
-.tasse-bild::after { content: ""; position: absolute; left: 12px; top: 28px; width: 40px; height: 8px; border-radius: 50%; background: #3b2a1c; }
-.tasse-bild .henkel { position: absolute; left: 52px; top: 34px; width: 18px; height: 24px; border: 6px solid #c7beb1; border-left: 0; border-radius: 0 14px 14px 0; }
-.tasse-bild .dampf { position: absolute; top: 8px; width: 6px; height: 20px; border-radius: 50%; background: rgba(255,255,255,.0); }
-.tasse.dampft .dampf { background: rgba(255,250,240,.35); animation: dampf-steigt 2.8s ease-in-out infinite; }
-.tasse-bild .d1 { left: 22px; } .tasse-bild .d2 { left: 36px; animation-delay: -1.3s !important; }
-@keyframes dampf-steigt { 0% { transform: translateY(6px) scaleX(1); opacity: 0; } 30% { opacity: .7; } 100% { transform: translateY(-16px) scaleX(1.6); opacity: 0; } }
-.tasse-zahl { position: absolute; left: 8px; top: 40px; width: 48px; text-align: center; font-size: 12px; color: #fff8ea; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
-/* Glas mit Fundstück */
-.desk-ding.glas { left: 24%; top: 56%; width: 50px; height: 70px; }
-.glas-bild { position: relative; width: 50px; height: 70px; }
-.glaskoerper { position: absolute; left: 4px; top: 10px; width: 42px; height: 56px; border-radius: 6px 6px 12px 12px; background: linear-gradient(90deg, rgba(255,255,255,.22), rgba(255,255,255,.06) 40%, rgba(255,255,255,.18)); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.35), 0 3px 6px rgba(0,0,0,.5); }
-.glaskoerper::before { content: ""; position: absolute; left: 8px; top: -8px; width: 26px; height: 10px; border-radius: 4px; background: #7a6a52; }
-.fundstueck { position: absolute; left: 18px; top: 40px; width: 14px; height: 16px; border-radius: 40% 60% 55% 45%; background: radial-gradient(circle at 40% 35%, #c9a25a, #6b4f25); }
-/* Brief */
-.desk-ding.brief { left: 9%; top: 82%; width: 92px; height: 62px; --dreh: -7deg; }
-.brief-bild { width: 92px; height: 62px; background: linear-gradient(#efe3c8, #dccba6); border-radius: 2px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,.55); }
-.brief-bild::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 0; border-left: 46px solid transparent; border-right: 46px solid transparent; border-top: 30px solid rgba(120,90,50,.22); }
-.brief-bild .siegel { position: absolute; left: 38px; top: 22px; width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #c8352b, #6e1710); box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+/* ---- Tasse ---- */
+.desk-ding.tasse { right: 10%; top: calc(44% + 150px); width: 76px; height: 84px; }
+.tasse-bild { position: relative; width: 76px; height: 84px; }
+.tasse-bild::before { content: ""; position: absolute; left: 8px; top: 28px; width: 48px; height: 48px; border-radius: 6px 6px 18px 18px; background: linear-gradient(90deg, #b9ada0, #e4dccf 40%, #b9ada0); box-shadow: inset 0 -12px 14px rgba(0,0,0,.18), inset 0 2px 0 rgba(255,255,255,.5), 0 3px 6px rgba(0,0,0,.6); }
+.tasse-bild::after { content: ""; position: absolute; left: 12px; top: 30px; width: 40px; height: 9px; border-radius: 50%; background: radial-gradient(ellipse at 50% 50%, #4a3322, #2a1a10); }
+.tasse-bild .henkel { position: absolute; left: 52px; top: 36px; width: 18px; height: 24px; border: 6px solid #cfc5b6; border-left: 0; border-radius: 0 14px 14px 0; }
+.tasse-bild .dampf { position: absolute; top: 8px; width: 6px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0); }
+.tasse.dampft .dampf { background: rgba(255,250,240,.38); animation: dampf-steigt 2.8s ease-in-out infinite; }
+.tasse-bild .d1 { left: 18px; } .tasse-bild .d2 { left: 30px; animation-delay: -1.3s !important; } .tasse-bild .d3 { left: 42px; animation-delay: -.7s !important; }
+@keyframes dampf-steigt { 0% { transform: translateY(8px) scaleX(1); opacity: 0; } 30% { opacity: .7; } 100% { transform: translateY(-18px) scaleX(1.7); opacity: 0; } }
+.tasse-zahl { position: absolute; left: 8px; top: 44px; width: 48px; text-align: center; font-size: 12px; color: #fff8ea; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+/* ---- Glas mit Fundstück ---- */
+.desk-ding.glas { left: 24%; top: calc(44% + 190px); width: 54px; height: 74px; }
+.glas-bild { position: relative; width: 54px; height: 74px; }
+.glaskoerper { position: absolute; left: 4px; top: 12px; width: 46px; height: 58px; border-radius: 7px 7px 13px 13px; background: linear-gradient(90deg, rgba(255,255,255,.26), rgba(255,255,255,.05) 35%, rgba(255,255,255,.02) 60%, rgba(255,255,255,.2)); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.38), inset 0 -6px 10px rgba(255,255,255,.08), 0 3px 6px rgba(0,0,0,.55); }
+.glas-deckel { position: absolute; left: 10px; top: 4px; width: 34px; height: 12px; border-radius: 4px; background: linear-gradient(#8a7a62, #5a4a36); box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.fundstueck { position: absolute; left: 20px; top: 44px; width: 14px; height: 16px; border-radius: 40% 60% 55% 45%; background: radial-gradient(circle at 40% 35%, #c9a25a, #6b4f25); }
+.fund-foto { position: absolute; left: 9px; top: 22px; width: 36px; height: 42px; object-fit: cover; border-radius: 4px 4px 9px 9px; opacity: .85; filter: sepia(.35) contrast(.9); }
+/* ---- Brief ---- */
+.desk-ding.brief { left: 9%; top: calc(44% + 310px); width: 96px; height: 64px; --dreh: -7deg; }
+.brief-bild { width: 96px; height: 64px; background: linear-gradient(#f0e4c9, #dccba6); border-radius: 2px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,.6); overflow: hidden; }
+.brief-bild::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 0; border-left: 48px solid transparent; border-right: 48px solid transparent; border-top: 32px solid rgba(120,90,50,.22); }
+.brief-bild .zeile { position: absolute; left: 10px; height: 1.5px; background: rgba(60,40,20,.35); transform: rotate(-1deg); }
+.brief-bild .z1 { top: 40px; width: 36px; } .brief-bild .z2 { top: 48px; width: 52px; }
+.brief-bild .siegel { position: absolute; left: 40px; top: 22px; width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #d13d31, #6e1710); box-shadow: 0 1px 2px rgba(0,0,0,.5); overflow: hidden; display: grid; place-items: center; }
+.brief-bild .siegel.eigen { width: 26px; height: 26px; left: 36px; top: 18px; background: #f7efe0; }
+.brief-bild .siegel img { width: 80%; height: 80%; object-fit: contain; }
 .desk-ding.brief.bereit .siegel { animation: siegel-pocht 1.6s ease-in-out infinite; box-shadow: 0 0 0 4px rgba(232,194,122,.35); }
 .desk-ding.brief.leer .brief-bild { opacity: .75; }
 @keyframes siegel-pocht { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-/* Karteikarten */
-.desk-ding.karten { right: 24%; top: 70%; width: 70px; height: 48px; --dreh: 4deg; }
+/* ---- Karteikarten, Lupe, Stummel, Notizbuch ---- */
+.desk-ding.karten { right: 24%; top: calc(44% + 270px); width: 70px; height: 48px; --dreh: 4deg; }
 .karten-bild { position: relative; width: 70px; height: 48px; }
-.karten-bild i { position: absolute; left: 0; top: 0; width: 64px; height: 40px; border-radius: 3px; background: repeating-linear-gradient(transparent 0 9px, rgba(120,140,200,.35) 9px 10px), #f5f0e0; box-shadow: 0 1px 3px rgba(0,0,0,.5); }
+.karten-bild i { position: absolute; left: 0; top: 0; width: 64px; height: 40px; border-radius: 3px; background: repeating-linear-gradient(transparent 0 9px, rgba(120,140,200,.35) 9px 10px), linear-gradient(#fbf6e8, #eee6d2); box-shadow: 0 1px 3px rgba(0,0,0,.55); }
+.karten-bild i:nth-child(1)::before { content: ""; position: absolute; left: 0; right: 0; top: 9px; height: 1px; background: rgba(200,80,80,.5); }
 .karten-bild i:nth-child(2) { transform: translate(3px, 3px) rotate(3deg); } .karten-bild i:nth-child(3) { transform: translate(6px, 6px) rotate(-2deg); }
-/* Lupe & Stummel */
-.desk-ding.lupe { right: 5%; top: 86%; width: 60px; height: 48px; --dreh: 30deg; }
-.lupe-bild { position: relative; width: 60px; height: 48px; }
-.lupe-bild .linse { position: absolute; left: 0; top: 6px; width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.45), rgba(200,220,255,.12) 60%); box-shadow: inset 0 0 0 4px #8a6d3c, 0 2px 4px rgba(0,0,0,.5); }
-.lupe-bild .griff { position: absolute; left: 32px; top: 24px; width: 26px; height: 7px; border-radius: 4px; background: #3a2a1c; transform: rotate(35deg); transform-origin: left center; }
-.desk-ding.stummel { left: 50%; top: 62%; width: 38px; height: 12px; --dreh: -18deg; }
-.stummel-bild { width: 38px; height: 10px; background: linear-gradient(90deg, #e9b45c 0 22px, #f1dfc0 22px 30px, #2b2520 30px); border-radius: 2px 50% 50% 2px / 2px 50% 50% 2px; box-shadow: 0 1px 3px rgba(0,0,0,.5); }
-/* Notizbuch */
-.desk-ding.notizbuch { right: 8%; top: 64%; width: 96px; height: 64px; --dreh: 6deg; }
-.notizbuch-bild { --heft1: #6f4334; width: 96px; height: 64px; border-radius: 3px 8px 8px 3px; background: linear-gradient(145deg, var(--heft1), color-mix(in srgb, var(--heft1) 70%, #000)); position: relative; box-shadow: 0 3px 6px rgba(0,0,0,.55), inset 6px 0 0 rgba(0,0,0,.25); }
-.notizbuch-bild .zettelchen { position: absolute; top: -6px; width: 18px; height: 12px; background: #f2d98a; box-shadow: 0 1px 2px rgba(0,0,0,.4); }
+.desk-ding.lupe { right: 5%; top: calc(44% + 330px); width: 62px; height: 50px; --dreh: 30deg; }
+.lupe-bild { position: relative; width: 62px; height: 50px; }
+.lupe-bild .linse { position: absolute; left: 0; top: 6px; width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.42), rgba(200,220,255,.14) 60%, rgba(255,255,255,.05)); box-shadow: inset 0 0 0 4px #8a6d3c, inset 0 0 0 5px rgba(255,230,170,.4), 0 2px 4px rgba(0,0,0,.55); }
+.lupe-bild .glanz { position: absolute; left: 9px; top: 12px; width: 9px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.55); transform: rotate(-30deg); }
+.lupe-bild .griff { position: absolute; left: 33px; top: 25px; width: 28px; height: 8px; border-radius: 4px; background: linear-gradient(#4a3622, #2a1c10); transform: rotate(35deg); transform-origin: left center; box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.desk-ding.stummel { left: 50%; top: calc(44% + 230px); width: 40px; height: 12px; --dreh: -18deg; }
+.stummel-bild { position: relative; width: 40px; height: 10px; }
+.stummel-bild .holz { position: absolute; left: 0; top: 0; width: 34px; height: 10px; border-radius: 2px 40% 40% 2px / 2px 50% 50% 2px; background: linear-gradient(#e9c36a, #c99a3d); box-shadow: 0 1px 3px rgba(0,0,0,.55); }
+.stummel-bild .holz::after { content: ""; position: absolute; right: 0; top: 1px; width: 9px; height: 8px; border-radius: 0 50% 50% 0; background: linear-gradient(90deg, #f1dfc0, #d8c49c); }
+.stummel-bild .mine { position: absolute; left: 34px; top: 3px; width: 6px; height: 4px; border-radius: 0 3px 3px 0; background: #2b2520; }
+.desk-ding.notizbuch { right: 8%; top: calc(44% + 220px); width: 96px; height: 66px; --dreh: 6deg; }
+.notizbuch-bild { --heft1: #6f4334; width: 96px; height: 66px; border-radius: 3px 8px 8px 3px; background: linear-gradient(145deg, var(--heft1), color-mix(in srgb, var(--heft1) 70%, #000)); position: relative; box-shadow: 0 3px 6px rgba(0,0,0,.6), inset 6px 0 0 rgba(0,0,0,.25); }
+.notizbuch-bild .zettelchen { position: absolute; top: -6px; width: 18px; height: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.4); }
 .notizbuch-bild .z1 { left: 18px; background: #f2d98a; } .notizbuch-bild .z2 { left: 42px; top: -9px; background: #f3cfd3; } .notizbuch-bild .z3 { left: 66px; background: #cadfea; }
-/* Verse */
+.notizbuch-bild .gummi { position: absolute; top: -2px; bottom: -2px; right: 14px; width: 6px; background: #2c251c; opacity: .9; border-radius: 2px; }
+/* ---- Verse ---- */
 .desk-vers { position: absolute; z-index: 1; font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 13px; color: rgba(235,220,190,.42); max-width: 220px; pointer-events: none; transform: rotate(var(--dreh, -4deg)); text-shadow: 0 1px 1px rgba(0,0,0,.4); }
-.desk-vers.v1 { left: 40%; top: 60%; --dreh: -6deg; } .desk-vers.v2 { left: 62%; top: 36%; --dreh: 3deg; } .desk-vers.v3 { left: 34%; top: 86%; --dreh: -2deg; }
-/* Schublade */
-.desk-schublade { position: absolute; left: 30%; right: 30%; bottom: 0; height: 34px; border-radius: 6px 6px 0 0; background: linear-gradient(#2c1f16, #1b120d); box-shadow: inset 0 2px 0 rgba(255,255,255,.08), 0 -2px 8px rgba(0,0,0,.4); z-index: 2; transition: transform .25s; }
+.desk-vers.v1 { left: 40%; top: calc(44% + 250px); --dreh: -6deg; } .desk-vers.v2 { left: 62%; top: calc(44% + 130px); --dreh: 3deg; } .desk-vers.v3 { left: 34%; top: calc(44% + 330px); --dreh: -2deg; }
+/* ---- Papierkorb, Schublade, Einrichten ---- */
+.desk-korb { position: absolute; left: 4%; bottom: 6px; width: 64px; height: 54px; z-index: 3; border-radius: 4px 4px 10px 10px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 3px, transparent 3px 6px), linear-gradient(#3a2c20, #1e160f); box-shadow: inset 0 0 0 1px rgba(255,220,160,.1), 0 3px 8px rgba(0,0,0,.6); filter: drop-shadow(0 4px 6px rgba(0,0,0,.5)); }
+.desk-korb .korbrand { position: absolute; left: -3px; right: -3px; top: -3px; height: 7px; border-radius: 4px; background: linear-gradient(#5a4530, #2a1f14); }
+.desk-korb .knuell { position: absolute; width: 22px; height: 20px; border-radius: 45% 55% 50% 50%; background: radial-gradient(circle at 35% 35%, #f3e9d4, #c9bda0 70%); box-shadow: inset -3px -3px 6px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.5); }
+.desk-korb .k1 { left: 6px; top: -10px; transform: rotate(-12deg); } .desk-korb .k2 { left: 26px; top: -14px; transform: rotate(18deg); } .desk-korb .k3 { left: 42px; top: -6px; transform: rotate(-30deg); width: 18px; height: 16px; }
+.desk-schublade { position: absolute; left: 30%; right: 30%; bottom: 0; height: 36px; border-radius: 6px 6px 0 0; background: linear-gradient(#2c1f16, #1b120d); box-shadow: inset 0 2px 0 rgba(255,255,255,.08), 0 -2px 8px rgba(0,0,0,.4); z-index: 3; transition: transform .25s; }
 .desk-schublade:hover { transform: translateY(-4px); }
-.desk-schublade .griffknauf { position: absolute; left: 50%; top: 50%; width: 34px; height: 10px; margin: -5px 0 0 -17px; border-radius: 5px; background: linear-gradient(#c9a25a, #7a5a2a); box-shadow: 0 1px 2px rgba(0,0,0,.6); }
+.desk-schublade .griffknauf { position: absolute; left: 50%; top: 50%; width: 36px; height: 10px; margin: -5px 0 0 -18px; border-radius: 5px; background: linear-gradient(#d9b463, #7a5a2a); box-shadow: 0 1px 2px rgba(0,0,0,.6); }
 .desk-einrichten { position: absolute; right: 12px; top: 12px; z-index: 4; background: rgba(20,16,12,.6); color: #e8c27a; }
-/* Unordnung: weniger Dinge bei wenig Unordnung */
-.desk-szene[style*="--unordnung:0"] .desk-vers, .desk-szene[style*="--unordnung:0."] .desk-vers { opacity: calc(var(--unordnung) * 2); }
 @media (max-width: 760px) {
-  .desk-fenster { height: 34%; min-height: 200px; }
-  .desk-ding.manuskript { width: 40%; left: 28%; top: 4%; } .desk-ding.manuskript.m2 { left: 34%; } .desk-ding.manuskript.m3 { left: 22%; top: 12%; }
-  .desk-ding.lampe { left: 2%; top: -50px; transform: scale(.8); }
-  .desk-ding.leuchter { right: -10px; top: -70px; transform: scale(.78); }
-  .desk-ding.tinte { left: 66%; top: 30%; transform: scale(.8); }
-  .desk-ding-halter.buecher { width: 30%; top: 52%; }
-  .desk-ding.tasse { right: 6%; top: 48%; transform: scale(.85); }
-  .desk-ding.glas { left: 36%; top: 60%; } .desk-ding.brief { top: 84%; left: 6%; }
-  .desk-ding.karten { right: 32%; top: 78%; } .desk-ding.lupe { right: 4%; top: 88%; } .desk-ding.stummel { left: 52%; top: 70%; } .desk-ding.notizbuch { right: 6%; top: 66%; transform: scale(.85); }
+  .desk-szene { min-height: 720px; }
+  .desk-ding.lampe { left: -6px; transform: scale(.78); transform-origin: top left; }
+  .desk-ding.leuchter { right: -16px; transform: scale(.72); transform-origin: top right; }
+  .desk-ding.uhr { right: 28%; transform: scale(.8); transform-origin: top; } .desk-ding.stuhl { display: none; }
+  .desk-ding.manuskript { width: 40%; left: 26%; } .desk-ding.manuskript.m2 { left: 32%; } .desk-ding.manuskript.m3 { left: 20%; }
+  .desk-ding.tinte { left: 68%; top: calc(44% + 90px); transform: scale(.8); }
+  .desk-ding-halter.buecher { width: 30%; top: calc(44% + 180px); }
+  .desk-ding.tasse { right: 4%; top: calc(44% + 180px); transform: scale(.85); }
+  .desk-ding.glas { left: 38%; top: calc(44% + 250px); } .desk-ding.brief { top: calc(44% + 330px); left: 6%; width: 80px; }
+  .desk-ding.karten { right: 30%; top: calc(44% + 320px); } .desk-ding.lupe { right: 4%; top: calc(44% + 340px); } .desk-ding.stummel { left: 54%; top: calc(44% + 280px); } .desk-ding.notizbuch { right: 6%; top: calc(44% + 250px); transform: scale(.85); }
   .desk-vers { font-size: 11px; max-width: 150px; }
+  .desk-korb { width: 50px; height: 44px; }
 }
 /* ===================== LESESTAPEL & LESEMODUS ===================== */
 .modal.lesestapel { width: min(760px, 96vw); max-height: 90dvh; overflow: auto; }
@@ -696,6 +706,21 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .lese-balken { flex: 1; accent-color: var(--akzent); }
 .lese-stand { font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; color: #c9b48e; }
 .modal.zitat-kasten textarea { width: 100%; font-size: 14px; line-height: 1.5; }
+.lese-kopf .rundknopf.hat-notiz::after { content: ""; position: absolute; right: 5px; top: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--akzent); }
+.lese-kopf .rundknopf { position: relative; }
+.buchsuche-treffer { display: grid; gap: 4px; max-height: 52dvh; overflow: auto; }
+.buchsuche-treffer button { text-align: left; padding: 8px 10px; border-radius: 9px; font-size: 14px; line-height: 1.4; }
+.buchsuche-treffer button:hover { background: var(--hg2); }
+.buchsuche-treffer b { color: var(--akzent); font-weight: 600; }
+.buchsuche-treffer small { display: block; color: var(--blass); font-size: 12px; }
+.lese-notizen { display: grid; gap: 8px; max-height: 40dvh; overflow: auto; margin: 6px 0; }
+.lese-notiz { padding: 8px 10px; border-radius: 10px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 14px; }
+.lese-notiz small { color: var(--blass); }
+.lesezeichen-farbe { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.koffer-passwort { width: 100%; padding: 11px 13px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 17px; }
+.weiterlesen-karte { display: flex; gap: 14px; align-items: center; width: 100%; text-align: left; margin-top: 12px; }
+.weiterlesen-karte img { width: 44px; height: 58px; object-fit: cover; border-radius: 2px 5px 5px 2px; box-shadow: 0 3px 8px var(--schein); }
+.weiterlesen-karte b { display: block; } .weiterlesen-karte small { color: var(--blass); }
 .modal.brief-kasten textarea { width: 100%; font-size: 16px; line-height: 1.55; font-family: ui-serif, "New York", Georgia, serif; }
 .brief-wann { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 14px; }
 .brief-wann select { padding: 6px 10px; border-radius: 10px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font: inherit; color: inherit; }
@@ -1797,7 +1822,12 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
    ================================================================ */
 
 /* Die Räume liegen in einer eigenen Rolle. */
-.raumrolle { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; }
+/* Die Räume rollen in ihrer eigenen Rolle — wird es eng, scrollt nur sie; Suche
+   und Feinheiten bleiben unten immer sichtbar. */
+.raumrolle { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.raumrolle::-webkit-scrollbar { display: none; }
+#leiste { min-height: 0; }
+#leiste .luecke { flex: 1 0 6px; }
 
 /* Tagesbalken müssen schrumpfen dürfen — sonst wird die Hälfte abgeschnitten. */
 .statistikbalken .tag { min-width: 0; }

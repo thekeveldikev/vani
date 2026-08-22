@@ -1382,3 +1382,63 @@ Tests 146/146 (neu `test/schreibtisch.mjs`, Schreibtisch-Vertrag). Browser:
 Raum mit allen Dingen, Lampe schaltet, Brief versiegelt, Schublade, Buch
 aufgelegt (316 S., Cover, Titel/Autor aus Dateinamen), Lesemodus rendert,
 blättert (Doppelseite „2–3"), Lesezeichen, Gliederung, Zitat mit Text, Nacht.
+
+## 23. Der Schreibtisch, gemalt — und der Bücherkoffer (23. August 2026, VANI 5.16.0)
+
+### Malerei (`src/54b-schreibtisch-malerei.js`)
+Ein Canvas für die ganze Szene: `schreibtischMaler(canvas, opt)` →
+`{start, stopp, setze}`. Unbewegtes (Wand, Platte, Rahmen) einmal in ein
+Offscreen-Canvas (`maleStatisch`), dann geblittet; bewegt: Himmel nach
+`schreibtischTageslicht(h)` (0 Nacht … .55 grauer Tag, Dämmerung/erstes Grau
+dazwischen) mit `schreibtischHimmelFarben`, Sterne, Mond mit Phase und Maren,
+Garten in drei Tiefen (Bäume mit Kronen, im Winter Geäst; Büsche; Gras), alles
+mit Sinus-Wiegen × Wind, Nebelbänder, `schreibtischJahreszeit`: Sommer
+Glühwürmchen (`kerzeSchein`), Herbst fallende Blätter, Winter Schnee + kahle
+Bäume + Schneekante, Frühling Blüten; Regen als 180 Tropfen mit eigener Lage
+(**keine Kachel** — der CSS-Regen loopte sichtbar), Glas-Tropfen, Wetterleuchten
+mit Zufallspause; Licht: Dunkelschleier über der Platte, Lampenkegel (bei
+`lampeAn`), Kerzenschein — alles `kerzeSchein` (kantenfrei). Holz: Maserung
+(70 Wellen), Astlöcher, Handstelle, Kratzer, Tintenkleckse mit Satelliten,
+Wachs, Kaffeering. Saat = `tagKey()` → der Tisch bleibt am Tag gleich.
+
+### Die Dinge (`src/54-schreibtisch.js`)
+- **Lampe mit Zugschnur** (`baueLampe`): Knauf per Pointer ziehen, Schnur dehnt
+  sich (über Max nur noch 12 %), loslassen → `schnurSchritt` (Feder k=70,
+  Dämpfung 7) schwingt zurück; über `SCHWELLE` 46 px schaltet `umschalten()`
+  (`lampeAn`, Klasse `lampe-aus`, Maler `setze`, leiser Klick synthetisch).
+  Schirm antippen: Stufen .45/.65/.8/1.
+- **Leuchter** mit Messingarmen, Tüllen, Wachsläufen; `leuchterStand(wachs)`:
+  je Kerze eigenes Tempo; `schreibtischWachsVerbrennen(min)` wird aus
+  `beendeSprint` gerufen; nach 20 h „neue aufstecken".
+- **Standuhr** (`baueUhr`): Zeiger jede Sekunde, Pendel-Animation, optional
+  Ticken (`uhrTickt`) + Glockenschlag zur vollen Stunde; Tipp: Zeit am Tisch
+  (sessionStorage `vani-session-start`).
+- **Zweiter Stuhl** → Faden. **Papierkorb** (`papierkorbAmTisch`: Bündel aus
+  `papierkorb`, `holeZurueck`). **Glas** zeigt ein eigenes Foto
+  (`schreibtischFundfoto`, tagesstabil). **Brief** mit Siegelbild (`bild` =
+  Sticker/Kiste/gezeichnet).
+- Einstellungen neu: `lampeAn`, `uhrTickt`, `wachs`, `kerzenGewechselt`.
+
+### Bücherkoffer
+`werkzeug/buecherkoffer.mjs <Ordner> [Passwort]` → `buecher/koffer.json` +
+`buch-NN.enc` (Format `VANIBUCH1` + Salz 16 + IV 12 + AES-256-GCM; PBKDF2-SHA-256
+200 000). App: `buecherkofferHolen()` → `passwortFragen` → `kofferEntschluesseln`
+(WebCrypto) → `buchAuflegenAusBlob`. Falsches Passwort → OperationError →
+„Das Passwort passt nicht." Der Vertrag erlaubt im Ordner nur `.enc` +
+`koffer.json`, nie eine PDF. **Das Passwort steht nirgends im Repo** — es wurde
+der Nutzerin im Gespräch genannt. Plan: Koffer aus dem Repo nehmen, sobald die
+Bücher auf ihren Geräten liegen.
+
+### Lesemodus erweitert
+Randnotizen (`buchnotiz` {parent, seite, text}), Suche im Buch (Textebene je
+Seite, im Leser gecacht), Vorlesen (`vorlesen`), Lesestatistik
+(`buch.statistik[tagKey] = Seiten`, 60 Tage), farbige Lesezeichen
+(`lesezeichenFarben`), „Weiterlesen" auf dem Zuhause (letzte 14 Tage).
+
+### Leiste
+`.raumrolle` scrollt (overflow-y auto, min-height 0), Suche/Feinheiten bleiben.
+
+Tests 149/149. Browser: Szene gemalt (Himmel/Holz-Pixel), alle Dinge, Schnur
+zieht 124 px und federt auf 54 zurück, schaltet ab Schwelle, kleiner Zug nicht;
+Koffer: 6 Bücher, Entschlüsseln 1,6 MB in 266 ms, falsches Passwort abgewiesen,
+Buch aufgelegt; Randnotiz-Punkt, Statistik „2 Seiten heute", Weiterlesen-Karte.

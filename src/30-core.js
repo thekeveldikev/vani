@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.15.0';
+const APP_VERSION = '5.16.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -473,6 +473,11 @@ function sauberesDokument(quelle) {
     if (d.zuletzt != null) d.zuletzt = begrenze(d.zuletzt, 0, Date.now() + 86400000, 0);
     if (d.lesezeichen != null) d.lesezeichen = Array.isArray(d.lesezeichen) ? [...new Set(d.lesezeichen.map((n) => Math.round(Number(n))).filter((n) => Number.isFinite(n) && n >= 1 && n <= 100000))].slice(0, 200) : [];
   }
+  if (d.typ === 'buch') {
+    if (d.lesezeichenFarben != null) { const aus = {}; if (d.lesezeichenFarben && typeof d.lesezeichenFarben === 'object') for (const [k, v] of Object.entries(d.lesezeichenFarben).slice(0, 200)) if (/^\d{1,6}$/.test(k) && /^#[0-9a-f]{6}$/i.test(String(v))) aus[k] = v; d.lesezeichenFarben = aus; }
+    if (d.statistik != null) { const aus = {}; if (d.statistik && typeof d.statistik === 'object') for (const [k, v] of Object.entries(d.statistik).slice(-60)) if (/^\d{4}-\d{2}-\d{2}$/.test(k)) aus[k] = Math.round(begrenze(v, 0, 100000, 0)); d.statistik = aus; }
+  }
+  if (d.typ === 'buchnotiz' && d.seite != null) d.seite = Math.round(begrenze(d.seite, 1, 100000, 1));
   if (d.typ === 'brief') {
     if (d.oeffnen != null) d.oeffnen = begrenze(d.oeffnen, 0, 4102444800000, 0);
     if (d.versiegelt != null) d.versiegelt = d.versiegelt === true;

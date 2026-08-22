@@ -1,0 +1,36 @@
+{
+ "version": 1,
+ "runden": 200000,
+ "buecher": [
+  {
+   "datei": "buch-01.enc",
+   "groesse": 6972538,
+   "name": "Der Herr der Ringe - Neuüberarbeitung der Übersetzung von Wolfgang Krege - überarbeitet und aktualisiert (Tolkien, J R R"
+  },
+  {
+   "datei": "buch-02.enc",
+   "groesse": 3021609,
+   "name": "Der kleine Prinz (De Saint-Exupery, Antoine)"
+  },
+  {
+   "datei": "buch-03.enc",
+   "groesse": 4846930,
+   "name": "ES (King Stephen)"
+  },
+  {
+   "datei": "buch-04.enc",
+   "groesse": 15158352,
+   "name": "Feuerblut - Der Schwur der Jagdlinge (Fowler, Aisling Verfasser, Diestelmeier etc.)"
+  },
+  {
+   "datei": "buch-05.enc",
+   "groesse": 1636120,
+   "name": "Der letzte Elf (Mari, Silvana de [Mari, Silvana de])"
+  },
+  {
+   "datei": "buch-06.enc",
+   "groesse": 4105319,
+   "name": "epdf.pub_tintenblut"
+  }
+ ]
+}
