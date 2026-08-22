@@ -264,15 +264,26 @@ RENDER.heft = function (haupt, heftId) {
         seiten = kinder(heft.id, 'seite');
         let naechste = seiten[idx + 1];
         const leerUndFrei = naechste && !(naechste.text || '').trim() && !kinder(naechste.id).length;
-        if (!leerUndFrei) {
+        if (weiter && weiter.still && naechste && !leerUndFrei && naechste.format === paket.format && !naechste.titel) {
+          /* Stilles Weiterreichen: der Überhang kommt VOR den Anfang der
+             nächsten Seite — wie im Heft, wenn man oben Platz braucht. */
+          if (paket.format === 'rich') { naechste.rich = paket.rich + (naechste.rich || ''); naechste.text = richReinerText(naechste.rich).trimEnd(); }
+          else naechste.text = paket.text + (naechste.text ? '\n' + naechste.text : '');
+          speichere(naechste);
+        } else if (!leerUndFrei) {
           for (let i = seiten.length - 1; i > idx; i--) { seiten[i].ord = i + 1; speichereStill(seiten[i]); }
           naechste = neuDoc('seite', { parent: heft.id, ord: idx + 1, titel: '', text: paket.text, rich: paket.rich, format: paket.format });
         } else {
           naechste.text = paket.text; naechste.rich = paket.rich; naechste.format = paket.format;
           speichere(naechste); D.stats.letzte[naechste.id] = worte(paket.text);
         }
-        idx++;
         heft.geaendert = Date.now(); speichereStill(heft);
+        if (weiter && weiter.still) {
+          /* Der Überhang liegt jetzt auf der nächsten Seite; hier bleibt alles. */
+          seiten = kinder(heft.id, 'seite');
+          return;
+        }
+        idx++;
         zeigeSeite();
         requestAnimationFrame(() => {
           const feld = $('.schreibflaeche', halter);
@@ -482,7 +493,26 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
         };
         const teil = richTeileFuerHoehe(text, passt);
         if (!teil) return;
+        /* Steht der Cursor am Ende, folgt er dem Text auf die nächste Seite.
+           Schreibt man mittendrin auf einer vollen Seite, wandert nur der
+           Überhang still hinüber — die Seite bleibt, die Tastatur auch. */
+        const amEnde = (() => { try { const s = window.getSelection(); if (!s || !s.rangeCount || !text.contains(s.anchorNode)) return true; const r = s.getRangeAt(0).cloneRange(); r.selectNodeContents(text); r.setStart(s.getRangeAt(0).endContainer, s.getRangeAt(0).endOffset); return r.toString().trim().length === 0; } catch (e) { return true; } })();
+        const cursorIm = amEnde ? null : (() => { try { const s = window.getSelection(); const r = s.getRangeAt(0).cloneRange(); r.selectNodeContents(text); r.setEnd(s.getRangeAt(0).startContainer, s.getRangeAt(0).startOffset); return r.toString().length; } catch (e) { return null; } })();
+        const still = !amEnde && cursorIm !== null && cursorIm < richReinerText(teil.hier).length;
         richBlaettert = true; rp.sichern.sofort();
+        if (still) {
+          /* Cursor retten: Textposition merken, Inhalt kürzen, Cursor zurücksetzen. */
+          text.innerHTML = teil.hier; seite.rich = teil.hier; seite.text = richReinerText(teil.hier).trimEnd(); seite.format = 'rich'; speichere(seite);
+          D.stats.letzte[seite.id] = worte(seite.text); speichereStats();
+          try {
+            const walker = document.createTreeWalker(text, NodeFilter.SHOW_TEXT); let rest = cursorIm, knoten = null;
+            while ((knoten = walker.nextNode())) { if (rest <= knoten.nodeValue.length) break; rest -= knoten.nodeValue.length; }
+            if (knoten) { const r = document.createRange(); r.setStart(knoten, Math.max(0, Math.min(rest, knoten.nodeValue.length))); r.collapse(true); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+          } catch (e) {}
+          optionen.autoWeiter({ rich: teil.weiter, text: richReinerText(teil.weiter).trimStart(), format: 'rich', still: true });
+          richBlaettert = false;
+          return;
+        }
         text.innerHTML = teil.hier; seite.rich = teil.hier; seite.text = richReinerText(teil.hier).trimEnd(); seite.format = 'rich'; speichere(seite);
         D.stats.letzte[seite.id] = worte(seite.text); speichereStats();
         optionen.autoWeiter({ rich: teil.weiter, text: richReinerText(teil.weiter).trimStart(), format: 'rich' });
@@ -502,9 +532,24 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
     let blaettert = false;
     text.addEventListener('input', () => {
       sichereText();
-      if (!optionen.autoWeiter || blaettert || text.selectionStart < text.value.length - 2) return;
+      if (!optionen.autoWeiter || blaettert) return;
+      const mittendrin = text.selectionStart < text.value.length - 2;
       requestAnimationFrame(() => {
         if (blaettert || !text.isConnected) return;
+        if (mittendrin) {
+          /* Volle Seite, Cursor mittendrin: nur der Überhang geht still weiter. */
+          if (text.scrollHeight <= text.clientHeight + 2) return;
+          const passtStill = (wert) => { const messer = text.cloneNode(); messer.className = text.className; messer.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;height:auto;min-height:0;max-height:none;overflow:hidden;width:' + text.clientWidth + 'px'; messer.value = wert; blatt.append(messer); const ok = messer.scrollHeight <= text.clientHeight + 2; messer.remove(); return ok; };
+          const teilStill = seitenUmbruch(text.value, passtStill);
+          if (!teilStill || text.selectionStart > teilStill.hier.length) return;
+          const c = text.selectionStart;
+          sichereText.sofort();
+          text.value = teilStill.hier; seite.text = teilStill.hier; speichere(seite);
+          D.stats.letzte[seite.id] = worte(teilStill.hier); speichereStats();
+          text.setSelectionRange(c, c);
+          optionen.autoWeiter({ text: teilStill.weiter, rich: '', format: 'plain', still: true });
+          return;
+        }
         const passt = (wert) => {
           const messer = text.cloneNode();
           messer.className = text.className;

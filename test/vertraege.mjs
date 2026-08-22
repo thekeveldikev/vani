@@ -556,6 +556,30 @@ test('Hefte-Vertrag: Umschlag, drei Ansichten, animiertes Wegstellen', () => {
   for (const t of ['Der Umschlag', 'Karten, Regal, Tisch']) assert.match(anl, new RegExp("t: '" + t + "'"), 'Anleitung: ' + t);
 });
 
+test('Ruhe-Vertrag: Sync zeichnet nicht mitten ins Schreiben, volle Seiten reichen still weiter', () => {
+  const s = lies('src/31-sync.js');
+  /* Nur Unterschiede übernehmen, in das vorhandene Objekt hinein (offene Editoren
+     halten es), und neu zeichnen nur, wenn sich etwas änderte — nie beim Tippen. */
+  assert.match(s, /if \(alt && syncGleich\(alt, d\)\) continue;/);
+  assert.match(s, /Object\.assign\(alt, d\);/);
+  assert.match(s, /if \(!veraendert && !_sync\.zeichnenAusstehend\) return;/);
+  assert.match(s, /function syncSchreibtGerade/);
+  assert.match(s, /if \(syncSchreibtGerade\(\)\) \{\s*_sync\.zeichnenAusstehend = true;/);
+  assert.doesNotMatch(s, /\} finally \{ _sync\.uebernimmt = false; \}\s*try \{ baueLeiste\(\); zeichne\(\); \}/, 'der blinde zeichne()-Aufruf darf nicht zurück');
+  /* Schreibraum: formatierter Text scrollt den Textbereich, nicht das Fenster. */
+  const r = lies('src/45-schreibraum.js');
+  assert.match(r, /function zentriereZeileRich/);
+  assert.match(r, /if \(_sr\.istRich\) \{ zentriereZeileRich\(false\); return; \}/);
+  assert.match(r, /if \(D\.einst\.typewriter \|\| istRich\) zentriereZeile\(\);/);
+  assert.match(r, /window\.addEventListener\('scroll', srFensterZurueck/);
+  /* Hefte: Cursor mittendrin auf voller Seite → Überhang wandert still, die Seite bleibt. */
+  const h = lies('src/43-hefte.js');
+  assert.match(h, /format: 'rich', still: true \}\);/);
+  assert.match(h, /format: 'plain', still: true \}\);/);
+  assert.match(h, /if \(weiter && weiter\.still\) \{/);
+  assert.match(h, /naechste\.rich = paket\.rich \+ \(naechste\.rich \|\| ''\)/, 'stiller Überhang kommt VOR den Anfang der nächsten Seite');
+});
+
 test('Umzugs-Vertrag: die alte Adresse leitet nicht blind weiter', () => {
   /* Die Umzugsseite zählt erst nach, ob dort noch ein Bestand liegt. Vorher
      leitete sie nach fünf Sekunden weiter — auf einem Schul-iPad ohne

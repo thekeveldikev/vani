@@ -153,7 +153,7 @@ function oeffneSchreibraum(docId) {
       + ' Zeichen · etwa ' + Math.max(1, Math.round(n / 200)) + ' Min. Lesezeit';
     kopf.classList.add('versunken');
     aktualisiereSpiegel();
-    if (D.einst.typewriter) zentriereZeile();
+    if (D.einst.typewriter || istRich) zentriereZeile();
     if (D.einst.tagesziel > 0 && !zielKlangGespielt) {
       const heute = (D.stats.tage[tagKey()] || 0);
       if (heute >= D.einst.tagesziel) { zielKlangGespielt = true; glocke(); toast('Tagesziel. Der Rest ist Geschenk.'); }
@@ -191,11 +191,14 @@ function oeffneSchreibraum(docId) {
   function spiegelBeiAuswahl() {
     if (!_sr || document.activeElement !== ta) return;
     aktualisiereSpiegel();
-    if (D.einst.typewriter) zentriereZeile();
+    if (D.einst.typewriter || istRich) zentriereZeile();
   }
+  /* Safari schiebt bei formatiertem Text gern das Fenster — zurück damit. */
+  if (istRich) window.addEventListener('scroll', srFensterZurueck, { passive: true });
   _sr.spiegelBeiAuswahl = spiegelBeiAuswahl;
 }
 
+function srFensterZurueck() { if (_sr && window.scrollY) window.scrollTo(0, 0); }
 function srAktuellerText() {
   if (!_sr) return '';
   return _sr.istRich ? richReinerText(_sr.ta.innerHTML) : _sr.ta.value;
@@ -212,6 +215,7 @@ function schliesseSchreibraum(zurueck) {
   if (typeof vorlesenStopp === 'function') vorlesenStopp();
   _sr.sichern && _sr.sichern.sofort();
   document.removeEventListener('selectionchange', _sr.spiegelBeiAuswahl);
+  window.removeEventListener('scroll', srFensterZurueck);
   if (_sr.sprint) { const k = _sr.sprint.kerze; beendeSprint(true); if (k) k.entfernen(); }
   const geschrieben = worte(srAktuellerText()) - _sr.startWorte;
   _sr.raum.remove();
@@ -257,9 +261,38 @@ function aktualisiereSpiegel() {
 }
 
 let _messer = null;
+/* Formatierter Text: iPad-Safari scrollt sonst das ganze Fenster, um den
+   Cursor zu zeigen — die feste Bühne springt, man sieht nicht mehr, wo man
+   schreibt. Hier wird stattdessen der Textbereich selbst gescrollt: mit
+   Schreibmaschine auf 42 % Höhe, sonst nur so weit, dass der Cursor nicht
+   unter die Tastaturkante gerät. */
+function zentriereZeileRich(sanft) {
+  if (!_sr || !_sr.istRich) return;
+  const { ta, mitte } = _sr;
+  const sel = window.getSelection && window.getSelection();
+  if (!sel || !sel.rangeCount || !ta.contains(sel.anchorNode)) return;
+  let r = sel.getRangeAt(0).cloneRange();
+  let box = r.getBoundingClientRect();
+  if (!box || (!box.height && !box.width)) {
+    /* Leere Zeile: ein unsichtbarer Messpunkt liefert die Lage. */
+    const mess = document.createElement('span'); mess.textContent = '\u200b';
+    try { r.insertNode(mess); box = mess.getBoundingClientRect(); mess.remove(); ta.normalize(); } catch (e) { return; }
+  }
+  if (!box || !box.height) return;
+  const m = mitte.getBoundingClientRect();
+  const oben = box.top - m.top, unten = box.bottom - m.top;
+  if (D.einst.typewriter) {
+    const ziel = mitte.scrollTop + oben - m.height * .42;
+    mitte.scrollTo({ top: Math.max(0, ziel), behavior: sanft ? 'smooth' : 'auto' });
+  } else if (unten > m.height - 120 || oben < 64) {
+    mitte.scrollTo({ top: Math.max(0, mitte.scrollTop + unten - m.height * .55), behavior: sanft ? 'smooth' : 'auto' });
+  }
+  /* Und das Fenster bleibt, wo es hingehört. */
+  if (window.scrollY) window.scrollTo(0, 0);
+}
 function zentriereZeile() {
   if (!_sr) return;
-  if (_sr.istRich) return;
+  if (_sr.istRich) { zentriereZeileRich(false); return; }
   const { ta, mitte } = _sr;
   const stil = getComputedStyle(ta);
   if (!_messer || _messer.parentElement !== ta.parentElement) {

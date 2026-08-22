@@ -237,17 +237,47 @@ function syncSeedLokal() {
     _sync.ystate.set('stats', JSON.stringify(D.stats));
   }, SYNC_LOKAL);
 }
+/* Wird gerade geschrieben? Dann darf der Raum nicht unter den Händen neu
+   entstehen — das Feld verlöre den Fokus, die Tastatur klappte zu, hinter dem
+   Schreibraum führe der Raum hoch. */
+function syncSchreibtGerade() {
+  try {
+    if (typeof _sr !== 'undefined' && _sr) return true;
+    const a = document.activeElement;
+    if (!a) return false;
+    if (a.tagName === 'TEXTAREA' || a.tagName === 'INPUT' || a.isContentEditable) return true;
+    if (document.querySelector('.kritzelflaeche, .schleier')) return true;
+  } catch (e) {}
+  return false;
+}
+function syncGleich(a, b) {
+  try { return JSON.stringify(a) === JSON.stringify(b); } catch (e) { return false; }
+}
 async function syncUebernehmeAusY() {
   if (!_sync.ydocs || _sync.uebernimmt) return;
   _sync.uebernimmt = true;
+  let veraendert = 0;
   try {
     const da = new Set();
     for (const [id, y] of _sync.ydocs.entries()) {
       const d = syncLeseDokument(id, y);
       if (!d) continue;
-      da.add(id); D.docs.set(id, d); await dbPut('docs', d);
+      da.add(id);
+      const alt = D.docs.get(id);
+      /* Nur was sich wirklich unterscheidet, wird übernommen — und zwar in
+         das vorhandene Objekt hinein, damit offene Editoren, die es halten,
+         weiterschreiben können, statt ins Leere. */
+      if (alt && syncGleich(alt, d)) continue;
+      if (alt) {
+        for (const k of Object.keys(alt)) if (!(k in d)) delete alt[k];
+        Object.assign(alt, d);
+        await dbPut('docs', alt);
+      } else {
+        D.docs.set(id, d); await dbPut('docs', d);
+      }
+      veraendert++;
     }
-    for (const id of [...D.docs.keys()]) if (!da.has(id)) { D.docs.delete(id); await dbDel('docs', id); }
+    for (const id of [...D.docs.keys()]) if (!da.has(id)) { D.docs.delete(id); await dbDel('docs', id); veraendert++; }
     const einst = _sync.ystate.get('einst');
     if (typeof einst === 'string') try { uebernehmeEinstellungen(JSON.parse(einst)); await dbPut('kv', D.einst, 'einst'); setzeThema(D.einst.thema); } catch (e) {}
     const stats = _sync.ystate.get('stats');
@@ -257,8 +287,26 @@ async function syncUebernehmeAusY() {
       await dbPut('kv', D.stats, 'stats');
     } catch (e) {}
   } finally { _sync.uebernimmt = false; }
+  if (!veraendert && !_sync.zeichnenAusstehend) return;
+  /* Neu zeichnen nur, wenn sich etwas geändert hat — und nie mitten ins
+     Schreiben hinein. Dann wartet es, bis die Hände ruhen. */
+  if (syncSchreibtGerade()) {
+    _sync.zeichnenAusstehend = true;
+    clearTimeout(_sync.zeichnenTimer);
+    _sync.zeichnenTimer = setTimeout(() => { if (_sync.zeichnenAusstehend && !syncSchreibtGerade()) { _sync.zeichnenAusstehend = false; try { baueLeiste(); zeichne(); } catch (e) {} } }, 6000);
+    return;
+  }
+  _sync.zeichnenAusstehend = false;
   try { baueLeiste(); zeichne(); } catch (e) {}
 }
+/* Wenn der Fokus den Text verlässt, holt VANI ein aufgeschobenes Neuzeichnen nach. */
+try {
+  document.addEventListener('focusout', () => {
+    if (!_sync.zeichnenAusstehend) return;
+    setTimeout(() => { if (_sync.zeichnenAusstehend && !syncSchreibtGerade()) { _sync.zeichnenAusstehend = false; try { baueLeiste(); zeichne(); } catch (e) {} } }, 400);
+  });
+  window.addEventListener('hashchange', () => { _sync.zeichnenAusstehend = false; });
+} catch (e) {}
 function syncPlaneUebernahme() {
   clearTimeout(_sync.anwendenTimer);
   _sync.anwendenTimer = setTimeout(() => syncUebernehmeAusY().catch(() => syncMelde('fehler')), 80);
