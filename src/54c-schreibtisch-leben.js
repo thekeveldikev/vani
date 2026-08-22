@@ -166,7 +166,7 @@ function baueOffenesBuch(b, szene) {
         const pdfjs = await pdfjsLaden();
         const blob = await dbGet('media', b.datei);
         if (!blob || !halter.isConnected) return;
-        dok = await pdfjs.getDocument({ data: await blob.arrayBuffer() }).promise;
+        dok = await pdfjsDokument(pdfjs, await blob.arrayBuffer()).promise;
         if (!halter.isConnected) { dok.destroy(); dok = null; return; }
         await male();
         halter.classList.add('offen');

@@ -1677,3 +1677,50 @@ Alles animiert (Flackern, Glutpulsieren, aufsteigende Funken, Rauch) und bei
 Tests 158/158 (neu: Seitenfüllung, Feuer-Helfer). Browser geprüft: Rolle und
 „Am Stück" mit einer Werkzeugreihe und durchgehendem Papier, Feuer in allen
 fünf Zuständen (aus → Glut → klein → voll → lodernd mit drei Scheiten).
+
+## 29. Es wird Tag am Schreibtisch — und Feuerblut hat Seiten (24. August 2026, VANI 5.21.0)
+
+### Drei Fehler
+- **Orangene Kästen beim Tippen** (Rolle, Am Stück): Safaris globales `:focus-visible`
+  (`outline: 2.5px var(--akzent)`) trifft bei jedem Tipp in ein Textfeld. Jetzt
+  `textarea/input/[contenteditable]/.schreibflaeche/.rich-editor:focus-visible { outline: none }`
+  — der Cursor zeigt, wo man ist.
+- **Feuerblut leer**: die Seiten tragen JPEG-2000-Bilder. pdf.js 6 dekodiert JPX/JBIG2
+  per WebAssembly und braucht dafür `wasmUrl` — ohne sie rendert die Seite weiß, obwohl
+  Text da ist („Dependent image isn't ready yet"). Jetzt liegen `openjpeg.wasm`,
+  `jbig2.wasm`, `qcms_bg.wasm` (+ Fallbacks, Lizenzen) in `vendor/wasm/`, und jedes
+  Aufschlagen läuft über `pdfjsDokument(pdfjs, daten)` mit `wasmUrl` (55, 54c).
+  Gemessen: Seite 20 vorher 0 dunkle Pixel, mit WASM 6227.
+- Hosting-Test liest die Version aus der App (war auf 5.1x festgenagelt).
+
+### Der Himmel lebt (54b)
+Pure Helfer: `schreibtischSonnenzeiten(wann)` (Auf-/Untergang übers Jahr, Kosinus um
+den 21. Juni), `schreibtischTageszeitInfo(wann, wahl)` → `{stunde, sonne 0..1, u 0..1
+(Ost→West), licht, phase, waerme, aufgang, untergang}`; `wahl` kann `morgen/mittag/
+golden/abend/nacht` festhalten. `schreibtischHimmelFarben(info, jahreszeit, wetter)`
+mischt Nacht → Dämmerung → Horizont → Tag, Winter blasser, Herbst grauer, Regen/Gewitter
+wolkig. `schreibtischTageslicht` bleibt als Helligkeit (0..1, jetzt wirklich 1 am Tag).
+`maleFenster` neu: Sonne wandert (Position aus `u`, Höhe aus `sonne`), glüht tief
+stehend orange, zarte drehende Strahlen; sechs treibende Wolken (weiß/rosig/nachts
+hauchzart, dichter bei Regen); Vogelschwärme am Tag (Herbst: Gänse im Keil, Sommer:
+schnelle Segler); Baumkronen, Büsche und Gras färben sich nach Jahreszeit (Frühling
+hell, Sommer satt, Herbst orange/braun, Winter kahl mit Schnee auf den Ästen) und
+dunkeln mit der Nacht; Sonnenseite der Kronen; Schmetterlinge im Sommer; Morgennebel
+im Herbst dichter; Eisblumen in den Scheibenecken im Winter bei Dunkelheit; Mond nur,
+wenn es dunkel wird. `maleLicht`: Fensterlicht kühl/golden nach `waerme`, ein
+Sonnenbalken fällt schräg (nach Sonnenstand) durch beide Fensterhälften auf die
+Platte, mit Sprossenschatten und tanzendem Staub; der Raum hellt am Tag ganz auf.
+`data-tageszeit` (tag/daemmerung/nacht) + `data-phase` an der Szene.
+
+### Einrichten
+`saubererSchreibtisch` + `tageszeit` (`TAGESZEIT_WAHLEN`: echt, morgen, mittag, golden,
+abend, nacht, zufall) und `jahreszeit` (`JAHRESZEIT_WAHLEN`: echt, fruehling, sommer,
+herbst, winter, zufall); „Überraschung" würfelt beim Betreten und bleibt, solange der
+Tisch steht (Signatur trägt nur die Wahl). Zwei Wahlgruppen im Einrichten-Fenster;
+`maler.setze({jahreszeitWahl})` malt die statische Schicht neu.
+
+Tests 158/158 (Tageslicht-Tests auf echte Sonne umgestellt, neu: Sonnenzeiten Juni/
+Dezember, Info mittag/nacht/golden/morgen, Himmelsfarben Tag/Nacht/Regen/Winter).
+Browser: Mittag (blauer Himmel, Sonne, Wolken, Schmetterling, heller Raum), goldene
+Stunde im Herbst (orange Kronen, fallende Blätter, warmes Licht), Winternacht (kahle
+Bäume, Schnee, Mond, Sterne); Feuerblut im Leser und im aufgeschlagenen Buch.

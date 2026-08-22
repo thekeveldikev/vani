@@ -14,7 +14,7 @@ const roh = (x) => JSON.parse(JSON.stringify(x));
 
 test('saubererSchreibtisch: Vorgaben, Grenzen, nur bekannte Hölzer', async () => {
   const k = await frisch();
-  assert.deepEqual(roh(k.saubererSchreibtisch(undefined)), { holz: 'nuss', lampe: .8, lampeAn: true, kerzen: true, wetterFolgtKlang: true, unordnung: .7, verse: true, uhrTickt: false, wachs: 0, kerzenGewechselt: 0, kleckse: [], federKratzt: false, offenesBuch: true, blattId: null });
+  assert.deepEqual(roh(k.saubererSchreibtisch(undefined)), { holz: 'nuss', lampe: .8, lampeAn: true, kerzen: true, wetterFolgtKlang: true, unordnung: .7, verse: true, uhrTickt: false, wachs: 0, kerzenGewechselt: 0, kleckse: [], federKratzt: false, offenesBuch: true, tageszeit: 'echt', jahreszeit: 'echt', blattId: null });
   const w = roh(k.saubererSchreibtisch({ holz: 'plastik', lampe: 9, kerzen: false, unordnung: -1, verse: 'ja', wachs: 99999, lampeAn: false, uhrTickt: true }));
   assert.equal(w.holz, 'nuss'); assert.equal(w.lampe, 1); assert.equal(w.kerzen, false); assert.equal(w.unordnung, 0); assert.equal(w.verse, true);
   assert.equal(w.wachs, 1200, 'Wachs endet bei zwanzig Stunden'); assert.equal(w.lampeAn, false); assert.equal(w.uhrTickt, true);
@@ -69,9 +69,32 @@ test('leuchterStand und Jahreszeit/Tageslicht/Himmel', async () => {
   assert.equal(k.schreibtischJahreszeit(Date.UTC(2026, 11, 15)), 'winter');
   const um = (h) => { const d = new Date(2026, 5, 10, h, 0); return d.getTime(); };
   assert.equal(k.schreibtischTageslicht(um(1)), 0, 'tiefe Nacht');
-  assert.equal(k.schreibtischTageslicht(um(12)), .55, 'grauer Tag');
-  assert.ok(k.schreibtischTageslicht(um(18)) < .55 && k.schreibtischTageslicht(um(18)) > .2, 'Dämmerung dazwischen');
-  assert.ok(k.schreibtischTageslicht(um(5)) > 0 && k.schreibtischTageslicht(um(5)) < .3, 'erstes Grau');
+  assert.ok(k.schreibtischTageslicht(um(13)) > .95, 'heller Junitag');
+  assert.ok(k.schreibtischTageslicht(um(22)) < .45 && k.schreibtischTageslicht(um(22)) > 0, 'Dämmerung nach dem Untergang (Juni 21:30)');
+  assert.ok(k.schreibtischTageslicht(um(5)) > 0 && k.schreibtischTageslicht(um(5)) < .5, 'erstes Grau vor dem Aufgang');
+  /* Sonnenzeiten wandern mit dem Jahr */
+  const juni = k.schreibtischSonnenzeiten(new Date(2026, 5, 21).getTime()), dez = k.schreibtischSonnenzeiten(new Date(2026, 11, 21).getTime());
+  assert.ok(juni.aufgang < 5.5 && juni.untergang > 21, 'Juni: lang');
+  assert.ok(dez.aufgang > 7.8 && dez.untergang < 16.8, 'Dezember: kurz');
+  /* Die Tageszeit-Info: Mittag hoch, Nacht nichts, feste Wahl überstimmt die Uhr */
+  const mittag = k.schreibtischTageszeitInfo(um(13));
+  assert.ok(mittag.sonne > .9 && mittag.phase === 'tag' && mittag.waerme < .05);
+  const nacht = k.schreibtischTageszeitInfo(um(2));
+  assert.ok(nacht.sonne === 0 && nacht.licht === 0 && nacht.phase === 'nacht');
+  const golden = k.schreibtischTageszeitInfo(um(2), 'golden');
+  assert.ok(golden.sonne > 0 && golden.sonne < .5 && golden.waerme > .3 && ['golden', 'sonnenuntergang'].includes(golden.phase), 'feste Wahl: goldene Stunde ' + JSON.stringify(golden));
+  assert.ok(k.schreibtischTageszeitInfo(um(13), 'nacht').licht === 0, 'feste Wahl: Nacht am Mittag');
+  const morgen = k.schreibtischTageszeitInfo(um(13), 'morgen');
+  assert.ok(morgen.u > 0 && morgen.u < .2, 'Morgen liegt kurz nach dem Aufgang');
+  assert.ok(k.TAGESZEIT_WAHLEN.includes('zufall') && k.JAHRESZEIT_WAHLEN.includes('winter'));
+  /* Himmelsfarben: drei rgb, Tag blau, Nacht dunkel, Winter blasser, Regen grau */
+  const tagH = roh(k.schreibtischHimmelFarben(mittag, 'sommer')), nachtH = roh(k.schreibtischHimmelFarben(nacht, 'sommer'));
+  assert.equal(tagH.length, 3); assert.match(tagH[0], /^rgb\(/);
+  const kanal = (s) => s.match(/\d+/g).map(Number);
+  assert.ok(kanal(tagH[0])[2] > 150 && kanal(nachtH[0])[2] < 60, 'Tag blau, Nacht dunkel');
+  assert.ok(kanal(roh(k.schreibtischHimmelFarben(mittag, 'sommer', 'regen'))[0])[2] < kanal(tagH[0])[2], 'Regen nimmt das Blau');
+  const winterH = roh(k.schreibtischHimmelFarben(mittag, 'winter'));
+  assert.ok(Math.abs(kanal(winterH[0])[0] - kanal(winterH[0])[2]) < Math.abs(kanal(tagH[0])[0] - kanal(tagH[0])[2]), 'Winter blasser');
   const n = roh(k.schreibtischHimmelFarben(0)), t = roh(k.schreibtischHimmelFarben(1));
   assert.equal(n.length, 3); assert.match(n[0], /^rgb\(/); assert.notDeepEqual(n, t);
   assert.equal(k.buchStatistikWorte({}), '');

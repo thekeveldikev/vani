@@ -22,6 +22,14 @@ async function pdfjsLaden() {
   _pdfjs = modul;
   return modul;
 }
+/* Ein PDF aufschlagen — immer mit den Decodern neben der App: JPEG-2000- und
+   JBIG2-Bilder (gescannte Bücher!) brauchen WebAssembly, sonst bleiben die
+   Seiten weiß, obwohl der Text da ist. */
+function pdfjsDokument(pdfjs, daten, extra) {
+  let wasm = 'vendor/wasm/';
+  try { wasm = new URL('./vendor/wasm/', location.href).toString(); } catch (e) {}
+  return pdfjs.getDocument(Object.assign({ data: daten, wasmUrl: wasm, isEvalSupported: false }, extra || {}));
+}
 
 function lesestapelBuecher() {
   return vomTyp('buch').sort((a, b) => (b.zuletzt || b.angelegt || 0) - (a.zuletzt || a.angelegt || 0));
@@ -146,7 +154,7 @@ async function buchCoverAusDemNetz(b, { still = false } = {}) {
     const pdfjs = await pdfjsLaden();
     const blob = await dbGet('media', b.datei);
     if (blob) {
-      const dok = await pdfjs.getDocument({ data: await blob.arrayBuffer() }).promise;
+      const dok = await pdfjsDokument(pdfjs, await blob.arrayBuffer()).promise;
       const isbns = await isbnAusPdf(dok);
       try { dok.destroy(); } catch (e) {}
       for (const i of isbns) if (await probiere(i)) return true;
@@ -188,7 +196,7 @@ async function buchAuflegenAusBlob(blob, name, { datei = null, isbn = null, auto
   try { const kopf = await blob.slice(0, 64).arrayBuffer(); if (typeof istEpub === 'function' && istEpub(kopf, name)) return await buchAuflegenEpub(blob, name, { datei, isbn, autorVorgabe, titelFest }); } catch (e) { if (/^\.?epub/i.test(String(name || '').split('.').pop())) throw e; }
   const pdfjs = await pdfjsLaden();
   const daten = await blob.arrayBuffer();
-  const dok = await pdfjs.getDocument({ data: daten.slice(0) }).promise;
+  const dok = await pdfjsDokument(pdfjs, daten.slice(0)).promise;
   try {
   const seiten = dok.numPages;
   let titel = String(name || 'Buch').replace(/\.pdf$/i, '');
@@ -412,7 +420,7 @@ async function buchCoverAusSeite(b, n) {
   try {
     const pdfjs = await pdfjsLaden();
     const blob = await dbGet('media', b.datei); if (!blob) return;
-    const dok = await pdfjs.getDocument({ data: await blob.arrayBuffer() }).promise;
+    const dok = await pdfjsDokument(pdfjs, await blob.arrayBuffer()).promise;
     try {
     const seite = await dok.getPage(Math.max(1, Math.min(dok.numPages, n)));
     const vp0 = seite.getViewport({ scale: 1 }); const vp = seite.getViewport({ scale: 480 / vp0.width });
@@ -463,7 +471,7 @@ async function buchOeffnen(b) {
     const pdfjs = await pdfjsLaden();
     const blob = await dbGet('media', b.datei);
     if (!blob) throw new Error('Datei fehlt');
-    leser.dok = await pdfjs.getDocument({ data: await blob.arrayBuffer() }).promise;
+    leser.dok = await pdfjsDokument(pdfjs, await blob.arrayBuffer()).promise;
     if (leser.dok.numPages !== b.seiten) { b.seiten = leser.dok.numPages; speichereStill(b); balken.max = String(b.seiten); }
   } catch (x) { if (_leser === leser) { toast('Das Buch ließ sich nicht aufschlagen.' + (x && x.message ? ' (' + x.message + ')' : ''), 4200); buchSchliessen(); } return; }
   if (_leser !== leser) { try { leser.dok.destroy(); } catch (e) {} return; }   /* „Zurück" kam schneller als das Buch */

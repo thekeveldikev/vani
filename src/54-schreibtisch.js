@@ -37,6 +37,8 @@ function saubererSchreibtisch(roh) {
     kleckse: typeof saubereKleckse === 'function' ? saubereKleckse(q.kleckse) : [],
     federKratzt: q.federKratzt === true,
     offenesBuch: q.offenesBuch !== false,
+    tageszeit: (typeof TAGESZEIT_WAHLEN !== 'undefined' ? TAGESZEIT_WAHLEN : ['echt']).includes(q.tageszeit) ? q.tageszeit : 'echt',
+    jahreszeit: (typeof JAHRESZEIT_WAHLEN !== 'undefined' ? JAHRESZEIT_WAHLEN : ['echt']).includes(q.jahreszeit) ? q.jahreszeit : 'echt',
     blattId: typeof q.blattId === 'string' && q.blattId ? q.blattId.slice(0, 80) : null
   };
 }
@@ -472,7 +474,7 @@ function schreibtischSignatur() {
   const tag = schreibtischTag();
   const fund = schreibtischFundfoto();
   return JSON.stringify([
-    e.holz, e.kerzen, e.wetterFolgtKlang, e.unordnung, e.verse, e.uhrTickt, e.kerzenGewechselt, e.federKratzt, e.offenesBuch,
+    e.holz, e.kerzen, e.wetterFolgtKlang, e.unordnung, e.verse, e.uhrTickt, e.kerzenGewechselt, e.federKratzt, e.offenesBuch, e.tageszeit, e.jahreszeit,
     e.wetterFolgtKlang ? schreibtischWetter() : 'still', D.einst.tagesziel, tag.heute, tag.serie,
     buecher.slice(0, 9).map((b) => b.id + ':' + (b.seite || 0) + ':' + (b.bild || '') + ':' + (b.titel || '')),
     schreibtischLetzteTexte(3).map((d) => d.id + ':' + (d.geaendert || 0)),
@@ -489,7 +491,10 @@ RENDER.schreibtisch = function (haupt) {
   const erstesMal = !sessionStorage.getItem('vani-desk-gesehen');
   const szene = el('div', { class: 'desk-szene holz-' + e.holz + ' wetter-' + wetter + (e.kerzen ? ' kerzen-an' : '') + (e.lampeAn ? '' : ' lampe-aus'), style: '--lampe:' + e.lampe + ';--unordnung:' + e.unordnung });
   const leinwand = el('canvas', { class: 'desk-malerei' });
-  const maler = schreibtischMaler(leinwand, { holz: e.holz, lampe: e.lampe, lampeAn: e.lampeAn, wetter, kerzen: e.kerzen, unordnung: e.unordnung, alter: schreibtischAlter(D.stats.tage), kleckse: e.kleckse });
+  /* „Überraschung" wird beim Betreten gewürfelt — und bleibt, solange der Tisch steht */
+  const tageszeitWahl = e.tageszeit === 'zufall' ? ['morgen', 'mittag', 'golden', 'abend', 'nacht'][Math.floor(Math.random() * 5)] : e.tageszeit;
+  const jahreszeitWahl = e.jahreszeit === 'zufall' ? ['fruehling', 'sommer', 'herbst', 'winter'][Math.floor(Math.random() * 4)] : e.jahreszeit;
+  const maler = schreibtischMaler(leinwand, { holz: e.holz, lampe: e.lampe, lampeAn: e.lampeAn, wetter, kerzen: e.kerzen, unordnung: e.unordnung, alter: schreibtischAlter(D.stats.tage), kleckse: e.kleckse, tageszeitWahl, jahreszeitWahl });
   const dinge = el('div', { class: 'desk-dinge' });
   szene.append(leinwand, dinge);
 
@@ -667,6 +672,9 @@ function schreibtischEinrichten(danach) {
   const kasten = el('div', { class: 'modal tisch-einrichten' },
     el('h2', {}, 'Den Schreibtisch einrichten'),
     el('div', { class: 'einstellgruppe' }, el('b', {}, 'Holz'), wahlgruppe(SCHREIBTISCH_HOELZER, () => e.holz, (v) => { e.holz = v; })),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Tageszeit vor dem Fenster'), el('div', { style: 'font-size:12.5px;color:var(--blass);margin:-4px 0 8px' }, 'Wie draußen: Sonne und Mond gehen mit der echten Uhr, Auf- und Untergang wandern mit dem Jahr.'),
+      wahlgruppe([['echt', 'Wie draußen'], ['morgen', 'Morgen'], ['mittag', 'Mittag'], ['golden', 'Goldene Stunde'], ['abend', 'Abend'], ['nacht', 'Nacht'], ['zufall', 'Überraschung']], () => e.tageszeit, (v) => { e.tageszeit = v; })),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Jahreszeit im Garten'), wahlgruppe([['echt', 'Wie draußen'], ['fruehling', 'Frühling'], ['sommer', 'Sommer'], ['herbst', 'Herbst'], ['winter', 'Winter'], ['zufall', 'Überraschung']], () => e.jahreszeit, (v) => { e.jahreszeit = v; })),
     zeile('Lampe', 'Kein Deckenlicht. Niemals. Nur dieser Kegel — an der Schnur ziehen schaltet sie.', lampe),
     zeile('Leuchter', 'Sieben Flammen. Die Kerzen brennen über ' + LEUCHTER_STUNDEN + ' Schreibstunden wirklich herunter (' + Math.round((1 - leuchterStand(e.wachs)) * 100) + ' % übrig).', schalter(() => e.kerzen, (v) => { e.kerzen = v; })),
     zeile('Die Uhr tickt', 'Ein leises Ticken, zur vollen Stunde ein Glockenschlag.', schalter(() => e.uhrTickt, (v) => { e.uhrTickt = v; })),

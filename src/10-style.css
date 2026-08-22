@@ -1395,6 +1395,9 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22p
    ================================================================ */
 
 :focus-visible { outline: 2.5px solid var(--akzent); outline-offset: 3px; }
+/* Schreibfelder zeigen den Cursor, keinen Rahmen: Safari setzt :focus-visible bei
+   jedem Tipp in ein Textfeld — das waren die orangenen Kaesten in Rolle und Am Stueck. */
+textarea:focus-visible, input:focus-visible, [contenteditable]:focus-visible, .schreibflaeche:focus-visible, .rich-editor:focus-visible { outline: none; }
 .schnipsel-modus { flex: none; }
 .freie-suche {
   display: none; align-items: center; gap: 9px; margin: 0 auto 8px; width: min(760px, calc(100% - 40px));
