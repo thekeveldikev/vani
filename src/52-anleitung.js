@@ -221,6 +221,12 @@ const ANLEITUNG = [
         'Oben im Klangraum stehen zwei Reiter. „Aufnahmen" sind echte Feldaufnahmen — Lagerfeuer, Landdämmerung, Waldmorgen, alte Mühle. „Gewebt" sind Klänge, die VANI selbst errechnet: Regen, Meer, Wind, Grillen und mehr.',
         'Beides lässt sich mischen. Ein echtes Lagerfeuer unter gewebtem Regen klingt oft besser als jedes für sich.'
       ] },
+      { t: 'Was im Fundus liegt', p: [
+        'Wetter: Regen in mehreren Stärken, Gewitter, vier Windstärken. Wasser: Meer, Brandung, Sturm auf See, Bach, Wasserfall, unter Wasser. Natur: Wald, Vögel, Grillen, Dschungel, Sumpf bei Nacht. Feuer: Kamin und Lagerfeuer.',
+        'Dazu Orte, die es sonst nirgends gibt: Markt in Marrakesch, Wirtshaus am Samstagabend, Straße in China, Schulhof, Café, volles Restaurant, Bahnhofshalle, U-Bahn, Dampfzug, Fabrik, Schreibmaschinenbüro, altes Uhrwerk, Landdämmerung.',
+        'Woher jede Aufnahme stammt, steht unten in ihrer Feineinstellung.',
+        'Über dem Fundus liegt ein Suchfeld. Ich tippe „Regen" oder „Orte" und sehe nur noch, was passt; Esc leert das Feld wieder.'
+      ] },
       { t: 'Aufnahmen holen', p: [
         'Eine Aufnahme wird erst geholt, wenn ich sie das erste Mal anschalte — dafür braucht es einmal Internet. Danach liegt sie im Gerät und läuft auch offline, im Zug, im Flugzeug.',
         'Rechts an jeder Zeile steht, ob sie schon „im Gerät" ist oder wie groß sie ist. Unter „Vorrat …" hole ich alle auf einmal oder schaffe wieder Platz.'

@@ -95,22 +95,48 @@ function baueAmbiencePult(kompakt, statusNeu) {
     return zeile;
   };
 
+  /* Der Fundus ist auf über sechzig Aufnahmen gewachsen. Ohne Suche scrollt man
+     durch acht Blöcke, bis man den Regen findet. Das Feld liegt außerhalb von
+     `liste`, damit es beim Neuaufbau den Eingabefokus behält. */
+  let filter = '';
+  const suche = el('input', {
+    type: 'search', class: 'klang-suche', placeholder: 'Klang suchen — Regen, Meer, Café …',
+    'aria-label': 'Klang suchen'
+  });
+  const zaehler = el('span', { class: 'klang-zaehler' });
+
   const baueListe = () => {
     liste.innerHTML = '';
     const alle = alleAmbiences();
+    zaehler.textContent = alle.length ? alle.length + ' Aufnahmen' : '';
     if (!alle.length) {
       liste.append(el('div', { class: 'leer klein' }, 'Noch keine Aufnahmen da. Über „Eigenen Klang" holst du dir welche herein.'));
       return;
     }
+    const treffer = !filter ? alle : alle.filter((a) =>
+      (a.name || '').toLowerCase().includes(filter) || (a.kat || '').toLowerCase().includes(filter));
+    if (!treffer.length) {
+      liste.append(el('div', { class: 'leer klein' }, 'Nichts gefunden zu „' + suche.value.trim() + '".'));
+      return;
+    }
+    if (filter) zaehler.textContent = treffer.length + ' von ' + alle.length;
     for (const kat of ambienceKategorien()) {
+      const drin = treffer.filter((x) => x.kat === kat);
+      if (!drin.length) continue;   /* leere Überschriften wären nur Lärm */
       const block = el('div', { class: 'klangblock' }, el('div', { class: 'kartenkopf', style: 'margin-top:14px' }, kat.toUpperCase()));
-      for (const a of alle.filter((x) => x.kat === kat)) block.append(zeileBauen(a));
+      for (const a of drin) block.append(zeileBauen(a));
       liste.append(block);
     }
   };
+  suche.addEventListener('input', () => { filter = suche.value.trim().toLowerCase(); baueListe(); });
+  suche.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || !suche.value) return;
+    e.stopPropagation();            /* sonst schließt Escape den ganzen Raum */
+    suche.value = ''; filter = ''; baueListe();
+  });
   baueListe();
 
-  wurzel.append(liste);
+  wurzel.append(el('div', { class: 'klang-suchzeile' }, suche, zaehler), liste);
   wurzel.baueListe = baueListe;
   return wurzel;
 }

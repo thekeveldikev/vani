@@ -384,6 +384,23 @@ test('Klangkatalog: jede Aufnahme hat Namen, Kategorie und ehrliche Herkunft', (
   assert.ok(gesamt < 60, 'Der Fundus ist auf ' + gesamt.toFixed(1) + ' MB gewachsen — das wird zu schwer.');
 });
 
+test('Klangvertrag: der Fundus lässt sich durchsuchen', () => {
+  /* Bei über sechzig Aufnahmen über acht Blöcke ist Scrollen keine Bedienung
+     mehr. Die Suche filtert nach Name UND Kategorie, blendet leere
+     Überschriften aus und sagt, wenn nichts passt. */
+  const q = lies('src/51-klangraum.js');
+  assert.match(q, /class: 'klang-suche'/, 'das Suchfeld fehlt');
+  assert.match(q, /\.name \|\| ''\)\.toLowerCase\(\)\.includes\(filter\)/, 'Suche nach Namen fehlt');
+  assert.match(q, /\.kat \|\| ''\)\.toLowerCase\(\)\.includes\(filter\)/, 'Suche nach Kategorie fehlt');
+  assert.match(q, /if \(!drin\.length\) continue;/, 'leere Kategorieblöcke müssen wegfallen');
+  assert.match(q, /Nichts gefunden zu/, 'ohne Treffer braucht es eine Rückmeldung');
+  /* Das Feld darf beim Neuaufbau der Liste nicht mitgelöscht werden, sonst
+     verliert man nach jedem Buchstaben den Eingabefokus. */
+  assert.match(q, /wurzel\.append\(el\('div', \{ class: 'klang-suchzeile' \}/,
+    'das Suchfeld gehört neben die Liste, nicht hinein');
+  assert.match(lies('src/10-style.css'), /\.klang-suche \{/, 'der Stil dazu fehlt');
+});
+
 test('Klangvertrag: der Fundus liegt neben der App und reist in die Desktop-Fassung mit', () => {
   const paket = JSON.parse(lies('package.json'));
   assert.ok(paket.build.files.includes('klang/**'), 'ohne diesen Eintrag fehlen der Desktop-App alle Aufnahmen');

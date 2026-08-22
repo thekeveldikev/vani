@@ -918,6 +918,15 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22p
 .wieder-ziel { animation: wiederLeuchten 2.2s ease; }
 @keyframes wiederLeuchten { 0%,100% { box-shadow: 0 1px 4px var(--schein), inset 0 0 0 1px var(--linie); } 35% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--gold) 35%, transparent); } }
 
+/* Suchzeile über dem Klangfundus — bei über sechzig Aufnahmen unentbehrlich. */
+.klang-suchzeile { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.klang-suche { flex: 1; min-width: 0; padding: 10px 13px; border: 0; border-radius: 12px;
+  background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); color: var(--tinte);
+  font: inherit; font-size: 14px; }
+.klang-suche:focus { outline: 0; box-shadow: inset 0 0 0 2px var(--akzent); }
+.klang-suche::-webkit-search-cancel-button { cursor: pointer; }
+.klang-zaehler { flex: none; color: var(--blass); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+
 .klangstatus { margin-bottom: 13px; padding: 9px 12px; border-radius: 12px; color: var(--blass); background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 13px; }
 .klangstatus::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; background: var(--blass); }
 .klangstatus.laeuft::before { background: var(--akzent2); box-shadow: 0 0 8px var(--akzent2); }

@@ -937,6 +937,15 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22p
 .wieder-ziel { animation: wiederLeuchten 2.2s ease; }
 @keyframes wiederLeuchten { 0%,100% { box-shadow: 0 1px 4px var(--schein), inset 0 0 0 1px var(--linie); } 35% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--gold) 35%, transparent); } }
 
+/* Suchzeile über dem Klangfundus — bei über sechzig Aufnahmen unentbehrlich. */
+.klang-suchzeile { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.klang-suche { flex: 1; min-width: 0; padding: 10px 13px; border: 0; border-radius: 12px;
+  background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); color: var(--tinte);
+  font: inherit; font-size: 14px; }
+.klang-suche:focus { outline: 0; box-shadow: inset 0 0 0 2px var(--akzent); }
+.klang-suche::-webkit-search-cancel-button { cursor: pointer; }
+.klang-zaehler { flex: none; color: var(--blass); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+
 .klangstatus { margin-bottom: 13px; padding: 9px 12px; border-radius: 12px; color: var(--blass); background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 13px; }
 .klangstatus::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; background: var(--blass); }
 .klangstatus.laeuft::before { background: var(--akzent2); box-shadow: 0 0 8px var(--akzent2); }
@@ -1570,7 +1579,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.7.1';
+const APP_VERSION = '5.8.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -10755,22 +10764,48 @@ function baueAmbiencePult(kompakt, statusNeu) {
     return zeile;
   };
 
+  /* Der Fundus ist auf über sechzig Aufnahmen gewachsen. Ohne Suche scrollt man
+     durch acht Blöcke, bis man den Regen findet. Das Feld liegt außerhalb von
+     `liste`, damit es beim Neuaufbau den Eingabefokus behält. */
+  let filter = '';
+  const suche = el('input', {
+    type: 'search', class: 'klang-suche', placeholder: 'Klang suchen — Regen, Meer, Café …',
+    'aria-label': 'Klang suchen'
+  });
+  const zaehler = el('span', { class: 'klang-zaehler' });
+
   const baueListe = () => {
     liste.innerHTML = '';
     const alle = alleAmbiences();
+    zaehler.textContent = alle.length ? alle.length + ' Aufnahmen' : '';
     if (!alle.length) {
       liste.append(el('div', { class: 'leer klein' }, 'Noch keine Aufnahmen da. Über „Eigenen Klang" holst du dir welche herein.'));
       return;
     }
+    const treffer = !filter ? alle : alle.filter((a) =>
+      (a.name || '').toLowerCase().includes(filter) || (a.kat || '').toLowerCase().includes(filter));
+    if (!treffer.length) {
+      liste.append(el('div', { class: 'leer klein' }, 'Nichts gefunden zu „' + suche.value.trim() + '".'));
+      return;
+    }
+    if (filter) zaehler.textContent = treffer.length + ' von ' + alle.length;
     for (const kat of ambienceKategorien()) {
+      const drin = treffer.filter((x) => x.kat === kat);
+      if (!drin.length) continue;   /* leere Überschriften wären nur Lärm */
       const block = el('div', { class: 'klangblock' }, el('div', { class: 'kartenkopf', style: 'margin-top:14px' }, kat.toUpperCase()));
-      for (const a of alle.filter((x) => x.kat === kat)) block.append(zeileBauen(a));
+      for (const a of drin) block.append(zeileBauen(a));
       liste.append(block);
     }
   };
+  suche.addEventListener('input', () => { filter = suche.value.trim().toLowerCase(); baueListe(); });
+  suche.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || !suche.value) return;
+    e.stopPropagation();            /* sonst schließt Escape den ganzen Raum */
+    suche.value = ''; filter = ''; baueListe();
+  });
   baueListe();
 
-  wurzel.append(liste);
+  wurzel.append(el('div', { class: 'klang-suchzeile' }, suche, zaehler), liste);
   wurzel.baueListe = baueListe;
   return wurzel;
 }
@@ -11242,6 +11277,12 @@ const ANLEITUNG = [
       { t: 'Zwei Arten von Klang', p: [
         'Oben im Klangraum stehen zwei Reiter. „Aufnahmen" sind echte Feldaufnahmen — Lagerfeuer, Landdämmerung, Waldmorgen, alte Mühle. „Gewebt" sind Klänge, die VANI selbst errechnet: Regen, Meer, Wind, Grillen und mehr.',
         'Beides lässt sich mischen. Ein echtes Lagerfeuer unter gewebtem Regen klingt oft besser als jedes für sich.'
+      ] },
+      { t: 'Was im Fundus liegt', p: [
+        'Wetter: Regen in mehreren Stärken, Gewitter, vier Windstärken. Wasser: Meer, Brandung, Sturm auf See, Bach, Wasserfall, unter Wasser. Natur: Wald, Vögel, Grillen, Dschungel, Sumpf bei Nacht. Feuer: Kamin und Lagerfeuer.',
+        'Dazu Orte, die es sonst nirgends gibt: Markt in Marrakesch, Wirtshaus am Samstagabend, Straße in China, Schulhof, Café, volles Restaurant, Bahnhofshalle, U-Bahn, Dampfzug, Fabrik, Schreibmaschinenbüro, altes Uhrwerk, Landdämmerung.',
+        'Woher jede Aufnahme stammt, steht unten in ihrer Feineinstellung.',
+        'Über dem Fundus liegt ein Suchfeld. Ich tippe „Regen" oder „Orte" und sehe nur noch, was passt; Esc leert das Feld wieder.'
       ] },
       { t: 'Aufnahmen holen', p: [
         'Eine Aufnahme wird erst geholt, wenn ich sie das erste Mal anschalte — dafür braucht es einmal Internet. Danach liegt sie im Gerät und läuft auch offline, im Zug, im Flugzeug.',

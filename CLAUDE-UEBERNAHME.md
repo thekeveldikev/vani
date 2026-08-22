@@ -995,10 +995,38 @@ verschlüsselten Sync, nie im Repo.
 Beschaffung (`werkzeug`-fremd, nur lokal gelaufen): archive.org-Metadaten
 ausgewertet, 26 Atmosphären kuratiert, per `ffmpeg-static` je ein ruhiger
 70-Sekunden-Abschnitt geschnitten, leicht normalisiert und als Opus 56 kbit/s
-kodiert: **≈450 KB statt 4–15 MB je Aufnahme**. 14 kamen durch; archive.org
-drosselt aggressiv (HTTP 500/502), das Skript hat Wiederholung mit Backoff.
-Regen, Meer und Gewitter fehlen in dieser Teilsammlung ganz — dafür bleiben die
-gewebten Klänge, die genau darin stark sind.
+kodiert: **≈450 KB statt 4–15 MB je Aufnahme**.
+
+**Nachtrag (VANI 5.8.0): 39 freie Aufnahmen dazu, Fundus jetzt 65 (26,9 MB).**
+Diese stammen aus vier Sammlungen unter **CC0 bzw. Public Domain Mark** —
+SSE Library: AMBIENCE, Valentino Sound Effects Library, Nature Sounds /
+Sound Therapy, GOLD TAPE: Ambience. Damit ist die Lizenzfrage für den größeren
+Teil des Fundus entschärft: Regen, Gewitter, Donner, Meer, Brandung, Sturm auf
+See, vier Windstärken, Bach, Wasserfall, Grillen, Dschungel, Sumpf, Kaminfeuer
+und rund zwanzig Orte sind frei. Jeder gewebte Klang hat nun eine echte
+Entsprechung. Die Herkunft steht je Aufnahme im Katalog und in der App.
+
+Drei Dinge, die beim Beschaffen Zeit kosteten und beim nächsten Mal nicht
+wieder kosten müssen:
+
+1. **archive.org liefert ~35 KB/s**, unabhängig von der Zahl paralleler
+   Verbindungen — die Bandbreite wird geteilt, mehr Spuren bringen fast nichts.
+2. **`fetch` ohne Zeitgrenze hängt unbegrenzt**, wenn die Gegenseite die
+   Verbindung offen lässt und nichts mehr schickt. Der Wiederhol-Mechanismus
+   greift dann nie, weil der Aufruf gar nicht zurückkommt. Nötig ist ein
+   Wächter, der den Datenstrom beobachtet und abbricht, wenn N Sekunden kein
+   Byte kam. Ein pauschaler Gesamt-Timeout taugt nicht: bei 35 KB/s braucht
+   eine 50-MB-Datei über zwanzig Minuten, und das ist kein Fehler.
+3. **Der entscheidende Hebel war `Range:`.** Gebraucht werden je nur 75–80
+   Sekunden. WAV ist unkomprimiert und linear, also lassen sich aus dem Kopf
+   Byterate und Datenanfang lesen und genau der gewünschte Ausschnitt abrufen;
+   aus Kopf + Ausschnitt entsteht wieder eine gültige WAV-Datei. Das halbierte
+   die Ladezeit (**12,6 MB statt 31 MB** je Aufnahme). Offsets müssen auf
+   `blockAlign` gerundet werden, sonst verrutschen die Kanäle.
+
+Ein Muster darf außerdem nicht nur auf den Dateinamen passen, sondern muss auf
+eine **Audio-Endung** prüfen — sonst lädt es Beidateien wie `.afpk`, und ffmpeg
+scheitert (genau daran starb „Werkstatt" im ersten Lauf).
 
 ### `src/53-ambience.js` — die Maschine
 
@@ -1034,6 +1062,11 @@ gewebten Klänge, die genau darin stark sind.
   Lesezeit an Blättern und im Wortzähler, Funken kopieren, Wort kopieren,
   Wörterzahl im Papierkorb.
 
-Qualitätsstand: `npm test` 103/103, Hosting 2/2, Lint sauber, im Browser gemessen
+Qualitätsstand (5.8.0): `npm test` 106/106, im Browser gemessen — 65 Aufnahmen
+gelistet, Regen/Donner/Brandung/Bach/Wasserfall/Sturm dekodiert (75–80 s, stereo,
+Spitze −4 bis −6 dB, kein Clipping), Suche filtert nach Name und Kategorie,
+eine fehlende Datei meldet sauber statt hängenzubleiben.
+
+Früherer Stand: `npm test` 103/103, Hosting 2/2, Lint sauber, im Browser gemessen
 (Ton nach 1 s hörbar, zwei Aufnahmen gemischt, Klangbild stellt wieder her,
 Gruppe nimmt Blasen mit, Brett als 700×498-PNG).
