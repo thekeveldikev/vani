@@ -1253,3 +1253,40 @@ Kerze, Welle 2). Im Browser geprüft: Safari-Spans → `<b>/<i>/<u>`; Kerze
 brennt, Luftzug, geht mit dem Raum; Strich gezeichnet → Lasso → gelöscht;
 gerader Strich + halten → 2 Punkte; gespeichert/geladen; Reiter, Gliederung
 (Sprung), Cornell-Klasse, Mikro-Knopf.
+
+## 20. Umschlag und Regal (22. August 2026, VANI 5.12.0)
+
+`src/43e-deckel.js` ersetzt das alte Atelier und die Hefteübersicht; die alten
+Einstiege (`heftGestalten`, `RENDER.hefte`) bleiben als Stubs.
+
+- **Deckelmodell** `heft.deckel` = `saubererDeckel({stoff, etikett, schrift,
+  ecken, gummi, gummifarbe, abgegriffen, sticker[{bild,pos}]})` — pur, mit
+  Vorgaben, ≤ 24 Sticker, Sanitizer in `sauberesDokument`. Farben/Muster/
+  Papier bleiben die alten Felder.
+- **`baueDeckelElement(h, {gross, interaktiv, seitenzahl, beiSticker})`**:
+  Stoffklassen (`stoff-leder|kraft|samt|marmor|glatt|leinen` — CSS mit
+  `!important` über den Musterverläufen), `.seitenblock` (Dicke `--dick` aus
+  der Seitenzahl), `.abnutzung` (Deckkraft `--abgegriffen`), Metallecken,
+  `.gummiband` (`--gummi`), Etikett-Varianten, Sticker-Lage. Derselbe
+  Baustein im Regal (klein), im Atelier (gross) und als Mini-Knopf im
+  Heftkopf (`.heft-minideckel`, alles außer Deckelfarbe ausgeblendet).
+- **Atelier** `heftAtelier`: große Vorschau; Sticker per Pointer ziehen,
+  Langdruck-Menü (drehen/größer/kleiner/abmachen); „Sticker aufs Cover" aus
+  Mitgebracht + Kiste (`stickerMitgebrachtBild`), „Aufs Cover kritzeln"
+  (`stickerZeichnen` ohne Kiste); „Würfeln" (`zufallsLook`). Abbrechen stellt
+  den Stand per JSON-Kopie wieder her.
+- **Drei Ansichten** (`D.einst.hefteAnsicht`): karten (Grid), regal
+  (`.buecherregal` mit zwei Brettern „AUF DEM TISCH"/„IM REGAL",
+  `baueRuecken`: Breite 30 + 1,1·Seiten, Höhe variiert mit Titellänge), tisch
+  (`.heft-tisch` Holzplatte, `--dreh` je Heft, Archiv als `.heft-stapel`).
+- **Animation** per FLIP: `merkeHeftLagen()` vor `zeichne()` (im heftMenue
+  bei archiv/zurueck), `spieleHeftLagen()` nach dem Render — Transform vom
+  alten zum neuen Ort über .55 s. Antippen: `.zieht` (herausziehen), dann
+  öffnen.
+- Fallstrick gesehen: Prägungs-Etikett brach „GRAUWALD" mitten im Wort —
+  `word-break: normal` für dieses Etikett.
+
+Tests 135/135 (neu `test/deckel.mjs`, Hefte-Vertrag). Im Browser: drei
+Ansichten, Stoffe, Gummiband, Cover-Sticker (Schmu), Seitenblock, FLIP beim
+Wegstellen (Heft landet auf dem „IM REGAL"-Brett), Atelier mit acht Gruppen,
+Würfeln ändert Stoff/Etikett, Minideckel im Heftkopf.

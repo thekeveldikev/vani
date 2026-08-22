@@ -531,6 +531,31 @@ test('Welle-2-Vertrag: Lasso, Formen, gespeicherte Striche, Tonnotiz, Reiter, Gl
   for (const t of ['Lasso und Formen', 'Tonnotiz', 'Reiter', 'Gliederung', 'Papiervorlagen']) assert.match(anl, new RegExp("t: '" + t + "'"), 'Anleitung: ' + t);
 });
 
+test('Hefte-Vertrag: Umschlag, drei Ansichten, animiertes Wegstellen', () => {
+  const d = lies('src/43e-deckel.js');
+  assert.match(d, /function baueDeckelElement/);
+  assert.match(d, /function heftAtelier/);
+  assert.match(d, /function renderHefteRegal/);
+  assert.match(d, /function baueRuecken/, 'das Regal zeigt Buchrücken');
+  /* FLIP: Lage merken, dann hingleiten — kein Verschwinden und Wiederauftauchen. */
+  assert.match(d, /function merkeHeftLagen/);
+  assert.match(d, /function spieleHeftLagen/);
+  assert.match(lies('src/43-hefte.js'), /merkeHeftLagen\(\);\s*h\.archiv = Date\.now\(\)/, 'Ins Regal stellen merkt sich die Lage');
+  /* Alte Einstiege bleiben und zeigen auf das Neue. */
+  assert.match(lies('src/43-hefte.js'), /async function heftGestalten\(h, danach\) \{ return heftAtelier\(h, danach\); \}/);
+  assert.match(lies('src/43-hefte.js'), /RENDER\.hefte = function \(haupt\) \{ return renderHefteRegal\(haupt\); \};/);
+  /* Der Deckel hängt als Knopf im Heftkopf. */
+  assert.match(lies('src/43-hefte.js'), /class: 'heft-minideckel'/);
+  /* Deckel werden bereinigt; Einstellung der Ansicht ist begrenzt. */
+  assert.match(lies('src/30-core.js'), /d\.deckel = typeof saubererDeckel === 'function' \? saubererDeckel\(d\.deckel\) : undefined;/);
+  assert.match(lies('src/30-core.js'), /\['karten', 'regal', 'tisch'\]\.includes\(D\.einst\.hefteAnsicht\)/);
+  const css = lies('src/10-style.css');
+  for (const k of ['.heftdeckel .seitenblock', '.heftdeckel.stoff-leder', '.heftdeckel .gummiband', '.heftdeckel .abnutzung', '.buecherregal', '.heftruecken', '.heft-tisch']) assert.ok(css.includes(k), 'CSS fehlt: ' + k);
+  for (const datei of ['werkzeug/build-web.mjs', 'build.sh', 'test/sandkasten.mjs']) assert.match(lies(datei), /43e-deckel\.js/, datei);
+  const anl = lies('src/52-anleitung.js');
+  for (const t of ['Der Umschlag', 'Karten, Regal, Tisch']) assert.match(anl, new RegExp("t: '" + t + "'"), 'Anleitung: ' + t);
+});
+
 test('Umzugs-Vertrag: die alte Adresse leitet nicht blind weiter', () => {
   /* Die Umzugsseite zählt erst nach, ob dort noch ein Bestand liegt. Vorher
      leitete sie nach fünf Sekunden weiter — auf einem Schul-iPad ohne

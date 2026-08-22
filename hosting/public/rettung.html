@@ -1199,6 +1199,102 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22p
 .mini-deckel.muster-diagonal { background: repeating-linear-gradient(135deg, var(--heft1) 0 4px, var(--heft2) 4px 8px); }
 .mini-deckel.muster-punkte { background: radial-gradient(rgba(255,255,255,.35) 1px, transparent 1px), var(--heft1); background-size: 5px 5px; }
 .heft-vorschau { width: 176px; margin: 4px auto 22px; }
+/* ===== Umschlag: Stoff, Seitenblock, Etikett, Gummiband, Ecken, Abnutzung ===== */
+.heft-halter { display: block; width: 100%; text-align: inherit; transform: rotate(var(--dreh, 0deg)); transition: transform .32s cubic-bezier(.2,.8,.2,1); }
+.heft-halter.zieht { transform: translateY(-14px) rotate(var(--dreh, 0deg)) scale(1.03); }
+.heftdeckel { overflow: visible; }
+.heftdeckel .seitenblock { position: absolute; right: -5px; top: 3px; bottom: -4px; width: calc(4px + var(--dick, 1) * 1.4px); z-index: -2; border-radius: 0 3px 3px 0;
+  background: repeating-linear-gradient(90deg, #f4ecd8 0 1px, #cfc3a8 1px 2px); box-shadow: 2px 2px 4px rgba(0,0,0,.18); }
+.heftdeckel .seitenblock::after { content: ""; position: absolute; left: 2px; right: 2px; bottom: -3px; height: 4px; background: repeating-linear-gradient(0deg, #f4ecd8 0 1px, #cfc3a8 1px 2px); border-radius: 0 0 3px 3px; }
+/* Stoffe */
+.heftdeckel.stoff-leder { background-image: radial-gradient(rgba(0,0,0,.12) .6px, transparent 1.2px), radial-gradient(rgba(255,255,255,.07) .6px, transparent 1.2px), linear-gradient(150deg, color-mix(in srgb, var(--heft1) 92%, #fff), var(--heft1) 40%, color-mix(in srgb, var(--heft2) 75%, #000)) !important; background-size: 5px 5px, 7px 7px, auto !important; background-position: 0 0, 2px 3px, 0 0 !important; box-shadow: 0 4px 12px var(--schein), inset 0 0 0 1px rgba(255,255,255,.08), inset 0 0 18px rgba(0,0,0,.28), inset -2px 0 6px rgba(0,0,0,.1); }
+.heftdeckel.stoff-kraft { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='k'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23k)' opacity='.34'/%3E%3C/svg%3E"), linear-gradient(160deg, color-mix(in srgb, var(--heft1) 70%, #c9a87a), color-mix(in srgb, var(--heft2) 70%, #a8865a)) !important; color: #2c2216; text-shadow: none; }
+.heftdeckel.stoff-kraft .htitel { text-shadow: none; }
+.heftdeckel.stoff-samt { background-image: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,.22), transparent 55%), radial-gradient(ellipse at 80% 90%, rgba(0,0,0,.28), transparent 55%), linear-gradient(140deg, var(--heft1), var(--heft2)) !important; box-shadow: 0 4px 14px var(--schein), inset 0 0 30px rgba(0,0,0,.2), inset -2px 0 6px rgba(0,0,0,.08); }
+.heftdeckel.stoff-marmor { background-image: radial-gradient(ellipse at 20% 30%, rgba(255,255,255,.55), transparent 40%), radial-gradient(ellipse at 70% 70%, rgba(255,255,255,.35), transparent 45%), repeating-linear-gradient(115deg, transparent 0 18px, rgba(0,0,0,.07) 18px 19px, transparent 19px 33px, rgba(255,255,255,.25) 33px 34px), linear-gradient(150deg, color-mix(in srgb, var(--heft1) 55%, #fff), color-mix(in srgb, var(--heft2) 70%, #fff)) !important; color: #2c251c; }
+.heftdeckel.stoff-marmor .htitel { text-shadow: none; }
+.heftdeckel.stoff-glatt { background-image: linear-gradient(150deg, color-mix(in srgb, var(--heft1) 88%, #fff), var(--heft1) 45%, color-mix(in srgb, var(--heft2) 88%, #000)) !important; box-shadow: 0 4px 12px var(--schein), inset 0 1px 0 rgba(255,255,255,.25), inset -2px 0 6px rgba(0,0,0,.08); }
+.heftdeckel.stoff-leinen.muster-schlicht { background-image: repeating-linear-gradient(2deg, transparent 0 3px, rgba(255,255,255,.045) 3px 4px), repeating-linear-gradient(92deg, transparent 0 4px, rgba(0,0,0,.07) 4px 5px), linear-gradient(145deg, var(--heft1), var(--heft2)); }
+/* Etiketten */
+.heftdeckel .etikett { position: relative; z-index: 3; max-width: 82%; padding: 8px 12px; }
+.heftdeckel.etikett-schild .etikett { background: #f7f0dc; color: #2c251c; border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,.3), inset 0 0 0 1.5px rgba(120,95,50,.35), inset 0 0 0 4px #f7f0dc, inset 0 0 0 5px rgba(120,95,50,.2); }
+.heftdeckel.etikett-schild .htitel { text-shadow: none; font-size: 16px; }
+.heftdeckel.etikett-tesa .etikett { background: rgba(255,255,255,.88); color: #2c251c; transform: rotate(-2.5deg); box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+.heftdeckel.etikett-tesa .etikett::before, .heftdeckel.etikett-tesa .etikett::after { content: ""; position: absolute; top: -7px; width: 34px; height: 14px; background: rgba(255,250,220,.55); box-shadow: 0 1px 2px rgba(0,0,0,.15); transform: rotate(-8deg); }
+.heftdeckel.etikett-tesa .etikett::before { left: -12px; } .heftdeckel.etikett-tesa .etikett::after { right: -12px; transform: rotate(10deg); top: auto; bottom: -7px; }
+.heftdeckel.etikett-tesa .htitel { text-shadow: none; font-size: 16px; }
+.heftdeckel.etikett-hand .etikett { padding: 0; }
+.heftdeckel.etikett-hand .htitel { font-family: "Bradley Hand", "Noteworthy", "Segoe Print", "Comic Sans MS", cursive; font-size: 21px; transform: rotate(-3deg); text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+.heftdeckel.etikett-praegung .etikett { padding: 0; }
+.heftdeckel.etikett-praegung .htitel { color: rgba(255,255,255,.55); text-shadow: 0 1px 0 rgba(255,255,255,.25), 0 -1px 1px rgba(0,0,0,.55); letter-spacing: .06em; text-transform: uppercase; font-size: 13px; word-break: normal; overflow-wrap: normal; hyphens: manual; }
+.heftdeckel .hdatum { font-size: 9.5px; top: 22px; z-index: 3; }
+.heftdeckel.schrift-hand .htitel { font-family: "Bradley Hand", "Noteworthy", "Segoe Print", "Comic Sans MS", cursive; }
+.heftdeckel.schrift-klar .htitel { font-family: ui-rounded, -apple-system, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif; font-weight: 600; }
+.heftdeckel .htitel.frei { position: relative; z-index: 3; }
+/* Gummiband */
+.heftdeckel .gummiband { position: absolute; top: -2px; bottom: -2px; right: 14%; width: 7px; background: var(--gummi, #2c251c); opacity: .92; z-index: 4; box-shadow: 1px 0 3px rgba(0,0,0,.35), inset 1px 0 0 rgba(255,255,255,.15); border-radius: 2px; }
+/* Ecken */
+.heftdeckel.ecken-eckig { border-radius: 3px 6px 6px 3px; }
+.heftdeckel .ecke { position: absolute; width: 18px; height: 18px; z-index: 5; background: linear-gradient(135deg, #e9d8a6, #a8863f 55%, #e2cb8c); }
+.heftdeckel .ecke.ol { left: 0; top: 0; clip-path: polygon(0 0, 100% 0, 0 100%); border-radius: 6px 0 0 0; }
+.heftdeckel .ecke.or { right: 0; top: 0; clip-path: polygon(0 0, 100% 0, 100% 100%); border-radius: 0 14px 0 0; }
+.heftdeckel .ecke.ul { left: 0; bottom: 0; clip-path: polygon(0 0, 100% 100%, 0 100%); border-radius: 0 0 0 6px; }
+.heftdeckel .ecke.ur { right: 0; bottom: 0; clip-path: polygon(100% 0, 100% 100%, 0 100%); border-radius: 0 0 14px 0; }
+/* Abnutzung: helle Kanten, stumpfe Ecken, Kratzer — Stärke über --abgegriffen */
+.heftdeckel .abnutzung { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2; opacity: var(--abgegriffen, 0);
+  background: radial-gradient(circle at 0 0, rgba(255,255,255,.55), transparent 22px), radial-gradient(circle at 100% 0, rgba(255,255,255,.45), transparent 26px), radial-gradient(circle at 100% 100%, rgba(255,255,255,.5), transparent 30px), radial-gradient(circle at 0 100%, rgba(255,255,255,.4), transparent 20px),
+    linear-gradient(90deg, rgba(255,255,255,.18), transparent 6px), linear-gradient(-90deg, rgba(255,255,255,.22), transparent 7px), linear-gradient(rgba(255,255,255,.15), transparent 5px), linear-gradient(0deg, rgba(255,255,255,.2), transparent 6px),
+    repeating-linear-gradient(27deg, transparent 0 41px, rgba(255,255,255,.12) 41px 42px, transparent 42px 97px), repeating-linear-gradient(-63deg, transparent 0 67px, rgba(0,0,0,.08) 67px 68px); }
+/* Sticker auf dem Deckel */
+.heftdeckel .deckel-sticker { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.heftdeckel .deckel-aufkleber { position: absolute; pointer-events: auto; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); touch-action: none; }
+.heftdeckel .deckel-aufkleber img { width: 100%; display: block; pointer-events: none; }
+.heftdeckel.gross { width: min(280px, 70vw); aspect-ratio: 3 / 4; margin: 6px auto 18px; font-size: 18px; }
+.heftdeckel.gross .htitel { font-size: 22px; }
+.atelier-buehne { display: grid; place-items: center; padding: 10px 0 4px; }
+.atelier-kopf { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+.atelier-kopf h2 { margin-bottom: 0; }
+.heft-atelier .einstellzeile { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+/* Mini-Deckel im Heftkopf */
+.heft-minideckel { width: 40px; flex: none; }
+.heft-minideckel .heftdeckel { padding: 6px 4px 6px 9px; border-radius: 3px 7px 7px 3px; box-shadow: 0 2px 6px var(--schein); }
+.heft-minideckel .heftdeckel .htitel, .heft-minideckel .heftdeckel .hseiten, .heft-minideckel .heftdeckel .hdatum, .heft-minideckel .heftdeckel .etikett, .heft-minideckel .heftdeckel .gummiband, .heft-minideckel .heftdeckel .ecke, .heft-minideckel .deckel-sticker { display: none; }
+.heft-minideckel .heftdeckel::before { left: 4px; width: 3px; }
+.heft-minideckel .heftdeckel .seitenblock { right: -3px; width: 3px; }
+/* ===== Der Tisch: Hefte liegen verstreut auf einer Platte ===== */
+.hefte-tisch { padding-bottom: 24px; }
+.heft-tisch { display: grid; grid-template-columns: repeat(auto-fill, minmax(172px, 1fr)); gap: 30px 22px; padding: 30px 24px 36px; border-radius: 18px;
+  background: repeating-linear-gradient(90deg, rgba(0,0,0,.045) 0 2px, transparent 2px 64px), linear-gradient(160deg, #b9936a, #8f6a44 60%, #7a5737); box-shadow: inset 0 0 60px rgba(0,0,0,.25), 0 10px 30px var(--schein); }
+html[data-thema="tinte"] .heft-tisch, html[data-thema="kerze"] .heft-tisch { background: repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 2px, transparent 2px 64px), linear-gradient(160deg, #4a3526, #2f2118 60%, #241911); }
+.heft-tisch .heft-halter { filter: drop-shadow(0 14px 14px rgba(0,0,0,.35)); }
+.heft-tisch .heftdeckel { box-shadow: 0 2px 4px rgba(0,0,0,.3); }
+.heft-stapel { position: relative; display: flex; gap: 0; padding: 20px 24px 30px; }
+.heft-stapel .heft-halter { width: 150px; margin-left: -110px; transform: translateY(calc(var(--lage, 0) * -3px)) rotate(var(--dreh, 0deg)); }
+.heft-stapel .heft-halter:first-child { margin-left: 0; }
+.heft-stapel .heft-halter:hover { transform: translateY(-16px) rotate(var(--dreh, 0deg)); z-index: 3; }
+/* ===== Das Regal: Bretter und stehende Rücken ===== */
+.buecherregal { display: grid; gap: 34px; padding: 10px 6px 30px; }
+.regalbrett { position: relative; padding: 0 18px 0; }
+.regalbuecher { display: flex; align-items: flex-end; gap: 3px; flex-wrap: wrap; min-height: 170px; padding: 0 10px; }
+.regalbrett .brettrand { position: absolute; left: 0; right: 0; bottom: -16px; height: 16px; border-radius: 3px;
+  background: linear-gradient(#c49a6a, #8d6640 50%, #6e4b2c); box-shadow: 0 8px 16px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.25); }
+.regalbrett::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: -28px; height: 12px; background: linear-gradient(rgba(0,0,0,.22), transparent); border-radius: 0 0 8px 8px; }
+html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regalbrett .brettrand { background: linear-gradient(#4a3526, #33251a 50%, #241911); }
+.brettschild { position: absolute; right: 26px; bottom: -13px; font-size: 10px; letter-spacing: .12em; color: #fff6e0; opacity: .85; z-index: 2; }
+.heftruecken { position: relative; border-radius: 3px 3px 2px 2px; color: rgba(255,252,240,.95); box-shadow: inset -3px 0 6px rgba(0,0,0,.28), inset 2px 0 3px rgba(255,255,255,.14), 0 2px 4px rgba(0,0,0,.25);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--heft1) 80%, #000), var(--heft1) 35%, var(--heft2) 80%, color-mix(in srgb, var(--heft2) 75%, #000)); display: grid; place-items: center; transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease; overflow: hidden; }
+.heftruecken:hover, .heftruecken.zieht { transform: translateY(-12px) rotate(-1.5deg); box-shadow: 0 10px 18px rgba(0,0,0,.35); z-index: 2; }
+.heftruecken .rtitel { writing-mode: vertical-rl; transform: rotate(180deg); font-family: ui-serif, "New York", Georgia, serif; font-size: 13px; font-weight: 600; letter-spacing: .04em; max-height: 80%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,.4); }
+.heftruecken.schrift-hand .rtitel { font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 14px; }
+.heftruecken.schrift-klar .rtitel { font-family: ui-rounded, -apple-system, system-ui, sans-serif; }
+.heftruecken .rband { position: absolute; left: 0; right: 0; top: 10px; height: 5px; background: var(--heftband); box-shadow: 0 18px 0 -1px var(--heftband); opacity: .9; }
+.heftruecken.stoff-leder { background-image: radial-gradient(rgba(0,0,0,.14) .6px, transparent 1.2px), linear-gradient(90deg, color-mix(in srgb, var(--heft1) 78%, #000), var(--heft1) 40%, color-mix(in srgb, var(--heft2) 72%, #000)); background-size: 5px 5px, auto; }
+.heftruecken.stoff-kraft { background: linear-gradient(90deg, #a8865a, #c9a87a 40%, #a8865a); color: #2c2216; }
+.heftruecken.stoff-kraft .rtitel { text-shadow: none; }
+.heftruecken.stoff-marmor { background: linear-gradient(90deg, #d9cdb5, #f1e8d6 40%, #cfc2a9); color: #2c251c; }
+.heftruecken.stoff-marmor .rtitel { text-shadow: none; }
+.regal-leer { font-size: 13px; color: #fff6e0; opacity: .7; align-self: center; padding: 20px; }
+@media (max-width: 640px) { .heft-tisch { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; padding: 20px 14px 26px; } .heft-stapel .heft-halter { width: 120px; margin-left: -86px; } }
 .heft-atelier { max-height: min(880px, 90dvh); overflow: auto; }
 .heft-atelier .einstellgruppe { display: grid; gap: 9px; padding: 13px 0; border-top: 1px solid var(--linie); }
 .heft-farben { display: flex; gap: 7px; flex-wrap: wrap; }
@@ -1663,7 +1759,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.11.0';
+const APP_VERSION = '5.12.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -1975,7 +2071,7 @@ const STANDARD_EINST = {
   thema: 'papier', schrift: 'serife', groesse: 19, breite: 'mittel',
   typewriter: true, fokus: false, mischung: {}, lautstaerke: .5,
   tastenklang: false, tagesziel: 0, ersetzungen: true, autokorrektur: true, kurzschrift: true,
-  autoSeitenwechsel: true, schnipselAnsicht: 'lauf', blattSortierung: 'zuletzt',
+  autoSeitenwechsel: true, schnipselAnsicht: 'lauf', blattSortierung: 'zuletzt', hefteAnsicht: 'karten',
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
   stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
   ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95
@@ -2006,6 +2102,7 @@ function uebernehmeEinstellungen(quelle) {
   for (const k of ['typewriter', 'fokus', 'tastenklang', 'ersetzungen', 'autokorrektur', 'autoSeitenwechsel']) D.einst[k] = D.einst[k] !== false;
   D.einst.goodnotesSync = D.einst.goodnotesSync === true;
   D.einst.kurzschrift = D.einst.kurzschrift !== false;
+  D.einst.hefteAnsicht = ['karten', 'regal', 'tisch'].includes(D.einst.hefteAnsicht) ? D.einst.hefteAnsicht : 'karten';
   D.einst.fadenAbgewaehlt = D.einst.fadenAbgewaehlt === true;
   D.einst.blattSortierung = ['zuletzt', 'aeltest', 'az'].includes(D.einst.blattSortierung) ? D.einst.blattSortierung : 'zuletzt';
   D.einst.schnipselAnsicht = D.einst.schnipselAnsicht === 'frei' ? 'frei' : 'lauf';
@@ -2120,6 +2217,7 @@ function sauberesDokument(quelle) {
       : null).filter((r) => r && r.seite) : [];
   }
   if (d.dauer != null) d.dauer = begrenze(d.dauer, 0, 36000, 0);
+  if (d.deckel != null) d.deckel = typeof saubererDeckel === 'function' ? saubererDeckel(d.deckel) : undefined;
   if (d.mime != null) d.mime = String(d.mime).slice(0, 60);
   /* Gruppen und Bilder auf Brettern liegen in Weltkoordinaten und brauchen
      eine Größe — pos.w/h dürfen dort viel größer sein als bei einer Anlage. */
@@ -5670,100 +5768,10 @@ function papierKlassen(heft, extra = '') {
   return 'papierseite ' + (heft.papier || 'liniert') + ' papierfarbe-' + (heft.papierfarbe || 'hell') + (heft.rand ? ' mit-rand' : '') + extra;
 }
 
-async function heftGestalten(h, danach) {
-  const vorschau = el('div', { class: 'heftdeckel heft-vorschau' }, el('div', { class: 'htitel' }, h.titel));
-  const farben = el('div', { class: 'heft-farben' });
-  const muster = el('div', { class: 'wahlgruppe heft-musterwahl', style: 'flex-wrap:wrap' });
-  const frei = el('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(h.farbe || '') ? h.farbe : HEFTFARBEN[0], title: 'Eigene Grundfarbe' });
-  const zweit = el('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(h.farbe2 || '') ? h.farbe2 : (h.farbe || HEFTFARBEN[0]), title: 'Zweite Farbe' });
-  const band = el('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(h.band || '') ? h.band : '#d6bd92', title: 'Buchband' });
-  const aktualisiere = () => {
-    const d = heftDeckelDaten(h); vorschau.className = 'heftdeckel heft-vorschau muster-' + d.muster; vorschau.style.cssText = d.style;
-  };
-  for (const f of HEFTFARBEN) farben.append(el('button', { class: 'heft-farbpunkt', style: 'background:' + f, title: f, onclick: () => { h.farbe = f; frei.value = f; aktualisiere(); } }));
-  for (const [id, name] of HEFT_MUSTER) muster.append(el('button', { class: (h.muster || 'schlicht') === id ? 'an' : '', onclick: (e) => {
-    h.muster = id; $$('button', muster).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); aktualisiere();
-  } }, name));
-  frei.addEventListener('input', () => { h.farbe = frei.value; aktualisiere(); });
-  zweit.addEventListener('input', () => { h.farbe2 = zweit.value; aktualisiere(); });
-  band.addEventListener('input', () => { h.band = band.value; aktualisiere(); });
-  const papier = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
-  for (const [id, name] of [['liniert', 'Liniert'], ['breit', 'Breite Linien'], ['kariert', 'Kariert'], ['punkte', 'Punktraster'], ['blank', 'Blanko'], ['cornell', 'Cornell'], ['storyboard', 'Storyboard'], ['dialog', 'Dialogblatt']]) papier.append(el('button', {
-    class: (h.papier || 'liniert') === id ? 'an' : '', onclick: (e) => { h.papier = id; $$('button', papier).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); }
-  }, name));
-  /* Papierfarbe und Randlinie: wie das Heft innen aussieht */
-  const papierfarbe = el('div', { class: 'wahlgruppe papierfarben', style: 'flex-wrap:wrap' });
-  for (const [id, name] of PAPIERFARBEN) papierfarbe.append(el('button', {
-    class: 'papierfarbe-' + id + ((h.papierfarbe || 'hell') === id ? ' an' : ''), title: name,
-    onclick: (e) => { h.papierfarbe = id; $$('button', papierfarbe).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); }
-  }, name));
-  const rand = el('button', { class: 'schalter' + (h.rand ? ' an' : ''), onclick: (e) => { h.rand = !h.rand; e.currentTarget.classList.toggle('an', h.rand); } }, el('i'));
-  let behalten = false;
-  const kasten = el('div', { class: 'modal heft-atelier' }, el('h2', {}, 'Heft gestalten'), vorschau,
-    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Grundfarbe'), farben,
-      el('div', { class: 'heft-freifarben' }, el('label', {}, 'Grundton ', frei), el('label', {}, 'Zweitton ', zweit), el('label', {}, 'Band ', band))),
-    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Muster'), muster),
-    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Papier'), papier),
-    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Papierfarbe'), papierfarbe),
-    el('div', { class: 'einstellgruppe einstellzeile' }, el('span', { class: 'ename' }, 'Randlinie', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Eine Linie am linken Rand wie im Schulheft — Platz für Notizen.')), rand),
-    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
-      el('button', { class: 'knopf voll', onclick: () => { behalten = true; speichere(h); zu(); if (danach) danach(); } }, 'So bleibt es')));
-  const alt = { farbe: h.farbe, farbe2: h.farbe2, band: h.band, muster: h.muster, papier: h.papier, papierfarbe: h.papierfarbe, rand: h.rand };
-  const zu = zeigeDeck(kasten, () => { if (!behalten) { Object.assign(h, alt); if (danach) danach(); } });
-  aktualisiere();
-}
+/* Umschlag gestalten und die Übersicht wohnen in 43e-deckel.js. */
+async function heftGestalten(h, danach) { return heftAtelier(h, danach); }
 
-RENDER.hefte = function (haupt) {
-  haupt.append(raumkopf('Hefte', null,
-    el('button', {
-      class: 'rundknopf voll', html: ik('plus'), title: 'Neues Heft', onclick: async () => {
-        const name = await eingabe({ titel: 'Ein neues Heft', platzhalter: 'Wie soll es heißen?' });
-        if (!name) return;
-        const h = neuDoc('heft', { titel: name, farbe: zufall(HEFTFARBEN), farbe2: zufall(HEFTFARBEN), band: '#d6bd92', muster: 'leinen', papier: 'liniert', ansicht: 'seiten' });
-        location.hash = '#/heft/' + h.id;
-      }
-    })
-  ));
-  const inhalt = el('div', { class: 'inhalt' });
-
-  const alle = vomTyp('heft').sort((a, b) => b.geaendert - a.geaendert);
-  const aktive = alle.filter((h) => !h.archiv);
-  const imRegal = alle.filter((h) => h.archiv);
-
-  if (!alle.length) {
-    inhalt.append(el('div', { class: 'leer' }, 'Ein leeres Regal.',
-      el('div', { class: 'klein' }, 'Das erste Heft ist das beste Versprechen, das es gibt.')));
-  }
-
-  const baueDeckel = (h) => {
-    const seiten = kinder(h.id, 'seite').length;
-    const stil = heftDeckelDaten(h);
-    const deckel = el('button', {
-      class: 'heftdeckel muster-' + stil.muster + (h.archiv ? ' archiv' : ''),
-      style: stil.style,
-      onclick: () => { location.hash = '#/heft/' + h.id; }
-    },
-      h.archiv ? el('div', { class: 'hdatum' }, 'INS REGAL · ' + fmtDatum(h.archiv)) : null,
-      el('div', { class: 'htitel' }, h.titel),
-      el('div', { class: 'hseiten' }, seiten === 1 ? '1 Seite' : seiten + ' Seiten')
-    );
-    langdruck(deckel, () => heftMenue(h, () => zeichne()));
-    return deckel;
-  };
-
-  if (aktive.length) {
-    const regal = el('div', { class: 'regal' });
-    aktive.forEach((h) => regal.append(baueDeckel(h)));
-    inhalt.append(regal);
-  }
-  if (imRegal.length) {
-    inhalt.append(el('div', { class: 'regal-trenner' }, 'IM REGAL'));
-    const regal = el('div', { class: 'regal' });
-    imRegal.forEach((h) => regal.append(baueDeckel(h)));
-    inhalt.append(regal);
-  }
-  haupt.append(inhalt);
-};
+RENDER.hefte = function (haupt) { return renderHefteRegal(haupt); };
 
 /* ----- Text von außen hereinholen -----
    Auf einem verwalteten iPad lässt sich oft keine Datei auswählen. Kopieren und
@@ -5850,9 +5858,11 @@ async function heftMenue(h, danach) {
   } else if (wahl === 'dazu') {
     await hinzufuegenMenue(h);
   } else if (wahl === 'archiv') {
+    if (typeof merkeHeftLagen === 'function') merkeHeftLagen();
     h.archiv = Date.now(); speichereStill(h);
     toast('Feierlich ins Regal gestellt.');
   } else if (wahl === 'zurueck') {
+    if (typeof merkeHeftLagen === 'function') merkeHeftLagen();
     delete h.archiv; speichereStill(h);
   } else if (wahl === 'weg') {
     const seiten = kinder(h.id, 'seite').length;
@@ -5907,6 +5917,7 @@ RENDER.heft = function (haupt, heftId) {
 
   haupt.append(el('div', { class: 'kopf' },
     zurueckknopf('#/hefte'),
+    el('button', { class: 'heft-minideckel', title: 'Umschlag gestalten', onclick: () => heftGestalten(heft, () => zeichne()) }, baueDeckelElement(heft, { seitenzahl: seiten.length })),
     el('h1', {}, heft.titel),
     el('div', { class: 'heft-ansichtswahl', role: 'group', 'aria-label': 'Heftansicht' },
       el('button', { class: (heft.ansicht || 'seiten') === 'seiten' ? 'an' : '', title: 'Einzelne Seiten', onclick: () => { heft.ansicht = 'seiten'; speichere(heft); zeichne(); } }, 'Seiten'),
@@ -7340,6 +7351,332 @@ function baueTon(a, blatt, neuBauen) {
   halter.append(el('div', { class: 'ton-kassette' }, spiel, el('div', { class: 'ton-text' }, name, zeit)));
   anlageGesten(halter, a, blatt, neuBauen);
   return halter;
+}
+
+/* ================================================================
+   VANI — Umschlag und Regal: Hefte, die aussehen wie benutzt.
+
+   Ein Heft ist mehr als eine Farbe mit Muster. Es hat einen Stoff (Leinen,
+   Leder, Kraftpapier, Samt, Marmor), ein Etikett (Schild, Tesastreifen,
+   Handschrift, Prägung), Ecken, ein Gummiband, abgegriffene Kanten, Sticker
+   und Gekritzel auf dem Deckel — und einen Seitenblock, der an der Kante
+   hervorlugt. All das wird hier gebaut: der Deckel selbst (`baueDeckelElement`),
+   das Atelier zum Gestalten (`heftAtelier`) und die drei Ansichten der
+   Hefteübersicht: Karten, das Regal mit stehenden Rücken, der Tisch mit
+   verstreuten Heften. Ins Regal stellen und herausnehmen ist animiert.
+   ================================================================ */
+
+const DECKEL_STOFFE = [['leinen', 'Leinen'], ['leder', 'Leder'], ['kraft', 'Kraftpapier'], ['samt', 'Samt'], ['marmor', 'Marmor'], ['glatt', 'Glatt']];
+const DECKEL_ETIKETTEN = [['schild', 'Schild'], ['tesa', 'Tesastreifen'], ['hand', 'Handschrift'], ['praegung', 'Prägung'], ['keins', 'Ohne']];
+const DECKEL_SCHRIFTEN = [['serif', 'Serife'], ['hand', 'Handschrift'], ['klar', 'Klar']];
+const DECKEL_ECKEN = [['rund', 'Rund'], ['eckig', 'Eckig'], ['metall', 'Metallecken']];
+const HEFTE_ANSICHTEN = [['karten', 'Karten'], ['regal', 'Regal'], ['tisch', 'Tisch']];
+
+/* Was auf einem Deckel stehen darf — begrenzt, mit Vorgaben. Pur. */
+function saubererDeckel(roh) {
+  const q = roh && typeof roh === 'object' && !Array.isArray(roh) ? roh : {};
+  const wahl = (wert, liste, vorgabe) => liste.some((e) => e[0] === wert) ? wert : vorgabe;
+  const sticker = Array.isArray(q.sticker) ? q.sticker.slice(0, 200).map((s) => {
+    if (!s || typeof s !== 'object' || typeof s.bild !== 'string') return null;
+    const p = s.pos && typeof s.pos === 'object' ? s.pos : {};
+    return { bild: s.bild.slice(0, 500), pos: { x: begrenze(p.x, -20, 110, 50), y: begrenze(p.y, -20, 110, 50), rot: begrenze(p.rot, -180, 180, 0), w: begrenze(p.w, 8, 90, 34) } };
+  }).filter(Boolean).slice(0, 24) : [];
+  return {
+    stoff: wahl(q.stoff, DECKEL_STOFFE, 'leinen'),
+    etikett: wahl(q.etikett, DECKEL_ETIKETTEN, 'schild'),
+    schrift: wahl(q.schrift, DECKEL_SCHRIFTEN, 'serif'),
+    ecken: wahl(q.ecken, DECKEL_ECKEN, 'rund'),
+    gummi: q.gummi === true,
+    gummifarbe: /^#[0-9a-f]{6}$/i.test(q.gummifarbe || '') ? q.gummifarbe : '#2c251c',
+    abgegriffen: begrenze(q.abgegriffen, 0, 1, 0),
+    sticker
+  };
+}
+
+/* Das Heft als Element — klein im Regal, groß im Atelier. */
+function baueDeckelElement(h, { gross = false, interaktiv = false, seitenzahl = null, beiSticker = null } = {}) {
+  const stil = heftDeckelDaten(h);
+  const d = saubererDeckel(h.deckel);
+  const seiten = seitenzahl == null ? kinder(h.id, 'seite').length : seitenzahl;
+  const dick = Math.min(5, 1 + Math.floor(seiten / 12));   /* der Seitenblock wächst mit */
+  const deckel = el('div', {
+    class: 'heftdeckel muster-' + stil.muster + ' stoff-' + d.stoff + ' etikett-' + d.etikett + ' schrift-' + d.schrift + ' ecken-' + d.ecken
+      + (d.gummi ? ' mit-gummi' : '') + (gross ? ' gross' : '') + (h.archiv ? ' archiv' : ''),
+    style: stil.style + ';--dick:' + dick + ';--abgegriffen:' + d.abgegriffen.toFixed(2) + ';--gummi:' + d.gummifarbe,
+    'data-heft': h.id
+  });
+  deckel.append(el('div', { class: 'seitenblock' }));
+  if (d.abgegriffen > 0) deckel.append(el('div', { class: 'abnutzung' }));
+  if (d.ecken === 'metall') deckel.append(el('i', { class: 'ecke ol' }), el('i', { class: 'ecke or' }), el('i', { class: 'ecke ul' }), el('i', { class: 'ecke ur' }));
+  /* Sticker und Gekritzel auf dem Deckel */
+  const stickerLage = el('div', { class: 'deckel-sticker' });
+  d.sticker.forEach((s, i) => {
+    const img = el('img', { alt: '', draggable: 'false' });
+    setzeBild(img, s.bild);
+    const halter = el('div', { class: 'deckel-aufkleber', style: 'left:' + s.pos.x + '%;top:' + s.pos.y + '%;width:' + s.pos.w + '%;transform:translate(-50%,-50%) rotate(' + s.pos.rot + 'deg)' }, img);
+    if (interaktiv && beiSticker) beiSticker(halter, s, i);
+    stickerLage.append(halter);
+  });
+  deckel.append(stickerLage);
+  if (d.etikett !== 'keins') {
+    deckel.append(el('div', { class: 'etikett' }, el('div', { class: 'htitel' }, h.titel || 'Ohne Titel')));
+  } else {
+    deckel.append(el('div', { class: 'htitel frei' }, h.titel || 'Ohne Titel'));
+  }
+  if (d.gummi) deckel.append(el('div', { class: 'gummiband' }));
+  if (!gross) {
+    if (h.archiv) deckel.append(el('div', { class: 'hdatum' }, 'INS REGAL · ' + fmtDatum(h.archiv)));
+    deckel.append(el('div', { class: 'hseiten' }, seiten === 1 ? '1 Seite' : seiten + ' Seiten'));
+  }
+  return deckel;
+}
+
+/* Der Buchrücken fürs stehende Regal. */
+function baueRuecken(h) {
+  const stil = heftDeckelDaten(h);
+  const d = saubererDeckel(h.deckel);
+  const seiten = kinder(h.id, 'seite').length;
+  const breite = Math.round(30 + Math.min(34, seiten * 1.1));
+  const hoehe = 150 + ((h.titel || '').length % 3) * 8;   /* nicht alle gleich hoch — wie im echten Regal */
+  return el('button', {
+    class: 'heftruecken stoff-' + d.stoff + ' schrift-' + d.schrift, 'data-heft': h.id,
+    style: stil.style + ';width:' + breite + 'px;height:' + hoehe + 'px', title: h.titel
+  }, el('span', { class: 'rtitel' }, h.titel || 'Ohne Titel'), el('i', { class: 'rband' }));
+}
+
+/* Ein zufälliger, schöner Look — fürs schnelle Ausprobieren. */
+function zufallsLook(h) {
+  h.farbe = zufall(HEFTFARBEN); h.farbe2 = Math.random() < .5 ? h.farbe : zufall(HEFTFARBEN);
+  h.band = zufall(['#d6bd92', '#b8923f', '#2c251c', '#f3e6c6', '#7a4048']);
+  h.muster = zufall(HEFT_MUSTER)[0];
+  const d = saubererDeckel(h.deckel);
+  d.stoff = zufall(DECKEL_STOFFE)[0]; d.etikett = zufall(DECKEL_ETIKETTEN.filter((e) => e[0] !== 'keins'))[0];
+  d.schrift = zufall(DECKEL_SCHRIFTEN)[0]; d.ecken = zufall(DECKEL_ECKEN)[0];
+  d.gummi = Math.random() < .45; d.abgegriffen = Math.random() < .5 ? 0 : Math.round(Math.random() * 8) / 10;
+  h.deckel = d;
+}
+
+/* ----- Das Atelier ----- */
+async function heftAtelier(h, danach) {
+  h.deckel = saubererDeckel(h.deckel);
+  const alt = JSON.parse(JSON.stringify({ farbe: h.farbe, farbe2: h.farbe2, band: h.band, muster: h.muster, papier: h.papier, papierfarbe: h.papierfarbe, rand: h.rand, deckel: h.deckel }));
+  const buehne = el('div', { class: 'atelier-buehne' });
+  let behalten = false;
+
+  /* Sticker auf der Vorschau: ziehen, lange halten für Menü */
+  const stickerGesten = (halter, s) => {
+    let zieht = null;
+    halter.addEventListener('pointerdown', (e) => {
+      e.stopPropagation(); e.preventDefault();
+      const r = halter.parentElement.getBoundingClientRect();
+      zieht = { sx: e.clientX, sy: e.clientY, x0: s.pos.x, y0: s.pos.y, r, bewegt: false };
+      try { halter.setPointerCapture(e.pointerId); } catch (x) {}
+    });
+    halter.addEventListener('pointermove', (e) => {
+      if (!zieht) return;
+      const dx = e.clientX - zieht.sx, dy = e.clientY - zieht.sy;
+      if (!zieht.bewegt && Math.hypot(dx, dy) < 5) return;
+      zieht.bewegt = true;
+      s.pos.x = begrenze(zieht.x0 + dx / zieht.r.width * 100, -20, 110, 50);
+      s.pos.y = begrenze(zieht.y0 + dy / zieht.r.height * 100, -20, 110, 50);
+      halter.style.left = s.pos.x + '%'; halter.style.top = s.pos.y + '%';
+    });
+    halter.addEventListener('pointerup', () => { zieht = null; });
+    langdruck(halter, async () => {
+      const wahl = await menue([
+        { text: 'Etwas drehen', icon: 'drehen', wert: 'dreh' },
+        { text: 'Größer', icon: 'auf', wert: 'gross' }, { text: 'Kleiner', icon: 'ab', wert: 'klein' },
+        { text: 'Abmachen', icon: 'muell', wert: 'weg', rot: true }
+      ]);
+      if (wahl === 'dreh') s.pos.rot = ((s.pos.rot || 0) + 15 + 180) % 360 - 180;
+      else if (wahl === 'gross') s.pos.w = Math.min(90, s.pos.w * 1.2);
+      else if (wahl === 'klein') s.pos.w = Math.max(8, s.pos.w / 1.2);
+      else if (wahl === 'weg') h.deckel.sticker = h.deckel.sticker.filter((x) => x !== s);
+      if (wahl) aktualisiere();
+    });
+  };
+  const aktualisiere = () => {
+    buehne.innerHTML = '';
+    buehne.append(baueDeckelElement(h, { gross: true, interaktiv: true, beiSticker: stickerGesten }));
+  };
+
+  const wahlgruppe = (liste, lies, setze) => {
+    const g = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
+    for (const [id, name] of liste) g.append(el('button', { class: lies() === id ? 'an' : '', onclick: (e) => { setze(id); $$('button', g).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); aktualisiere(); } }, name));
+    return g;
+  };
+  const farben = el('div', { class: 'heft-farben' });
+  const frei = el('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(h.farbe || '') ? h.farbe : HEFTFARBEN[0], title: 'Eigene Grundfarbe' });
+  const zweit = el('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(h.farbe2 || '') ? h.farbe2 : (h.farbe || HEFTFARBEN[0]), title: 'Zweite Farbe' });
+  const band = el('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(h.band || '') ? h.band : '#d6bd92', title: 'Buchband' });
+  const gummifarbe = el('input', { type: 'color', value: h.deckel.gummifarbe, title: 'Gummiband' });
+  for (const f of HEFTFARBEN) farben.append(el('button', { class: 'heft-farbpunkt', style: 'background:' + f, title: f, onclick: () => { h.farbe = f; frei.value = f; aktualisiere(); } }));
+  frei.addEventListener('input', () => { h.farbe = frei.value; aktualisiere(); });
+  zweit.addEventListener('input', () => { h.farbe2 = zweit.value; aktualisiere(); });
+  band.addEventListener('input', () => { h.band = band.value; aktualisiere(); });
+  gummifarbe.addEventListener('input', () => { h.deckel.gummifarbe = gummifarbe.value; aktualisiere(); });
+  const gummi = el('button', { class: 'schalter' + (h.deckel.gummi ? ' an' : ''), onclick: (e) => { h.deckel.gummi = !h.deckel.gummi; e.currentTarget.classList.toggle('an', h.deckel.gummi); aktualisiere(); } }, el('i'));
+  const abgegriffen = el('input', { type: 'range', min: '0', max: '1', step: '.1', value: String(h.deckel.abgegriffen), 'aria-label': 'Abgegriffen' });
+  abgegriffen.addEventListener('input', () => { h.deckel.abgegriffen = Number(abgegriffen.value); aktualisiere(); });
+  const rand = el('button', { class: 'schalter' + (h.rand ? ' an' : ''), onclick: (e) => { h.rand = !h.rand; e.currentTarget.classList.toggle('an', h.rand); } }, el('i'));
+  const papierfarbe = el('div', { class: 'wahlgruppe papierfarben', style: 'flex-wrap:wrap' });
+  for (const [id, name] of PAPIERFARBEN) papierfarbe.append(el('button', {
+    class: 'papierfarbe-' + id + ((h.papierfarbe || 'hell') === id ? ' an' : ''), title: name,
+    onclick: (e) => { h.papierfarbe = id; $$('button', papierfarbe).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); }
+  }, name));
+
+  const stickerDazu = async (art) => {
+    let bild = null, verhaeltnis = .5;
+    if (art === 'zeichnen') {
+      const neu = await stickerZeichnen({ titel: 'Aufs Cover kritzeln', inKiste: false });
+      if (!neu) return;
+      bild = neu.bild; verhaeltnis = neu.seitenverhaeltnis;
+    } else {
+      const kiste = stickerKiste();
+      const wahl = await menue([
+        ...STICKER_MITGEBRACHT.map((m) => ({ text: m.name, icon: 'sticker', wert: 'm:' + m.id })),
+        ...kiste.slice(0, 12).map((v, i) => ({ text: 'Aus meiner Kiste ' + (i + 1), icon: 'archiv', wert: 'k:' + v.id }))
+      ], 'Welcher Sticker aufs Cover?');
+      if (!wahl) return;
+      if (wahl.startsWith('m:')) { const m = STICKER_MITGEBRACHT.find((x) => x.id === wahl.slice(2)); try { bild = await stickerMitgebrachtBild(m); verhaeltnis = m.verhaeltnis; } catch (e) { toast('Der Sticker ließ sich nicht laden.'); return; } }
+      else { const v = D.docs.get(wahl.slice(2)); if (!v) return; bild = v.bild; verhaeltnis = v.verhaeltnis || .5; }
+    }
+    h.deckel.sticker.push({ bild, pos: { x: 30 + Math.random() * 40, y: 30 + Math.random() * 40, rot: -12 + Math.random() * 24, w: verhaeltnis < .35 ? 46 : 32 } });
+    h.deckel.sticker = h.deckel.sticker.slice(-24);
+    aktualisiere();
+  };
+
+  const kasten = el('div', { class: 'modal heft-atelier' },
+    el('div', { class: 'atelier-kopf' }, el('h2', {}, 'Heft gestalten'),
+      el('button', { class: 'knopf zart', title: 'Zufälliger Look', onclick: () => { zufallsLook(h); frei.value = h.farbe; zweit.value = h.farbe2 || h.farbe; band.value = h.band; aktualisiere(); toast('Gewürfelt. Nochmal würfeln oder verfeinern.'); } }, el('span', { html: ik('wuerfel'), style: 'display:flex' }), 'Würfeln')),
+    buehne,
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Stoff'), wahlgruppe(DECKEL_STOFFE, () => h.deckel.stoff, (v) => { h.deckel.stoff = v; })),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Farben'), farben,
+      el('div', { class: 'heft-freifarben' }, el('label', {}, 'Grundton ', frei), el('label', {}, 'Zweitton ', zweit), el('label', {}, 'Band ', band))),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Muster'), wahlgruppe(HEFT_MUSTER, () => h.muster || 'schlicht', (v) => { h.muster = v; })),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Etikett'), wahlgruppe(DECKEL_ETIKETTEN, () => h.deckel.etikett, (v) => { h.deckel.etikett = v; }),
+      el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Schrift'), wahlgruppe(DECKEL_SCHRIFTEN, () => h.deckel.schrift, (v) => { h.deckel.schrift = v; })),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Aufkleben & kritzeln'),
+      el('div', { style: 'display:flex;gap:8px;flex-wrap:wrap' },
+        el('button', { class: 'knopf', onclick: () => stickerDazu('kiste') }, el('span', { html: ik('sticker'), style: 'display:flex' }), 'Sticker aufs Cover'),
+        el('button', { class: 'knopf', onclick: () => stickerDazu('zeichnen') }, el('span', { html: ik('stift'), style: 'display:flex' }), 'Aufs Cover kritzeln')),
+      el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Auf der Vorschau ziehen verschiebt, lange halten dreht, vergrößert oder macht ab.')),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Ecken & Band'), wahlgruppe(DECKEL_ECKEN, () => h.deckel.ecken, (v) => { h.deckel.ecken = v; }),
+      el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, 'Gummiband', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'hält das Heft zu — wie bei einem Notizbuch aus dem Laden')), el('span', { style: 'display:flex;gap:10px;align-items:center' }, gummifarbe, gummi)),
+      el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, 'Abgegriffen', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Kanten und Ecken, die schon viel erlebt haben')), abgegriffen)),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Papier'), wahlgruppe(
+      [['liniert', 'Liniert'], ['breit', 'Breite Linien'], ['kariert', 'Kariert'], ['punkte', 'Punktraster'], ['blank', 'Blanko'], ['cornell', 'Cornell'], ['storyboard', 'Storyboard'], ['dialog', 'Dialogblatt']],
+      () => h.papier || 'liniert', (v) => { h.papier = v; })),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Papierfarbe'), papierfarbe),
+    el('div', { class: 'einstellgruppe einstellzeile' }, el('span', { class: 'ename' }, 'Randlinie', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Eine Linie am linken Rand wie im Schulheft — Platz für Notizen.')), rand),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
+      el('button', { class: 'knopf voll', onclick: () => { behalten = true; speichere(h); zu(); if (danach) danach(); } }, 'So bleibt es')));
+  const zu = zeigeDeck(kasten, () => { if (!behalten) { Object.assign(h, alt); if (danach) danach(); } });
+  aktualisiere();
+}
+
+/* ----- Die Übersicht: Karten, Regal, Tisch ----- */
+
+/* FLIP: vor dem Neuzeichnen die Lage merken, danach von dort aus hingleiten.
+   So sieht man, wie ein Heft ins Regal wandert — statt dass es verschwindet
+   und woanders wieder auftaucht. */
+const _heftLagen = new Map();
+function merkeHeftLagen() {
+  _heftLagen.clear();
+  $$('[data-heft]').forEach((e) => { const r = e.getBoundingClientRect(); if (r.width) _heftLagen.set(e.dataset.heft, r); });
+}
+function spieleHeftLagen() {
+  if (!_heftLagen.size) return;
+  requestAnimationFrame(() => {
+    $$('[data-heft]').forEach((e) => {
+      const alt = _heftLagen.get(e.dataset.heft);
+      if (!alt) return;
+      const neu = e.getBoundingClientRect();
+      const dx = alt.left - neu.left, dy = alt.top - neu.top, sx = alt.width / (neu.width || 1), sy = alt.height / (neu.height || 1);
+      if (Math.abs(dx) < 2 && Math.abs(dy) < 2 && Math.abs(sx - 1) < .05) return;
+      e.style.transition = 'none';
+      e.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sx + ',' + sy + ')';
+      e.style.transformOrigin = 'top left';
+      requestAnimationFrame(() => {
+        e.style.transition = 'transform .55s cubic-bezier(.2,.8,.2,1)';
+        e.style.transform = '';
+        setTimeout(() => { e.style.transition = ''; e.style.transformOrigin = ''; }, 600);
+      });
+    });
+    _heftLagen.clear();
+  });
+}
+
+function renderHefteRegal(haupt) {
+  const ansicht = HEFTE_ANSICHTEN.some((a) => a[0] === D.einst.hefteAnsicht) ? D.einst.hefteAnsicht : 'karten';
+  const wahl = el('div', { class: 'heft-ansichtswahl', role: 'group', 'aria-label': 'Ansicht der Hefte' },
+    HEFTE_ANSICHTEN.map(([id, name]) => el('button', { class: ansicht === id ? 'an' : '', onclick: () => { D.einst.hefteAnsicht = id; speichereEinst(); zeichne(); } }, name)));
+  haupt.append(raumkopf('Hefte', null, wahl,
+    el('button', {
+      class: 'rundknopf voll', html: ik('plus'), title: 'Neues Heft', onclick: async () => {
+        const name = await eingabe({ titel: 'Ein neues Heft', platzhalter: 'Wie soll es heißen?' });
+        if (!name) return;
+        const h = neuDoc('heft', { titel: name, farbe: zufall(HEFTFARBEN), farbe2: zufall(HEFTFARBEN), band: '#d6bd92', muster: 'leinen', papier: 'liniert', ansicht: 'seiten', deckel: saubererDeckel({ stoff: zufall(DECKEL_STOFFE)[0] }) });
+        location.hash = '#/heft/' + h.id;
+      }
+    })
+  ));
+  const inhalt = el('div', { class: 'inhalt hefte-' + ansicht });
+  const alle = vomTyp('heft').sort((a, b) => b.geaendert - a.geaendert);
+  const aktive = alle.filter((h) => !h.archiv);
+  const imRegal = alle.filter((h) => h.archiv);
+  if (!alle.length) {
+    inhalt.append(el('div', { class: 'leer' }, 'Ein leeres Regal.', el('div', { class: 'klein' }, 'Das erste Heft ist das beste Versprechen, das es gibt.')));
+    haupt.append(inhalt); return;
+  }
+  const oeffne = (h, e) => {
+    /* kurz herausziehen, dann aufschlagen */
+    const el_ = e && e.currentTarget; if (el_) el_.classList.add('zieht');
+    setTimeout(() => { location.hash = '#/heft/' + h.id; }, el_ ? 180 : 0);
+  };
+  const menueMit = (h) => heftMenue(h, () => { merkeHeftLagen(); zeichne(); spieleHeftLagen(); });
+
+  if (ansicht === 'karten' || ansicht === 'tisch') {
+    const gitter = el('div', { class: ansicht === 'tisch' ? 'heft-tisch' : 'regal' });
+    aktive.forEach((h, i) => {
+      const d = baueDeckelElement(h);
+      const knopf = el('button', { class: 'heft-halter', style: ansicht === 'tisch' ? '--dreh:' + ((i * 37) % 11 - 5) + 'deg' : '', onclick: (e) => oeffne(h, e) }, d);
+      langdruck(knopf, () => menueMit(h));
+      gitter.append(knopf);
+    });
+    inhalt.append(gitter);
+    if (imRegal.length) {
+      inhalt.append(el('div', { class: 'regal-trenner' }, 'IM REGAL'));
+      const g2 = el('div', { class: ansicht === 'tisch' ? 'heft-stapel' : 'regal' });
+      imRegal.forEach((h, i) => {
+        const knopf = el('button', { class: 'heft-halter', style: ansicht === 'tisch' ? '--dreh:' + ((i * 53) % 9 - 4) + 'deg;--lage:' + i : '', onclick: (e) => oeffne(h, e) }, baueDeckelElement(h));
+        langdruck(knopf, () => menueMit(h));
+        g2.append(knopf);
+      });
+      inhalt.append(g2);
+    }
+  } else {
+    /* Das Regal: Bretter mit stehenden Rücken; was im Regal steht, ein Brett tiefer. */
+    const regal = el('div', { class: 'buecherregal' });
+    const brett = (hefte, titel) => {
+      const reihe = el('div', { class: 'regalbrett' }, el('div', { class: 'brettrand' }));
+      const buecher = el('div', { class: 'regalbuecher' });
+      hefte.forEach((h) => {
+        const r = baueRuecken(h);
+        r.addEventListener('click', (e) => oeffne(h, e));
+        langdruck(r, () => menueMit(h));
+        buecher.append(r);
+      });
+      if (!hefte.length) buecher.append(el('div', { class: 'regal-leer' }, titel === 'IM REGAL' ? 'Noch nichts weggestellt.' : 'Alles weggestellt.'));
+      reihe.append(buecher, el('div', { class: 'brettschild' }, titel));
+      return reihe;
+    };
+    regal.append(brett(aktive, 'AUF DEM TISCH'));
+    regal.append(brett(imRegal, 'IM REGAL'));
+    inhalt.append(regal);
+  }
+  haupt.append(inhalt);
+  spieleHeftLagen();
 }
 
 /* ================================================================
@@ -12985,6 +13322,8 @@ const ANLEITUNG = [
         'Von links nach rechts: 📌 Nadel = Zettel ankleben · Kamera = Foto einkleben · Stift = Kritzeln · Aa = Text formatieren · drei Punkte = Mehr (Im Schreibraum öffnen, Hinzufügen & verbinden, Als loses Blatt herausnehmen, Seite herausreißen).',
         'Der Zettel hat also einen eigenen Knopf und steckt in keinem Menü.'
       ], tipp: 'Wenn ich diese Knöpfe nicht sehe: In den Feinheiten auf „VANI jetzt aktualisieren" tippen. Dann ist die neueste Fassung da.' },
+      { t: 'Der Umschlag', p: ['Der kleine Deckel oben links im Heft (oder lange halten → „Umschlag & Papier gestalten") öffnet das Atelier mit großer Vorschau. Stoff: Leinen, Leder, Kraftpapier, Samt, Marmor, Glatt. Farben: Grundton, Zweitton, Band. Muster. Etikett: Schild, Tesastreifen, Handschrift, Prägung — und die Schrift dazu. Ecken (rund, eckig, Metallecken), Gummiband in eigener Farbe, „Abgegriffen" als Regler für Kanten, die schon viel erlebt haben. Der Seitenblock an der Kante wächst mit den Seiten.', 'Aufkleben & kritzeln: Sticker aus der Kiste (und mein „Schmu!") aufs Cover, oder direkt aufs Cover kritzeln. Auf der Vorschau ziehen verschiebt, lange halten dreht, vergrößert oder macht ab. „Würfeln" schlägt einen ganzen Look vor.'], b: 'Dunkles Leder, Metallecken, ein rotes Gummiband, Prägung als Etikett — und quer drüber ein Schmu!-Sticker.' },
+      { t: 'Karten, Regal, Tisch', p: ['Die Hefteübersicht hat drei Ansichten (oben im Kopf): Karten (die Deckel in Reihen), Regal (ein echtes Bücherregal: die Hefte stehen mit dem Rücken nach vorn auf Brettern, unterschiedlich hoch und dick; was ich ins Regal gestellt habe, steht ein Brett tiefer) und Tisch (die Hefte liegen verstreut auf einer Holzplatte, leicht gedreht, das Weggestellte als Stapel). „Ins Regal stellen" und „Zurück auf den Tisch" sind animiert: das Heft gleitet wirklich hinüber. Antippen zieht es kurz heraus und schlägt es auf.'] },
       { t: 'Zettel', p: ['Kleine farbige Notizzettel auf der Seite — auch über den Seitenrand hinaus, wie im echten Heft. Ziehen verschiebt, der Griff unten rechts ändert die Größe, der runde Griff oben dreht frei, Tippen macht ihn beschreibbar. Lange halten: Andere Farbe (acht Töne), Schrift (Handschrift, Klar, Serife), Form (schmal, normal, breit), Befestigung (Tesa, Reißzwecke, lose aufgelegt), Etwas drehen, Gerade rücken, Abmachen.'], b: 'Eine Figurenbeschreibung als gelber Zettel schräg an den Rand der Seite — mit Tesa. Die Seite selbst bleibt frei für die Szene.' },
       { t: 'Fotos', p: ['„Foto einkleben" legt ein Bild auf die Seite, leicht schräg wie eingeklebt. Es lässt sich genauso ziehen, drehen, vergrößern und befestigen wie ein Zettel.'] },
       { t: 'Sticker', p: ['Das Sticker-Symbol in den Seitenwerkzeugen öffnet den Stickerblock: eine kleine Zeichenfläche mit Stiften (rot zuerst), Dicke, Radierer, Zurück. Was ich zeichne, wird so groß wie das Gezeichnete — der Rest bleibt durchsichtig — und klebt dann lose auf der Seite: ziehen, am Griff unten rechts größer und kleiner, am runden Griff oben frei drehen (nahe null rastet es gerade ein), lange halten zum Abmachen.', 'Sticker dürfen wie Zettel über den Seitenrand hinausragen. „Seite verdoppeln" nimmt sie mit.'], b: 'Ein rotes „SCHMU!" einmal gezeichnet — und ab jetzt in jedem Heft an der richtigen Stelle.' },

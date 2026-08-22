@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.11.0';
+const APP_VERSION = '5.12.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -315,7 +315,7 @@ const STANDARD_EINST = {
   thema: 'papier', schrift: 'serife', groesse: 19, breite: 'mittel',
   typewriter: true, fokus: false, mischung: {}, lautstaerke: .5,
   tastenklang: false, tagesziel: 0, ersetzungen: true, autokorrektur: true, kurzschrift: true,
-  autoSeitenwechsel: true, schnipselAnsicht: 'lauf', blattSortierung: 'zuletzt',
+  autoSeitenwechsel: true, schnipselAnsicht: 'lauf', blattSortierung: 'zuletzt', hefteAnsicht: 'karten',
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
   stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
   ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95
@@ -346,6 +346,7 @@ function uebernehmeEinstellungen(quelle) {
   for (const k of ['typewriter', 'fokus', 'tastenklang', 'ersetzungen', 'autokorrektur', 'autoSeitenwechsel']) D.einst[k] = D.einst[k] !== false;
   D.einst.goodnotesSync = D.einst.goodnotesSync === true;
   D.einst.kurzschrift = D.einst.kurzschrift !== false;
+  D.einst.hefteAnsicht = ['karten', 'regal', 'tisch'].includes(D.einst.hefteAnsicht) ? D.einst.hefteAnsicht : 'karten';
   D.einst.fadenAbgewaehlt = D.einst.fadenAbgewaehlt === true;
   D.einst.blattSortierung = ['zuletzt', 'aeltest', 'az'].includes(D.einst.blattSortierung) ? D.einst.blattSortierung : 'zuletzt';
   D.einst.schnipselAnsicht = D.einst.schnipselAnsicht === 'frei' ? 'frei' : 'lauf';
@@ -460,6 +461,7 @@ function sauberesDokument(quelle) {
       : null).filter((r) => r && r.seite) : [];
   }
   if (d.dauer != null) d.dauer = begrenze(d.dauer, 0, 36000, 0);
+  if (d.deckel != null) d.deckel = typeof saubererDeckel === 'function' ? saubererDeckel(d.deckel) : undefined;
   if (d.mime != null) d.mime = String(d.mime).slice(0, 60);
   /* Gruppen und Bilder auf Brettern liegen in Weltkoordinaten und brauchen
      eine Größe — pos.w/h dürfen dort viel größer sein als bei einer Anlage. */

@@ -15,100 +15,10 @@ function papierKlassen(heft, extra = '') {
   return 'papierseite ' + (heft.papier || 'liniert') + ' papierfarbe-' + (heft.papierfarbe || 'hell') + (heft.rand ? ' mit-rand' : '') + extra;
 }
 
-async function heftGestalten(h, danach) {
-  const vorschau = el('div', { class: 'heftdeckel heft-vorschau' }, el('div', { class: 'htitel' }, h.titel));
-  const farben = el('div', { class: 'heft-farben' });
-  const muster = el('div', { class: 'wahlgruppe heft-musterwahl', style: 'flex-wrap:wrap' });
-  const frei = el('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(h.farbe || '') ? h.farbe : HEFTFARBEN[0], title: 'Eigene Grundfarbe' });
-  const zweit = el('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(h.farbe2 || '') ? h.farbe2 : (h.farbe || HEFTFARBEN[0]), title: 'Zweite Farbe' });
-  const band = el('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(h.band || '') ? h.band : '#d6bd92', title: 'Buchband' });
-  const aktualisiere = () => {
-    const d = heftDeckelDaten(h); vorschau.className = 'heftdeckel heft-vorschau muster-' + d.muster; vorschau.style.cssText = d.style;
-  };
-  for (const f of HEFTFARBEN) farben.append(el('button', { class: 'heft-farbpunkt', style: 'background:' + f, title: f, onclick: () => { h.farbe = f; frei.value = f; aktualisiere(); } }));
-  for (const [id, name] of HEFT_MUSTER) muster.append(el('button', { class: (h.muster || 'schlicht') === id ? 'an' : '', onclick: (e) => {
-    h.muster = id; $$('button', muster).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); aktualisiere();
-  } }, name));
-  frei.addEventListener('input', () => { h.farbe = frei.value; aktualisiere(); });
-  zweit.addEventListener('input', () => { h.farbe2 = zweit.value; aktualisiere(); });
-  band.addEventListener('input', () => { h.band = band.value; aktualisiere(); });
-  const papier = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
-  for (const [id, name] of [['liniert', 'Liniert'], ['breit', 'Breite Linien'], ['kariert', 'Kariert'], ['punkte', 'Punktraster'], ['blank', 'Blanko'], ['cornell', 'Cornell'], ['storyboard', 'Storyboard'], ['dialog', 'Dialogblatt']]) papier.append(el('button', {
-    class: (h.papier || 'liniert') === id ? 'an' : '', onclick: (e) => { h.papier = id; $$('button', papier).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); }
-  }, name));
-  /* Papierfarbe und Randlinie: wie das Heft innen aussieht */
-  const papierfarbe = el('div', { class: 'wahlgruppe papierfarben', style: 'flex-wrap:wrap' });
-  for (const [id, name] of PAPIERFARBEN) papierfarbe.append(el('button', {
-    class: 'papierfarbe-' + id + ((h.papierfarbe || 'hell') === id ? ' an' : ''), title: name,
-    onclick: (e) => { h.papierfarbe = id; $$('button', papierfarbe).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); }
-  }, name));
-  const rand = el('button', { class: 'schalter' + (h.rand ? ' an' : ''), onclick: (e) => { h.rand = !h.rand; e.currentTarget.classList.toggle('an', h.rand); } }, el('i'));
-  let behalten = false;
-  const kasten = el('div', { class: 'modal heft-atelier' }, el('h2', {}, 'Heft gestalten'), vorschau,
-    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Grundfarbe'), farben,
-      el('div', { class: 'heft-freifarben' }, el('label', {}, 'Grundton ', frei), el('label', {}, 'Zweitton ', zweit), el('label', {}, 'Band ', band))),
-    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Muster'), muster),
-    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Papier'), papier),
-    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Papierfarbe'), papierfarbe),
-    el('div', { class: 'einstellgruppe einstellzeile' }, el('span', { class: 'ename' }, 'Randlinie', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Eine Linie am linken Rand wie im Schulheft — Platz für Notizen.')), rand),
-    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
-      el('button', { class: 'knopf voll', onclick: () => { behalten = true; speichere(h); zu(); if (danach) danach(); } }, 'So bleibt es')));
-  const alt = { farbe: h.farbe, farbe2: h.farbe2, band: h.band, muster: h.muster, papier: h.papier, papierfarbe: h.papierfarbe, rand: h.rand };
-  const zu = zeigeDeck(kasten, () => { if (!behalten) { Object.assign(h, alt); if (danach) danach(); } });
-  aktualisiere();
-}
+/* Umschlag gestalten und die Übersicht wohnen in 43e-deckel.js. */
+async function heftGestalten(h, danach) { return heftAtelier(h, danach); }
 
-RENDER.hefte = function (haupt) {
-  haupt.append(raumkopf('Hefte', null,
-    el('button', {
-      class: 'rundknopf voll', html: ik('plus'), title: 'Neues Heft', onclick: async () => {
-        const name = await eingabe({ titel: 'Ein neues Heft', platzhalter: 'Wie soll es heißen?' });
-        if (!name) return;
-        const h = neuDoc('heft', { titel: name, farbe: zufall(HEFTFARBEN), farbe2: zufall(HEFTFARBEN), band: '#d6bd92', muster: 'leinen', papier: 'liniert', ansicht: 'seiten' });
-        location.hash = '#/heft/' + h.id;
-      }
-    })
-  ));
-  const inhalt = el('div', { class: 'inhalt' });
-
-  const alle = vomTyp('heft').sort((a, b) => b.geaendert - a.geaendert);
-  const aktive = alle.filter((h) => !h.archiv);
-  const imRegal = alle.filter((h) => h.archiv);
-
-  if (!alle.length) {
-    inhalt.append(el('div', { class: 'leer' }, 'Ein leeres Regal.',
-      el('div', { class: 'klein' }, 'Das erste Heft ist das beste Versprechen, das es gibt.')));
-  }
-
-  const baueDeckel = (h) => {
-    const seiten = kinder(h.id, 'seite').length;
-    const stil = heftDeckelDaten(h);
-    const deckel = el('button', {
-      class: 'heftdeckel muster-' + stil.muster + (h.archiv ? ' archiv' : ''),
-      style: stil.style,
-      onclick: () => { location.hash = '#/heft/' + h.id; }
-    },
-      h.archiv ? el('div', { class: 'hdatum' }, 'INS REGAL · ' + fmtDatum(h.archiv)) : null,
-      el('div', { class: 'htitel' }, h.titel),
-      el('div', { class: 'hseiten' }, seiten === 1 ? '1 Seite' : seiten + ' Seiten')
-    );
-    langdruck(deckel, () => heftMenue(h, () => zeichne()));
-    return deckel;
-  };
-
-  if (aktive.length) {
-    const regal = el('div', { class: 'regal' });
-    aktive.forEach((h) => regal.append(baueDeckel(h)));
-    inhalt.append(regal);
-  }
-  if (imRegal.length) {
-    inhalt.append(el('div', { class: 'regal-trenner' }, 'IM REGAL'));
-    const regal = el('div', { class: 'regal' });
-    imRegal.forEach((h) => regal.append(baueDeckel(h)));
-    inhalt.append(regal);
-  }
-  haupt.append(inhalt);
-};
+RENDER.hefte = function (haupt) { return renderHefteRegal(haupt); };
 
 /* ----- Text von außen hereinholen -----
    Auf einem verwalteten iPad lässt sich oft keine Datei auswählen. Kopieren und
@@ -195,9 +105,11 @@ async function heftMenue(h, danach) {
   } else if (wahl === 'dazu') {
     await hinzufuegenMenue(h);
   } else if (wahl === 'archiv') {
+    if (typeof merkeHeftLagen === 'function') merkeHeftLagen();
     h.archiv = Date.now(); speichereStill(h);
     toast('Feierlich ins Regal gestellt.');
   } else if (wahl === 'zurueck') {
+    if (typeof merkeHeftLagen === 'function') merkeHeftLagen();
     delete h.archiv; speichereStill(h);
   } else if (wahl === 'weg') {
     const seiten = kinder(h.id, 'seite').length;
@@ -252,6 +164,7 @@ RENDER.heft = function (haupt, heftId) {
 
   haupt.append(el('div', { class: 'kopf' },
     zurueckknopf('#/hefte'),
+    el('button', { class: 'heft-minideckel', title: 'Umschlag gestalten', onclick: () => heftGestalten(heft, () => zeichne()) }, baueDeckelElement(heft, { seitenzahl: seiten.length })),
     el('h1', {}, heft.titel),
     el('div', { class: 'heft-ansichtswahl', role: 'group', 'aria-label': 'Heftansicht' },
       el('button', { class: (heft.ansicht || 'seiten') === 'seiten' ? 'an' : '', title: 'Einzelne Seiten', onclick: () => { heft.ansicht = 'seiten'; speichere(heft); zeichne(); } }, 'Seiten'),
