@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
@@ -452,6 +452,15 @@ test('Sticker-Vertrag: Sticker sind Anlagen wie Zettel und Fotos — und reisen 
   assert.match(lies('src/49b-ankommen.js'), /if \(d\.bild\) ids\.add\(d\.bild\)/);
   assert.match(lies('src/30-core.js'), /\['zettel', 'foto', 'blase', 'sticker'\]\.includes\(d\.typ\)/, 'Sticker brauchen immer eine Position');
   for (const datei of ['werkzeug/build-web.mjs', 'build.sh', 'test/sandkasten.mjs']) assert.match(lies(datei), /43b-sticker\.js/, datei);
+  /* Mitgebrachte Sticker liegen neben der App — und müssen in die Desktop-App
+     und in den Rettungsraum mitreisen (derselbe Fehler wie einst bei klang/). */
+  assert.ok(JSON.parse(lies('package.json')).build.files.includes('sticker/**'), 'sticker/** fehlt in build.files');
+  assert.match(lies('hosting/scripts/copy-vani.mjs'), /'sticker'/);
+  for (const m of JSON.parse(lies('src/43b-sticker.js').match(/const STICKER_MITGEBRACHT = (\[[\s\S]*?\]);/)[1]
+    .replace(/(\w+):/g, '"$1":').replace(/'/g, '"').replace(/724 \/ 2172/g, '0.3333'))) {
+    assert.ok(existsSync(join(wurzel, m.datei)), 'mitgebrachter Sticker fehlt: ' + m.datei);
+    assert.ok(statSync(join(wurzel, m.datei)).size < 400 * 1024, m.datei + ' ist zu schwer');
+  }
   assert.match(lies('src/52-anleitung.js'), /t: 'Sticker'/);
   assert.match(lies('src/52-anleitung.js'), /t: 'Die Stickerkiste'/);
 });

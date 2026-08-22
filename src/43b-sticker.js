@@ -138,46 +138,69 @@ function stickerKiste() {
   return vomTyp(STICKER_VORLAGE).sort((a, b) => (b.zuletzt || b.angelegt || 0) - (a.zuletzt || a.angelegt || 0));
 }
 
-/* Einen Sticker aufkleben: neu zeichnen oder aus der Kiste nehmen. */
+/* Mitgebrachte Sticker: liegen als Bilddateien neben der App und werden beim
+   ersten Aufkleben in den Medienvorrat geholt — mit fester Kennung, damit
+   Sicherung und Sync sie wie jedes andere Bild mitnehmen. */
+const STICKER_MITGEBRACHT = [
+  { id: 'schmu', name: 'Schmu!', datei: 'sticker/schmu.png', verhaeltnis: 724 / 2172 }
+];
+async function stickerMitgebrachtBild(m) {
+  const id = 'sticker:' + m.id;
+  if (await dbGet('media', id)) return id;
+  const antwort = await fetch(m.datei, { cache: 'force-cache' });
+  if (!antwort.ok) throw new Error('Sticker nicht erreichbar');
+  const blob = await antwort.blob();
+  await dbPut('media', blob, id);
+  if (typeof syncMediaGeaendert === 'function') syncMediaGeaendert(id);
+  loeseMedienURL(id);
+  return id;
+}
+
+/* Einen Sticker aufkleben: aus der Kiste, aus dem Mitgebrachten, oder neu zeichnen. */
 async function stickerAufkleben(seite) {
   const kiste = stickerKiste();
-  let wahl = 'neu';
-  if (kiste.length) {
-    wahl = await new Promise((res) => {
-      let fertig = false;
-      const raster = el('div', { class: 'stickerkiste' });
-      for (const v of kiste) {
-        const img = el('img', { alt: '' });
-        setzeBild(img, v.bild);
-        const k = el('button', { class: 'stickerkiste-feld', title: 'Aufkleben', onclick: () => { fertig = true; zu(); res(v); } }, img);
-        langdruck(k, async () => {
-          if (await frage('Diesen Sticker aus der Kiste nehmen? Schon aufgeklebte bleiben, wo sie sind.', { ja: 'Aus der Kiste nehmen', gefahr: true })) {
-            await loesche(v.id, true); k.remove();
-            if (!raster.children.length) { fertig = true; zu(); res('neu'); }
-          }
-        });
-        raster.append(k);
-      }
-      const kasten = el('div', { class: 'modal stickerwahl' },
-        el('h2', {}, 'Stickerkiste'),
-        el('div', { class: 'stickerblock-hinweis' }, 'Antippen klebt ihn auf. Lange drücken nimmt ihn aus der Kiste.'),
-        raster,
-        el('div', { class: 'reihe' },
-          el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
-          el('button', { class: 'knopf voll', onclick: () => { fertig = true; zu(); res('neu'); } }, el('span', { html: ik('stift'), style: 'display:flex' }), 'Neuen zeichnen')));
-      const zu = zeigeDeck(kasten, () => { if (!fertig) { fertig = true; res(null); } });
-    });
-  }
+  const wahl = await new Promise((res) => {
+    let fertig = false;
+    const feld = (img, titel, beiWahl) => el('button', { class: 'stickerkiste-feld', title: titel, onclick: () => { fertig = true; zu(); res(beiWahl()); } }, img);
+    const eigene = el('div', { class: 'stickerkiste' });
+    for (const v of kiste) {
+      const img = el('img', { alt: '' });
+      setzeBild(img, v.bild);
+      const k = feld(img, 'Aufkleben', () => ({ art: 'kiste', v }));
+      langdruck(k, async () => {
+        if (await frage('Diesen Sticker aus der Kiste nehmen? Schon aufgeklebte bleiben, wo sie sind.', { ja: 'Aus der Kiste nehmen', gefahr: true })) {
+          await loesche(v.id, true); k.remove();
+        }
+      });
+      eigene.append(k);
+    }
+    const mitgebracht = el('div', { class: 'stickerkiste' },
+      STICKER_MITGEBRACHT.map((m) => feld(el('img', { alt: m.name, src: m.datei }), m.name, () => ({ art: 'mitgebracht', m }))));
+    const kasten = el('div', { class: 'modal stickerwahl' },
+      el('h2', {}, 'Stickerkiste'),
+      el('div', { class: 'stickerblock-hinweis' }, 'Antippen klebt ihn auf. Lange drücken nimmt einen eigenen aus der Kiste.'),
+      kiste.length ? el('div', { class: 'kartenkopf' }, 'MEINE') : null,
+      kiste.length ? eigene : null,
+      el('div', { class: 'kartenkopf', style: kiste.length ? 'margin-top:12px' : '' }, 'MITGEBRACHT'),
+      mitgebracht,
+      el('div', { class: 'reihe' },
+        el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
+        el('button', { class: 'knopf voll', onclick: () => { fertig = true; zu(); res({ art: 'neu' }); } }, el('span', { html: ik('stift'), style: 'display:flex' }), 'Neuen zeichnen')));
+    const zu = zeigeDeck(kasten, () => { if (!fertig) { fertig = true; res(null); } });
+  });
   if (!wahl) return null;
   let bild, verhaeltnis;
-  if (wahl === 'neu') {
+  if (wahl.art === 'neu') {
     const neu = await stickerZeichnen({});
     if (!neu) return null;
     bild = neu.bild; verhaeltnis = neu.seitenverhaeltnis;
     if (neu.inKiste) neuDoc(STICKER_VORLAGE, { bild, verhaeltnis, zuletzt: Date.now() });
+  } else if (wahl.art === 'mitgebracht') {
+    try { bild = await stickerMitgebrachtBild(wahl.m); } catch (e) { toast('Der Sticker ließ sich gerade nicht laden.'); return null; }
+    verhaeltnis = wahl.m.verhaeltnis;
   } else {
-    bild = wahl.bild; verhaeltnis = wahl.verhaeltnis || .5;
-    wahl.zuletzt = Date.now(); speichereStill(wahl);
+    bild = wahl.v.bild; verhaeltnis = wahl.v.verhaeltnis || .5;
+    wahl.v.zuletzt = Date.now(); speichereStill(wahl.v);
   }
   /* Breite so, dass ein Wort lesbar bleibt; lange schmale Sticker etwas breiter. */
   const w = begrenze(22 + (verhaeltnis < .35 ? 10 : 0), 10, 60, 24);

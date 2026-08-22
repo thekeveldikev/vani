@@ -1166,6 +1166,16 @@ Mitte, < 2,5° rastet gerade), die Ziehgrenzen reichen über den Rand (x −30�
 y −14…106), `.papierseite { overflow: visible }`. Seite verdoppeln nimmt
 Sticker mit. Neues Icon `IK.sticker`.
 
+**Mitgebrachte Sticker** (`STICKER_MITGEBRACHT`): Bilddateien unter `sticker/`
+(erste: `schmu.png`, das rote „SCHMU!" der Nutzerin als transparentes PNG,
+von 2172 px auf 1000 px verkleinert, 269 KB). Beim ersten Aufkleben holt
+`stickerMitgebrachtBild` die Datei in `media` mit fester Kennung
+`sticker:<id>` — so reist sie über Sicherung und Sync wie jedes Bild. Der
+Ordner steht in `package.json → build.files` und wird von `copy-vani.mjs`
+in den Rettungsraum kopiert; der Sticker-Vertrag prüft beides plus Existenz
+und Größe jeder Datei (derselbe Fehler wie einst bei `klang/` soll nicht
+wieder passieren).
+
 ### Tests
 
 119 grün. Neu: `test/ankommen.mjs` (6), `test/goodnotes.mjs` (3), Verträge
