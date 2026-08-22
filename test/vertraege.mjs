@@ -663,6 +663,24 @@ test('Malerei-Vertrag: Regen ohne Kachel, Schnur mit Feder, Leuchter brennt ab, 
   assert.match(d, /function schnurSchritt/);
   assert.match(d, /function baueLampe/);
   assert.match(d, /if \(maxZug >= SCHWELLE\) \{ umschalten\(\);/, 'Zug über die Schwelle schaltet');
+  /* Die Schnur ist frei (2D): Pfad im SVG, Knauf folgt in x und y, Feder in beiden Richtungen. */
+  assert.match(d, /document\.createElementNS\(NS, 'path'\)/);
+  assert.match(d, /z\.x = dx; z\.y = dy - RUHE;/);
+  assert.match(d, /if \(typeof z\.y === 'number'\) \{/, 'schnurSchritt kennt zwei Richtungen');
+  /* Bücherbord statt Stapel — jedes Buch greifbar */
+  assert.match(d, /class: 'bord-buch'/);
+  assert.doesNotMatch(d, /class: 'stapel-buch'/);
+  /* Cover per ISBN */
+  const lz2 = lies('src/55-lesestapel.js');
+  for (const f of ['function isbnZu10', 'function isbnAusText', 'function isbnAusPdf', 'function coverVonIsbn', 'function buchCoverAusDemNetz', 'function schoeneCoverHolen']) assert.ok(lz2.includes(f), f);
+  assert.match(lz2, /blob\.size > 5000/, 'ein Platzhalter-Bildchen zählt nicht als Cover');
+  assert.match(lies('buecher/koffer.json'), /"isbn": "3791504673"/);
+  /* Malerei: Licht schmilzt ein, Staub, Motte, Parallaxe */
+  const m2 = lies('src/54b-schreibtisch-malerei.js');
+  assert.match(m2, /lampeJetzt \+= \(ziel - lampeJetzt\)/);
+  assert.match(m2, /const staub = Array\.from/);
+  assert.match(m2, /motte = \{ t: 0/);
+  assert.match(m2, /opt\.parallax\.x/);
   assert.match(d, /function leuchterStand/);
   assert.match(d, /function schreibtischWachsVerbrennen/);
   assert.match(lies('src/45-schreibraum.js'), /schreibtischWachsVerbrennen\(sp\.minuten\)/, 'jede Kerze im Schreibraum nimmt dem Leuchter Wachs');

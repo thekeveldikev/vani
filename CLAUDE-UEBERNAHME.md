@@ -1442,3 +1442,47 @@ Tests 149/149. Browser: Szene gemalt (Himmel/Holz-Pixel), alle Dinge, Schnur
 zieht 124 px und federt auf 54 zurück, schaltet ab Schwelle, kleiner Zug nicht;
 Koffer: 6 Bücher, Entschlüsseln 1,6 MB in 266 ms, falsches Passwort abgewiesen,
 Buch aufgelegt; Randnotiz-Punkt, Statistik „2 Seiten heute", Weiterlesen-Karte.
+
+## 24. Lampe frei, Bücherbord, echte Cover (23. August 2026, VANI 5.17.0)
+
+Anlass: Foto vom iPad — nur zwei Bücher sichtbar, Brief/Papierkorb kollidierten,
+Cover „doof", Lampe nur senkrecht ziehbar, Szene insgesamt zu matt.
+
+### Lampe
+`baueLampe` (54): Schnur als SVG-Pfad (`.schnur-svg`/`.schnur-pfad`/`.schnur-schatten`)
+vom Aufhängepunkt P (128,140) zum Knauf; der Knauf folgt dem Finger **frei in 2D**
+(bis MAX 130 px, darüber gibt die Schnur nur noch 12 % nach, nicht über die
+Aufhängung hinaus), `schnurSchritt` ist jetzt 1D- oder 2D-Feder (k 70, d 7; quer
+0,9·k). Schaltschwelle 44 px Zug, Umschalten → `.schaltet` (Schirm zuckt),
+`maler.setze({lampeAn})`. CSS komplett neu: Messingfuß+Arm, Bernsteinschirm mit
+Birnensaum, weicher Lichtkegel (`.schirm::after`: breite Box, clip-path-Kegel,
+Seiten per Gradient, unten per mask ausgeblendet, `mix-blend-mode: screen`),
+Wandschein (`.lampe::before`), größere Grifffläche am Knauf (`::before`).
+Malerei: Licht schmilzt ein (`lampeJetzt`), Lichtteich unter dem Schirm,
+Staubkörner im Kegel, Motte im Sommer bei Nacht, Parallax (`para`).
+
+### Bücherbord statt Stapel
+`.desk-ding-halter.buecher` links unter der Lampe; `.bord-buch` je Buch als
+eigener Knopf (Cover, Leseband = Fortschritt, Rücken/Glanz via ::before/::after);
+`--ueberlapp` wird aus der Bordbreite und der Zahl gerechnet, damit die Reihe
+nie über die Manuskripte läuft (8 Bücher breit, 6 unter 1000 px, 5 schmal;
+Rest „+N · Lesestapel"). Layout neu geordnet (Manuskripte Mitte, Tinte rechts
+davon, Glas links vorn, Brief Mitte-links weg vom Papierkorb), Vignette
+(`.desk-szene::after`) und Tischkante (`::before`), schmale Geräte mit
+Prozent-Höhen für Tasse/Karten/Lupe/Notizbuch.
+
+### Echte Cover
+`isbnZu10`, `isbnAusText`, `isbnAusPdf` (Impressum der ersten 12 Seiten),
+`coverVonIsbn` (Amazon-Bildhost per ISBN-10, CORS *, Platzhalter < 5 kB
+verworfen; dann Open Library ISBN-13), `buchCoverSetzen`, `buchCoverAusDemNetz`,
+`schoeneCoverHolen` (alle ohne `coverNetz`). `koffer.json` trägt jetzt `isbn`,
+`name`, `autor` je Buch; `buecherkofferHolen` gibt `titelFest` (Koffer-Name
+schlägt PDF-Metadaten), dedupliziert nach ISBN **oder** Titel und repariert
+vorhandene Bücher (Titel/Autor aus dem Koffer). `saubererAutor` macht aus
+Katalogzeilen („Fowler, Aisling Verfasser", eckige Klammern, Doppelnamen) einen
+Namen. Sanitizer: `isbn`, `coverNetz`.
+
+Tests 151/151 (neu: isbn-Helfer, saubererAutor). Browser: Schnur schräg gezogen
+→ schaltet, federt zurück; Koffer holt 6 Bücher (Namen aus dem Koffer), alle
+Cover aus dem Netz; Bord zeigt alle; 1100×900, 1024×768, 768×1024, 740×1000 geprüft.
+Koffer bleibt auf Wunsch vorerst im Repo; das Passwort steht weiter nirgends.

@@ -51,10 +51,19 @@ function briefIstOffen(brief, jetzt = Date.now()) {
   return (Number(brief.oeffnen) || 0) <= jetzt;
 }
 
-/* Die Zugschnur: Feder mit Dämpfung. Pur, je Schritt. */
+/* Die Zugschnur: Feder mit Dämpfung — in einer Richtung (x) oder in zweien
+   (x, y als Auslenkung von der Ruhelage). Pur, je Schritt. */
 function schnurSchritt(zustand, dt) {
   const z = zustand;
   const k = 70, d = 7;       /* Federhärte, Dämpfung */
+  if (typeof z.y === 'number') {
+    /* 2D: die Ruhelage hängt senkrecht; quer wirkt die Feder etwas weicher */
+    const ax = -k * .9 * z.x - d * (z.vx || 0), ay = -k * z.y - d * (z.vy || 0);
+    z.vx = (z.vx || 0) + ax * dt; z.vy = (z.vy || 0) + ay * dt;
+    z.x += z.vx * dt; z.y += z.vy * dt;
+    if (Math.hypot(z.x, z.y) < .3 && Math.hypot(z.vx, z.vy) < 3) { z.x = 0; z.y = 0; z.vx = 0; z.vy = 0; }
+    return z;
+  }
   const a = -k * z.x - d * z.v;
   z.v += a * dt; z.x += z.v * dt;
   if (Math.abs(z.x) < .3 && Math.abs(z.v) < 3) { z.x = 0; z.v = 0; }
@@ -324,49 +333,75 @@ function baueLampe(szene, e, maler) {
   const halter = el('div', { class: 'desk-ding lampe' + (e.lampeAn ? '' : ' aus'), title: 'Die Lampe: an der Schnur ziehen' });
   const schirm = el('div', { class: 'schirm' });
   const arm = el('i', { class: 'arm' });
-  const schnur = el('div', { class: 'schnur' }, el('i', { class: 'faden' }), el('b', { class: 'knauf' }));
-  halter.append(arm, schirm, schnur);
-  const RUHE = 54, MAX = 150, SCHWELLE = 46;
-  const zustand = { x: 0, v: 0 };   /* Auslenkung über Ruhe */
+  /* Die Schnur ist ein Pfad: vom Schirm zum Knauf, mit leichtem Bauch, und sie
+     folgt dem Finger frei — nach unten, zur Seite, schräg. */
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'schnur-svg'); svg.setAttribute('viewBox', '0 0 240 320');
+  const pfad = document.createElementNS(NS, 'path'); pfad.setAttribute('class', 'schnur-pfad'); svg.append(pfad);
+  const schatten = document.createElementNS(NS, 'path'); schatten.setAttribute('class', 'schnur-schatten'); svg.insertBefore(schatten, pfad);
+  const knauf = el('b', { class: 'knauf', title: 'Ziehen: Licht an oder aus' });
+  halter.append(arm, schirm, svg, knauf);
+  /* Aufhängung und Ruhelage in Lampen-Koordinaten (px) */
+  const P = { x: 128, y: 140 }, RUHE = 58, MAX = 130, SCHWELLE = 44;
+  const z = { x: 0, y: 0, vx: 0, vy: 0 };   /* Auslenkung des Knaufs von der Ruhelage */
   let zieht = null, raf = 0, letzte = 0, maxZug = 0;
-  const male = () => { schnur.style.height = (RUHE + zustand.x) + 'px'; schnur.style.setProperty('--dehnung', (1 + zustand.x / 260).toFixed(3)); };
+  const knaufPos = () => ({ x: P.x + z.x, y: P.y + RUHE + z.y });
+  const male = () => {
+    const k = knaufPos();
+    const dx = k.x - P.x, dy = k.y - P.y, l = Math.hypot(dx, dy) || 1;
+    /* Bauch der Schnur: quer zur Zugrichtung, von der Geschwindigkeit gebogen */
+    const bauch = Math.max(-26, Math.min(26, -(z.vx || 0) * .04 + (zieht ? 0 : Math.sin(performance.now() / 700) * .6)));
+    const mx = (P.x + k.x) / 2 - dy / l * bauch, my = (P.y + k.y) / 2 + dx / l * bauch;
+    const d = 'M' + P.x + ' ' + P.y + ' Q' + mx.toFixed(1) + ' ' + my.toFixed(1) + ' ' + k.x.toFixed(1) + ' ' + k.y.toFixed(1);
+    pfad.setAttribute('d', d); schatten.setAttribute('d', d);
+    const winkel = Math.atan2(dx, dy) * -180 / Math.PI;
+    knauf.style.transform = 'translate(' + (k.x - 8).toFixed(1) + 'px,' + (k.y - 2).toFixed(1) + 'px) rotate(' + winkel.toFixed(1) + 'deg)';
+    /* gedehnt: je länger, desto dünner */
+    pfad.style.strokeWidth = (2.4 - Math.min(1, (l - RUHE) / 160)).toFixed(2);
+  };
   const feder = (jetzt) => {
     const dt = Math.min(.04, (jetzt - letzte) / 1000 || .016); letzte = jetzt;
-    schnurSchritt(zustand, dt); male();
-    if (zustand.x !== 0 || zustand.v !== 0) raf = requestAnimationFrame(feder); else raf = 0;
+    schnurSchritt(z, dt); male();
+    if (z.x !== 0 || z.y !== 0 || z.vx !== 0 || z.vy !== 0) raf = requestAnimationFrame(feder); else raf = 0;
   };
   const umschalten = () => {
     e.lampeAn = !e.lampeAn;
     D.einst.schreibtisch = { ...e }; speichereEinst();
     halter.classList.toggle('aus', !e.lampeAn);
     szene.classList.toggle('lampe-aus', !e.lampeAn);
+    halter.classList.add('schaltet'); setTimeout(() => halter.classList.remove('schaltet'), 500);
     if (maler) maler.setze({ lampeAn: e.lampeAn });
     schreibtischKlick('klick');
   };
-  const knauf = schnur.querySelector('.knauf');
   knauf.addEventListener('pointerdown', (ev) => {
     ev.stopPropagation(); ev.preventDefault();
     cancelAnimationFrame(raf); raf = 0;
-    zieht = { y0: ev.clientY, x0: zustand.x }; maxZug = 0; zustand.v = 0;
+    const r = halter.getBoundingClientRect();
+    zieht = { ox: ev.clientX - (r.left + knaufPos().x), oy: ev.clientY - (r.top + knaufPos().y), r }; maxZug = 0;
+    z.vx = 0; z.vy = 0;
     try { knauf.setPointerCapture(ev.pointerId); } catch (x) {}
     halter.classList.add('zieht');
   });
   knauf.addEventListener('pointermove', (ev) => {
     if (!zieht) return;
-    const roh = zieht.x0 + (ev.clientY - zieht.y0);
-    /* Die Schnur gibt nach, aber nicht unendlich — oben bleibt sie straff. */
-    zustand.x = roh < 0 ? roh * .15 : roh > MAX - RUHE ? (MAX - RUHE) + (roh - (MAX - RUHE)) * .12 : roh;
-    maxZug = Math.max(maxZug, zustand.x);
+    /* Wunschposition des Knaufs, dann an der Schnur gehalten: maximal MAX lang,
+       darüber gibt sie nur noch ein wenig nach */
+    let wx = ev.clientX - zieht.ox - zieht.r.left, wy = ev.clientY - zieht.oy - zieht.r.top;
+    let dx = wx - P.x, dy = wy - P.y;
+    if (dy < 6) { dy = 6 + (dy - 6) * .08; }       /* nicht über die Aufhängung hinaus */
+    const l = Math.hypot(dx, dy);
+    if (l > MAX) { const ueber = l - MAX; const f = (MAX + ueber * .12) / l; dx *= f; dy *= f; }
+    z.x = dx; z.y = dy - RUHE;
+    maxZug = Math.max(maxZug, Math.hypot(dx, dy) - RUHE);
     male();
   });
   const loslassen = () => {
     if (!zieht) return;
     zieht = null; halter.classList.remove('zieht');
-    if (maxZug >= SCHWELLE) { umschalten(); zustand.v = -260; } else zustand.v = -60;
+    if (maxZug >= SCHWELLE) { umschalten(); z.vy = -240; } else { z.vy = -50; }
     letzte = performance.now(); raf = requestAnimationFrame(feder);
   };
   knauf.addEventListener('pointerup', loslassen); knauf.addEventListener('pointercancel', loslassen);
-  /* Der Schirm selbst: Helligkeit in Stufen */
   schirm.addEventListener('click', () => {
     if (!e.lampeAn) { umschalten(); return; }
     const stufen = [.45, .65, .8, 1];
@@ -378,6 +413,9 @@ function baueLampe(szene, e, maler) {
     toast(e.lampe >= 1 ? 'Hell.' : e.lampe >= .8 ? 'Warm.' : e.lampe >= .65 ? 'Gedämpft.' : 'Nur ein Schimmer.');
   });
   male();
+  /* Ein Hauch Bewegung, auch in Ruhe */
+  const atmen = () => { if (!halter.isConnected) return; if (!zieht && !raf) male(); setTimeout(() => requestAnimationFrame(atmen), 140); };
+  requestAnimationFrame(atmen);
   return halter;
 }
 
@@ -463,20 +501,30 @@ RENDER.schreibtisch = function (haupt) {
   /* Tintenfass & Feder */
   dinge.append(ding('tinte', 'Tintenfass und Feder: ein neues Blatt', el('div', { class: 'tinte-bild' }, el('i', { class: 'fass' }), el('i', { class: 'fass-glanz' }), el('i', { class: 'feder f1' }), el('i', { class: 'feder f2' })), () => schreibtischNeuesBlatt()));
 
-  /* Bücherstapel (Lesestapel) */
+  /* Das Bücherbord: die Bücher stehen in einer Reihe, leicht gelehnt, jedes
+     für sich greifbar — kein Stapel, in dem nur das oberste zu sehen ist. */
   const buecher = typeof lesestapelBuecher === 'function' ? lesestapelBuecher() : [];
-  const stapel = el('div', { class: 'buecher-stapel' });
-  buecher.slice(0, 6).forEach((b, i) => {
+  const bord = el('div', { class: 'buecher-bord' });
+  const schmal = window.innerWidth < 760;
+  const zeigbar = Math.min(buecher.length, schmal ? 5 : window.innerWidth < 1000 ? 6 : 8);
+  /* Die Reihe bleibt in ihrer Breite: je mehr Bücher, desto enger stehen sie */
+  const bordBreite = schmal ? window.innerWidth * .40 : Math.min(320, (window.innerWidth - 86) * .33);
+  const buchBreite = schmal ? 52 : 64;
+  const schritt = zeigbar > 1 ? Math.max(22, Math.min(buchBreite - 12, (bordBreite - buchBreite - 12) / (zeigbar - 1))) : buchBreite - 14;
+  bord.style.setProperty('--ueberlapp', (schritt - buchBreite).toFixed(1) + 'px');
+  buecher.slice(0, zeigbar).forEach((b, i) => {
     const img = el('img', { alt: b.titel || 'Buch', draggable: 'false' });
     if (b.bild) setzeBild(img, b.bild);
-    stapel.append(el('button', { class: 'stapel-buch' + (b.bild ? '' : ' ohne-cover'), title: (b.titel || 'Buch') + (b.seiten ? ' · Seite ' + (b.seite || 1) + ' von ' + b.seiten : ''), style: '--i:' + i + ';--dreh:' + ((i * 11) % 7 - 3) + 'deg', onclick: () => buchOeffnen(b) }, img, b.bild ? null : el('span', {}, b.titel || 'Buch')));
+    const fortschritt = buchFortschritt(b.seite, b.seiten);
+    bord.append(el('button', { class: 'bord-buch' + (b.bild ? '' : ' ohne-cover'), title: (b.titel || 'Buch') + (b.seiten ? ' · Seite ' + (b.seite || 1) + ' von ' + b.seiten : ''), style: '--i:' + i + ';--lehn:' + ((i * 7) % 5 - 2) + 'deg', onclick: () => buchOeffnen(b) },
+      img, b.bild ? null : el('span', {}, b.titel || 'Buch'), fortschritt > 0 ? el('i', { class: 'leseband', style: 'height:' + Math.max(8, 100 - fortschritt) + '%' }) : null));
   });
-  stapel.append(el('button', { class: 'stapel-fuss', title: 'Der Lesestapel: Bücher auflegen, ordnen', onclick: () => lesestapelZeigen() }, buecher.length ? (buecher.length > 6 ? '+' + (buecher.length - 6) + ' · ' : '') + 'Lesestapel' : 'Bücher auflegen'));
-  dinge.append(el('div', { class: 'desk-ding-halter buecher' }, stapel));
+  bord.append(el('button', { class: 'bord-fuss', title: 'Der Lesestapel: Bücher auflegen, ordnen', onclick: () => lesestapelZeigen() }, buecher.length ? (buecher.length > zeigbar ? '+' + (buecher.length - zeigbar) + ' · ' : '') + 'Lesestapel' : 'Bücher auflegen'));
+  dinge.append(el('div', { class: 'desk-ding-halter buecher' }, bord, el('i', { class: 'bordbrett' })));
 
   /* Tasse: der Schreibtag */
   const tag = schreibtischTag();
-  dinge.append(ding('tasse' + (tag.heute > 0 ? ' dampft' : ''), 'Die Tasse: ' + (tag.heute ? tag.heute + ' Wörter heute' : 'heute noch nichts') + (tag.serie > 1 ? ' · ' + tag.serie + ' Tage in Folge' : ''), el('div', { class: 'tasse-bild' }, el('i', { class: 'dampf d1' }), el('i', { class: 'dampf d2' }), el('i', { class: 'dampf d3' }), el('i', { class: 'henkel' }), el('span', { class: 'tasse-zahl' }, tag.heute ? String(tag.heute) : '')), () => {
+  dinge.append(ding('tasse' + (tag.heute > 0 ? ' dampft' : ''), 'Die Tasse: ' + (tag.heute ? tag.heute + ' Wörter heute' : 'heute noch nichts') + (tag.serie > 1 ? ' · ' + tag.serie + ' Tage in Folge' : ''), el('div', { class: 'tasse-bild' }, el('i', { class: 'dampf d1' }), el('i', { class: 'dampf d2' }), el('i', { class: 'dampf d3' }), el('i', { class: 'henkel' }), el('span', { class: 'tasse-zahl' }, tag.heute ? (tag.heute >= 10000 ? Math.round(tag.heute / 1000) + 'k' : String(tag.heute)) : '')), () => {
     toast(tag.heute ? tag.heute + ' Wörter heute' + (tag.serie > 1 ? ' — der ' + tag.serie + '. Tag in Folge.' : '.') : 'Heute noch nichts. Die Tasse wartet.', 3600);
   }));
 
@@ -524,6 +572,17 @@ RENDER.schreibtisch = function (haupt) {
   dinge.append(el('button', { class: 'rundknopf zart desk-einrichten', html: ik('feinheiten'), title: 'Schreibtisch einrichten', onclick: () => schreibtischEinrichten(() => zeichne()) }));
 
   haupt.append(szene);
+  /* Auftritt: die Dinge kommen gestaffelt auf den Tisch */
+  $$('.desk-ding, .desk-ding-halter', dinge).forEach((d, i) => { d.style.setProperty('--n', String(i)); d.classList.add('tritt-auf'); });
+  /* Parallaxe: der Blick wandert ein wenig mit dem Zeiger — das Fenster weiter
+     hinten bewegt sich anders als der Tisch. */
+  szene.addEventListener('pointermove', (ev) => {
+    if (ev.pointerType === 'touch') return;
+    const r = szene.getBoundingClientRect();
+    const px = (ev.clientX - r.left) / r.width * 2 - 1, py = (ev.clientY - r.top) / r.height * 2 - 1;
+    maler.setze({ parallax: { x: Math.max(-1, Math.min(1, px)), y: Math.max(-1, Math.min(1, py)) } });
+    dinge.style.setProperty('--px', (px * -4).toFixed(1) + 'px'); dinge.style.setProperty('--py', (py * -2).toFixed(1) + 'px');
+  });
   maler.start();
   /* Aufhören, sobald der Raum weg ist */
   const beobachter = new MutationObserver(() => { if (!szene.isConnected) { maler.stopp(); beobachter.disconnect(); } });

@@ -102,6 +102,34 @@ darüber). Neue Gedanken:
   später (eigener Renderer, kein pdf.js).
 - **Siegelwachs**: Brief an mich mit eigenem Siegelbild (Sticker).
 
+## Die nächste große Welle — Brainstorm (nach 5.17)
+
+**Der Schreibtisch als Ort, der lebt**
+- Tag/Nacht auch im Raum: bei Tag fällt graues Licht durchs Fenster auf die Platte (weicher Streifen), die Lampe ist dann fast aus; Dämmerung färbt die Kante der Dinge.
+- Regen auf der Scheibe mit Brechung (Tropfen, die das Garten-Bild verzerren); Wind, der die Manuskriptecken anhebt; ein Luftzug, wenn die Tür (Leiste) wechselt.
+- Der Tisch altert: Kratzer und Kleckse wachsen mit den geschriebenen Wörtern — tagesstabil gewürfelt aus den Statistiken; nach 100 000 Wörtern ein neuer Ring unter der Tasse.
+- Geräusche als Raum: Klangbild „Schreibtisch bei Nacht" (Uhrticken, Federkratzen beim Tippen, ferner Wind) mit einem Griff aus dem Klangraum.
+- Ein Wetterglas am Fenster, das den Klang anzeigt; eine Katze? nein — aber ein Spinnennetz in der Fensterecke im Herbst.
+- Der Stuhl: ein zweites Profil (Cousine) sitzt „gegenüber" — gemeinsamer Faden, sichtbar als zweite Tasse.
+
+**Schreiben vom Tisch aus**
+- „Blatt einspannen": ein Blatt liegt wirklich auf dem Tisch und wird dort getippt (kleiner Schreibraum in der Szene), die Lampe schaut zu.
+- Die Feder tropft: nach jeder Sitzung ein neuer Tintenfleck an der Stelle, wo der Cursor stand.
+- Der Leuchter als Uhr: jede Kerze eine Woche — sieben Kerzen, sieben Tage, die Flamme der heutigen brennt höher.
+
+**Lesen vom Tisch aus**
+- Ein Buch liegt aufgeschlagen auf dem Tisch (Doppelseite als Vorschau), Blättern direkt dort.
+- Lesen mit Notizen am Rand als Randspalte neben der Seite (nicht nur im Dialog).
+- Vorlesen mit Satz-Hervorhebung in der Textebene; Stimme wählbar.
+- EPUB: eigener Renderer (Paginierung per CSS columns), Schrift/Größe frei.
+- Zitate als Fundstücke auf dem Zuhause; „Lese-Serie" neben der Schreib-Serie.
+
+**Überall**
+- Rückgängig-Verlauf je Text (Stände einfrieren automatisch alle 15 Minuten).
+- Schreibziel-Kalender als Fensterbrett-Kerzen: ein Teelicht je Tag der Woche, brennt, wenn das Ziel erreicht wurde.
+- Tastaturkürzel-Übersicht; Spotlight-Suche mit Vorschau.
+- Handy: der Schreibtisch als Hochformat-Fassung (Fenster schmal, Dinge in zwei Reihen).
+
 ## Nach Raum
 
 ### Hefte

@@ -532,30 +532,66 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .desk-tuer small { color: #c9b48e; font-size: 13px; }
 .desk-szene { position: relative; height: calc(var(--vvh, 100dvh) - 2px); min-height: 620px; overflow: hidden; background: #0d0b0a; color: #e8d9b8; user-select: none; --lampe: .8; --unordnung: .7; }
 .desk-malerei { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* Vignette über allem (klickt nicht) und eine vordere Tischkante */
+.desk-szene::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none; background: radial-gradient(ellipse at 50% 42%, transparent 52%, rgba(0,0,0,.38) 100%); }
+.desk-szene::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 26px; z-index: 1; pointer-events: none; background: linear-gradient(rgba(255,255,255,.05), rgba(0,0,0,0) 35%, rgba(0,0,0,.5)); }
 .desk-dinge { position: absolute; inset: 0; }
 .desk-fensterknopf { position: absolute; right: 30px; top: calc(44% - 58px); width: 38px; height: 38px; border-radius: 50%; background: rgba(20,16,12,.6); color: #e8c27a; display: grid; place-items: center; box-shadow: 0 0 0 1px rgba(232,194,122,.3); z-index: 3; }
 .desk-fensterknopf svg.ik { width: 20px; height: 20px; }
 /* Alle Dinge: Schatten auf die Platte, leichtes Heben beim Darüberfahren */
+.desk-dinge { --px: 0px; --py: 0px; }
 .desk-ding, .desk-ding-halter { position: absolute; z-index: 2; transform: rotate(var(--dreh, 0deg)); transition: transform .25s cubic-bezier(.2,.8,.2,1), filter .25s; filter: drop-shadow(0 7px 9px rgba(0,0,0,.6)); text-align: left; }
+.desk-ding.tritt-auf, .desk-ding-halter.tritt-auf { animation: ding-landet .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--n, 0) * 45ms); }
+@keyframes ding-landet { from { opacity: 0; transform: translateY(10px) rotate(var(--dreh, 0deg)) scale(.96); } to { opacity: 1; transform: translateY(0) rotate(var(--dreh, 0deg)) scale(1); } }
+.desk-ding.lampe.tritt-auf, .desk-ding.leuchter.tritt-auf, .desk-ding.uhr.tritt-auf, .desk-ding.stuhl.tritt-auf { animation-name: ding-kommt; }
+@keyframes ding-kommt { from { opacity: 0; } to { opacity: 1; } }
+/* Beschriftung beim Darüberfahren — nur mit Maus */
+@media (hover: hover) {
+  .desk-ding[title]:hover::after { content: attr(title); position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; padding: 4px 10px; border-radius: 8px; background: rgba(20,16,12,.92); color: #f1e4c8; font-size: 12px; font-family: ui-rounded, -apple-system, system-ui, sans-serif; pointer-events: none; z-index: 30; box-shadow: 0 2px 8px rgba(0,0,0,.5); }
+  .desk-ding.lampe[title]:hover::after, .desk-ding.manuskript[title]:hover::after { display: none; }
+}
+.lampe-aus .desk-malerei { filter: saturate(.85); transition: filter .6s; }
 .desk-ding:hover { transform: rotate(var(--dreh, 0deg)) translateY(-3px); filter: drop-shadow(0 12px 14px rgba(0,0,0,.65)) brightness(1.06); }
 .desk-ding:active { transform: rotate(var(--dreh, 0deg)) scale(.98); }
 .lampe-aus .desk-ding:not(.lampe):not(.leuchter) { filter: drop-shadow(0 7px 9px rgba(0,0,0,.6)) brightness(.62) saturate(.8); }
-/* ---- Die Lampe mit Zugschnur ---- */
-.desk-ding.lampe { left: 4%; top: calc(44% - 140px); width: 150px; height: 260px; filter: none; cursor: default; z-index: 3; }
+/* ---- Die Lampe mit Zugschnur: Messingfuß und -arm, Bernsteinschirm, ein weicher Kegel aus Licht ---- */
+.desk-ding.lampe { left: 1%; top: calc(44% - 150px); width: 240px; height: 320px; filter: none; cursor: default; z-index: 3; }
 .desk-ding.lampe:hover, .desk-ding.lampe:active { transform: none; filter: none; }
-.desk-ding.lampe .arm { position: absolute; left: 18px; top: 128px; width: 7px; height: 120px; border-radius: 4px; background: linear-gradient(90deg, #2a231f, #5a4c42 45%, #1a1512); box-shadow: 1px 0 2px rgba(0,0,0,.5); }
-.desk-ding.lampe .arm::before { content: ""; position: absolute; left: -3px; top: -10px; width: 60px; height: 8px; border-radius: 4px; background: linear-gradient(#3a302a, #1a1512); transform: rotate(-18deg); transform-origin: left center; }
-.desk-ding.lampe .schirm { position: absolute; left: 20px; top: 88px; width: 118px; height: 54px; border-radius: 10px 10px 56% 56% / 10px 10px 36% 36%; cursor: pointer;
-  background: linear-gradient(175deg, #3a2f28, #1c1613 60%, #110d0b); box-shadow: inset 0 -8px 14px rgba(255,196,110,calc(.9 * var(--lampe))), inset 0 2px 0 rgba(255,255,255,.08), 0 3px 8px rgba(0,0,0,.55); }
-.desk-ding.lampe .schirm::before { content: ""; position: absolute; left: 6px; right: 6px; bottom: -2px; height: 10px; border-radius: 50%; background: radial-gradient(ellipse at 50% 50%, rgba(255,215,140,calc(.95 * var(--lampe))), rgba(255,190,100,calc(.4 * var(--lampe))) 60%, transparent 72%); }
-.desk-ding.lampe .schirm::after { content: ""; position: absolute; left: 4px; right: 4px; top: 50px; height: 230px; clip-path: polygon(0 0, 100% 0, 190% 100%, -90% 100%); background: linear-gradient(rgba(255,205,120,calc(.34 * var(--lampe))), rgba(255,190,100,calc(.08 * var(--lampe))) 55%, transparent); pointer-events: none; }
-.desk-ding.lampe.aus .schirm { box-shadow: inset 0 -6px 10px rgba(0,0,0,.5), inset 0 2px 0 rgba(255,255,255,.06), 0 3px 8px rgba(0,0,0,.55); }
-.desk-ding.lampe.aus .schirm::before { background: radial-gradient(ellipse at 50% 50%, #6a5a48, #3a3028 60%, transparent 72%); }
-.desk-ding.lampe.aus .schirm::after { display: none; }
-.desk-ding.lampe .schnur { position: absolute; left: 120px; top: 136px; width: 18px; height: 54px; display: flex; flex-direction: column; align-items: center; }
-.desk-ding.lampe .schnur .faden { flex: 1; width: 2px; background: linear-gradient(#d8cbb2, #a89a82); box-shadow: 0 0 1px rgba(0,0,0,.6); transform: scaleX(var(--dehnung, 1)); }
-.desk-ding.lampe .schnur .knauf { width: 14px; height: 20px; border-radius: 6px 6px 7px 7px / 5px 5px 9px 9px; background: linear-gradient(#e9c98a, #9c7a3a); box-shadow: 0 2px 4px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.4); cursor: grab; touch-action: none; transition: transform .15s; }
-.desk-ding.lampe.zieht .schnur .knauf { cursor: grabbing; transform: scaleX(1.1); }
+/* Der Schein an der Wand hinter dem Schirm */
+.desk-ding.lampe::before { content: ""; position: absolute; left: 18px; top: 16px; width: 220px; height: 160px; border-radius: 50%; pointer-events: none; mix-blend-mode: screen; transition: opacity .5s;
+  background: radial-gradient(ellipse at 50% 62%, rgba(255,196,110,calc(.3 * var(--lampe))), rgba(255,176,86,calc(.09 * var(--lampe))) 48%, transparent 72%); }
+.desk-ding.lampe.aus::before { opacity: 0; }
+/* Fuß und Arm aus Messing: der Fuß steht auf der Platte, der Arm trägt den Schirm nach rechts hinüber */
+.desk-ding.lampe .arm { position: absolute; left: 24px; top: 74px; width: 9px; height: 104px; border-radius: 5px; background: linear-gradient(90deg, #5a4326, #c9a25a 40%, #7a5a2a 72%, #3a2a14); box-shadow: 2px 0 3px rgba(0,0,0,.5); }
+.desk-ding.lampe .arm::before { content: ""; position: absolute; left: 2px; top: 1px; width: 112px; height: 8px; border-radius: 4px; background: linear-gradient(#d9b463, #8a6a2e 60%, #4a3618); transform: rotate(16deg); transform-origin: left center; box-shadow: 0 2px 3px rgba(0,0,0,.5); }
+.desk-ding.lampe .arm::after { content: ""; position: absolute; left: -20px; top: 96px; width: 58px; height: 16px; border-radius: 50%; background: radial-gradient(ellipse at 50% 40%, #c9a25a, #6a4e28 58%, #2a1c0c); box-shadow: 0 5px 9px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.3); }
+/* Der Schirm: dunkles Glas, das unten bernsteinfarben glüht; oben ein Messingring */
+.desk-ding.lampe .schirm { position: absolute; left: 69px; top: 88px; width: 118px; height: 54px; cursor: pointer; border-radius: 14px 14px 58% 58% / 12px 12px 42% 42%; transform-origin: 50% 0;
+  background: linear-gradient(178deg, #7a4a22, #3e2512 42%, #2a180c 100%);
+  box-shadow: inset 0 3px 0 #b08a3c, inset 0 -11px 16px rgba(255,190,95,calc(.95 * var(--lampe))), inset 0 -1px 0 rgba(255,225,160,calc(.8 * var(--lampe))), 0 3px 10px rgba(0,0,0,.55), 0 0 34px rgba(255,170,80,calc(.4 * var(--lampe)));
+  transition: box-shadow .4s ease, background .4s ease; }
+/* Die Birne: ein warmer Saum unter dem Schirm */
+.desk-ding.lampe .schirm::before { content: ""; position: absolute; left: 8px; right: 8px; bottom: -4px; height: 16px; border-radius: 50%; pointer-events: none; transition: opacity .4s;
+  background: radial-gradient(ellipse at 50% 50%, rgba(255,244,210,calc(1 * var(--lampe))), rgba(255,205,115,calc(.6 * var(--lampe))) 48%, transparent 72%); filter: blur(1px); }
+/* Der Kegel: breit unten, weich an den Rändern, verläuft nach unten ins Nichts */
+.desk-ding.lampe .schirm::after { content: ""; position: absolute; left: -120px; right: -120px; top: 46px; height: 270px; pointer-events: none; mix-blend-mode: screen; opacity: var(--lampe); transition: opacity .4s;
+  clip-path: polygon(34% 0, 66% 0, 100% 100%, 0 100%);
+  background: linear-gradient(90deg, transparent 6%, rgba(255,214,140,.5) 32%, rgba(255,214,140,.55) 50%, rgba(255,214,140,.5) 68%, transparent 94%);
+  -webkit-mask: linear-gradient(rgba(0,0,0,.95), rgba(0,0,0,.42) 40%, rgba(0,0,0,.12) 78%, transparent); mask: linear-gradient(rgba(0,0,0,.95), rgba(0,0,0,.42) 40%, rgba(0,0,0,.12) 78%, transparent); }
+.desk-ding.lampe.aus .schirm { box-shadow: inset 0 3px 0 #8a6a2e, inset 0 -6px 10px rgba(0,0,0,.5), 0 3px 10px rgba(0,0,0,.55); }
+.desk-ding.lampe.aus .schirm::before { opacity: 0; }
+.desk-ding.lampe.aus .schirm::after { opacity: 0; }
+/* Die Schnur: ein Pfad, der dem Finger folgt */
+.desk-ding.lampe .schnur-svg { position: absolute; left: 0; top: 0; width: 240px; height: 320px; overflow: visible; pointer-events: none; }
+.desk-ding.lampe .schnur-pfad { fill: none; stroke: #d8cbb2; stroke-width: 2.4; stroke-linecap: round; }
+.desk-ding.lampe .schnur-schatten { fill: none; stroke: rgba(0,0,0,.45); stroke-width: 4; stroke-linecap: round; transform: translate(2px, 3px); }
+.desk-ding.lampe .knauf { position: absolute; left: 0; top: 0; width: 16px; height: 22px; border-radius: 7px 7px 8px 8px / 6px 6px 10px 10px; background: linear-gradient(#efd39a, #a07c3c); box-shadow: 0 2px 5px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.45), inset 0 -2px 3px rgba(0,0,0,.25); cursor: grab; touch-action: none; transform-origin: 8px 2px; }
+.desk-ding.lampe .knauf::before { content: ""; position: absolute; left: -14px; top: -12px; right: -14px; bottom: -14px; }   /* größere Griff-Fläche für Finger */
+.desk-ding.lampe .knauf::after { content: ""; position: absolute; left: 6px; top: 8px; width: 4px; height: 8px; border-radius: 2px; background: rgba(255,255,255,.25); }
+.desk-ding.lampe.zieht .knauf { cursor: grabbing; filter: brightness(1.12); }
+.desk-ding.lampe.zieht .schirm { transform: rotate(.6deg); }
+.desk-ding.lampe.schaltet .schirm { animation: schirm-zuckt .7s cubic-bezier(.2,.8,.2,1); }
+@keyframes schirm-zuckt { 0% { transform: rotate(0); filter: brightness(1); } 18% { transform: rotate(1.6deg); filter: brightness(1.6); } 42% { transform: rotate(-1.1deg); filter: brightness(.9); } 68% { transform: rotate(.5deg); filter: brightness(1.15); } 100% { transform: rotate(0); filter: brightness(1); } }
 /* ---- Der Leuchter ---- */
 .desk-ding.leuchter { right: 2%; top: calc(44% - 112px); width: 170px; height: 150px; filter: drop-shadow(0 10px 10px rgba(0,0,0,.6)); }
 .leuchter-bild { width: 170px; height: 150px; position: relative; }
@@ -583,8 +619,8 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .stuhl-bild .bein { position: absolute; top: 86px; width: 6px; height: 64px; background: linear-gradient(90deg, #2a1b12, #4a2f1e, #2a1b12); }
 .stuhl-bild .b1 { left: 8px; } .stuhl-bild .b2 { left: 56px; }
 /* ---- Manuskripte ---- */
-.desk-ding.manuskript { left: 30%; top: calc(44% + 16px); width: min(220px, 28%); aspect-ratio: 3 / 4; }
-.desk-ding.manuskript.m2 { left: 37%; top: calc(44% + 44px); } .desk-ding.manuskript.m3 { left: 25%; top: calc(44% + 70px); }
+.desk-ding.manuskript { left: 46%; top: calc(44% + 16px); width: min(220px, 26%); aspect-ratio: 3 / 4; }
+.desk-ding.manuskript.m2 { left: 52%; top: calc(44% + 44px); } .desk-ding.manuskript.m3 { left: 42%; top: calc(44% + 70px); }
 .manuskript-papier { position: relative; width: 100%; height: 100%; padding: 14px 14px 10px; text-align: left; overflow: hidden; border-radius: 2px;
   background: linear-gradient(170deg, #f5ebd3, #e6d8ba), repeating-linear-gradient(transparent 0 21px, rgba(90,70,40,.08) 21px 22px); color: #2c2218; font-family: ui-serif, "New York", Georgia, serif; font-size: 11px; line-height: 1.45; box-shadow: inset 0 0 34px rgba(120,90,40,.18), inset 2px 0 0 rgba(180,60,40,.25); }
 .manuskript-papier b { display: block; font-size: 12.5px; margin-bottom: 5px; border-bottom: 1px solid rgba(60,40,20,.2); padding-bottom: 3px; }
@@ -593,7 +629,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .manuskript-papier .k1 { left: 18%; right: 40%; top: 41%; } .manuskript-papier .k2 { left: 50%; right: 12%; top: 63%; transform: rotate(1deg); }
 .desk-ding.manuskript.leer .manuskript-papier { color: #7a6a52; font-style: italic; }
 /* ---- Tintenfass & Federn ---- */
-.desk-ding.tinte { left: 58%; top: calc(44% + 10px); width: 96px; height: 96px; }
+.desk-ding.tinte { left: 70%; top: calc(44% + 6px); width: 96px; height: 96px; }
 .tinte-bild { position: relative; width: 96px; height: 96px; }
 .tinte-bild .fass { position: absolute; left: 30px; bottom: 8px; width: 38px; height: 34px; border-radius: 7px 7px 12px 12px; background: linear-gradient(90deg, #151a38, #0a0c1e 50%, #1a1f44); box-shadow: inset 0 0 0 2px rgba(255,255,255,.1), inset 0 10px 12px rgba(255,255,255,.07), 0 3px 6px rgba(0,0,0,.65); }
 .tinte-bild .fass::before { content: ""; position: absolute; left: 9px; top: -9px; width: 20px; height: 10px; border-radius: 4px 4px 0 0; background: linear-gradient(#3a3f66, #1a1f44); }
@@ -601,15 +637,23 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .tinte-bild .feder { position: absolute; width: 9px; height: 66px; border-radius: 50% 50% 10% 10%; transform-origin: bottom; background: repeating-linear-gradient(100deg, #ecdfc5 0 1.5px, #cdbfa0 1.5px 3px), linear-gradient(#ecdfc5, #cdbfa0); }
 .tinte-bild .feder::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; margin-left: -.5px; background: rgba(90,70,40,.45); }
 .tinte-bild .feder.f1 { left: 46px; bottom: 22px; transform: rotate(22deg); } .tinte-bild .feder.f2 { left: 6px; bottom: 4px; transform: rotate(-70deg); height: 58px; filter: brightness(.85); }
-/* ---- Bücherstapel ---- */
-.desk-ding-halter.buecher { left: 3%; top: calc(44% + 150px); width: min(170px, 24%); }
-.buecher-stapel { position: relative; }
-.stapel-buch { position: relative; display: block; width: 100%; aspect-ratio: 3 / 4; margin-top: calc(-90% + 14px); transform: rotate(var(--dreh, 0deg)); border-radius: 2px 5px 5px 2px; overflow: hidden; box-shadow: 0 3px 5px rgba(0,0,0,.6), inset 2px 0 4px rgba(255,255,255,.12); background: #4a3a2a; transition: transform .25s; }
-.stapel-buch:first-child { margin-top: 0; }
-.stapel-buch img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.stapel-buch.ohne-cover span { position: absolute; inset: 0; display: grid; place-items: center; padding: 10px; font-family: ui-serif, "New York", Georgia, serif; font-size: 13px; color: #f1e4c8; text-align: center; }
-.stapel-buch:hover { transform: rotate(var(--dreh, 0deg)) translateY(-6px); z-index: 2; }
-.stapel-fuss { display: block; margin-top: 8px; padding: 4px 10px; border-radius: 8px; background: rgba(255,230,180,.1); color: #e8c27a; font-size: 12px; letter-spacing: .04em; }
+/* ---- Das Bücherbord: eine Reihe stehender Bücher, jedes greifbar ---- */
+.desk-ding-halter.buecher { left: 8%; top: calc(44% + 26px); width: min(320px, 33%); filter: none; }
+.desk-ding-halter.buecher:hover { transform: none; }
+.buecher-bord { position: relative; display: flex; align-items: flex-end; gap: 0; padding: 0 6px 6px; min-height: 110px; }
+.bord-buch { position: relative; flex: 0 0 auto; width: 64px; aspect-ratio: 3 / 4; margin-right: var(--ueberlapp, -14px); border-radius: 2px 5px 5px 2px; overflow: hidden; background: #4a3a2a;
+  transform: rotate(var(--lehn, 0deg)); transform-origin: bottom center; box-shadow: 0 4px 7px rgba(0,0,0,.6), inset 2px 0 4px rgba(255,255,255,.14), -1px 0 0 rgba(0,0,0,.5);
+  transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s, margin .28s; z-index: calc(10 - var(--i, 0)); }
+.bord-buch img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bord-buch::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 7px; z-index: 2; pointer-events: none; background: linear-gradient(90deg, rgba(0,0,0,.5), rgba(255,255,255,.14) 55%, rgba(0,0,0,.14)); }
+.bord-buch::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, rgba(255,255,255,.18), rgba(255,255,255,0) 36%, rgba(0,0,0,.2) 100%); }
+.bord-buch:hover::after, .bord-buch:focus-visible::after { background: linear-gradient(105deg, rgba(255,255,255,.26), rgba(255,255,255,0) 40%, rgba(0,0,0,.12) 100%); }
+.bord-buch.ohne-cover span { position: absolute; inset: 0; display: grid; place-items: center; padding: 6px; font-family: ui-serif, "New York", Georgia, serif; font-size: 11px; color: #f1e4c8; text-align: center; line-height: 1.2; }
+.bord-buch .leseband { position: absolute; right: 6px; top: 0; width: 5px; border-radius: 0 0 2px 2px; background: #c0533f; box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.bord-buch:hover, .bord-buch:focus-visible { transform: translateY(-14px) rotate(0deg) scale(1.08); z-index: 20; box-shadow: 0 16px 22px rgba(0,0,0,.7), inset 2px 0 4px rgba(255,255,255,.14); }
+.bordbrett { position: absolute; left: -4px; right: -4px; bottom: -5px; height: 9px; border-radius: 3px; background: linear-gradient(#7a5636, #3a2818); box-shadow: 0 8px 12px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14); }
+.bord-fuss { position: absolute; left: 6px; bottom: -30px; padding: 3px 10px; border-radius: 8px; background: rgba(255,230,180,.1); color: #e8c27a; font-size: 12px; letter-spacing: .04em; white-space: nowrap; }
+@media (max-width: 760px) { .bord-buch { width: 52px; } }
 /* ---- Tasse ---- */
 .desk-ding.tasse { right: 10%; top: calc(44% + 150px); width: 76px; height: 84px; }
 .tasse-bild { position: relative; width: 76px; height: 84px; }
@@ -622,14 +666,14 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 @keyframes dampf-steigt { 0% { transform: translateY(8px) scaleX(1); opacity: 0; } 30% { opacity: .7; } 100% { transform: translateY(-18px) scaleX(1.7); opacity: 0; } }
 .tasse-zahl { position: absolute; left: 8px; top: 44px; width: 48px; text-align: center; font-size: 12px; color: #fff8ea; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
 /* ---- Glas mit Fundstück ---- */
-.desk-ding.glas { left: 24%; top: calc(44% + 190px); width: 54px; height: 74px; }
+.desk-ding.glas { left: 4%; top: calc(44% + 206px); width: 54px; height: 74px; }
 .glas-bild { position: relative; width: 54px; height: 74px; }
 .glaskoerper { position: absolute; left: 4px; top: 12px; width: 46px; height: 58px; border-radius: 7px 7px 13px 13px; background: linear-gradient(90deg, rgba(255,255,255,.26), rgba(255,255,255,.05) 35%, rgba(255,255,255,.02) 60%, rgba(255,255,255,.2)); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.38), inset 0 -6px 10px rgba(255,255,255,.08), 0 3px 6px rgba(0,0,0,.55); }
 .glas-deckel { position: absolute; left: 10px; top: 4px; width: 34px; height: 12px; border-radius: 4px; background: linear-gradient(#8a7a62, #5a4a36); box-shadow: 0 1px 2px rgba(0,0,0,.5); }
 .fundstueck { position: absolute; left: 20px; top: 44px; width: 14px; height: 16px; border-radius: 40% 60% 55% 45%; background: radial-gradient(circle at 40% 35%, #c9a25a, #6b4f25); }
 .fund-foto { position: absolute; left: 9px; top: 22px; width: 36px; height: 42px; object-fit: cover; border-radius: 4px 4px 9px 9px; opacity: .85; filter: sepia(.35) contrast(.9); }
 /* ---- Brief ---- */
-.desk-ding.brief { left: 9%; top: calc(44% + 310px); width: 96px; height: 64px; --dreh: -7deg; }
+.desk-ding.brief { left: 24%; top: calc(44% + 332px); width: 96px; height: 64px; --dreh: -7deg; }
 .brief-bild { width: 96px; height: 64px; background: linear-gradient(#f0e4c9, #dccba6); border-radius: 2px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,.6); overflow: hidden; }
 .brief-bild::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 0; border-left: 48px solid transparent; border-right: 48px solid transparent; border-top: 32px solid rgba(120,90,50,.22); }
 .brief-bild .zeile { position: absolute; left: 10px; height: 1.5px; background: rgba(60,40,20,.35); transform: rotate(-1deg); }
@@ -651,7 +695,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .lupe-bild .linse { position: absolute; left: 0; top: 6px; width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.42), rgba(200,220,255,.14) 60%, rgba(255,255,255,.05)); box-shadow: inset 0 0 0 4px #8a6d3c, inset 0 0 0 5px rgba(255,230,170,.4), 0 2px 4px rgba(0,0,0,.55); }
 .lupe-bild .glanz { position: absolute; left: 9px; top: 12px; width: 9px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.55); transform: rotate(-30deg); }
 .lupe-bild .griff { position: absolute; left: 33px; top: 25px; width: 28px; height: 8px; border-radius: 4px; background: linear-gradient(#4a3622, #2a1c10); transform: rotate(35deg); transform-origin: left center; box-shadow: 0 1px 2px rgba(0,0,0,.5); }
-.desk-ding.stummel { left: 50%; top: calc(44% + 230px); width: 40px; height: 12px; --dreh: -18deg; }
+.desk-ding.stummel { left: 56%; top: calc(44% + 250px); width: 40px; height: 12px; --dreh: -18deg; }
 .stummel-bild { position: relative; width: 40px; height: 10px; }
 .stummel-bild .holz { position: absolute; left: 0; top: 0; width: 34px; height: 10px; border-radius: 2px 40% 40% 2px / 2px 50% 50% 2px; background: linear-gradient(#e9c36a, #c99a3d); box-shadow: 0 1px 3px rgba(0,0,0,.55); }
 .stummel-bild .holz::after { content: ""; position: absolute; right: 0; top: 1px; width: 9px; height: 8px; border-radius: 0 50% 50% 0; background: linear-gradient(90deg, #f1dfc0, #d8c49c); }
@@ -663,9 +707,9 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .notizbuch-bild .gummi { position: absolute; top: -2px; bottom: -2px; right: 14px; width: 6px; background: #2c251c; opacity: .9; border-radius: 2px; }
 /* ---- Verse ---- */
 .desk-vers { position: absolute; z-index: 1; font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 13px; color: rgba(235,220,190,.42); max-width: 220px; pointer-events: none; transform: rotate(var(--dreh, -4deg)); text-shadow: 0 1px 1px rgba(0,0,0,.4); }
-.desk-vers.v1 { left: 40%; top: calc(44% + 250px); --dreh: -6deg; } .desk-vers.v2 { left: 62%; top: calc(44% + 130px); --dreh: 3deg; } .desk-vers.v3 { left: 34%; top: calc(44% + 330px); --dreh: -2deg; }
+.desk-vers.v1 { left: 12%; top: calc(44% + 160px); --dreh: -6deg; } .desk-vers.v2 { left: 62%; top: calc(44% + 130px); --dreh: 3deg; } .desk-vers.v3 { left: 34%; top: calc(44% + 330px); --dreh: -2deg; }
 /* ---- Papierkorb, Schublade, Einrichten ---- */
-.desk-korb { position: absolute; left: 4%; bottom: 6px; width: 64px; height: 54px; z-index: 3; border-radius: 4px 4px 10px 10px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 3px, transparent 3px 6px), linear-gradient(#3a2c20, #1e160f); box-shadow: inset 0 0 0 1px rgba(255,220,160,.1), 0 3px 8px rgba(0,0,0,.6); filter: drop-shadow(0 4px 6px rgba(0,0,0,.5)); }
+.desk-korb { position: absolute; left: 1.5%; bottom: 4px; width: 64px; height: 54px; z-index: 3; border-radius: 4px 4px 10px 10px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 3px, transparent 3px 6px), linear-gradient(#3a2c20, #1e160f); box-shadow: inset 0 0 0 1px rgba(255,220,160,.1), 0 3px 8px rgba(0,0,0,.6); filter: drop-shadow(0 4px 6px rgba(0,0,0,.5)); }
 .desk-korb .korbrand { position: absolute; left: -3px; right: -3px; top: -3px; height: 7px; border-radius: 4px; background: linear-gradient(#5a4530, #2a1f14); }
 .desk-korb .knuell { position: absolute; width: 22px; height: 20px; border-radius: 45% 55% 50% 50%; background: radial-gradient(circle at 35% 35%, #f3e9d4, #c9bda0 70%); box-shadow: inset -3px -3px 6px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.5); }
 .desk-korb .k1 { left: 6px; top: -10px; transform: rotate(-12deg); } .desk-korb .k2 { left: 26px; top: -14px; transform: rotate(18deg); } .desk-korb .k3 { left: 42px; top: -6px; transform: rotate(-30deg); width: 18px; height: 16px; }
@@ -675,16 +719,16 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .desk-einrichten { position: absolute; right: 12px; top: 12px; z-index: 4; background: rgba(20,16,12,.6); color: #e8c27a; }
 @media (max-width: 760px) {
   .desk-szene { min-height: 720px; }
-  .desk-ding.lampe { left: -6px; transform: scale(.78); transform-origin: top left; }
+  .desk-ding.lampe { left: -12px; transform: scale(.78); transform-origin: top left; }
   .desk-ding.leuchter { right: -16px; transform: scale(.72); transform-origin: top right; }
   .desk-ding.uhr { right: 28%; transform: scale(.8); transform-origin: top; } .desk-ding.stuhl { display: none; }
-  .desk-ding.manuskript { width: 40%; left: 26%; } .desk-ding.manuskript.m2 { left: 32%; } .desk-ding.manuskript.m3 { left: 20%; }
-  .desk-ding.tinte { left: 68%; top: calc(44% + 90px); transform: scale(.8); }
-  .desk-ding-halter.buecher { width: 30%; top: calc(44% + 180px); }
-  .desk-ding.tasse { right: 4%; top: calc(44% + 180px); transform: scale(.85); }
-  .desk-ding.glas { left: 38%; top: calc(44% + 250px); } .desk-ding.brief { top: calc(44% + 330px); left: 6%; width: 80px; }
-  .desk-ding.karten { right: 30%; top: calc(44% + 320px); } .desk-ding.lupe { right: 4%; top: calc(44% + 340px); } .desk-ding.stummel { left: 54%; top: calc(44% + 280px); } .desk-ding.notizbuch { right: 6%; top: calc(44% + 250px); transform: scale(.85); }
-  .desk-vers { font-size: 11px; max-width: 150px; }
+  .desk-ding.manuskript { width: 36%; left: 44%; } .desk-ding.manuskript.m2 { left: 50%; } .desk-ding.manuskript.m3 { left: 38%; }
+  .desk-ding.tinte { left: 76%; top: calc(44% + 30px); transform: scale(.8); }
+  .desk-ding-halter.buecher { left: 4%; width: 40%; top: calc(44% + 14px); }
+  .desk-ding.tasse { right: 4%; top: calc(44% + 27%); transform: scale(.85); }
+  .desk-ding.glas { left: 5%; top: calc(44% + 190px); } .desk-ding.brief { top: calc(44% + 330px); left: 26%; width: 80px; }
+  .desk-ding.karten { right: 30%; top: calc(44% + 40%); } .desk-ding.lupe { right: 4%; top: calc(44% + 46%); } .desk-ding.stummel { left: 58%; top: calc(44% + 290px); } .desk-ding.notizbuch { right: 5%; top: calc(44% + 36%); transform: scale(.85); }
+  .desk-vers { font-size: 11px; max-width: 150px; } .desk-vers.v1 { left: 8%; top: calc(44% + 150px); }
   .desk-korb { width: 50px; height: 44px; }
 }
 /* ===================== LESESTAPEL & LESEMODUS ===================== */
@@ -2034,7 +2078,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.16.0';
+const APP_VERSION = '5.17.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -2501,6 +2545,8 @@ function sauberesDokument(quelle) {
     if (d.seiten != null) d.seiten = Math.round(begrenze(d.seiten, 0, 100000, 0));
     if (d.seite != null) d.seite = Math.round(begrenze(d.seite, 1, 100000, 1));
     if (d.autor != null) d.autor = String(d.autor).slice(0, 200);
+    if (d.isbn != null) d.isbn = String(d.isbn).replace(/[^0-9Xx]/g, '').slice(0, 13);
+    if (d.coverNetz != null) d.coverNetz = d.coverNetz === true;
     if (d.zuletzt != null) d.zuletzt = begrenze(d.zuletzt, 0, Date.now() + 86400000, 0);
     if (d.lesezeichen != null) d.lesezeichen = Array.isArray(d.lesezeichen) ? [...new Set(d.lesezeichen.map((n) => Math.round(Number(n))).filter((n) => Number.isFinite(n) && n >= 1 && n <= 100000))].slice(0, 200) : [];
   }
@@ -13871,12 +13917,13 @@ const ANLEITUNG = [
     kurz: 'Ein schwerer Tisch vor dem Nachtfenster — alles darauf tut etwas.',
     abschnitte: [
       { t: 'Was das ist', p: ['Kein Raum zum Einsortieren, sondern der Mittelpunkt. Dunkles Holz, eine Lampe mit bernsteinfarbenem Kegel (kein Deckenlicht, niemals), ein siebenarmiger Leuchter, das Fenster auf den verwilderten Garten bei Nacht, mit echter Mondphase. Nichts darauf ist Dekoration: jedes Ding ist ein Griff in mein Schreiben.'] },
-      { t: 'Die Lampe', p: ['Am Knauf der Zugschnur ziehen — sie dehnt sich mit, schnappt zurück und schaltet die Lampe an oder aus (ab etwa einem Drittel Zug). Ist sie aus, bleibt nur der Schein der Kerzen. Auf den Schirm tippen: heller oder dunkler in Stufen. Das Fenster weiß außerdem, wie spät es ist: Dämmerung am frühen Abend, tiefe Nacht, erstes Grau vor sechs, und ein grauer Tag — der Tisch bleibt ein Nachttisch, aber der Himmel lügt nicht. Und er kennt die Jahreszeit: Glühwürmchen im Sommer, fallende Blätter im Herbst, Schnee und kahle Bäume im Winter, Blüten im Frühling.'] },
+      { t: 'Die Lampe', p: ['Am Knauf der Zugschnur ziehen — nach unten, zur Seite, schräg, wohin die Hand will; die Schnur folgt, dehnt sich, bekommt einen Bauch, und schnappt beim Loslassen zurück. Ist sie weit genug gezogen, schaltet die Lampe an oder aus — das Licht schmilzt ein wie ein Glühfaden, nicht wie ein Schalter; der Schirm zuckt kurz. Im Kegel treibt Staub, im Sommer verirrt sich nachts ab und zu eine Motte ums Licht. Der Blick wandert leicht mit der Maus: der Garten hinten bewegt sich anders als der Tisch vorn. Ist sie aus, bleibt nur der Schein der Kerzen. Auf den Schirm tippen: heller oder dunkler in Stufen. Das Fenster weiß außerdem, wie spät es ist: Dämmerung am frühen Abend, tiefe Nacht, erstes Grau vor sechs, und ein grauer Tag — der Tisch bleibt ein Nachttisch, aber der Himmel lügt nicht. Und er kennt die Jahreszeit: Glühwürmchen im Sommer, fallende Blätter im Herbst, Schnee und kahle Bäume im Winter, Blüten im Frühling.'] },
       { t: 'Leuchter, Uhr und der zweite Stuhl', p: ['Der Leuchter brennt wirklich ab: Jede Kerze, die ich im Schreibraum anzünde, nimmt den sieben Kerzen etwas Wachs — nach zwanzig Schreibstunden sind sie herunter, dann „neue aufstecken" als kleines Ritual. Die Standuhr zeigt die Zeit, antippen sagt, wie lange ich schon am Tisch sitze; wer mag, lässt sie ticken (Einrichten), zur vollen Stunde ein leiser Glockenschlag. Der zweite Stuhl ist der Faden — ein Gespräch am Tisch.'] },
       { t: 'Der Papierkorb unterm Tisch', p: ['Links unten, mit zerknüllten Blättern: der Papierkorb. Antippen zeigt, was zuletzt hineinflog; eines „glätten" holt es zurück — an seinen alten Ort.'] },
       { t: 'Die Dinge', p: ['Die Manuskripte in der Mitte sind meine drei zuletzt bearbeiteten Texte — antippen schreibt weiter. Tintenfass und Feder: ein neues Blatt. Die Tasse: der Schreibtag (sie dampft, wenn ich heute geschrieben habe; die Zahl sind die Wörter). Das Glas mit dem Fundstück: der Funke des Tages. Der Brief: eine Zeitkapsel an mich selbst. Die Karteikarten: eine Wortkiste abfragen. Die Lupe: suchen. Der Bleistiftstummel: schnell einen Schnipsel. Das Notizbuch mit den Zetteln: mein letztes Heft. Der Bücherstapel: der Lesestapel. Die Lampe: heller oder dunkler. Der Leuchter: Schreibzeit anzünden — öffnet ein Blatt und die Kerze brennt. Das Fenster: die Grillen und der Wind des Nachtgartens (Klang); spielt im Klangraum Regen, regnet es vor dem Fenster, bei Gewitter wetterleuchtet es.'] },
       { t: 'Die Schublade', p: ['Unten am Tisch. Darin: drei Fundstücke aus meinen eigenen Texten (wie auf dem Zuhause, nur verstaut), eine winzige Lupe, Bindfaden (Cluster), getrocknete Blätter (die losen Blätter), Briefmarken (etwas hinausschicken), ein Schlüssel ohne Schloss (Feinheiten) — und ein Stück Metall unbekannter Herkunft: ein alter Schnipsel, der entweder bedeutungslos ist oder der Schlüssel zu einem ganzen Roman.'] },
       { t: 'Brief an mich', p: ['Ich schreibe, wähle „in einem Monat" (oder einer Woche, einem Jahr) — der Brief wird versiegelt und liegt auf dem Tisch. Vor dem Datum lässt er sich nicht öffnen. Ist es so weit, pocht das Siegel. Öffnen, lesen, antworten (wird ein neues Blatt) oder wegwerfen.'], b: 'Am Anfang eines Projekts einen Brief „in drei Monaten": was ich hoffe, was ich fürchte, wo ich stehen will.' },
+      { t: 'Das Bücherbord und die Cover', p: ['Die Bücher stehen in einer Reihe auf einem Brett, leicht gelehnt, jedes für sich greifbar — Darüberfahren hebt eines heraus, ein rotes Leseband zeigt, wie weit ich bin. Cover holt VANI aus dem Netz über die ISBN (aus dem Impressum der PDF oder dem Koffer): beim Auflegen still im Hintergrund, für alles schon Aufgelegte mit „Schöne Cover holen" im Lesestapel, je Buch mit „Cover aus dem Netz (ISBN)" — notfalls tippe ich die ISBN selbst.'] },
       { t: 'Der Lesestapel', p: ['Bücher als PDF auf dem Tisch — sie liegen nur auf meinen Geräten und reisen verschlüsselt über den privaten Bereich, nie übers Netz, nie ins Repo. Das Cover malt VANI aus der ersten Seite (oder ich wähle eine andere). Antippen schlägt auf; lange halten: umbenennen, Cover, von vorn, vom Tisch nehmen.'] },
       { t: 'Der Bücherkoffer', p: ['Liegt neben der App ein verschlüsselter Bücherkoffer, fragt „Aus dem Bücherkoffer (Passwort)" nach dem Passwort und legt die Bücher auf den Tisch — ohne Dateiauswahl, ohne Netz danach. Die Dateien im Koffer sind ohne Passwort Rauschen. Das Werkzeug dazu: `node werkzeug/buecherkoffer.mjs <Ordner>`.'] },
       { t: 'Bücher auflegen — drei Wege', s: ['„PDF auflegen" wählt Dateien — am Laptop, am Handy, überall, wo das Gerät Dateien öffnen darf.', 'Auf dem Schul-iPad: Bücher, die schon im Goodnotes-Archiv liegen, mit „Aus dem Goodnotes-Archiv" aufs Lesepult — oder am Handy auflegen, der private Bereich bringt sie aufs iPad.', 'In der Desktop-App: „Aus dem Bücherordner" — alles, was in „Dokumente/VANI-Bücher" oder im Ordner „buecher" neben der App liegt, mit einem Griff.'] },
@@ -14414,8 +14461,12 @@ function schreibtischMaler(canvas, optionen = {}) {
   const saatText = tagKey();
   let saat = 17; for (const c of saatText) saat = (saat * 31 + c.charCodeAt(0)) >>> 0;
   const zuf = kerzeZufall(saat);
-  const opt = Object.assign({ holz: 'nuss', lampe: .8, lampeAn: true, wetter: 'still', kerzen: true, unordnung: .7, fensterAnteil: .44 }, optionen);
+  const opt = Object.assign({ holz: 'nuss', lampe: .8, lampeAn: true, wetter: 'still', kerzen: true, unordnung: .7, fensterAnteil: .44, parallax: { x: 0, y: 0 } }, optionen);
   let W = 0, H = 0, fensterH = 0, statisch = null, laeuft = false, t = 0, letzte = 0, blitz = 0, blitzWarte = 6 + zuf() * 10;
+  let lampeJetzt = opt.lampeAn ? opt.lampe : 0;       /* das Licht schmilzt ein, es springt nicht */
+  let para = { x: 0, y: 0 };                          /* geglättete Parallaxe */
+  const staub = Array.from({ length: 46 }, () => ({ x: zuf(), y: zuf(), r: .5 + zuf() * 1.1, ph: zuf() * 6.3, v: .004 + zuf() * .008 }));
+  let motte = null, motteWarte = 50 + zuf() * 120;
   const jahreszeit = schreibtischJahreszeit();
   const mond = mondphase();
 
@@ -14524,6 +14575,7 @@ function schreibtischMaler(canvas, optionen = {}) {
 
   /* ----- Das Bewegte ----- */
   function maleFenster(dt) {
+    para.x += (opt.parallax.x - para.x) * Math.min(1, dt * 4); para.y += (opt.parallax.y - para.y) * Math.min(1, dt * 4);
     const licht = schreibtischTageslicht();
     const [h1, h2, h3] = schreibtischHimmelFarben(licht);
     const sky = ctx.createLinearGradient(0, 0, 0, fensterH);
@@ -14563,7 +14615,7 @@ function schreibtischMaler(canvas, optionen = {}) {
     const boden = fensterH - 12;
     const farbe = (tief) => nacht > .5 ? (tief ? '#0a0f0a' : '#0e150e') : (tief ? '#1d251c' : '#263125');
     for (const b of baeume) {
-      const sway = Math.sin(t * .6 * wind + b.ph) * 3 * wind;
+      const sway = Math.sin(t * .6 * wind + b.ph) * 3 * wind + para.x * (b.tief ? -3 : -7);
       const bx = 16 + b.x * (W - 32), bw = b.w * (W - 32), bh = b.h * (fensterH - 40);
       ctx.fillStyle = farbe(b.tief);
       /* Stamm */
@@ -14578,7 +14630,7 @@ function schreibtischMaler(canvas, optionen = {}) {
       }
     }
     for (const s of buesche) {
-      const sway = Math.sin(t * .9 * wind + s.ph) * 2.2 * wind;
+      const sway = Math.sin(t * .9 * wind + s.ph) * 2.2 * wind + para.x * -9;
       const sx = 16 + s.x * (W - 32), sw = s.w * (W - 32), sh = s.h * (fensterH - 40);
       ctx.fillStyle = nacht > .5 ? '#0b120b' : '#1f2a1e';
       ctx.beginPath(); ctx.ellipse(sx + sway, boden - sh * .35, sw * .5, sh * .5, 0, 0, 6.29); ctx.fill();
@@ -14651,16 +14703,49 @@ function schreibtischMaler(canvas, optionen = {}) {
     ctx.restore();
   }
 
-  function maleLicht() {
+  function maleLicht(dt) {
     const oben = fensterH + 10;
-    /* Dunkelheit über der Platte, die Lampe frisst sie auf */
-    const an = opt.lampeAn ? opt.lampe : 0;
-    ctx.fillStyle = 'rgba(0,0,0,' + (.58 - .42 * an).toFixed(3) + ')'; ctx.fillRect(0, oben, W, H - oben);
-    if (an > 0) {
+    /* Dunkelheit über der Platte, die Lampe frisst sie auf — und sie geht nicht
+       an wie ein Schalter, sondern wie ein Glühfaden: erst warm, dann hell. */
+    const ziel = opt.lampeAn ? opt.lampe : 0;
+    lampeJetzt += (ziel - lampeJetzt) * Math.min(1, dt * (ziel > lampeJetzt ? 5 : 9));
+    if (Math.abs(ziel - lampeJetzt) < .004) lampeJetzt = ziel;
+    const an = lampeJetzt;
+    ctx.fillStyle = 'rgba(0,0,0,' + (.62 - .48 * an).toFixed(3) + ')'; ctx.fillRect(0, oben, W, H - oben);
+    /* Der Schirm hängt links über der Platte; der Teich aus Licht liegt ein Stück rechts darunter */
+    const lx = W * .16 + para.x * 4, ly = oben + (H - oben) * .27;
+    if (an > .01) {
       const flacker = 1 + .012 * Math.sin(t * 7.3) + .008 * Math.sin(t * 13.1);
-      kerzeSchein(ctx, W * .2, oben + (H - oben) * .3, W * .42 * flacker, (H - oben) * .62, [[0, 'rgba(255,196,110,' + (.5 * an).toFixed(3) + ')'], [.35, 'rgba(255,170,80,' + (.22 * an).toFixed(3) + ')'], [1, 'rgba(255,150,60,0)']]);
-      /* Lichtstreif an der Wand unter der Lampe */
-      kerzeSchein(ctx, W * .14, oben - 10, W * .1, 30, [[0, 'rgba(255,200,120,' + (.18 * an).toFixed(3) + ')'], [1, 'rgba(255,200,120,0)']]);
+      kerzeSchein(ctx, lx, ly, W * .46 * flacker, (H - oben) * .7, [[0, 'rgba(255,200,115,' + (.62 * an).toFixed(3) + ')'], [.3, 'rgba(255,176,85,' + (.3 * an).toFixed(3) + ')'], [.7, 'rgba(255,150,60,' + (.09 * an).toFixed(3) + ')'], [1, 'rgba(255,150,60,0)']]);
+      /* Der helle Teich direkt unter dem Schirm, mit einem schärferen Kern */
+      kerzeSchein(ctx, lx + W * .01, oben + (H - oben) * .2, W * .2 * flacker, (H - oben) * .2, [[0, 'rgba(255,228,165,' + (.34 * an).toFixed(3) + ')'], [.5, 'rgba(255,210,130,' + (.14 * an).toFixed(3) + ')'], [1, 'rgba(255,210,130,0)']]);
+      /* Lichtstreif an der Wand unter der Lampe und ein helles Herz */
+      kerzeSchein(ctx, lx - W * .02, oben - 8, W * .11, 34, [[0, 'rgba(255,205,125,' + (.26 * an).toFixed(3) + ')'], [1, 'rgba(255,205,125,0)']]);
+      kerzeSchein(ctx, lx, ly - 10, W * .12, (H - oben) * .16, [[0, 'rgba(255,232,170,' + (.28 * an).toFixed(3) + ')'], [1, 'rgba(255,232,170,0)']]);
+      /* Staub im Lichtkegel: treibt langsam, nur dort sichtbar, wo Licht ist */
+      for (const s of staub) {
+        s.y += s.v * dt * .6; s.x += Math.sin(t * .4 + s.ph) * .0006;
+        if (s.y > 1) { s.y = 0; s.x = zuf(); }
+        const sx = lx - W * .3 + s.x * W * .6, sy = oben + s.y * (H - oben) * .8;
+        const naehe = 1 - Math.min(1, Math.hypot((sx - lx) / (W * .36), (sy - ly) / ((H - oben) * .6)));
+        if (naehe <= 0) continue;
+        const a = naehe * an * (.25 + .25 * Math.sin(t * 1.3 + s.ph));
+        ctx.fillStyle = 'rgba(255,236,190,' + a.toFixed(3) + ')'; ctx.beginPath(); ctx.arc(sx, sy, s.r, 0, 6.29); ctx.fill();
+      }
+      /* Eine Motte, selten, im Sommer, wenn es dunkel ist: kreist in Achten um den Schirm */
+      const nachtDraussen = schreibtischTageslicht() < .3;
+      if (!motte && jahreszeit === 'sommer' && nachtDraussen) { motteWarte -= dt; if (motteWarte <= 0) { motte = { t: 0, dauer: 14 + zuf() * 10, cx: W * .2, cy: oben - 40 }; } }
+      if (motte) {
+        motte.t += dt;
+        const u = motte.t * 2.2, rx = 42 + 8 * Math.sin(motte.t * .7), ry = 24;
+        const mx = motte.cx + Math.sin(u) * rx, my = motte.cy + Math.sin(2 * u) * ry * .5 + Math.cos(u * .5) * 6;
+        const fluegel = Math.sin(motte.t * 40) * 3;
+        ctx.fillStyle = 'rgba(40,32,26,.85)';
+        ctx.beginPath(); ctx.ellipse(mx - 3, my, 3.5, 1.6 + Math.abs(fluegel) * .3, -.5, 0, 6.29); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(mx + 3, my, 3.5, 1.6 + Math.abs(fluegel) * .3, .5, 0, 6.29); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(mx, my, 1.6, 2.4, 0, 0, 6.29); ctx.fill();
+        if (motte.t > motte.dauer) { motte = null; motteWarte = 90 + zuf() * 200; }
+      }
     }
     if (opt.kerzen) {
       const fl = 1 + .1 * Math.sin(t * 9) + .06 * Math.sin(t * 17.3);
@@ -14675,7 +14760,7 @@ function schreibtischMaler(canvas, optionen = {}) {
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(statisch, 0, 0);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     maleFenster(dt);
-    maleLicht();
+    maleLicht(dt);
     requestAnimationFrame(bild);
   }
   return {
@@ -14739,10 +14824,19 @@ function briefIstOffen(brief, jetzt = Date.now()) {
   return (Number(brief.oeffnen) || 0) <= jetzt;
 }
 
-/* Die Zugschnur: Feder mit Dämpfung. Pur, je Schritt. */
+/* Die Zugschnur: Feder mit Dämpfung — in einer Richtung (x) oder in zweien
+   (x, y als Auslenkung von der Ruhelage). Pur, je Schritt. */
 function schnurSchritt(zustand, dt) {
   const z = zustand;
   const k = 70, d = 7;       /* Federhärte, Dämpfung */
+  if (typeof z.y === 'number') {
+    /* 2D: die Ruhelage hängt senkrecht; quer wirkt die Feder etwas weicher */
+    const ax = -k * .9 * z.x - d * (z.vx || 0), ay = -k * z.y - d * (z.vy || 0);
+    z.vx = (z.vx || 0) + ax * dt; z.vy = (z.vy || 0) + ay * dt;
+    z.x += z.vx * dt; z.y += z.vy * dt;
+    if (Math.hypot(z.x, z.y) < .3 && Math.hypot(z.vx, z.vy) < 3) { z.x = 0; z.y = 0; z.vx = 0; z.vy = 0; }
+    return z;
+  }
   const a = -k * z.x - d * z.v;
   z.v += a * dt; z.x += z.v * dt;
   if (Math.abs(z.x) < .3 && Math.abs(z.v) < 3) { z.x = 0; z.v = 0; }
@@ -15012,49 +15106,75 @@ function baueLampe(szene, e, maler) {
   const halter = el('div', { class: 'desk-ding lampe' + (e.lampeAn ? '' : ' aus'), title: 'Die Lampe: an der Schnur ziehen' });
   const schirm = el('div', { class: 'schirm' });
   const arm = el('i', { class: 'arm' });
-  const schnur = el('div', { class: 'schnur' }, el('i', { class: 'faden' }), el('b', { class: 'knauf' }));
-  halter.append(arm, schirm, schnur);
-  const RUHE = 54, MAX = 150, SCHWELLE = 46;
-  const zustand = { x: 0, v: 0 };   /* Auslenkung über Ruhe */
+  /* Die Schnur ist ein Pfad: vom Schirm zum Knauf, mit leichtem Bauch, und sie
+     folgt dem Finger frei — nach unten, zur Seite, schräg. */
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'schnur-svg'); svg.setAttribute('viewBox', '0 0 240 320');
+  const pfad = document.createElementNS(NS, 'path'); pfad.setAttribute('class', 'schnur-pfad'); svg.append(pfad);
+  const schatten = document.createElementNS(NS, 'path'); schatten.setAttribute('class', 'schnur-schatten'); svg.insertBefore(schatten, pfad);
+  const knauf = el('b', { class: 'knauf', title: 'Ziehen: Licht an oder aus' });
+  halter.append(arm, schirm, svg, knauf);
+  /* Aufhängung und Ruhelage in Lampen-Koordinaten (px) */
+  const P = { x: 128, y: 140 }, RUHE = 58, MAX = 130, SCHWELLE = 44;
+  const z = { x: 0, y: 0, vx: 0, vy: 0 };   /* Auslenkung des Knaufs von der Ruhelage */
   let zieht = null, raf = 0, letzte = 0, maxZug = 0;
-  const male = () => { schnur.style.height = (RUHE + zustand.x) + 'px'; schnur.style.setProperty('--dehnung', (1 + zustand.x / 260).toFixed(3)); };
+  const knaufPos = () => ({ x: P.x + z.x, y: P.y + RUHE + z.y });
+  const male = () => {
+    const k = knaufPos();
+    const dx = k.x - P.x, dy = k.y - P.y, l = Math.hypot(dx, dy) || 1;
+    /* Bauch der Schnur: quer zur Zugrichtung, von der Geschwindigkeit gebogen */
+    const bauch = Math.max(-26, Math.min(26, -(z.vx || 0) * .04 + (zieht ? 0 : Math.sin(performance.now() / 700) * .6)));
+    const mx = (P.x + k.x) / 2 - dy / l * bauch, my = (P.y + k.y) / 2 + dx / l * bauch;
+    const d = 'M' + P.x + ' ' + P.y + ' Q' + mx.toFixed(1) + ' ' + my.toFixed(1) + ' ' + k.x.toFixed(1) + ' ' + k.y.toFixed(1);
+    pfad.setAttribute('d', d); schatten.setAttribute('d', d);
+    const winkel = Math.atan2(dx, dy) * -180 / Math.PI;
+    knauf.style.transform = 'translate(' + (k.x - 8).toFixed(1) + 'px,' + (k.y - 2).toFixed(1) + 'px) rotate(' + winkel.toFixed(1) + 'deg)';
+    /* gedehnt: je länger, desto dünner */
+    pfad.style.strokeWidth = (2.4 - Math.min(1, (l - RUHE) / 160)).toFixed(2);
+  };
   const feder = (jetzt) => {
     const dt = Math.min(.04, (jetzt - letzte) / 1000 || .016); letzte = jetzt;
-    schnurSchritt(zustand, dt); male();
-    if (zustand.x !== 0 || zustand.v !== 0) raf = requestAnimationFrame(feder); else raf = 0;
+    schnurSchritt(z, dt); male();
+    if (z.x !== 0 || z.y !== 0 || z.vx !== 0 || z.vy !== 0) raf = requestAnimationFrame(feder); else raf = 0;
   };
   const umschalten = () => {
     e.lampeAn = !e.lampeAn;
     D.einst.schreibtisch = { ...e }; speichereEinst();
     halter.classList.toggle('aus', !e.lampeAn);
     szene.classList.toggle('lampe-aus', !e.lampeAn);
+    halter.classList.add('schaltet'); setTimeout(() => halter.classList.remove('schaltet'), 500);
     if (maler) maler.setze({ lampeAn: e.lampeAn });
     schreibtischKlick('klick');
   };
-  const knauf = schnur.querySelector('.knauf');
   knauf.addEventListener('pointerdown', (ev) => {
     ev.stopPropagation(); ev.preventDefault();
     cancelAnimationFrame(raf); raf = 0;
-    zieht = { y0: ev.clientY, x0: zustand.x }; maxZug = 0; zustand.v = 0;
+    const r = halter.getBoundingClientRect();
+    zieht = { ox: ev.clientX - (r.left + knaufPos().x), oy: ev.clientY - (r.top + knaufPos().y), r }; maxZug = 0;
+    z.vx = 0; z.vy = 0;
     try { knauf.setPointerCapture(ev.pointerId); } catch (x) {}
     halter.classList.add('zieht');
   });
   knauf.addEventListener('pointermove', (ev) => {
     if (!zieht) return;
-    const roh = zieht.x0 + (ev.clientY - zieht.y0);
-    /* Die Schnur gibt nach, aber nicht unendlich — oben bleibt sie straff. */
-    zustand.x = roh < 0 ? roh * .15 : roh > MAX - RUHE ? (MAX - RUHE) + (roh - (MAX - RUHE)) * .12 : roh;
-    maxZug = Math.max(maxZug, zustand.x);
+    /* Wunschposition des Knaufs, dann an der Schnur gehalten: maximal MAX lang,
+       darüber gibt sie nur noch ein wenig nach */
+    let wx = ev.clientX - zieht.ox - zieht.r.left, wy = ev.clientY - zieht.oy - zieht.r.top;
+    let dx = wx - P.x, dy = wy - P.y;
+    if (dy < 6) { dy = 6 + (dy - 6) * .08; }       /* nicht über die Aufhängung hinaus */
+    const l = Math.hypot(dx, dy);
+    if (l > MAX) { const ueber = l - MAX; const f = (MAX + ueber * .12) / l; dx *= f; dy *= f; }
+    z.x = dx; z.y = dy - RUHE;
+    maxZug = Math.max(maxZug, Math.hypot(dx, dy) - RUHE);
     male();
   });
   const loslassen = () => {
     if (!zieht) return;
     zieht = null; halter.classList.remove('zieht');
-    if (maxZug >= SCHWELLE) { umschalten(); zustand.v = -260; } else zustand.v = -60;
+    if (maxZug >= SCHWELLE) { umschalten(); z.vy = -240; } else { z.vy = -50; }
     letzte = performance.now(); raf = requestAnimationFrame(feder);
   };
   knauf.addEventListener('pointerup', loslassen); knauf.addEventListener('pointercancel', loslassen);
-  /* Der Schirm selbst: Helligkeit in Stufen */
   schirm.addEventListener('click', () => {
     if (!e.lampeAn) { umschalten(); return; }
     const stufen = [.45, .65, .8, 1];
@@ -15066,6 +15186,9 @@ function baueLampe(szene, e, maler) {
     toast(e.lampe >= 1 ? 'Hell.' : e.lampe >= .8 ? 'Warm.' : e.lampe >= .65 ? 'Gedämpft.' : 'Nur ein Schimmer.');
   });
   male();
+  /* Ein Hauch Bewegung, auch in Ruhe */
+  const atmen = () => { if (!halter.isConnected) return; if (!zieht && !raf) male(); setTimeout(() => requestAnimationFrame(atmen), 140); };
+  requestAnimationFrame(atmen);
   return halter;
 }
 
@@ -15151,20 +15274,30 @@ RENDER.schreibtisch = function (haupt) {
   /* Tintenfass & Feder */
   dinge.append(ding('tinte', 'Tintenfass und Feder: ein neues Blatt', el('div', { class: 'tinte-bild' }, el('i', { class: 'fass' }), el('i', { class: 'fass-glanz' }), el('i', { class: 'feder f1' }), el('i', { class: 'feder f2' })), () => schreibtischNeuesBlatt()));
 
-  /* Bücherstapel (Lesestapel) */
+  /* Das Bücherbord: die Bücher stehen in einer Reihe, leicht gelehnt, jedes
+     für sich greifbar — kein Stapel, in dem nur das oberste zu sehen ist. */
   const buecher = typeof lesestapelBuecher === 'function' ? lesestapelBuecher() : [];
-  const stapel = el('div', { class: 'buecher-stapel' });
-  buecher.slice(0, 6).forEach((b, i) => {
+  const bord = el('div', { class: 'buecher-bord' });
+  const schmal = window.innerWidth < 760;
+  const zeigbar = Math.min(buecher.length, schmal ? 5 : window.innerWidth < 1000 ? 6 : 8);
+  /* Die Reihe bleibt in ihrer Breite: je mehr Bücher, desto enger stehen sie */
+  const bordBreite = schmal ? window.innerWidth * .40 : Math.min(320, (window.innerWidth - 86) * .33);
+  const buchBreite = schmal ? 52 : 64;
+  const schritt = zeigbar > 1 ? Math.max(22, Math.min(buchBreite - 12, (bordBreite - buchBreite - 12) / (zeigbar - 1))) : buchBreite - 14;
+  bord.style.setProperty('--ueberlapp', (schritt - buchBreite).toFixed(1) + 'px');
+  buecher.slice(0, zeigbar).forEach((b, i) => {
     const img = el('img', { alt: b.titel || 'Buch', draggable: 'false' });
     if (b.bild) setzeBild(img, b.bild);
-    stapel.append(el('button', { class: 'stapel-buch' + (b.bild ? '' : ' ohne-cover'), title: (b.titel || 'Buch') + (b.seiten ? ' · Seite ' + (b.seite || 1) + ' von ' + b.seiten : ''), style: '--i:' + i + ';--dreh:' + ((i * 11) % 7 - 3) + 'deg', onclick: () => buchOeffnen(b) }, img, b.bild ? null : el('span', {}, b.titel || 'Buch')));
+    const fortschritt = buchFortschritt(b.seite, b.seiten);
+    bord.append(el('button', { class: 'bord-buch' + (b.bild ? '' : ' ohne-cover'), title: (b.titel || 'Buch') + (b.seiten ? ' · Seite ' + (b.seite || 1) + ' von ' + b.seiten : ''), style: '--i:' + i + ';--lehn:' + ((i * 7) % 5 - 2) + 'deg', onclick: () => buchOeffnen(b) },
+      img, b.bild ? null : el('span', {}, b.titel || 'Buch'), fortschritt > 0 ? el('i', { class: 'leseband', style: 'height:' + Math.max(8, 100 - fortschritt) + '%' }) : null));
   });
-  stapel.append(el('button', { class: 'stapel-fuss', title: 'Der Lesestapel: Bücher auflegen, ordnen', onclick: () => lesestapelZeigen() }, buecher.length ? (buecher.length > 6 ? '+' + (buecher.length - 6) + ' · ' : '') + 'Lesestapel' : 'Bücher auflegen'));
-  dinge.append(el('div', { class: 'desk-ding-halter buecher' }, stapel));
+  bord.append(el('button', { class: 'bord-fuss', title: 'Der Lesestapel: Bücher auflegen, ordnen', onclick: () => lesestapelZeigen() }, buecher.length ? (buecher.length > zeigbar ? '+' + (buecher.length - zeigbar) + ' · ' : '') + 'Lesestapel' : 'Bücher auflegen'));
+  dinge.append(el('div', { class: 'desk-ding-halter buecher' }, bord, el('i', { class: 'bordbrett' })));
 
   /* Tasse: der Schreibtag */
   const tag = schreibtischTag();
-  dinge.append(ding('tasse' + (tag.heute > 0 ? ' dampft' : ''), 'Die Tasse: ' + (tag.heute ? tag.heute + ' Wörter heute' : 'heute noch nichts') + (tag.serie > 1 ? ' · ' + tag.serie + ' Tage in Folge' : ''), el('div', { class: 'tasse-bild' }, el('i', { class: 'dampf d1' }), el('i', { class: 'dampf d2' }), el('i', { class: 'dampf d3' }), el('i', { class: 'henkel' }), el('span', { class: 'tasse-zahl' }, tag.heute ? String(tag.heute) : '')), () => {
+  dinge.append(ding('tasse' + (tag.heute > 0 ? ' dampft' : ''), 'Die Tasse: ' + (tag.heute ? tag.heute + ' Wörter heute' : 'heute noch nichts') + (tag.serie > 1 ? ' · ' + tag.serie + ' Tage in Folge' : ''), el('div', { class: 'tasse-bild' }, el('i', { class: 'dampf d1' }), el('i', { class: 'dampf d2' }), el('i', { class: 'dampf d3' }), el('i', { class: 'henkel' }), el('span', { class: 'tasse-zahl' }, tag.heute ? (tag.heute >= 10000 ? Math.round(tag.heute / 1000) + 'k' : String(tag.heute)) : '')), () => {
     toast(tag.heute ? tag.heute + ' Wörter heute' + (tag.serie > 1 ? ' — der ' + tag.serie + '. Tag in Folge.' : '.') : 'Heute noch nichts. Die Tasse wartet.', 3600);
   }));
 
@@ -15212,6 +15345,17 @@ RENDER.schreibtisch = function (haupt) {
   dinge.append(el('button', { class: 'rundknopf zart desk-einrichten', html: ik('feinheiten'), title: 'Schreibtisch einrichten', onclick: () => schreibtischEinrichten(() => zeichne()) }));
 
   haupt.append(szene);
+  /* Auftritt: die Dinge kommen gestaffelt auf den Tisch */
+  $$('.desk-ding, .desk-ding-halter', dinge).forEach((d, i) => { d.style.setProperty('--n', String(i)); d.classList.add('tritt-auf'); });
+  /* Parallaxe: der Blick wandert ein wenig mit dem Zeiger — das Fenster weiter
+     hinten bewegt sich anders als der Tisch. */
+  szene.addEventListener('pointermove', (ev) => {
+    if (ev.pointerType === 'touch') return;
+    const r = szene.getBoundingClientRect();
+    const px = (ev.clientX - r.left) / r.width * 2 - 1, py = (ev.clientY - r.top) / r.height * 2 - 1;
+    maler.setze({ parallax: { x: Math.max(-1, Math.min(1, px)), y: Math.max(-1, Math.min(1, py)) } });
+    dinge.style.setProperty('--px', (px * -4).toFixed(1) + 'px'); dinge.style.setProperty('--py', (py * -2).toFixed(1) + 'px');
+  });
   maler.start();
   /* Aufhören, sobald der Raum weg ist */
   const beobachter = new MutationObserver(() => { if (!szene.isConnected) { maler.stopp(); beobachter.disconnect(); } });
@@ -15303,8 +15447,126 @@ function leseEinstellung() {
 }
 function leseEinstellungSpeichern(e) { try { localStorage.setItem('vani-lese', JSON.stringify(saubereLeseEinstellung(e))); } catch (x) {} }
 
+/* ----- Cover aus dem Netz: über die ISBN ----- */
+/* ISBN-13 → ISBN-10 (nur 978er); eine 10er bleibt. Pur. */
+function isbnZu10(roh) {
+  const k = String(roh || '').replace(/[^0-9Xx]/g, '').toUpperCase();
+  if (k.length === 10) return k;
+  if (k.length !== 13 || !k.startsWith('978')) return null;
+  const kern = k.slice(3, 12);
+  let s = 0; for (let i = 0; i < 9; i++) s += (10 - i) * Number(kern[i]);
+  const r = (11 - s % 11) % 11;
+  return kern + (r === 10 ? 'X' : String(r));
+}
+/* ISBNs aus einem Text (Impressum). Pur. */
+function isbnAusText(text) {
+  const aus = [];
+  for (const m of String(text || '').matchAll(/ISBN[\s:–-]*((?:97[89][\s-]?)?\d[\d\s-]{8,16}[\dXx])/gi)) {
+    let k = m[1].replace(/[\s-]/g, '').toUpperCase();
+    if (k.length > 13 && /^97[89]/.test(k)) k = k.slice(0, 13);
+    if ((k.length === 13 || k.length === 10) && !aus.includes(k)) aus.push(k);
+  }
+  return aus;
+}
+/* ISBNs aus den ersten Seiten eines aufgeschlagenen PDFs. */
+async function isbnAusPdf(dok, maxSeiten = 12) {
+  const aus = [];
+  for (let n = 1; n <= Math.min(maxSeiten, dok.numPages); n++) {
+    try { const tc = await (await dok.getPage(n)).getTextContent(); for (const i of isbnAusText(tc.items.map((x) => x.str).join(' '))) if (!aus.includes(i)) aus.push(i); } catch (e) {}
+    if (aus.length >= 3) break;
+  }
+  return aus;
+}
+/* Ein Cover zur ISBN: zuerst der große Bildhost (erlaubt fremde Abrufe), dann Open Library.
+   Ein Platzhalter-Bildchen (wenige Bytes) zählt nicht. */
+async function coverVonIsbn(isbn) {
+  const i10 = isbnZu10(isbn);
+  const i13 = String(isbn || '').replace(/[^0-9Xx]/g, '');
+  const quellen = [];
+  if (i10) quellen.push('https://images-na.ssl-images-amazon.com/images/P/' + i10 + '.01.LZZZZZZZ.jpg');
+  if (i13.length === 13) quellen.push('https://covers.openlibrary.org/b/isbn/' + i13 + '-L.jpg?default=false');
+  for (const url of quellen) {
+    try {
+      const ab = new AbortController(); const t = setTimeout(() => ab.abort(), 9000);
+      const r = await fetch(url, { signal: ab.signal, mode: 'cors' }); clearTimeout(t);
+      if (!r.ok) continue;
+      const blob = await r.blob();
+      if (blob.size > 5000 && /^image\//.test(blob.type || 'image/jpeg')) return blob;
+    } catch (e) {}
+  }
+  return null;
+}
+async function buchCoverSetzen(b, blob, ausDemNetz) {
+  const id = await speichereDateiBlob(new File([blob], 'cover.jpg', { type: blob.type || 'image/jpeg' }));
+  if (!id) return false;
+  b.bild = id; if (ausDemNetz) b.coverNetz = true;
+  speichere(b); return true;
+}
+/* Koffer-Manifest: ISBN zu einem Buch über den Namen finden. */
+async function kofferIsbnFuer(b) {
+  const k = await buecherkofferListe().catch(() => null);
+  if (!k) return null;
+  const norm = (s) => String(s || '').toLowerCase().replace(/[^a-zäöüß0-9]+/g, ' ').trim();
+  const t = norm(b.titel);
+  const e = k.buecher.find((x) => x.isbn && (norm(x.name) === t || (t.length > 4 && (norm(x.name).includes(t) || t.includes(norm(x.name))))));
+  return e ? e.isbn : null;
+}
+/* Versucht, für ein Buch das offizielle Cover zu holen: eigene ISBN, Koffer,
+   dann die ersten Seiten der PDF. Still = ohne Nachfragen und Hinweise. */
+async function buchCoverAusDemNetz(b, { still = false } = {}) {
+  const versucht = new Set();
+  const probiere = async (isbn) => {
+    if (!isbn || versucht.has(isbn)) return false; versucht.add(isbn);
+    const blob = await coverVonIsbn(isbn);
+    if (!blob) return false;
+    b.isbn = isbn;
+    return buchCoverSetzen(b, blob, true);
+  };
+  if (b.isbn && await probiere(b.isbn)) return true;
+  const aus = await kofferIsbnFuer(b);
+  if (aus && await probiere(aus)) return true;
+  try {
+    const pdfjs = await pdfjsLaden();
+    const blob = await dbGet('media', b.datei);
+    if (blob) {
+      const dok = await pdfjs.getDocument({ data: await blob.arrayBuffer() }).promise;
+      const isbns = await isbnAusPdf(dok);
+      try { dok.destroy(); } catch (e) {}
+      for (const i of isbns) if (await probiere(i)) return true;
+    }
+  } catch (e) {}
+  if (still) return false;
+  const eingabeIsbn = await eingabe({ titel: 'Kein Cover gefunden — ISBN des Buchs?', platzhalter: '978… (steht im Impressum oder hinten auf dem Buch)', ok: 'Cover holen' });
+  if (!eingabeIsbn) return false;
+  if (await probiere(eingabeIsbn)) return true;
+  toast('Zu dieser ISBN gibt es kein Cover im Netz.', 3600);
+  return false;
+}
+/* Für alle Bücher auf dem Tisch, die noch kein Netz-Cover haben. */
+async function schoeneCoverHolen() {
+  const offen = lesestapelBuecher().filter((b) => !b.coverNetz);
+  if (!offen.length) { toast('Alle Bücher haben schon ihr Cover.'); return; }
+  toast('Suche Cover für ' + offen.length + (offen.length === 1 ? ' Buch …' : ' Bücher …'), 3000);
+  let n = 0;
+  for (const b of offen) { try { if (await buchCoverAusDemNetz(b, { still: true })) n++; } catch (e) {} }
+  toast(n ? n + (n === 1 ? ' Cover gefunden.' : ' Cover gefunden.') : 'Im Netz war kein passendes Cover — über „Cover" am Buch geht es mit ISBN.', 4200);
+  zeichne();
+}
+
 /* Ein PDF (Datei/Blob) als Buch auflegen: Datei ablegen, zählen, Cover malen. */
-async function buchAuflegenAusBlob(blob, name, { datei = null } = {}) {
+/* Autorenangaben aus PDF-Metadaten sind oft Katalogzeilen: „Nachname, Vorname Verfasser", eckige
+   Klammern, doppelte Namen. Hier wird daraus ein Name. Pur. */
+function saubererAutor(roh) {
+  let a = String(roh || '').replace(/\[[^\]]*\]/g, ' ').replace(/\b(Verfasser(?:in)?|Autor(?:in)?|author|Hrsg\.?|Übersetzer(?:in)?)\b\.?/gi, ' ').replace(/[;|/]+/g, ',').replace(/\s+/g, ' ').trim().replace(/^[,\s]+|[,\s]+$/g, '');
+  const m = a.match(/^([^,]+),\s*([^,]+)$/);
+  if (m && !/\s(?:und|and|&)\s/i.test(a)) a = (m[2] + ' ' + m[1]).replace(/\s+/g, ' ').trim();
+  /* „Silvana de Mari Silvana de Mari" -> einmal reicht */
+  const h = a.length >> 1;
+  if (a.length > 8 && a.slice(0, h).trim().toLowerCase() === a.slice(h).trim().toLowerCase()) a = a.slice(0, h).trim();
+  return a.slice(0, 120);
+}
+
+async function buchAuflegenAusBlob(blob, name, { datei = null, isbn = null, autorVorgabe = '', titelFest = false } = {}) {
   const pdfjs = await pdfjsLaden();
   const daten = await blob.arrayBuffer();
   const dok = await pdfjs.getDocument({ data: daten.slice(0) }).promise;
@@ -15316,8 +15578,8 @@ async function buchAuflegenAusBlob(blob, name, { datei = null } = {}) {
   try {
     const meta = await dok.getMetadata();
     if (meta && meta.info) {
-      if (meta.info.Title && String(meta.info.Title).trim().length > 2 && !/untitled|microsoft|word/i.test(meta.info.Title)) titel = String(meta.info.Title).trim().slice(0, 160);
-      if (meta.info.Author && String(meta.info.Author).trim()) autor = String(meta.info.Author).trim().slice(0, 160);
+      if (!titelFest && meta.info.Title && String(meta.info.Title).trim().length > 2 && !/untitled|microsoft|word/i.test(meta.info.Title)) titel = String(meta.info.Title).trim().slice(0, 160);
+      if (meta.info.Author && String(meta.info.Author).trim()) autor = saubererAutor(meta.info.Author);
     }
   } catch (e) {}
   if (!autor) { const m = titel.match(/\(([^()]{3,80})\)\s*$/); if (m) { autor = m[1].replace(/^(\w[^,]*),\s*(.+)$/, '$2 $1').trim(); titel = titel.replace(/\s*\([^()]*\)\s*$/, '').trim(); } }
@@ -15333,8 +15595,18 @@ async function buchAuflegenAusBlob(blob, name, { datei = null } = {}) {
     await seite.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
     bild = await new Promise((res) => c.toBlob(async (b) => { if (!b) return res(null); try { res(await speichereDateiBlob(new File([b], 'cover.jpg', { type: 'image/jpeg' }))); } catch (e) { res(null); } }, 'image/jpeg', .82));
   } catch (e) {}
+  /* ISBN aus dem Impressum — damit später das echte Cover kommt */
+  let isbns = [];
+  try { isbns = await isbnAusPdf(dok); } catch (e) {}
   try { dok.destroy(); } catch (e) {}
-  const buch = neuDoc('buch', { titel, autor, datei: dateiId, bild, seiten, seite: 1, lesezeichen: [], zuletzt: Date.now() });
+  if (autorVorgabe) autor = autorVorgabe;   /* eine kuratierte Angabe schlägt Metadaten */
+  const buch = neuDoc('buch', { titel, autor, datei: dateiId, bild, seiten, seite: 1, lesezeichen: [], zuletzt: Date.now(), isbn: isbn || isbns[0] || undefined });
+  /* Das offizielle Cover aus dem Netz, wenn eines zu finden ist — still, im Hintergrund. */
+  (async () => {
+    for (const i of [isbn, ...isbns].filter(Boolean)) {
+      try { const c = await coverVonIsbn(i); if (c) { buch.isbn = i; await buchCoverSetzen(buch, c, true); zeichne(); return; } } catch (e) {}
+    }
+  })();
   return buch;
 }
 
@@ -15419,18 +15691,25 @@ function passwortFragen(titel, hinweis) {
 async function buecherkofferHolen() {
   const koffer = await buecherkofferListe();
   if (!koffer || !koffer.buecher.length) { toast('Gerade liegt kein Bücherkoffer neben der App.', 3600); return; }
-  const da = new Set(lesestapelBuecher().map((b) => (b.titel || '').toLowerCase()));
+  /* Schon da? Nach ISBN oder Titel — und wer schon da ist, bekommt Namen und Autor aus dem Koffer,
+     falls beim ersten Holen die PDF-Metadaten gewonnen hatten. */
+  const vorhanden = lesestapelBuecher();
+  const da = new Set(vorhanden.flatMap((b) => [(b.titel || '').toLowerCase(), b.isbn || '']).filter(Boolean));
+  for (const b of koffer.buecher) {
+    const alt = b.isbn && vorhanden.find((x) => x.isbn === b.isbn);
+    if (alt && b.name && (alt.titel !== b.name || (b.autor && alt.autor !== b.autor))) { alt.titel = b.name; if (b.autor) alt.autor = b.autor; speichere(alt); }
+  }
   const passwort = await passwortFragen('Der Bücherkoffer', koffer.buecher.length + ' Bücher, verschlüsselt. Das Passwort bleibt hier auf dem Gerät; die Bücher landen in deinem eigenen Vorrat.');
   if (!passwort) return;
   let n = 0, fehl = 0;
   for (const b of koffer.buecher) {
-    if (da.has(String(b.name || '').toLowerCase())) continue;
+    if (da.has(String(b.name || '').toLowerCase()) || (b.isbn && da.has(b.isbn))) continue;
     toast('Hole „' + (b.name || b.datei) + '" …', 2400);
     try {
       const a = await fetch('buecher/' + b.datei, { cache: 'no-store' });
       if (!a.ok) throw new Error('HTTP ' + a.status);
       const blob = await kofferEntschluesseln(await a.arrayBuffer(), passwort, koffer.runden || 200000);
-      await buchAuflegenAusBlob(blob, (b.name || 'Buch') + '.pdf'); n++;
+      await buchAuflegenAusBlob(blob, (b.name || 'Buch') + '.pdf', { isbn: b.isbn || null, autorVorgabe: b.autor || '', titelFest: !!b.name }); n++;
     } catch (e) {
       fehl++;
       if (/OperationError|decrypt/i.test(String(e && (e.name + ' ' + e.message)))) { toast('Das Passwort passt nicht.', 4200); return; }
@@ -15479,11 +15758,13 @@ function lesestapelZeigen() {
     langdruck(k, async () => {
       const wahl = await menue([
         { text: 'Umbenennen', icon: 'stift', wert: 'name' },
+        { text: 'Cover aus dem Netz (ISBN)', icon: 'suche', wert: 'netz' },
         { text: 'Cover aus einer anderen Seite', icon: 'kamera', wert: 'cover' },
         { text: 'Von vorn beginnen', icon: 'wieder', wert: 'anfang' },
         { text: 'Vom Tisch nehmen', icon: 'muell', wert: 'weg', rot: true }
       ], b.titel || 'Buch');
       if (wahl === 'name') { const n = await eingabe({ titel: 'Das Buch heißt …', wert: b.titel || '' }); if (n) { b.titel = n; speichere(b); zu(); lesestapelZeigen(); } }
+      else if (wahl === 'netz') { zu(); toast('Suche das Cover …', 2500); const ok = await buchCoverAusDemNetz(b); if (ok) toast('Das Cover ist da.'); zeichne(); }
       else if (wahl === 'cover') { const s = await eingabe({ titel: 'Welche Seite als Cover?', wert: '1', platzhalter: 'Seitenzahl' }); const n = parseInt(s, 10); if (n > 0) { await buchCoverAusSeite(b, n); zu(); lesestapelZeigen(); } }
       else if (wahl === 'anfang') { b.seite = 1; speichere(b); zu(); lesestapelZeigen(); }
       else if (wahl === 'weg' && await frage('„' + (b.titel || 'Buch') + '" vom Tisch nehmen? Die Datei geht in den Papierkorb.', { ja: 'Vom Tisch nehmen', gefahr: true })) { await loesche(b.id); zu(); zeichne(); }
@@ -15501,6 +15782,7 @@ function lesestapelZeigen() {
       vomTyp('goodnote').some((d) => d.art === 'pdf') ? el('button', { class: 'knopf', onclick: () => { zu(); buchAusGoodnotesArchiv(); } }, 'Aus dem Goodnotes-Archiv') : null,
       desk ? el('button', { class: 'knopf', onclick: () => { zu(); buecherAusOrdner(); } }, 'Aus dem Bücherordner') : null,
       el('button', { class: 'knopf', title: 'Verschlüsselte Bücher neben der App, mit Passwort', onclick: () => { zu(); buecherkofferHolen(); } }, 'Aus dem Bücherkoffer (Passwort)'),
+      buecher.some((b) => !b.coverNetz) ? el('button', { class: 'knopf', title: 'Offizielle Cover über die ISBN holen', onclick: () => { zu(); schoeneCoverHolen(); } }, el('span', { html: ik('kamera'), style: 'display:flex' }), 'Schöne Cover holen') : null,
       el('span', { class: 'rest' }),
       el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen')));
   const zu = zeigeDeck(kasten);

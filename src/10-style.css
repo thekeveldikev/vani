@@ -513,30 +513,66 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .desk-tuer small { color: #c9b48e; font-size: 13px; }
 .desk-szene { position: relative; height: calc(var(--vvh, 100dvh) - 2px); min-height: 620px; overflow: hidden; background: #0d0b0a; color: #e8d9b8; user-select: none; --lampe: .8; --unordnung: .7; }
 .desk-malerei { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* Vignette über allem (klickt nicht) und eine vordere Tischkante */
+.desk-szene::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none; background: radial-gradient(ellipse at 50% 42%, transparent 52%, rgba(0,0,0,.38) 100%); }
+.desk-szene::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 26px; z-index: 1; pointer-events: none; background: linear-gradient(rgba(255,255,255,.05), rgba(0,0,0,0) 35%, rgba(0,0,0,.5)); }
 .desk-dinge { position: absolute; inset: 0; }
 .desk-fensterknopf { position: absolute; right: 30px; top: calc(44% - 58px); width: 38px; height: 38px; border-radius: 50%; background: rgba(20,16,12,.6); color: #e8c27a; display: grid; place-items: center; box-shadow: 0 0 0 1px rgba(232,194,122,.3); z-index: 3; }
 .desk-fensterknopf svg.ik { width: 20px; height: 20px; }
 /* Alle Dinge: Schatten auf die Platte, leichtes Heben beim Darüberfahren */
+.desk-dinge { --px: 0px; --py: 0px; }
 .desk-ding, .desk-ding-halter { position: absolute; z-index: 2; transform: rotate(var(--dreh, 0deg)); transition: transform .25s cubic-bezier(.2,.8,.2,1), filter .25s; filter: drop-shadow(0 7px 9px rgba(0,0,0,.6)); text-align: left; }
+.desk-ding.tritt-auf, .desk-ding-halter.tritt-auf { animation: ding-landet .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--n, 0) * 45ms); }
+@keyframes ding-landet { from { opacity: 0; transform: translateY(10px) rotate(var(--dreh, 0deg)) scale(.96); } to { opacity: 1; transform: translateY(0) rotate(var(--dreh, 0deg)) scale(1); } }
+.desk-ding.lampe.tritt-auf, .desk-ding.leuchter.tritt-auf, .desk-ding.uhr.tritt-auf, .desk-ding.stuhl.tritt-auf { animation-name: ding-kommt; }
+@keyframes ding-kommt { from { opacity: 0; } to { opacity: 1; } }
+/* Beschriftung beim Darüberfahren — nur mit Maus */
+@media (hover: hover) {
+  .desk-ding[title]:hover::after { content: attr(title); position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; padding: 4px 10px; border-radius: 8px; background: rgba(20,16,12,.92); color: #f1e4c8; font-size: 12px; font-family: ui-rounded, -apple-system, system-ui, sans-serif; pointer-events: none; z-index: 30; box-shadow: 0 2px 8px rgba(0,0,0,.5); }
+  .desk-ding.lampe[title]:hover::after, .desk-ding.manuskript[title]:hover::after { display: none; }
+}
+.lampe-aus .desk-malerei { filter: saturate(.85); transition: filter .6s; }
 .desk-ding:hover { transform: rotate(var(--dreh, 0deg)) translateY(-3px); filter: drop-shadow(0 12px 14px rgba(0,0,0,.65)) brightness(1.06); }
 .desk-ding:active { transform: rotate(var(--dreh, 0deg)) scale(.98); }
 .lampe-aus .desk-ding:not(.lampe):not(.leuchter) { filter: drop-shadow(0 7px 9px rgba(0,0,0,.6)) brightness(.62) saturate(.8); }
-/* ---- Die Lampe mit Zugschnur ---- */
-.desk-ding.lampe { left: 4%; top: calc(44% - 140px); width: 150px; height: 260px; filter: none; cursor: default; z-index: 3; }
+/* ---- Die Lampe mit Zugschnur: Messingfuß und -arm, Bernsteinschirm, ein weicher Kegel aus Licht ---- */
+.desk-ding.lampe { left: 1%; top: calc(44% - 150px); width: 240px; height: 320px; filter: none; cursor: default; z-index: 3; }
 .desk-ding.lampe:hover, .desk-ding.lampe:active { transform: none; filter: none; }
-.desk-ding.lampe .arm { position: absolute; left: 18px; top: 128px; width: 7px; height: 120px; border-radius: 4px; background: linear-gradient(90deg, #2a231f, #5a4c42 45%, #1a1512); box-shadow: 1px 0 2px rgba(0,0,0,.5); }
-.desk-ding.lampe .arm::before { content: ""; position: absolute; left: -3px; top: -10px; width: 60px; height: 8px; border-radius: 4px; background: linear-gradient(#3a302a, #1a1512); transform: rotate(-18deg); transform-origin: left center; }
-.desk-ding.lampe .schirm { position: absolute; left: 20px; top: 88px; width: 118px; height: 54px; border-radius: 10px 10px 56% 56% / 10px 10px 36% 36%; cursor: pointer;
-  background: linear-gradient(175deg, #3a2f28, #1c1613 60%, #110d0b); box-shadow: inset 0 -8px 14px rgba(255,196,110,calc(.9 * var(--lampe))), inset 0 2px 0 rgba(255,255,255,.08), 0 3px 8px rgba(0,0,0,.55); }
-.desk-ding.lampe .schirm::before { content: ""; position: absolute; left: 6px; right: 6px; bottom: -2px; height: 10px; border-radius: 50%; background: radial-gradient(ellipse at 50% 50%, rgba(255,215,140,calc(.95 * var(--lampe))), rgba(255,190,100,calc(.4 * var(--lampe))) 60%, transparent 72%); }
-.desk-ding.lampe .schirm::after { content: ""; position: absolute; left: 4px; right: 4px; top: 50px; height: 230px; clip-path: polygon(0 0, 100% 0, 190% 100%, -90% 100%); background: linear-gradient(rgba(255,205,120,calc(.34 * var(--lampe))), rgba(255,190,100,calc(.08 * var(--lampe))) 55%, transparent); pointer-events: none; }
-.desk-ding.lampe.aus .schirm { box-shadow: inset 0 -6px 10px rgba(0,0,0,.5), inset 0 2px 0 rgba(255,255,255,.06), 0 3px 8px rgba(0,0,0,.55); }
-.desk-ding.lampe.aus .schirm::before { background: radial-gradient(ellipse at 50% 50%, #6a5a48, #3a3028 60%, transparent 72%); }
-.desk-ding.lampe.aus .schirm::after { display: none; }
-.desk-ding.lampe .schnur { position: absolute; left: 120px; top: 136px; width: 18px; height: 54px; display: flex; flex-direction: column; align-items: center; }
-.desk-ding.lampe .schnur .faden { flex: 1; width: 2px; background: linear-gradient(#d8cbb2, #a89a82); box-shadow: 0 0 1px rgba(0,0,0,.6); transform: scaleX(var(--dehnung, 1)); }
-.desk-ding.lampe .schnur .knauf { width: 14px; height: 20px; border-radius: 6px 6px 7px 7px / 5px 5px 9px 9px; background: linear-gradient(#e9c98a, #9c7a3a); box-shadow: 0 2px 4px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.4); cursor: grab; touch-action: none; transition: transform .15s; }
-.desk-ding.lampe.zieht .schnur .knauf { cursor: grabbing; transform: scaleX(1.1); }
+/* Der Schein an der Wand hinter dem Schirm */
+.desk-ding.lampe::before { content: ""; position: absolute; left: 18px; top: 16px; width: 220px; height: 160px; border-radius: 50%; pointer-events: none; mix-blend-mode: screen; transition: opacity .5s;
+  background: radial-gradient(ellipse at 50% 62%, rgba(255,196,110,calc(.3 * var(--lampe))), rgba(255,176,86,calc(.09 * var(--lampe))) 48%, transparent 72%); }
+.desk-ding.lampe.aus::before { opacity: 0; }
+/* Fuß und Arm aus Messing: der Fuß steht auf der Platte, der Arm trägt den Schirm nach rechts hinüber */
+.desk-ding.lampe .arm { position: absolute; left: 24px; top: 74px; width: 9px; height: 104px; border-radius: 5px; background: linear-gradient(90deg, #5a4326, #c9a25a 40%, #7a5a2a 72%, #3a2a14); box-shadow: 2px 0 3px rgba(0,0,0,.5); }
+.desk-ding.lampe .arm::before { content: ""; position: absolute; left: 2px; top: 1px; width: 112px; height: 8px; border-radius: 4px; background: linear-gradient(#d9b463, #8a6a2e 60%, #4a3618); transform: rotate(16deg); transform-origin: left center; box-shadow: 0 2px 3px rgba(0,0,0,.5); }
+.desk-ding.lampe .arm::after { content: ""; position: absolute; left: -20px; top: 96px; width: 58px; height: 16px; border-radius: 50%; background: radial-gradient(ellipse at 50% 40%, #c9a25a, #6a4e28 58%, #2a1c0c); box-shadow: 0 5px 9px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.3); }
+/* Der Schirm: dunkles Glas, das unten bernsteinfarben glüht; oben ein Messingring */
+.desk-ding.lampe .schirm { position: absolute; left: 69px; top: 88px; width: 118px; height: 54px; cursor: pointer; border-radius: 14px 14px 58% 58% / 12px 12px 42% 42%; transform-origin: 50% 0;
+  background: linear-gradient(178deg, #7a4a22, #3e2512 42%, #2a180c 100%);
+  box-shadow: inset 0 3px 0 #b08a3c, inset 0 -11px 16px rgba(255,190,95,calc(.95 * var(--lampe))), inset 0 -1px 0 rgba(255,225,160,calc(.8 * var(--lampe))), 0 3px 10px rgba(0,0,0,.55), 0 0 34px rgba(255,170,80,calc(.4 * var(--lampe)));
+  transition: box-shadow .4s ease, background .4s ease; }
+/* Die Birne: ein warmer Saum unter dem Schirm */
+.desk-ding.lampe .schirm::before { content: ""; position: absolute; left: 8px; right: 8px; bottom: -4px; height: 16px; border-radius: 50%; pointer-events: none; transition: opacity .4s;
+  background: radial-gradient(ellipse at 50% 50%, rgba(255,244,210,calc(1 * var(--lampe))), rgba(255,205,115,calc(.6 * var(--lampe))) 48%, transparent 72%); filter: blur(1px); }
+/* Der Kegel: breit unten, weich an den Rändern, verläuft nach unten ins Nichts */
+.desk-ding.lampe .schirm::after { content: ""; position: absolute; left: -120px; right: -120px; top: 46px; height: 270px; pointer-events: none; mix-blend-mode: screen; opacity: var(--lampe); transition: opacity .4s;
+  clip-path: polygon(34% 0, 66% 0, 100% 100%, 0 100%);
+  background: linear-gradient(90deg, transparent 6%, rgba(255,214,140,.5) 32%, rgba(255,214,140,.55) 50%, rgba(255,214,140,.5) 68%, transparent 94%);
+  -webkit-mask: linear-gradient(rgba(0,0,0,.95), rgba(0,0,0,.42) 40%, rgba(0,0,0,.12) 78%, transparent); mask: linear-gradient(rgba(0,0,0,.95), rgba(0,0,0,.42) 40%, rgba(0,0,0,.12) 78%, transparent); }
+.desk-ding.lampe.aus .schirm { box-shadow: inset 0 3px 0 #8a6a2e, inset 0 -6px 10px rgba(0,0,0,.5), 0 3px 10px rgba(0,0,0,.55); }
+.desk-ding.lampe.aus .schirm::before { opacity: 0; }
+.desk-ding.lampe.aus .schirm::after { opacity: 0; }
+/* Die Schnur: ein Pfad, der dem Finger folgt */
+.desk-ding.lampe .schnur-svg { position: absolute; left: 0; top: 0; width: 240px; height: 320px; overflow: visible; pointer-events: none; }
+.desk-ding.lampe .schnur-pfad { fill: none; stroke: #d8cbb2; stroke-width: 2.4; stroke-linecap: round; }
+.desk-ding.lampe .schnur-schatten { fill: none; stroke: rgba(0,0,0,.45); stroke-width: 4; stroke-linecap: round; transform: translate(2px, 3px); }
+.desk-ding.lampe .knauf { position: absolute; left: 0; top: 0; width: 16px; height: 22px; border-radius: 7px 7px 8px 8px / 6px 6px 10px 10px; background: linear-gradient(#efd39a, #a07c3c); box-shadow: 0 2px 5px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.45), inset 0 -2px 3px rgba(0,0,0,.25); cursor: grab; touch-action: none; transform-origin: 8px 2px; }
+.desk-ding.lampe .knauf::before { content: ""; position: absolute; left: -14px; top: -12px; right: -14px; bottom: -14px; }   /* größere Griff-Fläche für Finger */
+.desk-ding.lampe .knauf::after { content: ""; position: absolute; left: 6px; top: 8px; width: 4px; height: 8px; border-radius: 2px; background: rgba(255,255,255,.25); }
+.desk-ding.lampe.zieht .knauf { cursor: grabbing; filter: brightness(1.12); }
+.desk-ding.lampe.zieht .schirm { transform: rotate(.6deg); }
+.desk-ding.lampe.schaltet .schirm { animation: schirm-zuckt .7s cubic-bezier(.2,.8,.2,1); }
+@keyframes schirm-zuckt { 0% { transform: rotate(0); filter: brightness(1); } 18% { transform: rotate(1.6deg); filter: brightness(1.6); } 42% { transform: rotate(-1.1deg); filter: brightness(.9); } 68% { transform: rotate(.5deg); filter: brightness(1.15); } 100% { transform: rotate(0); filter: brightness(1); } }
 /* ---- Der Leuchter ---- */
 .desk-ding.leuchter { right: 2%; top: calc(44% - 112px); width: 170px; height: 150px; filter: drop-shadow(0 10px 10px rgba(0,0,0,.6)); }
 .leuchter-bild { width: 170px; height: 150px; position: relative; }
@@ -564,8 +600,8 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .stuhl-bild .bein { position: absolute; top: 86px; width: 6px; height: 64px; background: linear-gradient(90deg, #2a1b12, #4a2f1e, #2a1b12); }
 .stuhl-bild .b1 { left: 8px; } .stuhl-bild .b2 { left: 56px; }
 /* ---- Manuskripte ---- */
-.desk-ding.manuskript { left: 30%; top: calc(44% + 16px); width: min(220px, 28%); aspect-ratio: 3 / 4; }
-.desk-ding.manuskript.m2 { left: 37%; top: calc(44% + 44px); } .desk-ding.manuskript.m3 { left: 25%; top: calc(44% + 70px); }
+.desk-ding.manuskript { left: 46%; top: calc(44% + 16px); width: min(220px, 26%); aspect-ratio: 3 / 4; }
+.desk-ding.manuskript.m2 { left: 52%; top: calc(44% + 44px); } .desk-ding.manuskript.m3 { left: 42%; top: calc(44% + 70px); }
 .manuskript-papier { position: relative; width: 100%; height: 100%; padding: 14px 14px 10px; text-align: left; overflow: hidden; border-radius: 2px;
   background: linear-gradient(170deg, #f5ebd3, #e6d8ba), repeating-linear-gradient(transparent 0 21px, rgba(90,70,40,.08) 21px 22px); color: #2c2218; font-family: ui-serif, "New York", Georgia, serif; font-size: 11px; line-height: 1.45; box-shadow: inset 0 0 34px rgba(120,90,40,.18), inset 2px 0 0 rgba(180,60,40,.25); }
 .manuskript-papier b { display: block; font-size: 12.5px; margin-bottom: 5px; border-bottom: 1px solid rgba(60,40,20,.2); padding-bottom: 3px; }
@@ -574,7 +610,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .manuskript-papier .k1 { left: 18%; right: 40%; top: 41%; } .manuskript-papier .k2 { left: 50%; right: 12%; top: 63%; transform: rotate(1deg); }
 .desk-ding.manuskript.leer .manuskript-papier { color: #7a6a52; font-style: italic; }
 /* ---- Tintenfass & Federn ---- */
-.desk-ding.tinte { left: 58%; top: calc(44% + 10px); width: 96px; height: 96px; }
+.desk-ding.tinte { left: 70%; top: calc(44% + 6px); width: 96px; height: 96px; }
 .tinte-bild { position: relative; width: 96px; height: 96px; }
 .tinte-bild .fass { position: absolute; left: 30px; bottom: 8px; width: 38px; height: 34px; border-radius: 7px 7px 12px 12px; background: linear-gradient(90deg, #151a38, #0a0c1e 50%, #1a1f44); box-shadow: inset 0 0 0 2px rgba(255,255,255,.1), inset 0 10px 12px rgba(255,255,255,.07), 0 3px 6px rgba(0,0,0,.65); }
 .tinte-bild .fass::before { content: ""; position: absolute; left: 9px; top: -9px; width: 20px; height: 10px; border-radius: 4px 4px 0 0; background: linear-gradient(#3a3f66, #1a1f44); }
@@ -582,15 +618,23 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .tinte-bild .feder { position: absolute; width: 9px; height: 66px; border-radius: 50% 50% 10% 10%; transform-origin: bottom; background: repeating-linear-gradient(100deg, #ecdfc5 0 1.5px, #cdbfa0 1.5px 3px), linear-gradient(#ecdfc5, #cdbfa0); }
 .tinte-bild .feder::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; margin-left: -.5px; background: rgba(90,70,40,.45); }
 .tinte-bild .feder.f1 { left: 46px; bottom: 22px; transform: rotate(22deg); } .tinte-bild .feder.f2 { left: 6px; bottom: 4px; transform: rotate(-70deg); height: 58px; filter: brightness(.85); }
-/* ---- Bücherstapel ---- */
-.desk-ding-halter.buecher { left: 3%; top: calc(44% + 150px); width: min(170px, 24%); }
-.buecher-stapel { position: relative; }
-.stapel-buch { position: relative; display: block; width: 100%; aspect-ratio: 3 / 4; margin-top: calc(-90% + 14px); transform: rotate(var(--dreh, 0deg)); border-radius: 2px 5px 5px 2px; overflow: hidden; box-shadow: 0 3px 5px rgba(0,0,0,.6), inset 2px 0 4px rgba(255,255,255,.12); background: #4a3a2a; transition: transform .25s; }
-.stapel-buch:first-child { margin-top: 0; }
-.stapel-buch img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.stapel-buch.ohne-cover span { position: absolute; inset: 0; display: grid; place-items: center; padding: 10px; font-family: ui-serif, "New York", Georgia, serif; font-size: 13px; color: #f1e4c8; text-align: center; }
-.stapel-buch:hover { transform: rotate(var(--dreh, 0deg)) translateY(-6px); z-index: 2; }
-.stapel-fuss { display: block; margin-top: 8px; padding: 4px 10px; border-radius: 8px; background: rgba(255,230,180,.1); color: #e8c27a; font-size: 12px; letter-spacing: .04em; }
+/* ---- Das Bücherbord: eine Reihe stehender Bücher, jedes greifbar ---- */
+.desk-ding-halter.buecher { left: 8%; top: calc(44% + 26px); width: min(320px, 33%); filter: none; }
+.desk-ding-halter.buecher:hover { transform: none; }
+.buecher-bord { position: relative; display: flex; align-items: flex-end; gap: 0; padding: 0 6px 6px; min-height: 110px; }
+.bord-buch { position: relative; flex: 0 0 auto; width: 64px; aspect-ratio: 3 / 4; margin-right: var(--ueberlapp, -14px); border-radius: 2px 5px 5px 2px; overflow: hidden; background: #4a3a2a;
+  transform: rotate(var(--lehn, 0deg)); transform-origin: bottom center; box-shadow: 0 4px 7px rgba(0,0,0,.6), inset 2px 0 4px rgba(255,255,255,.14), -1px 0 0 rgba(0,0,0,.5);
+  transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s, margin .28s; z-index: calc(10 - var(--i, 0)); }
+.bord-buch img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bord-buch::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 7px; z-index: 2; pointer-events: none; background: linear-gradient(90deg, rgba(0,0,0,.5), rgba(255,255,255,.14) 55%, rgba(0,0,0,.14)); }
+.bord-buch::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, rgba(255,255,255,.18), rgba(255,255,255,0) 36%, rgba(0,0,0,.2) 100%); }
+.bord-buch:hover::after, .bord-buch:focus-visible::after { background: linear-gradient(105deg, rgba(255,255,255,.26), rgba(255,255,255,0) 40%, rgba(0,0,0,.12) 100%); }
+.bord-buch.ohne-cover span { position: absolute; inset: 0; display: grid; place-items: center; padding: 6px; font-family: ui-serif, "New York", Georgia, serif; font-size: 11px; color: #f1e4c8; text-align: center; line-height: 1.2; }
+.bord-buch .leseband { position: absolute; right: 6px; top: 0; width: 5px; border-radius: 0 0 2px 2px; background: #c0533f; box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.bord-buch:hover, .bord-buch:focus-visible { transform: translateY(-14px) rotate(0deg) scale(1.08); z-index: 20; box-shadow: 0 16px 22px rgba(0,0,0,.7), inset 2px 0 4px rgba(255,255,255,.14); }
+.bordbrett { position: absolute; left: -4px; right: -4px; bottom: -5px; height: 9px; border-radius: 3px; background: linear-gradient(#7a5636, #3a2818); box-shadow: 0 8px 12px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14); }
+.bord-fuss { position: absolute; left: 6px; bottom: -30px; padding: 3px 10px; border-radius: 8px; background: rgba(255,230,180,.1); color: #e8c27a; font-size: 12px; letter-spacing: .04em; white-space: nowrap; }
+@media (max-width: 760px) { .bord-buch { width: 52px; } }
 /* ---- Tasse ---- */
 .desk-ding.tasse { right: 10%; top: calc(44% + 150px); width: 76px; height: 84px; }
 .tasse-bild { position: relative; width: 76px; height: 84px; }
@@ -603,14 +647,14 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 @keyframes dampf-steigt { 0% { transform: translateY(8px) scaleX(1); opacity: 0; } 30% { opacity: .7; } 100% { transform: translateY(-18px) scaleX(1.7); opacity: 0; } }
 .tasse-zahl { position: absolute; left: 8px; top: 44px; width: 48px; text-align: center; font-size: 12px; color: #fff8ea; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
 /* ---- Glas mit Fundstück ---- */
-.desk-ding.glas { left: 24%; top: calc(44% + 190px); width: 54px; height: 74px; }
+.desk-ding.glas { left: 4%; top: calc(44% + 206px); width: 54px; height: 74px; }
 .glas-bild { position: relative; width: 54px; height: 74px; }
 .glaskoerper { position: absolute; left: 4px; top: 12px; width: 46px; height: 58px; border-radius: 7px 7px 13px 13px; background: linear-gradient(90deg, rgba(255,255,255,.26), rgba(255,255,255,.05) 35%, rgba(255,255,255,.02) 60%, rgba(255,255,255,.2)); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.38), inset 0 -6px 10px rgba(255,255,255,.08), 0 3px 6px rgba(0,0,0,.55); }
 .glas-deckel { position: absolute; left: 10px; top: 4px; width: 34px; height: 12px; border-radius: 4px; background: linear-gradient(#8a7a62, #5a4a36); box-shadow: 0 1px 2px rgba(0,0,0,.5); }
 .fundstueck { position: absolute; left: 20px; top: 44px; width: 14px; height: 16px; border-radius: 40% 60% 55% 45%; background: radial-gradient(circle at 40% 35%, #c9a25a, #6b4f25); }
 .fund-foto { position: absolute; left: 9px; top: 22px; width: 36px; height: 42px; object-fit: cover; border-radius: 4px 4px 9px 9px; opacity: .85; filter: sepia(.35) contrast(.9); }
 /* ---- Brief ---- */
-.desk-ding.brief { left: 9%; top: calc(44% + 310px); width: 96px; height: 64px; --dreh: -7deg; }
+.desk-ding.brief { left: 24%; top: calc(44% + 332px); width: 96px; height: 64px; --dreh: -7deg; }
 .brief-bild { width: 96px; height: 64px; background: linear-gradient(#f0e4c9, #dccba6); border-radius: 2px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,.6); overflow: hidden; }
 .brief-bild::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 0; border-left: 48px solid transparent; border-right: 48px solid transparent; border-top: 32px solid rgba(120,90,50,.22); }
 .brief-bild .zeile { position: absolute; left: 10px; height: 1.5px; background: rgba(60,40,20,.35); transform: rotate(-1deg); }
@@ -632,7 +676,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .lupe-bild .linse { position: absolute; left: 0; top: 6px; width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.42), rgba(200,220,255,.14) 60%, rgba(255,255,255,.05)); box-shadow: inset 0 0 0 4px #8a6d3c, inset 0 0 0 5px rgba(255,230,170,.4), 0 2px 4px rgba(0,0,0,.55); }
 .lupe-bild .glanz { position: absolute; left: 9px; top: 12px; width: 9px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.55); transform: rotate(-30deg); }
 .lupe-bild .griff { position: absolute; left: 33px; top: 25px; width: 28px; height: 8px; border-radius: 4px; background: linear-gradient(#4a3622, #2a1c10); transform: rotate(35deg); transform-origin: left center; box-shadow: 0 1px 2px rgba(0,0,0,.5); }
-.desk-ding.stummel { left: 50%; top: calc(44% + 230px); width: 40px; height: 12px; --dreh: -18deg; }
+.desk-ding.stummel { left: 56%; top: calc(44% + 250px); width: 40px; height: 12px; --dreh: -18deg; }
 .stummel-bild { position: relative; width: 40px; height: 10px; }
 .stummel-bild .holz { position: absolute; left: 0; top: 0; width: 34px; height: 10px; border-radius: 2px 40% 40% 2px / 2px 50% 50% 2px; background: linear-gradient(#e9c36a, #c99a3d); box-shadow: 0 1px 3px rgba(0,0,0,.55); }
 .stummel-bild .holz::after { content: ""; position: absolute; right: 0; top: 1px; width: 9px; height: 8px; border-radius: 0 50% 50% 0; background: linear-gradient(90deg, #f1dfc0, #d8c49c); }
@@ -644,9 +688,9 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .notizbuch-bild .gummi { position: absolute; top: -2px; bottom: -2px; right: 14px; width: 6px; background: #2c251c; opacity: .9; border-radius: 2px; }
 /* ---- Verse ---- */
 .desk-vers { position: absolute; z-index: 1; font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 13px; color: rgba(235,220,190,.42); max-width: 220px; pointer-events: none; transform: rotate(var(--dreh, -4deg)); text-shadow: 0 1px 1px rgba(0,0,0,.4); }
-.desk-vers.v1 { left: 40%; top: calc(44% + 250px); --dreh: -6deg; } .desk-vers.v2 { left: 62%; top: calc(44% + 130px); --dreh: 3deg; } .desk-vers.v3 { left: 34%; top: calc(44% + 330px); --dreh: -2deg; }
+.desk-vers.v1 { left: 12%; top: calc(44% + 160px); --dreh: -6deg; } .desk-vers.v2 { left: 62%; top: calc(44% + 130px); --dreh: 3deg; } .desk-vers.v3 { left: 34%; top: calc(44% + 330px); --dreh: -2deg; }
 /* ---- Papierkorb, Schublade, Einrichten ---- */
-.desk-korb { position: absolute; left: 4%; bottom: 6px; width: 64px; height: 54px; z-index: 3; border-radius: 4px 4px 10px 10px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 3px, transparent 3px 6px), linear-gradient(#3a2c20, #1e160f); box-shadow: inset 0 0 0 1px rgba(255,220,160,.1), 0 3px 8px rgba(0,0,0,.6); filter: drop-shadow(0 4px 6px rgba(0,0,0,.5)); }
+.desk-korb { position: absolute; left: 1.5%; bottom: 4px; width: 64px; height: 54px; z-index: 3; border-radius: 4px 4px 10px 10px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 3px, transparent 3px 6px), linear-gradient(#3a2c20, #1e160f); box-shadow: inset 0 0 0 1px rgba(255,220,160,.1), 0 3px 8px rgba(0,0,0,.6); filter: drop-shadow(0 4px 6px rgba(0,0,0,.5)); }
 .desk-korb .korbrand { position: absolute; left: -3px; right: -3px; top: -3px; height: 7px; border-radius: 4px; background: linear-gradient(#5a4530, #2a1f14); }
 .desk-korb .knuell { position: absolute; width: 22px; height: 20px; border-radius: 45% 55% 50% 50%; background: radial-gradient(circle at 35% 35%, #f3e9d4, #c9bda0 70%); box-shadow: inset -3px -3px 6px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.5); }
 .desk-korb .k1 { left: 6px; top: -10px; transform: rotate(-12deg); } .desk-korb .k2 { left: 26px; top: -14px; transform: rotate(18deg); } .desk-korb .k3 { left: 42px; top: -6px; transform: rotate(-30deg); width: 18px; height: 16px; }
@@ -656,16 +700,16 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .desk-einrichten { position: absolute; right: 12px; top: 12px; z-index: 4; background: rgba(20,16,12,.6); color: #e8c27a; }
 @media (max-width: 760px) {
   .desk-szene { min-height: 720px; }
-  .desk-ding.lampe { left: -6px; transform: scale(.78); transform-origin: top left; }
+  .desk-ding.lampe { left: -12px; transform: scale(.78); transform-origin: top left; }
   .desk-ding.leuchter { right: -16px; transform: scale(.72); transform-origin: top right; }
   .desk-ding.uhr { right: 28%; transform: scale(.8); transform-origin: top; } .desk-ding.stuhl { display: none; }
-  .desk-ding.manuskript { width: 40%; left: 26%; } .desk-ding.manuskript.m2 { left: 32%; } .desk-ding.manuskript.m3 { left: 20%; }
-  .desk-ding.tinte { left: 68%; top: calc(44% + 90px); transform: scale(.8); }
-  .desk-ding-halter.buecher { width: 30%; top: calc(44% + 180px); }
-  .desk-ding.tasse { right: 4%; top: calc(44% + 180px); transform: scale(.85); }
-  .desk-ding.glas { left: 38%; top: calc(44% + 250px); } .desk-ding.brief { top: calc(44% + 330px); left: 6%; width: 80px; }
-  .desk-ding.karten { right: 30%; top: calc(44% + 320px); } .desk-ding.lupe { right: 4%; top: calc(44% + 340px); } .desk-ding.stummel { left: 54%; top: calc(44% + 280px); } .desk-ding.notizbuch { right: 6%; top: calc(44% + 250px); transform: scale(.85); }
-  .desk-vers { font-size: 11px; max-width: 150px; }
+  .desk-ding.manuskript { width: 36%; left: 44%; } .desk-ding.manuskript.m2 { left: 50%; } .desk-ding.manuskript.m3 { left: 38%; }
+  .desk-ding.tinte { left: 76%; top: calc(44% + 30px); transform: scale(.8); }
+  .desk-ding-halter.buecher { left: 4%; width: 40%; top: calc(44% + 14px); }
+  .desk-ding.tasse { right: 4%; top: calc(44% + 27%); transform: scale(.85); }
+  .desk-ding.glas { left: 5%; top: calc(44% + 190px); } .desk-ding.brief { top: calc(44% + 330px); left: 26%; width: 80px; }
+  .desk-ding.karten { right: 30%; top: calc(44% + 40%); } .desk-ding.lupe { right: 4%; top: calc(44% + 46%); } .desk-ding.stummel { left: 58%; top: calc(44% + 290px); } .desk-ding.notizbuch { right: 5%; top: calc(44% + 36%); transform: scale(.85); }
+  .desk-vers { font-size: 11px; max-width: 150px; } .desk-vers.v1 { left: 8%; top: calc(44% + 150px); }
   .desk-korb { width: 50px; height: 44px; }
 }
 /* ===================== LESESTAPEL & LESEMODUS ===================== */

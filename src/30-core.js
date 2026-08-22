@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.16.0';
+const APP_VERSION = '5.17.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -470,6 +470,8 @@ function sauberesDokument(quelle) {
     if (d.seiten != null) d.seiten = Math.round(begrenze(d.seiten, 0, 100000, 0));
     if (d.seite != null) d.seite = Math.round(begrenze(d.seite, 1, 100000, 1));
     if (d.autor != null) d.autor = String(d.autor).slice(0, 200);
+    if (d.isbn != null) d.isbn = String(d.isbn).replace(/[^0-9Xx]/g, '').slice(0, 13);
+    if (d.coverNetz != null) d.coverNetz = d.coverNetz === true;
     if (d.zuletzt != null) d.zuletzt = begrenze(d.zuletzt, 0, Date.now() + 86400000, 0);
     if (d.lesezeichen != null) d.lesezeichen = Array.isArray(d.lesezeichen) ? [...new Set(d.lesezeichen.map((n) => Math.round(Number(n))).filter((n) => Number.isFinite(n) && n >= 1 && n <= 100000))].slice(0, 200) : [];
   }

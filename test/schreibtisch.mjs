@@ -87,3 +87,24 @@ test('buchFortschritt und saubereLeseEinstellung', async () => {
   assert.deepEqual(e, { helligkeit: .4, waerme: 1, nacht: false, doppel: 'auto', blaettern: false, zoom: 'seite' });
   assert.deepEqual(roh(k.saubereLeseEinstellung(null)), { helligkeit: 1, waerme: .15, nacht: false, doppel: 'auto', blaettern: true, zoom: 'seite' });
 });
+
+test('isbnZu10 und isbnAusText: Prüfziffer, Bindestriche, Impressumszeilen', async () => {
+  const k = await frisch();
+  assert.equal(k.isbnZu10('978-3-608-93828-6'), '3608938281');
+  assert.equal(k.isbnZu10('3791504673'), '3791504673');
+  assert.equal(k.isbnZu10('9783453435773'), '345343577X');
+  assert.equal(k.isbnZu10('979-10-90636-07-1'), null, '979er haben keine ISBN-10');
+  assert.equal(k.isbnZu10('12345'), null);
+  const t = 'Impressum\nISBN 978-3-608-93828-6 (Gebunden)\nISBN: 3-7915-0467-3\nISBN 978-3-608-93828-6';
+  assert.deepEqual([...k.isbnAusText(t)], ['9783608938286', '3791504673']);
+  assert.deepEqual([...k.isbnAusText('')], []);
+});
+
+test('saubererAutor: Katalogzeilen werden zu Namen', async () => {
+  const k = await frisch();
+  assert.equal(k.saubererAutor('Fowler, Aisling Verfasser'), 'Aisling Fowler');
+  assert.equal(k.saubererAutor('Silvana de [Mari, Silvana de] Mari'), 'Silvana de Mari');
+  assert.equal(k.saubererAutor('Stephen King'), 'Stephen King');
+  assert.equal(k.saubererAutor('Tolkien, John R'), 'John R Tolkien');
+  assert.equal(k.saubererAutor(''), '');
+});

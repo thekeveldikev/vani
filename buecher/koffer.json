@@ -5,32 +5,44 @@
   {
    "datei": "buch-01.enc",
    "groesse": 6972538,
-   "name": "Der Herr der Ringe - Neuüberarbeitung der Übersetzung von Wolfgang Krege - überarbeitet und aktualisiert (Tolkien, J R R"
+   "name": "Der Herr der Ringe",
+   "isbn": "3608938281",
+   "autor": "J. R. R. Tolkien"
   },
   {
    "datei": "buch-02.enc",
    "groesse": 3021609,
-   "name": "Der kleine Prinz (De Saint-Exupery, Antoine)"
+   "name": "Der kleine Prinz",
+   "isbn": "3792000504",
+   "autor": "Antoine de Saint-Exupéry"
   },
   {
    "datei": "buch-03.enc",
    "groesse": 4846930,
-   "name": "ES (King Stephen)"
+   "name": "ES",
+   "isbn": "345343577X",
+   "autor": "Stephen King"
   },
   {
    "datei": "buch-04.enc",
    "groesse": 15158352,
-   "name": "Feuerblut - Der Schwur der Jagdlinge (Fowler, Aisling Verfasser, Diestelmeier etc.)"
+   "name": "Feuerblut – Der Schwur der Jagdlinge",
+   "isbn": "3748800738",
+   "autor": "Aisling Fowler"
   },
   {
    "datei": "buch-05.enc",
    "groesse": 1636120,
-   "name": "Der letzte Elf (Mari, Silvana de [Mari, Silvana de])"
+   "name": "Der letzte Elf",
+   "isbn": "3641023122",
+   "autor": "Silvana De Mari"
   },
   {
    "datei": "buch-06.enc",
    "groesse": 4105319,
-   "name": "epdf.pub_tintenblut"
+   "name": "Tintenblut",
+   "isbn": "3791504673",
+   "autor": "Cornelia Funke"
   }
  ]
 }

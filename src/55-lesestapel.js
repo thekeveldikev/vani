@@ -52,8 +52,126 @@ function leseEinstellung() {
 }
 function leseEinstellungSpeichern(e) { try { localStorage.setItem('vani-lese', JSON.stringify(saubereLeseEinstellung(e))); } catch (x) {} }
 
+/* ----- Cover aus dem Netz: über die ISBN ----- */
+/* ISBN-13 → ISBN-10 (nur 978er); eine 10er bleibt. Pur. */
+function isbnZu10(roh) {
+  const k = String(roh || '').replace(/[^0-9Xx]/g, '').toUpperCase();
+  if (k.length === 10) return k;
+  if (k.length !== 13 || !k.startsWith('978')) return null;
+  const kern = k.slice(3, 12);
+  let s = 0; for (let i = 0; i < 9; i++) s += (10 - i) * Number(kern[i]);
+  const r = (11 - s % 11) % 11;
+  return kern + (r === 10 ? 'X' : String(r));
+}
+/* ISBNs aus einem Text (Impressum). Pur. */
+function isbnAusText(text) {
+  const aus = [];
+  for (const m of String(text || '').matchAll(/ISBN[\s:–-]*((?:97[89][\s-]?)?\d[\d\s-]{8,16}[\dXx])/gi)) {
+    let k = m[1].replace(/[\s-]/g, '').toUpperCase();
+    if (k.length > 13 && /^97[89]/.test(k)) k = k.slice(0, 13);
+    if ((k.length === 13 || k.length === 10) && !aus.includes(k)) aus.push(k);
+  }
+  return aus;
+}
+/* ISBNs aus den ersten Seiten eines aufgeschlagenen PDFs. */
+async function isbnAusPdf(dok, maxSeiten = 12) {
+  const aus = [];
+  for (let n = 1; n <= Math.min(maxSeiten, dok.numPages); n++) {
+    try { const tc = await (await dok.getPage(n)).getTextContent(); for (const i of isbnAusText(tc.items.map((x) => x.str).join(' '))) if (!aus.includes(i)) aus.push(i); } catch (e) {}
+    if (aus.length >= 3) break;
+  }
+  return aus;
+}
+/* Ein Cover zur ISBN: zuerst der große Bildhost (erlaubt fremde Abrufe), dann Open Library.
+   Ein Platzhalter-Bildchen (wenige Bytes) zählt nicht. */
+async function coverVonIsbn(isbn) {
+  const i10 = isbnZu10(isbn);
+  const i13 = String(isbn || '').replace(/[^0-9Xx]/g, '');
+  const quellen = [];
+  if (i10) quellen.push('https://images-na.ssl-images-amazon.com/images/P/' + i10 + '.01.LZZZZZZZ.jpg');
+  if (i13.length === 13) quellen.push('https://covers.openlibrary.org/b/isbn/' + i13 + '-L.jpg?default=false');
+  for (const url of quellen) {
+    try {
+      const ab = new AbortController(); const t = setTimeout(() => ab.abort(), 9000);
+      const r = await fetch(url, { signal: ab.signal, mode: 'cors' }); clearTimeout(t);
+      if (!r.ok) continue;
+      const blob = await r.blob();
+      if (blob.size > 5000 && /^image\//.test(blob.type || 'image/jpeg')) return blob;
+    } catch (e) {}
+  }
+  return null;
+}
+async function buchCoverSetzen(b, blob, ausDemNetz) {
+  const id = await speichereDateiBlob(new File([blob], 'cover.jpg', { type: blob.type || 'image/jpeg' }));
+  if (!id) return false;
+  b.bild = id; if (ausDemNetz) b.coverNetz = true;
+  speichere(b); return true;
+}
+/* Koffer-Manifest: ISBN zu einem Buch über den Namen finden. */
+async function kofferIsbnFuer(b) {
+  const k = await buecherkofferListe().catch(() => null);
+  if (!k) return null;
+  const norm = (s) => String(s || '').toLowerCase().replace(/[^a-zäöüß0-9]+/g, ' ').trim();
+  const t = norm(b.titel);
+  const e = k.buecher.find((x) => x.isbn && (norm(x.name) === t || (t.length > 4 && (norm(x.name).includes(t) || t.includes(norm(x.name))))));
+  return e ? e.isbn : null;
+}
+/* Versucht, für ein Buch das offizielle Cover zu holen: eigene ISBN, Koffer,
+   dann die ersten Seiten der PDF. Still = ohne Nachfragen und Hinweise. */
+async function buchCoverAusDemNetz(b, { still = false } = {}) {
+  const versucht = new Set();
+  const probiere = async (isbn) => {
+    if (!isbn || versucht.has(isbn)) return false; versucht.add(isbn);
+    const blob = await coverVonIsbn(isbn);
+    if (!blob) return false;
+    b.isbn = isbn;
+    return buchCoverSetzen(b, blob, true);
+  };
+  if (b.isbn && await probiere(b.isbn)) return true;
+  const aus = await kofferIsbnFuer(b);
+  if (aus && await probiere(aus)) return true;
+  try {
+    const pdfjs = await pdfjsLaden();
+    const blob = await dbGet('media', b.datei);
+    if (blob) {
+      const dok = await pdfjs.getDocument({ data: await blob.arrayBuffer() }).promise;
+      const isbns = await isbnAusPdf(dok);
+      try { dok.destroy(); } catch (e) {}
+      for (const i of isbns) if (await probiere(i)) return true;
+    }
+  } catch (e) {}
+  if (still) return false;
+  const eingabeIsbn = await eingabe({ titel: 'Kein Cover gefunden — ISBN des Buchs?', platzhalter: '978… (steht im Impressum oder hinten auf dem Buch)', ok: 'Cover holen' });
+  if (!eingabeIsbn) return false;
+  if (await probiere(eingabeIsbn)) return true;
+  toast('Zu dieser ISBN gibt es kein Cover im Netz.', 3600);
+  return false;
+}
+/* Für alle Bücher auf dem Tisch, die noch kein Netz-Cover haben. */
+async function schoeneCoverHolen() {
+  const offen = lesestapelBuecher().filter((b) => !b.coverNetz);
+  if (!offen.length) { toast('Alle Bücher haben schon ihr Cover.'); return; }
+  toast('Suche Cover für ' + offen.length + (offen.length === 1 ? ' Buch …' : ' Bücher …'), 3000);
+  let n = 0;
+  for (const b of offen) { try { if (await buchCoverAusDemNetz(b, { still: true })) n++; } catch (e) {} }
+  toast(n ? n + (n === 1 ? ' Cover gefunden.' : ' Cover gefunden.') : 'Im Netz war kein passendes Cover — über „Cover" am Buch geht es mit ISBN.', 4200);
+  zeichne();
+}
+
 /* Ein PDF (Datei/Blob) als Buch auflegen: Datei ablegen, zählen, Cover malen. */
-async function buchAuflegenAusBlob(blob, name, { datei = null } = {}) {
+/* Autorenangaben aus PDF-Metadaten sind oft Katalogzeilen: „Nachname, Vorname Verfasser", eckige
+   Klammern, doppelte Namen. Hier wird daraus ein Name. Pur. */
+function saubererAutor(roh) {
+  let a = String(roh || '').replace(/\[[^\]]*\]/g, ' ').replace(/\b(Verfasser(?:in)?|Autor(?:in)?|author|Hrsg\.?|Übersetzer(?:in)?)\b\.?/gi, ' ').replace(/[;|/]+/g, ',').replace(/\s+/g, ' ').trim().replace(/^[,\s]+|[,\s]+$/g, '');
+  const m = a.match(/^([^,]+),\s*([^,]+)$/);
+  if (m && !/\s(?:und|and|&)\s/i.test(a)) a = (m[2] + ' ' + m[1]).replace(/\s+/g, ' ').trim();
+  /* „Silvana de Mari Silvana de Mari" -> einmal reicht */
+  const h = a.length >> 1;
+  if (a.length > 8 && a.slice(0, h).trim().toLowerCase() === a.slice(h).trim().toLowerCase()) a = a.slice(0, h).trim();
+  return a.slice(0, 120);
+}
+
+async function buchAuflegenAusBlob(blob, name, { datei = null, isbn = null, autorVorgabe = '', titelFest = false } = {}) {
   const pdfjs = await pdfjsLaden();
   const daten = await blob.arrayBuffer();
   const dok = await pdfjs.getDocument({ data: daten.slice(0) }).promise;
@@ -65,8 +183,8 @@ async function buchAuflegenAusBlob(blob, name, { datei = null } = {}) {
   try {
     const meta = await dok.getMetadata();
     if (meta && meta.info) {
-      if (meta.info.Title && String(meta.info.Title).trim().length > 2 && !/untitled|microsoft|word/i.test(meta.info.Title)) titel = String(meta.info.Title).trim().slice(0, 160);
-      if (meta.info.Author && String(meta.info.Author).trim()) autor = String(meta.info.Author).trim().slice(0, 160);
+      if (!titelFest && meta.info.Title && String(meta.info.Title).trim().length > 2 && !/untitled|microsoft|word/i.test(meta.info.Title)) titel = String(meta.info.Title).trim().slice(0, 160);
+      if (meta.info.Author && String(meta.info.Author).trim()) autor = saubererAutor(meta.info.Author);
     }
   } catch (e) {}
   if (!autor) { const m = titel.match(/\(([^()]{3,80})\)\s*$/); if (m) { autor = m[1].replace(/^(\w[^,]*),\s*(.+)$/, '$2 $1').trim(); titel = titel.replace(/\s*\([^()]*\)\s*$/, '').trim(); } }
@@ -82,8 +200,18 @@ async function buchAuflegenAusBlob(blob, name, { datei = null } = {}) {
     await seite.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
     bild = await new Promise((res) => c.toBlob(async (b) => { if (!b) return res(null); try { res(await speichereDateiBlob(new File([b], 'cover.jpg', { type: 'image/jpeg' }))); } catch (e) { res(null); } }, 'image/jpeg', .82));
   } catch (e) {}
+  /* ISBN aus dem Impressum — damit später das echte Cover kommt */
+  let isbns = [];
+  try { isbns = await isbnAusPdf(dok); } catch (e) {}
   try { dok.destroy(); } catch (e) {}
-  const buch = neuDoc('buch', { titel, autor, datei: dateiId, bild, seiten, seite: 1, lesezeichen: [], zuletzt: Date.now() });
+  if (autorVorgabe) autor = autorVorgabe;   /* eine kuratierte Angabe schlägt Metadaten */
+  const buch = neuDoc('buch', { titel, autor, datei: dateiId, bild, seiten, seite: 1, lesezeichen: [], zuletzt: Date.now(), isbn: isbn || isbns[0] || undefined });
+  /* Das offizielle Cover aus dem Netz, wenn eines zu finden ist — still, im Hintergrund. */
+  (async () => {
+    for (const i of [isbn, ...isbns].filter(Boolean)) {
+      try { const c = await coverVonIsbn(i); if (c) { buch.isbn = i; await buchCoverSetzen(buch, c, true); zeichne(); return; } } catch (e) {}
+    }
+  })();
   return buch;
 }
 
@@ -168,18 +296,25 @@ function passwortFragen(titel, hinweis) {
 async function buecherkofferHolen() {
   const koffer = await buecherkofferListe();
   if (!koffer || !koffer.buecher.length) { toast('Gerade liegt kein Bücherkoffer neben der App.', 3600); return; }
-  const da = new Set(lesestapelBuecher().map((b) => (b.titel || '').toLowerCase()));
+  /* Schon da? Nach ISBN oder Titel — und wer schon da ist, bekommt Namen und Autor aus dem Koffer,
+     falls beim ersten Holen die PDF-Metadaten gewonnen hatten. */
+  const vorhanden = lesestapelBuecher();
+  const da = new Set(vorhanden.flatMap((b) => [(b.titel || '').toLowerCase(), b.isbn || '']).filter(Boolean));
+  for (const b of koffer.buecher) {
+    const alt = b.isbn && vorhanden.find((x) => x.isbn === b.isbn);
+    if (alt && b.name && (alt.titel !== b.name || (b.autor && alt.autor !== b.autor))) { alt.titel = b.name; if (b.autor) alt.autor = b.autor; speichere(alt); }
+  }
   const passwort = await passwortFragen('Der Bücherkoffer', koffer.buecher.length + ' Bücher, verschlüsselt. Das Passwort bleibt hier auf dem Gerät; die Bücher landen in deinem eigenen Vorrat.');
   if (!passwort) return;
   let n = 0, fehl = 0;
   for (const b of koffer.buecher) {
-    if (da.has(String(b.name || '').toLowerCase())) continue;
+    if (da.has(String(b.name || '').toLowerCase()) || (b.isbn && da.has(b.isbn))) continue;
     toast('Hole „' + (b.name || b.datei) + '" …', 2400);
     try {
       const a = await fetch('buecher/' + b.datei, { cache: 'no-store' });
       if (!a.ok) throw new Error('HTTP ' + a.status);
       const blob = await kofferEntschluesseln(await a.arrayBuffer(), passwort, koffer.runden || 200000);
-      await buchAuflegenAusBlob(blob, (b.name || 'Buch') + '.pdf'); n++;
+      await buchAuflegenAusBlob(blob, (b.name || 'Buch') + '.pdf', { isbn: b.isbn || null, autorVorgabe: b.autor || '', titelFest: !!b.name }); n++;
     } catch (e) {
       fehl++;
       if (/OperationError|decrypt/i.test(String(e && (e.name + ' ' + e.message)))) { toast('Das Passwort passt nicht.', 4200); return; }
@@ -228,11 +363,13 @@ function lesestapelZeigen() {
     langdruck(k, async () => {
       const wahl = await menue([
         { text: 'Umbenennen', icon: 'stift', wert: 'name' },
+        { text: 'Cover aus dem Netz (ISBN)', icon: 'suche', wert: 'netz' },
         { text: 'Cover aus einer anderen Seite', icon: 'kamera', wert: 'cover' },
         { text: 'Von vorn beginnen', icon: 'wieder', wert: 'anfang' },
         { text: 'Vom Tisch nehmen', icon: 'muell', wert: 'weg', rot: true }
       ], b.titel || 'Buch');
       if (wahl === 'name') { const n = await eingabe({ titel: 'Das Buch heißt …', wert: b.titel || '' }); if (n) { b.titel = n; speichere(b); zu(); lesestapelZeigen(); } }
+      else if (wahl === 'netz') { zu(); toast('Suche das Cover …', 2500); const ok = await buchCoverAusDemNetz(b); if (ok) toast('Das Cover ist da.'); zeichne(); }
       else if (wahl === 'cover') { const s = await eingabe({ titel: 'Welche Seite als Cover?', wert: '1', platzhalter: 'Seitenzahl' }); const n = parseInt(s, 10); if (n > 0) { await buchCoverAusSeite(b, n); zu(); lesestapelZeigen(); } }
       else if (wahl === 'anfang') { b.seite = 1; speichere(b); zu(); lesestapelZeigen(); }
       else if (wahl === 'weg' && await frage('„' + (b.titel || 'Buch') + '" vom Tisch nehmen? Die Datei geht in den Papierkorb.', { ja: 'Vom Tisch nehmen', gefahr: true })) { await loesche(b.id); zu(); zeichne(); }
@@ -250,6 +387,7 @@ function lesestapelZeigen() {
       vomTyp('goodnote').some((d) => d.art === 'pdf') ? el('button', { class: 'knopf', onclick: () => { zu(); buchAusGoodnotesArchiv(); } }, 'Aus dem Goodnotes-Archiv') : null,
       desk ? el('button', { class: 'knopf', onclick: () => { zu(); buecherAusOrdner(); } }, 'Aus dem Bücherordner') : null,
       el('button', { class: 'knopf', title: 'Verschlüsselte Bücher neben der App, mit Passwort', onclick: () => { zu(); buecherkofferHolen(); } }, 'Aus dem Bücherkoffer (Passwort)'),
+      buecher.some((b) => !b.coverNetz) ? el('button', { class: 'knopf', title: 'Offizielle Cover über die ISBN holen', onclick: () => { zu(); schoeneCoverHolen(); } }, el('span', { html: ik('kamera'), style: 'display:flex' }), 'Schöne Cover holen') : null,
       el('span', { class: 'rest' }),
       el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen')));
   const zu = zeigeDeck(kasten);

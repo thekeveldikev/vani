@@ -47,8 +47,12 @@ function schreibtischMaler(canvas, optionen = {}) {
   const saatText = tagKey();
   let saat = 17; for (const c of saatText) saat = (saat * 31 + c.charCodeAt(0)) >>> 0;
   const zuf = kerzeZufall(saat);
-  const opt = Object.assign({ holz: 'nuss', lampe: .8, lampeAn: true, wetter: 'still', kerzen: true, unordnung: .7, fensterAnteil: .44 }, optionen);
+  const opt = Object.assign({ holz: 'nuss', lampe: .8, lampeAn: true, wetter: 'still', kerzen: true, unordnung: .7, fensterAnteil: .44, parallax: { x: 0, y: 0 } }, optionen);
   let W = 0, H = 0, fensterH = 0, statisch = null, laeuft = false, t = 0, letzte = 0, blitz = 0, blitzWarte = 6 + zuf() * 10;
+  let lampeJetzt = opt.lampeAn ? opt.lampe : 0;       /* das Licht schmilzt ein, es springt nicht */
+  let para = { x: 0, y: 0 };                          /* geglättete Parallaxe */
+  const staub = Array.from({ length: 46 }, () => ({ x: zuf(), y: zuf(), r: .5 + zuf() * 1.1, ph: zuf() * 6.3, v: .004 + zuf() * .008 }));
+  let motte = null, motteWarte = 50 + zuf() * 120;
   const jahreszeit = schreibtischJahreszeit();
   const mond = mondphase();
 
@@ -157,6 +161,7 @@ function schreibtischMaler(canvas, optionen = {}) {
 
   /* ----- Das Bewegte ----- */
   function maleFenster(dt) {
+    para.x += (opt.parallax.x - para.x) * Math.min(1, dt * 4); para.y += (opt.parallax.y - para.y) * Math.min(1, dt * 4);
     const licht = schreibtischTageslicht();
     const [h1, h2, h3] = schreibtischHimmelFarben(licht);
     const sky = ctx.createLinearGradient(0, 0, 0, fensterH);
@@ -196,7 +201,7 @@ function schreibtischMaler(canvas, optionen = {}) {
     const boden = fensterH - 12;
     const farbe = (tief) => nacht > .5 ? (tief ? '#0a0f0a' : '#0e150e') : (tief ? '#1d251c' : '#263125');
     for (const b of baeume) {
-      const sway = Math.sin(t * .6 * wind + b.ph) * 3 * wind;
+      const sway = Math.sin(t * .6 * wind + b.ph) * 3 * wind + para.x * (b.tief ? -3 : -7);
       const bx = 16 + b.x * (W - 32), bw = b.w * (W - 32), bh = b.h * (fensterH - 40);
       ctx.fillStyle = farbe(b.tief);
       /* Stamm */
@@ -211,7 +216,7 @@ function schreibtischMaler(canvas, optionen = {}) {
       }
     }
     for (const s of buesche) {
-      const sway = Math.sin(t * .9 * wind + s.ph) * 2.2 * wind;
+      const sway = Math.sin(t * .9 * wind + s.ph) * 2.2 * wind + para.x * -9;
       const sx = 16 + s.x * (W - 32), sw = s.w * (W - 32), sh = s.h * (fensterH - 40);
       ctx.fillStyle = nacht > .5 ? '#0b120b' : '#1f2a1e';
       ctx.beginPath(); ctx.ellipse(sx + sway, boden - sh * .35, sw * .5, sh * .5, 0, 0, 6.29); ctx.fill();
@@ -284,16 +289,49 @@ function schreibtischMaler(canvas, optionen = {}) {
     ctx.restore();
   }
 
-  function maleLicht() {
+  function maleLicht(dt) {
     const oben = fensterH + 10;
-    /* Dunkelheit über der Platte, die Lampe frisst sie auf */
-    const an = opt.lampeAn ? opt.lampe : 0;
-    ctx.fillStyle = 'rgba(0,0,0,' + (.58 - .42 * an).toFixed(3) + ')'; ctx.fillRect(0, oben, W, H - oben);
-    if (an > 0) {
+    /* Dunkelheit über der Platte, die Lampe frisst sie auf — und sie geht nicht
+       an wie ein Schalter, sondern wie ein Glühfaden: erst warm, dann hell. */
+    const ziel = opt.lampeAn ? opt.lampe : 0;
+    lampeJetzt += (ziel - lampeJetzt) * Math.min(1, dt * (ziel > lampeJetzt ? 5 : 9));
+    if (Math.abs(ziel - lampeJetzt) < .004) lampeJetzt = ziel;
+    const an = lampeJetzt;
+    ctx.fillStyle = 'rgba(0,0,0,' + (.62 - .48 * an).toFixed(3) + ')'; ctx.fillRect(0, oben, W, H - oben);
+    /* Der Schirm hängt links über der Platte; der Teich aus Licht liegt ein Stück rechts darunter */
+    const lx = W * .16 + para.x * 4, ly = oben + (H - oben) * .27;
+    if (an > .01) {
       const flacker = 1 + .012 * Math.sin(t * 7.3) + .008 * Math.sin(t * 13.1);
-      kerzeSchein(ctx, W * .2, oben + (H - oben) * .3, W * .42 * flacker, (H - oben) * .62, [[0, 'rgba(255,196,110,' + (.5 * an).toFixed(3) + ')'], [.35, 'rgba(255,170,80,' + (.22 * an).toFixed(3) + ')'], [1, 'rgba(255,150,60,0)']]);
-      /* Lichtstreif an der Wand unter der Lampe */
-      kerzeSchein(ctx, W * .14, oben - 10, W * .1, 30, [[0, 'rgba(255,200,120,' + (.18 * an).toFixed(3) + ')'], [1, 'rgba(255,200,120,0)']]);
+      kerzeSchein(ctx, lx, ly, W * .46 * flacker, (H - oben) * .7, [[0, 'rgba(255,200,115,' + (.62 * an).toFixed(3) + ')'], [.3, 'rgba(255,176,85,' + (.3 * an).toFixed(3) + ')'], [.7, 'rgba(255,150,60,' + (.09 * an).toFixed(3) + ')'], [1, 'rgba(255,150,60,0)']]);
+      /* Der helle Teich direkt unter dem Schirm, mit einem schärferen Kern */
+      kerzeSchein(ctx, lx + W * .01, oben + (H - oben) * .2, W * .2 * flacker, (H - oben) * .2, [[0, 'rgba(255,228,165,' + (.34 * an).toFixed(3) + ')'], [.5, 'rgba(255,210,130,' + (.14 * an).toFixed(3) + ')'], [1, 'rgba(255,210,130,0)']]);
+      /* Lichtstreif an der Wand unter der Lampe und ein helles Herz */
+      kerzeSchein(ctx, lx - W * .02, oben - 8, W * .11, 34, [[0, 'rgba(255,205,125,' + (.26 * an).toFixed(3) + ')'], [1, 'rgba(255,205,125,0)']]);
+      kerzeSchein(ctx, lx, ly - 10, W * .12, (H - oben) * .16, [[0, 'rgba(255,232,170,' + (.28 * an).toFixed(3) + ')'], [1, 'rgba(255,232,170,0)']]);
+      /* Staub im Lichtkegel: treibt langsam, nur dort sichtbar, wo Licht ist */
+      for (const s of staub) {
+        s.y += s.v * dt * .6; s.x += Math.sin(t * .4 + s.ph) * .0006;
+        if (s.y > 1) { s.y = 0; s.x = zuf(); }
+        const sx = lx - W * .3 + s.x * W * .6, sy = oben + s.y * (H - oben) * .8;
+        const naehe = 1 - Math.min(1, Math.hypot((sx - lx) / (W * .36), (sy - ly) / ((H - oben) * .6)));
+        if (naehe <= 0) continue;
+        const a = naehe * an * (.25 + .25 * Math.sin(t * 1.3 + s.ph));
+        ctx.fillStyle = 'rgba(255,236,190,' + a.toFixed(3) + ')'; ctx.beginPath(); ctx.arc(sx, sy, s.r, 0, 6.29); ctx.fill();
+      }
+      /* Eine Motte, selten, im Sommer, wenn es dunkel ist: kreist in Achten um den Schirm */
+      const nachtDraussen = schreibtischTageslicht() < .3;
+      if (!motte && jahreszeit === 'sommer' && nachtDraussen) { motteWarte -= dt; if (motteWarte <= 0) { motte = { t: 0, dauer: 14 + zuf() * 10, cx: W * .2, cy: oben - 40 }; } }
+      if (motte) {
+        motte.t += dt;
+        const u = motte.t * 2.2, rx = 42 + 8 * Math.sin(motte.t * .7), ry = 24;
+        const mx = motte.cx + Math.sin(u) * rx, my = motte.cy + Math.sin(2 * u) * ry * .5 + Math.cos(u * .5) * 6;
+        const fluegel = Math.sin(motte.t * 40) * 3;
+        ctx.fillStyle = 'rgba(40,32,26,.85)';
+        ctx.beginPath(); ctx.ellipse(mx - 3, my, 3.5, 1.6 + Math.abs(fluegel) * .3, -.5, 0, 6.29); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(mx + 3, my, 3.5, 1.6 + Math.abs(fluegel) * .3, .5, 0, 6.29); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(mx, my, 1.6, 2.4, 0, 0, 6.29); ctx.fill();
+        if (motte.t > motte.dauer) { motte = null; motteWarte = 90 + zuf() * 200; }
+      }
     }
     if (opt.kerzen) {
       const fl = 1 + .1 * Math.sin(t * 9) + .06 * Math.sin(t * 17.3);
@@ -308,7 +346,7 @@ function schreibtischMaler(canvas, optionen = {}) {
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(statisch, 0, 0);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     maleFenster(dt);
-    maleLicht();
+    maleLicht(dt);
     requestAnimationFrame(bild);
   }
   return {
