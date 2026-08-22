@@ -1,0 +1,49 @@
+{
+ "hinweis": "Fotos von Wikimedia Commons unter freien Lizenzen; die Angaben gehoeren zu den Bildern und werden in der App gezeigt.",
+ "fotos": [
+  {
+   "id": "king",
+   "name": "Stephen King",
+   "datei": "autoren/king.jpg",
+   "titel": "Stephen King (cropped).jpg",
+   "urheber": "Kevin Payravi",
+   "lizenz": "CC BY-SA 4.0",
+   "lizenzUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+   "seite": "https://commons.wikimedia.org/wiki/File:Stephen_King_(cropped).jpg",
+   "quelle": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Stephen_King_%28cropped%29.jpg"
+  },
+  {
+   "id": "funke",
+   "name": "Cornelia Funke",
+   "datei": "autoren/funke.jpg",
+   "titel": "Cornelia Funke, Frankfurter Buchmesse 2023 1.jpg",
+   "urheber": "Elena Ternovaja",
+   "lizenz": "CC BY-SA 3.0",
+   "lizenzUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+   "seite": "https://commons.wikimedia.org/wiki/File:Cornelia_Funke,_Frankfurter_Buchmesse_2023_1.jpg",
+   "quelle": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Cornelia_Funke%2C_Frankfurter_Buchmesse_2023_1.jpg/960px-Cornelia_Funke%2C_Frankfurter_Buchmesse_2023_1.jpg"
+  },
+  {
+   "id": "rothfuss",
+   "name": "Patrick Rothfuss",
+   "datei": "autoren/rothfuss.jpg",
+   "titel": "Patrick-rothfuss-2014-kyle-cassidy.jpg",
+   "urheber": "Kyle Cassidy",
+   "lizenz": "CC BY-SA 3.0",
+   "lizenzUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+   "seite": "https://commons.wikimedia.org/wiki/File:Patrick-rothfuss-2014-kyle-cassidy.jpg",
+   "quelle": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Patrick-rothfuss-2014-kyle-cassidy.jpg/960px-Patrick-rothfuss-2014-kyle-cassidy.jpg"
+  },
+  {
+   "id": "kaestner",
+   "name": "Erich Kästner",
+   "datei": "autoren/kaestner.jpg",
+   "titel": "Erich Kästner 1961 (cropped).jpg",
+   "urheber": "Basch / Anefo, Nationaal Archief",
+   "lizenz": "CC0 1.0",
+   "lizenzUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "seite": "https://commons.wikimedia.org/wiki/File:Erich_K%C3%A4stner_1961_(cropped).jpg",
+   "quelle": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Erich_K%C3%A4stner_1961_%28cropped%29.jpg/960px-Erich_K%C3%A4stner_1961_%28cropped%29.jpg"
+  }
+ ]
+}

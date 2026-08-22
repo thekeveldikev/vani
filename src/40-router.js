@@ -6,6 +6,7 @@ const RENDER = {};
 const ALLE_RAEUME = [
   { id: 'zuhause', name: 'Zuhause', icon: 'zuhause', fest: true },
   { id: 'schreibtisch', name: 'Schreibtisch', icon: 'schreibtisch' },
+  { id: 'salon', name: 'Salon', icon: 'rahmen' },
   { id: 'schnipsel', name: 'Schnipsel', icon: 'schnipsel' },
   { id: 'blaetter', name: 'Blätter', icon: 'blatt' },
   { id: 'hefte', name: 'Hefte', icon: 'hefte' },

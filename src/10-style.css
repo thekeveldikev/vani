@@ -2254,3 +2254,85 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 .manuskript-vorschau { max-height: 30dvh; overflow: auto; padding: 12px 14px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font: 12.5px/1.6 ui-monospace, "SF Mono", Consolas, monospace; white-space: pre-wrap; color: var(--tinte); }
 .blattsuche { width: 100%; padding: 10px 14px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 15px; margin-bottom: 12px; color: var(--tinte); }
 .menue button:focus-visible { background: var(--karte); outline: 2px solid var(--akzent); outline-offset: -2px; }
+
+/* ===================== DER SALON: DIE LIEBLINGSWAND ===================== */
+.salon { padding: 6px 22px calc(env(safe-area-inset-bottom) + 40px); max-width: 1120px; margin: 0 auto; }
+.salon-galerie { position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 30px 26px; padding: 30px 26px 40px; border-radius: 22px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255,230,180,.18), transparent 60%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 2px, transparent 2px 58px),
+    linear-gradient(180deg, color-mix(in srgb, var(--hg2) 92%, #6a4a30), color-mix(in srgb, var(--hg2) 86%, #3a2818));
+  box-shadow: inset 0 0 80px rgba(0,0,0,.18), 0 10px 40px var(--schein); }
+.salon-galerie::before { content: ""; position: absolute; inset: 0; border-radius: 22px; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cpath d='M60 10c8 0 14 6 14 14s-6 14-14 14-14-6-14-14 6-14 14-14zm0 60c8 0 14 6 14 14s-6 14-14 14-14-6-14-14 6-14 14-14z' fill='none' stroke='rgba(255,255,255,.05)' stroke-width='1.2'/%3E%3C/svg%3E"); opacity: .9; }
+.salon-platz { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.salon-rahmen { position: relative; width: 100%; max-width: 250px; padding: 16px 16px 14px; border-radius: 5px; text-align: center; cursor: pointer; transform: rotate(calc((var(--n, 0) - 1.5) * .5deg)); transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s;
+  box-shadow: 0 18px 30px rgba(0,0,0,.35), 0 2px 4px rgba(0,0,0,.3), inset 0 0 0 2px rgba(0,0,0,.25), inset 0 0 0 5px rgba(255,255,255,.12), inset 0 0 0 7px rgba(0,0,0,.18); animation: salon-haengt .7s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--n, 0) * 90ms); }
+@keyframes salon-haengt { from { opacity: 0; transform: translateY(-10px) rotate(calc((var(--n, 0) - 1.5) * .5deg + 2deg)); } }
+.salon-rahmen:hover { transform: rotate(0deg) translateY(-4px) scale(1.02); box-shadow: 0 28px 40px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.3), inset 0 0 0 2px rgba(0,0,0,.25), inset 0 0 0 5px rgba(255,255,255,.14), inset 0 0 0 7px rgba(0,0,0,.18); }
+.salon-rahmen:active { transform: rotate(0deg) scale(.99); }
+.salon-rahmen.nuss { background: linear-gradient(135deg, #7a5230, #4a2e18 45%, #6b4628 70%, #3a2212); }
+.salon-rahmen.gold { background: linear-gradient(135deg, #e2bd6a, #9a7130 40%, #d9b463 62%, #7a5622); }
+.salon-rahmen.kupfer { background: linear-gradient(135deg, #c9855a, #7a4a2c 45%, #b8744a 70%, #5c3520); }
+.salon-rahmen.dunkel { background: linear-gradient(135deg, #3a3432, #15110f 45%, #2c2624 70%, #0e0b0a); }
+.salon-rahmen.gold::before, .salon-rahmen.kupfer::before { content: ""; position: absolute; inset: 4px; border-radius: 3px; pointer-events: none; background: repeating-linear-gradient(45deg, rgba(255,255,255,.08) 0 2px, transparent 2px 9px); mix-blend-mode: overlay; }
+/* Die Bilderleuchte über dem Rahmen */
+.salon-lampe { position: absolute; left: 50%; top: -14px; width: 70px; height: 10px; margin-left: -35px; border-radius: 6px 6px 3px 3px; background: linear-gradient(#d9b463, #8a6a2e); box-shadow: 0 2px 3px rgba(0,0,0,.4); }
+.salon-lampe::before { content: ""; position: absolute; left: 50%; top: -8px; width: 4px; height: 9px; margin-left: -2px; background: #8a6a2e; border-radius: 2px; }
+.salon-lampe::after { content: ""; position: absolute; left: -30px; right: -30px; top: 10px; height: 150px; pointer-events: none; background: linear-gradient(rgba(255,220,150,.28), rgba(255,220,150,.06) 50%, transparent); clip-path: polygon(28% 0, 72% 0, 100% 100%, 0 100%); }
+.salon-passepartout { background: #efe7d6; padding: 12px; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15), inset 0 2px 6px rgba(0,0,0,.18); }
+.salon-foto { position: relative; aspect-ratio: 3 / 4; overflow: hidden; background: #2a2422; box-shadow: inset 0 0 0 1px rgba(0,0,0,.4); }
+.salon-foto img { width: 100%; height: 100%; object-fit: cover; display: block; filter: sepia(.18) contrast(1.04) saturate(.92); transition: filter .4s; }
+.salon-rahmen:hover .salon-foto img { filter: sepia(.05) contrast(1.06) saturate(1); }
+.salon-glas { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, rgba(255,255,255,.22), rgba(255,255,255,0) 38%, rgba(255,255,255,0) 70%, rgba(255,255,255,.08)); }
+.salon-monogramm { display: grid; place-items: center; height: 100%; font: 600 64px ui-serif, "New York", Georgia, serif; color: #cdbb93; }
+.salon-schild { margin: 12px auto 0; padding: 5px 10px 4px; width: fit-content; max-width: 100%; border-radius: 3px; background: linear-gradient(#e8c878, #a8832f); color: #2b1d0c; box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 1px 2px rgba(0,0,0,.4); text-align: center; }
+.salon-schild b { display: block; font: 600 13px ui-serif, "New York", Georgia, serif; letter-spacing: .06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.salon-schild span { display: block; font-size: 9.5px; letter-spacing: .04em; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.salon-kurz { font: italic 13px/1.45 ui-serif, "New York", Georgia, serif; color: color-mix(in srgb, var(--tinte) 78%, transparent); text-align: center; max-width: 260px; }
+.salon-tageskarte { display: grid; gap: 4px; width: 100%; max-width: 260px; padding: 12px 14px 10px; border-radius: 12px; text-align: left; background: rgba(255,245,225,.92); color: #2c2218; box-shadow: 0 6px 16px rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.08); transform: rotate(.6deg); transition: transform .25s; }
+.salon-tageskarte:hover { transform: rotate(0) translateY(-2px); }
+.salon-tageskarte .st-ueber { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #8a6a2e; }
+.salon-tageskarte .st-text { font: 14px/1.45 ui-serif, "New York", Georgia, serif; }
+.salon-tageskarte .st-fuss { font-size: 10.5px; color: rgba(44,34,24,.6); }
+.salon-fuss { margin-top: 14px; font-size: 12px; color: var(--blass); text-align: center; }
+html[data-thema="tinte"] .salon-galerie, html[data-thema="kerze"] .salon-galerie { background: radial-gradient(ellipse at 50% 0%, rgba(255,220,160,.12), transparent 60%), repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 2px, transparent 2px 58px), linear-gradient(180deg, #2a1f18, #15100c); }
+/* Das Sprechfenster */
+.modal.salon-fenster { width: min(640px, calc(100vw - 32px)); padding: 0; overflow: hidden; }
+.salon-fenster-kopf { display: flex; align-items: center; gap: 14px; padding: 16px 18px; background: linear-gradient(135deg, #4a2e18, #2a1a10); color: #f3e7c9; }
+.salon-fenster.gold .salon-fenster-kopf { background: linear-gradient(135deg, #9a7130, #5a3f14); } .salon-fenster.kupfer .salon-fenster-kopf { background: linear-gradient(135deg, #7a4a2c, #4a2a18); } .salon-fenster.dunkel .salon-fenster-kopf { background: linear-gradient(135deg, #2c2624, #0e0b0a); }
+.salon-fenster-kopf h2 { margin: 0; color: inherit; font-size: 22px; } .salon-fenster-unter { font-size: 12px; opacity: .75; }
+.salon-fenster-kopf > div:nth-child(2) { flex: 1; min-width: 0; }
+.salon-fenster-foto { width: 64px; height: 80px; border-radius: 3px; overflow: hidden; flex: none; box-shadow: 0 0 0 3px rgba(255,255,255,.2), 0 4px 10px rgba(0,0,0,.4); background: #2a2422; }
+.salon-fenster-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.salon-reiter { display: flex; gap: 4px; padding: 10px 16px 0; border-bottom: 1px solid var(--linie); }
+.salon-reiterknopf { padding: 8px 12px; border-radius: 10px 10px 0 0; font-size: 14px; color: var(--blass); }
+.salon-reiterknopf.an { color: var(--tinte); background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.salon-seite { display: none; padding: 14px 18px 18px; max-height: min(62dvh, calc(var(--vvh, 100dvh) - 200px)); overflow: auto; }
+.salon-seite.an { display: block; }
+.salon-themen { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.salon-sprech { min-height: 110px; padding: 16px 18px; border-radius: 14px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); margin-bottom: 12px; position: relative; }
+.salon-sprech::before { content: ""; position: absolute; left: 28px; top: -9px; width: 16px; height: 16px; background: var(--karte); transform: rotate(45deg); box-shadow: -1px -1px 0 var(--linie); }
+.salon-rat { font: 17px/1.55 ui-serif, "New York", Georgia, serif; min-height: 56px; }
+.salon-ratfuss { margin-top: 8px; font-size: 11.5px; color: var(--blass); }
+.salon-leer { font-style: italic; color: var(--blass); }
+.salon-zitat { padding: 12px 0; border-bottom: 1px solid var(--linie); }
+.salon-zitat:last-child { border-bottom: none; }
+.sz-text { font: 16px/1.5 ui-serif, "New York", Georgia, serif; }
+.sz-original { margin-top: 4px; font-size: 12.5px; color: var(--blass); font-style: italic; }
+.sz-quelle { margin-top: 4px; font-size: 12px; color: var(--blass); }
+.sz-knoepfe { display: flex; gap: 4px; margin-top: 4px; } .sz-knoepfe .knopf { padding: 4px 8px; font-size: 12px; }
+.salon-ueber p { font-size: 14.5px; line-height: 1.55; margin-bottom: 8px; }
+.salon-lizenz { font-size: 12px; color: var(--blass); margin: 4px 0; } .salon-lizenz a { color: var(--akzent); }
+.salon-bearbeiten input, .salon-bearbeiten textarea { width: 100%; padding: 9px 12px; border-radius: 10px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 15px; margin-top: 6px; }
+.salon-foto-vorschau { width: 54px; height: 68px; border-radius: 4px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); overflow: hidden; display: grid; place-items: center; font-size: 10px; color: var(--blass); }
+.salon-foto-vorschau img { width: 100%; height: 100%; object-fit: cover; }
+/* Auf dem Zuhause */
+.salonkarte-inhalt { display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%; }
+.salonkarte-foto { width: 46px; height: 58px; border-radius: 3px; overflow: hidden; flex: none; box-shadow: 0 0 0 3px #a8832f, 0 3px 8px rgba(0,0,0,.3); background: #2a2422; }
+.salonkarte-foto img { width: 100%; height: 100%; object-fit: cover; display: block; filter: sepia(.2); }
+.salonkarte-text { display: grid; gap: 4px; min-width: 0; }
+.salonkarte-text i { font: italic 14.5px/1.45 ui-serif, "New York", Georgia, serif; }
+.salonkarte-text small { font-size: 11.5px; color: var(--blass); }
+@media (max-width: 700px) { .salon { padding-inline: 12px; } .salon-galerie { padding: 22px 14px 30px; gap: 26px 16px; grid-template-columns: repeat(2, 1fr); } .salon-rahmen { padding: 12px 12px 10px; } .salon-passepartout { padding: 8px; } .salon-kurz { font-size: 12px; } .salon-tageskarte { max-width: none; } }
+@media (max-width: 420px) { .salon-galerie { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .salon-rahmen { animation: none; } }

@@ -130,6 +130,105 @@ darüber). Neue Gedanken:
 - Tastaturkürzel-Übersicht; Spotlight-Suche mit Vorschau.
 - Handy: der Schreibtisch als Hochformat-Fassung (Fenster schmal, Dinge in zwei Reihen).
 
+## Das große Brainstorm (nach 5.22): Der Salon, und wie jeder Raum ein Ort wird
+
+Gedacht wie der Schreibtisch: jeder Bereich soll sich anfühlen wie ein Zimmer,
+in dem man sitzen möchte — nicht wie eine Liste. Sterne = zuerst bauen.
+
+### Der Salon (5.22 gebaut) — und was er werden kann
+- ★ **Gespräch statt Rat:** „Frag die Wand" — man tippt eine Frage („Mein Anfang
+  ist langweilig"), und alle vier antworten nacheinander, jeder in seiner Stimme
+  (Treffer über Themen-Schlüsselworte im Baukasten), als Gesprächsrunde mit
+  Sprechblasen; Kästner widerspricht King, Rothfuss ergänzt, Funke lacht.
+- ★ **Schreibaufgaben von der Wand:** jede Person stellt Übungen in ihrem Stil
+  („King: Schreib 300 Wörter über das Geräusch im Keller, kein Adjektiv",
+  „Kästner: Ein Gedicht mit vier Strophen über eine Straßenbahn", „Funke:
+  Beschreib einen Ort nur über Gerüche", „Rothfuss: Ein Absatz, in dem niemand
+  spricht und alles gesagt wird") — mit Timer, Wortziel, am Ende ein Lob in
+  ihrer Stimme; die Aufgabe landet als Blatt mit Kopfzeile.
+- **Werkbiografie als Zeitleiste:** je Person ein Regalbrett mit ihren Büchern
+  (Titel, Jahr, ein Satz) — Cover als gezeichnete Rücken, nicht als Fotos;
+  „Welches davon hast du gelesen?" als Häkchen; daraus ein eigenes Regal
+  „Meine Lieblinge".
+- **Briefe an die Wand:** ich schreibe einem der vier einen Brief (Brief-Mechanik
+  vom Tisch); die „Antwort" kommt nach drei Tagen — ein Rat, eingebettet in eine
+  kurze fiktive Antwort in der Stimme („Lieber Schreiber, …"), deutlich als
+  erfunden markiert.
+- **Lesung:** ein Zitat wird vorgelesen (Vorlesen-Funktion) mit gewählter Stimme,
+  der Rahmen bekommt währenddessen ein Lampenlicht, die anderen dunkeln.
+- **Die Wand wächst:** mehr Rahmen (Astrid Lindgren, Michael Ende, Tove Jansson,
+  Terry Pratchett, Ursula K. Le Guin, Walter Moers …) als „Gästezimmer" —
+  eigene Leute sowieso (gebaut: Name, Foto, Zitate, eigener Rat).
+- **Stimmungen:** Kaminfeuer-Variante der Wand (Klangbild „Salon am Abend":
+  Kaminknistern, Uhr, leise Seiten), Tapete wechselbar (Damast, Leinen, Holz).
+- **Zitat des Tages auf dem Sperrbild / Ladebildschirm; Zitat-Fundstücke**
+  wandern ins Zuhause („EIN ZITAT" gibt es schon).
+- **Meine Merksätze:** alles, was ich von der Wand „gemerkt" habe, als eigene
+  Sammlung mit Datum; „Was hat mir wann geholfen?".
+- **Ein Rat wird Ritual:** „Sitzung beginnen" (siehe unten) zieht zuerst einen
+  Rat von der Wand, dann Kerze, Klang, Blatt.
+
+### Jeder Raum ein Ort — visuell
+- ★ **Zuhause = Diele:** Garderobe mit der Tasse (Schreibfeuer), ein Spiegel mit
+  dem Funken, Briefe auf der Konsole (Fundstücke), Türen zu den Räumen (die
+  Leiste bleibt, aber die Diele zeigt, was in jedem Raum neu ist: „im Salon rät
+  heute Kästner", „zwei Briefe ungeöffnet", „Lesestand Feuerblut 41 %").
+- ★ **Schnipsel = Zettelkasten:** ein hölzerner Kasten mit Karteireitern
+  (Tage), die Schnipsel als Zettel, die oben herausragen; Ziehen = sortieren,
+  „Kasten schütteln" = drei zufällige Zettel nebeneinander (Funke-Material).
+- ★ **Blätter = Stapel auf dem Schreibtisch:** die Blätter liegen als Papierstapel
+  mit Eselsohren, das aktuelle oben; „Blatt anheben" zeigt den ersten Absatz als
+  Vorschau; Sortieren wie Papiere schieben.
+- ★ **Hefte = Regal** (gibt es) → dazu: **Tisch mit Heften aufgeschlagen**, Lesezeichen-
+  Bändchen sichtbar, Staub auf lange nicht geöffneten Heften (zart).
+- **Projekte = Werkstatt:** Szenen als Karteikarten an einer Korkwand, Fäden
+  (Beziehungen) als rote Schnur, Akte als Bretter; der Spannungsbogen als gespannte
+  Schnur über der Wand.
+- **Cluster = Tisch mit Tuch:** Blasen als Porzellanstücke/Steine auf einem
+  Tischtuch, Kanten als Fäden — Pinch bleibt; Nachtmodus mit Kerzenlicht.
+- **Wörter = Setzkasten:** die Wortkisten als Druckerei-Setzkasten mit Lettern,
+  „Wort ziehen" klappert; die Karteikarten zum Abfragen als Holzkiste.
+- **Klang = Musikzimmer:** Plattenspieler (Klangbilder als Platten, Nadel aufsetzen),
+  ein Regal mit Hüllen, Mischpult als Messingregler; Fenster zeigt das Wetter der
+  Mischung.
+- **Faden = Telefonbank im Flur:** das Gespräch auf einer Bank, die Lampe darüber;
+  alte Nachrichten als Brief­stapel; „an Vani" als Hörer.
+- **Suche = Lupe auf dem Tisch** (ist schon Spotlight) → Treffer als Karten, die
+  aus einer Schublade gezogen werden.
+- **Feinheiten = Werkzeugkasten:** Schubladen je Bereich (Schrift, Klang, Sync,
+  Sicherung); die wichtigsten zwei oben.
+- **Überall:** Raumwechsel als Türöffnen (kurzer Schwenk, Luftzug), Tageszeit des
+  Schreibtischs färbt leicht alle Räume (Zuhause morgens heller), Jahreszeiten-
+  Akzente in der Leiste (Blatt, Schneeflocke), ein Geräusch je Raum (Tür, Papier,
+  Glas) — abschaltbar.
+
+### Jeder Raum ein Ort — funktional
+- **Zuhause:** „Heute"-Zeile (Wörter, Seiten gelesen, Rat, Brief), Morgenseiten-
+  Knopf, „Wo war ich?" (letzte drei Stellen, auch im Buch), Wochenrückblick als
+  Postkarte (Sonntag).
+- **Schnipsel:** Schnipsel verketten (Faden durch mehrere), Schnipsel → Szene mit
+  einem Zug, Sprachaufnahme als Schnipsel (Ton gibt es in Heften), Zeitstempel-Sicht
+  („was dachte ich um 23 Uhr").
+- **Blätter:** Stände-Diff (zwei Stände nebeneinander), Blatt → Heftseite/Szene
+  (gibt es), Wortwolke je Blatt, Lesezeit, Schreibzeit je Blatt (aus Sitzungen).
+- **Hefte:** Seitenübersicht-Raster, Doppelseite quer, Lineal, Textsticker,
+  Foto freistellen, PDF-Export, Kapitelmarken in der Rolle, Heft-Lesezeichen.
+- **Projekte:** Szenenbrett/Zeitleiste, Figuren-Kartei mit Auftritten, Kapitelziele
+  mit Kurve, Exposé-Ansicht (alle Szenen-Rückseiten untereinander), Export als
+  Manuskript (Normseiten).
+- **Cluster:** Gruppen einklappen, Karten in Blasen, Blasen → Szene, Zeitachse als
+  Linie, Bild-Vorlagen (Brett als Bild gibt es).
+- **Wörter:** Wortherkunft (eigene Notiz), Wort des Tages aus den Kisten, Kisten
+  teilen (Bild), Funken-Generator mit eigenen Listen speisen (gibt es teils).
+- **Klang:** eigene Aufnahmen schneiden (Anfang/Ende), Timer „in 30 Minuten
+  ausblenden", Klang je Raum merken, Mischung als Bild teilen.
+- **Faden:** Suchen im Faden mit Datum springen, Faden-Exposé (Monatsrückblick),
+  Nachricht als Schnipsel/Blatt (gibt es teils), Fotos im Faden.
+- **Schreibtisch:** Stufe drei (siehe unten), „Sitzung beginnen", eigene Dinge.
+- **Lesen:** Markieren im PDF, EPUB-Suche/Fußnoten/Wörterbuch, Lesetagebuch,
+  Lesezeit-Schätzung, zwei Bücher nebeneinander.
+- **Salon:** siehe oben.
+
 ## Die übernächste Welle — Brainstorm (nach 5.18)
 
 Gedacht als große Welle in fünf Strängen. Jeder Punkt ist so notiert, dass man ihn

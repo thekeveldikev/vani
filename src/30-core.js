@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.21.0';
+const APP_VERSION = '5.22.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -215,6 +215,7 @@ async function teileText(text) {
 const IK = {
   zuhause: '<path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/>',
   sticker: '<path d="M5 7a2 2 0 0 1 2-2h7.5L19 9.5V17a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"/><path d="M14.5 5v4.5H19"/><path d="M8.5 13.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8"/>',
+  rahmen: '<rect x="4" y="3" width="16" height="18" rx="1.5"/><rect x="7.5" y="6.5" width="9" height="10"/><path d="M9 21v1.5M15 21v1.5"/><path d="M10.5 12.5c1-1.5 2-1.5 3 0"/>',
   schreibtisch: '<path d="M3 14h18"/><path d="M5 14v6M19 14v6"/><path d="M8 14v-3.5a2 2 0 0 1 2-2h1"/><path d="M14 5.5 12.5 10h4L15 5.5h-1Z"/><path d="M13.2 10.5v3.5"/><circle cx="7" cy="10.5" r="1.2"/>',
   lasso: '<path d="M12 4c4.4 0 8 2 8 4.8S16.4 13.6 12 13.6 4 11.6 4 8.8 7.6 4 12 4Z" stroke-dasharray="3 2.2"/><path d="M8.5 13.2c-.6 2.2-.2 4.3 1.4 6.3"/><circle cx="10.4" cy="20" r="1.2"/>',
   gliederung: '<path d="M5 6h3M10 6h9"/><path d="M7 11h3M12 11h7"/><path d="M7 16h3M12 16h7"/><path d="M5 20h3M10 20h9"/>',
@@ -540,6 +541,12 @@ function sauberesDokument(quelle) {
   if (d.sicht != null) {
     const s = d.sicht && typeof d.sicht === 'object' && !Array.isArray(d.sicht) ? d.sicht : {};
     d.sicht = { x: begrenze(s.x, -100000, 100000, 60), y: begrenze(s.y, -100000, 100000, 60), z: begrenze(s.z, .1, 5, 1) };
+  }
+  if (d.typ === 'mentor') {
+    const zeilen = (a) => (Array.isArray(a) ? a : []).filter((s) => typeof s === 'string').map((s) => s.slice(0, 600)).slice(0, 80);
+    d.zitate = zeilen(d.zitate); d.rat = zeilen(d.rat);
+    d.jahre = String(d.jahre || '').slice(0, 60); d.woher = String(d.woher || '').slice(0, 80);
+    d.rahmen = ['nuss', 'gold', 'kupfer', 'dunkel'].includes(d.rahmen) ? d.rahmen : 'nuss';
   }
   if (d.staende != null) {
     d.staende = Array.isArray(d.staende) ? d.staende.slice(-20).filter((s) => s && typeof s === 'object').map((s) => ({

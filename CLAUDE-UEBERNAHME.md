@@ -1724,3 +1724,48 @@ Dezember, Info mittag/nacht/golden/morgen, Himmelsfarben Tag/Nacht/Regen/Winter)
 Browser: Mittag (blauer Himmel, Sonne, Wolken, Schmetterling, heller Raum), goldene
 Stunde im Herbst (orange Kronen, fallende Blätter, warmes Licht), Winternacht (kahle
 Bäume, Schnee, Mond, Sterne); Feuerblut im Leser und im aufgeschlagenen Buch.
+
+## 30. Der Salon — die Lieblingswand (24. August 2026, VANI 5.22.0)
+
+Neuer Raum `salon` (`src/56-salon.js`, Icon `rahmen`, in der Leiste nach dem Schreibtisch,
+Anleitungs-Kapitel, Spotlight-Befehl über ALLE_RAEUME).
+
+### Daten
+`SALON_AUTOREN`: King, Kästner, Funke, Rothfuss — je `id, name, jahre, woher, bild
+(autoren/*.jpg), lage (object-position), foto {urheber, lizenz, lizenzUrl, seite}, kurz,
+rahmen (nuss/gold/kupfer/dunkel), anrede, zitate [{t, o?, q}], saetze [30+], anfang [12],
+kern [[thema, text] × ~29], schluss [10]`. **Zitate sind echt** und tragen ihre Quelle
+(bei Übersetzungen das Original in `o`); unsichere stehen als „zugeschrieben". **Rat ist
+erfunden** — das steht in der UI unter jedem Rat („erfunden, in … Geist").
+`SALON_THEMEN` (11 Themen). Fotos: Wikimedia Commons, Lizenzen in `autoren/quellen.json`
+und im Fenster „Über die Bilder"; CC BY-SA verlangt die Nennung — sie steht im Reiter „Über".
+
+### Rat-Generator (pur, getestet)
+`salonHash` (FNV), `salonZufall(saat)` (gemischte Saat + LCG + Xorshift-Mischer, unsigned!),
+`salonRat(autor, saat, thema)` → `{text, art: 'satz'|'baukasten', thema}`: etwa jeder dritte
+ein handgeschriebener Satz, sonst Anfang + Kern (nach Thema gefiltert) + meist Schluss.
+`salonRatDesTages(autor, tagKey)` (Saat aus Tag + id). `salonVorrat(autor)` = Sätze +
+Anfang×Kern×Schluss (≈ 3 500 je Stimme, 14 162 gesamt). Gleiche Saat → gleicher Rat;
+200 Saaten → > 150 verschiedene.
+
+### UI
+Wand mit Tapete (Streifen + Ornament), vier Rahmen (Holz/Gold/Kupfer/Ebenholz, Bilderleuchte
+mit Lichtkegel, Passepartout, Glasglanz, Messingschild; Auftritt gestaffelt, leichte Neigung,
+Hover richtet auf), darunter Kurzsatz und die „Rat des Tages"-Karte. Tipp → `salonSprechen`:
+Fenster mit Kopf (Foto, Name), Reiter Rat/Zitate/Über; Rat erscheint Wort für Wort
+(Schreibmaschine), Themen-Chips, „Noch einen Rat", „Merken" (Schnipsel), „Damit schreiben"
+(Blatt mit dem Satz); Zitate mit Original, Quelle, „Als Schnipsel"/„Kopieren". Eigene Leute:
+`neuDoc('mentor', {titel, jahre, woher, notiz, zitate[], rat[], bild, rahmen})`
+(Sanitizer in 30-core), Bearbeiten/Abnehmen im Reiter „Über". Zuhause: Karte „Aus dem Salon"
+(Tag wählt die Person über `salonHash(tag)`).
+
+### Außerdem
+`IDEEN.md` „Das große Brainstorm (nach 5.22)": Salon weitergedacht (Gesprächsrunde,
+Schreibaufgaben, Werkregal, Briefe an die Wand, Lesung, mehr Rahmen) und jeder Raum als Ort
+(visuell: Diele, Zettelkasten, Papierstapel, Werkstatt, Setzkasten, Musikzimmer …; funktional je
+Raum). `CODEX-UEBERGABE.md`: alles seit 5.9 für das Sites-Hosting (Ordner `autoren/`,
+`vendor/wasm/` mitkopieren — `copy-vani.mjs` tut es). `package.json build.files` + `autoren/**`.
+
+Tests 159/159 (neu: Salon-Vertrag: 4 Stimmen, ≥ 5 Zitate mit Quelle, ≥ 3000 Vorrat, alle Themen
+je Stimme, Wiederholbarkeit, Vielfalt, Themenfilter). Browser: vier Rahmen mit Bildern, Rat des
+Tages je Person, Sprechfenster (Kästner: 12 Chips, Dialog-Rat, 14 Zitate mit Quelle).

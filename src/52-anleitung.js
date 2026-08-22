@@ -77,6 +77,17 @@ const ANLEITUNG = [
     ]
   },
   {
+    id: 'salon', titel: 'Der Salon', icon: 'rahmen', raum: 'salon',
+    kurz: 'Die Lieblingswand: vier Porträts in Rahmen — echte Zitate, erfundener Rat in ihrer Stimme, und Platz für eigene Leute.',
+    abschnitte: [
+      { t: 'Was das ist', p: ['Eine Wand mit Bilderleuchten und vier Rahmen: Stephen King, Erich Kästner, Cornelia Funke, Patrick Rothfuss. Die Fotos kommen von Wikimedia Commons (freie Lizenzen, unter „Über die Bilder" nachzulesen). Jeder Rahmen hat unter sich den Rat des Tages — er bleibt den Tag über gleich und wechselt am nächsten.'] },
+      { t: 'Anklopfen', p: ['Ein Tipp auf den Rahmen öffnet das Gespräch: ein Rat erscheint Wort für Wort, „Noch einen Rat" gibt den nächsten, die Themen-Chips (Anfangen, Zweifel, Dranbleiben, Figuren, Dialog, Sprache, Überarbeiten, Angst, Lesen, Enden, Pausen) grenzen ein. „Merken" legt den Rat als Schnipsel ab, „Damit schreiben" öffnet ein Blatt mit dem Satz als Anfang.'] },
+      { t: 'Echt und erfunden', p: ['Die Zitate im Reiter „Zitate" sind echt: mit Quelle, bei Übersetzungen steht das Original dabei; sie lassen sich kopieren oder als Schnipsel ablegen. Die Ratschläge sind erfunden — geschrieben in der Stimme der jeweiligen Person, aus handgeschriebenen Sätzen und einem Baukasten (Anfang, Kern, Schluss) gewürfelt, tausende verschiedene je Stimme. Das steht unter jedem Rat.'] },
+      { t: 'Eigene Leute an die Wand', p: ['Das Plus im Kopf hängt einen eigenen Menschen auf: Name, Jahre, Foto (aus den eigenen Bildern), ein Satz darüber, Zitate (eines je Zeile) und Ratschläge in dieser Stimme (eines je Zeile). Der Rahmen ist wählbar. Abnehmen geht im Reiter „Über".'] },
+      { t: 'Auf dem Zuhause', p: ['Jeden Tag rät jemand anderes von der Wand auf dem Zuhause — die Karte „Aus dem Salon" führt hinüber.'] }
+    ]
+  },
+  {
     id: 'schnipsel', titel: 'Schnipsel', icon: 'schnipsel', raum: 'schnipsel',
     kurz: 'Der Chat mit mir selbst.',
     abschnitte: [

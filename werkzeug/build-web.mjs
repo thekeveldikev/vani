@@ -10,7 +10,7 @@ const jsDateien = [
   'src/42d-goodnotes.js', 'src/43-hefte.js', 'src/43b-sticker.js', 'src/43c-kritzel.js', 'src/43d-ton.js', 'src/43e-deckel.js', 'src/44-projekte.js',
   'src/45-schreibraum.js', 'src/45b-kerze.js', 'src/46-cluster.js', 'src/47-woerter.js', 'src/47b-karteikarten.js',
   'src/48-suche.js', 'src/49-feinheiten.js', 'src/49b-ankommen.js', 'src/50-audio.js',
-  'src/53-ambience.js', 'src/51-klangraum.js', 'src/52-anleitung.js', 'src/48b-spotlight.js', 'src/54b-schreibtisch-malerei.js', 'src/54-schreibtisch.js', 'src/54c-schreibtisch-leben.js', 'src/55-lesestapel.js', 'src/55b-epub.js', 'src/60-boot.js'
+  'src/53-ambience.js', 'src/51-klangraum.js', 'src/52-anleitung.js', 'src/48b-spotlight.js', 'src/54b-schreibtisch-malerei.js', 'src/54-schreibtisch.js', 'src/54c-schreibtisch-leben.js', 'src/55-lesestapel.js', 'src/55b-epub.js', 'src/56-salon.js', 'src/60-boot.js'
 ];
 const lies = (p) => readFileSync(join(wurzel, p), 'utf8').replace(/\r\n/g, '\n');
 const js = [lies('vendor/vani-sync.js'), ...jsDateien.map(lies)].join('\n');

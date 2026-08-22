@@ -272,3 +272,30 @@ test('Schreibfeuer: Flammenhöhe am Tagesziel, Scheite nach Tagen in Folge, Bild
   assert.ok(k.feuerBild('brennt', { id: 'a' }).includes('feuera-aussen'));
   assert.ok(!k.feuerBild('brennt', { id: 'b' }).includes('feuera-aussen'));
 });
+
+test('Salon: vier Stimmen, echte Zitate mit Quelle, Rat wiederholbar und unerschöpflich', async () => {
+  const k = await frisch();
+  assert.equal(k.SALON_AUTOREN.length, 4);
+  for (const a of k.SALON_AUTOREN) {
+    assert.ok(a.zitate.length >= 5, a.name + ' hat Zitate');
+    for (const z of a.zitate) { assert.ok(z.t.length > 10); assert.ok(z.q && z.q.length > 2, a.name + ': jedes Zitat trägt eine Quelle'); }
+    assert.ok(k.salonVorrat(a) >= 3000, a.name + ' hat genug Rat: ' + k.salonVorrat(a));
+    assert.ok(a.saetze.length >= 30, a.name + ' hat handgeschriebene Sätze');
+    assert.ok(a.foto && a.foto.lizenz && a.foto.urheber, a.name + ': Foto mit Lizenz');
+    /* jedes Thema kommt im Baukasten vor */
+    for (const [id] of k.SALON_THEMEN) assert.ok(a.kern.some((x) => x[0] === id), a.name + ' kann zu ' + id + ' raten');
+  }
+  const king = k.SALON_AUTOREN[0];
+  const r1 = k.salonRat(king, 42), r2 = k.salonRat(king, 42), r3 = k.salonRat(king, 43);
+  assert.equal(r1.text, r2.text, 'gleiche Saat, gleicher Rat');
+  assert.ok(r1.text.length > 20);
+  const texte = new Set(); for (let i = 0; i < 200; i++) texte.add(k.salonRat(king, i).text);
+  assert.ok(texte.size > 150, 'zweihundert Saaten geben viele verschiedene Räte: ' + texte.size);
+  /* Thema grenzt ein: mit Thema kommt ein Rat aus diesem Thema (oder selten ein Satz) */
+  let imThema = 0; for (let i = 0; i < 60; i++) { const r = k.salonRat(king, i, 'dialog'); if (r.art === 'baukasten') { assert.equal(r.thema, 'dialog'); imThema++; } }
+  assert.ok(imThema > 40);
+  assert.equal(k.salonRatDesTages(king, '2026-08-24').text, k.salonRatDesTages(king, '2026-08-24').text);
+  assert.notEqual(k.salonRatDesTages(king, '2026-08-24').text, k.salonRatDesTages(k.SALON_AUTOREN[1], '2026-08-24').text);
+  assert.equal(k.salonRat(null, 1), null);
+  assert.equal(typeof k.salonHash('abc'), 'number');
+});
