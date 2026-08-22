@@ -198,3 +198,24 @@ test('spotlightTreffer: Titel vor Text, Gruppenname, Grenze', async () => {
   assert.deepEqual(roh(k.spotlightTreffer('n', docs)), []);
   assert.ok(k.TASTENKUERZEL.length >= 4 && k.TASTENKUERZEL[0][1].some((z) => /Spotlight/.test(z[1])));
 });
+
+test('caretZiel: der Cursor wird von unten und von oben ins Bild geholt', async () => {
+  const k = await frisch();
+  const halter = { top: 100, bottom: 600, height: 500, scrollTop: 400 };
+  /* Cursor tief unten, hinter der Tastatur: es wird so weit gescrollt, dass er über dem Rand steht */
+  assert.equal(k.caretZiel({ top: 560, bottom: 580, height: 20 }, halter), 400 + (580 - (600 - 108)));
+  /* Cursor mitten im Bild: nichts tun */
+  assert.equal(k.caretZiel({ top: 300, bottom: 320, height: 20 }, halter), null);
+  /* Cursor zu weit oben (unter dem Kopf verborgen) */
+  assert.equal(k.caretZiel({ top: 120, bottom: 140, height: 20 }, halter), 400 - ((100 + 76) - 120));
+  /* Nie über den Anfang hinaus */
+  assert.equal(k.caretZiel({ top: -400, bottom: -380, height: 20 }, { ...halter, scrollTop: 10 }), 0);
+  /* Eigene Ränder, und bei kleinen Haltern werden sie anteilig kleiner */
+  assert.equal(k.caretZiel({ top: 560, bottom: 580, height: 20 }, halter, { oben: 0, unten: 0 }), null, 'ohne Raender steht er noch im Bild');
+  assert.equal(k.caretZiel({ top: 600, bottom: 620, height: 20 }, halter, { oben: 0, unten: 0 }), 400 + 620 - 600);
+  const klein = { top: 0, bottom: 100, height: 100, scrollTop: 0 };
+  assert.equal(k.caretZiel({ top: 90, bottom: 98, height: 8 }, klein), 98 - (100 - 40));
+  /* Ohne Maß kein Ziel */
+  assert.equal(k.caretZiel(null, halter), null);
+  assert.equal(k.caretZiel({ top: 1, bottom: 2 }, { top: 0, bottom: 0, height: 0, scrollTop: 0 }), null);
+});

@@ -84,9 +84,12 @@ html[data-thema="nebel"] {
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html { height: 100%; overflow: hidden; }
 body {
+  /* Fest verankert: sonst schiebt Safari die ganze Seite unter der Tastatur
+     weg, das Geruest rutscht nach oben und unten klafft eine leere Flaeche. */
+  position: fixed; inset: 0;
   height: 100%;
+  width: 100%;
   overflow: hidden;
-  position: relative;
   font-family: ui-rounded, -apple-system, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
   font-size: 17px;
   color: var(--tinte);
@@ -98,7 +101,9 @@ body {
   -webkit-touch-callout: none;
 }
 button, .lknopf, .knopf, .rundknopf, input[type="range"] { touch-action: manipulation; }
-textarea, input { user-select: text; -webkit-user-select: text; font-family: inherit; color: inherit; }
+textarea, input { user-select: text; -webkit-user-select: text; font-family: inherit; color: inherit; caret-color: var(--tinte); }
+[contenteditable] { caret-color: var(--tinte); }
+.papierseite.papierfarbe-nacht textarea, .papierseite.papierfarbe-nacht [contenteditable] { caret-color: #ece3d1; }
 textarea { resize: none; border: none; outline: none; background: transparent; }
 input { border: none; outline: none; background: transparent; }
 button { border: none; background: none; color: inherit; font: inherit; cursor: pointer; touch-action: manipulation; }
@@ -127,9 +132,7 @@ html[data-thema="kerze"] body::before {
   height: 100dvh;
   height: var(--vvh, 100dvh);
   padding-left: env(safe-area-inset-left);
-  /* Schiebt iOS den sichtbaren Ausschnitt (Tastatur, Caret unten), folgt das Gerüst ihm:
-     sonst rutscht es nach oben weg und unten klafft eine leere Fläche. */
-  position: fixed; left: 0; right: 0; top: var(--vvt, 0px);
+  position: relative;
 }
 #raum { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; position: relative; min-width: 0; }
 
@@ -204,7 +207,7 @@ html[data-thema="kerze"] body::before {
 /* ----- Deck: Modale, Menüs, Overlays ----- */
 #deck:empty { display: none; }
 .schleier {
-  position: fixed; inset: 0; bottom: auto; top: var(--vvt, 0px); z-index: 100; background: var(--deck);
+  position: fixed; inset: 0; bottom: auto; z-index: 100; background: var(--deck);
   height: 100dvh; height: var(--vvh, 100dvh);
   display: flex; align-items: center; justify-content: center;
   padding: 16px;
@@ -855,7 +858,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .lesestapel-balken { height: 4px; border-radius: 2px; background: var(--hg2); overflow: hidden; }
 .lesestapel-balken i { display: block; height: 100%; background: var(--akzent); }
 .lesestapel-stand { font-size: 11.5px; color: var(--blass); }
-.lesemodus { position: fixed; inset: 0; bottom: auto; top: var(--vvt, 0px); height: 100dvh; height: var(--vvh, 100dvh); z-index: 80; background: #1b1613; color: #f1e4c8; display: flex; flex-direction: column; --lese-hell: 1; --lese-waerme: .15; }
+.lesemodus { position: fixed; inset: 0; bottom: auto; height: 100dvh; height: var(--vvh, 100dvh); z-index: 80; background: #1b1613; color: #f1e4c8; display: flex; flex-direction: column; --lese-hell: 1; --lese-waerme: .15; }
 .lese-kopf, .lese-fuss { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(20,16,12,.92); transition: opacity .4s, transform .4s; z-index: 2; }
 .lese-kopf { padding-top: calc(env(safe-area-inset-top) + 10px); }
 .lese-fuss { padding-bottom: calc(env(safe-area-inset-bottom) + 10px); }
@@ -1016,7 +1019,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 /* ================================================================
    Schreibraum
    ================================================================ */
-.schreibraum { position: fixed; inset: 0; bottom: auto; top: var(--vvt, 0px); height: 100dvh; height: min(100dvh, var(--vvh, 100dvh)); z-index: 70; background: var(--hg); display: flex; flex-direction: column; }
+.schreibraum { position: fixed; inset: 0; bottom: auto; height: 100dvh; height: min(100dvh, var(--vvh, 100dvh)); z-index: 70; background: var(--hg); display: flex; flex-direction: column; }
 .sr-kopf {
   display: flex; align-items: center; gap: 8px;
   padding: calc(env(safe-area-inset-top) + 10px) 16px 8px;
@@ -1763,6 +1766,17 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 .papierseite.blank .schreibflaeche { background: none; }
 .heftrolle { max-width: 840px; margin: 8px auto 70px; display: flex; flex-direction: column; gap: 0; }
 .rollen-seite { position: relative; }
+.heftrolle .papierseite:focus-within { position: relative; z-index: 2; }
+/* Ohne Grenzen ist die Rolle ein einziges langes Blatt */
+.heftrolle:not(.zeigt-grenzen) .rollen-seite .papierseite { box-shadow: none; }
+.heftrolle:not(.zeigt-grenzen) { box-shadow: 0 4px 18px var(--schein), 0 1px 3px var(--schein); border-radius: 14px; background: var(--papier); }
+.heftrolle:not(.zeigt-grenzen) .rollen-plus { margin: 0 14px 18px; }
+/* Die Formatleiste erscheint nur an der Stelle, an der man schreibt */
+.heftrolle:not(.zeigt-grenzen) .rollen-seite .formatleiste { display: none; }
+.heftrolle:not(.zeigt-grenzen) .rollen-seite .papierseite:focus-within .formatleiste { display: flex; }
+/* Die Werkzeuge einer Seite zeigen sich erst beim Schreiben oder Darüberfahren */
+@media (hover: hover) { .heftrolle:not(.zeigt-grenzen) .rollen-seite .seitenwerkzeuge { opacity: 0; transition: opacity .2s; }
+  .heftrolle:not(.zeigt-grenzen) .rollen-seite .papierseite:hover .seitenwerkzeuge, .heftrolle:not(.zeigt-grenzen) .rollen-seite .papierseite:focus-within .seitenwerkzeuge { opacity: 1; } }
 .rollen-seite .papierseite { min-height: 0; overflow: visible; border-radius: 0; animation: none; padding-top: 4px; padding-bottom: 4px; }
 .rollen-seite:first-child .papierseite { border-radius: 14px 14px 0 0; padding-top: 27px; }
 .rollen-seite:nth-last-child(2) .papierseite { border-radius: 0 0 14px 14px; padding-bottom: 42px; }

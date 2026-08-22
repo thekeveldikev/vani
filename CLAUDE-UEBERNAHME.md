@@ -1583,3 +1583,50 @@ Sync-Übernahmen und Rückwege aus Fenstern bauen den Tisch nicht mehr neu. Auft
 (`tritt-auf`) und Luftzug nur beim ersten Betreten pro Sitzung (`sessionStorage
 vani-desk-gesehen`), sonst `.desk-szene.weich` (kurzes Einblenden). Weglegen des
 Blattes malt den Klecks über `szene._maler.setze({kleckse})` ein statt neu zu zeichnen.
+
+## 27. Der Cursor bleibt im Blick (24. August 2026, VANI 5.19.0)
+
+Gemeldet: „man klickt rein, tippt — und es springt woanders hin; man sieht nicht,
+wo man schreibt." In allen Bereichen. Zwei Ursachen, beide gefunden und behoben.
+
+### 1. Das Springen: `autogrow`
+`autogrow` (30-core) setzte bei **jedem Tastendruck** `height: auto`, um neu zu
+messen. In diesem Moment ist ein langes Textfeld nur eine Zeile hoch — der
+Browser kappt dabei die Scrollposition **aller Kästen darüber** (`#raum`).
+Danach wuchs das Feld zurück, die Sicht blieb gekappt: nach jedem Zeichen stand
+man an einer ganz anderen Stelle. Jetzt merkt sich `autogrow` vor dem Messen den
+`scrollTop` aller Vorfahren und gibt ihn danach zurück. Im Browser gemessen:
+sechs Anschläge in einer langen Rolle → 0 px Versatz (vorher sprang es jedes Mal).
+
+### 2. Man sah nicht, wo man tippt: `src/36-caret.js` (neu)
+Safari holt den Cursor über die Tastatur, indem es **die ganze Seite** schiebt.
+VANIs Gerüst ist aber auf die sichtbare Höhe (`--vvh`) gebaut — also rutschte es
+nach oben weg, und unten klaffte die leere Fläche aus den Screenshots. Der
+Versuch aus 5.18.1, das Gerüst per `--vvt` mitzuschieben, war falsch: Safari
+scrollte daraufhin erneut (Rückkopplung) — genau das Springen.
+
+Richtig ist beides zusammen:
+- Die Seite wird festgehalten: `body { position: fixed; inset: 0 }`, dazu
+  `seiteFesthalten()` bei `scroll` und `visualViewport`-Ereignissen. `--vvt`
+  ist wieder entfernt (aus `#app`, `.schleier`, `.schreibraum`, `.lesemodus`).
+- VANI holt den Cursor selbst ins Bild, überall: `caretKasten(feld)` misst ihn
+  (Rich-Text über die Auswahl, Textfelder über einen unsichtbaren Spiegel mit
+  denselben Schriftmaßen), `caretHalter(feld)` sucht den nächsten scrollenden
+  Kasten, `caretZiel(cursor, halter, raender)` (pur, getestet) sagt, wohin
+  gescrollt werden muss (76 px Luft oben, 108 px unten, bei kleinen Kästen
+  anteilig). Angehängt an `input`, `keyup` (Pfeile/Enter/Backspace),
+  `focusin` (zweimal: sofort und wenn die Tastatur oben ist), `selectionchange`
+  für Rich-Text und `visualViewport resize`. Der Schreibraum bleibt außen vor —
+  er zentriert mit seiner Schreibmaschinen-Logik selbst.
+- Der Cursor ist überall sichtbar gefärbt (`caret-color`, auf Nachtpapier hell).
+
+### Nebenbei: die Rolle ist wirklich ein Blatt
+Ohne Seitengrenzen hat die Rolle jetzt einen einzigen Papierschatten statt einen
+je Seite, die Formatleiste erscheint nur an der Stelle, an der geschrieben wird,
+und die Seitenwerkzeuge zeigen sich erst beim Darüberfahren.
+
+Tests 156/156 (neu: `caretZiel`). Browser (1024×420, wie mit Tastatur): Tippen in
+der Rolle bewegt die Sicht nicht mehr, der Cursor bleibt im Bild; weggescrollt +
+getippt holt ihn zurück (Scroll 0 → 2598, Cursor bei 280); Rich-Text ebenso;
+Schreibraum unverändert; alle elf Räume und ein Fenster ohne Fehler, `scrollY`
+bleibt 0.

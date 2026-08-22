@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.18.2';
+const APP_VERSION = '5.19.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -896,8 +896,20 @@ function langdruck(elem, fn) {
   elem.addEventListener('contextmenu', (e) => { e.preventDefault(); elem._langGedrueckt = Date.now(); fn(e); });
 }
 
+/* Ein Textfeld waechst mit. Wichtig dabei: waehrend des Messens ist es kurz
+   nur eine Zeile hoch — der Browser kappt in diesem Moment die Scrollposition
+   aller Kaesten darueber. Wer weit unten in einer langen Rolle schrieb, landete
+   dadurch nach jedem Zeichen woanders. Also: Sicht merken und zurueckgeben. */
 function autogrow(ta) {
-  const anpassen = () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; };
+  const anpassen = () => {
+    const merker = [];
+    for (let p = ta.parentElement; p && p !== document.documentElement; p = p.parentElement) {
+      if (p.scrollTop) merker.push([p, p.scrollTop]);
+    }
+    ta.style.height = 'auto';
+    ta.style.height = ta.scrollHeight + 'px';
+    for (const [p, oben] of merker) if (p.scrollTop !== oben) p.scrollTop = oben;
+  };
   ta.addEventListener('input', anpassen);
   requestAnimationFrame(anpassen);
   return anpassen;
