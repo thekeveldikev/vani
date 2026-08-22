@@ -486,7 +486,7 @@ test('Sticker-Vertrag: Sticker sind Anlagen wie Zettel und Fotos — und reisen 
   const s = lies('src/43b-sticker.js');
   assert.match(s, /parent: seite\.id, bild, verhaeltnis/);
   assert.match(lies('src/49b-ankommen.js'), /if \(d\.bild\) ids\.add\(d\.bild\)/);
-  assert.match(lies('src/30-core.js'), /\['zettel', 'foto', 'blase', 'sticker'\]\.includes\(d\.typ\)/, 'Sticker brauchen immer eine Position');
+  assert.match(lies('src/30-core.js'), /\['zettel', 'foto', 'blase', 'sticker', 'ton'\]\.includes\(d\.typ\)/, 'Sticker und Tonnotizen brauchen immer eine Position');
   for (const datei of ['werkzeug/build-web.mjs', 'build.sh', 'test/sandkasten.mjs']) assert.match(lies(datei), /43b-sticker\.js/, datei);
   /* Mitgebrachte Sticker liegen neben der App — und müssen in die Desktop-App
      und in den Rettungsraum mitreisen (derselbe Fehler wie einst bei klang/). */
@@ -499,6 +499,36 @@ test('Sticker-Vertrag: Sticker sind Anlagen wie Zettel und Fotos — und reisen 
   }
   assert.match(lies('src/52-anleitung.js'), /t: 'Sticker'/);
   assert.match(lies('src/52-anleitung.js'), /t: 'Die Stickerkiste'/);
+});
+
+test('Welle-2-Vertrag: Lasso, Formen, gespeicherte Striche, Tonnotiz, Reiter, Gliederung, Papiervorlagen', () => {
+  const h = lies('src/43-hefte.js');
+  /* Striche bleiben Punktfolgen: gespeichert, wieder geladen, nie nur Bild. */
+  assert.match(h, /seite\.striche = leer \? \[\] : saubereStriche\(striche\.map\(\(s\) => strichVerdichten\(s\)\)\)/);
+  assert.match(h, /const hatStriche = Array\.isArray\(seite\.striche\) && seite\.striche\.length > 0;/);
+  /* Ein altes Bild bleibt als Grundlage unter eigener Kennung — sonst steht nach
+     dem ersten Speichern alles doppelt da. */
+  assert.match(h, /seite\.skizzeBasis = neuId/);
+  for (const d of ['src/49b-ankommen.js', 'src/31-sync.js']) assert.match(lies(d), /skizzeBasis/, d + ' muss die Grundlage mitnehmen');
+  /* Lasso und Form-halten hängen am Zeichnen. */
+  assert.match(h, /auswahl = stricheImLasso\(striche, lasso\)/);
+  assert.match(h, /const f = formErkennen\(strich\.punkte\)/);
+  assert.match(h, /\}, 560\);/, 'Form halten: gut ein halber Atemzug');
+  /* Auswahlrahmen ist Anzeige — vor dem Speichern weg. */
+  assert.match(h, /auswahl = \[\]; lasso = null; alleszeichnen\(\);\s*seite\.striche/);
+  /* Tonnotiz: nur angeboten, wo das Gerät ein Mikrofon hergibt; Datei im Medienvorrat. */
+  assert.match(h, /tonUnterstuetzt\(\) \? el\('button'/);
+  assert.match(lies('src/43d-ton.js'), /speichereDateiBlob\(new File\(\[blob\]/);
+  assert.match(lies('src/43d-ton.js'), /TON_MAX_SEKUNDEN = 300/);
+  /* Reiter und Gliederung */
+  assert.match(h, /const REITERFARBEN = /);
+  assert.match(h, /function heftGliederung/);
+  assert.match(lies('src/44-projekte.js'), /function projektGliederung/);
+  assert.match(lies('src/30-core.js'), /if \(d\.reiter != null\)/);
+  assert.match(lies('src/30-core.js'), /'cornell', 'storyboard', 'dialog'\]\.includes\(d\.papier\)/);
+  for (const datei of ['werkzeug/build-web.mjs', 'build.sh', 'test/sandkasten.mjs']) { assert.match(lies(datei), /43c-kritzel\.js/, datei); assert.match(lies(datei), /43d-ton\.js/, datei); }
+  const anl = lies('src/52-anleitung.js');
+  for (const t of ['Lasso und Formen', 'Tonnotiz', 'Reiter', 'Gliederung', 'Papiervorlagen']) assert.match(anl, new RegExp("t: '" + t + "'"), 'Anleitung: ' + t);
 });
 
 test('Umzugs-Vertrag: die alte Adresse leitet nicht blind weiter', () => {

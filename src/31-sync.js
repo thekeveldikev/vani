@@ -270,6 +270,7 @@ function syncMedienIds() {
     if (d.typ === 'goodnote' && !D.einst.goodnotesSync) continue;
     if (d.bild) ids.add(d.bild);
     if (d.skizze) ids.add(d.skizze);
+    if (d.skizzeBasis) ids.add(d.skizzeBasis);
     if (d.datei) ids.add(d.datei);
   }
   return ids;

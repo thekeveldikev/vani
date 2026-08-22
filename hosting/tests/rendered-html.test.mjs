@@ -17,7 +17,7 @@ test("Hosting-Build enthält Umzugsseite, Rettungsraum und keinen zweiten Servic
   assert.match(index, /https:\/\/thekeveldikev\.github\.io\/vani\//);
   assert.match(index, /rettung\.html\?rettung=1&amp;kein-sw=1/);
   assert.doesNotMatch(index, /rel=["']manifest["']/);
-  assert.match(rettung, /const APP_VERSION = '5\.9\.0'/);
+  assert.match(rettung, /const APP_VERSION = '5\.1\d\.\d'/);
   /* Die Rettungsfassung muss den Umzugshelfer und den dateilosen Weg kennen —
      sonst steht jemand mit altem Bestand auf einem Schul-iPad ohne Ausweg da. */
   assert.match(rettung, /function umzugsHelfer/);

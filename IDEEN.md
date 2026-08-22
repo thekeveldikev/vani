@@ -42,12 +42,13 @@ Schreiben. Nicht alles gehört herüber; das hier schon:
 |---|---|---|
 | Elemente / Sticker-Sammlung | Stickerkiste | **da** |
 | Objekte drehen am Griff | Drehgriff an Zettel, Foto, Sticker | **da** |
-| Lasso: Striche auswählen, verschieben, löschen | Lasso im Kritzeln — Striche sind schon als Punktfolgen gespeichert, also machbar ohne Bildspeicher | Welle 2 |
-| Formen begradigen (Linie, Kreis, Pfeil) | „Form halten": am Ende eines Strichs kurz stehen bleiben → Strich wird gerade / rund | Welle 2 |
-| Audio-Notiz an der Seite | Kleine Aufnahme (MediaRecorder) als Sticker mit Abspielknopf — für Stimmnotizen zu Szenen | Welle 2 |
-| Seitenvorlagen (Linien, Kästchen, Punkte, Cornell) | Papierarten gibt es; dazu: Cornell-Raster, Storyboard (6 Kästen), Dialogblatt (zwei Spalten) | Welle 2 |
-| Favoriten / Tabs | Lesezeichen gibt es; dazu: mehrere Lesezeichen je Heft, farbige Reiter am Rand | Welle 2 |
-| Gliederung aus Überschriften | Im Projekt und in langen Heften: „Inhalt" aus H1–H3 der Rich-Texte, springt hin | Welle 2 |
+| Lasso: Striche auswählen, verschieben, löschen | Lasso im Kritzeln — Striche werden jetzt als Punktfolgen gespeichert (`seite.striche`), greifbar auch nach Tagen | **da (5.11)** |
+| Formen begradigen (Linie, Kreis, Pfeil) | „Form halten": am Ende eines Strichs kurz stehen bleiben → Linie / Ellipse / Rechteck | **da (5.11)** |
+| Audio-Notiz an der Seite | Tonnotiz (MediaRecorder) als Kassette auf der Seite mit Abspielknopf, bis 5 Min, reist über Sicherung/Sync | **da (5.11)** |
+| Seitenvorlagen (Linien, Kästchen, Punkte, Cornell) | Cornell, Storyboard (2×3), Dialogblatt (zwei Spalten) im Heft-Atelier | **da (5.11)** |
+| Favoriten / Tabs | Farbige Reiter je Heft (mehrere), als Zungen unter dem Titel, springen zur Seite | **da (5.11)** |
+| Gliederung aus Überschriften | Heft: Gliederung aller H1–H3, springt zur Seite und scrollt zur Überschrift; Projekt: Kapitel → Szenen → Überschriften | **da (5.11)** |
+| Lasso: Pfeil als Form | Offener Strich mit Haken am Ende → Pfeil | Welle 3 |
 | Zoom-Schreibfenster | nein — Tastatur ist der Normalfall | — |
 | Handschrift durchsuchen | nein — keine Erkennung ohne Netz; Goodnotes-PDFs mit Texterkennung werden ohnehin durchsucht | — |
 | Präsentationsmodus / Laserpointer | nein | — |

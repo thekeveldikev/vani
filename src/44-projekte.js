@@ -118,6 +118,7 @@ RENDER.projekt = function (haupt, pid) {
     zurueckknopf('#/projekte'),
     el('h1', {}, p.titel, el('div', { class: 'unter' },
       w.toLocaleString('de-DE') + ' Wörter' + (p.ziel ? ' von ' + p.ziel.toLocaleString('de-DE') : '') + ' · ' + (p.art || ''))),
+    el('button', { class: 'rundknopf zart', html: ik('gliederung'), title: 'Gliederung: Kapitel, Szenen, Überschriften', onclick: () => projektGliederung(p) }),
     el('button', { class: 'rundknopf zart', html: ik('lesen'), title: 'Leseansicht', onclick: () => zeigeLeseansicht(p) }),
     el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Projekt-Menü', onclick: () => projektMenue(p, () => zeichne()) })
   ));
@@ -564,4 +565,24 @@ function zeigeLeseansicht(p) {
     el('button', { class: 'knopf', onclick: () => teileDatei(p.titel.replace(/[^\wäöüß -]/gi, '') + '.txt', gesamt) }, 'Als Datei')
   );
   document.body.append(bogen, leiste);
+}
+
+/* Gliederung eines Projekts: Kapitel → Szenen → Überschriften in den Szenen.
+   Antippen öffnet die Szene im Schreibraum. */
+function projektGliederung(p) {
+  const liste = el('div', { class: 'gliederung' });
+  for (const k of kinder(p.id, 'kapitel')) {
+    liste.append(el('div', { class: 'gliederung-seite' }, k.titel || 'Kapitel'));
+    for (const s of kinder(k.id, 'szene')) {
+      liste.append(el('button', { class: 'gliederung-punkt ebene-1', onclick: () => { zu(); oeffneSchreibraum(s.id); } },
+        (s.titel || 'Szene ohne Namen') + (s.text ? ' · ' + worte(s.text) + ' W.' : '')));
+      if (s.format === 'rich') for (const u of gliederungAusHTML(s.rich)) {
+        liste.append(el('button', { class: 'gliederung-punkt ebene-' + Math.min(3, u.ebene + 1), onclick: () => { zu(); oeffneSchreibraum(s.id); } }, u.text));
+      }
+    }
+  }
+  if (!liste.children.length) { toast('Noch keine Kapitel.'); return; }
+  const kasten = el('div', { class: 'modal gliederung-kasten' }, el('h2', {}, p.titel), liste,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Schließen')));
+  const zu = zeigeDeck(kasten);
 }

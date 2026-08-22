@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.10.0';
+const APP_VERSION = '5.11.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -194,6 +194,9 @@ async function teileText(text) {
 const IK = {
   zuhause: '<path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/>',
   sticker: '<path d="M5 7a2 2 0 0 1 2-2h7.5L19 9.5V17a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"/><path d="M14.5 5v4.5H19"/><path d="M8.5 13.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8"/>',
+  lasso: '<path d="M12 4c4.4 0 8 2 8 4.8S16.4 13.6 12 13.6 4 11.6 4 8.8 7.6 4 12 4Z" stroke-dasharray="3 2.2"/><path d="M8.5 13.2c-.6 2.2-.2 4.3 1.4 6.3"/><circle cx="10.4" cy="20" r="1.2"/>',
+  gliederung: '<path d="M5 6h3M10 6h9"/><path d="M7 11h3M12 11h7"/><path d="M7 16h3M12 16h7"/><path d="M5 20h3M10 20h9"/>',
+  mikro: '<rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M6 11.5a6 6 0 0 0 12 0"/><path d="M12 17.5V21M9 21h6"/>',
   schnipsel: '<path d="M21 12a8 8 0 0 1-8 8c-1.6 0-3-.4-4.3-1L4 20l1.2-4A8 8 0 1 1 21 12Z"/>',
   hefte: '<path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4Z"/><path d="M5 4v14"/><path d="M9 8h6M9 11.5h6"/>',
   projekte: '<rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/>',
@@ -422,7 +425,7 @@ function sauberesDokument(quelle) {
   if (d.farbe2 && !/^#[0-9a-f]{6}$/i.test(d.farbe2)) d.farbe2 = '';
   if (d.band && !/^#[0-9a-f]{6}$/i.test(d.band)) d.band = '';
   if (d.muster && !['leinen', 'diagonal', 'punkte', 'rahmen', 'welle', 'schlicht'].includes(d.muster)) d.muster = 'schlicht';
-  if (d.papier && !['liniert', 'kariert', 'blank', 'punkte', 'breit'].includes(d.papier)) d.papier = 'liniert';
+  if (d.papier && !['liniert', 'kariert', 'blank', 'punkte', 'breit', 'cornell', 'storyboard', 'dialog'].includes(d.papier)) d.papier = 'liniert';
   if (d.ansicht && !['seiten', 'rolle', 'fluss'].includes(d.ansicht)) d.ansicht = 'seiten';
   if (d.papierfarbe && !['hell', 'weiss', 'creme', 'kraft', 'nacht'].includes(d.papierfarbe)) d.papierfarbe = 'hell';
   /* Klangbilder merken sich Mischungen und woran sie hängen. */
@@ -447,7 +450,17 @@ function sauberesDokument(quelle) {
   if (d.rich != null && typeof sauberesRichHTML === 'function') d.rich = sauberesRichHTML(d.rich);
   /* Zettel, Fotos und Blasen brauchen immer eine Position — sonst stürzt
      das Anfassen einer beschädigt importierten Anlage ab. */
-  if (d.pos == null && ['zettel', 'foto', 'blase', 'sticker'].includes(d.typ)) d.pos = { x: 10, y: 10, rot: 0, w: 30 };
+  if (d.pos == null && ['zettel', 'foto', 'blase', 'sticker', 'ton'].includes(d.typ)) d.pos = { x: 10, y: 10, rot: 0, w: 30 };
+  /* Kritzel-Striche, Reiter und Tonnotizen: begrenzt und bereinigt. */
+  if (d.striche != null) d.striche = typeof saubereStriche === 'function' ? saubereStriche(d.striche) : [];
+  if (d.skizzeBasis != null) d.skizzeBasis = String(d.skizzeBasis).slice(0, 500);
+  if (d.reiter != null) {
+    d.reiter = Array.isArray(d.reiter) ? d.reiter.slice(0, 40).map((r) => r && typeof r === 'object'
+      ? { seite: String(r.seite || '').slice(0, 200), farbe: /^[a-z]{1,12}$/.test(String(r.farbe || '')) ? r.farbe : 'rot', name: String(r.name || '').slice(0, 40) }
+      : null).filter((r) => r && r.seite) : [];
+  }
+  if (d.dauer != null) d.dauer = begrenze(d.dauer, 0, 36000, 0);
+  if (d.mime != null) d.mime = String(d.mime).slice(0, 60);
   /* Gruppen und Bilder auf Brettern liegen in Weltkoordinaten und brauchen
      eine Größe — pos.w/h dürfen dort viel größer sein als bei einer Anlage. */
   if (['gruppe', 'brettbild'].includes(d.typ)) {

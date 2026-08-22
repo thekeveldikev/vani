@@ -475,6 +475,40 @@ html[data-thema="tinte"] .menue button.rot, html[data-thema="kerze"] .menue butt
 .stickerkiste-feld { aspect-ratio: 1; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); display: grid; place-items: center; padding: 8px; }
 .stickerkiste-feld:active { transform: scale(.96); }
 .stickerkiste-feld img { max-width: 100%; max-height: 100%; object-fit: contain; }
+/* Tonnotiz: eine kleine Kassette auf der Seite */
+.ton-anlage .ton-kassette { display: flex; align-items: center; gap: 9px; padding: 8px 12px 8px 8px; border-radius: 11px; background: #2e2a28; color: #f3e9d6; box-shadow: 0 2px 7px rgba(0,0,0,.32); }
+.ton-anlage .ton-spiel { width: 34px; height: 34px; flex: none; border-radius: 50%; background: #e9b85a; color: #2e2a28; display: grid; place-items: center; }
+.ton-anlage .ton-spiel svg.ik { width: 18px; height: 18px; }
+.ton-anlage.spielt .ton-spiel { background: #f3e9d6; animation: pulsieren 1.4s ease-in-out infinite; }
+.ton-anlage .ton-text { min-width: 0; }
+.ton-anlage .ton-name { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ton-anlage .ton-zeit { font-size: 11px; opacity: .8; font-variant-numeric: tabular-nums; }
+.modal.tonnotiz .ton-buehne { display: flex; gap: 18px; align-items: center; margin: 12px 0 6px; }
+.ton-knopf { width: 76px; height: 76px; flex: none; border-radius: 50%; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie), 0 2px 8px var(--schein); display: grid; place-items: center; }
+.ton-punkt { width: 30px; height: 30px; border-radius: 50%; background: #c8322b; transition: border-radius .2s; }
+.ton-knopf.an .ton-punkt { border-radius: 7px; animation: pulsieren 1.2s ease-in-out infinite; }
+.ton-rechts { display: grid; gap: 8px; }
+.ton-uhr { font-size: 30px; font-variant-numeric: tabular-nums; font-family: ui-serif, "New York", Georgia, serif; }
+.ton-pegel { height: 8px; width: 170px; border-radius: 4px; background: var(--hg2); overflow: hidden; }
+.ton-pegel i { display: block; height: 100%; width: 0; background: #c8322b; transition: width .08s linear; }
+@keyframes pulsieren { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+/* Reiter am Heft */
+.heftreiter-leiste { display: flex; gap: 8px; flex-wrap: wrap; padding: 2px 16px 8px; }
+.heftreiter { display: flex; gap: 7px; align-items: center; padding: 4px 12px 4px 8px; border-radius: 4px 11px 11px 4px; font-size: 12.5px; color: #fffdf7; box-shadow: 0 1px 3px rgba(0,0,0,.22); }
+.heftreiter b { font-size: 11px; opacity: .85; }
+.heftreiter.rot { background: #c0533f; } .heftreiter.gelb { background: #d9a441; } .heftreiter.gruen { background: #5f7752; }
+.heftreiter.blau { background: #41597a; } .heftreiter.lila { background: #765187; } .heftreiter.grau { background: #7a746a; }
+/* Gliederung */
+.modal.gliederung-kasten { width: min(520px, calc(100vw - 48px)); }
+.gliederung { display: grid; gap: 2px; max-height: 58dvh; overflow: auto; }
+.gliederung-seite { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--blass); margin: 10px 0 3px; }
+.gliederung-punkt { text-align: left; padding: 6px 10px; border-radius: 9px; font-size: 15px; }
+.gliederung-punkt:hover { background: var(--hg2); }
+.gliederung-punkt.ebene-1 { font-weight: 600; } .gliederung-punkt.ebene-2 { padding-left: 24px; } .gliederung-punkt.ebene-3 { padding-left: 38px; font-size: 14px; color: var(--blass); }
+/* Papiervorlagen: Cornell (Randspalte + Zusammenfassung), Storyboard (2×3), Dialogblatt (zwei Spalten) */
+.papierseite.cornell { background-image: linear-gradient(90deg, transparent calc(30% - .5px), var(--linie) calc(30% - .5px), var(--linie) calc(30% + .5px), transparent calc(30% + .5px)), linear-gradient(transparent calc(100% - 96px), var(--linie) calc(100% - 96px), var(--linie) calc(100% - 95px), transparent calc(100% - 95px)); }
+.papierseite.storyboard { background-image: linear-gradient(90deg, transparent calc(50% - .5px), var(--linie) calc(50% - .5px), var(--linie) calc(50% + .5px), transparent calc(50% + .5px)), repeating-linear-gradient(transparent 0 calc(33.33% - .5px), var(--linie) calc(33.33% - .5px) calc(33.33% + .5px)); background-clip: content-box; }
+.papierseite.dialog { background-image: linear-gradient(90deg, transparent calc(50% - .5px), var(--linie) calc(50% - .5px), var(--linie) calc(50% + .5px), transparent calc(50% + .5px)); }
 .anlage .griff {
   position: absolute; right: -7px; bottom: -7px; width: 26px; height: 26px; border-radius: 50%;
   background: var(--akzent); color: var(--papier); display: none; align-items: center; justify-content: center;
@@ -1629,7 +1663,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.10.0';
+const APP_VERSION = '5.11.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -1820,6 +1854,9 @@ async function teileText(text) {
 const IK = {
   zuhause: '<path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/>',
   sticker: '<path d="M5 7a2 2 0 0 1 2-2h7.5L19 9.5V17a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"/><path d="M14.5 5v4.5H19"/><path d="M8.5 13.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8"/>',
+  lasso: '<path d="M12 4c4.4 0 8 2 8 4.8S16.4 13.6 12 13.6 4 11.6 4 8.8 7.6 4 12 4Z" stroke-dasharray="3 2.2"/><path d="M8.5 13.2c-.6 2.2-.2 4.3 1.4 6.3"/><circle cx="10.4" cy="20" r="1.2"/>',
+  gliederung: '<path d="M5 6h3M10 6h9"/><path d="M7 11h3M12 11h7"/><path d="M7 16h3M12 16h7"/><path d="M5 20h3M10 20h9"/>',
+  mikro: '<rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M6 11.5a6 6 0 0 0 12 0"/><path d="M12 17.5V21M9 21h6"/>',
   schnipsel: '<path d="M21 12a8 8 0 0 1-8 8c-1.6 0-3-.4-4.3-1L4 20l1.2-4A8 8 0 1 1 21 12Z"/>',
   hefte: '<path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4Z"/><path d="M5 4v14"/><path d="M9 8h6M9 11.5h6"/>',
   projekte: '<rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/>',
@@ -2048,7 +2085,7 @@ function sauberesDokument(quelle) {
   if (d.farbe2 && !/^#[0-9a-f]{6}$/i.test(d.farbe2)) d.farbe2 = '';
   if (d.band && !/^#[0-9a-f]{6}$/i.test(d.band)) d.band = '';
   if (d.muster && !['leinen', 'diagonal', 'punkte', 'rahmen', 'welle', 'schlicht'].includes(d.muster)) d.muster = 'schlicht';
-  if (d.papier && !['liniert', 'kariert', 'blank', 'punkte', 'breit'].includes(d.papier)) d.papier = 'liniert';
+  if (d.papier && !['liniert', 'kariert', 'blank', 'punkte', 'breit', 'cornell', 'storyboard', 'dialog'].includes(d.papier)) d.papier = 'liniert';
   if (d.ansicht && !['seiten', 'rolle', 'fluss'].includes(d.ansicht)) d.ansicht = 'seiten';
   if (d.papierfarbe && !['hell', 'weiss', 'creme', 'kraft', 'nacht'].includes(d.papierfarbe)) d.papierfarbe = 'hell';
   /* Klangbilder merken sich Mischungen und woran sie hängen. */
@@ -2073,7 +2110,17 @@ function sauberesDokument(quelle) {
   if (d.rich != null && typeof sauberesRichHTML === 'function') d.rich = sauberesRichHTML(d.rich);
   /* Zettel, Fotos und Blasen brauchen immer eine Position — sonst stürzt
      das Anfassen einer beschädigt importierten Anlage ab. */
-  if (d.pos == null && ['zettel', 'foto', 'blase', 'sticker'].includes(d.typ)) d.pos = { x: 10, y: 10, rot: 0, w: 30 };
+  if (d.pos == null && ['zettel', 'foto', 'blase', 'sticker', 'ton'].includes(d.typ)) d.pos = { x: 10, y: 10, rot: 0, w: 30 };
+  /* Kritzel-Striche, Reiter und Tonnotizen: begrenzt und bereinigt. */
+  if (d.striche != null) d.striche = typeof saubereStriche === 'function' ? saubereStriche(d.striche) : [];
+  if (d.skizzeBasis != null) d.skizzeBasis = String(d.skizzeBasis).slice(0, 500);
+  if (d.reiter != null) {
+    d.reiter = Array.isArray(d.reiter) ? d.reiter.slice(0, 40).map((r) => r && typeof r === 'object'
+      ? { seite: String(r.seite || '').slice(0, 200), farbe: /^[a-z]{1,12}$/.test(String(r.farbe || '')) ? r.farbe : 'rot', name: String(r.name || '').slice(0, 40) }
+      : null).filter((r) => r && r.seite) : [];
+  }
+  if (d.dauer != null) d.dauer = begrenze(d.dauer, 0, 36000, 0);
+  if (d.mime != null) d.mime = String(d.mime).slice(0, 60);
   /* Gruppen und Bilder auf Brettern liegen in Weltkoordinaten und brauchen
      eine Größe — pos.w/h dürfen dort viel größer sein als bei einer Anlage. */
   if (['gruppe', 'brettbild'].includes(d.typ)) {
@@ -3105,6 +3152,7 @@ function syncMedienIds() {
     if (d.typ === 'goodnote' && !D.einst.goodnotesSync) continue;
     if (d.bild) ids.add(d.bild);
     if (d.skizze) ids.add(d.skizze);
+    if (d.skizzeBasis) ids.add(d.skizzeBasis);
     if (d.datei) ids.add(d.datei);
   }
   return ids;
@@ -5640,7 +5688,7 @@ async function heftGestalten(h, danach) {
   zweit.addEventListener('input', () => { h.farbe2 = zweit.value; aktualisiere(); });
   band.addEventListener('input', () => { h.band = band.value; aktualisiere(); });
   const papier = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
-  for (const [id, name] of [['liniert', 'Liniert'], ['breit', 'Breite Linien'], ['kariert', 'Kariert'], ['punkte', 'Punktraster'], ['blank', 'Blanko']]) papier.append(el('button', {
+  for (const [id, name] of [['liniert', 'Liniert'], ['breit', 'Breite Linien'], ['kariert', 'Kariert'], ['punkte', 'Punktraster'], ['blank', 'Blanko'], ['cornell', 'Cornell'], ['storyboard', 'Storyboard'], ['dialog', 'Dialogblatt']]) papier.append(el('button', {
     class: (h.papier || 'liniert') === id ? 'an' : '', onclick: (e) => { h.papier = id; $$('button', papier).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); }
   }, name));
   /* Papierfarbe und Randlinie: wie das Heft innen aussieht */
@@ -5867,8 +5915,20 @@ RENDER.heft = function (haupt, heftId) {
     el('button', { class: 'rundknopf zart', html: ik('inhalt'), title: 'Inhalt: alle Seiten', onclick: () => heftInhalt(heft, (seite) => {
       sessionStorage.setItem('zielSeite', seite.id); zeichne();
     }) }),
+    heftHatUeberschriften(heft) ? el('button', { class: 'rundknopf zart', html: ik('gliederung'), title: 'Gliederung aus Überschriften', onclick: () => heftGliederung(heft) }) : null,
     el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Heft-Menü', onclick: () => heftMenue(heft, () => zeichne()) })
   ));
+  /* Farbige Reiter: springen zu ihren Seiten — in jeder Ansicht. */
+  if (Array.isArray(heft.reiter) && heft.reiter.length) {
+    const leiste = el('div', { class: 'heftreiter-leiste' });
+    for (const r of heft.reiter) {
+      const si = seiten.findIndex((x) => x.id === r.seite);
+      if (si < 0) continue;
+      leiste.append(el('button', { class: 'heftreiter ' + (r.farbe || 'rot'), title: 'Seite ' + (si + 1), onclick: () => { sessionStorage.setItem('zielSeite', r.seite); sessionStorage.setItem('heftSeite:' + heftId, String(si)); zeichne(); } },
+        el('b', {}, String(si + 1)), r.name || ''));
+    }
+    haupt.append(leiste);
+  }
 
   const inhalt = el('div', { class: 'inhalt' });
   const halter = el('div', { class: 'seitenhalter' });
@@ -6046,6 +6106,13 @@ function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
       const s = await stickerAufkleben(z.seite);
       if (s) auffrischen();
     } }),
+    tonUnterstuetzt() ? el('button', { class: 'rundknopf', title: 'Tonnotiz aufnehmen', html: ik('mikro'), onclick: async () => {
+      const z = ziel(); if (!z) return;
+      const t = await tonAufnehmen();
+      if (!t) return;
+      neuDoc('ton', { parent: z.seite.id, datei: t.datei, dauer: t.dauer, mime: t.mime, befestigung: 'tesa', pos: { x: 50 + Math.random() * 25, y: 68 + Math.random() * 14, rot: -3 + Math.random() * 6, w: 36 } });
+      auffrischen();
+    } }) : null,
     el('button', { class: 'rundknopf format-seite-knopf', title: 'Text formatieren', onclick: () => {
       const z = ziel(); if (!z) return;
       if (z.seite.format !== 'rich') {
@@ -6065,6 +6132,7 @@ function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
         const wahl = await menue([
           { text: 'Im Schreibraum öffnen', icon: 'stift', wert: 'sr' },
           { text: istLesezeichen ? 'Lesezeichen entfernen' : 'Lesezeichen hierher', icon: 'lesezeichen', wert: 'lesezeichen' },
+          { text: (z.heft.reiter || []).some((r) => r.seite === z.seite.id) ? 'Reiter abnehmen' : 'Farbigen Reiter anheften', icon: 'lesezeichen', wert: 'reiter' },
           i > 0 ? { text: 'Seite nach vorn', icon: 'auf', wert: 'vor' } : null,
           i < geschwister.length - 1 ? { text: 'Seite nach hinten', icon: 'ab', wert: 'zurueck' } : null,
           { text: 'Seite verdoppeln', icon: 'wandel', wert: 'doppel' },
@@ -6073,6 +6141,21 @@ function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
           { text: 'Seite herausreißen', icon: 'muell', wert: 'weg', rot: true }
         ], 'Seite ' + (i + 1) + ' von ' + geschwister.length);
         if (wahl === 'sr') oeffneSchreibraum(z.seite.id);
+        else if (wahl === 'reiter') {
+          const reiter = Array.isArray(z.heft.reiter) ? z.heft.reiter : [];
+          const da = reiter.findIndex((r) => r.seite === z.seite.id);
+          if (da >= 0) { reiter.splice(da, 1); z.heft.reiter = reiter; speichereStill(z.heft); toast('Reiter abgenommen.'); }
+          else {
+            const farbe = await menue(REITERFARBEN.map(([id, name]) => ({ text: name, icon: 'lesezeichen', wert: id })), 'Welche Farbe?');
+            if (!farbe) return;
+            const name = await eingabe({ titel: 'Was steht auf dem Reiter?', wert: (z.seite.titel || '').slice(0, 24), platzhalter: 'kurz — z. B. Figuren', ok: 'Anheften' });
+            if (name === null) return;
+            reiter.push({ seite: z.seite.id, farbe, name: (name || '').slice(0, 40) });
+            z.heft.reiter = reiter.slice(0, 40); speichereStill(z.heft);
+            toast('Reiter hängt an Seite ' + (i + 1) + '.');
+          }
+          if (neuZeichnen) neuZeichnen();
+        }
         else if (wahl === 'lesezeichen') {
           if (istLesezeichen) delete z.heft.lesezeichen; else z.heft.lesezeichen = z.seite.id;
           speichereStill(z.heft);
@@ -6194,6 +6277,15 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
   /* Ohne Filter macht die native append-Methode aus einem fehlenden Element
      den sichtbaren Text „null" — auf jeder schlichten Heftseite. */
   blatt.append(...[skizzenbild, titel, formatleiste, text, werkzeuge].filter(Boolean));
+  /* Aus der Gliederung kommend: zur n-ten Überschrift dieser Seite scrollen. */
+  const zielUe = sessionStorage.getItem('zielUeberschrift');
+  if (zielUe !== null && sessionStorage.getItem('zielSeiteGerade') !== seite.id) {
+    const wartend = sessionStorage.getItem('zielSeite');
+    if (!wartend) {
+      sessionStorage.removeItem('zielUeberschrift');
+      requestAnimationFrame(() => { const u = $$('h1,h2,h3', text)[Number(zielUe)]; if (u) u.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+    }
+  }
 
   /* Angeklebtes */
   function baueAnlagen() {
@@ -6202,6 +6294,7 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
       if (a.typ === 'zettel') blatt.append(baueZettel(a, blatt, baueAnlagen));
       else if (a.typ === 'foto') blatt.append(baueFoto(a, blatt, baueAnlagen));
       else if (a.typ === 'sticker') blatt.append(baueSticker(a, blatt, baueAnlagen));
+      else if (a.typ === 'ton') blatt.append(baueTon(a, blatt, baueAnlagen));
     }
   }
   baueAnlagen();
@@ -6299,6 +6392,7 @@ function anlageGesten(elem, a, blatt, neuBauen) {
     const wahl = await menue([
       a.typ === 'sticker' && !inKiste ? { text: 'In die Stickerkiste legen', icon: 'archiv', wert: 'kiste' } : null,
       a.typ === 'sticker' ? { text: 'Noch einmal aufkleben', icon: 'plus', wert: 'nochmal' } : null,
+      a.typ === 'ton' ? { text: 'Beschriften', icon: 'stift', wert: 'label' } : null,
       a.typ === 'zettel' ? { text: 'Andere Farbe', icon: 'farbe', wert: 'farbe' } : null,
       a.typ === 'zettel' ? { text: 'Schrift: ' + ({ hand: 'Handschrift', klar: 'Klar', serif: 'Serife' }[a.schrift || 'hand']), icon: 'stift', wert: 'schrift' } : null,
       a.typ === 'zettel' ? { text: 'Form: ' + (a.pos.w <= 24 ? 'schmal' : a.pos.w >= 44 ? 'breit' : 'normal'), icon: 'wandel', wert: 'form' } : null,
@@ -6310,6 +6404,9 @@ function anlageGesten(elem, a, blatt, neuBauen) {
     if (wahl === 'kiste') {
       neuDoc('stickervorlage', { bild: a.bild, verhaeltnis: a.verhaeltnis, zuletzt: Date.now() });
       toast('Liegt in der Stickerkiste.');
+    } else if (wahl === 'label') {
+      const n = await eingabe({ titel: 'Wie heißt die Tonnotiz?', wert: a.label || '', platzhalter: 'z. B. Tonfall Kapitel 3' });
+      if (n != null) { a.label = n; speichereStill(a); neuBauen(); }
     } else if (wahl === 'nochmal') {
       neuDoc('sticker', { parent: a.parent, bild: a.bild, verhaeltnis: a.verhaeltnis, befestigung: 'lose', pos: { x: Math.min(90, a.pos.x + 8), y: Math.min(100, a.pos.y + 8), rot: a.pos.rot, w: a.pos.w } });
       neuBauen();
@@ -6333,7 +6430,7 @@ function anlageGesten(elem, a, blatt, neuBauen) {
       speichereStill(a);
       elem.style.transform = 'rotate(' + a.pos.rot + 'deg)';
     } else if (wahl === 'weg') {
-      if (await frage(a.typ === 'zettel' ? 'Zettel abmachen und wegwerfen?' : a.typ === 'sticker' ? 'Sticker abmachen?' : 'Foto abmachen?', { ja: 'Abmachen', gefahr: true })) {
+      if (await frage(a.typ === 'zettel' ? 'Zettel abmachen und wegwerfen?' : a.typ === 'sticker' ? 'Sticker abmachen?' : a.typ === 'ton' ? 'Tonnotiz abmachen? Die Aufnahme geht mit.' : 'Foto abmachen?', { ja: 'Abmachen', gefahr: true })) {
         await loesche(a.id); neuBauen();
       }
     }
@@ -6411,6 +6508,9 @@ async function starteKritzeln(blatt, seite) {
   let basis = null;
   let breite = 0, hoehe = 0;
   let strich = null;
+  /* Lasso und Formen: Striche sind Punktfolgen und bleiben greifbar. */
+  let werkzeug = 'stift';
+  let lasso = null, auswahl = [], zieheAuswahl = null, formTimer = null;
 
   const altesBild = $('.skizzenbild', blatt);
   if (altesBild) altesBild.style.display = 'none';
@@ -6448,6 +6548,25 @@ async function starteKritzeln(blatt, seite) {
       kritzelZeichneStrich(ctx, s, breite);
     }
     ctx.globalCompositeOperation = 'source-over';
+    /* Auswahlrahmen und Lasso-Schlinge — nur Anzeige, nie im gespeicherten Bild. */
+    if (auswahl.length) {
+      const box = strichBox(auswahl.map((i) => striche[i]).filter(Boolean));
+      if (box) {
+        ctx.save(); ctx.setLineDash([6, 5]); ctx.strokeStyle = 'rgba(60,100,200,.9)'; ctx.lineWidth = 1.2;
+        ctx.strokeRect(box.x0 * breite - 6, box.y0 * breite - 6, box.w * breite + 12, box.h * breite + 12);
+        ctx.restore();
+      }
+    }
+    if (lasso && lasso.length > 1) {
+      ctx.save(); ctx.setLineDash([5, 4]); ctx.strokeStyle = 'rgba(60,100,200,.9)'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(lasso[0].x * breite, lasso[0].y * breite);
+      for (const q of lasso) ctx.lineTo(q.x * breite, q.y * breite);
+      ctx.stroke(); ctx.restore();
+    }
+  }
+  function auswahlLeisteAuffrischen() {
+    const an = auswahl.length > 0;
+    for (const k of [auswahlWegKnopf, auswahlFarbeKnopf, auswahlAufhebenKnopf]) { k.disabled = !an; k.style.opacity = an ? '' : '.35'; }
   }
   function knoepfeAuffrischen() {
     zurueckKnopf.disabled = !striche.length;
@@ -6460,6 +6579,16 @@ async function starteKritzeln(blatt, seite) {
     if (e.button != null && e.button > 0) return;
     try { canvas.setPointerCapture(e.pointerId); } catch (x) {}
     const p = punktAus(e);
+    if (werkzeug === 'lasso') {
+      /* In der Auswahl angefasst: verschieben. Sonst: neue Schlinge ziehen. */
+      const box = auswahl.length ? strichBox(auswahl.map((i) => striche[i]).filter(Boolean)) : null;
+      if (box && p.x >= box.x0 - .01 && p.x <= box.x1 + .01 && p.y >= box.y0 - .01 && p.y <= box.y1 + .01) {
+        zieheAuswahl = { sx: p.x, sy: p.y, vorher: striche };
+      } else { auswahl = []; lasso = [p]; }
+      alleszeichnen(); auswahlLeisteAuffrischen();
+      e.preventDefault();
+      return;
+    }
     strich = { farbe, radierer, punkte: [{ x: p.x, y: p.y, w: strichbreite(e) }] };
     striche.push(strich);
     zurueckgelegt = [];
@@ -6469,7 +6598,21 @@ async function starteKritzeln(blatt, seite) {
     e.preventDefault();
   });
   canvas.addEventListener('pointermove', (e) => {
-    if (!strich) return;
+    if (werkzeug === 'lasso') {
+      const p = punktAus(e);
+      if (zieheAuswahl) { striche = stricheVerschieben(zieheAuswahl.vorher, auswahl, p.x - zieheAuswahl.sx, p.y - zieheAuswahl.sy); alleszeichnen(); }
+      else if (lasso) { lasso.push(p); alleszeichnen(); }
+      return;
+    }
+    if (!strich || strich.geformt) return;
+    /* Form halten: bleibt der Stift am Ende kurz stehen, wird der Strich zur Form. */
+    clearTimeout(formTimer);
+    formTimer = setTimeout(() => {
+      if (!strich || strich.geformt || strich.radierer) return;
+      const f = formErkennen(strich.punkte);
+      if (!f) return;
+      strich.punkte = f.punkte; strich.geformt = true; alleszeichnen();
+    }, 560);
     const punkte = (e.getCoalescedEvents && e.getCoalescedEvents().length ? e.getCoalescedEvents() : [e]);
     ctx.globalCompositeOperation = strich.radierer ? 'destination-out' : 'source-over';
     ctx.strokeStyle = strich.farbe;
@@ -6488,7 +6631,14 @@ async function starteKritzeln(blatt, seite) {
     }
     ctx.globalCompositeOperation = 'source-over';
   });
-  const strichEnde = () => { strich = null; };
+  const strichEnde = () => {
+    clearTimeout(formTimer);
+    if (werkzeug === 'lasso') {
+      if (lasso) { auswahl = stricheImLasso(striche, lasso); lasso = null; if (!auswahl.length) toast('Nichts in der Schlinge.'); }
+      zieheAuswahl = null; alleszeichnen(); auswahlLeisteAuffrischen();
+    }
+    strich = null;
+  };
   canvas.addEventListener('pointerup', strichEnde);
   canvas.addEventListener('pointercancel', strichEnde);
 
@@ -6529,6 +6679,35 @@ async function starteKritzeln(blatt, seite) {
       alleszeichnen(); knoepfeAuffrischen();
     }
   });
+  const lassoKnopf = el('button', {
+    class: 'rundknopf kritzel-werkzeug', html: ik('lasso'), title: 'Lasso: Striche greifen, verschieben, löschen', onclick: () => {
+      werkzeug = werkzeug === 'lasso' ? 'stift' : 'lasso';
+      lassoKnopf.classList.toggle('an', werkzeug === 'lasso');
+      if (werkzeug !== 'lasso') { auswahl = []; lasso = null; }
+      canvas.style.cursor = werkzeug === 'lasso' ? 'crosshair' : '';
+      alleszeichnen(); auswahlLeisteAuffrischen();
+      if (werkzeug === 'lasso') toast('Eine Schlinge um Striche ziehen. Dann anfassen und verschieben, oder löschen.', 3600);
+    }
+  });
+  const auswahlWegKnopf = el('button', {
+    class: 'rundknopf kritzel-werkzeug', html: ik('kreuz'), title: 'Ausgewählte Striche löschen', onclick: () => {
+      if (!auswahl.length) return;
+      const menge = new Set(auswahl);
+      striche = striche.filter((s, i) => !menge.has(i)); auswahl = []; zurueckgelegt = [];
+      alleszeichnen(); knoepfeAuffrischen(); auswahlLeisteAuffrischen();
+    }
+  });
+  const auswahlFarbeKnopf = el('button', {
+    class: 'rundknopf kritzel-werkzeug', html: ik('farbe'), title: 'Ausgewählte Striche in der Stiftfarbe', onclick: () => {
+      if (!auswahl.length) return;
+      const menge = new Set(auswahl);
+      striche = striche.map((s, i) => menge.has(i) && !s.radierer ? { ...s, farbe } : s);
+      alleszeichnen();
+    }
+  });
+  const auswahlAufhebenKnopf = el('button', {
+    class: 'rundknopf kritzel-werkzeug', html: ik('haken'), title: 'Auswahl aufheben', onclick: () => { auswahl = []; alleszeichnen(); auswahlLeisteAuffrischen(); }
+  });
   const leerKnopf = el('button', {
     class: 'rundknopf kritzel-werkzeug', html: ik('muell'), title: 'Alles löschen', onclick: async () => {
       if (!striche.length && !basis) { toast('Hier ist noch nichts.'); return; }
@@ -6548,6 +6727,14 @@ async function starteKritzeln(blatt, seite) {
   const fertigKnopf = el('button', {
     class: 'knopf voll', style: 'padding:7px 14px', onclick: async () => {
       const leer = !striche.length && !basis;
+      /* Ein altes Bild ohne Striche bleibt als Grundlage erhalten — unter
+         eigener Kennung, damit das fertige Bild darüber nicht die Grundlage
+         überschreibt und beim nächsten Öffnen alles doppelt dasteht. */
+      if (basis && seite.skizze && !seite.skizzeBasis) {
+        try { const alt = await dbGet('media', seite.skizze); if (alt) { const neuId = uid(); await dbPut('media', alt, neuId); seite.skizzeBasis = neuId; if (typeof syncMediaGeaendert === 'function') syncMediaGeaendert(neuId); } } catch (x) {}
+      }
+      auswahl = []; lasso = null; alleszeichnen();
+      seite.striche = leer ? [] : saubereStriche(striche.map((s) => strichVerdichten(s)));
       seite.skizze = leer ? seite.skizze : await speichereKritzelei(canvas, seite.skizze);
       speichere(seite);
       aufraeumen();
@@ -6577,9 +6764,11 @@ async function starteKritzeln(blatt, seite) {
     }),
     el('label', { class: 'stift-eigen', title: 'Eigene Farbe' }, '＋', eigeneFarbe),
     el('label', { class: 'stift-dicke' }, dickeProbe, dickeRegler),
-    radierKnopf,
+    radierKnopf, lassoKnopf,
     el('span', { class: 'kritzel-trenner' }),
     zurueckKnopf, vorKnopf, leerKnopf,
+    el('span', { class: 'kritzel-trenner' }),
+    auswahlWegKnopf, auswahlFarbeKnopf, auswahlAufhebenKnopf,
     el('span', { class: 'kritzel-trenner' }),
     abbrechenKnopf, fertigKnopf
   );
@@ -6595,15 +6784,50 @@ async function starteKritzeln(blatt, seite) {
   const beobachter = typeof ResizeObserver === 'function' ? new ResizeObserver(beiGroesse) : { observe() {}, disconnect() {} };
   try { beobachter.observe(canvas); } catch (e) {}
 
-  if (seite.skizze) {
-    const url = await bildURL(seite.skizze);
+  /* Gespeicherte Striche sind die Wahrheit; ein altes Bild ist nur noch
+     Grundlage (skizzeBasis) oder, ganz ohne Striche, das Einzige, was es gibt. */
+  const hatStriche = Array.isArray(seite.striche) && seite.striche.length > 0;
+  if (hatStriche) striche = seite.striche.map((s) => ({ ...s, punkte: (s.punkte || []).map((q) => ({ ...q })) }));
+  const basisId = hatStriche ? seite.skizzeBasis : seite.skizze;
+  if (basisId) {
+    const url = await bildURL(basisId);
     if (url && canvas.isConnected) {
       const alt = new Image();
       await new Promise((res) => { alt.onload = res; alt.onerror = res; alt.src = url; });
       if (alt.width && alt.height) basis = alt;
     }
   }
-  if (canvas.isConnected) { messen(); alleszeichnen(); }
+  if (canvas.isConnected) { messen(); alleszeichnen(); knoepfeAuffrischen(); auswahlLeisteAuffrischen(); }
+}
+
+/* ----- Reiter und Gliederung ----- */
+const REITERFARBEN = [['rot', 'Rot'], ['gelb', 'Gelb'], ['gruen', 'Grün'], ['blau', 'Blau'], ['lila', 'Lila'], ['grau', 'Grau']];
+
+function heftHatUeberschriften(heft) {
+  return kinder(heft.id, 'seite').some((s) => s.format === 'rich' && /<h[1-3][\s>]/i.test(s.rich || ''));
+}
+
+/* Gliederung: alle Überschriften aller Seiten, eingerückt nach Ebene; antippen
+   springt zur Seite und scrollt zur Überschrift. */
+function heftGliederung(heft) {
+  const seiten = kinder(heft.id, 'seite');
+  const liste = el('div', { class: 'gliederung' });
+  let gesamt = 0;
+  seiten.forEach((s, i) => {
+    const ue = s.format === 'rich' ? gliederungAusHTML(s.rich) : [];
+    if (!ue.length && !s.titel) return;
+    liste.append(el('div', { class: 'gliederung-seite' }, 'Seite ' + (i + 1) + (s.titel ? ' · ' + s.titel : '')));
+    ue.forEach((u, n) => {
+      gesamt++;
+      liste.append(el('button', { class: 'gliederung-punkt ebene-' + u.ebene, onclick: () => {
+        zu(); sessionStorage.setItem('zielSeite', s.id); sessionStorage.setItem('zielUeberschrift', String(n)); zeichne();
+      } }, u.text));
+    });
+  });
+  if (!gesamt) { toast('Noch keine Überschriften — mit „Ü" in der Formatleiste entstehen sie.'); return; }
+  const kasten = el('div', { class: 'modal gliederung-kasten' }, el('h2', {}, 'Gliederung'), liste,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Schließen')));
+  const zu = zeigeDeck(kasten);
 }
 
 /* ================================================================
@@ -6830,6 +7054,295 @@ function baueSticker(a, blatt, neuBauen) {
 }
 
 /* ================================================================
+   VANI — Kritzeln, zweiter Teil: reine Geometrie.
+
+   Striche sind Punktfolgen, keine Pixel. Darum lassen sie sich nachträglich
+   greifen (Lasso), verschieben, löschen, umfärben — und ein Strich, bei dem
+   der Stift am Ende kurz stehen bleibt, wird zur Form: Linie, Ellipse oder
+   Rechteck. Alles hier ist pur und wird einzeln geprüft; das Zeichnen selbst
+   steht in starteKritzeln.
+   ================================================================ */
+
+/* Punkt im Polygon (Strahlmethode). Polygon als Liste {x,y}. */
+function punktInPolygon(p, poly) {
+  if (!p || !Array.isArray(poly) || poly.length < 3) return false;
+  let drin = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const a = poly[i], b = poly[j];
+    if (((a.y > p.y) !== (b.y > p.y)) && (p.x < (b.x - a.x) * (p.y - a.y) / ((b.y - a.y) || 1e-12) + a.x)) drin = !drin;
+  }
+  return drin;
+}
+
+/* Umriss eines Strichs (oder mehrerer). */
+function strichBox(striche) {
+  const liste = Array.isArray(striche) ? striche : [striche];
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const s of liste) for (const p of (s && s.punkte) || []) {
+    if (p.x < x0) x0 = p.x; if (p.x > x1) x1 = p.x; if (p.y < y0) y0 = p.y; if (p.y > y1) y1 = p.y;
+  }
+  return x0 === Infinity ? null : { x0, y0, x1, y1, w: x1 - x0, h: y1 - y0 };
+}
+
+/* Welche Striche liegen im Lasso? Ein Strich zählt, wenn mehr als die Hälfte
+   seiner Punkte drin liegt — so greift man nicht versehentlich ganze
+   Nachbarlinien, nur weil ein Ende hineinragt. Löschmarken und Radierer-
+   striche werden nie gegriffen. */
+function stricheImLasso(striche, poly) {
+  const aus = [];
+  (striche || []).forEach((s, i) => {
+    if (!s || s.leeren || s.radierer || !Array.isArray(s.punkte) || !s.punkte.length) return;
+    let drin = 0;
+    for (const p of s.punkte) if (punktInPolygon(p, poly)) drin++;
+    if (drin * 2 > s.punkte.length) aus.push(i);
+  });
+  return aus;
+}
+
+/* Verschiebt Striche (Indizes) um dx, dy — gibt neue Objekte zurück. */
+function stricheVerschieben(striche, indizes, dx, dy) {
+  const menge = new Set(indizes);
+  return striche.map((s, i) => menge.has(i) && s.punkte
+    ? { ...s, punkte: s.punkte.map((p) => ({ ...p, x: p.x + dx, y: p.y + dy })) }
+    : s);
+}
+
+/* Form erkennen: Linie, wenn der Strich nahe an seiner Sehne bleibt; Ellipse,
+   wenn er sich schließt und rund um seine Mitte liegt; Rechteck, wenn er sich
+   schließt und seine Punkte an den Kanten des Umrisses kleben. Sonst null. */
+function formErkennen(punkte) {
+  const p = (punkte || []).filter((q) => q && Number.isFinite(q.x) && Number.isFinite(q.y));
+  if (p.length < 6) return null;
+  const box = strichBox({ punkte: p });
+  const diag = Math.hypot(box.w, box.h);
+  if (diag < .02) return null;
+  const w = p.reduce((n, q) => n + (q.w || 0), 0) / p.length || .004;
+  const a = p[0], z = p[p.length - 1];
+  const geschlossen = Math.hypot(z.x - a.x, z.y - a.y) < .18 * diag;
+  if (!geschlossen) {
+    const sehne = Math.hypot(z.x - a.x, z.y - a.y);
+    if (sehne < .02) return null;
+    let maxAbstand = 0;
+    for (const q of p) {
+      const t = ((q.x - a.x) * (z.x - a.x) + (q.y - a.y) * (z.y - a.y)) / (sehne * sehne);
+      const fx = a.x + (z.x - a.x) * t, fy = a.y + (z.y - a.y) * t;
+      maxAbstand = Math.max(maxAbstand, Math.hypot(q.x - fx, q.y - fy));
+    }
+    if (maxAbstand / sehne < .09) return { art: 'linie', punkte: [{ x: a.x, y: a.y, w }, { x: z.x, y: z.y, w }] };
+    return null;
+  }
+  const cx = (box.x0 + box.x1) / 2, cy = (box.y0 + box.y1) / 2;
+  const rx = Math.max(.004, box.w / 2), ry = Math.max(.004, box.h / 2);
+  /* Rund? Normierter Abstand zur Mitte soll nahe 1 liegen. */
+  let summe = 0, summe2 = 0;
+  for (const q of p) { const r = Math.hypot((q.x - cx) / rx, (q.y - cy) / ry); summe += r; summe2 += r * r; }
+  const mittel = summe / p.length, streuung = Math.sqrt(Math.max(0, summe2 / p.length - mittel * mittel));
+  /* Eckig? Punkte kleben an den Kanten des Umrisses. */
+  let anKante = 0;
+  const rand = .12;
+  for (const q of p) {
+    const nx = Math.abs(q.x - cx) / rx, ny = Math.abs(q.y - cy) / ry;
+    if (nx > 1 - rand || ny > 1 - rand) anKante++;
+  }
+  const kantenAnteil = anKante / p.length;
+  /* Erst das Eckige prüfen: ein Rechteck liegt auch „rund" um seine Mitte
+     (Abstand 1 bis √2), aber ein Kreis klebt nur zu gut 60 % an den Kanten. */
+  if (kantenAnteil > .82) {
+    return { art: 'rechteck', punkte: [
+      { x: box.x0, y: box.y0, w }, { x: box.x1, y: box.y0, w }, { x: box.x1, y: box.y1, w }, { x: box.x0, y: box.y1, w }, { x: box.x0, y: box.y0, w }
+    ] };
+  }
+  if (streuung < .12 && mittel > .8) {
+    const aus = [];
+    for (let i = 0; i <= 48; i++) { const t = i / 48 * Math.PI * 2; aus.push({ x: cx + Math.cos(t) * rx, y: cy + Math.sin(t) * ry, w }); }
+    return { art: 'ellipse', punkte: aus };
+  }
+  return null;
+}
+
+/* Punkte ausdünnen, damit gespeicherte Striche klein bleiben: Punkte, die
+   dem vorigen näher als ein Hauch sind, fallen weg; Anfang und Ende bleiben. */
+function strichVerdichten(s, mindest = .0018) {
+  if (!s || !Array.isArray(s.punkte) || s.punkte.length < 3) return s;
+  const aus = [s.punkte[0]];
+  for (let i = 1; i < s.punkte.length - 1; i++) {
+    const v = aus[aus.length - 1], q = s.punkte[i];
+    if (Math.hypot(q.x - v.x, q.y - v.y) >= mindest) aus.push(q);
+  }
+  aus.push(s.punkte[s.punkte.length - 1]);
+  return { ...s, punkte: aus };
+}
+
+/* Gliederung aus Überschriften eines formatierten Textes: h1–h3, in
+   Reihenfolge, ohne Tags. Pur (Regex), weil unser Rich-HTML aufgeräumt ist. */
+function gliederungAusHTML(html) {
+  const aus = [];
+  const re = /<h([1-3])(?:\s[^>]*)?>([\s\S]*?)<\/h\1>/gi;
+  let m;
+  while ((m = re.exec(String(html || ''))) && aus.length < 400) {
+    const text = m[2].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
+    if (text) aus.push({ ebene: Number(m[1]), text: text.slice(0, 120) });
+  }
+  return aus;
+}
+
+/* Was in ein Dokument darf: begrenzt, bereinigt, nie mehr als das Budget. */
+function saubereStriche(roh, maxStriche = 4000, maxPunkte = 24000) {
+  if (!Array.isArray(roh)) return [];
+  const aus = [];
+  let punkte = 0;
+  for (const s of roh.slice(-maxStriche)) {
+    if (!s || typeof s !== 'object') continue;
+    if (s.leeren) { aus.length = 0; punkte = 0; continue; }   /* ein Löschen davor macht alles Frühere unnötig */
+    if (!Array.isArray(s.punkte) || !s.punkte.length) continue;
+    const farbe = typeof s.farbe === 'string' && /^(#[0-9a-f]{3,8}|[a-z]{1,20}|rgba?\([\d.,\s%]{1,40}\))$/i.test(s.farbe) ? s.farbe : '#000';
+    const p = [];
+    for (const q of s.punkte) {
+      if (!q || typeof q !== 'object') continue;
+      const x = Number(q.x), y = Number(q.y), w = Number(q.w);
+      if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+      p.push({ x: Math.max(-1, Math.min(2, x)), y: Math.max(-1, Math.min(3, y)), w: Number.isFinite(w) ? Math.max(.0005, Math.min(.2, w)) : .004 });
+      if (p.length >= 4000) break;
+    }
+    if (!p.length) continue;
+    punkte += p.length;
+    aus.push({ farbe, radierer: s.radierer === true, punkte: p });
+  }
+  /* Über dem Budget fallen die ältesten Striche weg — die neuesten zählen. */
+  while (punkte > maxPunkte && aus.length) punkte -= aus.shift().punkte.length;
+  return aus;
+}
+
+/* ================================================================
+   VANI — Tonnotiz: eine Stimme auf der Heftseite.
+
+   Manches sagt man schneller, als man es tippt: wie der Satz klingen soll,
+   eine Idee im Halbschlaf, der Tonfall einer Figur. Die Tonnotiz nimmt auf
+   (Mikrofon des Geräts), liegt dann als kleine Kassette auf der Seite —
+   antippen spielt ab, noch einmal hält an — und reist wie ein Foto über
+   Sicherung und Sync, weil die Aufnahme im Medienvorrat liegt.
+   ================================================================ */
+
+function tonUnterstuetzt() {
+  return typeof navigator !== 'undefined' && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) && typeof MediaRecorder !== 'undefined';
+}
+function tonFormat(sek) {
+  const s = Math.max(0, Math.round(Number(sek) || 0));
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+/* Welches Format das Gerät hergibt: Safari mp4, die anderen webm/opus. */
+function tonMime() {
+  if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return '';
+  for (const m of ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/ogg']) if (MediaRecorder.isTypeSupported(m)) return m;
+  return '';
+}
+
+const TON_MAX_SEKUNDEN = 300;
+
+/* Aufnehmen: ein Dialog mit einem Knopf, einem Pegel und einer Uhr. */
+function tonAufnehmen() {
+  return new Promise((res) => {
+    if (!tonUnterstuetzt()) { toast('Dieses Gerät gibt das Mikrofon hier nicht frei.', 3600); return res(null); }
+    let strom = null, rekorder = null, stuecke = [], laeuft = false, fertig = false, t0 = 0, uhrTimer = null;
+    let audioCtx = null, analyser = null, pegelRaf = 0, blob = null, dauer = 0, probe = null;
+    const uhr = el('div', { class: 'ton-uhr' }, '0:00');
+    const pegel = el('div', { class: 'ton-pegel' }, el('i'));
+    const hinweis = el('div', { class: 'stickerblock-hinweis' }, 'Antippen startet die Aufnahme, noch einmal hält an. Bis zu fünf Minuten.');
+    const knopf = el('button', { class: 'ton-knopf', title: 'Aufnehmen' }, el('span', { class: 'ton-punkt' }));
+    const aufkleben = el('button', { class: 'knopf voll', disabled: 'disabled', onclick: async () => {
+      if (!blob) return;
+      fertig = true; aufraeumen(); zu();
+      try { const id = await speichereDateiBlob(new File([blob], 'tonnotiz', { type: blob.type || 'audio/webm' })); res({ datei: id, dauer, mime: blob.type || '' }); }
+      catch (e) { toast('Die Aufnahme ließ sich nicht ablegen.'); res(null); }
+    } }, 'Aufkleben');
+    const anhoeren = el('button', { class: 'knopf', disabled: 'disabled', onclick: () => {
+      if (!blob) return;
+      if (probe) { probe.pause(); probe = null; anhoeren.textContent = 'Anhören'; return; }
+      probe = new Audio(URL.createObjectURL(blob)); probe.onended = () => { probe = null; anhoeren.textContent = 'Anhören'; };
+      probe.play().catch(() => {}); anhoeren.textContent = 'Anhalten';
+    } }, 'Anhören');
+
+    const pegelZeichnen = () => {
+      if (!analyser) return;
+      const d = new Uint8Array(analyser.fftSize); analyser.getByteTimeDomainData(d);
+      let sum = 0; for (const v of d) { const x = (v - 128) / 128; sum += x * x; }
+      const eff = Math.sqrt(sum / d.length);
+      pegel.firstChild.style.width = Math.min(100, Math.round(eff * 260)) + '%';
+      pegelRaf = requestAnimationFrame(pegelZeichnen);
+    };
+    const aufraeumen = () => {
+      cancelAnimationFrame(pegelRaf); clearInterval(uhrTimer);
+      try { if (rekorder && rekorder.state !== 'inactive') rekorder.stop(); } catch (e) {}
+      try { if (strom) strom.getTracks().forEach((t) => t.stop()); } catch (e) {}
+      try { if (audioCtx) audioCtx.close(); } catch (e) {}
+      if (probe) { try { probe.pause(); } catch (e) {} }
+    };
+    const starte = async () => {
+      try { strom = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+      catch (e) { toast('Kein Zugriff aufs Mikrofon. In den Geräteeinstellungen erlauben.', 4200); return; }
+      stuecke = []; blob = null; aufkleben.disabled = true; anhoeren.disabled = true;
+      const mime = tonMime();
+      try { rekorder = mime ? new MediaRecorder(strom, { mimeType: mime }) : new MediaRecorder(strom); }
+      catch (e) { rekorder = new MediaRecorder(strom); }
+      rekorder.ondataavailable = (e) => { if (e.data && e.data.size) stuecke.push(e.data); };
+      rekorder.onstop = () => {
+        blob = new Blob(stuecke, { type: rekorder.mimeType || mime || 'audio/webm' });
+        dauer = Math.round((Date.now() - t0) / 1000);
+        laeuft = false; knopf.classList.remove('an'); hinweis.textContent = tonFormat(dauer) + ' aufgenommen. Anhören — oder gleich aufkleben.';
+        aufkleben.disabled = false; anhoeren.disabled = false;
+        try { strom.getTracks().forEach((t) => t.stop()); } catch (e) {}
+        cancelAnimationFrame(pegelRaf);
+      };
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser(); analyser.fftSize = 512;
+        audioCtx.createMediaStreamSource(strom).connect(analyser);
+        pegelZeichnen();
+      } catch (e) {}
+      rekorder.start(250);
+      t0 = Date.now(); laeuft = true; knopf.classList.add('an'); hinweis.textContent = 'Aufnahme läuft …';
+      uhrTimer = setInterval(() => {
+        const s = (Date.now() - t0) / 1000; uhr.textContent = tonFormat(s);
+        if (s >= TON_MAX_SEKUNDEN) stoppe();
+      }, 250);
+    };
+    const stoppe = () => { clearInterval(uhrTimer); try { rekorder.stop(); } catch (e) {} };
+    knopf.addEventListener('click', () => { if (laeuft) stoppe(); else starte(); });
+
+    const kasten = el('div', { class: 'modal tonnotiz' },
+      el('h2', {}, 'Eine Tonnotiz'),
+      hinweis,
+      el('div', { class: 'ton-buehne' }, knopf, el('div', { class: 'ton-rechts' }, uhr, pegel)),
+      el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'), anhoeren, aufkleben));
+    const zu = zeigeDeck(kasten, () => { if (!fertig) { fertig = true; aufraeumen(); res(null); } });
+  });
+}
+
+/* Die Kassette auf der Seite. */
+function baueTon(a, blatt, neuBauen) {
+  const halter = el('div', { class: 'anlage ton-anlage befestigung-' + (a.befestigung || 'tesa') });
+  positioniere(halter, a);
+  let audio = null;
+  const spiel = el('button', { class: 'ton-spiel', html: ik('vorlesen'), title: 'Abspielen' });
+  const name = el('div', { class: 'ton-name' }, a.label || 'Tonnotiz');
+  const zeit = el('div', { class: 'ton-zeit' }, tonFormat(a.dauer));
+  spiel.addEventListener('pointerdown', (e) => e.stopPropagation());
+  spiel.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    if (audio && !audio.paused) { audio.pause(); audio.currentTime = 0; halter.classList.remove('spielt'); zeit.textContent = tonFormat(a.dauer); return; }
+    const url = await bildURL(a.datei);
+    if (!url) { toast('Die Aufnahme ist nicht da.'); return; }
+    audio = new Audio(url);
+    audio.ontimeupdate = () => { zeit.textContent = tonFormat(audio.currentTime) + ' / ' + tonFormat(a.dauer); };
+    audio.onended = () => { halter.classList.remove('spielt'); zeit.textContent = tonFormat(a.dauer); };
+    try { await audio.play(); halter.classList.add('spielt'); } catch (x) { toast('Abspielen ging gerade nicht.'); }
+  });
+  halter.append(el('div', { class: 'ton-kassette' }, spiel, el('div', { class: 'ton-text' }, name, zeit)));
+  anlageGesten(halter, a, blatt, neuBauen);
+  return halter;
+}
+
+/* ================================================================
    VANI — Projekte: Kapitel, Szenen, Pinnwand, Leseansicht
    ================================================================ */
 
@@ -6949,6 +7462,7 @@ RENDER.projekt = function (haupt, pid) {
     zurueckknopf('#/projekte'),
     el('h1', {}, p.titel, el('div', { class: 'unter' },
       w.toLocaleString('de-DE') + ' Wörter' + (p.ziel ? ' von ' + p.ziel.toLocaleString('de-DE') : '') + ' · ' + (p.art || ''))),
+    el('button', { class: 'rundknopf zart', html: ik('gliederung'), title: 'Gliederung: Kapitel, Szenen, Überschriften', onclick: () => projektGliederung(p) }),
     el('button', { class: 'rundknopf zart', html: ik('lesen'), title: 'Leseansicht', onclick: () => zeigeLeseansicht(p) }),
     el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Projekt-Menü', onclick: () => projektMenue(p, () => zeichne()) })
   ));
@@ -7395,6 +7909,26 @@ function zeigeLeseansicht(p) {
     el('button', { class: 'knopf', onclick: () => teileDatei(p.titel.replace(/[^\wäöüß -]/gi, '') + '.txt', gesamt) }, 'Als Datei')
   );
   document.body.append(bogen, leiste);
+}
+
+/* Gliederung eines Projekts: Kapitel → Szenen → Überschriften in den Szenen.
+   Antippen öffnet die Szene im Schreibraum. */
+function projektGliederung(p) {
+  const liste = el('div', { class: 'gliederung' });
+  for (const k of kinder(p.id, 'kapitel')) {
+    liste.append(el('div', { class: 'gliederung-seite' }, k.titel || 'Kapitel'));
+    for (const s of kinder(k.id, 'szene')) {
+      liste.append(el('button', { class: 'gliederung-punkt ebene-1', onclick: () => { zu(); oeffneSchreibraum(s.id); } },
+        (s.titel || 'Szene ohne Namen') + (s.text ? ' · ' + worte(s.text) + ' W.' : '')));
+      if (s.format === 'rich') for (const u of gliederungAusHTML(s.rich)) {
+        liste.append(el('button', { class: 'gliederung-punkt ebene-' + Math.min(3, u.ebene + 1), onclick: () => { zu(); oeffneSchreibraum(s.id); } }, u.text));
+      }
+    }
+  }
+  if (!liste.children.length) { toast('Noch keine Kapitel.'); return; }
+  const kasten = el('div', { class: 'modal gliederung-kasten' }, el('h2', {}, p.titel), liste,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Schließen')));
+  const zu = zeigeDeck(kasten);
 }
 
 /* ================================================================
@@ -10147,7 +10681,7 @@ async function baueSicherungsPaket({ mitMedien = true } = {}) {
   const media = {};
   if (mitMedien) {
     const ids = new Set();
-    for (const d of D.docs.values()) { if (d.bild) ids.add(d.bild); if (d.skizze) ids.add(d.skizze); if (d.datei) ids.add(d.datei); }
+    for (const d of D.docs.values()) { if (d.bild) ids.add(d.bild); if (d.skizze) ids.add(d.skizze); if (d.skizzeBasis) ids.add(d.skizzeBasis); if (d.datei) ids.add(d.datei); }
     for (const id of ids) {
       const blob = await dbGet('media', id);
       if (blob) media[id] = await blobZuDataURL(blob);
@@ -10184,6 +10718,7 @@ async function sicherungEinspielen(paket, modus) {
     neu.push(d);
     if (d.bild) benoetigteMedien.add(d.bild);
     if (d.skizze) benoetigteMedien.add(d.skizze);
+    if (d.skizzeBasis) benoetigteMedien.add(d.skizzeBasis);
     if (d.datei) benoetigteMedien.add(d.datei);
   }
   let medien = 0;
@@ -12454,6 +12989,11 @@ const ANLEITUNG = [
       { t: 'Fotos', p: ['„Foto einkleben" legt ein Bild auf die Seite, leicht schräg wie eingeklebt. Es lässt sich genauso ziehen, drehen, vergrößern und befestigen wie ein Zettel.'] },
       { t: 'Sticker', p: ['Das Sticker-Symbol in den Seitenwerkzeugen öffnet den Stickerblock: eine kleine Zeichenfläche mit Stiften (rot zuerst), Dicke, Radierer, Zurück. Was ich zeichne, wird so groß wie das Gezeichnete — der Rest bleibt durchsichtig — und klebt dann lose auf der Seite: ziehen, am Griff unten rechts größer und kleiner, am runden Griff oben frei drehen (nahe null rastet es gerade ein), lange halten zum Abmachen.', 'Sticker dürfen wie Zettel über den Seitenrand hinausragen. „Seite verdoppeln" nimmt sie mit.'], b: 'Ein rotes „SCHMU!" einmal gezeichnet — und ab jetzt in jedem Heft an der richtigen Stelle.' },
       { t: 'Die Stickerkiste', p: ['Das Sticker-Symbol öffnet zuerst die Kiste: oben „Meine" (was ich gezeichnet habe), darunter „Mitgebracht" — mein rotes „Schmu!" ist schon dabei, als echtes Bild mit durchsichtigem Grund. Antippen klebt auf, lange drücken nimmt einen eigenen heraus, „Neuen zeichnen" öffnet den Block. Beim Zeichnen ist „Auch in die Stickerkiste legen" angehakt. Ein schon aufgeklebter Sticker kommt per langem Halten nachträglich in die Kiste („In die Stickerkiste legen") oder gleich noch einmal auf die Seite („Noch einmal aufkleben").'] },
+      { t: 'Lasso und Formen', p: ['Das Lasso-Symbol in der Kritzelleiste: eine Schlinge um Striche ziehen — sie sind ausgewählt (gestrichelter Rahmen). Dann anfassen und verschieben, mit dem Kreuz löschen, mit dem Farbknopf in die aktuelle Stiftfarbe umfärben, Haken hebt die Auswahl auf. Das geht auch nach Tagen noch, weil VANI Striche als Punktfolgen speichert, nicht als Bild.', 'Formen: Bleibt der Stift am Ende eines Strichs einen halben Atemzug stehen, wird der Strich zur Form — eine gerade Linie, eine Ellipse, ein Rechteck. Was keine Form ist, bleibt Handschrift.'], b: 'Schnell einen Kreis um ein Wort ziehen, kurz stehen bleiben — ein sauberer Kreis. Später mit dem Lasso ein Stück nach rechts rücken.' },
+      { t: 'Tonnotiz', p: ['Das Mikrofon in den Seitenwerkzeugen nimmt auf (bis fünf Minuten, mit Pegel und Uhr). Die Aufnahme liegt dann als kleine Kassette auf der Seite: antippen spielt ab, noch einmal hält an. Lange halten: Beschriften, drehen, abmachen. Sie reist mit Sicherung und Sync wie ein Foto.'], b: 'Den Tonfall einer Figur einsprechen, bevor ich ihn vergesse — direkt neben der Szene.' },
+      { t: 'Reiter', p: ['Im Seitenmenü „Farbigen Reiter anheften": Farbe wählen, ein Wort draufschreiben. Alle Reiter eines Hefts stehen als farbige Zungen unter dem Titel und springen zu ihrer Seite — in jeder Ansicht. Mehrere Reiter je Heft, das Lesezeichen (wo das Heft aufgeht) bleibt eigenständig.'] },
+      { t: 'Gliederung', p: ['Sobald eine Seite eine Überschrift hat (Ü in der Formatleiste), erscheint oben das Gliederungs-Symbol: alle Überschriften aller Seiten, eingerückt nach Ebene. Antippen springt zur Seite und scrollt zur Überschrift. Projekte haben dasselbe: Kapitel → Szenen → Überschriften in den Szenen.'] },
+      { t: 'Papiervorlagen', p: ['Neben Liniert, Kariert, Punkten und Blanko: Cornell (schmale Randspalte für Stichworte, unten ein Feld für die Zusammenfassung), Storyboard (sechs Felder) und Dialogblatt (zwei Spalten — links die eine Stimme, rechts die andere). Im Heft-Atelier unter „Papier".'] },
       { t: 'Kritzeln', p: [
         '„Kritzeln" legt eine Zeichenfläche über die Seite. Die Werkzeugleiste schwebt oben: zwölf Farben plus eine eigene, stufenlose Stiftdicke, Radierer, ein Schritt zurück, ein Schritt wieder vor, alles löschen, Abbrechen und Fertig.',
         'Was gezeichnet wird, sitzt genau unter dem Stift — in der Dicke, die eingestellt ist. Ein echter Stift wird druckempfindlich geführt, ein Finger zeichnet gleichmäßig.',

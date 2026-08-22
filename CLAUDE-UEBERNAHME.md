@@ -1191,3 +1191,65 @@ Sticker gerendert mit Drehgriff, Werkzeugknopf da, Absatzabstand 0, Seite
 
 Siehe **IDEEN.md** (neu): Goodnotes-Abgleich (Lasso, Formen begradigen,
 Audio-Notiz, Gliederung aus Überschriften …) und je Raum.
+
+## 19. Speichern, Kerze, Welle 2 (22. August 2026, VANI 5.10.0 → 5.11.0)
+
+### Der Speicher-Bug (5.10.0)
+
+Befund: Safari (iPad) erzeugt bei execCommand('bold') mit `styleWithCSS`
+kein `<b>`, sondern `<span style="font-weight: bold">` — dito kursiv und
+unterstrichen. `sauberesRichHTML` warf genau diese Stile weg (es behielt nur
+color/background/font-size/text-align). Ergebnis: im Editor sichtbar, nach
+„Fertig" und Wiederöffnen fort. Fix in `src/35-richtext.js`:
+- span/div/p-Stile font-weight/font-style/text-decoration → echte
+  `<b>/<i>/<u>/<s>` um den Inhalt (kein `<b>` im `<b>`, via `closest`).
+- `<font color/size>` → span-Stil statt Textknoten; `align`-Attribut →
+  text-align.
+- `richBefehl`: `styleWithCSS` nur für Farben/Größe/Ausrichtung, sonst false —
+  so liefern Chrome und Safari dasselbe.
+- Sofort sichern bei `blur` (nur wenn `entprellt.haengt()`), damit „Fertig",
+  Seitenwechsel, Raumwechsel nichts verlieren.
+Vertrag: „Speicher-Vertrag" in `test/vertraege.mjs`.
+
+### Die Kerze (`src/45b-kerze.js`, 5.10.0)
+
+Canvas 120×270, 30 fps, nur solange sie brennt. Flamme = Profil
+`kerzeFlammenBreite(u)` (breit bei ~1/3, weich auslaufend) mit drei
+Schwingungen und einer Neigung (Feder) auf `zug`; `puste()` bei jedem
+Anschlag. Schein über `kerzeSchein` (Kontext skalieren, damit Verlauf und
+Ellipse zusammenfallen — kantenfrei). Wachsbahnen einmal gewürfelt
+(`kerzeZufall(saat)`), Tropfen werden dauerhaft, Ruß bei |Neigung| > .45,
+Rauchkette nach dem Ausblasen. `kerzeStand(anteil)` 150 → 14 px linear. Die
+Kerze meldet ihr Ende selbst (`beiEnde`), kein zweiter Timer. Schreibraum:
+`_sr.sprint.kerze`, `.kerze-brennt` auf dem Raum (Hauch warmes Licht).
+Techniken nach der Talgkerze aus PAPA OS (recovery.js), neu gebaut.
+
+### Welle 2 aus IDEEN.md (5.11.0)
+
+- **Striche gespeichert** (`seite.striche`, `saubereStriche` ≤ 24 000 Punkte,
+  `strichVerdichten`): Grundlage-Bild bei Altseiten als `skizzeBasis` unter
+  neuer Kennung, damit das Kompositbild nicht doppelt übereinanderliegt.
+  `skizzeBasis` reist in Sicherung (49b) und Sync (31) mit.
+- **Lasso** (`stricheImLasso`: > 50 % der Punkte im Polygon, Radierer nie),
+  verschieben (`stricheVerschieben`), löschen, umfärben; Rahmen/Schlinge sind
+  Anzeige und werden vor dem Speichern entfernt.
+- **Form halten** (`formErkennen`): 560 ms ohne Bewegung → Linie (Abstand zur
+  Sehne < 9 %), Rechteck (> 82 % der Punkte an den Umrisskanten — VOR der
+  Ellipse prüfen, ein Rechteck liegt auch „rund"), Ellipse (Streuung < .12).
+- **Tonnotiz** (`src/43d-ton.js`): MediaRecorder, mime-Reihenfolge
+  mp4/webm-opus/webm/ogg, Pegel via AnalyserNode, max 300 s, Blob →
+  `speichereDateiBlob` → Doc `ton` {datei, dauer, mime}. Kassette mit
+  Abspielknopf; Menü „Beschriften". Knopf nur wenn `tonUnterstuetzt()`.
+- **Papiervorlagen** cornell/storyboard/dialog (CSS auf `.papierseite`).
+- **Reiter** `heft.reiter[{seite,farbe,name}]` (≤ 40), Seitenmenü „Farbigen
+  Reiter anheften", Zungen unter dem Kopf, springen per `zielSeite`.
+- **Gliederung** `gliederungAusHTML` (Regex, h1–h3), `heftGliederung`
+  (springt zu Seite + scrollt zur n-ten Überschrift über
+  `zielUeberschrift`), `projektGliederung` (Kapitel → Szenen → Überschriften).
+- Neue Icons: lasso, gliederung, mikro.
+
+Tests 131/131 (neu `test/kerze.mjs`, `test/kritzel.mjs`; Verträge Speicher,
+Kerze, Welle 2). Im Browser geprüft: Safari-Spans → `<b>/<i>/<u>`; Kerze
+brennt, Luftzug, geht mit dem Raum; Strich gezeichnet → Lasso → gelöscht;
+gerader Strich + halten → 2 Punkte; gespeichert/geladen; Reiter, Gliederung
+(Sprung), Cornell-Klasse, Mikro-Knopf.

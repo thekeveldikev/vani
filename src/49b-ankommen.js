@@ -165,7 +165,7 @@ async function baueSicherungsPaket({ mitMedien = true } = {}) {
   const media = {};
   if (mitMedien) {
     const ids = new Set();
-    for (const d of D.docs.values()) { if (d.bild) ids.add(d.bild); if (d.skizze) ids.add(d.skizze); if (d.datei) ids.add(d.datei); }
+    for (const d of D.docs.values()) { if (d.bild) ids.add(d.bild); if (d.skizze) ids.add(d.skizze); if (d.skizzeBasis) ids.add(d.skizzeBasis); if (d.datei) ids.add(d.datei); }
     for (const id of ids) {
       const blob = await dbGet('media', id);
       if (blob) media[id] = await blobZuDataURL(blob);
@@ -202,6 +202,7 @@ async function sicherungEinspielen(paket, modus) {
     neu.push(d);
     if (d.bild) benoetigteMedien.add(d.bild);
     if (d.skizze) benoetigteMedien.add(d.skizze);
+    if (d.skizzeBasis) benoetigteMedien.add(d.skizzeBasis);
     if (d.datei) benoetigteMedien.add(d.datei);
   }
   let medien = 0;

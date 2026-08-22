@@ -456,6 +456,40 @@ html[data-thema="tinte"] .menue button.rot, html[data-thema="kerze"] .menue butt
 .stickerkiste-feld { aspect-ratio: 1; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); display: grid; place-items: center; padding: 8px; }
 .stickerkiste-feld:active { transform: scale(.96); }
 .stickerkiste-feld img { max-width: 100%; max-height: 100%; object-fit: contain; }
+/* Tonnotiz: eine kleine Kassette auf der Seite */
+.ton-anlage .ton-kassette { display: flex; align-items: center; gap: 9px; padding: 8px 12px 8px 8px; border-radius: 11px; background: #2e2a28; color: #f3e9d6; box-shadow: 0 2px 7px rgba(0,0,0,.32); }
+.ton-anlage .ton-spiel { width: 34px; height: 34px; flex: none; border-radius: 50%; background: #e9b85a; color: #2e2a28; display: grid; place-items: center; }
+.ton-anlage .ton-spiel svg.ik { width: 18px; height: 18px; }
+.ton-anlage.spielt .ton-spiel { background: #f3e9d6; animation: pulsieren 1.4s ease-in-out infinite; }
+.ton-anlage .ton-text { min-width: 0; }
+.ton-anlage .ton-name { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ton-anlage .ton-zeit { font-size: 11px; opacity: .8; font-variant-numeric: tabular-nums; }
+.modal.tonnotiz .ton-buehne { display: flex; gap: 18px; align-items: center; margin: 12px 0 6px; }
+.ton-knopf { width: 76px; height: 76px; flex: none; border-radius: 50%; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie), 0 2px 8px var(--schein); display: grid; place-items: center; }
+.ton-punkt { width: 30px; height: 30px; border-radius: 50%; background: #c8322b; transition: border-radius .2s; }
+.ton-knopf.an .ton-punkt { border-radius: 7px; animation: pulsieren 1.2s ease-in-out infinite; }
+.ton-rechts { display: grid; gap: 8px; }
+.ton-uhr { font-size: 30px; font-variant-numeric: tabular-nums; font-family: ui-serif, "New York", Georgia, serif; }
+.ton-pegel { height: 8px; width: 170px; border-radius: 4px; background: var(--hg2); overflow: hidden; }
+.ton-pegel i { display: block; height: 100%; width: 0; background: #c8322b; transition: width .08s linear; }
+@keyframes pulsieren { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+/* Reiter am Heft */
+.heftreiter-leiste { display: flex; gap: 8px; flex-wrap: wrap; padding: 2px 16px 8px; }
+.heftreiter { display: flex; gap: 7px; align-items: center; padding: 4px 12px 4px 8px; border-radius: 4px 11px 11px 4px; font-size: 12.5px; color: #fffdf7; box-shadow: 0 1px 3px rgba(0,0,0,.22); }
+.heftreiter b { font-size: 11px; opacity: .85; }
+.heftreiter.rot { background: #c0533f; } .heftreiter.gelb { background: #d9a441; } .heftreiter.gruen { background: #5f7752; }
+.heftreiter.blau { background: #41597a; } .heftreiter.lila { background: #765187; } .heftreiter.grau { background: #7a746a; }
+/* Gliederung */
+.modal.gliederung-kasten { width: min(520px, calc(100vw - 48px)); }
+.gliederung { display: grid; gap: 2px; max-height: 58dvh; overflow: auto; }
+.gliederung-seite { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--blass); margin: 10px 0 3px; }
+.gliederung-punkt { text-align: left; padding: 6px 10px; border-radius: 9px; font-size: 15px; }
+.gliederung-punkt:hover { background: var(--hg2); }
+.gliederung-punkt.ebene-1 { font-weight: 600; } .gliederung-punkt.ebene-2 { padding-left: 24px; } .gliederung-punkt.ebene-3 { padding-left: 38px; font-size: 14px; color: var(--blass); }
+/* Papiervorlagen: Cornell (Randspalte + Zusammenfassung), Storyboard (2×3), Dialogblatt (zwei Spalten) */
+.papierseite.cornell { background-image: linear-gradient(90deg, transparent calc(30% - .5px), var(--linie) calc(30% - .5px), var(--linie) calc(30% + .5px), transparent calc(30% + .5px)), linear-gradient(transparent calc(100% - 96px), var(--linie) calc(100% - 96px), var(--linie) calc(100% - 95px), transparent calc(100% - 95px)); }
+.papierseite.storyboard { background-image: linear-gradient(90deg, transparent calc(50% - .5px), var(--linie) calc(50% - .5px), var(--linie) calc(50% + .5px), transparent calc(50% + .5px)), repeating-linear-gradient(transparent 0 calc(33.33% - .5px), var(--linie) calc(33.33% - .5px) calc(33.33% + .5px)); background-clip: content-box; }
+.papierseite.dialog { background-image: linear-gradient(90deg, transparent calc(50% - .5px), var(--linie) calc(50% - .5px), var(--linie) calc(50% + .5px), transparent calc(50% + .5px)); }
 .anlage .griff {
   position: absolute; right: -7px; bottom: -7px; width: 26px; height: 26px; border-radius: 50%;
   background: var(--akzent); color: var(--papier); display: none; align-items: center; justify-content: center;

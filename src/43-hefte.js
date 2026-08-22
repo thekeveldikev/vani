@@ -33,7 +33,7 @@ async function heftGestalten(h, danach) {
   zweit.addEventListener('input', () => { h.farbe2 = zweit.value; aktualisiere(); });
   band.addEventListener('input', () => { h.band = band.value; aktualisiere(); });
   const papier = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
-  for (const [id, name] of [['liniert', 'Liniert'], ['breit', 'Breite Linien'], ['kariert', 'Kariert'], ['punkte', 'Punktraster'], ['blank', 'Blanko']]) papier.append(el('button', {
+  for (const [id, name] of [['liniert', 'Liniert'], ['breit', 'Breite Linien'], ['kariert', 'Kariert'], ['punkte', 'Punktraster'], ['blank', 'Blanko'], ['cornell', 'Cornell'], ['storyboard', 'Storyboard'], ['dialog', 'Dialogblatt']]) papier.append(el('button', {
     class: (h.papier || 'liniert') === id ? 'an' : '', onclick: (e) => { h.papier = id; $$('button', papier).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); }
   }, name));
   /* Papierfarbe und Randlinie: wie das Heft innen aussieht */
@@ -260,8 +260,20 @@ RENDER.heft = function (haupt, heftId) {
     el('button', { class: 'rundknopf zart', html: ik('inhalt'), title: 'Inhalt: alle Seiten', onclick: () => heftInhalt(heft, (seite) => {
       sessionStorage.setItem('zielSeite', seite.id); zeichne();
     }) }),
+    heftHatUeberschriften(heft) ? el('button', { class: 'rundknopf zart', html: ik('gliederung'), title: 'Gliederung aus Überschriften', onclick: () => heftGliederung(heft) }) : null,
     el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Heft-Menü', onclick: () => heftMenue(heft, () => zeichne()) })
   ));
+  /* Farbige Reiter: springen zu ihren Seiten — in jeder Ansicht. */
+  if (Array.isArray(heft.reiter) && heft.reiter.length) {
+    const leiste = el('div', { class: 'heftreiter-leiste' });
+    for (const r of heft.reiter) {
+      const si = seiten.findIndex((x) => x.id === r.seite);
+      if (si < 0) continue;
+      leiste.append(el('button', { class: 'heftreiter ' + (r.farbe || 'rot'), title: 'Seite ' + (si + 1), onclick: () => { sessionStorage.setItem('zielSeite', r.seite); sessionStorage.setItem('heftSeite:' + heftId, String(si)); zeichne(); } },
+        el('b', {}, String(si + 1)), r.name || ''));
+    }
+    haupt.append(leiste);
+  }
 
   const inhalt = el('div', { class: 'inhalt' });
   const halter = el('div', { class: 'seitenhalter' });
@@ -439,6 +451,13 @@ function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
       const s = await stickerAufkleben(z.seite);
       if (s) auffrischen();
     } }),
+    tonUnterstuetzt() ? el('button', { class: 'rundknopf', title: 'Tonnotiz aufnehmen', html: ik('mikro'), onclick: async () => {
+      const z = ziel(); if (!z) return;
+      const t = await tonAufnehmen();
+      if (!t) return;
+      neuDoc('ton', { parent: z.seite.id, datei: t.datei, dauer: t.dauer, mime: t.mime, befestigung: 'tesa', pos: { x: 50 + Math.random() * 25, y: 68 + Math.random() * 14, rot: -3 + Math.random() * 6, w: 36 } });
+      auffrischen();
+    } }) : null,
     el('button', { class: 'rundknopf format-seite-knopf', title: 'Text formatieren', onclick: () => {
       const z = ziel(); if (!z) return;
       if (z.seite.format !== 'rich') {
@@ -458,6 +477,7 @@ function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
         const wahl = await menue([
           { text: 'Im Schreibraum öffnen', icon: 'stift', wert: 'sr' },
           { text: istLesezeichen ? 'Lesezeichen entfernen' : 'Lesezeichen hierher', icon: 'lesezeichen', wert: 'lesezeichen' },
+          { text: (z.heft.reiter || []).some((r) => r.seite === z.seite.id) ? 'Reiter abnehmen' : 'Farbigen Reiter anheften', icon: 'lesezeichen', wert: 'reiter' },
           i > 0 ? { text: 'Seite nach vorn', icon: 'auf', wert: 'vor' } : null,
           i < geschwister.length - 1 ? { text: 'Seite nach hinten', icon: 'ab', wert: 'zurueck' } : null,
           { text: 'Seite verdoppeln', icon: 'wandel', wert: 'doppel' },
@@ -466,6 +486,21 @@ function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
           { text: 'Seite herausreißen', icon: 'muell', wert: 'weg', rot: true }
         ], 'Seite ' + (i + 1) + ' von ' + geschwister.length);
         if (wahl === 'sr') oeffneSchreibraum(z.seite.id);
+        else if (wahl === 'reiter') {
+          const reiter = Array.isArray(z.heft.reiter) ? z.heft.reiter : [];
+          const da = reiter.findIndex((r) => r.seite === z.seite.id);
+          if (da >= 0) { reiter.splice(da, 1); z.heft.reiter = reiter; speichereStill(z.heft); toast('Reiter abgenommen.'); }
+          else {
+            const farbe = await menue(REITERFARBEN.map(([id, name]) => ({ text: name, icon: 'lesezeichen', wert: id })), 'Welche Farbe?');
+            if (!farbe) return;
+            const name = await eingabe({ titel: 'Was steht auf dem Reiter?', wert: (z.seite.titel || '').slice(0, 24), platzhalter: 'kurz — z. B. Figuren', ok: 'Anheften' });
+            if (name === null) return;
+            reiter.push({ seite: z.seite.id, farbe, name: (name || '').slice(0, 40) });
+            z.heft.reiter = reiter.slice(0, 40); speichereStill(z.heft);
+            toast('Reiter hängt an Seite ' + (i + 1) + '.');
+          }
+          if (neuZeichnen) neuZeichnen();
+        }
         else if (wahl === 'lesezeichen') {
           if (istLesezeichen) delete z.heft.lesezeichen; else z.heft.lesezeichen = z.seite.id;
           speichereStill(z.heft);
@@ -587,6 +622,15 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
   /* Ohne Filter macht die native append-Methode aus einem fehlenden Element
      den sichtbaren Text „null" — auf jeder schlichten Heftseite. */
   blatt.append(...[skizzenbild, titel, formatleiste, text, werkzeuge].filter(Boolean));
+  /* Aus der Gliederung kommend: zur n-ten Überschrift dieser Seite scrollen. */
+  const zielUe = sessionStorage.getItem('zielUeberschrift');
+  if (zielUe !== null && sessionStorage.getItem('zielSeiteGerade') !== seite.id) {
+    const wartend = sessionStorage.getItem('zielSeite');
+    if (!wartend) {
+      sessionStorage.removeItem('zielUeberschrift');
+      requestAnimationFrame(() => { const u = $$('h1,h2,h3', text)[Number(zielUe)]; if (u) u.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+    }
+  }
 
   /* Angeklebtes */
   function baueAnlagen() {
@@ -595,6 +639,7 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
       if (a.typ === 'zettel') blatt.append(baueZettel(a, blatt, baueAnlagen));
       else if (a.typ === 'foto') blatt.append(baueFoto(a, blatt, baueAnlagen));
       else if (a.typ === 'sticker') blatt.append(baueSticker(a, blatt, baueAnlagen));
+      else if (a.typ === 'ton') blatt.append(baueTon(a, blatt, baueAnlagen));
     }
   }
   baueAnlagen();
@@ -692,6 +737,7 @@ function anlageGesten(elem, a, blatt, neuBauen) {
     const wahl = await menue([
       a.typ === 'sticker' && !inKiste ? { text: 'In die Stickerkiste legen', icon: 'archiv', wert: 'kiste' } : null,
       a.typ === 'sticker' ? { text: 'Noch einmal aufkleben', icon: 'plus', wert: 'nochmal' } : null,
+      a.typ === 'ton' ? { text: 'Beschriften', icon: 'stift', wert: 'label' } : null,
       a.typ === 'zettel' ? { text: 'Andere Farbe', icon: 'farbe', wert: 'farbe' } : null,
       a.typ === 'zettel' ? { text: 'Schrift: ' + ({ hand: 'Handschrift', klar: 'Klar', serif: 'Serife' }[a.schrift || 'hand']), icon: 'stift', wert: 'schrift' } : null,
       a.typ === 'zettel' ? { text: 'Form: ' + (a.pos.w <= 24 ? 'schmal' : a.pos.w >= 44 ? 'breit' : 'normal'), icon: 'wandel', wert: 'form' } : null,
@@ -703,6 +749,9 @@ function anlageGesten(elem, a, blatt, neuBauen) {
     if (wahl === 'kiste') {
       neuDoc('stickervorlage', { bild: a.bild, verhaeltnis: a.verhaeltnis, zuletzt: Date.now() });
       toast('Liegt in der Stickerkiste.');
+    } else if (wahl === 'label') {
+      const n = await eingabe({ titel: 'Wie heißt die Tonnotiz?', wert: a.label || '', platzhalter: 'z. B. Tonfall Kapitel 3' });
+      if (n != null) { a.label = n; speichereStill(a); neuBauen(); }
     } else if (wahl === 'nochmal') {
       neuDoc('sticker', { parent: a.parent, bild: a.bild, verhaeltnis: a.verhaeltnis, befestigung: 'lose', pos: { x: Math.min(90, a.pos.x + 8), y: Math.min(100, a.pos.y + 8), rot: a.pos.rot, w: a.pos.w } });
       neuBauen();
@@ -726,7 +775,7 @@ function anlageGesten(elem, a, blatt, neuBauen) {
       speichereStill(a);
       elem.style.transform = 'rotate(' + a.pos.rot + 'deg)';
     } else if (wahl === 'weg') {
-      if (await frage(a.typ === 'zettel' ? 'Zettel abmachen und wegwerfen?' : a.typ === 'sticker' ? 'Sticker abmachen?' : 'Foto abmachen?', { ja: 'Abmachen', gefahr: true })) {
+      if (await frage(a.typ === 'zettel' ? 'Zettel abmachen und wegwerfen?' : a.typ === 'sticker' ? 'Sticker abmachen?' : a.typ === 'ton' ? 'Tonnotiz abmachen? Die Aufnahme geht mit.' : 'Foto abmachen?', { ja: 'Abmachen', gefahr: true })) {
         await loesche(a.id); neuBauen();
       }
     }
@@ -804,6 +853,9 @@ async function starteKritzeln(blatt, seite) {
   let basis = null;
   let breite = 0, hoehe = 0;
   let strich = null;
+  /* Lasso und Formen: Striche sind Punktfolgen und bleiben greifbar. */
+  let werkzeug = 'stift';
+  let lasso = null, auswahl = [], zieheAuswahl = null, formTimer = null;
 
   const altesBild = $('.skizzenbild', blatt);
   if (altesBild) altesBild.style.display = 'none';
@@ -841,6 +893,25 @@ async function starteKritzeln(blatt, seite) {
       kritzelZeichneStrich(ctx, s, breite);
     }
     ctx.globalCompositeOperation = 'source-over';
+    /* Auswahlrahmen und Lasso-Schlinge — nur Anzeige, nie im gespeicherten Bild. */
+    if (auswahl.length) {
+      const box = strichBox(auswahl.map((i) => striche[i]).filter(Boolean));
+      if (box) {
+        ctx.save(); ctx.setLineDash([6, 5]); ctx.strokeStyle = 'rgba(60,100,200,.9)'; ctx.lineWidth = 1.2;
+        ctx.strokeRect(box.x0 * breite - 6, box.y0 * breite - 6, box.w * breite + 12, box.h * breite + 12);
+        ctx.restore();
+      }
+    }
+    if (lasso && lasso.length > 1) {
+      ctx.save(); ctx.setLineDash([5, 4]); ctx.strokeStyle = 'rgba(60,100,200,.9)'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(lasso[0].x * breite, lasso[0].y * breite);
+      for (const q of lasso) ctx.lineTo(q.x * breite, q.y * breite);
+      ctx.stroke(); ctx.restore();
+    }
+  }
+  function auswahlLeisteAuffrischen() {
+    const an = auswahl.length > 0;
+    for (const k of [auswahlWegKnopf, auswahlFarbeKnopf, auswahlAufhebenKnopf]) { k.disabled = !an; k.style.opacity = an ? '' : '.35'; }
   }
   function knoepfeAuffrischen() {
     zurueckKnopf.disabled = !striche.length;
@@ -853,6 +924,16 @@ async function starteKritzeln(blatt, seite) {
     if (e.button != null && e.button > 0) return;
     try { canvas.setPointerCapture(e.pointerId); } catch (x) {}
     const p = punktAus(e);
+    if (werkzeug === 'lasso') {
+      /* In der Auswahl angefasst: verschieben. Sonst: neue Schlinge ziehen. */
+      const box = auswahl.length ? strichBox(auswahl.map((i) => striche[i]).filter(Boolean)) : null;
+      if (box && p.x >= box.x0 - .01 && p.x <= box.x1 + .01 && p.y >= box.y0 - .01 && p.y <= box.y1 + .01) {
+        zieheAuswahl = { sx: p.x, sy: p.y, vorher: striche };
+      } else { auswahl = []; lasso = [p]; }
+      alleszeichnen(); auswahlLeisteAuffrischen();
+      e.preventDefault();
+      return;
+    }
     strich = { farbe, radierer, punkte: [{ x: p.x, y: p.y, w: strichbreite(e) }] };
     striche.push(strich);
     zurueckgelegt = [];
@@ -862,7 +943,21 @@ async function starteKritzeln(blatt, seite) {
     e.preventDefault();
   });
   canvas.addEventListener('pointermove', (e) => {
-    if (!strich) return;
+    if (werkzeug === 'lasso') {
+      const p = punktAus(e);
+      if (zieheAuswahl) { striche = stricheVerschieben(zieheAuswahl.vorher, auswahl, p.x - zieheAuswahl.sx, p.y - zieheAuswahl.sy); alleszeichnen(); }
+      else if (lasso) { lasso.push(p); alleszeichnen(); }
+      return;
+    }
+    if (!strich || strich.geformt) return;
+    /* Form halten: bleibt der Stift am Ende kurz stehen, wird der Strich zur Form. */
+    clearTimeout(formTimer);
+    formTimer = setTimeout(() => {
+      if (!strich || strich.geformt || strich.radierer) return;
+      const f = formErkennen(strich.punkte);
+      if (!f) return;
+      strich.punkte = f.punkte; strich.geformt = true; alleszeichnen();
+    }, 560);
     const punkte = (e.getCoalescedEvents && e.getCoalescedEvents().length ? e.getCoalescedEvents() : [e]);
     ctx.globalCompositeOperation = strich.radierer ? 'destination-out' : 'source-over';
     ctx.strokeStyle = strich.farbe;
@@ -881,7 +976,14 @@ async function starteKritzeln(blatt, seite) {
     }
     ctx.globalCompositeOperation = 'source-over';
   });
-  const strichEnde = () => { strich = null; };
+  const strichEnde = () => {
+    clearTimeout(formTimer);
+    if (werkzeug === 'lasso') {
+      if (lasso) { auswahl = stricheImLasso(striche, lasso); lasso = null; if (!auswahl.length) toast('Nichts in der Schlinge.'); }
+      zieheAuswahl = null; alleszeichnen(); auswahlLeisteAuffrischen();
+    }
+    strich = null;
+  };
   canvas.addEventListener('pointerup', strichEnde);
   canvas.addEventListener('pointercancel', strichEnde);
 
@@ -922,6 +1024,35 @@ async function starteKritzeln(blatt, seite) {
       alleszeichnen(); knoepfeAuffrischen();
     }
   });
+  const lassoKnopf = el('button', {
+    class: 'rundknopf kritzel-werkzeug', html: ik('lasso'), title: 'Lasso: Striche greifen, verschieben, löschen', onclick: () => {
+      werkzeug = werkzeug === 'lasso' ? 'stift' : 'lasso';
+      lassoKnopf.classList.toggle('an', werkzeug === 'lasso');
+      if (werkzeug !== 'lasso') { auswahl = []; lasso = null; }
+      canvas.style.cursor = werkzeug === 'lasso' ? 'crosshair' : '';
+      alleszeichnen(); auswahlLeisteAuffrischen();
+      if (werkzeug === 'lasso') toast('Eine Schlinge um Striche ziehen. Dann anfassen und verschieben, oder löschen.', 3600);
+    }
+  });
+  const auswahlWegKnopf = el('button', {
+    class: 'rundknopf kritzel-werkzeug', html: ik('kreuz'), title: 'Ausgewählte Striche löschen', onclick: () => {
+      if (!auswahl.length) return;
+      const menge = new Set(auswahl);
+      striche = striche.filter((s, i) => !menge.has(i)); auswahl = []; zurueckgelegt = [];
+      alleszeichnen(); knoepfeAuffrischen(); auswahlLeisteAuffrischen();
+    }
+  });
+  const auswahlFarbeKnopf = el('button', {
+    class: 'rundknopf kritzel-werkzeug', html: ik('farbe'), title: 'Ausgewählte Striche in der Stiftfarbe', onclick: () => {
+      if (!auswahl.length) return;
+      const menge = new Set(auswahl);
+      striche = striche.map((s, i) => menge.has(i) && !s.radierer ? { ...s, farbe } : s);
+      alleszeichnen();
+    }
+  });
+  const auswahlAufhebenKnopf = el('button', {
+    class: 'rundknopf kritzel-werkzeug', html: ik('haken'), title: 'Auswahl aufheben', onclick: () => { auswahl = []; alleszeichnen(); auswahlLeisteAuffrischen(); }
+  });
   const leerKnopf = el('button', {
     class: 'rundknopf kritzel-werkzeug', html: ik('muell'), title: 'Alles löschen', onclick: async () => {
       if (!striche.length && !basis) { toast('Hier ist noch nichts.'); return; }
@@ -941,6 +1072,14 @@ async function starteKritzeln(blatt, seite) {
   const fertigKnopf = el('button', {
     class: 'knopf voll', style: 'padding:7px 14px', onclick: async () => {
       const leer = !striche.length && !basis;
+      /* Ein altes Bild ohne Striche bleibt als Grundlage erhalten — unter
+         eigener Kennung, damit das fertige Bild darüber nicht die Grundlage
+         überschreibt und beim nächsten Öffnen alles doppelt dasteht. */
+      if (basis && seite.skizze && !seite.skizzeBasis) {
+        try { const alt = await dbGet('media', seite.skizze); if (alt) { const neuId = uid(); await dbPut('media', alt, neuId); seite.skizzeBasis = neuId; if (typeof syncMediaGeaendert === 'function') syncMediaGeaendert(neuId); } } catch (x) {}
+      }
+      auswahl = []; lasso = null; alleszeichnen();
+      seite.striche = leer ? [] : saubereStriche(striche.map((s) => strichVerdichten(s)));
       seite.skizze = leer ? seite.skizze : await speichereKritzelei(canvas, seite.skizze);
       speichere(seite);
       aufraeumen();
@@ -970,9 +1109,11 @@ async function starteKritzeln(blatt, seite) {
     }),
     el('label', { class: 'stift-eigen', title: 'Eigene Farbe' }, '＋', eigeneFarbe),
     el('label', { class: 'stift-dicke' }, dickeProbe, dickeRegler),
-    radierKnopf,
+    radierKnopf, lassoKnopf,
     el('span', { class: 'kritzel-trenner' }),
     zurueckKnopf, vorKnopf, leerKnopf,
+    el('span', { class: 'kritzel-trenner' }),
+    auswahlWegKnopf, auswahlFarbeKnopf, auswahlAufhebenKnopf,
     el('span', { class: 'kritzel-trenner' }),
     abbrechenKnopf, fertigKnopf
   );
@@ -988,13 +1129,48 @@ async function starteKritzeln(blatt, seite) {
   const beobachter = typeof ResizeObserver === 'function' ? new ResizeObserver(beiGroesse) : { observe() {}, disconnect() {} };
   try { beobachter.observe(canvas); } catch (e) {}
 
-  if (seite.skizze) {
-    const url = await bildURL(seite.skizze);
+  /* Gespeicherte Striche sind die Wahrheit; ein altes Bild ist nur noch
+     Grundlage (skizzeBasis) oder, ganz ohne Striche, das Einzige, was es gibt. */
+  const hatStriche = Array.isArray(seite.striche) && seite.striche.length > 0;
+  if (hatStriche) striche = seite.striche.map((s) => ({ ...s, punkte: (s.punkte || []).map((q) => ({ ...q })) }));
+  const basisId = hatStriche ? seite.skizzeBasis : seite.skizze;
+  if (basisId) {
+    const url = await bildURL(basisId);
     if (url && canvas.isConnected) {
       const alt = new Image();
       await new Promise((res) => { alt.onload = res; alt.onerror = res; alt.src = url; });
       if (alt.width && alt.height) basis = alt;
     }
   }
-  if (canvas.isConnected) { messen(); alleszeichnen(); }
+  if (canvas.isConnected) { messen(); alleszeichnen(); knoepfeAuffrischen(); auswahlLeisteAuffrischen(); }
+}
+
+/* ----- Reiter und Gliederung ----- */
+const REITERFARBEN = [['rot', 'Rot'], ['gelb', 'Gelb'], ['gruen', 'Grün'], ['blau', 'Blau'], ['lila', 'Lila'], ['grau', 'Grau']];
+
+function heftHatUeberschriften(heft) {
+  return kinder(heft.id, 'seite').some((s) => s.format === 'rich' && /<h[1-3][\s>]/i.test(s.rich || ''));
+}
+
+/* Gliederung: alle Überschriften aller Seiten, eingerückt nach Ebene; antippen
+   springt zur Seite und scrollt zur Überschrift. */
+function heftGliederung(heft) {
+  const seiten = kinder(heft.id, 'seite');
+  const liste = el('div', { class: 'gliederung' });
+  let gesamt = 0;
+  seiten.forEach((s, i) => {
+    const ue = s.format === 'rich' ? gliederungAusHTML(s.rich) : [];
+    if (!ue.length && !s.titel) return;
+    liste.append(el('div', { class: 'gliederung-seite' }, 'Seite ' + (i + 1) + (s.titel ? ' · ' + s.titel : '')));
+    ue.forEach((u, n) => {
+      gesamt++;
+      liste.append(el('button', { class: 'gliederung-punkt ebene-' + u.ebene, onclick: () => {
+        zu(); sessionStorage.setItem('zielSeite', s.id); sessionStorage.setItem('zielUeberschrift', String(n)); zeichne();
+      } }, u.text));
+    });
+  });
+  if (!gesamt) { toast('Noch keine Überschriften — mit „Ü" in der Formatleiste entstehen sie.'); return; }
+  const kasten = el('div', { class: 'modal gliederung-kasten' }, el('h2', {}, 'Gliederung'), liste,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Schließen')));
+  const zu = zeigeDeck(kasten);
 }
