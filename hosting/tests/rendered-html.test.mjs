@@ -13,11 +13,16 @@ test("Hosting-Build enthält Umzugsseite, Rettungsraum und keinen zweiten Servic
     readFile(new URL("worker/index.ts", root), "utf8"),
     readFile(new URL(".openai/hosting.json", root), "utf8"),
   ]);
+  /* Die Version steht nur an einer Stelle: in der App. Der Test liest sie dort
+     und prueft, dass die Rettungsfassung genau dieselbe traegt — so faellt er
+     nicht bei jedem Versionssprung um, aber sehr wohl bei einer alten Kopie. */
+  const kern = await readFile(new URL("../src/30-core.js", root), "utf8");
+  const version = kern.match(/APP_VERSION = '([^']+)'/)[1];
   assert.match(index, /VANI hat jetzt ein einziges Zuhause/);
   assert.match(index, /https:\/\/thekeveldikev\.github\.io\/vani\//);
   assert.match(index, /rettung\.html\?rettung=1&amp;kein-sw=1/);
   assert.doesNotMatch(index, /rel=["']manifest["']/);
-  assert.match(rettung, /const APP_VERSION = '5\.1\d\.\d'/);
+  assert.ok(rettung.includes("const APP_VERSION = '" + version + "'"), 'Die Rettungsfassung traegt eine andere Version als die App: ' + version);
   /* Die Rettungsfassung muss den Umzugshelfer und den dateilosen Weg kennen —
      sonst steht jemand mit altem Bestand auf einem Schul-iPad ohne Ausweg da. */
   assert.match(rettung, /function umzugsHelfer/);
