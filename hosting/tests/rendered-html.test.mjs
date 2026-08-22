@@ -17,7 +17,15 @@ test("Hosting-Build enthält Umzugsseite, Rettungsraum und keinen zweiten Servic
   assert.match(index, /https:\/\/thekeveldikev\.github\.io\/vani\//);
   assert.match(index, /rettung\.html\?rettung=1&amp;kein-sw=1/);
   assert.doesNotMatch(index, /rel=["']manifest["']/);
-  assert.match(rettung, /const APP_VERSION = '5\.7\.1'/);
+  assert.match(rettung, /const APP_VERSION = '5\.9\.0'/);
+  /* Die Rettungsfassung muss den Umzugshelfer und den dateilosen Weg kennen —
+     sonst steht jemand mit altem Bestand auf einem Schul-iPad ohne Ausweg da. */
+  assert.match(rettung, /function umzugsHelfer/);
+  assert.match(rettung, /In die Zwischenablage sichern/);
+  /* Die Umzugsseite leitet nicht mehr blind nach fünf Sekunden weiter. */
+  assert.match(index, /indexedDB\.open/);
+  assert.match(index, /Alten Bestand retten/);
+  assert.doesNotMatch(index, /\),5000\)/, 'der blinde 5-Sekunden-Redirect ist zurück');
   assert.match(rettung, /Privater Bereich/);
   assert.match(rettung, /Wem gehört dieses VANI/);
   assert.match(rettung, /Funkenkiste/);

@@ -23,8 +23,8 @@ async function neuerSyncBereich() {
   catch (e) { toast((e && e.message) || 'Der Bereich ließ sich noch nicht anlegen.', 5000); }
 }
 
-async function vorhandenenSyncBereichKoppeln() {
-  const code = await eingabe({ titel: 'Kopplungscode vom anderen Gerät', platzhalter: 'VANI1-…', mehrzeilig: true, ok: 'Prüfen und verbinden' });
+async function vorhandenenSyncBereichKoppeln(codeVorgabe) {
+  const code = codeVorgabe || await eingabe({ titel: 'Kopplungscode vom anderen Gerät', platzhalter: 'VANI1-…', mehrzeilig: true, ok: 'Prüfen und verbinden' });
   if (!code) return;
   let modus = 'ersetzen';
   if (D.docs.size) {
@@ -297,25 +297,8 @@ RENDER.feinheiten = function (haupt) {
     el('div', { style: 'font-size:13.5px;color:var(--blass);margin:-6px 0 10px' }, 'Gelöschtes liegt hier, 30 Tage lang mindestens. Nichts verschwindet einfach so.'),
     korbKarte));
 
-  /* Sicherung */
-  const wann = D.stats.letzteSicherung;
-  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Sicher ist sicher'),
-    el('div', { class: 'karte' },
-      el('div', { style: 'font-size:14px;color:var(--blass);line-height:1.6;margin-bottom:14px' },
-        'Alles hier lebt nur auf diesem Gerät. Eine Sicherung ist eine einzige Datei mit allem drin — Texte, Hefte, Fotos. ',
-        wann ? 'Zuletzt gesichert: ' + vorZeit(wann) + '.' : 'Noch nie gesichert.'),
-      el('div', { style: 'display:flex;gap:10px;flex-wrap:wrap' },
-        el('button', { class: 'knopf voll', onclick: () => sichereAlles() }, el('span', { html: ik('teilen'), style: 'display:flex' }), 'Alles sichern'),
-        el('button', { class: 'knopf', onclick: () => leseSicherung() }, el('span', { html: ik('runter'), style: 'display:flex;transform:rotate(180deg)' }), 'Sicherung einlesen'),
-        el('button', {
-          class: 'knopf', onclick: async () => {
-            const texte = alleTexteAlsText();
-            try { await navigator.clipboard.writeText(texte); toast('Alle Texte in der Zwischenablage.'); }
-            catch (e) { teileDatei('vani-texte.txt', texte); }
-          }
-        }, 'Nur Texte kopieren')
-      )
-    )));
+  /* Sicherung — mit Datei und ohne (Zwischenablage, Kopplungscode) */
+  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Sicher ist sicher'), ankommenKarte()));
 
   /* Goodnotes bleibt ein eigener, stiller Bestand. */
   inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Goodnotes hereinholen'),
@@ -464,21 +447,7 @@ function dataURLZuBlob(durl) {
 
 async function sichereAlles() {
   toast('Packe alles ein …');
-  const media = {};
-  const ids = new Set();
-  for (const d of D.docs.values()) { if (d.bild) ids.add(d.bild); if (d.skizze) ids.add(d.skizze); if (d.datei) ids.add(d.datei); }
-  for (const id of ids) {
-    const blob = await dbGet('media', id);
-    if (blob) media[id] = await blobZuDataURL(blob);
-  }
-  const paket = {
-    vani: 2, wann: Date.now(),
-    docs: [...D.docs.values()],
-    einst: D.einst,
-    stats: D.stats,
-    media,
-    sync: await dbAlle('sync')
-  };
+  const paket = await baueSicherungsPaket({ mitMedien: true });
   const name = 'vani-sicherung-' + tagKey() + '.vani';
   const ok = await teileDatei(name, JSON.stringify(paket), 'application/json');
   if (ok) {
@@ -501,49 +470,8 @@ function leseSicherung() {
     let paket;
     try { paket = JSON.parse(await datei.text()); } catch (e) { toast('Das ist keine VANI-Sicherung.'); return; }
     if (!pruefeSicherung(paket)) { toast('Das ist keine VANI-Sicherung.'); return; }
-    const modus = await menue([
-      { text: 'Dazulegen (nichts geht verloren)', icon: 'plus', wert: 'dazu' },
-      { text: 'Alles ersetzen', icon: 'wandel', wert: 'ersetzen', rot: true }
-    ], paket.docs.length + ' Dinge vom ' + fmtDatum(begrenze(paket.wann, 0, Date.now() + 86400000, Date.now())));
-    if (!modus) return;
-    if (modus === 'ersetzen') {
-      if (!await frage('Wirklich alles Jetzige durch die Sicherung ersetzen?', { ja: 'Ersetzen', gefahr: true })) return;
-      await dbTu('docs', 'readwrite', (s) => s.clear());
-      await dbTu('media', 'readwrite', (s) => s.clear());
-      await dbTu('sync', 'readwrite', (s) => s.clear());
-      D.docs.clear();
-    }
-    const benoetigteMedien = new Set();
-    for (const roh of paket.docs) {
-      const d = sauberesDokument(roh);
-      if (!d) continue;
-      if (modus === 'dazu' && D.docs.has(d.id)) continue;
-      D.docs.set(d.id, d);
-      await dbPut('docs', d);
-      if (d.bild) benoetigteMedien.add(d.bild);
-      if (d.skizze) benoetigteMedien.add(d.skizze);
-      if (d.datei) benoetigteMedien.add(d.datei);
-    }
-    for (const [id, durl] of Object.entries(paket.media || {})) {
-      if (!benoetigteMedien.has(id)) continue;
-      try {
-        if (modus === 'ersetzen' || !(await dbGet('media', id))) await dbPut('media', dataURLZuBlob(durl), id);
-      } catch (e) {}
-    }
-    for (const marker of paket.sync || []) {
-      const sauber = saubererSyncMarker(marker);
-      if (sauber) try { await dbPut('sync', sauber, sauber.id); } catch (e) {}
-    }
-    if (modus === 'ersetzen') {
-      if (paket.einst) { uebernehmeEinstellungen(paket.einst); speichereEinst(); setzeThema(D.einst.thema); }
-      if (paket.stats) {
-        D.stats = { tage: saubereZaehler(paket.stats.tage), letzte: saubereZaehler(paket.stats.letzte),
-          letzteSicherung: begrenze(paket.stats.letzteSicherung, 0, Date.now() + 86400000, 0) };
-        speichereStats();
-      }
-    }
-    toast('Alles wieder da.');
-    zeichne();
+    /* Einspielen und Zusammenfassung teilen sich Datei und Zwischenablage. */
+    await sicherungAnnehmen(paket, datei.name);
   });
   inp.click();
 }

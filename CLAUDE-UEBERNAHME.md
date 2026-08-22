@@ -1070,3 +1070,114 @@ eine fehlende Datei meldet sauber statt hängenzubleiben.
 Früherer Stand: `npm test` 103/103, Hosting 2/2, Lint sauber, im Browser gemessen
 (Ton nach 1 s hörbar, zwei Aufnahmen gemischt, Klangbild stellt wieder her,
 Gruppe nimmt Blasen mit, Brett als 700×498-PNG).
+
+## 18. Ankommen & Goodnotes (22. August 2026, VANI 5.9.0)
+
+### Der Befund, der alles auslöste
+
+Der dokumentierte Umzugsweg (Alles sichern → `.vani`-Datei → Sicherung
+einlesen) war auf dem verwalteten Schul-iPad **tot**: `leseSicherung()` kannte
+nur den Datei-Dialog, und genau der ist dort gesperrt (Managed-Open-In — nur
+Goodnotes-Dateien sind wählbar). Es gab **keine Brücke ohne Datei**. Dazu die
+Falle auf der alten Sites-Adresse: die Umzugsseite leitete nach **fünf
+Sekunden** blind weiter — zu schnell für „Alten Bestand retten".
+
+Recherchiert und für die Anleitung festgehalten: iPadOS gibt **jeder
+Home-Bildschirm-App ihren eigenen Speicher** — auch zwei Symbole derselben
+Adresse teilen nichts. (firt.dev/ios-14, WebKit-Blog zur Storage-Policy.)
+
+### `src/49b-ankommen.js` — alles herein, auch ohne Datei
+
+- **Erkenner (pur, getestet in `test/ankommen.mjs`):** `erkenneEinfuegeInhalt`
+  → `leer | kopplungscode | sicherung | kaputt | vanitext | whatsapp |
+  gegliedert | text`. Reihenfolge: das Eindeutige zuerst. `whatsappZerlegen`
+  (Android- und iPhone-Format, Fortsetzungszeilen, Systemzeilen),
+  `markdownZerlegen` (Rauten und Unterstreichungen, Vorspann),
+  `vaniTextZerlegen` (der „Nur Texte"-Export, den es seit der ersten Fassung
+  gibt — daraus entstehen wieder Projekte, Hefte mit Zetteln, Schnipsel mit
+  Datum).
+- **Gemeinsame Paket-Logik:** `baueSicherungsPaket({mitMedien})` und
+  `sicherungEinspielen(paket, modus)` — Datei und Zwischenablage nehmen
+  denselben Weg; `leseSicherung` ruft nur noch `sicherungAnnehmen`.
+- **Zwischenablage hinaus:** `textInZwischenablage(promise)` schreibt ein
+  `ClipboardItem` mit **Versprechen** — iOS erlaubt das Schreiben nur kurz nach
+  einer Berührung, und das Packen dauert. `writeText` nach dem `await` wäre zu
+  spät.
+- **Zwischenablage herein:** das Feld fängt das `paste`-Ereignis ab und
+  verarbeitet den Text sofort, ohne ihn ins Feld zu malen (große Sicherungen
+  frieren sonst ein). `readText` als Knopf, mit höflichem Hinweis, wenn das
+  Gerät die Zwischenablage nur per Einfügen hergibt.
+- **Umzugshelfer** (`umzugsHelfer`): drei Wege, adaptiv (im Rettungsmodus
+  aus der Sicht des alten VANI), mit direkt klickbaren Schritten.
+- **Ankunfts-Zusammenfassung** (`ankunftZusammenfassen`): „3 Hefte · 41 Seiten
+  · 5 Bilder · 12.300 Wörter" statt „Alles wieder da."; Dedupe gegen Vorhandenes.
+- Dialog-Reihenfolge beachtet: `fertig = true; zu(); res(...)` — sonst löst
+  `beiZu` mit `null` auf (der bekannte Stolperstein aus §16).
+
+### Hosting: Umzugsseite zählt erst nach
+
+`hosting/scripts/copy-vani.mjs` erzeugt eine Umzugsseite, die `indexedDB.open`
+auf `vani` und alle `vani-profil-*` macht, `docs` zählt und **nur bei leerem
+Bestand** weiterleitet; sonst hebt sie „Alten Bestand retten (N)" hervor. Die
+Rettungsfassung ist `index.html` (5.9.0) mit Umzugshelfer. **Deploy der
+Sites-Adresse geht nicht von hier** (ChatGPT-Sites-Projekt, `.openai/
+hosting.json`) — `hosting/public/` ist aktualisiert, der Hosting-Test
+(`hosting/tests/rendered-html.test.mjs`) prüft Version 5.9.0 und das neue
+Verhalten; das Ausrollen braucht Codex/Sites.
+
+### Goodnotes: drei Reparaturen beim Einfügen (`src/35-richtext.js`)
+
+Aus den Screenshots der Nutzerin:
+1. **`&#x20;` stand wörtlich im Text.** Goodnotes schreibt Leerzeichen am
+   Zeilenende als Entität *in den Text* (nicht als HTML). `entitaetenReparieren`
+   wandelt Zahlen-Entitäten und die paar benannten zurück — in beiden
+   Einfüge-Wegen (Textknoten in `einfuegeHTML`, Zeilen in `einfuegeAusText`).
+   Steuerzeichen/Surrogate werden nicht erzeugt; Unbekanntes bleibt stehen.
+2. **Lücke mitten im Satz** („geschenkt [ ] hatte"): Goodnotes liefert jede
+   umgebrochene Zeile als eigenen Absatz. `verbindeWeicheUmbrueche` verbindet
+   zwei `p`, wenn der erste ohne Satzzeichen endet und der zweite klein
+   beginnt; Listen, Überschriften, Aufzählungszeichen und Leerzeilen trennen
+   hart. Heuristik — bewusst eng.
+3. **`_WORT_` soll kursiv sein:** `kurzschriftZuHTML` (`_i_ *b* ~s~`) beim
+   Einfügen und `kurzschriftLive` beim Tippen (nur auf `insertText` mit einem
+   der drei Zeichen; der Cursor verlässt das Element über ein U+200B, das
+   `sauberesRichHTML` und `richReinerText` wieder entfernen).
+4. **Absätze zu groß:** `.rich-editor p { margin: 0 }` — Absätze sind Zeilen.
+
+### Rich-Text überall
+
+Neue Szenen (`44-projekte`, `42-schnipsel`, `49b`) und Blätter (`blattAusText`)
+entstehen mit `format: 'rich'`. Ältere Texte: „Aa" im Schreibraum-Kopf (war
+vorher in den Einstellungen versteckt). Typewriter/Zeilenfokus gelten weiter
+nur im schlichten Modus (Spiegel-Div) — Ideen dazu in IDEEN.md.
+
+### Sticker (`src/43b-sticker.js`)
+
+Doc-Typ `sticker` (Anlage: `parent`, `bild`, `verhaeltnis`, `pos`) und
+`stickervorlage` (Kiste). `stickerZeichnen` ist ein kleiner Zeichenblock
+(Stifte, Dicke, Radierer, Zurück, Alles löschen), `stickerZuschneiden`
+beschneidet auf den gezeichneten Inhalt (Alpha > 8, 6 px Rand), das PNG geht
+über `speichereKritzelei` in `media` — also in Sicherung und Sync wie Fotos.
+`stickerAufkleben` zeigt zuerst die Kiste (antippen klebt, lange drücken nimmt
+heraus), sonst den Block. Rendering über `baueSticker` + `anlageGesten`.
+
+`anlageGesten` hat jetzt für **alle** Anlagen einen **Drehgriff** (um die
+Mitte, < 2,5° rastet gerade), die Ziehgrenzen reichen über den Rand (x −30…100,
+y −14…106), `.papierseite { overflow: visible }`. Seite verdoppeln nimmt
+Sticker mit. Neues Icon `IK.sticker`.
+
+### Tests
+
+119 grün. Neu: `test/ankommen.mjs` (6), `test/goodnotes.mjs` (3), Verträge
+„Ankommen", „Umzug", „Goodnotes", „Sticker". Im Browser geprüft: WhatsApp →
+Faden (3, beim zweiten Mal „Nichts Neues"), VANI-Textexport → Heft mit 2 Seiten
+und Zettel + Schnipsel, Paste-Ereignis wird abgefangen, Umzugshelfer rendert;
+`&#x20;` repariert (HTML und Text), weicher Umbruch verbunden, Kurzschrift beim
+Einfügen und live (`Hallo <i>Welt</i> weiter` gespeichert ohne U+200B),
+Sticker gerendert mit Drehgriff, Werkzeugknopf da, Absatzabstand 0, Seite
+`overflow: visible`.
+
+### Offen / Ideen
+
+Siehe **IDEEN.md** (neu): Goodnotes-Abgleich (Lasso, Formen begradigen,
+Audio-Notiz, Gliederung aus Überschriften …) und je Raum.

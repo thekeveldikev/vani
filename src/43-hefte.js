@@ -434,6 +434,11 @@ function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
     el('button', { class: 'rundknopf', title: 'Kritzeln', html: ik('stift'), onclick: () => {
       const z = ziel(); if (z) starteKritzeln(z.blatt, z.seite);
     } }),
+    el('button', { class: 'rundknopf', title: 'Sticker aufkleben', html: ik('sticker'), onclick: async () => {
+      const z = ziel(); if (!z) return;
+      const s = await stickerAufkleben(z.seite);
+      if (s) auffrischen();
+    } }),
     el('button', { class: 'rundknopf format-seite-knopf', title: 'Text formatieren', onclick: () => {
       const z = ziel(); if (!z) return;
       if (z.seite.format !== 'rich') {
@@ -477,8 +482,8 @@ function seitenWerkzeuge(ziel, { neuZeichnen, frisch, klasse } = {}) {
           geschwister.forEach((x, n) => { x.ord = n >= i + 1 ? n + 1 : n; speichereStill(x); });
           const kopie = neuDoc('seite', { parent: z.heft.id, ord: i + 1, titel: z.seite.titel ? z.seite.titel + ' (Abschrift)' : '', text: z.seite.text || '', rich: z.seite.rich || '', format: z.seite.format || 'plain' });
           for (const a of kinder(z.seite.id)) {
-            if (a.typ !== 'zettel') continue;
-            neuDoc('zettel', { parent: kopie.id, text: a.text, farbe: a.farbe, schrift: a.schrift, befestigung: a.befestigung, pos: Object.assign({}, a.pos) });
+            if (a.typ === 'zettel') neuDoc('zettel', { parent: kopie.id, text: a.text, farbe: a.farbe, schrift: a.schrift, befestigung: a.befestigung, pos: Object.assign({}, a.pos) });
+            else if (a.typ === 'sticker') neuDoc('sticker', { parent: kopie.id, bild: a.bild, verhaeltnis: a.verhaeltnis, befestigung: 'lose', pos: Object.assign({}, a.pos) });
           }
           sessionStorage.setItem('zielSeite', kopie.id);
           toast('Verdoppelt. Fotos und Kritzeleien bleiben beim Original.');
@@ -589,6 +594,7 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
     for (const a of kinder(seite.id)) {
       if (a.typ === 'zettel') blatt.append(baueZettel(a, blatt, baueAnlagen));
       else if (a.typ === 'foto') blatt.append(baueFoto(a, blatt, baueAnlagen));
+      else if (a.typ === 'sticker') blatt.append(baueSticker(a, blatt, baueAnlagen));
     }
   }
   baueAnlagen();
@@ -624,8 +630,9 @@ function anlageGesten(elem, a, blatt, neuBauen) {
     if (!zieht.bewegt && Math.hypot(dx, dy) < 6) return;
     zieht.bewegt = true;
     elem._zieht = true;
-    a.pos.x = Math.max(-10, Math.min(96, zieht.px + dx / zieht.r.width * 100));
-    a.pos.y = Math.max(-2, Math.min(102, zieht.py + dy / zieht.r.height * 100));
+    /* Über den Rand hinaus ist erlaubt — nur nicht ganz weg. */
+    a.pos.x = Math.max(-30, Math.min(100, zieht.px + dx / zieht.r.width * 100));
+    a.pos.y = Math.max(-14, Math.min(106, zieht.py + dy / zieht.r.height * 100));
     elem.style.left = a.pos.x + '%';
     elem.style.top = a.pos.y + '%';
   });
@@ -651,14 +658,40 @@ function anlageGesten(elem, a, blatt, neuBauen) {
   });
   griff.addEventListener('pointermove', (e) => {
     if (!groesse) return;
-    a.pos.w = Math.max(12, Math.min(92, groesse.w + (e.clientX - groesse.sx) / groesse.r.width * 100));
+    a.pos.w = Math.max(a.typ === 'sticker' ? 5 : 12, Math.min(92, groesse.w + (e.clientX - groesse.sx) / groesse.r.width * 100));
     elem.style.width = a.pos.w + '%';
   });
   griff.addEventListener('pointerup', () => { if (groesse) speichereStill(a); groesse = null; });
   elem.append(griff);
 
+  /* Drehgriff: um die Mitte drehen, nahe null rastet es gerade ein. */
+  const dreh = el('div', { class: 'drehgriff', html: ik('drehen'), title: 'Drehen' });
+  let drehung = null;
+  dreh.addEventListener('pointerdown', (e) => {
+    e.stopPropagation(); e.preventDefault();
+    const r = elem.getBoundingClientRect();
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    drehung = { cx, cy, start: Math.atan2(e.clientY - cy, e.clientX - cx), rot0: a.pos.rot || 0 };
+    try { dreh.setPointerCapture(e.pointerId); } catch (x) {}
+  });
+  dreh.addEventListener('pointermove', (e) => {
+    if (!drehung) return;
+    const w = Math.atan2(e.clientY - drehung.cy, e.clientX - drehung.cx);
+    let grad = drehung.rot0 + (w - drehung.start) * 180 / Math.PI;
+    grad = ((grad + 180) % 360 + 360) % 360 - 180;
+    if (Math.abs(grad) < 2.5) grad = 0;
+    a.pos.rot = Math.round(grad * 10) / 10;
+    elem.style.transform = 'rotate(' + a.pos.rot + 'deg)';
+  });
+  const drehEnde = () => { if (drehung) speichereStill(a); drehung = null; };
+  dreh.addEventListener('pointerup', drehEnde); dreh.addEventListener('pointercancel', drehEnde);
+  elem.append(dreh);
+
   langdruck(elem, async () => {
+    const inKiste = a.typ === 'sticker' && vomTyp('stickervorlage').some((v) => v.bild === a.bild);
     const wahl = await menue([
+      a.typ === 'sticker' && !inKiste ? { text: 'In die Stickerkiste legen', icon: 'archiv', wert: 'kiste' } : null,
+      a.typ === 'sticker' ? { text: 'Noch einmal aufkleben', icon: 'plus', wert: 'nochmal' } : null,
       a.typ === 'zettel' ? { text: 'Andere Farbe', icon: 'farbe', wert: 'farbe' } : null,
       a.typ === 'zettel' ? { text: 'Schrift: ' + ({ hand: 'Handschrift', klar: 'Klar', serif: 'Serife' }[a.schrift || 'hand']), icon: 'stift', wert: 'schrift' } : null,
       a.typ === 'zettel' ? { text: 'Form: ' + (a.pos.w <= 24 ? 'schmal' : a.pos.w >= 44 ? 'breit' : 'normal'), icon: 'wandel', wert: 'form' } : null,
@@ -667,7 +700,13 @@ function anlageGesten(elem, a, blatt, neuBauen) {
       { text: 'Gerade rücken', icon: 'ausBlock', wert: 'gerade' },
       { text: 'Abmachen', icon: 'muell', wert: 'weg', rot: true }
     ]);
-    if (wahl === 'farbe') {
+    if (wahl === 'kiste') {
+      neuDoc('stickervorlage', { bild: a.bild, verhaeltnis: a.verhaeltnis, zuletzt: Date.now() });
+      toast('Liegt in der Stickerkiste.');
+    } else if (wahl === 'nochmal') {
+      neuDoc('sticker', { parent: a.parent, bild: a.bild, verhaeltnis: a.verhaeltnis, befestigung: 'lose', pos: { x: Math.min(90, a.pos.x + 8), y: Math.min(100, a.pos.y + 8), rot: a.pos.rot, w: a.pos.w } });
+      neuBauen();
+    } else if (wahl === 'farbe') {
       a.farbe = ZETTELFARBEN[(ZETTELFARBEN.indexOf(a.farbe) + 1) % ZETTELFARBEN.length];
       speichereStill(a); neuBauen();
     } else if (wahl === 'schrift') {
@@ -687,7 +726,7 @@ function anlageGesten(elem, a, blatt, neuBauen) {
       speichereStill(a);
       elem.style.transform = 'rotate(' + a.pos.rot + 'deg)';
     } else if (wahl === 'weg') {
-      if (await frage(a.typ === 'zettel' ? 'Zettel abmachen und wegwerfen?' : 'Foto abmachen?', { ja: 'Abmachen', gefahr: true })) {
+      if (await frage(a.typ === 'zettel' ? 'Zettel abmachen und wegwerfen?' : a.typ === 'sticker' ? 'Sticker abmachen?' : 'Foto abmachen?', { ja: 'Abmachen', gefahr: true })) {
         await loesche(a.id); neuBauen();
       }
     }

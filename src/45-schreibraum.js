@@ -88,6 +88,11 @@ function oeffneSchreibraum(docId) {
     worteAnzeige,
     vorleseKnopf,
     klangKnopf,
+    /* Ältere Texte sind noch schlicht. Ein Tipp, und sie lassen sich formatieren. */
+    istRich ? null : el('button', { class: 'rundknopf zart', title: 'Text formatieren (fett, kursiv, Überschriften …)', onclick: () => {
+      doc.format = 'rich'; doc.rich = richAusText(srAktuellerText()); speichere(doc);
+      const id = doc.id; schliesseSchreibraum(); setTimeout(() => oeffneSchreibraum(id), 30);
+    } }, 'Aa'),
     el('button', { class: 'rundknopf zart', html: ik('feinheiten'), title: 'Schreibraum einstellen', onclick: () => srEinstellungen() })
   );
 

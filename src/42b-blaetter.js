@@ -2,8 +2,9 @@
    VANI — Blätter: nur Texte, nichts sonst.
    ================================================================ */
 
+/* Blätter sind von Anfang an formatierbar — Rich-Text überall, wo man schreibt. */
 function blattAusText(titel, text) {
-  return neuDoc('blatt', { titel: titel || '', text: text || '', ord: Date.now() });
+  return neuDoc('blatt', { titel: titel || '', text: text || '', rich: richAusText(text || ''), format: 'rich', ord: Date.now() });
 }
 
 RENDER.blaetter = function (haupt) {

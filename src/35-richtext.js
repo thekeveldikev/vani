@@ -14,7 +14,7 @@ function richReinerText(html) {
     d.innerHTML = html
       .replace(/<br\s*\/?>/gi, '\n')
       .replace(/<\/(?:p|div|li|h[1-6]|blockquote|tr|section|article|figcaption|dd|dt|pre)\s*>/gi, '\n');
-    return (d.textContent || '').replace(/\u00a0/g, ' ');
+    return (d.textContent || '').replace(/\u00a0/g, ' ').replace(/\u200b/g, '');
   }
   return html.replace(/<script[\s\S]*?<\/script\s*>/gi, '').replace(/<style[\s\S]*?<\/style\s*>/gi, '')
     .replace(/<br\s*\/?>/gi, '\n').replace(/<\/(?:p|div|li|h[1-3]|blockquote)>/gi, '\n').replace(/<[^>]+>/g, '')
@@ -57,7 +57,62 @@ function sauberesRichHTML(html) {
     if (ausrichtung) teile.push('text-align:' + ausrichtung);
     if (teile.length) node.setAttribute('style', teile.join(';'));
   }
-  return vorlage.innerHTML.slice(0, 10000000);
+  return vorlage.innerHTML.replace(/\u200b/g, '').slice(0, 10000000);
+}
+
+/* ----- Drei kleine Reparaturen für fremden Text -----
+   Goodnotes (und andere) schreiben Leerzeichen am Zeilenende als „&#x20;" in
+   den Text — nicht als HTML, sondern als Buchstaben. Beim Einfügen standen
+   sie dann wörtlich auf der Seite. Hier werden solche Reste zurückverwandelt.
+   Nur das Eindeutige: Zahlen-Entitäten und die paar benannten, die in Text
+   wirklich vorkommen. */
+const ENTITAETEN = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", shy: '', hellip: '…', ndash: '–', mdash: '—', laquo: '«', raquo: '»', bdquo: '„', ldquo: '“', rdquo: '”', lsquo: '‘', rsquo: '’', sbquo: '‚' };
+function entitaetenReparieren(text) {
+  const t = String(text || '');
+  if (t.indexOf('&') < 0) return t;
+  return t.replace(/&(#x([0-9a-f]{1,6})|#(\d{1,7})|([a-z]{2,8}));/gi, (ganz, _, hex, dez, name) => {
+    let code = null;
+    if (hex) code = parseInt(hex, 16);
+    else if (dez) code = parseInt(dez, 10);
+    else if (name && Object.prototype.hasOwnProperty.call(ENTITAETEN, name.toLowerCase())) return ENTITAETEN[name.toLowerCase()];
+    else return ganz;
+    if (!Number.isFinite(code) || code < 9 || code > 0x10ffff || (code >= 0xd800 && code <= 0xdfff)) return ganz;
+    try { return String.fromCodePoint(code); } catch (e) { return ganz; }
+  });
+}
+
+/* Kurzschrift: _kursiv_, *fett*, ~durchgestrichen~ — so, wie man es in
+   WhatsApp oder Goodnotes tippt. Arbeitet auf schon escaptem HTML, deshalb
+   dürfen die Zeichen drinnen keine Tags anreißen. */
+function kurzschriftZuHTML(html) {
+  let h = String(html || '');
+  if (!/[_*~]/.test(h)) return h;
+  const tausche = (zeichen, tag) => {
+    const z = zeichen === '*' ? '\\*' : zeichen;
+    const re = new RegExp('(^|[\\s(„"“>])' + z + '([^' + z + '<>\\n][^' + z + '<>\\n]{0,400}?[^' + z + '<>\\n\\s]|[^' + z + '<>\\n\\s])' + z + '(?=[\\s.,;:!?)“"”»<]|$)', 'g');
+    h = h.replace(re, (ganz, vor, inhalt) => /^\s/.test(inhalt) ? ganz : vor + '<' + tag + '>' + inhalt + '</' + tag + '>');
+  };
+  tausche('_', 'i'); tausche('*', 'b'); tausche('~', 's');
+  return h;
+}
+
+/* Weiche Umbrüche: Goodnotes bricht lange Absätze an der Zeilenkante um und
+   liefert jede Zeile als eigenen Absatz. Auf der Seite stand dann mitten im
+   Satz eine Lücke. Endet ein Absatz ohne Satzzeichen und der nächste beginnt
+   klein, gehören beide zusammen. Arbeitet auf Blöcken {tag, inhalt}. */
+function verbindeWeicheUmbrueche(bloecke) {
+  const text = (html) => String(html || '').replace(/<[^>]+>/g, '').replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&#39;|&apos;/g, "'").trim();
+  const raus = [];
+  for (const b of bloecke) {
+    const vorher = raus[raus.length - 1];
+    if (vorher && vorher.tag === 'p' && b.tag === 'p') {
+      const a = text(vorher.inhalt), z = text(b.inhalt);
+      const offen = a && !/[.!?:;…"“”»›)\]}—–]$/.test(a) && !/^[-–—•·*]/.test(z);
+      if (offen && /^[a-zäöüß]/.test(z)) { vorher.inhalt = vorher.inhalt.replace(/\s+$/, '') + ' ' + b.inhalt.replace(/^\s+/, ''); continue; }
+    }
+    raus.push(b);
+  }
+  return raus;
 }
 
 /* Aus fremdem HTML wird ruhiger VANI-Text.
@@ -87,7 +142,7 @@ function einfuegeHTML(html, maxBloecke = 20000) {
   const lauf = (knoten, tiefe) => {
     if (tiefe > 80 || bloecke.length >= maxBloecke) return;
     for (const k of knoten.childNodes) {
-      if (k.nodeType === 3) { jetzt.html += esc(k.nodeValue || ''); continue; }
+      if (k.nodeType === 3) { jetzt.html += esc(entitaetenReparieren(k.nodeValue || '')); continue; }
       if (k.nodeType !== 1) continue;
       const name = k.tagName;
       if (name === 'BR') { ablegen(); continue; }
@@ -103,11 +158,13 @@ function einfuegeHTML(html, maxBloecke = 20000) {
   lauf(vorlage.content, 0);
   ablegen();
 
+  const verbunden = verbindeWeicheUmbrueche(bloecke);
+  for (const b of verbunden) b.inhalt = kurzschriftZuHTML(b.inhalt);
   const raus = [];
-  for (let i = 0; i < bloecke.length; i++) {
-    if (bloecke[i].tag !== 'li') { raus.push('<' + bloecke[i].tag + '>' + bloecke[i].inhalt + '</' + bloecke[i].tag + '>'); continue; }
+  for (let i = 0; i < verbunden.length; i++) {
+    if (verbunden[i].tag !== 'li') { raus.push('<' + verbunden[i].tag + '>' + verbunden[i].inhalt + '</' + verbunden[i].tag + '>'); continue; }
     const punkte = [];
-    while (i < bloecke.length && bloecke[i].tag === 'li') { punkte.push('<li>' + bloecke[i].inhalt + '</li>'); i++; }
+    while (i < verbunden.length && verbunden[i].tag === 'li') { punkte.push('<li>' + verbunden[i].inhalt + '</li>'); i++; }
     i--;
     raus.push('<ul>' + punkte.join('') + '</ul>');
   }
@@ -117,13 +174,46 @@ function einfuegeHTML(html, maxBloecke = 20000) {
 /* Reiner Text von außen wird zu ruhigen Absätzen, ohne Leerzeilenwüsten. */
 function einfuegeAusText(text) {
   const zeilen = String(text || '').replace(/\r\n?/g, '\n').split('\n');
-  const raus = [];
+  const bloecke = [];
   for (const z of zeilen) {
-    const sauber = z.replace(/[ \t ]+/g, ' ').trim();
-    if (sauber) raus.push('<p>' + esc(sauber) + '</p>');
-    else if (raus.length && raus[raus.length - 1] !== '<p><br></p>') raus.push('<p><br></p>');
+    const sauber = entitaetenReparieren(z).replace(/[ \t ]+/g, ' ').trim();
+    if (sauber) bloecke.push({ tag: 'p', inhalt: kurzschriftZuHTML(esc(sauber)) });
+    else if (bloecke.length && bloecke[bloecke.length - 1].inhalt !== '<br>') bloecke.push({ tag: 'p', inhalt: '<br>' });
   }
+  const raus = verbindeWeicheUmbrueche(bloecke).map((b) => '<p>' + b.inhalt + '</p>');
   return sauberesRichHTML(raus.join(''));
+}
+
+/* Kurzschrift beim Tippen: Sobald das schließende _, * oder ~ fällt, wird
+   das Wort dazwischen kursiv, fett oder durchgestrichen. Der Cursor landet
+   dahinter und schreibt wieder normal — dafür sorgt ein unsichtbares Zeichen,
+   das beim Speichern wieder verschwindet. */
+function kurzschriftLive(editor) {
+  const sel = typeof window !== 'undefined' && window.getSelection ? window.getSelection() : null;
+  if (!sel || !sel.rangeCount || !sel.isCollapsed) return false;
+  const r = sel.getRangeAt(0);
+  const knoten = r.startContainer;
+  if (!knoten || knoten.nodeType !== 3 || !editor.contains(knoten)) return false;
+  const davor = knoten.nodeValue.slice(0, r.startOffset);
+  const m = davor.match(/(^|[\s(„"“])([_*~])([^_*~\n]{1,200}?)\2$/);
+  if (!m) return false;
+  const inhalt = m[3];
+  if (!inhalt.trim() || /^\s|\s$/.test(inhalt)) return false;
+  const tag = { _: 'i', '*': 'b', '~': 's' }[m[2]];
+  const start = r.startOffset - (inhalt.length + 2);
+  if (start < 0) return false;
+  const bereich = document.createRange();
+  bereich.setStart(knoten, start); bereich.setEnd(knoten, r.startOffset);
+  bereich.deleteContents();
+  const neu = document.createElement(tag);
+  neu.textContent = inhalt;
+  bereich.insertNode(neu);
+  const nach = document.createTextNode('\u200b');
+  neu.after(nach);
+  const ziel = document.createRange();
+  ziel.setStart(nach, 1); ziel.collapse(true);
+  sel.removeAllRanges(); sel.addRange(ziel);
+  return true;
 }
 
 function richBefehl(editor, befehl, wert) {
@@ -219,7 +309,10 @@ function baueRichEditor(doc, optionen = {}) {
     speichere(doc); zaehleWorte(doc.id, doc.text);
     if (optionen.beiSpeichern) optionen.beiSpeichern(doc, editor);
   }, optionen.warten || 400, true);
-  editor.addEventListener('input', () => { sichern(); if (optionen.beiInput) optionen.beiInput(doc, editor, startWorte); });
+  editor.addEventListener('input', (e) => {
+    if (D.einst.kurzschrift !== false && e && e.inputType === 'insertText' && /[_*~]/.test(e.data || '')) { try { kurzschriftLive(editor); } catch (x) {} }
+    sichern(); if (optionen.beiInput) optionen.beiInput(doc, editor, startWorte);
+  });
   editor.addEventListener('paste', (e) => {
     if (!e.clipboardData) return;
     const html = e.clipboardData.getData('text/html');

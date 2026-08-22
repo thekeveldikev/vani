@@ -261,7 +261,7 @@ function baueKapitel(k, p) {
   for (const s of szenen) wand.append(baueSzenenkarte(s, p));
   wand.append(el('button', {
     class: 'plusskarte', onclick: () => {
-      const s = neuDoc('szene', { parent: k.id, projekt: p.id, ord: szenen.length, titel: '', text: '', status: 'funke', farbe: '' });
+      const s = neuDoc('szene', { parent: k.id, projekt: p.id, ord: szenen.length, titel: '', text: '', rich: '', format: 'rich', status: 'funke', farbe: '' });
       oeffneSchreibraum(s.id);
     }
   }, el('span', { html: ik('plus'), style: 'display:flex' }), 'Szene'));
@@ -415,7 +415,7 @@ function szenenGesten(karte, s, p) {
       const i = (SZENENFARBEN.indexOf(s.farbe || '') + 1) % SZENENFARBEN.length;
       s.farbe = SZENENFARBEN[i]; speichereStill(s); zeichne();
     } else if (wahl === 'doppel') {
-      neuDoc('szene', { parent: s.parent, projekt: s.projekt, ord: (s.ord || 0) + .5, titel: (s.titel || 'Szene') + ' (Fassung 2)', text: s.text, status: s.status, farbe: s.farbe, notiz: s.notiz });
+      neuDoc('szene', { parent: s.parent, projekt: s.projekt, ord: (s.ord || 0) + .5, titel: (s.titel || 'Szene') + ' (Fassung 2)', text: s.text, rich: s.rich || '', format: s.format || 'plain', status: s.status, farbe: s.farbe, notiz: s.notiz });
       kinder(s.parent, 'szene').forEach((x, i) => { x.ord = i; speichereStill(x); });
       zeichne();
     } else if (wahl === 'zieh') {

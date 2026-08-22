@@ -384,6 +384,91 @@ test('Klangkatalog: jede Aufnahme hat Namen, Kategorie und ehrliche Herkunft', (
   assert.ok(gesamt < 60, 'Der Fundus ist auf ' + gesamt.toFixed(1) + ' MB gewachsen — das wird zu schwer.');
 });
 
+test('Ankommen-Vertrag: Sichern und Einlesen gehen auch ohne Datei', () => {
+  /* Auf verwalteten Schul-iPads ist die Dateiauswahl gesperrt. Darum muss jeder
+     Weg auch über die Zwischenablage gehen — hinaus und herein — und die
+     Rettungsfassung der alten Adresse muss denselben Helfer mitbringen. */
+  const a = lies('src/49b-ankommen.js');
+  const f = lies('src/49-feinheiten.js');
+  assert.match(a, /function inZwischenablageSichern/);
+  assert.match(a, /function ausZwischenablageEinlesen/);
+  assert.match(a, /function umzugsHelfer/);
+  /* Datei und Zwischenablage teilen sich das Einspielen — sonst driften sie auseinander. */
+  assert.match(f, /await sicherungAnnehmen\(paket, datei\.name\)/, 'Datei-Import muss den gemeinsamen Weg nehmen');
+  assert.match(f, /baueSicherungsPaket\(\{ mitMedien: true \}\)/, 'Datei-Export muss das gemeinsame Paket bauen');
+  /* iOS: Schreiben in die Zwischenablage nur kurz nach einer Berührung. Das
+     Packen dauert — deshalb ein ClipboardItem mit Versprechen, nicht writeText danach. */
+  assert.match(a, /new ClipboardItem\(\{ 'text\/plain': text\.then/);
+  /* Große Sicherungen dürfen nicht erst ins Textfeld gemalt werden. */
+  assert.match(a, /e\.preventDefault\(\);\s*verarbeite\(text\)/);
+  /* Der Kopplungscode darf ohne Dialog vorgegeben werden (aus der Zwischenablage erkannt). */
+  assert.match(f, /async function vorhandenenSyncBereichKoppeln\(codeVorgabe\)/);
+  /* Jede Ankunft endet mit einer Zusammenfassung, nicht mit „Alles wieder da.". */
+  assert.doesNotMatch(f, /toast\('Alles wieder da\.'\)/);
+  assert.match(a, /function ankunftZusammenfassen/);
+  /* Das neue Modul ist in beiden Buildlisten und im Sandkasten. */
+  assert.match(lies('werkzeug/build-web.mjs'), /49b-ankommen\.js/);
+  assert.match(lies('build.sh'), /49b-ankommen\.js/);
+  assert.match(lies('test/sandkasten.mjs'), /49b-ankommen\.js/);
+  /* Die Anleitung kennt die neuen Wege. */
+  const anl = lies('src/52-anleitung.js');
+  for (const t of ['In die Zwischenablage sichern', 'Aus der Zwischenablage einlesen', 'Von einem alten VANI umziehen']) assert.match(anl, new RegExp("t: '" + t + "'"), 'Anleitung: ' + t);
+});
+
+test('Goodnotes-Vertrag: Einfügen repariert, Absätze sind Zeilen, Rich-Text überall', () => {
+  const r = lies('src/35-richtext.js');
+  /* Die drei Reparaturen greifen in BEIDEN Einfüge-Wegen — HTML und reiner Text. */
+  assert.match(r, /esc\(entitaetenReparieren\(k\.nodeValue/, 'HTML-Textknoten müssen repariert werden');
+  assert.match(r, /const sauber = entitaetenReparieren\(z\)/, 'reiner Text muss repariert werden');
+  assert.match(r, /const verbunden = verbindeWeicheUmbrueche\(bloecke\)/, 'weiche Umbrüche beim HTML-Einfügen');
+  assert.match(r, /verbindeWeicheUmbrueche\(bloecke\)\.map/, 'weiche Umbrüche beim Text-Einfügen');
+  assert.match(r, /kurzschriftZuHTML\(b\.inhalt\)/);
+  /* Live-Kurzschrift: nur auf insertText und nur bei den drei Zeichen — sonst
+     kostet es bei jedem Buchstaben eine Auswahlprüfung. */
+  assert.match(r, /e\.inputType === 'insertText' && \/\[_\*~\]\/\.test\(e\.data/);
+  /* Das unsichtbare Zeichen, das den Cursor aus dem Kursiven holt, verschwindet beim Speichern. */
+  assert.match(r, /replace\(\/\\u200b\/g, ''\)\.slice/, 'sauberesRichHTML muss U+200B entfernen');
+  const css = lies('src/10-style.css');
+  assert.match(css, /\.rich-editor p, \.rich-editor div \{ margin: 0; \}/, 'Absätze sind normale Zeilen');
+  /* Rich-Text überall: neue Szenen und Blätter kommen formatierbar zur Welt. */
+  assert.match(lies('src/44-projekte.js'), /titel: '', text: '', rich: '', format: 'rich', status: 'funke'/, 'neue Szene muss rich sein');
+  assert.match(lies('src/42b-blaetter.js'), /rich: richAusText\(text \|\| ''\), format: 'rich'/, 'neues Blatt muss rich sein');
+  assert.match(lies('src/45-schreibraum.js'), /istRich \? null : el\('button'/, 'Aa-Knopf im Schreibraum-Kopf für alte Texte');
+  assert.match(lies('src/30-core.js'), /kurzschrift: true/);
+});
+
+test('Sticker-Vertrag: Sticker sind Anlagen wie Zettel und Fotos — und reisen überall mit', () => {
+  const h = lies('src/43-hefte.js');
+  assert.match(h, /else if \(a\.typ === 'sticker'\) blatt\.append\(baueSticker/);
+  assert.match(h, /stickerAufkleben\(z\.seite\)/);
+  assert.match(h, /class: 'drehgriff'/, 'Drehgriff für alle Anlagen');
+  /* Über den Rand hinaus ist erlaubt — aber nie ganz weg. */
+  assert.match(h, /Math\.max\(-30, Math\.min\(100,/);
+  assert.match(h, /Math\.max\(-14, Math\.min\(106,/);
+  assert.match(lies('src/10-style.css'), /\.papierseite \{[^}]*overflow: visible;/);
+  /* Sticker tragen ihr Bild im Feld `bild` — genau das, was Sicherung und Sync einsammeln. */
+  const s = lies('src/43b-sticker.js');
+  assert.match(s, /parent: seite\.id, bild, verhaeltnis/);
+  assert.match(lies('src/49b-ankommen.js'), /if \(d\.bild\) ids\.add\(d\.bild\)/);
+  assert.match(lies('src/30-core.js'), /\['zettel', 'foto', 'blase', 'sticker'\]\.includes\(d\.typ\)/, 'Sticker brauchen immer eine Position');
+  for (const datei of ['werkzeug/build-web.mjs', 'build.sh', 'test/sandkasten.mjs']) assert.match(lies(datei), /43b-sticker\.js/, datei);
+  assert.match(lies('src/52-anleitung.js'), /t: 'Sticker'/);
+  assert.match(lies('src/52-anleitung.js'), /t: 'Die Stickerkiste'/);
+});
+
+test('Umzugs-Vertrag: die alte Adresse leitet nicht blind weiter', () => {
+  /* Die Umzugsseite zählt erst nach, ob dort noch ein Bestand liegt. Vorher
+     leitete sie nach fünf Sekunden weiter — auf einem Schul-iPad ohne
+     Dateiauswahl war das der Verlust des einzigen Rettungswegs. */
+  const q = lies('hosting/scripts/copy-vani.mjs');
+  assert.match(q, /indexedDB\.open\(name\)/);
+  assert.match(q, /Alten Bestand retten/);
+  assert.doesNotMatch(q, /\),5000\)\)/, 'der blinde 5-Sekunden-Redirect darf nicht zurückkommen');
+  assert.match(q, /summe>0/);
+  /* Rettungsmodus führt direkt zum Umzugshelfer. */
+  assert.match(lies('src/60-boot.js'), /umzugsHelfer\(\)/);
+});
+
 test('Klangvertrag: der Fundus lässt sich durchsuchen', () => {
   /* Bei über sechzig Aufnahmen über acht Blöcke ist Scrollen keine Bedienung
      mehr. Die Suche filtert nach Name UND Kategorie, blendet leere

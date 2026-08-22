@@ -6,7 +6,37 @@
 </style></head><body><main class="karte"><h1>VANI hat jetzt ein einziges Zuhause.</h1>
 <p>Diese frühere zweite Adresse ist nur noch der unsichtbare, verschlüsselte Sync-Tresor.</p>
 <strong class="adresse">https://thekeveldikev.github.io/vani/</strong>
-<div class="aktionen"><a class="haupt" href="https://thekeveldikev.github.io/vani/">VANI öffnen</a><a href="./rettung.html?rettung=1&amp;kein-sw=1">Alten Bestand retten</a></div>
-<small>Du wirst gleich automatisch weitergeleitet. Wenn hier noch ungesicherte alte Notizen liegen, wähle vorher „Alten Bestand retten“.</small></main>
-<script>Promise.all([('serviceWorker'in navigator?navigator.serviceWorker.getRegistrations().then(r=>Promise.all(r.map(x=>x.unregister()))):0),('caches'in window?caches.keys().then(k=>Promise.all(k.map(x=>caches.delete(x)))):0)]).finally(()=>setTimeout(()=>location.replace("https://thekeveldikev.github.io/vani/"),5000));</script>
+<div class="aktionen"><a class="haupt" href="https://thekeveldikev.github.io/vani/">VANI öffnen</a><a id="retten" href="./rettung.html?rettung=1&amp;kein-sw=1">Alten Bestand retten</a></div>
+<small id="hinweis">Einen Moment — ich sehe nach, ob hier noch etwas liegt.</small></main>
+<script>
+/* Früher leitete diese Seite nach fünf Sekunden weiter — zu schnell, um „Alten
+   Bestand retten" überhaupt anzutippen, und auf einem Schul-iPad ohne
+   Dateiauswahl war der Rettungsraum der einzige Weg zum alten Bestand.
+   Jetzt zählt die Seite erst nach: Liegt hier noch etwas, bleibt sie stehen
+   und hebt den Rettungsweg hervor. Nur ein leerer Bestand leitet weiter. */
+(async()=>{
+  try{await Promise.all([('serviceWorker'in navigator?navigator.serviceWorker.getRegistrations().then(r=>Promise.all(r.map(x=>x.unregister()))):0),('caches'in window?caches.keys().then(k=>Promise.all(k.map(x=>caches.delete(x)))):0)]);}catch(e){}
+  const zaehle=(name)=>new Promise((res)=>{try{
+    const r=indexedDB.open(name);let neuAngelegt=false;
+    r.onupgradeneeded=()=>{neuAngelegt=true;};
+    r.onsuccess=()=>{const db=r.result;try{
+      if(neuAngelegt||!db.objectStoreNames.contains('docs')){db.close();if(neuAngelegt)indexedDB.deleteDatabase(name);return res(0);}
+      const z=db.transaction('docs','readonly').objectStore('docs').count();
+      z.onsuccess=()=>{db.close();res(z.result||0);};z.onerror=()=>{db.close();res(0);};
+    }catch(e){db.close();res(0);}};
+    r.onerror=()=>res(0);r.onblocked=()=>res(0);
+  }catch(e){res(0);}});
+  let namen=['vani'];
+  try{if(indexedDB.databases){const alle=await indexedDB.databases();namen=[...new Set([...namen,...alle.map(d=>d.name).filter(n=>n&&/^vani(-profil-|$)/.test(n))])];}}catch(e){}
+  let summe=0;for(const n of namen)summe+=await zaehle(n);
+  const h=document.getElementById('hinweis'),r=document.getElementById('retten');
+  if(summe>0){
+    h.innerHTML='<b>Hier liegen noch '+summe+' Dinge aus deinem alten VANI.</b> Sie wandern nicht von allein mit. Wähle „Alten Bestand retten“ — dort zeigt dir VANI zwei Wege ins neue VANI, beide ohne Datei: Kopplungscode oder Zwischenablage. Erst wenn drüben alles da ist, darf dieses Symbol weg.';
+    r.className='haupt';r.textContent='Alten Bestand retten ('+summe+')';
+  }else{
+    h.textContent='Hier liegt nichts mehr. Du wirst gleich zur einen VANI-Adresse weitergeleitet.';
+    setTimeout(()=>location.replace("https://thekeveldikev.github.io/vani/"),4000);
+  }
+})();
+</script>
 </body></html>

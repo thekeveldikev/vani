@@ -291,6 +291,25 @@ html[data-thema="tinte"] .menue button.rot, html[data-thema="kerze"] .menue butt
 .funke-text { font-family: ui-serif, "New York", Georgia, serif; font-size: 18px; line-height: 1.5; }
 .karte .fussreihe { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 
+/* Ankommen: Zwischenablage-Feld, Ankunfts-Zusammenfassung, Umzugshelfer */
+.ankommen-karte .ankommen-zeile { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.ankommen-etikett { flex: none; width: 86px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--blass); }
+.ankommen-knoepfe { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; min-width: 0; }
+.modal.ankommen { width: min(520px, calc(100vw - 48px)); }
+.ankommen-hinweis { font-size: 13.5px; color: var(--blass); line-height: 1.55; margin-bottom: 12px; }
+.ankommen-feld { min-height: 150px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 1.45; }
+.modal.ankunft ul.ankunft-liste { list-style: none; margin: 0 0 6px; padding: 0; font-size: 17px; line-height: 1.7; }
+.modal.ankunft .ankunft-liste li::before { content: '·'; color: var(--akzent); margin-right: 8px; }
+.ankunft-fuss { font-size: 13.5px; color: var(--blass); margin-top: 6px; }
+.modal.umzug { width: min(560px, calc(100vw - 48px)); }
+.umzug-einleitung { font-size: 14.5px; line-height: 1.6; color: var(--blass); margin-bottom: 14px; }
+.umzug-weg { margin-top: 12px; padding: 14px 16px; }
+.umzug-weg h3 { font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; margin-bottom: 4px; }
+.umzug-unter { font-size: 13px; color: var(--blass); line-height: 1.5; margin-bottom: 10px; }
+.umzug-schritt { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px; line-height: 1.55; margin-top: 8px; }
+.umzug-schritt > b { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--hg2); color: var(--akzent); font-size: 12px; display: grid; place-items: center; margin-top: 2px; }
+.umzug-schritt .knopf.klein { padding: 4px 11px; font-size: 13.5px; vertical-align: middle; }
+.umzug-fuss { font-size: 13.5px; line-height: 1.55; color: var(--blass); margin-top: 14px; padding: 10px 12px; border-radius: 12px; background: var(--hg2); }
 .sicherungs-mahnung { font-size: 13px; color: var(--blass); text-align: center; margin-top: 18px; }
 .sicherungs-mahnung button { color: var(--akzent); font-size: 13px; }
 
@@ -366,7 +385,8 @@ html[data-thema="tinte"] .menue button.rot, html[data-thema="kerze"] .menue butt
   background: var(--papier);
   box-shadow: 0 4px 18px var(--schein), 0 1px 3px var(--schein);
   min-height: 74dvh; padding: 34px 38px 46px;
-  overflow: hidden;
+  /* Zettel und Sticker dürfen über den Rand kleben — wie im echten Heft. */
+  overflow: visible;
 }
 .papierseite.liniert .schreibflaeche {
   background-image: repeating-linear-gradient(transparent, transparent 31px, var(--linie) 31px, var(--linie) 32px);
@@ -414,6 +434,28 @@ html[data-thema="tinte"] .menue button.rot, html[data-thema="kerze"] .menue butt
 }
 .foto-anlage::before { top: -7px; left: -14px; transform: rotate(-38deg); }
 .foto-anlage::after { top: -7px; right: -14px; transform: rotate(38deg); }
+/* Sticker: durchsichtige Zeichnung, lose aufgelegt */
+.sticker-anlage img { width: 100%; display: block; pointer-events: none; filter: drop-shadow(0 1px 1px rgba(0,0,0,.18)); }
+.sticker-anlage.befestigung-lose::before { display: none; }
+/* Drehgriff: erscheint über der angefassten Anlage, dreht um die Mitte */
+.anlage .drehgriff { position: absolute; left: 50%; top: -30px; width: 24px; height: 24px; margin-left: -12px; border-radius: 50%;
+  background: var(--papier); color: var(--akzent); box-shadow: 0 1px 5px rgba(0,0,0,.28); display: none; place-items: center;
+  cursor: grab; touch-action: none; z-index: 8; }
+.anlage .drehgriff svg.ik { width: 15px; height: 15px; }
+.anlage .drehgriff::after { content: ''; position: absolute; left: 50%; top: 23px; height: 7px; border-left: 1px solid var(--blass); }
+.anlage.aktiv .drehgriff { display: grid; }
+/* Stickerblock und Stickerkiste */
+.modal.stickerblock, .modal.stickerwahl { width: min(540px, calc(100vw - 40px)); }
+.stickerblock-hinweis { font-size: 13.5px; color: var(--blass); line-height: 1.5; margin-bottom: 10px; }
+.stickerblock-rahmen { display: grid; place-items: center; padding: 8px; border-radius: 14px; box-shadow: inset 0 0 0 1px var(--linie);
+  background: repeating-conic-gradient(var(--hg2) 0 25%, transparent 0 50%) 0 0 / 18px 18px; }
+.stickerblock-flaeche { touch-action: none; border-radius: 10px; max-width: 100%; }
+.stickerblock-leiste { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+.stickerblock-kiste { display: flex; gap: 8px; align-items: center; font-size: 13.5px; color: var(--blass); margin-top: 10px; cursor: pointer; }
+.stickerkiste { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 10px; max-height: 46dvh; overflow: auto; padding: 2px; }
+.stickerkiste-feld { aspect-ratio: 1; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); display: grid; place-items: center; padding: 8px; }
+.stickerkiste-feld:active { transform: scale(.96); }
+.stickerkiste-feld img { max-width: 100%; max-height: 100%; object-fit: contain; }
 .anlage .griff {
   position: absolute; right: -7px; bottom: -7px; width: 26px; height: 26px; border-radius: 50%;
   background: var(--akzent); color: var(--papier); display: none; align-items: center; justify-content: center;
@@ -1072,7 +1114,8 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22p
 .format-groesse { min-width: 18px; color: var(--tinte); font-variant-numeric: tabular-nums; }
 .rich-editor { white-space: normal; overflow-wrap: anywhere; outline: none; }
 .rich-editor:empty::before { content: attr(data-placeholder); color: var(--blass); opacity: .52; font-style: italic; pointer-events: none; }
-.rich-editor p, .rich-editor div { margin: 0 0 .45em; }
+/* Absätze sind normale Zeilen. Wer Luft will, lässt eine Zeile frei. */
+.rich-editor p, .rich-editor div { margin: 0; }
 .rich-editor h1 { font-size: 2em; line-height: 1.16; margin: .65em 0 .3em; }
 .rich-editor h2 { font-size: 1.55em; line-height: 1.22; margin: .65em 0 .3em; }
 .rich-editor h3 { font-size: 1.25em; margin: .55em 0 .25em; }

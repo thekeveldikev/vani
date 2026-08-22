@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.8.0';
+const APP_VERSION = '5.9.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -192,6 +192,7 @@ async function teileText(text) {
 /* ----- Icons ----- */
 const IK = {
   zuhause: '<path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/>',
+  sticker: '<path d="M5 7a2 2 0 0 1 2-2h7.5L19 9.5V17a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"/><path d="M14.5 5v4.5H19"/><path d="M8.5 13.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8"/>',
   schnipsel: '<path d="M21 12a8 8 0 0 1-8 8c-1.6 0-3-.4-4.3-1L4 20l1.2-4A8 8 0 1 1 21 12Z"/>',
   hefte: '<path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4Z"/><path d="M5 4v14"/><path d="M9 8h6M9 11.5h6"/>',
   projekte: '<rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/>',
@@ -309,7 +310,7 @@ aktiviereProfil(null);
 const STANDARD_EINST = {
   thema: 'papier', schrift: 'serife', groesse: 19, breite: 'mittel',
   typewriter: true, fokus: false, mischung: {}, lautstaerke: .5,
-  tastenklang: false, tagesziel: 0, ersetzungen: true, autokorrektur: true,
+  tastenklang: false, tagesziel: 0, ersetzungen: true, autokorrektur: true, kurzschrift: true,
   autoSeitenwechsel: true, schnipselAnsicht: 'lauf', blattSortierung: 'zuletzt',
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
   stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
@@ -340,6 +341,7 @@ function uebernehmeEinstellungen(quelle) {
   D.einst.breite = ['schmal', 'mittel', 'breit'].includes(D.einst.breite) ? D.einst.breite : 'mittel';
   for (const k of ['typewriter', 'fokus', 'tastenklang', 'ersetzungen', 'autokorrektur', 'autoSeitenwechsel']) D.einst[k] = D.einst[k] !== false;
   D.einst.goodnotesSync = D.einst.goodnotesSync === true;
+  D.einst.kurzschrift = D.einst.kurzschrift !== false;
   D.einst.fadenAbgewaehlt = D.einst.fadenAbgewaehlt === true;
   D.einst.blattSortierung = ['zuletzt', 'aeltest', 'az'].includes(D.einst.blattSortierung) ? D.einst.blattSortierung : 'zuletzt';
   D.einst.schnipselAnsicht = D.einst.schnipselAnsicht === 'frei' ? 'frei' : 'lauf';
@@ -444,7 +446,7 @@ function sauberesDokument(quelle) {
   if (d.rich != null && typeof sauberesRichHTML === 'function') d.rich = sauberesRichHTML(d.rich);
   /* Zettel, Fotos und Blasen brauchen immer eine Position — sonst stürzt
      das Anfassen einer beschädigt importierten Anlage ab. */
-  if (d.pos == null && ['zettel', 'foto', 'blase'].includes(d.typ)) d.pos = { x: 10, y: 10, rot: 0, w: 30 };
+  if (d.pos == null && ['zettel', 'foto', 'blase', 'sticker'].includes(d.typ)) d.pos = { x: 10, y: 10, rot: 0, w: 30 };
   /* Gruppen und Bilder auf Brettern liegen in Weltkoordinaten und brauchen
      eine Größe — pos.w/h dürfen dort viel größer sein als bei einer Anlage. */
   if (['gruppe', 'brettbild'].includes(d.typ)) {

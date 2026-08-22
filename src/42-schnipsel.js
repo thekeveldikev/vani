@@ -264,7 +264,7 @@ async function verwandleSchnipsel(s, neuZeichnen) {
     const geschwister = kinder(wo.kapitel.id, 'szene');
     neuDoc('szene', {
       parent: wo.kapitel.id, projekt: wo.projekt.id, ord: geschwister.length,
-      titel: (s.text || '').split('\n')[0].slice(0, 40), text: s.text || '', status: 'funke', farbe: ''
+      titel: (s.text || '').split('\n')[0].slice(0, 40), text: s.text || '', rich: richAusText(s.text || ''), format: 'rich', status: 'funke', farbe: ''
     });
     await loesche(s.id);
     toast('Jetzt eine Szene in „' + wo.projekt.titel + '".');

@@ -119,8 +119,9 @@ async function sucheAppUpdate(neuLaden = false) {
     }
   }
   if (vaniAdresseArt() === 'rettung') {
-    setTimeout(() => toastMitAktion('Du bist im Rettungsmodus der früheren zweiten Adresse.', 'Sicher umziehen', () => {
+    setTimeout(() => toastMitAktion('Du bist im alten VANI unter der früheren Adresse.', 'Ins neue VANI umziehen', () => {
       location.hash = '#/feinheiten'; zeichne();
+      setTimeout(() => umzugsHelfer(), 150);
     }, 20000), 900);
   }
   if (typeof profilStarteAutosperre === 'function') profilStarteAutosperre();

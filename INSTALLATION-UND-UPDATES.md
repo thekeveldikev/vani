@@ -9,27 +9,48 @@ Für iPad, Handy und Laptop-Browser gilt nur:
 Die Sites-Adresse ist ausschließlich der unsichtbare verschlüsselte Sync-Tresor.
 Sie ist keine zweite installierbare VANI-App mehr.
 
-## Für deine Cousine: einmal sicher auf die feste Adresse umziehen
+## Von einem alten VANI umziehen — auch ohne Datei
 
-Wenn ihr bisher eine Vorschau- oder alte Adresse benutzt habt, ist **ein letzter
-Umzug** nötig. Der Grund ist nicht die neue App, sondern: iPadOS trennt die
-Daten verschiedener Web-Adressen vollständig.
+Jedes VANI-Symbol auf einem iPad hat **seinen eigenen Bestand**. Das gilt für
+verschiedene Adressen, und es gilt sogar für zwei Symbole derselben Adresse:
+iPadOS gibt jeder Home-Bildschirm-App ihren eigenen Speicher. Darum muss ein
+alter Bestand einmal herüber — danach bleibt dasselbe Symbol für immer.
 
-1. Im alten VANI: **Feinheiten → Alles sichern**. Die `.vani`-Datei in „Dateien“
-   aufheben.
-2. https://thekeveldikev.github.io/vani/ in Safari öffnen.
-3. Teilen → **Zum Home-Bildschirm**.
-4. Im neuen VANI: **Feinheiten → Sicherung einlesen** und die Datei wählen.
-5. Erst prüfen, ob alles da ist. Dann darf das alte Icon entfernt werden.
+Das neue VANI hat dafür einen **Umzugshelfer**: Feinheiten → „Sicher ist
+sicher" → **„Von einem alten VANI umziehen →"**. Er zeigt drei Wege und passt
+sich an. Kurz:
 
-Ab diesem Umzug bleibt dasselbe Icon. Neue Web-Fassungen kommen automatisch
-hinter diesem Icon an; notfalls **Feinheiten → VANI jetzt aktualisieren**.
+**Weg 1 — Kopplungscode** (wenn das alte VANI schon „iPad ↔ Laptop" kennt):
+1. Im neuen VANI: Feinheiten → iPad ↔ Laptop → „Weiteres Gerät koppeln" → der
+   Code liegt in der Zwischenablage.
+2. Im alten VANI: Feinheiten → iPad ↔ Laptop → „Mit Bereich verbinden" → Code
+   einfügen → **„Beides zusammenlegen"**.
+3. Warten. Alles kommt verschlüsselt herüber — Texte, Hefte, Bilder.
 
-Falls versehentlich einmal die frühere Sites-App benutzt wurde, bleibt ein bewusster
-Rettungszugang erhalten. Er wird nur zum Sichern oder Abgleichen alter lokaler Daten
-verwendet; im Alltag niemals als zweites Icon installieren.
+**Weg 2 — Zwischenablage** (ohne Datei, ohne Netz; für jede VANI-Fassung):
+1. Im alten VANI: Feinheiten → **„In die Zwischenablage sichern"**. Bei einer
+   ganz alten Fassung, die das noch nicht hat: **„Nur Texte kopieren"** — das
+   neue VANI versteht auch das und baut Projekte, Hefte und Schnipsel daraus
+   wieder auf.
+2. Im neuen VANI: Feinheiten → **„Aus der Zwischenablage einlesen"** → ins Feld
+   einfügen. VANI erkennt selbst, was es ist, und sagt am Ende, was ankam.
+3. Bei sehr vielen Bildern lieber zweimal: erst „Nur Texte", die Bilder später
+   über den Kopplungscode.
+
+**Weg 3 — Datei** (wo das Gerät Dateien öffnen darf): Im alten VANI „Alles
+sichern" → Datei aufheben → im neuen VANI „Sicherung einlesen" → „Dazulegen".
+Auf verwalteten Schul-iPads ist die Dateiauswahl oft gesperrt — dann Weg 1 oder 2.
+
+**Lief das alte VANI unter der früheren zweiten Adresse?** Beim Öffnen erscheint
+„VANI ist umgezogen". Die Seite zählt, was dort noch liegt, und leitet nicht
+weiter, solange etwas da ist. **„Alten Bestand retten"** öffnet das alte VANI
+mit seinem ganzen Bestand; von dort gehen Weg 1 und 2. Das alte Symbol erst
+löschen, wenn im neuen alles da ist.
 
     https://vani-schreibzuhause.craftkey.chatgpt.site/rettung.html?rettung=1&kein-sw=1
+
+Ab dem Umzug bleibt dasselbe Symbol. Neue Fassungen kommen automatisch
+dahinter an; notfalls **Feinheiten → VANI jetzt aktualisieren**.
 
 ## Der alte Faden
 
