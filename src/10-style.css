@@ -127,6 +127,9 @@ html[data-thema="kerze"] body::before {
   height: 100dvh;
   height: var(--vvh, 100dvh);
   padding-left: env(safe-area-inset-left);
+  /* Schiebt iOS den sichtbaren Ausschnitt (Tastatur, Caret unten), folgt das Gerüst ihm:
+     sonst rutscht es nach oben weg und unten klafft eine leere Fläche. */
+  position: fixed; left: 0; right: 0; top: var(--vvt, 0px);
 }
 #raum { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; position: relative; min-width: 0; }
 
@@ -201,7 +204,7 @@ html[data-thema="kerze"] body::before {
 /* ----- Deck: Modale, Menüs, Overlays ----- */
 #deck:empty { display: none; }
 .schleier {
-  position: fixed; inset: 0; bottom: auto; z-index: 100; background: var(--deck);
+  position: fixed; inset: 0; bottom: auto; top: var(--vvt, 0px); z-index: 100; background: var(--deck);
   height: 100dvh; height: var(--vvh, 100dvh);
   display: flex; align-items: center; justify-content: center;
   padding: 16px;
@@ -536,7 +539,8 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .desk-ding:active { transform: rotate(var(--dreh, 0deg)) scale(.98); }
 .lampe-aus .desk-ding:not(.lampe):not(.leuchter) { filter: drop-shadow(0 7px 9px rgba(0,0,0,.6)) brightness(.62) saturate(.8); }
 /* ---- Die Lampe mit Zugschnur: Messingfuß und -arm, Bernsteinschirm, ein weicher Kegel aus Licht ---- */
-.desk-ding.lampe { left: 1%; top: calc(44% - 150px); width: 240px; height: 320px; filter: none; cursor: default; z-index: 3; }
+.desk-ding.lampe { left: 1%; top: calc(44% - 150px); width: 240px; height: 320px; filter: none; cursor: default; z-index: 3; pointer-events: none; }
+.desk-ding.lampe .schirm, .desk-ding.lampe .knauf { pointer-events: auto; }
 .desk-ding.lampe:hover, .desk-ding.lampe:active { transform: none; filter: none; }
 /* Der Schein an der Wand hinter dem Schirm */
 .desk-ding.lampe::before { content: ""; position: absolute; left: 18px; top: 16px; width: 220px; height: 160px; border-radius: 50%; pointer-events: none; mix-blend-mode: screen; transition: opacity .5s;
@@ -631,7 +635,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .bord-buch:hover::after, .bord-buch:focus-visible::after { background: linear-gradient(105deg, rgba(255,255,255,.26), rgba(255,255,255,0) 40%, rgba(0,0,0,.12) 100%); }
 .bord-buch.ohne-cover span { position: absolute; inset: 0; display: grid; place-items: center; padding: 6px; font-family: ui-serif, "New York", Georgia, serif; font-size: 11px; color: #f1e4c8; text-align: center; line-height: 1.2; }
 .bord-buch .leseband { position: absolute; right: 6px; top: 0; width: 5px; border-radius: 0 0 2px 2px; background: #c0533f; box-shadow: 0 1px 2px rgba(0,0,0,.5); }
-.bord-buch:hover, .bord-buch:focus-visible { transform: translateY(-14px) rotate(0deg) scale(1.08); z-index: 20; box-shadow: 0 16px 22px rgba(0,0,0,.7), inset 2px 0 4px rgba(255,255,255,.14); }
+.bord-buch:hover, .bord-buch:focus-visible, .bord-buch:active { transform: translateY(-14px) rotate(0deg) scale(1.08); z-index: 20; box-shadow: 0 16px 22px rgba(0,0,0,.7), inset 2px 0 4px rgba(255,255,255,.14); }
 .bordbrett { position: absolute; left: -4px; right: -4px; bottom: -5px; height: 9px; border-radius: 3px; background: linear-gradient(#7a5636, #3a2818); box-shadow: 0 8px 12px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14); }
 .bord-fuss { position: absolute; left: 6px; bottom: -30px; padding: 3px 10px; border-radius: 8px; background: rgba(255,230,180,.1); color: #e8c27a; font-size: 12px; letter-spacing: .04em; white-space: nowrap; }
 @media (max-width: 760px) { .bord-buch { width: 52px; } }
@@ -849,11 +853,12 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .lesestapel-balken { height: 4px; border-radius: 2px; background: var(--hg2); overflow: hidden; }
 .lesestapel-balken i { display: block; height: 100%; background: var(--akzent); }
 .lesestapel-stand { font-size: 11.5px; color: var(--blass); }
-.lesemodus { position: fixed; inset: 0; z-index: 80; background: #1b1613; color: #f1e4c8; display: flex; flex-direction: column; --lese-hell: 1; --lese-waerme: .15; }
+.lesemodus { position: fixed; inset: 0; bottom: auto; top: var(--vvt, 0px); height: 100dvh; height: var(--vvh, 100dvh); z-index: 80; background: #1b1613; color: #f1e4c8; display: flex; flex-direction: column; --lese-hell: 1; --lese-waerme: .15; }
 .lese-kopf, .lese-fuss { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(20,16,12,.92); transition: opacity .4s, transform .4s; z-index: 2; }
 .lese-kopf { padding-top: calc(env(safe-area-inset-top) + 10px); }
 .lese-fuss { padding-bottom: calc(env(safe-area-inset-bottom) + 10px); }
 .lese-kopf.weg { opacity: 0; transform: translateY(-100%); pointer-events: none; } .lese-fuss.weg { opacity: 0; transform: translateY(100%); pointer-events: none; }
+.lesemodus.deck-offen .lese-kopf, .lesemodus.deck-offen .lese-fuss { opacity: 0; pointer-events: none; }
 .lese-kopf .knopf, .lese-fuss .knopf { color: inherit; background: rgba(255,255,255,.08); }
 .lese-kopf .rundknopf, .lese-fuss .rundknopf { color: #f1e4c8; background: rgba(255,255,255,.08); }
 .lese-kopf .rundknopf.an { background: var(--akzent); color: #fff; }
@@ -1009,7 +1014,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 /* ================================================================
    Schreibraum
    ================================================================ */
-.schreibraum { position: fixed; inset: 0; bottom: auto; height: 100dvh; height: min(100dvh, var(--vvh, 100dvh)); z-index: 70; background: var(--hg); display: flex; flex-direction: column; }
+.schreibraum { position: fixed; inset: 0; bottom: auto; top: var(--vvt, 0px); height: 100dvh; height: min(100dvh, var(--vvh, 100dvh)); z-index: 70; background: var(--hg); display: flex; flex-direction: column; }
 .sr-kopf {
   display: flex; align-items: center; gap: 8px;
   padding: calc(env(safe-area-inset-top) + 10px) 16px 8px;
@@ -1754,11 +1759,17 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 .papierseite.breit .schreibflaeche { background-image: repeating-linear-gradient(transparent, transparent 39px, var(--linie) 39px, var(--linie) 40px); background-position-y: 11px; line-height: 40px; }
 .papierseite.punkte { background-image: radial-gradient(var(--linie) 1px, transparent 1.25px); background-size: 23px 23px; }
 .papierseite.blank .schreibflaeche { background: none; }
-.heftrolle { max-width: 840px; margin: 8px auto 70px; display: flex; flex-direction: column; gap: 22px; }
+.heftrolle { max-width: 840px; margin: 8px auto 70px; display: flex; flex-direction: column; gap: 0; }
 .rollen-seite { position: relative; }
-.rollen-seite .papierseite { min-height: 340px; overflow: visible; }
-.rollen-seite .schreibflaeche { min-height: 260px; }
-.rollen-seitennummer { margin: 0 0 7px 7px; color: var(--blass); font: italic 12px ui-serif, Georgia, serif; }
+.rollen-seite .papierseite { min-height: 0; overflow: visible; border-radius: 0; animation: none; padding-top: 4px; padding-bottom: 4px; }
+.rollen-seite:first-child .papierseite { border-radius: 14px 14px 0 0; padding-top: 27px; }
+.rollen-seite:nth-last-child(2) .papierseite { border-radius: 0 0 14px 14px; padding-bottom: 42px; }
+.rollen-seite .schreibflaeche { min-height: 96px; }
+.rollen-seitennummer { display: none; margin: 0 0 7px 7px; color: var(--blass); font: italic 12px ui-serif, Georgia, serif; }
+.heftrolle .stitel:placeholder-shown { display: none; }
+/* Auf Wunsch: Grenzen und Überschriften sichtbar */
+.heftrolle.zeigt-grenzen { gap: 22px; } .heftrolle.zeigt-grenzen .rollen-seitennummer { display: block; } .heftrolle.zeigt-grenzen .stitel:placeholder-shown { display: block; } .heftrolle.zeigt-grenzen .rollen-seite .papierseite { border-radius: 14px; min-height: 200px; padding-top: 27px; padding-bottom: 42px; }
+.rollen-plus { margin-top: 16px; }
 .rollen-plus { min-height: 86px; background: color-mix(in srgb, var(--karte) 65%, transparent); }
 .auto-weiter { height: 56dvh; overflow: hidden; resize: none; }
 .rich-editor.auto-weiter { min-height: 0; }

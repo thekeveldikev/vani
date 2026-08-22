@@ -84,13 +84,14 @@ async function heftMenue(h, danach) {
   const wahl = await menue([
     { text: 'Umbenennen', icon: 'stift', wert: 'name' },
     { text: 'Umschlag & Papier gestalten', icon: 'farbe', wert: 'gestalten' },
-    { text: 'Ansicht: ' + ({ rolle: 'Seiten untereinander', fluss: 'eine lange Seite am Stück' }[h.ansicht] || 'einzelne Seiten'), icon: 'lesen', wert: 'ansicht' },
+    { text: 'Ansicht: ' + ({ rolle: 'Rolle (ein Textblock)', fluss: 'eine lange Seite am Stück' }[h.ansicht] || 'einzelne Seiten'), icon: 'lesen', wert: 'ansicht' },
+    h.ansicht === 'rolle' ? { text: (h.rollenGrenzen ? 'Seitengrenzen in der Rolle verbergen' : 'Seitengrenzen und Überschriften in der Rolle zeigen'), icon: 'gliederung', wert: 'grenzen' } : null,
     { text: h.projektRef ? 'Projekt-Zuordnung ändern' : 'Einem Projekt zuordnen', icon: 'projekte', wert: 'projekt' },
     { text: 'Text aus einer anderen App hereinholen', icon: 'runter', wert: 'einfuegen' },
     { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
     h.archiv ? { text: 'Zurück auf den Tisch', icon: 'archiv', wert: 'zurueck' } : { text: 'Ins Regal stellen', icon: 'archiv', wert: 'archiv' },
     { text: 'Heft verbrennen', icon: 'muell', wert: 'weg', rot: true }
-  ], h.titel);
+  ].filter(Boolean), h.titel);
   if (wahl === 'name') {
     const neu = await eingabe({ titel: 'Das Heft heißt jetzt …', wert: h.titel });
     if (neu) { h.titel = neu; speichere(h); }
@@ -98,6 +99,8 @@ async function heftMenue(h, danach) {
     await heftGestalten(h, danach); return;
   } else if (wahl === 'ansicht') {
     h.ansicht = { seiten: 'rolle', rolle: 'fluss' }[h.ansicht || 'seiten'] || 'seiten'; speichere(h);
+  } else if (wahl === 'grenzen') {
+    h.rollenGrenzen = !h.rollenGrenzen; speichere(h);
   } else if (wahl === 'einfuegen') {
     await textHereinholen(h, danach); return;
   } else if (wahl === 'projekt') {
@@ -197,7 +200,7 @@ RENDER.heft = function (haupt, heftId) {
   function zeigeRolle() {
     seiten = kinder(heft.id, 'seite');
     { const z = zielAufnehmen(); if (z) springZu = z; }
-    halter.className = 'heftrolle'; fuss.style.display = 'none'; halter.innerHTML = '';
+    halter.className = 'heftrolle' + (heft.rollenGrenzen ? ' zeigt-grenzen' : ''); fuss.style.display = 'none'; halter.innerHTML = '';
     for (let i = 0; i < seiten.length; i++) {
       const seite = seiten[i];
       halter.append(el('section', { class: 'rollen-seite', 'data-seite': seite.id },

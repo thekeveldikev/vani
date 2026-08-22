@@ -130,6 +130,98 @@ darüber). Neue Gedanken:
 - Tastaturkürzel-Übersicht; Spotlight-Suche mit Vorschau.
 - Handy: der Schreibtisch als Hochformat-Fassung (Fenster schmal, Dinge in zwei Reihen).
 
+## Die übernächste Welle — Brainstorm (nach 5.18)
+
+Gedacht als große Welle in fünf Strängen. Jeder Punkt ist so notiert, dass man ihn
+direkt bauen kann; Sterne markieren, was besonders viel bringt.
+
+**A · Schreiben als Ritual und Handwerk**
+- ★ „Sitzung beginnen": ein Griff, der alles zusammen tut — Kerze an, Klangbild an,
+  Blatt einspannen, Wortziel für heute, Uhr still; am Ende die Bilanz (Wörter, Minuten,
+  ein Satz als Fundstück) und die Feder tropft. Am Schreibtisch und im Schreibraum.
+- ★ Morgenseiten-Modus: drei Seiten (oder 750 Wörter), kein Zurückscrollen, kein
+  Löschen, Timer optional — danach wird der Text weggeschlossen (Brief an mich, öffnet
+  sich nach 7 Tagen).
+- ★ Stände vergleichen: zwei Stände nebeneinander mit Wort-Diff (eigener Diff, Myers
+  auf Wortbasis, pur & testbar); „Was habe ich heute verändert?" als Fundstück.
+- Diktat: `webkitSpeechRecognition` (iPad Safari kann es) als „Feder, die hört" —
+  Text fließt in das eingespannte Blatt, Satzzeichen per Stimme, Pausen = Absatz.
+- Fokus-Tunnel im Schreibraum: nur der aktuelle Absatz scharf, Rest weich; Atem-
+  Rhythmus-Linie als leise Pace-Hilfe (Tastenanschläge pro Minute, ohne Zahl).
+- Szenenbrett im Projekt: Szenen als Karten auf einer Zeitleiste (Akt/Tag/Ort),
+  ziehbar; Spannungsbogen als Kurve aus Wortzahl × Tempo; Farbspuren je Figur.
+- Figuren-Kartei: Figur = eigenes Dokument (Name, Stimme, Wunsch, Wunde, Geheimnis),
+  Auftritte automatisch aus Szenen (Namens-Treffer), Beziehungen als Faden-Linien.
+- Kapitel- und Projektziel mit Kurve (Soll/Ist je Tag), sanft, ohne Schuld.
+- „Zweiter Satz": VANI schlägt aus den eigenen Funken den nächsten Satz vor, wenn man
+  90 Sekunden nicht tippt (nur auf Wunsch, nur aus eigenem Material, nie KI-Text).
+- Lesung: der Text wird im Typewriter-Tempo abgespielt (Prompter) — mit Vorlesen oder
+  stumm zum Mitsprechen.
+
+**B · Hefte, Zettel, Hand**
+- Seitenübersicht als Raster (Miniaturen), Seiten per Ziehen sortieren, Doppelseite
+  im Querformat, Lineal zum Einschnappen.
+- Foto freistellen → Sticker (heller Hintergrund durchsichtig), Textsticker in
+  Handschrift, Sticker-Sammlung teilen (als Bild).
+- Heft als PDF/als Bilder hinausgeben (Druckansicht, Seitenumbrüche, Zettel eingebacken).
+- Rolle: „Seite für Seite" als reine Lesespur; Kapitelmarken statt Seiten; Lesezeichen
+  im Heft wie im Buch.
+- Kritzeln: Farben nachträglich ändern, Linienglättung wählbar, Füller mit Tinte,
+  Textmarker hinter Text (multiply), Formen füllen.
+
+**C · Der Schreibtisch, Stufe drei**
+- ★ Eigene Dinge auf dem Tisch: ein Bilderrahmen mit eigenem Foto, ein Stein aus dem
+  Urlaub (Foto freigestellt als Sticker), der Platz ist frei wählbar (ziehen, Position
+  im Einst. gespeichert, „Unordnung" bleibt Zufall).
+- ★ Fenster öffnen: ein Tipp auf die Scheibe kippt das Fenster — Klang wird lauter,
+  Wind bewegt Papiere stärker, Regen tropft auf die Bank; im Winter Kälte (Atem?).
+- Jahreszeiten-Deko: Tannenzweig und Kerze im Dezember, Blüten im April, Kürbis im
+  Oktober — automatisch, abschaltbar.
+- Der Briefkasten am Fenster: Briefe an die Cousine (über Sync) — sie landen drüben im
+  Kasten, mit Siegel, öffnen erst nach dem gewählten Datum.
+- Tisch-Stimmungen speichern („Nacht, Regen, Lampe gedämpft") und per Griff wechseln;
+  Stimmung folgt der Uhrzeit (Morgenlicht, Abendlicht) — wahlweise.
+- Mini-Schreibtisch als Karte auf dem Zuhause (Lampe an/aus, Kerzenstand, Teelichter).
+- Die Schublade mit Fächern: Stände, Briefe, Fundstücke, Zitate sortiert; ein Fach für
+  „Dinge, die ich nicht vergessen will" (Notizen mit Wiedervorlage-Datum).
+- Ein Radio auf dem Tisch: die eigenen Aufnahmen (Tonnotizen) und Klangbilder abspielen.
+
+**D · Lesen, Stufe drei**
+- ★ Markieren im PDF: Textmarker und Unterstreichen auf der Textebene (Rechtecke je
+  Textstück wie beim Vorlesen), gespeichert je Seite, als Liste „Meine Markierungen"
+  mit Sprung; Markierung → Zitat-Schnipsel mit einem Tipp.
+- ★ EPUB: Suche im Buch (Kapitel durchlaufen), Fußnoten als Popover, Bilder zoomen,
+  Schrift importieren (eigene .ttf per Datei), Wörterbuch-Nachschlag in den eigenen
+  Wortkisten („dieses Wort in meine Kiste"), Lesezeit-Schätzung je Kapitel.
+- Lesetagebuch: je Buch eine Seite mit Daten, Notizen, Zitaten, Lese-Kurve; „Beendet"
+  mit Datum → Regalbrett „Gelesen".
+- DOCX/Pages/Markdown hereinholen: der ZIP-Leser kann jetzt auch .docx (document.xml →
+  Absätze/Überschriften/Kursiv) — ohne Dateiauswahl über den Koffer oder Zwischenablage.
+- Vorlesen: Satz-Markierung auch im EPUB; Tempo per Geste; Einschlaf-Timer.
+- Zwei Bücher nebeneinander (Original/Übersetzung oder Buch/Notizheft).
+
+**E · Überall, Technik, Fürsorge**
+- ★ Sync-Kopplung per QR-Code (Kamera) statt Code tippen; Gerätenamen; „Was kam neu"
+  als Feed auf dem Zuhause; Konfliktanzeige (zwei Stände, einer gewinnt, der andere
+  wird eingefroren).
+- Export als ZIP-Ordner (eigener ZIP-Writer, stored + optional deflate über
+  CompressionStream): Texte als .md, Hefte als .json + Bilder, Bücher ausgenommen.
+- Persistenter Suchindex (kv) mit Aktualisierung je Speichern; Spotlight findet auch
+  in Büchern (Textebene der zuletzt gelesenen Seiten) und Randnotizen.
+- Barrierefreiheit: Dyslexie-freundliche Schrift, globaler Größenregler, Kontrast-
+  Thema, Bewegung reduzieren (prefers-reduced-motion respektieren: Schnur, Luftzug,
+  Kerzen ruhiger).
+- Speicher-Übersicht: was belegt wie viel (Bücher, Bilder, Töne), Aufräumer für
+  verwaiste Medien, Miniaturen für Bilder (schnellere Hefte).
+- Tastaturkürzel konfigurierbar; Befehle im Spotlight erweiterbar (Klangbilder,
+  Stimmungen, „Kerze 20 Minuten").
+- Heimlich hübsch: Ladebildschirm mit Jahreszeit; App-Icon-Varianten (iOS erlaubt
+  nur eines — aber das Zuhause-Bild darf wechseln).
+
+**Reihenfolge-Vorschlag:** A1 Sitzung + A3 Stände-Diff + D1 Markieren + C1 eigene
+Dinge + E1 QR-Kopplung zuerst — sie sind sichtbar, täglich nützlich und bauen auf
+Vorhandenem auf; danach B (Hefte) und der Rest.
+
 ## Nach Raum
 
 ### Hefte

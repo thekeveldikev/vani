@@ -640,7 +640,8 @@ async function leserZitat() {
     el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen'),
       el('button', { class: 'knopf', onclick: async () => { const t = (feld.selectionStart !== feld.selectionEnd ? feld.value.slice(feld.selectionStart, feld.selectionEnd) : feld.value).trim(); try { await navigator.clipboard.writeText(t + '\n' + quelle); toast('Kopiert, mit Quelle.'); } catch (e) { teileText(t + '\n' + quelle); } } }, 'Kopieren'),
       el('button', { class: 'knopf voll', onclick: () => { const t = (feld.selectionStart !== feld.selectionEnd ? feld.value.slice(feld.selectionStart, feld.selectionEnd) : feld.value).trim(); neuDoc('schnipsel', { text: t + '\n' + quelle }); toast('Liegt in den Schnipseln — mit Quelle.'); zu(); } }, 'Als Schnipsel')));
-  const zu = zeigeDeck(kasten);
+  if (_leser) _leser.raum.classList.add('deck-offen');
+  const zu = zeigeDeck(kasten, () => { if (_leser) _leser.raum.classList.remove('deck-offen'); });
 }
 function leserEinstellungen() {
   if (!_leser) return;
@@ -659,7 +660,8 @@ function leserEinstellungen() {
     (() => { const st = typeof speechSynthesis !== 'undefined' ? (speechSynthesis.getVoices() || []).filter((v) => /^de[-_]/i.test(v.lang)) : []; return st.length ? wahl('Stimme zum Vorlesen', 'stimme', [[null, 'Automatisch'], ...st.slice(0, 12).map((v) => [v.voiceURI, v.name.replace(/\(.*?\)/g, '').trim()])]) : null; })(),
     el('div', { class: 'stickerblock-hinweis', style: 'margin-top:8px' }, 'Diese Einstellungen bleiben an diesem Gerät — Helligkeit ist Gerätesache. Seite, Lesezeichen und Stapel reisen mit.'),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
-  const zu = zeigeDeck(kasten);
+  if (_leser) _leser.raum.classList.add('deck-offen');
+  const zu = zeigeDeck(kasten, () => { if (_leser) _leser.raum.classList.remove('deck-offen'); });
 }
 
 /* Randnotizen: zu jeder Seite beliebig viele kleine Zettel. */
@@ -690,7 +692,8 @@ async function leserNotizen() {
       } }, 'Alle ' + alle.length + ' Notizen') : el('span'),
       el('span', { style: 'display:flex;gap:8px' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen'),
         el('button', { class: 'knopf voll', onclick: () => { const t = feld.value.trim(); if (!t) return; neuDoc('buchnotiz', { parent: b.id, seite: l.seite, text: t }); feld.value = ''; bauen(); l.zeige(0); } }, 'Notiz dazu'))));
-  const zu = zeigeDeck(kasten);
+  if (_leser) _leser.raum.classList.add('deck-offen');
+  const zu = zeigeDeck(kasten, () => { if (_leser) _leser.raum.classList.remove('deck-offen'); });
   setTimeout(() => feld.focus(), 60);
 }
 
@@ -718,7 +721,8 @@ async function leserSuche() {
     el('small', {}, 'Seite ' + t.seite), '…' + t.vor, el('b', {}, t.mitte), t.nach + '…')));
   const kasten = el('div', { class: 'modal gliederung-kasten' }, el('h2', {}, treffer.length + (treffer.length === 1 ? ' Treffer' : ' Treffer') + ' für „' + frage_ + '"'), liste,
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Schließen')));
-  const zu = zeigeDeck(kasten);
+  if (_leser) _leser.raum.classList.add('deck-offen');
+  const zu = zeigeDeck(kasten, () => { if (_leser) _leser.raum.classList.remove('deck-offen'); });
 }
 
 /* Vorlesen: die Textebene der Seite mit der Stimme des Geräts. */

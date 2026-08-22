@@ -146,6 +146,9 @@ html[data-thema="kerze"] body::before {
   height: 100dvh;
   height: var(--vvh, 100dvh);
   padding-left: env(safe-area-inset-left);
+  /* Schiebt iOS den sichtbaren Ausschnitt (Tastatur, Caret unten), folgt das Gerüst ihm:
+     sonst rutscht es nach oben weg und unten klafft eine leere Fläche. */
+  position: fixed; left: 0; right: 0; top: var(--vvt, 0px);
 }
 #raum { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; position: relative; min-width: 0; }
 
@@ -220,7 +223,7 @@ html[data-thema="kerze"] body::before {
 /* ----- Deck: Modale, Menüs, Overlays ----- */
 #deck:empty { display: none; }
 .schleier {
-  position: fixed; inset: 0; bottom: auto; z-index: 100; background: var(--deck);
+  position: fixed; inset: 0; bottom: auto; top: var(--vvt, 0px); z-index: 100; background: var(--deck);
   height: 100dvh; height: var(--vvh, 100dvh);
   display: flex; align-items: center; justify-content: center;
   padding: 16px;
@@ -555,7 +558,8 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .desk-ding:active { transform: rotate(var(--dreh, 0deg)) scale(.98); }
 .lampe-aus .desk-ding:not(.lampe):not(.leuchter) { filter: drop-shadow(0 7px 9px rgba(0,0,0,.6)) brightness(.62) saturate(.8); }
 /* ---- Die Lampe mit Zugschnur: Messingfuß und -arm, Bernsteinschirm, ein weicher Kegel aus Licht ---- */
-.desk-ding.lampe { left: 1%; top: calc(44% - 150px); width: 240px; height: 320px; filter: none; cursor: default; z-index: 3; }
+.desk-ding.lampe { left: 1%; top: calc(44% - 150px); width: 240px; height: 320px; filter: none; cursor: default; z-index: 3; pointer-events: none; }
+.desk-ding.lampe .schirm, .desk-ding.lampe .knauf { pointer-events: auto; }
 .desk-ding.lampe:hover, .desk-ding.lampe:active { transform: none; filter: none; }
 /* Der Schein an der Wand hinter dem Schirm */
 .desk-ding.lampe::before { content: ""; position: absolute; left: 18px; top: 16px; width: 220px; height: 160px; border-radius: 50%; pointer-events: none; mix-blend-mode: screen; transition: opacity .5s;
@@ -650,7 +654,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .bord-buch:hover::after, .bord-buch:focus-visible::after { background: linear-gradient(105deg, rgba(255,255,255,.26), rgba(255,255,255,0) 40%, rgba(0,0,0,.12) 100%); }
 .bord-buch.ohne-cover span { position: absolute; inset: 0; display: grid; place-items: center; padding: 6px; font-family: ui-serif, "New York", Georgia, serif; font-size: 11px; color: #f1e4c8; text-align: center; line-height: 1.2; }
 .bord-buch .leseband { position: absolute; right: 6px; top: 0; width: 5px; border-radius: 0 0 2px 2px; background: #c0533f; box-shadow: 0 1px 2px rgba(0,0,0,.5); }
-.bord-buch:hover, .bord-buch:focus-visible { transform: translateY(-14px) rotate(0deg) scale(1.08); z-index: 20; box-shadow: 0 16px 22px rgba(0,0,0,.7), inset 2px 0 4px rgba(255,255,255,.14); }
+.bord-buch:hover, .bord-buch:focus-visible, .bord-buch:active { transform: translateY(-14px) rotate(0deg) scale(1.08); z-index: 20; box-shadow: 0 16px 22px rgba(0,0,0,.7), inset 2px 0 4px rgba(255,255,255,.14); }
 .bordbrett { position: absolute; left: -4px; right: -4px; bottom: -5px; height: 9px; border-radius: 3px; background: linear-gradient(#7a5636, #3a2818); box-shadow: 0 8px 12px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14); }
 .bord-fuss { position: absolute; left: 6px; bottom: -30px; padding: 3px 10px; border-radius: 8px; background: rgba(255,230,180,.1); color: #e8c27a; font-size: 12px; letter-spacing: .04em; white-space: nowrap; }
 @media (max-width: 760px) { .bord-buch { width: 52px; } }
@@ -868,11 +872,12 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .lesestapel-balken { height: 4px; border-radius: 2px; background: var(--hg2); overflow: hidden; }
 .lesestapel-balken i { display: block; height: 100%; background: var(--akzent); }
 .lesestapel-stand { font-size: 11.5px; color: var(--blass); }
-.lesemodus { position: fixed; inset: 0; z-index: 80; background: #1b1613; color: #f1e4c8; display: flex; flex-direction: column; --lese-hell: 1; --lese-waerme: .15; }
+.lesemodus { position: fixed; inset: 0; bottom: auto; top: var(--vvt, 0px); height: 100dvh; height: var(--vvh, 100dvh); z-index: 80; background: #1b1613; color: #f1e4c8; display: flex; flex-direction: column; --lese-hell: 1; --lese-waerme: .15; }
 .lese-kopf, .lese-fuss { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(20,16,12,.92); transition: opacity .4s, transform .4s; z-index: 2; }
 .lese-kopf { padding-top: calc(env(safe-area-inset-top) + 10px); }
 .lese-fuss { padding-bottom: calc(env(safe-area-inset-bottom) + 10px); }
 .lese-kopf.weg { opacity: 0; transform: translateY(-100%); pointer-events: none; } .lese-fuss.weg { opacity: 0; transform: translateY(100%); pointer-events: none; }
+.lesemodus.deck-offen .lese-kopf, .lesemodus.deck-offen .lese-fuss { opacity: 0; pointer-events: none; }
 .lese-kopf .knopf, .lese-fuss .knopf { color: inherit; background: rgba(255,255,255,.08); }
 .lese-kopf .rundknopf, .lese-fuss .rundknopf { color: #f1e4c8; background: rgba(255,255,255,.08); }
 .lese-kopf .rundknopf.an { background: var(--akzent); color: #fff; }
@@ -1028,7 +1033,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 /* ================================================================
    Schreibraum
    ================================================================ */
-.schreibraum { position: fixed; inset: 0; bottom: auto; height: 100dvh; height: min(100dvh, var(--vvh, 100dvh)); z-index: 70; background: var(--hg); display: flex; flex-direction: column; }
+.schreibraum { position: fixed; inset: 0; bottom: auto; top: var(--vvt, 0px); height: 100dvh; height: min(100dvh, var(--vvh, 100dvh)); z-index: 70; background: var(--hg); display: flex; flex-direction: column; }
 .sr-kopf {
   display: flex; align-items: center; gap: 8px;
   padding: calc(env(safe-area-inset-top) + 10px) 16px 8px;
@@ -1773,11 +1778,17 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 .papierseite.breit .schreibflaeche { background-image: repeating-linear-gradient(transparent, transparent 39px, var(--linie) 39px, var(--linie) 40px); background-position-y: 11px; line-height: 40px; }
 .papierseite.punkte { background-image: radial-gradient(var(--linie) 1px, transparent 1.25px); background-size: 23px 23px; }
 .papierseite.blank .schreibflaeche { background: none; }
-.heftrolle { max-width: 840px; margin: 8px auto 70px; display: flex; flex-direction: column; gap: 22px; }
+.heftrolle { max-width: 840px; margin: 8px auto 70px; display: flex; flex-direction: column; gap: 0; }
 .rollen-seite { position: relative; }
-.rollen-seite .papierseite { min-height: 340px; overflow: visible; }
-.rollen-seite .schreibflaeche { min-height: 260px; }
-.rollen-seitennummer { margin: 0 0 7px 7px; color: var(--blass); font: italic 12px ui-serif, Georgia, serif; }
+.rollen-seite .papierseite { min-height: 0; overflow: visible; border-radius: 0; animation: none; padding-top: 4px; padding-bottom: 4px; }
+.rollen-seite:first-child .papierseite { border-radius: 14px 14px 0 0; padding-top: 27px; }
+.rollen-seite:nth-last-child(2) .papierseite { border-radius: 0 0 14px 14px; padding-bottom: 42px; }
+.rollen-seite .schreibflaeche { min-height: 96px; }
+.rollen-seitennummer { display: none; margin: 0 0 7px 7px; color: var(--blass); font: italic 12px ui-serif, Georgia, serif; }
+.heftrolle .stitel:placeholder-shown { display: none; }
+/* Auf Wunsch: Grenzen und Überschriften sichtbar */
+.heftrolle.zeigt-grenzen { gap: 22px; } .heftrolle.zeigt-grenzen .rollen-seitennummer { display: block; } .heftrolle.zeigt-grenzen .stitel:placeholder-shown { display: block; } .heftrolle.zeigt-grenzen .rollen-seite .papierseite { border-radius: 14px; min-height: 200px; padding-top: 27px; padding-bottom: 42px; }
+.rollen-plus { margin-top: 16px; }
 .rollen-plus { min-height: 86px; background: color-mix(in srgb, var(--karte) 65%, transparent); }
 .auto-weiter { height: 56dvh; overflow: hidden; resize: none; }
 .rich-editor.auto-weiter { min-height: 0; }
@@ -2227,7 +2238,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.18.0';
+const APP_VERSION = '5.18.1';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -6435,13 +6446,14 @@ async function heftMenue(h, danach) {
   const wahl = await menue([
     { text: 'Umbenennen', icon: 'stift', wert: 'name' },
     { text: 'Umschlag & Papier gestalten', icon: 'farbe', wert: 'gestalten' },
-    { text: 'Ansicht: ' + ({ rolle: 'Seiten untereinander', fluss: 'eine lange Seite am Stück' }[h.ansicht] || 'einzelne Seiten'), icon: 'lesen', wert: 'ansicht' },
+    { text: 'Ansicht: ' + ({ rolle: 'Rolle (ein Textblock)', fluss: 'eine lange Seite am Stück' }[h.ansicht] || 'einzelne Seiten'), icon: 'lesen', wert: 'ansicht' },
+    h.ansicht === 'rolle' ? { text: (h.rollenGrenzen ? 'Seitengrenzen in der Rolle verbergen' : 'Seitengrenzen und Überschriften in der Rolle zeigen'), icon: 'gliederung', wert: 'grenzen' } : null,
     { text: h.projektRef ? 'Projekt-Zuordnung ändern' : 'Einem Projekt zuordnen', icon: 'projekte', wert: 'projekt' },
     { text: 'Text aus einer anderen App hereinholen', icon: 'runter', wert: 'einfuegen' },
     { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
     h.archiv ? { text: 'Zurück auf den Tisch', icon: 'archiv', wert: 'zurueck' } : { text: 'Ins Regal stellen', icon: 'archiv', wert: 'archiv' },
     { text: 'Heft verbrennen', icon: 'muell', wert: 'weg', rot: true }
-  ], h.titel);
+  ].filter(Boolean), h.titel);
   if (wahl === 'name') {
     const neu = await eingabe({ titel: 'Das Heft heißt jetzt …', wert: h.titel });
     if (neu) { h.titel = neu; speichere(h); }
@@ -6449,6 +6461,8 @@ async function heftMenue(h, danach) {
     await heftGestalten(h, danach); return;
   } else if (wahl === 'ansicht') {
     h.ansicht = { seiten: 'rolle', rolle: 'fluss' }[h.ansicht || 'seiten'] || 'seiten'; speichere(h);
+  } else if (wahl === 'grenzen') {
+    h.rollenGrenzen = !h.rollenGrenzen; speichere(h);
   } else if (wahl === 'einfuegen') {
     await textHereinholen(h, danach); return;
   } else if (wahl === 'projekt') {
@@ -6548,7 +6562,7 @@ RENDER.heft = function (haupt, heftId) {
   function zeigeRolle() {
     seiten = kinder(heft.id, 'seite');
     { const z = zielAufnehmen(); if (z) springZu = z; }
-    halter.className = 'heftrolle'; fuss.style.display = 'none'; halter.innerHTML = '';
+    halter.className = 'heftrolle' + (heft.rollenGrenzen ? ' zeigt-grenzen' : ''); fuss.style.display = 'none'; halter.innerHTML = '';
     for (let i = 0; i < seiten.length; i++) {
       const seite = seiten[i];
       halter.append(el('section', { class: 'rollen-seite', 'data-seite': seite.id },
@@ -15691,7 +15705,7 @@ RENDER.schreibtisch = function (haupt) {
   /* Die Reihe bleibt in ihrer Breite: je mehr Bücher, desto enger stehen sie */
   const bordBreite = schmal ? window.innerWidth * .40 : Math.min(320, (window.innerWidth - 86) * .33);
   const buchBreite = schmal ? 52 : 64;
-  const schritt = zeigbar > 1 ? Math.max(22, Math.min(buchBreite - 12, (bordBreite - buchBreite - 12) / (zeigbar - 1))) : buchBreite - 14;
+  const schritt = zeigbar > 1 ? Math.max(30, Math.min(buchBreite - 12, (bordBreite - buchBreite - 12) / (zeigbar - 1))) : buchBreite - 14;
   bord.style.setProperty('--ueberlapp', (schritt - buchBreite).toFixed(1) + 'px');
   buecher.slice(0, zeigbar).forEach((b, i) => {
     const img = el('img', { alt: b.titel || 'Buch', draggable: 'false' });
@@ -16682,7 +16696,8 @@ async function leserZitat() {
     el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen'),
       el('button', { class: 'knopf', onclick: async () => { const t = (feld.selectionStart !== feld.selectionEnd ? feld.value.slice(feld.selectionStart, feld.selectionEnd) : feld.value).trim(); try { await navigator.clipboard.writeText(t + '\n' + quelle); toast('Kopiert, mit Quelle.'); } catch (e) { teileText(t + '\n' + quelle); } } }, 'Kopieren'),
       el('button', { class: 'knopf voll', onclick: () => { const t = (feld.selectionStart !== feld.selectionEnd ? feld.value.slice(feld.selectionStart, feld.selectionEnd) : feld.value).trim(); neuDoc('schnipsel', { text: t + '\n' + quelle }); toast('Liegt in den Schnipseln — mit Quelle.'); zu(); } }, 'Als Schnipsel')));
-  const zu = zeigeDeck(kasten);
+  if (_leser) _leser.raum.classList.add('deck-offen');
+  const zu = zeigeDeck(kasten, () => { if (_leser) _leser.raum.classList.remove('deck-offen'); });
 }
 function leserEinstellungen() {
   if (!_leser) return;
@@ -16701,7 +16716,8 @@ function leserEinstellungen() {
     (() => { const st = typeof speechSynthesis !== 'undefined' ? (speechSynthesis.getVoices() || []).filter((v) => /^de[-_]/i.test(v.lang)) : []; return st.length ? wahl('Stimme zum Vorlesen', 'stimme', [[null, 'Automatisch'], ...st.slice(0, 12).map((v) => [v.voiceURI, v.name.replace(/\(.*?\)/g, '').trim()])]) : null; })(),
     el('div', { class: 'stickerblock-hinweis', style: 'margin-top:8px' }, 'Diese Einstellungen bleiben an diesem Gerät — Helligkeit ist Gerätesache. Seite, Lesezeichen und Stapel reisen mit.'),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
-  const zu = zeigeDeck(kasten);
+  if (_leser) _leser.raum.classList.add('deck-offen');
+  const zu = zeigeDeck(kasten, () => { if (_leser) _leser.raum.classList.remove('deck-offen'); });
 }
 
 /* Randnotizen: zu jeder Seite beliebig viele kleine Zettel. */
@@ -16732,7 +16748,8 @@ async function leserNotizen() {
       } }, 'Alle ' + alle.length + ' Notizen') : el('span'),
       el('span', { style: 'display:flex;gap:8px' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen'),
         el('button', { class: 'knopf voll', onclick: () => { const t = feld.value.trim(); if (!t) return; neuDoc('buchnotiz', { parent: b.id, seite: l.seite, text: t }); feld.value = ''; bauen(); l.zeige(0); } }, 'Notiz dazu'))));
-  const zu = zeigeDeck(kasten);
+  if (_leser) _leser.raum.classList.add('deck-offen');
+  const zu = zeigeDeck(kasten, () => { if (_leser) _leser.raum.classList.remove('deck-offen'); });
   setTimeout(() => feld.focus(), 60);
 }
 
@@ -16760,7 +16777,8 @@ async function leserSuche() {
     el('small', {}, 'Seite ' + t.seite), '…' + t.vor, el('b', {}, t.mitte), t.nach + '…')));
   const kasten = el('div', { class: 'modal gliederung-kasten' }, el('h2', {}, treffer.length + (treffer.length === 1 ? ' Treffer' : ' Treffer') + ' für „' + frage_ + '"'), liste,
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Schließen')));
-  const zu = zeigeDeck(kasten);
+  if (_leser) _leser.raum.classList.add('deck-offen');
+  const zu = zeigeDeck(kasten, () => { if (_leser) _leser.raum.classList.remove('deck-offen'); });
 }
 
 /* Vorlesen: die Textebene der Seite mit der Stimme des Geräts. */
@@ -17372,9 +17390,13 @@ async function sucheAppUpdate(neuLaden = false) {
   /* Tastatur-Höhe (iPad) */
   if (window.visualViewport) {
     const anpassen = () => {
-      document.documentElement.style.setProperty('--vvh', window.visualViewport.height + 'px');
+      const vv = window.visualViewport;
+      document.documentElement.style.setProperty('--vvh', vv.height + 'px');
+      /* iOS schiebt bei offener Tastatur den sichtbaren Ausschnitt über die Seite — das Gerüst zieht mit */
+      document.documentElement.style.setProperty('--vvt', Math.max(0, Math.round(vv.offsetTop)) + 'px');
     };
     window.visualViewport.addEventListener('resize', anpassen);
+    window.visualViewport.addEventListener('scroll', anpassen);
     anpassen();
     window.addEventListener('focusout', () => setTimeout(anpassen, 250));
   }

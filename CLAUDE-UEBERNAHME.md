@@ -1555,3 +1555,20 @@ istEpub, spotlightTreffer/Kürzel). Browser: Lampe bleibt nach Reload aus/an; We
 Spotlight Treffer+mark, Befehle, Kürzel (20 Zeilen); EPUB (Test-ZIP stored) 2 Kapitel,
 6 Seiten, TOC; Randspalte + Notiz; Vorlesen markiert 10 Stücke des ersten Satzes von 27;
 Leertaste im Randfeld blättert nicht; Lese-Serie auf dem Zuhause.
+
+## 26. Nachlese 5.18.1: Bücher greifbar, Tastatur-Ausschnitt, Rolle als Textblock (23. August 2026)
+
+- **Bücher links nicht antippbar**: die unsichtbare Box der Lampe (240×320, z 3) lag über
+  den ersten Büchern. Fix: `.desk-ding.lampe { pointer-events: none }`, nur `.schirm` und
+  `.knauf` sind wieder `auto`. Bord-Schritt mindestens 30 px, `:active` hebt wie Hover.
+- **Tastatur auf dem iPad (Projekte/Hefte)**: iOS schiebt den *sichtbaren Ausschnitt* über
+  die Seite (visualViewport.offsetTop), das Gerüst blieb oben stehen → unten eine leere
+  Fläche. Jetzt setzt Boot `--vvt` (offsetTop, auch bei `scroll`) und `#app`, `.schleier`,
+  `.schreibraum`, `.lesemodus` sind `position: fixed; top: var(--vvt)` mit Höhe `--vvh`.
+- **Rolle** ist ein durchgehender Textblock: kein Abstand zwischen Seiten, keine
+  Seitennummern, leere Überschriften-Felder versteckt, keine Lande-Animation je Seite,
+  Mindesthöhe 96 px. Heft-Menü: „Seitengrenzen und Überschriften in der Rolle zeigen"
+  (`heft.rollenGrenzen` → `.heftrolle.zeigt-grenzen`).
+- **Leser-Fenster** (Notizen/Zitat/Suche/Einstellungen): solange ein Fenster offen ist,
+  bleiben Kopf- und Fußleiste des Lesers verborgen (`.lesemodus.deck-offen`).
+- IDEEN.md: Abschnitt „Die übernächste Welle" (A–E, mit Reihenfolge-Vorschlag).

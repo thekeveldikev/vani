@@ -141,9 +141,13 @@ async function sucheAppUpdate(neuLaden = false) {
   /* Tastatur-Höhe (iPad) */
   if (window.visualViewport) {
     const anpassen = () => {
-      document.documentElement.style.setProperty('--vvh', window.visualViewport.height + 'px');
+      const vv = window.visualViewport;
+      document.documentElement.style.setProperty('--vvh', vv.height + 'px');
+      /* iOS schiebt bei offener Tastatur den sichtbaren Ausschnitt über die Seite — das Gerüst zieht mit */
+      document.documentElement.style.setProperty('--vvt', Math.max(0, Math.round(vv.offsetTop)) + 'px');
     };
     window.visualViewport.addEventListener('resize', anpassen);
+    window.visualViewport.addEventListener('scroll', anpassen);
     anpassen();
     window.addEventListener('focusout', () => setTimeout(anpassen, 250));
   }

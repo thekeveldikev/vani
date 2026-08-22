@@ -538,7 +538,7 @@ RENDER.schreibtisch = function (haupt) {
   /* Die Reihe bleibt in ihrer Breite: je mehr Bücher, desto enger stehen sie */
   const bordBreite = schmal ? window.innerWidth * .40 : Math.min(320, (window.innerWidth - 86) * .33);
   const buchBreite = schmal ? 52 : 64;
-  const schritt = zeigbar > 1 ? Math.max(22, Math.min(buchBreite - 12, (bordBreite - buchBreite - 12) / (zeigbar - 1))) : buchBreite - 14;
+  const schritt = zeigbar > 1 ? Math.max(30, Math.min(buchBreite - 12, (bordBreite - buchBreite - 12) / (zeigbar - 1))) : buchBreite - 14;
   bord.style.setProperty('--ueberlapp', (schritt - buchBreite).toFixed(1) + 'px');
   buecher.slice(0, zeigbar).forEach((b, i) => {
     const img = el('img', { alt: b.titel || 'Buch', draggable: 'false' });
