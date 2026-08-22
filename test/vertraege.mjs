@@ -437,6 +437,42 @@ test('Goodnotes-Vertrag: Einfügen repariert, Absätze sind Zeilen, Rich-Text ü
   assert.match(lies('src/30-core.js'), /kurzschrift: true/);
 });
 
+test('Speicher-Vertrag: Formatierung überlebt das Aufräumen — auch die aus Safari', () => {
+  /* Safari schreibt fett/kursiv/unterstrichen als span-Stil. Der Aufräumer
+     warf genau diese Stile weg: im Editor sichtbar, nach dem Wiederöffnen
+     fort. Jetzt werden sie zu echten <b>/<i>/<u>/<s>. */
+  const r = lies('src/35-richtext.js');
+  assert.match(r, /const fett = gewicht === 'bold' \|\| gewicht === 'bolder' \|\| parseInt\(gewicht, 10\) >= 600;/);
+  assert.match(r, /\[\[fett, 'b'\], \[kursiv, 'i'\], \[unter, 'u'\], \[durch, 's'\]\]/);
+  assert.match(r, /if \(!an \|\| node\.closest\(tag\)\) continue;/, 'kein <b> im <b>');
+  /* <font color/size> aus execCommand wird zu span-Stil statt verworfen. */
+  assert.match(r, /querySelectorAll\('font'\)/);
+  /* Befehle: Farben als Stil, Elemente als Elemente — browserunabhängig. */
+  assert.match(r, /const alsStil = \/\^\(foreColor\|hiliteColor\|backColor\|fontSize\|justify\)\/i\.test/);
+  assert.match(r, /document\.execCommand\('styleWithCSS', false, alsStil\)/);
+  /* Sofort sichern, wenn der Blick den Text verlässt. */
+  assert.match(r, /editor\.addEventListener\('blur', \(\) => \{ if \(sichern\.haengt && sichern\.haengt\(\)\) sichern\.sofort\(\); \}\);/);
+  assert.match(lies('src/30-core.js'), /g\.haengt = \(\) => letzteArgs !== null;/);
+  /* Schreibraum flusht beim Schließen — für schlicht UND formatiert. */
+  assert.match(lies('src/45-schreibraum.js'), /_sr\.sichern && _sr\.sichern\.sofort\(\);/);
+});
+
+test('Kerzen-Vertrag: die Kerze ist Canvas, meldet ihr Ende selbst und räumt sich weg', () => {
+  const k = lies('src/45b-kerze.js');
+  assert.match(k, /function kerzeAnzuenden/);
+  assert.match(k, /function kerzeSchein/, 'kantenfreier Schein');
+  assert.match(k, /requestAnimationFrame\(schleife\)/);
+  assert.match(k, /if \(jetzt - bild >= 32\)/, '30 Bilder je Sekunde genügen');
+  const s = lies('src/45-schreibraum.js');
+  assert.match(s, /kerzeAnzuenden\(\{/);
+  assert.match(s, /beiEnde: \(\) => beendeSprint\(false\)/, 'die Kerze meldet das Ende — kein zweiter Timer');
+  assert.doesNotMatch(s, /timer: setTimeout\(\(\) => beendeSprint\(false\)/, 'der alte Timer darf nicht zurückkommen');
+  assert.match(s, /_sr\.sprint\.kerze\.puste\(/, 'jeder Anschlag ein Luftzug');
+  assert.match(s, /if \(k\) k\.entfernen\(\);/, 'beim Schließen des Raums geht die Kerze mit');
+  for (const datei of ['werkzeug/build-web.mjs', 'build.sh', 'test/sandkasten.mjs']) assert.match(lies(datei), /45b-kerze\.js/, datei);
+  assert.match(lies('src/10-style.css'), /\.kerzenbuehne \{ position: fixed;/);
+});
+
 test('Sticker-Vertrag: Sticker sind Anlagen wie Zettel und Fotos — und reisen überall mit', () => {
   const h = lies('src/43-hefte.js');
   assert.match(h, /else if \(a\.typ === 'sticker'\) blatt\.append\(baueSticker/);

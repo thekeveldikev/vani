@@ -128,6 +128,8 @@ function oeffneSchreibraum(docId) {
     zaehleWorte(doc.id, doc.text);
   }, 500, true);
   _sr.sichern = sichern;
+  /* Jeder Anschlag ist ein kleiner Luftzug für die Kerze. */
+  ta.addEventListener('input', () => { if (_sr && _sr.sprint && _sr.sprint.kerze) _sr.sprint.kerze.puste(.22); });
 
   /* Deutsche Feder: -- wird –, gerade Anführungszeichen werden „so" */
   function ersetzeKlug() {
@@ -210,7 +212,7 @@ function schliesseSchreibraum(zurueck) {
   if (typeof vorlesenStopp === 'function') vorlesenStopp();
   _sr.sichern && _sr.sichern.sofort();
   document.removeEventListener('selectionchange', _sr.spiegelBeiAuswahl);
-  if (_sr.sprint) beendeSprint(true);
+  if (_sr.sprint) { const k = _sr.sprint.kerze; beendeSprint(true); if (k) k.entfernen(); }
   const geschrieben = worte(srAktuellerText()) - _sr.startWorte;
   _sr.raum.remove();
   _sr = null;
@@ -426,27 +428,33 @@ function sucheErsetze() {
 /* ----- Sprint: die Kerze ----- */
 function starteSprint(minuten) {
   if (!_sr || _sr.sprint) return;
-  const halter = $('.kerzenhalter', _sr.raum);
-  const kerze = el('div', { class: 'kerze', style: 'height:30px' }, el('div', { class: 'kerzenflamme' }));
-  halter.append(kerze);
-  requestAnimationFrame(() => {
-    kerze.style.transition = 'height ' + (minuten * 60) + 's linear';
-    requestAnimationFrame(() => { kerze.style.height = '4px'; });
-  });
   const startWorte = worte(srAktuellerText());
-  _sr.sprint = {
-    startWorte, minuten,
-    timer: setTimeout(() => beendeSprint(false), minuten * 60000)
-  };
+  /* Die Kerze steht rechts unten im Raum und brennt über die Zeit herunter.
+     Sie selbst meldet das Ende — kein zweiter Timer, der auseinanderläuft. */
+  const kerze = kerzeAnzuenden({
+    minuten,
+    beiEnde: () => beendeSprint(false),
+    beiTipp: async () => {
+      if (!_sr || !_sr.sprint) return;
+      const m = Math.ceil(kerze.rest() / 60000);
+      const wahl = await menue([
+        { text: 'Weiterbrennen lassen', icon: 'feuer', wert: 'weiter' },
+        { text: 'Ausblasen (Kerze beenden)', icon: 'kreuz', wert: 'aus', rot: true }
+      ], m > 1 ? 'Noch etwa ' + m + ' Minuten.' : 'Gleich ausgebrannt.');
+      if (wahl === 'aus') beendeSprint(true);
+    }
+  });
+  _sr.raum.append(kerze.element);
+  _sr.raum.classList.add('kerze-brennt');
+  _sr.sprint = { startWorte, minuten, kerze };
   toast('Die Kerze brennt. ' + minuten + ' Minuten gehören dir.');
 }
 function beendeSprint(abgebrochen) {
   if (!_sr || !_sr.sprint) return;
   const sp = _sr.sprint;
-  clearTimeout(sp.timer);
   _sr.sprint = null;
-  const kerze = $('.kerze', _sr.raum);
-  if (kerze) kerze.remove();
+  _sr.raum.classList.remove('kerze-brennt');
+  if (sp.kerze) { if (abgebrochen) sp.kerze.ausblasen(); else setTimeout(() => sp.kerze.entfernen(), 4500); }
   if (!abgebrochen) {
     const geschrieben = worte(srAktuellerText()) - sp.startWorte;
     glocke();

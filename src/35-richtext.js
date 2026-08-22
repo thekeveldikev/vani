@@ -36,6 +36,17 @@ function sauberesRichHTML(html) {
   if (typeof document === 'undefined' || !document.createElement || !document.createTreeWalker) return richAusText(richReinerText(html));
   const vorlage = document.createElement('template');
   vorlage.innerHTML = html.replace(/<script[\s\S]*?<\/script\s*>/gi, '').replace(/<style[\s\S]*?<\/style\s*>/gi, '');
+  /* <font> ist das, was execCommand ohne styleWithCSS erzeugt (Farbe, Größe).
+     Vorher flog das Element samt Farbe hinaus — jetzt wird es ein span. */
+  for (const font of [...vorlage.content.querySelectorAll('font')]) {
+    const span = document.createElement('span');
+    const farbe = _richFarbe(font.getAttribute('color') || '');
+    const groesse = ({ 1: 11, 2: 13, 3: 16, 4: 18, 5: 24, 6: 32, 7: 48 })[String(font.getAttribute('size') || '').replace('+', '')];
+    if (farbe) span.style.color = farbe;
+    if (groesse) span.style.fontSize = groesse + 'px';
+    while (font.firstChild) span.append(font.firstChild);
+    font.replaceWith(span);
+  }
   const walker = document.createTreeWalker(vorlage.content, (globalThis.NodeFilter && NodeFilter.SHOW_ELEMENT) || 1);
   const elemente = [];
   while (walker.nextNode()) elemente.push(walker.currentNode);
@@ -48,7 +59,17 @@ function sauberesRichHTML(html) {
     const farbe = _richFarbe(style.color);
     const hintergrund = _richFarbe(style.backgroundColor);
     const px = parseFloat(style.fontSize || '');
-    const ausrichtung = ['left', 'center', 'right', 'justify'].includes(style.textAlign) ? style.textAlign : '';
+    const ausrichtung = ['left', 'center', 'right', 'justify'].includes(style.textAlign) ? style.textAlign
+      : ['left', 'center', 'right', 'justify'].includes(String(node.getAttribute('align') || '').toLowerCase()) ? String(node.getAttribute('align')).toLowerCase() : '';
+    /* Safari schreibt fett/kursiv/unterstrichen als Stil auf ein span —
+       nicht als <b>/<i>/<u>. Genau diese Stile wurden beim Aufräumen
+       weggeworfen: im Editor sah man die Formatierung noch, nach dem
+       Wiederöffnen war sie fort. Jetzt werden sie zu echten Elementen. */
+    const gewicht = String(style.fontWeight || '');
+    const fett = gewicht === 'bold' || gewicht === 'bolder' || parseInt(gewicht, 10) >= 600;
+    const kursiv = style.fontStyle === 'italic' || style.fontStyle === 'oblique';
+    const deko = String(style.textDecorationLine || style.textDecoration || '');
+    const unter = /underline/.test(deko), durch = /line-through/.test(deko);
     for (const attr of [...node.attributes]) node.removeAttribute(attr.name);
     const teile = [];
     if (farbe) teile.push('color:' + farbe);
@@ -56,6 +77,12 @@ function sauberesRichHTML(html) {
     if (Number.isFinite(px)) teile.push('font-size:' + begrenze(px, 11, 72, 18) + 'px');
     if (ausrichtung) teile.push('text-align:' + ausrichtung);
     if (teile.length) node.setAttribute('style', teile.join(';'));
+    for (const [an, tag] of [[fett, 'b'], [kursiv, 'i'], [unter, 'u'], [durch, 's']]) {
+      if (!an || node.closest(tag)) continue;
+      const h = document.createElement(tag);
+      while (node.firstChild) h.append(node.firstChild);
+      node.append(h);
+    }
   }
   return vorlage.innerHTML.replace(/\u200b/g, '').slice(0, 10000000);
 }
@@ -219,7 +246,11 @@ function kurzschriftLive(editor) {
 function richBefehl(editor, befehl, wert) {
   if (!editor || !editor.isConnected) return false;
   editor.focus();
-  try { document.execCommand('styleWithCSS', false, true); } catch (e) {}
+  /* Farben, Größe und Ausrichtung als Stil; fett/kursiv/unterstrichen als
+     echte Elemente — so liefert jeder Browser dasselbe, und der Aufräumer
+     kennt beides. */
+  const alsStil = /^(foreColor|hiliteColor|backColor|fontSize|justify)/i.test(String(befehl));
+  try { document.execCommand('styleWithCSS', false, alsStil); } catch (e) {}
   try { return document.execCommand(befehl, false, wert == null ? null : wert); }
   catch (e) { return false; }
 }
@@ -313,6 +344,9 @@ function baueRichEditor(doc, optionen = {}) {
     if (D.einst.kurzschrift !== false && e && e.inputType === 'insertText' && /[_*~]/.test(e.data || '')) { try { kurzschriftLive(editor); } catch (x) {} }
     sichern(); if (optionen.beiInput) optionen.beiInput(doc, editor, startWorte);
   });
+  /* Sofort sichern, sobald der Blick den Text verlässt — nicht erst nach der
+     Schonfrist. Wer „Fertig" tippt oder die Seite wechselt, verliert nichts. */
+  editor.addEventListener('blur', () => { if (sichern.haengt && sichern.haengt()) sichern.sofort(); });
   editor.addEventListener('paste', (e) => {
     if (!e.clipboardData) return;
     const html = e.clipboardData.getData('text/html');
