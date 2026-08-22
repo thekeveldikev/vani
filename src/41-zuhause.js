@@ -202,12 +202,12 @@ RENDER.zuhause = function (haupt) {
   gitter.append(feuerKarte);
   /* Aus dem Salon: jeden Tag rät jemand anderes von der Wand */
   if (typeof SALON_AUTOREN !== 'undefined' && SALON_AUTOREN.length) {
-    const tag = tagKey(); const wer = SALON_AUTOREN[salonHash(tag) % SALON_AUTOREN.length]; const rat = salonRatDesTages(wer, tag);
+    const tag = tagKey(); const wer = SALON_AUTOREN[salonHash(tag) % SALON_AUTOREN.length]; const rat = typeof salonRatDesTagesZweisprachig === 'function' ? salonRatDesTagesZweisprachig(wer, tag) : salonRatDesTages(wer, tag);
     if (rat) gitter.append(el('div', { class: 'karte salonkarte' },
       el('div', { class: 'kartenkopf' }, el('span', { html: ik('rahmen') }), 'AUS DEM SALON'),
       el('button', { class: 'salonkarte-inhalt', onclick: () => { location.hash = '#/salon'; } },
         el('span', { class: 'salonkarte-foto' }, el('img', { src: wer.bild, alt: '', draggable: 'false', style: 'object-position:' + (wer.lage || '50% 30%') })),
-        el('span', { class: 'salonkarte-text' }, el('i', {}, rat.text), el('small', {}, wer.name + ' · erfunden, in seinem Geist' + (wer.id === 'funke' ? '' : '') ))),
+        el('span', { class: 'salonkarte-text' }, el('i', {}, rat.text), rat.de ? el('span', { class: 'salonkarte-de' }, rat.de) : null, el('small', {}, wer.name + ' · erfunden, in seinem Geist'))),
       el('div', { class: 'klein', style: 'font-size:11.5px;color:var(--blass);margin-top:6px' }, 'Im Salon: echte Zitate, mehr Rat, eigene Leute an die Wand.')));
   }
 

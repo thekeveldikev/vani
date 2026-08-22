@@ -77,7 +77,7 @@ function sitzungBeginnen(vorgabe = {}) {
   const wahl = (liste, lies, setze) => { const g = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' }); for (const [id, n] of liste) g.append(el('button', { class: lies() === id ? 'an' : '', onclick: (ev) => { setze(id); $$('button', g).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); } }, n)); return g; };
   const ziel = el('input', { type: 'text', inputmode: 'numeric', value: String(e.ziel || ''), placeholder: 'Wörter' });
   const ratVorschau = el('div', { class: 'sitzung-rat' });
-  const ratNeu = () => { if (typeof SALON_FEST === 'undefined') { ratVorschau.textContent = ''; return; } const a = SALON_FEST[Math.floor(Math.random() * SALON_FEST.length)]; const r = salonRat(a, Math.floor(Math.random() * 1e9)); ratVorschau.innerHTML = ''; ratVorschau.append(el('i', {}, r ? r.text : ''), el('small', {}, a.name + ' · erfunden, in seinem Geist')); ratVorschau.dataset.wer = a.id; };
+  const ratNeu = () => { if (typeof SALON_FEST === 'undefined') { ratVorschau.textContent = ''; return; } const a = SALON_FEST[Math.floor(Math.random() * SALON_FEST.length)]; const r = (typeof salonRatZweisprachig === 'function' ? salonRatZweisprachig : salonRat)(a, Math.floor(Math.random() * 1e9)); ratVorschau.innerHTML = ''; ratVorschau.append(el('i', {}, r ? r.text : ''), r && r.de ? el('span', { class: 'sitzung-rat-de' }, r.de) : null, el('small', {}, a.name + ' · erfunden, in seinem Geist')); ratVorschau.dataset.wer = a.id; };
   ratNeu();
   const schalter = (lies, setze) => el('button', { class: 'schalter' + (lies() ? ' an' : ''), onclick: (ev) => { setze(!lies()); ev.currentTarget.classList.toggle('an', lies()); } }, el('i'));
   const zeile = (name, inhalt) => el('div', { class: 'einstellgruppe' }, el('b', {}, name), inhalt);
@@ -126,7 +126,7 @@ function sitzungBilanz(abgebrochen) {
   const fund = sitzungFundsatz(s.textVorher, jetzt);
   const zielErreicht = s.ziel > 0 && geschrieben >= s.ziel;
   let lob = '';
-  try { if (typeof SALON_FEST !== 'undefined') { const a = SALON_FEST[salonHash(String(s.start)) % SALON_FEST.length]; const r = salonRat(a, s.start, geschrieben < 50 ? 'routine' : 'ende'); lob = r ? r.text + ' — ' + a.name : ''; } } catch (x) {}
+  try { if (typeof SALON_FEST !== 'undefined') { const a = SALON_FEST[salonHash(String(s.start)) % SALON_FEST.length]; const r = (typeof salonRatZweisprachig === 'function' ? salonRatZweisprachig : salonRat)(a, s.start, geschrieben < 50 ? 'routine' : 'ende'); lob = r ? r.text + (r.de ? ' (' + r.de + ')' : '') + ' — ' + a.name : ''; } } catch (x) {}
   const kasten = el('div', { class: 'modal sitzung-bilanz' }, el('h2', {}, abgebrochen ? 'Sitzung beendet' : 'Die Sitzung ist um'),
     el('div', { class: 'sitzung-zahlen' }, el('div', {}, el('b', {}, String(geschrieben)), el('span', {}, geschrieben === 1 ? 'Wort' : 'Wörter')), el('div', {}, el('b', {}, String(min)), el('span', {}, min === 1 ? 'Minute' : 'Minuten')), s.ziel ? el('div', {}, el('b', {}, zielErreicht ? '✓' : Math.round(geschrieben / s.ziel * 100) + ' %'), el('span', {}, 'vom Ziel')) : null),
     fund ? el('div', { class: 'sitzung-fund' }, el('span', { class: 'st-ueber' }, 'Ein Satz von heute'), el('i', {}, '„' + fund + '“'), el('button', { class: 'knopf zart', onclick: () => { neuDoc('schnipsel', { text: fund }); toast('Liegt in den Schnipseln.'); } }, 'Als Fundstück behalten')) : null,

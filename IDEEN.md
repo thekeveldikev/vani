@@ -452,3 +452,18 @@ Vorhandenem auf; danach B (Hefte) und der Rest.
 - Vertragstests für jede Anlage-Art (Zettel, Foto, Sticker) auf derselben Gesten-Basis.
 - Kontrast der Themen prüfen (WCAG AA) — besonders „Kerze".
 - Smoke-Test der Desktop-App um Klang- und Sticker-Schritte erweitern.
+
+## Umgesetzt in 5.26 (24. August 2026)
+- Orte Stufe vier: jede Kulisse neu gemalt, Dinge reagieren auf Tippen, kleine Bewegungen (abschaltbar),
+  Diele mit Detektivmantel, Schlüsselbrett (VW-Bus-Anhänger), Edding-Zeile auf dem Spiegel (eigener Text),
+  Kameraspiegel (optional). Blätter als liniertes Papier, Cluster am Küchentisch.
+- Die Schreibmaschine auf dem Lesetisch der Hefte — sie schreibt wirklich (Glocke, Wagenrücklauf, Band, Papier, „wie früher").
+- Salon: Tolkien, Blyton, Paolini, Twain; alle englischen Stimmen raten englisch, Übersetzung daneben; Setz dich sitzt; mehr Feuer.
+- Wortkisten mit gestaltbarem Rand.
+
+## Runde 4 (nach 5.26) — was noch käme
+- Schreibmaschine: Durchschlagpapier (Kopie als zweites Blatt), Korrekturband (drei Zeichen zurück, einmal pro Zeile), Tippgeschwindigkeits-Kurve im Feinheiten-Jahr.
+- Diele: der Mantel merkt sich das Wetter (Regen → nass, Schnee → Flocken auf den Schultern), die Katze folgt dem Mauszeiger mit den Augen.
+- Korkwand: Fotos aus der Mediathek als Polaroids, Kalender zeigt Schreibtage als kleine Kreuze.
+- Setzkasten: Andruck als echtes Druckbild (Blatt „Andruck vom …" ablegen).
+- Salon: Rat vorlesen in der Originalsprache (Stimme je Sprache), „Briefwechsel" als fortlaufendes Heft.

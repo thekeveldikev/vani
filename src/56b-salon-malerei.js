@@ -11,7 +11,8 @@ function salonMaler(canvas) {
   const zuf = kerzeZufall(20240824);
   let W = 0, H = 0, statisch = null, laeuft = false, t = 0, letzte = 0;
   const staub = Array.from({ length: 40 }, () => ({ x: zuf(), y: zuf(), r: .4 + zuf(), ph: zuf() * 6.3, v: .003 + zuf() * .006 }));
-  const funken = Array.from({ length: 14 }, () => ({ x: zuf(), y: zuf(), v: .12 + zuf() * .2, ph: zuf() * 6.3 }));
+  const funken = Array.from({ length: 30 }, () => ({ x: zuf(), y: zuf(), v: .12 + zuf() * .26, ph: zuf() * 6.3, r: .7 + zuf() * 1.2 }));
+  const rauch = Array.from({ length: 10 }, () => ({ x: zuf(), y: zuf(), v: .05 + zuf() * .05, ph: zuf() * 6.3, r: 3 + zuf() * 4 }));
   function messen() {
     const r = canvas.getBoundingClientRect();
     const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
@@ -113,12 +114,26 @@ function salonMaler(canvas) {
     /* Spielt das Kaminknistern, brennt das Feuer höher */
     const kaminKlang = (D.einst && D.einst.ambience && D.einst.ambience.kamin) || 0;
     const hoch = 1 + Math.min(.7, kaminKlang * 1.2);
-    for (const [dx, h, w, ph] of [[-22, 44, 16, 1], [-8, 58, 20, 2], [8, 52, 18, 3], [24, 40, 14, 4], [0, 30, 10, 5]]) flamme(kx + dx, fy - 10, h * hoch, w, ph);
-    for (const f of funken) {
-      f.y -= f.v * dt; f.x += Math.sin(t * 2 + f.ph) * .0015; if (f.y < 0) { f.y = 1; f.x = .3 + zuf() * .4; }
-      const px = kx - kb * .3 + f.x * kb * .6, py = ky + 26 + f.y * (kh - 40);
-      ctx.fillStyle = 'rgba(255,200,110,' + (.6 * f.y).toFixed(2) + ')'; ctx.beginPath(); ctx.arc(px, py, 1.2, 0, 6.29); ctx.fill();
+    /* Rauch: weiche graue Schwaden, die über den Flammen aufsteigen und sich auflösen */
+    for (const s of rauch) {
+      s.y -= s.v * dt * hoch; s.x += Math.sin(t * .8 + s.ph) * .002; if (s.y < 0) { s.y = .55 + zuf() * .2; s.x = .35 + zuf() * .3; }
+      const px = kx - kb * .3 + s.x * kb * .6, py = ky + 26 + s.y * (kh - 40);
+      ctx.fillStyle = 'rgba(120,110,104,' + (.09 * s.y * (1 - s.y) * 4).toFixed(3) + ')'; ctx.beginPath(); ctx.arc(px, py, s.r * (1.6 - s.y), 0, 6.29); ctx.fill();
     }
+    for (const [dx, h, w, ph] of [[-22, 44, 16, 1], [-8, 58, 20, 2], [8, 52, 18, 3], [24, 40, 14, 4], [0, 30, 10, 5], [-16, 26, 9, 6], [16, 24, 8, 7]]) flamme(kx + dx, fy - 10, h * hoch, w, ph);
+    /* Glut auf den Scheiten: atmet */
+    for (const [gx, gph] of [[-36, 0], [-18, 1.3], [-4, 2.1], [10, 2.9], [22, 3.7], [34, 4.6]]) {
+      const a = .35 + .35 * Math.sin(t * 2.2 + gph) + .1 * Math.sin(t * 9 + gph * 2);
+      kerzeSchein(ctx, kx + gx, fy - 8, 7, 4, [[0, 'rgba(255,140,50,' + a.toFixed(3) + ')'], [1, 'rgba(255,100,30,0)']]);
+    }
+    for (const f of funken) {
+      f.y -= f.v * dt * hoch; f.x += Math.sin(t * 2 + f.ph) * .0015; if (f.y < 0) { f.y = 1; f.x = .3 + zuf() * .4; }
+      const px = kx - kb * .3 + f.x * kb * .6, py = ky + 26 + f.y * (kh - 40);
+      const fl = .45 + .55 * Math.abs(Math.sin(t * 9 + f.ph));
+      ctx.fillStyle = 'rgba(255,' + Math.round(170 + 60 * fl) + ',110,' + (.75 * f.y * fl).toFixed(2) + ')'; ctx.beginPath(); ctx.arc(px, py, f.r * (.6 + .4 * f.y), 0, 6.29); ctx.fill();
+    }
+    /* Hitzeflimmern über dem Feuer: ein heller, wandernder Schleier */
+    ctx.fillStyle = 'rgba(255,200,120,' + (.05 + .03 * Math.sin(t * 5.3)).toFixed(3) + ')'; ctx.fillRect(kx - kb * .3, ky + 26, kb * .6, kh * .5);
     ctx.restore();
     /* Schein des Feuers auf Vertäfelung und Boden */
     const fl = 1 + .08 * Math.sin(t * 6.3) + .05 * Math.sin(t * 11.7);

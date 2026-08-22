@@ -66,6 +66,50 @@
    "lizenzUrl": "https://commons.wikimedia.org/wiki/Template:PD-old",
    "seite": "https://commons.wikimedia.org/wiki/File:Astrid_Lindgren_(cropped).jpg",
    "quelle": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Astrid_Lindgren_%28cropped%29.jpg"
+  },
+  {
+   "id": "tolkien",
+   "name": "J. R. R. Tolkien",
+   "datei": "autoren/tolkien.jpg",
+   "titel": "J. R. R. Tolkien, ca. 1925 (cropped).jpg",
+   "urheber": "unbekanntes Fotostudio, um 1925 (gemeinfrei)",
+   "lizenz": "Public Domain",
+   "lizenzUrl": "https://commons.wikimedia.org/wiki/Template:PD-old",
+   "seite": "https://commons.wikimedia.org/wiki/File:J._R._R._Tolkien,_ca._1925_(cropped).jpg",
+   "quelle": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/J._R._R._Tolkien%2C_ca._1925_%28cropped%29.jpg/960px-J._R._R._Tolkien%2C_ca._1925_%28cropped%29.jpg"
+  },
+  {
+   "id": "blyton",
+   "name": "Enid Blyton",
+   "datei": "autoren/blyton.jpg",
+   "titel": "Enid Blyton c. 1923.jpg",
+   "urheber": "unbekannt, um 1923 (gemeinfrei)",
+   "lizenz": "Public Domain",
+   "lizenzUrl": "https://commons.wikimedia.org/wiki/Template:PD-old",
+   "seite": "https://commons.wikimedia.org/wiki/File:Enid_Blyton_c._1923.jpg",
+   "quelle": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Enid_Blyton_c._1923.jpg/960px-Enid_Blyton_c._1923.jpg"
+  },
+  {
+   "id": "paolini",
+   "name": "Christopher Paolini",
+   "datei": "autoren/paolini.jpg",
+   "titel": "Christopher Paolini at the 2024 Library of Congress National Book Festival on August 24, 2024 (cropped).jpg",
+   "urheber": "Library of Congress Life",
+   "lizenz": "CC0 1.0",
+   "lizenzUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "seite": "https://commons.wikimedia.org/wiki/File:Christopher_Paolini_at_the_2024_Library_of_Congress_National_Book_Festival_on_August_24,_2024_(cropped).jpg",
+   "quelle": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Christopher_Paolini_at_the_2024_Library_of_Congress_National_Book_Festival_on_August_24%2C_2024_%28cropped%29.jpg"
+  },
+  {
+   "id": "twain",
+   "name": "Mark Twain",
+   "datei": "autoren/twain.jpg",
+   "titel": "Twain1909.jpg (Mark Twain 1907)",
+   "urheber": "A. F. Bradley, New York, 1907 (gemeinfrei)",
+   "lizenz": "Public Domain",
+   "lizenzUrl": "https://commons.wikimedia.org/wiki/Template:PD-old",
+   "seite": "https://commons.wikimedia.org/wiki/File:Twain1909.jpg",
+   "quelle": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Mark_Twain_1907.jpg/960px-Mark_Twain_1907.jpg"
   }
  ]
 }

@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.25.0';
+const APP_VERSION = '5.26.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -343,7 +343,7 @@ const STANDARD_EINST = {
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
   stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
   ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95,
-  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null, sitzung: null, salonBriefe: [], pausenErinnerung: true
+  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null, sitzung: null, salonBriefe: [], pausenErinnerung: true, schreibmaschine: null
 };
 const D = {
   docs: new Map(),
@@ -446,7 +446,7 @@ function sauberesDokument(quelle) {
     if (k === '__proto__' || k === 'prototype' || k === 'constructor') continue;
     d[k] = v;
   }
-  for (const k of ['text', 'rich', 'titel', 'notiz', 'schlagworte', 'dateiname', 'dateityp', 'art', 'vibe', 'farbe', 'farbe2', 'band', 'muster', 'papier', 'papierfarbe', 'ansicht', 'format', 'befestigung', 'label', 'schrift', 'lesezeichen']) {
+  for (const k of ['text', 'rich', 'titel', 'notiz', 'schlagworte', 'dateiname', 'dateityp', 'art', 'vibe', 'farbe', 'farbe2', 'kistenrand', 'kistenrandFarbe', 'band', 'muster', 'papier', 'papierfarbe', 'ansicht', 'format', 'befestigung', 'label', 'schrift', 'lesezeichen']) {
     if (k === 'lesezeichen' && d.typ === 'buch') continue;   /* Bücher: Seitenliste, siehe unten */
     if (d[k] != null) d[k] = String(d[k]).slice(0, k === 'text' || k === 'rich' || k === 'notiz' ? 10000000 : 1000);
   }
@@ -455,6 +455,8 @@ function sauberesDokument(quelle) {
   }
   if (d.farbe && !/^(#[0-9a-f]{3,8}|[a-z0-9_-]{1,30})$/i.test(d.farbe)) d.farbe = '';
   if (d.farbe2 && !/^#[0-9a-f]{6}$/i.test(d.farbe2)) d.farbe2 = '';
+  if (d.kistenrand && !/^[a-z]{1,16}$/.test(d.kistenrand)) d.kistenrand = '';
+  if (d.kistenrandFarbe && !/^#[0-9a-f]{6}$/i.test(d.kistenrandFarbe)) d.kistenrandFarbe = '';
   if (d.band && !/^#[0-9a-f]{6}$/i.test(d.band)) d.band = '';
   if (d.muster && !['leinen', 'diagonal', 'punkte', 'rahmen', 'welle', 'schlicht'].includes(d.muster)) d.muster = 'schlicht';
   if (d.papier && !['liniert', 'kariert', 'blank', 'punkte', 'breit', 'cornell', 'storyboard', 'dialog'].includes(d.papier)) d.papier = 'liniert';

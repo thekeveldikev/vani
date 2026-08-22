@@ -110,12 +110,19 @@ async function loescheWortkiste(kistenId, samtInhalt = false, still = false) {
   return true;
 }
 
+const WORTKISTEN_RAENDER = [['holz', 'Holz'], ['leinen', 'Leinen'], ['gold', 'Goldkante'], ['schwarz', 'Schwarz'], ['papier', 'Papier'], ['farbe', 'Eigene Farbe']];
 function wortkistenFormular(kiste) {
   return new Promise((resolve) => {
     const titel = el('input', { type: 'text', maxlength: '120', value: kiste ? kiste.titel || '' : '', placeholder: 'z. B. Synonyme' });
     const notiz = el('textarea', { rows: 3, maxlength: '600', placeholder: 'Wofür ist diese Kiste? (freiwillig)' });
     notiz.value = kiste ? kiste.notiz || '' : '';
     const farbe = el('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(kiste && kiste.farbe || '') ? kiste.farbe : WORTKISTEN_FARBEN[wortkisten().length % WORTKISTEN_FARBEN.length] });
+    /* Der Rand: Holz, Leinen, Goldkante, Schwarz, Papier oder eine eigene Farbe */
+    let rand = WORTKISTEN_RAENDER.some((r) => r[0] === (kiste && kiste.kistenrand)) ? kiste.kistenrand : 'holz';
+    const randFarbe = el('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(kiste && kiste.kistenrandFarbe || '') ? kiste.kistenrandFarbe : '#b0552f', 'aria-label': 'Randfarbe' });
+    const randWahl = el('div', { class: 'wortkisten-randwahl' });
+    const baueRand = () => { randWahl.innerHTML = ''; for (const [id, name] of WORTKISTEN_RAENDER) randWahl.append(el('button', { type: 'button', class: rand === id ? 'an' : '', 'data-rand': id, style: '--randfarbe:' + randFarbe.value, onclick: () => { rand = id; baueRand(); } }, el('i'), name)); randFarbe.style.display = rand === 'farbe' ? '' : 'none'; };
+    randFarbe.addEventListener('input', baueRand); baueRand();
     const meldung = el('div', { class: 'wortkisten-meldung', role: 'status' });
     let erledigt = false;
     const fertig = () => {
@@ -124,13 +131,14 @@ function wortkistenFormular(kiste) {
       if (wortkisten().some((d) => d.id !== (kiste && kiste.id) && normalisiere(d.titel || '') === normalisiere(t))) {
         meldung.textContent = 'Eine Kiste mit diesem Namen gibt es schon.'; titel.focus(); return;
       }
-      erledigt = true; zu(); resolve({ titel: t.slice(0, 120), notiz: notiz.value.trim().slice(0, 600), farbe: farbe.value });
+      erledigt = true; zu(); resolve({ titel: t.slice(0, 120), notiz: notiz.value.trim().slice(0, 600), farbe: farbe.value, kistenrand: rand, kistenrandFarbe: randFarbe.value });
     };
     const kasten = el('div', { class: 'modal wortkisten-modal' },
       el('div', { class: 'kartenkopf' }, el('span', { html: ik('woerter') }), kiste ? 'KISTE GESTALTEN' : 'NEUE WORTKISTE'),
       el('label', {}, el('span', {}, 'Name'), titel),
       el('label', {}, el('span', {}, 'Kleine Notiz'), notiz),
       el('label', { class: 'wortkisten-farbzeile' }, el('span', {}, 'Farbe'), farbe),
+      el('div', { class: 'wortkisten-randzeile' }, el('span', {}, 'Rand'), el('div', { class: 'reihe', style: 'align-items:center;gap:8px' }, randWahl, randFarbe)),
       meldung,
       el('div', { class: 'reihe' },
         el('button', { class: 'knopf zart', onclick: () => { zu(); } }, 'Abbrechen'),
@@ -203,7 +211,7 @@ RENDER.woerter = function (haupt) {
 
   async function kistenMenue(kiste) {
     const wahl = await menue([
-      { text: 'Name, Notiz & Farbe ändern', icon: 'stift', wert: 'edit' },
+      { text: 'Name, Notiz, Farbe & Rand ändern', icon: 'stift', wert: 'edit' },
       { text: 'Nur Kiste löschen · Wörter bleiben lose', icon: 'drehen', wert: 'loese', rot: true },
       { text: 'Kiste und ihre Wörter löschen', icon: 'muell', wert: 'alles', rot: true }
     ], kiste.titel || 'Wortkiste');
@@ -243,9 +251,11 @@ RENDER.woerter = function (haupt) {
         el('strong', {}, titel),
         el('small', {}, anzahl + (anzahl === 1 ? ' Wort' : ' Wörter')),
         notiz ? el('em', {}, notiz) : null));
+      const rand = kiste && WORTKISTEN_RAENDER.some((r) => r[0] === kiste.kistenrand) ? kiste.kistenrand : 'holz';
+      const randFarbe = kiste && /^#[0-9a-f]{6}$/i.test(kiste.kistenrandFarbe || '') ? kiste.kistenrandFarbe : '#6b4a32';
       const umschlag = el('div', {
-        class: 'wortkiste-mini' + (aktiveKiste === id ? ' an' : ''),
-        style: '--kistenfarbe:' + (farbe || '#857361')
+        class: 'wortkiste-mini rand-' + rand + (aktiveKiste === id ? ' an' : ''),
+        style: '--kistenfarbe:' + (farbe || '#857361') + ';--kistenrand:' + randFarbe
       }, waehlen);
       if (kiste) umschlag.append(el('button', {
         class: 'wortkiste-menue', title: 'Kiste bearbeiten', 'aria-label': titel + ' bearbeiten',

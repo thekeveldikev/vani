@@ -2563,3 +2563,163 @@ mark.lupe-wdh { background: rgba(255,196,90,.45); color: inherit; border-radius:
 .atem-kreis i { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle at 50% 40%, #ffe7b0, #e8a94e 60%, #b0552f); box-shadow: 0 0 40px rgba(255,180,90,.6); transform: scale(var(--atem)); transition: transform .12s linear; }
 .atem-wort { font: 600 24px ui-serif, "New York", Georgia, serif; }
 .atem-rest { font-size: 12.5px; color: var(--blass); margin-top: 4px; }
+
+/* ===================== 5.26: Orte, Stufe vier — Details, Bewegung, Tippen ===================== */
+.ort-kulisse .ort-bild { height: 150px; }
+.ort-tipp { cursor: pointer; outline: none; transition: filter .2s; transform-box: view-box; }
+.ort-tipp:hover { filter: brightness(1.08); }
+.ort-tipp:focus-visible { filter: drop-shadow(0 0 4px rgba(255,220,150,.9)); }
+.ort-tipp.tippt { animation: ort-wackeln .95s cubic-bezier(.3,1.4,.5,1); }
+@keyframes ort-wackeln { 0% { transform: none; } 18% { transform: rotate(-5deg) translateY(-1.5px); } 42% { transform: rotate(4deg); } 66% { transform: rotate(-2deg); } 100% { transform: none; } }
+.ort-kulisse .ort-schal, .ort-kulisse .ort-lichtkegel, .ort-kulisse .ort-platte.dreht, .ort-kulisse .ort-schnur { animation: none; }
+.ort-kulisse.lebt .ort-schal { animation: ort-schal 5s ease-in-out infinite alternate; transform-origin: 250px 48px; }
+.ort-kulisse.lebt .ort-lichtkegel { animation: ort-kegel 3.5s ease-in-out infinite alternate; }
+.ort-kulisse.lebt .ort-platte.dreht { animation: ort-dreht 4s linear infinite; }
+.ort-kulisse.lebt .ort-schnur { animation: ort-schnur 4s ease-in-out infinite alternate; }
+.ort-kulisse.lebt .ort-dampfzug { animation: ort-dampf 3.2s ease-in-out infinite; opacity: 0; transform-box: view-box; }
+.ort-kulisse.lebt .ort-dampfzug.d1 { animation-delay: 1s; } .ort-kulisse.lebt .ort-dampfzug.d2 { animation-delay: 2.1s; }
+@keyframes ort-dampf { 0% { opacity: 0; transform: translateY(4px); } 25% { opacity: .8; } 100% { opacity: 0; transform: translateY(-14px) translateX(3px); } }
+.ort-kulisse.lebt .ort-schwanz { animation: ort-schwanz 7s ease-in-out infinite; transform-box: view-box; }
+@keyframes ort-schwanz { 0%, 80%, 100% { transform: none; } 86% { transform: rotate(-18deg); } 92% { transform: rotate(10deg); } }
+.ort-kulisse.lebt .ort-sekunde { animation: ort-sekunde 60s linear infinite; transform-box: view-box; }
+@keyframes ort-sekunde { to { transform: rotate(360deg); } }
+.ort-kulisse.lebt .ort-schluesselbund { animation: ort-bund 4.5s ease-in-out infinite alternate; transform-box: view-box; }
+.ort-kulisse.lebt .ort-schluesselbund.b { animation-duration: 5.3s; animation-delay: .7s; } .ort-kulisse.lebt .ort-schluesselbund.c { animation-duration: 3.9s; animation-delay: 1.4s; }
+@keyframes ort-bund { from { transform: rotate(-2.5deg); } to { transform: rotate(2.5deg); } }
+.ort-kulisse.lebt .ort-flieger { animation: ort-flieger 22s ease-in-out infinite; transform-box: view-box; }
+@keyframes ort-flieger { 0%, 70% { transform: translate(0, 0) rotate(0); opacity: 1; } 85% { transform: translate(260px, -16px) rotate(-6deg); opacity: 1; } 90% { transform: translate(420px, 0) rotate(4deg); opacity: 0; } 91% { transform: translate(-60px, 10px); opacity: 0; } 100% { transform: translate(0, 0); opacity: 1; } }
+.ort-kulisse.lebt .ort-blaetter { animation: ort-blaetter 6s ease-in-out infinite alternate; transform-box: view-box; transform-origin: center bottom; }
+@keyframes ort-blaetter { from { transform: rotate(-1.5deg); } to { transform: rotate(1.5deg); } }
+.ort-kulisse.lebt .ort-pendel { animation: ort-pendel 1.3s ease-in-out infinite alternate; transform-box: view-box; }
+@keyframes ort-pendel { from { transform: rotate(-14deg); } to { transform: rotate(14deg); } }
+.ort-kulisse.lebt .ort-flamme { animation: ort-flamme .9s ease-in-out infinite alternate; transform-box: view-box; }
+@keyframes ort-flamme { from { transform: scale(1, .96) rotate(-2deg); } to { transform: scale(1.04, 1.08) rotate(2deg); } }
+.ort-kulisse.lebt .ort-band { animation: ort-band 5s ease-in-out infinite alternate; transform-box: view-box; }
+@keyframes ort-band { from { transform: rotate(-2deg); } to { transform: rotate(2deg); } }
+.ort-kulisse.lebt .ort-gluehbirne { animation: ort-birne 4s ease-in-out infinite; }
+@keyframes ort-birne { 0%, 92%, 100% { opacity: .9; } 95% { opacity: .6; } 97% { opacity: .95; } }
+.ort-noten .ort-note { opacity: 0; transform-box: view-box; }
+.ort-kulisse.lebt .ort-noten.an .ort-note { animation: ort-note 3.6s ease-in-out infinite; }
+.ort-kulisse.lebt .ort-noten.an .ort-note.n1 { animation-delay: 1.2s; } .ort-kulisse.lebt .ort-noten.an .ort-note.n2 { animation-delay: 2.4s; }
+@keyframes ort-note { 0% { opacity: 0; transform: translate(0, 6px) rotate(-6deg); } 20% { opacity: .9; } 100% { opacity: 0; transform: translate(10px, -30px) rotate(8deg); } }
+.ort-tipp.tippt .ort-libelle { animation: ort-libelle 1s ease-in-out; transform-box: view-box; }
+@keyframes ort-libelle { 30% { transform: translateX(-7px); } 65% { transform: translateX(5px); } 100% { transform: none; } }
+.ort-kulisse.lebt .ort-taste:nth-child(7n) { animation: ort-taste 9s ease-in-out infinite; transform-box: view-box; }
+@keyframes ort-taste { 0%, 96%, 100% { transform: none; } 98% { transform: translateY(1.2px); } }
+.ort-kulisse .ort-lichtkegel, .ort-kulisse .ort-gluehbirne { transition: opacity .35s; }
+.ort-kulisse.licht-aus .ort-lichtkegel, .ort-kulisse.licht-aus .ort-gluehbirne { opacity: 0 !important; animation: none; }
+html[data-orte-bewegung="aus"] .ort-kulisse * { animation-duration: 0s !important; }
+html[data-orte-bewegung="aus"] .ort-tipp.tippt { animation-duration: .95s !important; }
+/* Der Spiegel mit Kamera */
+.ort-spiegelbild { position: absolute; border-radius: 50%; overflow: hidden; pointer-events: none; opacity: 0; transition: opacity .9s ease; background: #cfd8db; z-index: 2; }
+.ort-spiegelbild.an { opacity: 1; }
+.ort-spiegelbild video { width: 100%; height: 100%; object-fit: cover; display: block; transform: scaleX(-1); filter: blur(2.2px) saturate(.55) brightness(.88) contrast(.92); transition: filter .6s; }
+.ort-spiegelbild .ort-nebel { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, rgba(220,228,230,.06) 28%, rgba(215,225,228,.5) 66%, rgba(210,220,224,.94) 100%), linear-gradient(160deg, rgba(255,255,255,.38), rgba(255,255,255,0) 42%); transition: opacity .6s; }
+.ort-spiegelbild.gewischt .ort-nebel { opacity: .35; } .ort-spiegelbild.gewischt video { filter: blur(.6px) saturate(.7) brightness(.95); }
+.ort-spiegelbild .ort-edding-html { position: absolute; left: 4%; right: 4%; top: 36%; text-align: center; transform: rotate(-7deg); font: 700 clamp(9px, 1.6vw, 14px)/1.15 "Marker Felt", "Chalkboard SE", "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive; color: #16181a; opacity: .88; }
+.ort-kulisse.kamera .ort-edding { opacity: 0; }
+/* Papierstapel: die Blätter sind Blätter — der Text sitzt auf den Linien */
+#raum[data-ort="blaetter"] .blattliste { gap: 20px 18px; }
+#raum[data-ort="blaetter"] .blattliste > * { position: relative; border-radius: 2px; padding: 22px 22px 16px 36px; color: #2c2218; background: repeating-linear-gradient(transparent 0 25px, rgba(90,110,170,.17) 25px 26px) 0 16px / 100% 26px, linear-gradient(170deg, #fbf6e8, #f1e6d0); box-shadow: 0 1px 0 #e5d9c0, 0 3px 0 -1px #f5ecd9, 0 4px 0 -1px #e5d9c0, 0 12px 22px var(--schein); transform: rotate(-.45deg); transition: transform .25s, box-shadow .25s; }
+#raum[data-ort="blaetter"] .blattliste > *:nth-child(3n) { transform: rotate(.55deg); } #raum[data-ort="blaetter"] .blattliste > *:nth-child(3n+2) { transform: rotate(-.2deg); }
+#raum[data-ort="blaetter"] .blattliste > *:hover { transform: rotate(0) translateY(-4px); box-shadow: 0 1px 0 #e5d9c0, 0 3px 0 -1px #f5ecd9, 0 4px 0 -1px #e5d9c0, 0 18px 28px var(--schein); }
+#raum[data-ort="blaetter"] .blattliste > *::before { content: ""; position: absolute; left: 27px; top: 0; bottom: 0; width: 1px; background: rgba(200,80,80,.38); }
+#raum[data-ort="blaetter"] .blattliste > *::after { content: ""; position: absolute; right: 0; top: 0; width: 0; height: 0; border-style: solid; border-width: 0 20px 20px 0; border-color: transparent var(--hg) transparent transparent; filter: drop-shadow(-1px 1px 1px rgba(0,0,0,.18)); }
+#raum[data-ort="blaetter"] .blattliste > * .btitel { font: 700 16px/26px ui-serif, "New York", Georgia, serif; color: #2c2218; margin: 0; }
+#raum[data-ort="blaetter"] .blattliste > * .bprobe { font: italic 13.5px/26px ui-serif, "New York", Georgia, serif; color: #4a3a28; margin: 0; max-height: 78px; overflow: hidden; }
+#raum[data-ort="blaetter"] .blattliste > * .bfuss { font-size: 11px; line-height: 26px; color: #8a7a62; margin: 0; }
+#raum[data-ort="blaetter"] .blattliste > * .blatt-nadel { position: absolute; left: 50%; top: -8px; margin-left: -9px; color: #c0392b; filter: drop-shadow(0 2px 2px rgba(0,0,0,.35)); }
+html[data-thema="tinte"] #raum[data-ort="blaetter"] .blattliste > *, html[data-thema="kerze"] #raum[data-ort="blaetter"] .blattliste > * { color: #e9e2d2; background: repeating-linear-gradient(transparent 0 25px, rgba(120,140,200,.16) 25px 26px) 0 16px / 100% 26px, linear-gradient(170deg, #2a241e, #211c17); }
+html[data-thema="tinte"] #raum[data-ort="blaetter"] .blattliste > * .btitel, html[data-thema="kerze"] #raum[data-ort="blaetter"] .blattliste > * .btitel { color: #f1e4c8; }
+html[data-thema="tinte"] #raum[data-ort="blaetter"] .blattliste > * .bprobe, html[data-thema="kerze"] #raum[data-ort="blaetter"] .blattliste > * .bprobe { color: #c9bda0; }
+/* Küchentisch: Holz statt Karo, Zettel statt Kiesel */
+#raum[data-ort="cluster"] .inhalt { background: linear-gradient(180deg, #b8895a, #9a6e44) ; background-image: repeating-linear-gradient(178deg, rgba(60,35,15,0) 0 26px, rgba(60,35,15,.12) 26px 28px), linear-gradient(180deg, #b8895a, #9a6e44); border-radius: 14px; padding-top: 18px; box-shadow: inset 0 0 60px rgba(60,35,15,.25); }
+#raum[data-ort="cluster"] .brettliste .brettkarte { position: relative; border-radius: 3px; background: repeating-linear-gradient(transparent 0 21px, rgba(90,110,170,.14) 21px 22px) 0 10px / 100% 22px, linear-gradient(160deg, #fbf7ee, #efe5cf); color: #2c2218; box-shadow: 0 6px 14px rgba(0,0,0,.28), inset 0 0 0 1px rgba(90,74,52,.1); padding: 20px 22px 16px; transform: rotate(calc((var(--n, 0) - 1) * .7deg)); }
+#raum[data-ort="cluster"] .brettliste .brettkarte:nth-child(2n) { transform: rotate(-.8deg); } #raum[data-ort="cluster"] .brettliste .brettkarte:nth-child(3n) { transform: rotate(.9deg); }
+#raum[data-ort="cluster"] .brettliste .brettkarte::before { content: ""; position: absolute; left: 50%; top: -5px; width: 11px; height: 11px; margin-left: -5px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #e8c27a, #8a6a2e); box-shadow: 0 2px 3px rgba(0,0,0,.4); z-index: 2; }
+html[data-thema="tinte"] #raum[data-ort="cluster"] .inhalt, html[data-thema="kerze"] #raum[data-ort="cluster"] .inhalt { background-image: repeating-linear-gradient(178deg, rgba(0,0,0,0) 0 26px, rgba(0,0,0,.2) 26px 28px), linear-gradient(180deg, #4a3420, #3a2818); }
+html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html[data-thema="kerze"] #raum[data-ort="cluster"] .brettliste .brettkarte { color: #e9e2d2; background: repeating-linear-gradient(transparent 0 21px, rgba(120,140,200,.14) 21px 22px) 0 10px / 100% 22px, linear-gradient(160deg, #2a241e, #211c17); }
+.orte-spiegelzeile input { width: min(260px, 100%); padding: 8px 12px; border-radius: 10px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-family: inherit; }
+@media (prefers-reduced-motion: reduce) { .ort-kulisse.lebt * { animation-duration: 0s !important; } }
+
+/* ===================== Die Schreibmaschine ===================== */
+.sm-buehne { position: fixed; inset: 0; height: var(--vvh, 100dvh); z-index: 320; display: grid; grid-template-rows: auto 1fr auto; background: radial-gradient(ellipse at 50% 20%, #5a4430, #2a1c12 72%); color: #f3e7c9; overflow: hidden; --sm-tinte: #1d1d1f; }
+.sm-kopf { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 16px 6px; padding-top: calc(10px + env(safe-area-inset-top)); }
+.sm-kopf b { font: 600 16px ui-serif, "New York", Georgia, serif; }
+.sm-zaehler { font-size: 12px; color: rgba(243,231,201,.72); font-variant-numeric: tabular-nums; }
+.sm-knoepfe { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.sm-knopf { font-size: 12px; padding: 5px 10px; }
+.sm-buehne .knopf.zart { color: #f3e7c9; box-shadow: inset 0 0 0 1px rgba(243,231,201,.25); background: rgba(0,0,0,.18); }
+.sm-buehne .knopf.zart.an { box-shadow: inset 0 0 0 1.5px #e8c27a; background: rgba(232,194,122,.14); }
+.sm-buehne .rundknopf.zart { color: #f3e7c9; background: rgba(0,0,0,.18); }
+.sm-papierhalter { position: relative; overflow: hidden; margin: 0 auto; width: min(760px, 100vw); min-height: 160px; }
+.sm-papier { --sp: 0; --ze: 0; --lh: 26px; position: absolute; left: 50%; top: calc(100% - 84px); width: 690px; min-height: 560px; padding: 40px 24px 0 36px; box-sizing: border-box; background: #f7efdd; box-shadow: 0 6px 22px rgba(0,0,0,.5), inset 0 0 40px rgba(120,90,40,.08); font: 17px/26px "Courier Prime", "Courier New", Courier, ui-monospace, Menlo, monospace; transform: translate(calc(-36px - var(--sp) * 1ch), calc(-40px - var(--ze) * var(--lh))); transition: transform .07s linear; will-change: transform; }
+.sm-papier.ruecklauf { transition: transform .32s cubic-bezier(.2,.8,.2,1); }
+.sm-buehne[data-papier="weiss"] .sm-papier { background: #fbfbf7; }
+.sm-buehne[data-papier="gelb"] .sm-papier { background: #f1e4a4; }
+.sm-buehne[data-papier="kariert"] .sm-papier { background: linear-gradient(rgba(120,150,200,.22) 1px, transparent 1px) 0 14px / 100% 13px, linear-gradient(90deg, rgba(120,150,200,.22) 1px, transparent 1px) 36px 0 / 13px 100%, #fbfbf7; }
+.sm-zeile { white-space: pre; height: 26px; color: var(--sm-tinte); }
+.sm-z { display: inline-block; width: 1ch; text-align: center; }
+.sm-z.s0 { opacity: .96; } .sm-z.s1 { opacity: .8; } .sm-z.s2 { opacity: .9; text-shadow: 0 0 .4px var(--sm-tinte); } .sm-z.s3 { opacity: .68; }
+.sm-z.frisch { animation: sm-schlag .14s ease-out; }
+@keyframes sm-schlag { from { transform: scale(1.35); opacity: 1; } }
+.sm-walze { position: absolute; left: 0; right: 0; bottom: 0; height: 46px; background: linear-gradient(#3a3d42, #15171a 60%, #2a2d31); box-shadow: 0 -4px 10px rgba(0,0,0,.4); pointer-events: none; }
+.sm-walze::before, .sm-walze::after { content: ""; position: absolute; top: 4px; width: 26px; height: 38px; border-radius: 6px; background: linear-gradient(#e8c27a, #8a6a2e); }
+.sm-walze::before { left: 2%; } .sm-walze::after { right: 2%; }
+.sm-typenfuehrung { position: absolute; left: 50%; bottom: 48px; width: 22px; height: 10px; margin-left: -11px; border: 2px solid rgba(20,22,26,.8); border-top: none; border-radius: 0 0 4px 4px; pointer-events: none; }
+.sm-maschine { width: min(760px, 100vw); margin: 0 auto; padding: 0 8px calc(6px + env(safe-area-inset-bottom)); }
+.sm-bild { width: 100%; height: auto; max-height: 27vh; display: block; }
+.sm-taste { transition: transform .08s; transform-box: view-box; }
+.sm-taste.gedrueckt { animation: sm-taste .16s ease-out; }
+@keyframes sm-taste { 40% { transform: translateY(2.2px) scale(.95); } }
+.sm-type { transform-box: view-box; transition: stroke .1s; }
+.sm-type.schlaegt { animation: sm-type .14s ease-in-out; stroke: #d9d4c8; }
+@keyframes sm-type { 45% { transform: scale(-1, -1); } }
+.sm-wagen { transform-box: view-box; }
+.sm-wagen.faehrt { animation: sm-wagen .4s ease-in-out; }
+@keyframes sm-wagen { 35% { transform: translateX(-28px); } }
+.sm-glocke { transform-box: view-box; }
+.sm-glocke.klingelt { animation: sm-glocke .6s ease-in-out; }
+@keyframes sm-glocke { 0%, 100% { transform: none; } 20% { transform: rotate(18deg); } 50% { transform: rotate(-14deg); } 80% { transform: rotate(8deg); } }
+.sm-maschine.nein { animation: sm-nein .3s ease-in-out; }
+@keyframes sm-nein { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.sm-eingabe { position: absolute; left: 50%; bottom: 30%; width: 4px; height: 4px; opacity: .02; border: none; resize: none; overflow: hidden; caret-color: transparent; }
+@media (max-width: 600px) { .sm-kopf b { display: none; } .sm-knopf { font-size: 11px; padding: 4px 8px; } .sm-papier { font-size: 15px; --lh: 24px; } .sm-zeile { height: 24px; } }
+
+/* ===================== Salon: mehr Stimmen, Rat auf Englisch mit Übersetzung ===================== */
+.salon-reihen-gaeste { display: grid; gap: 26px; margin-top: 30px; }
+.salon-reihen-gaeste .salon-reihe.gaeste { margin-top: 0; }
+.salon-rat.en { font-family: ui-serif, "New York", Georgia, serif; }
+.salon-rat-de { margin-top: 8px; padding: 8px 12px; border-left: 3px solid var(--gold); font: 14.5px/1.5 ui-serif, "New York", Georgia, serif; color: var(--tinte); background: color-mix(in srgb, var(--karte) 70%, transparent); border-radius: 0 8px 8px 0; animation: hochkommen .2s ease; }
+.salon-ratfuss .salon-rat-knopf { margin-left: 8px; padding: 2px 8px; font-size: 11.5px; vertical-align: middle; }
+.st-de, .salonkarte-de, .sitzung-rat-de { display: block; font: italic 12.5px/1.45 ui-serif, "New York", Georgia, serif; color: var(--blass); margin-top: 2px; }
+.salon-blase-de { font: italic 13px/1.45 ui-serif, "New York", Georgia, serif; color: var(--blass); margin-top: 4px; }
+.salon-rahmen.hell { --rahmen: #d9c9a6; }
+.salon-sessel { left: calc(50% - min(130px, 18%) - 118px); bottom: 20px; width: 100px; height: 116px; }
+
+/* ===================== Wortkisten: der Rand ===================== */
+.wortkiste-mini { --kistenrand: #6b4a32; }
+.wortkiste-mini.rand-holz .wortkiste-ruecken { background: linear-gradient(90deg, #4e3620, #8a6a3e 45%, #5a4326); box-shadow: inset -1px 0 0 rgba(0,0,0,.3); }
+.wortkiste-mini.rand-leinen .wortkiste-ruecken { background: repeating-linear-gradient(45deg, #d9c9a6 0 2px, #c9b890 2px 4px); }
+.wortkiste-mini.rand-leinen { box-shadow: 0 4px 12px var(--schein), inset 0 0 0 2px #d9c9a6; }
+.wortkiste-mini.rand-gold .wortkiste-ruecken { background: linear-gradient(90deg, #8a6a2e, #e8c27a 50%, #a8832f); }
+.wortkiste-mini.rand-gold { box-shadow: 0 4px 12px var(--schein), inset 0 0 0 2px #c9a25a, inset 0 0 0 3px rgba(255,240,200,.5); }
+.wortkiste-mini.rand-schwarz .wortkiste-ruecken { background: linear-gradient(90deg, #0f1113, #2a2d31 50%, #15171a); }
+.wortkiste-mini.rand-schwarz { box-shadow: 0 4px 12px var(--schein), inset 0 0 0 2px #15171a; }
+.wortkiste-mini.rand-papier .wortkiste-ruecken { background: repeating-linear-gradient(180deg, #fbf6e8 0 6px, #e9ddc3 6px 7px); }
+.wortkiste-mini.rand-papier { box-shadow: 0 4px 12px var(--schein), inset 0 0 0 2px #f1e6d0; }
+.wortkiste-mini.rand-farbe .wortkiste-ruecken { background: linear-gradient(90deg, color-mix(in srgb, var(--kistenrand) 70%, black), var(--kistenrand) 50%, color-mix(in srgb, var(--kistenrand) 80%, black)); }
+.wortkiste-mini.rand-farbe { box-shadow: 0 4px 12px var(--schein), inset 0 0 0 3px var(--kistenrand); }
+.wortkiste-mini.an[class*="rand-"] { box-shadow: 0 0 0 3px var(--papier), 0 0 0 5px var(--akzent), 0 9px 19px var(--schein); }
+.wortkisten-randzeile { display: grid; gap: 6px; }
+.wortkisten-randwahl { display: flex; flex-wrap: wrap; gap: 6px; }
+.wortkisten-randwahl button { padding: 5px 10px; border-radius: 100px; font-size: 12.5px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); display: inline-flex; align-items: center; gap: 6px; }
+.wortkisten-randwahl button.an { box-shadow: inset 0 0 0 2px var(--akzent); }
+.wortkisten-randwahl button i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+.wortkisten-randwahl button[data-rand="holz"] i { background: linear-gradient(90deg, #4e3620, #8a6a3e, #5a4326); }
+.wortkisten-randwahl button[data-rand="leinen"] i { background: repeating-linear-gradient(45deg, #d9c9a6 0 2px, #c9b890 2px 4px); }
+.wortkisten-randwahl button[data-rand="gold"] i { background: linear-gradient(90deg, #8a6a2e, #e8c27a, #a8832f); }
+.wortkisten-randwahl button[data-rand="schwarz"] i { background: #15171a; }
+.wortkisten-randwahl button[data-rand="papier"] i { background: repeating-linear-gradient(180deg, #fbf6e8 0 3px, #e9ddc3 3px 4px); }
+.wortkisten-randwahl button[data-rand="farbe"] i { background: var(--randfarbe, #b0552f); }
+.wortkisten-randzeile > span { font: 600 11.5px/1.2 ui-rounded, -apple-system, system-ui, sans-serif; letter-spacing: .04em; color: var(--blass); }

@@ -277,7 +277,7 @@ test('Salon: vier Stimmen, echte Zitate mit Quelle, Rat wiederholbar und unersch
   const k = await frisch();
   assert.equal(k.SALON_AUTOREN.length, 4);
   assert.equal(k.SALON_GAESTE.length, 2);
-  assert.equal(k.SALON_FEST.length, 6);
+  assert.equal(k.SALON_FEST.length, 10);
   for (const g of k.SALON_GAESTE) { assert.ok(g.gast && g.zitate.length >= 5 && g.saetze.length >= 12 && g.kern.length >= 10 && g.foto && g.foto.lizenz, g.name + ' als Gast vollständig'); }
   /* Werke und Aufgaben bei den Hausherren */
   for (const a of k.SALON_AUTOREN) { assert.ok(a.werke.length >= 4, a.name + ' hat ein Regal'); assert.ok(a.aufgaben.length >= 5, a.name + ' stellt Aufgaben'); for (const au of a.aufgaben) assert.ok(au.t.length > 20 && typeof au.min === 'number'); }

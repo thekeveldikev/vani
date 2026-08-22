@@ -1893,3 +1893,94 @@ Diktat-Knopf im Schreibraum (Chrome), Raumklang-Schalter in den Feinheiten.
 Tests 167/167 (neu: Textlupe, Jahresringe-Daten/Jahre/SVG, Heute-vor-einem-Jahr, Salon-Briefe).
 Browser: Zimmer mit zwei Rahmenreihen, Sessel- und Kaminfläche, sechs Konsolenkarten, Brief-Fenster,
 Jahresringe (12 Ringe, „841 Wörter an 1 Tagen"), Textlupe (6 Zahlen), altes Blatt auf dem Tisch.
+
+## 34. Orte mit Leben, die Schreibmaschine, vier Stimmen mehr (24. August 2026, VANI 5.26.0)
+
+### Orte, Stufe vier (`src/57-orte.js`, neu geschrieben)
+- Kulissen sind jetzt 150 px hoch und voller Dinge: **Diele** mit blauem Detektivmantel
+  (Kragen, Gürtel, zwei Knopfreihen), Hut, Schal, Jahreszeitendeko, Schuhen, Schirmständer,
+  **Schlüsselbrett** mit drei Schlüsseln (einer trägt einen kleinen VW-Bus als Anhänger),
+  **Spiegel** mit Goldrahmen und einer Zeile, als hätte jemand mit Edding drübergeschrieben
+  (Einstellung `orte.spiegelZeile`, Standard „Heute: ein Satz reicht.", max. 60 Zeichen — keine
+  Liedzeile im Code), Konsole mit Briefen, Katze, Wanduhr mit richtigen Zeigern.
+  **Zettelkasten** mit stehenden Karten, Messingschild, herausragendem letzten Zettel, Stempel,
+  Füller, Büroklammern. **Papierstapel** als Schreibtisch: das oberste Blatt zeigt Titel und
+  Anfang des neuesten Blatts auf den Linien, Briefbeschwerer, Bleistift, Tintenfass, ein
+  Papierflieger, der ab und zu segelt. **Lesetisch** mit Lampe (tippen schaltet), Bücherstapel,
+  Tasse mit Dampf, Brille, Pflanze, Lesezeichenband — und der **Schreibmaschine** in der Mitte.
+  **Korkwand** mit Karten, roter Schnur, Polaroid mit Klebeband, Kalenderblatt mit heutigem
+  Tag, Post-its mit den drei neuesten Projekten (tippen öffnet), Bleistift an der Schnur.
+  **Küchentisch** (statt Karo-Tischtuch): Holz, aufgeschlagenes Heft mit Bleistift-Gedankenkarte,
+  zwei Zettel mit Messingnadeln und rotem Faden, Teetasse mit Dampf, Keks, Rosmarin, Späne.
+  **Setzkasten** mit Fächern, Farbwalze und Andruckbogen (die neuesten Wörter, richtig herum).
+  **Musikzimmer** mit Grammophon-Horn, schwebenden Noten wenn etwas spielt, Metronom, Kerze.
+  **Telefonbank** mit Wählscheibe, Notizblock mit Gekritzel, Lampe, Hut, Farn. **Werkzeugkasten**
+  mit Lochwand, Hammer, Säge, Zange, Wasserwaage (Libelle wandert beim Tippen), Maßband.
+- **Alles reagiert auf Tippen** (`orteTipp`, `orteBeleben`, `ORTE_TUN`): Wackeln, ein Satz als
+  Toast (`data-sag`), optional Tick (wenn „leises Geräusch" an), manchmal eine Tat
+  (`data-tun`: Schreibmaschine öffnen, Lampe schalten, Spiegel wischen, oberstes Blatt öffnen,
+  letzten Zettel öffnen, Projekt öffnen). Tastatur: Enter/Leertaste auf fokussiertem Ding.
+- **Kleine Bewegungen** (`orte.bewegung`, Standard an; `html[data-orte-bewegung]`): Dampf, Schal,
+  Katzenschwanz, Sekundenzeiger, Schlüsselbund, Papierflieger, Blätter, Pendel, Kerzenflamme,
+  Lesezeichenband, Glühbirnenflackern, Noten, eine Taste der Schreibmaschine. Alle Ambient-
+  Animationen liegen unter `.ort-kulisse.lebt`; `prefers-reduced-motion` schaltet sie ab.
+- **Der Spiegel zeigt dich** (`orte.spiegelKamera`, Standard aus): `orteSpiegelKamera` holt die
+  Innenkamera (getUserMedia, facingMode user, 320 px), legt ein `<video>` gespiegelt, unscharf
+  und mit Nebel-Vignette genau in die Spiegelfläche (Koordinaten aus der viewBox-Abbildung,
+  ResizeObserver), die Edding-Zeile liegt als HTML darüber. Stream stoppt beim Verlassen der
+  Diele (`orteKameraStopp` in `orteAnwenden`). Verweigert die Nutzerin, bleibt die Kamera in
+  dieser Sitzung aus (Toast). Nichts wird gespeichert oder gesendet. Feinheiten-Karte: Schalter
+  „Kleine Bewegungen", Textfeld „Mit Edding auf dem Spiegel", Schalter „Der Spiegel zeigt dich".
+- Transform-Attribute liegen nie auf dem wackelnden Element selbst (CSS-transform würde sie
+  überschreiben) — deshalb innere `<g transform>`.
+
+### Die Schreibmaschine (`src/57b-schreibmaschine.js`, neu)
+- `schreibmaschineOeffnen(startText?)` legt eine Bühne über alles: Kopf (Band: schwarz/rot/
+  blau/grün, Papier: weiß/creme/gelb/kariert, „Wie früher" = keine Rücktaste, Ton, „Als Blatt
+  ablegen", Schließen), darunter der Bogen in der Walze (das Papier fährt: Spalte → translateX
+  in `ch`, Zeile → translateY; die Schreibstelle liegt fest über der Walze), darunter die
+  gezeichnete Maschine (SVG: Wagen mit Hebel, Farbband, 30 Typenhebel, vier Tastenreihen QWERTZ,
+  Leertaste, Glocke). Eine unsichtbare Textarea fängt die Eingabe; neue Zeichen werden mit
+  34 ms Abstand „getippt" (Taste drückt, Typenhebel schlägt, Klack), bei Spalte 52 klingelt die
+  Glocke (`schreibmaschineGlocke`), bei Zeile 60 und bei Enter fährt der Wagen zurück. Jede Type
+  schlägt ein wenig anders (`schreibmaschineSchlag`: Stärke 0–3, Versatz, Drehung — pur,
+  wiederholbar). `schreibmaschineZeilen(text, 60)` bricht wie die Maschine (pur).
+  Einstellungen in `D.einst.schreibmaschine` (`saubereSchreibmaschine`, STANDARD_EINST).
+  Geräusche synthetisch (`schreibmaschineKlang`: Rauschstöße + kurze Töne). Escape schließt;
+  mit ungetipptem Rest fragt sie, ob sie es ablegen soll. Auch im Spotlight („An die
+  Schreibmaschine") und als Chip/Ding auf dem Lesetisch der Hefte.
+
+### Salon: vier Stimmen mehr, englischer Rat (`src/56a-salon-stimmen.js`, neu; lädt vor 56)
+- **Tolkien, Blyton, Paolini, Twain** als Gäste (`SALON_GAESTE_MEHR`) mit Fotos (`autoren/`:
+  Tolkien ca. 1925 PD, Blyton ca. 1923 PD, Paolini 2024 CC0 Library of Congress, Twain 1907
+  Bradley PD — `autoren/quellen.json`), echten Zitaten mit Quelle (Original + Übersetzung;
+  unsichere als „zugeschrieben"), Werken, Aufgaben, und Rat auf **Englisch** (saetze, anfang,
+  kern, schluss) mit der **deutschen Fassung Satz für Satz parallel in `de`** (gleiche Längen,
+  gleiche Kern-Themen-Reihenfolge): `salonStimmeDe(autor)` baut die deutsche Stimme, und weil
+  `salonRat` nur über Längen und Reihenfolge würfelt, gibt dieselbe Saat denselben Rat in beiden
+  Sprachen — `salonRatZweisprachig(autor, saat, thema)` → `{ text, de }`.
+- **King, Rothfuss, Pratchett raten jetzt englisch** (`SALON_RAT_EN`, Übersetzungen ihrer
+  deutschen Sätze); beim Einmischen in 56-salon.js wandert ihr deutscher Rat nach `de`.
+- Überall, wo Rat steht, liegt die Übersetzung dabei: Sprechfenster (Knopf „Übersetzung"
+  unter dem Rat), Konsolenkarten (`.st-de`), Runde (`.salon-blase-de`), Sitzung (Vorschau und
+  Bilanz), Zuhause-Karte (`.salonkarte-de`), Briefantworten (in Klammern). Anrede im Brief „Dear
+  …" bei englischen Stimmen; Blyton „Liebe". Gäste-Reihen zu je fünf (`.salon-reihen-gaeste`).
+- `SALON_FEST` hat jetzt zehn Stimmen; Tests angepasst.
+- **„Setz dich" liegt auf dem Sessel**: `.salon-sessel { left: calc(50% - min(130px, 18%) -
+  118px); bottom: 20px; 100×116 }` deckt den gemalten Sessel (`sx = kx - kb/2 - 110`).
+- **Mehr Feuer**: 30 Funken mit Flimmern und Größe, Rauchschwaden über den Flammen, atmende
+  Glut auf den Scheiten, sieben Flammen, Hitzeschleier; alles höher, wenn das Kaminknistern
+  spielt.
+
+### Wortkisten: der Rand
+- `WORTKISTEN_RAENDER` (Holz, Leinen, Goldkante, Schwarz, Papier, eigene Farbe) im Kisten-
+  formular (Chips + Farbwähler), gespeichert als `kistenrand` / `kistenrandFarbe` (Sanitizer:
+  `[a-z]{1,16}` / `#rrggbb`; **nicht `rand`**, das ist das Ja/Nein der Hefte). Darstellung über
+  `.wortkiste-mini.rand-<art>` und `--kistenrand`.
+
+Tests 170/170 (neu `test/stimmen-orte.mjs`: Stimmen parallel, Zweisprachigkeit bei gleicher Saat,
+Schreibmaschine pur, Orte-Einstellungen, Umbruch, Kistenrand-Sanitizer).
+Browser: alle zehn Kulissen gerendert (Overlay-Probe), Tippen auf Mantel → Toast, Lampe → Licht
+aus, Schreibmaschine tippt vier Zeilen mit Glocke, Twain rät englisch mit Übersetzung, „Setz dich"
+über dem gemalten Sessel, Blätter als liniertes Papier, Küchentisch mit Zetteln, Kistenformular
+mit Randwahl.

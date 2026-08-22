@@ -568,7 +568,11 @@ function salonRatDesTages(autor, tagSchluessel) { return salonRat(autor, salonHa
 
 /* Zusatzdaten einmischen: Werke, Aufgaben, Sprachkennung */
 for (const a of SALON_AUTOREN) { const z = SALON_ZUSATZ[a.id]; if (z) Object.assign(a, z); }
-const SALON_FEST = [...SALON_AUTOREN, ...SALON_GAESTE];
+/* Englische Stimmen raten auf Englisch (56a): der deutsche Rat wandert nach `de` und bleibt als Übersetzung da */
+if (typeof SALON_RAT_EN !== 'undefined') for (const a of [...SALON_AUTOREN, ...SALON_GAESTE]) { const e = SALON_RAT_EN[a.id]; if (e && a.en) { a.de = { saetze: a.saetze, anfang: a.anfang, kern: a.kern, schluss: a.schluss }; Object.assign(a, e); } }
+const SALON_FEST = [...SALON_AUTOREN, ...SALON_GAESTE, ...(typeof SALON_GAESTE_MEHR !== 'undefined' ? SALON_GAESTE_MEHR : [])];
+/* Rat samt deutscher Fassung, wo es eine gibt */
+function salonRatDesTagesZweisprachig(autor, tagSchluessel) { return typeof salonRatZweisprachig === 'function' ? salonRatZweisprachig(autor, salonHash((tagSchluessel || '') + ':' + (autor && autor.id)), null) : salonRatDesTages(autor, tagSchluessel); }
 
 /* Eigene Menschen an der Wand: Dokumente vom Typ 'mentor'. */
 function salonEigene() { return vomTyp('mentor').sort((a, b) => (a.angelegt || 0) - (b.angelegt || 0)); }
@@ -613,7 +617,10 @@ RENDER.salon = function (haupt) {
   const haus = alle.filter((a) => !a.gast && !a.eigen), gaeste = alle.filter((a) => a.gast), eigene = alle.filter((a) => a.eigen);
   /* Die Wand: nur die Rahmen — oben die Hausherren, darunter kleiner die Gäste und die eigenen */
   const reihe1 = el('div', { class: 'salon-reihe haus' }, ...haus.map((a, i) => salonRahmen(a, i, () => salonSprechen(a))));
-  const reihe2 = el('div', { class: 'salon-reihe gaeste' }, ...[...gaeste, ...eigene].map((a, i) => salonRahmen(a, i + 4, () => salonSprechen(a))));
+  /* Gäste und eigene Leute: in Reihen zu höchstens fünf, damit die Wand nicht überläuft */
+  const rest = [...gaeste, ...eigene]; const reihen = [];
+  for (let i = 0; i < rest.length; i += 5) reihen.push(el('div', { class: 'salon-reihe gaeste' }, ...rest.slice(i, i + 5).map((a, j) => salonRahmen(a, i + j + 4, () => salonSprechen(a)))));
+  const reihe2 = el('div', { class: 'salon-reihen-gaeste' }, ...reihen);
   const sessel = el('button', { class: 'salon-sessel', title: 'Setz dich: eine Sitzung beginnen', 'aria-label': 'Setz dich — Sitzung beginnen', onclick: () => { if (typeof sitzungBeginnen === 'function') sitzungBeginnen(); } });
   const kamin = el('button', { class: 'salon-kaminknopf', title: 'Das Feuer: Klang an oder aus', 'aria-label': 'Kaminfeuer und Klang', onclick: () => salonKlang() });
   const galerie = el('div', { class: 'salon-galerie gemalt zimmer' }, reihe1, reihe2, sessel, kamin);
@@ -628,10 +635,10 @@ RENDER.salon = function (haupt) {
   /* Die Konsole unter der Wand: Rat des Tages je Person, Aufgabe, Briefe */
   const karten = el('div', { class: 'salon-konsole' });
   for (const a of alle) {
-    const rat = salonRatDesTages(a, heute); if (!rat) continue;
+    const rat = salonRatDesTagesZweisprachig(a, heute); if (!rat) continue;
     karten.append(el('button', { class: 'salon-tageskarte', onclick: () => salonSprechen(a, { saat: salonHash(heute + ':' + a.id) }) },
       el('span', { class: 'st-kopf' }, el('span', { class: 'st-mini' }, salonPortraet(a)), el('span', { class: 'st-ueber' }, 'Rat des Tages · ' + a.name.split(' ').pop())),
-      el('span', { class: 'st-text' }, rat.text), el('span', { class: 'st-fuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden — in ' + (a.anrede || a.name) + 's Geist')));
+      el('span', { class: 'st-text' }, rat.text), rat.de ? el('span', { class: 'st-de' }, rat.de) : null, el('span', { class: 'st-fuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden — in ' + (a.anrede || a.name) + 's Geist')));
   }
   const aufgabeHeute = (() => { const a = SALON_FEST[salonHash(heute + ':aufgabe') % SALON_FEST.length]; const l = a.aufgaben || []; return l.length ? { a, aufgabe: l[salonHash(heute + ':a') % l.length] } : null; })();
   const aufgabenkarte = aufgabeHeute ? el('button', { class: 'salon-aufgabe-heute', onclick: () => salonAufgabeAnnehmen(aufgabeHeute.a, aufgabeHeute.aufgabe) },
@@ -662,7 +669,7 @@ function salonBriefSchreiben(vorgewaehlt) {
     el('div', { class: 'einstellgruppe' }, el('b', {}, 'An'), wahl),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Nicht jetzt'), el('button', { class: 'knopf voll', onclick: () => {
       const a = salonFinde(an) || stimmen[0];
-      const b = blattAusText('Brief an ' + a.name, 'Liebe' + (a.id === 'funke' || a.id === 'lindgren' ? ' ' : 'r ') + (a.anrede || a.name) + ',\n\n');
+      const b = blattAusText('Brief an ' + a.name, (a.en ? 'Dear ' : 'Liebe' + (a.id === 'funke' || a.id === 'lindgren' || a.id === 'blyton' ? ' ' : 'r ')) + (a.anrede || a.name) + ',\n\n');
       salonBriefeSpeichern([...salonBriefe(), { an: a.id, docId: b.id, wann: Date.now(), beantwortet: false, frage: '' }]);
       zu(); oeffneSchreibraum(b.id);
       toast('Der Brief liegt bei den Blättern. In ' + SALON_ANTWORT_TAGE + ' Tagen kommt Antwort.', 3600);
@@ -677,9 +684,10 @@ function salonBriefeNachsehen() {
     const a = salonFinde(b.an); if (!a) { b.beantwortet = true; geaendert = true; continue; }
     const brief = D.docs.get(b.docId);
     const thema = brief ? salonThemaAusFrage(brief.text || '') : null;
-    const r1 = salonRat(a, salonHash(b.docId + ':1'), thema), r2 = salonRat(a, salonHash(b.docId + ':2'), null);
-    const anrede = brief && brief.titel ? '' : '';
-    const text = 'Antwort von ' + a.name + (brief ? ' auf „' + (brief.titel || 'deinen Brief') + '“' : '') + '\n\n' + (r1 ? r1.text : '') + (r2 && r2.text !== (r1 || {}).text ? '\n\n' + r2.text : '') + '\n\n— ' + (a.anrede || a.name) + ' (erfunden, in seinem Geist — aus dem Salon)' + anrede;
+    const zw = typeof salonRatZweisprachig === 'function' ? salonRatZweisprachig : salonRat;
+    const r1 = zw(a, salonHash(b.docId + ':1'), thema), r2 = zw(a, salonHash(b.docId + ':2'), null);
+    const satz = (r) => r ? r.text + (r.de ? '\n(' + r.de + ')' : '') : '';
+    const text = 'Antwort von ' + a.name + (brief ? ' auf „' + (brief.titel || 'deinen Brief') + '“' : '') + '\n\n' + satz(r1) + (r2 && r2.text !== (r1 || {}).text ? '\n\n' + satz(r2) : '') + '\n\n— ' + (a.anrede || a.name) + ' (erfunden, in seinem Geist — aus dem Salon)';
     neuDoc('schnipsel', { text });
     b.beantwortet = true; geaendert = true;
     toast('Post von der Wand: ' + a.name + ' hat geantwortet — sie liegt in den Schnipseln.', 5000);
@@ -714,11 +722,13 @@ function salonSprechen(a, { thema = null, saat = null, reiterStart = 'rat' } = {
   const chips = el('div', { class: 'salon-themen' });
   const tippe = (ziel, text, fertig) => { const w = text.split(' '); let i = 0; const tick = () => { if (!ziel.isConnected) return; ziel.textContent = w.slice(0, ++i).join(' '); if (i < w.length) setTimeout(tick, 26 + Math.random() * 38); else if (fertig) fertig(); }; tick(); };
   const zeigeRat = () => {
-    const r = salonRat(a, saatJetzt + zaehler * 7919, themaJetzt);
+    const r = (typeof salonRatZweisprachig === 'function' ? salonRatZweisprachig : salonRat)(a, saatJetzt + zaehler * 7919, themaJetzt);
     sprech.innerHTML = '';
     if (!r) { sprech.append(el('div', { class: 'salon-leer' }, a.eigen ? 'Noch kein Rat hinterlegt — beim Bearbeiten kannst du Sätze in ' + a.name + 's Stimme eintragen.' : 'Dazu fällt mir gerade nichts ein.')); return; }
-    const text = el('div', { class: 'salon-rat' });
-    sprech.append(text, el('div', { class: 'salon-ratfuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden, in ' + (a.anrede || a.name) + 's Geist' + (r.thema ? ' · ' + (SALON_THEMEN.find((t) => t[0] === r.thema) || [])[1] : '')));
+    const text = el('div', { class: 'salon-rat' + (a.en ? ' en' : '') });
+    const ueb = r.de ? el('div', { class: 'salon-rat-de', hidden: 'hidden' }, r.de) : null;
+    sprech.append(text, ueb, el('div', { class: 'salon-ratfuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden, in ' + (a.anrede || a.name) + 's Geist' + (r.thema ? ' · ' + (SALON_THEMEN.find((t) => t[0] === r.thema) || [])[1] : ''),
+      ueb ? el('button', { class: 'knopf zart salon-rat-knopf', onclick: (ev) => { ueb.hidden = !ueb.hidden; ev.currentTarget.textContent = ueb.hidden ? 'Übersetzung' : 'Übersetzung verbergen'; } }, 'Übersetzung') : null));
     tippe(text, r.text);
   };
   const baueChips = () => {
@@ -793,9 +803,10 @@ function salonRunde(frageText) {
     const naechste = () => {
       if (!liste.isConnected || i >= stimmen.length) return;
       const a = stimmen[i++];
-      const r = salonRat(a, salonHash(frageText + ':' + a.id + ':' + saat), thema) || salonRat(a, saat + i);
+      const zw = typeof salonRatZweisprachig === 'function' ? salonRatZweisprachig : salonRat;
+      const r = zw(a, salonHash(frageText + ':' + a.id + ':' + saat), thema) || zw(a, saat + i);
       const text = el('div', { class: 'sr-text' });
-      const blase = el('div', { class: 'salon-blase ' + (a.rahmen || 'nuss') }, el('div', { class: 'salon-blase-foto' }, salonPortraet(a)), el('div', { class: 'salon-blase-inhalt' }, el('b', {}, a.name), text, el('small', {}, 'erfunden, in ' + (a.anrede || a.name) + 's Geist')));
+      const blase = el('div', { class: 'salon-blase ' + (a.rahmen || 'nuss') }, el('div', { class: 'salon-blase-foto' }, salonPortraet(a)), el('div', { class: 'salon-blase-inhalt' }, el('b', {}, a.name), text, r && r.de ? el('div', { class: 'salon-blase-de' }, r.de) : null, el('small', {}, 'erfunden, in ' + (a.anrede || a.name) + 's Geist')));
       liste.append(blase); blase.scrollIntoView({ behavior: 'smooth', block: 'end' });
       const w = (r ? r.text : '…').split(' '); let k = 0;
       const tick = () => { if (!text.isConnected) return; text.textContent = w.slice(0, ++k).join(' '); if (k < w.length) setTimeout(tick, 22 + Math.random() * 30); else setTimeout(naechste, 420); };
