@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld('vaniDesktop', Object.freeze({
   geheimnisLesen: (profilId) => ipcRenderer.invoke('vani:geheimnis-lesen', profilId),
   geheimnisSpeichern: (wert, profilId) => ipcRenderer.invoke('vani:geheimnis-speichern', wert, profilId),
   geheimnisLoeschen: (profilId) => ipcRenderer.invoke('vani:geheimnis-loeschen', profilId),
+  buecherListe: () => ipcRenderer.invoke('vani:buecher-liste'),
+  buchLesen: (pfad) => ipcRenderer.invoke('vani:buch-lesen', pfad),
   updateSuchen: () => ipcRenderer.invoke('vani:update-suchen'),
   updateInstallieren: () => ipcRenderer.invoke('vani:update-installieren'),
   updateStatus: (fn) => {

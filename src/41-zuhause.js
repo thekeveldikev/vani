@@ -300,6 +300,11 @@ RENDER.zuhause = function (haupt) {
     zeichneFunde(); gitter.append(karte);
   }
 
+  /* Die Tür zum Schreibtisch */
+  inhalt.append(el('button', { class: 'karte desk-tuer', onclick: () => { location.hash = '#/schreibtisch'; } },
+    el('span', { html: ik('schreibtisch'), style: 'display:flex' }),
+    el('span', {}, el('b', {}, 'Der Schreibtisch'), el('small', {}, 'Lampe an, Fenster zur Nacht, die letzten Texte liegen noch da.'))));
+
   /* Sicherungs-Erinnerung, ganz leise */
   const tageOhneSicherung = D.stats.letzteSicherung ? Math.floor((Date.now() - D.stats.letzteSicherung) / 86400000) : null;
   if (D.docs.size > 12 && (tageOhneSicherung === null || tageOhneSicherung > 14)) {

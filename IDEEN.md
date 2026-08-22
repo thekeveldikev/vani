@@ -56,6 +56,39 @@ Schreiben. Nicht alles gehört herüber; das hier schon:
 
 ---
 
+## Der Schreibtisch — was er ist, was er werden kann
+
+Umgesetzt (5.15): ein eigener Raum. Fenster zur Nacht mit Sternen und echter
+Mondphase, Garten, der sich im Wind wiegt (und im Regen regnet, wenn der
+Klangraum Regen spielt), Lampe mit Lichtkegel, siebenarmiger Leuchter mit
+Flammen, Manuskripte = letzte Texte, Tintenfass = neues Blatt, Tasse =
+Schreibtag, Glas = Funke, Brief an mich = Zeitkapsel, Karteikarten, Lupe,
+Bleistiftstummel, Notizbuch = letztes Heft, Schublade, Lesestapel mit
+PDF-Lesemodus (pdf.js), Einrichten (Holz, Lampe, Leuchter, Wetter, Verse,
+Unordnung).
+
+Weiter gedacht:
+- **Tageszeit hinterm Fenster**: Dämmerung ab 17 Uhr, tiefe Nacht ab 22,
+  erstes Grau ab 5 — der Schreibtisch bleibt Nachttisch, aber das Fenster weiß,
+  wie spät es ist.
+- **Die Uhr**: eine alte Standuhr, die tickt (Klang) und die Schreibzeit der
+  Session zählt; Glockenschlag zur vollen Stunde, leise.
+- **Wachs**: der Leuchter brennt über Wochen wirklich ab (Zustand gespeichert),
+  neue Kerzen „aufstecken" als kleines Ritual nach 20 Schreibstunden.
+- **Fundstücke im Glas**: eigene Bilder (Fotos) als Fundstück — das Glas zeigt
+  jeden Tag ein anderes.
+- **Der Papierkorb unterm Tisch**: zerknüllte Blätter = der Papierkorb; ein
+  Blatt glätten = wiederherstellen.
+- **Ein zweiter Stuhl**: der Faden (Selbstchat) als „Gespräch am Tisch".
+- **Schreibtischlampe dimmt mit der Kerze**: brennt ein Sprint, geht die Lampe
+  etwas zurück; nur der Text bleibt hell.
+- **Lesestapel**: Notizen ins Buch (Randnotizen je Seite, gesynct), Textsuche
+  im Buch (pdf.js getTextContent über alle Seiten, mit Treffern), Vorlesen
+  aus dem Buch (Textebene → Stimme), Lesestatistik (Seiten pro Abend),
+  Lesezeichen mit Farbe, „Weiterlesen, wo ich war" auf dem Zuhause, EPUB
+  später (eigener Renderer, kein pdf.js).
+- **Siegelwachs**: Brief an mich mit eigenem Siegelbild (Sticker).
+
 ## Nach Raum
 
 ### Hefte

@@ -1333,3 +1333,52 @@ Textoffset zurücksetzen) und plain.
   folgen der Platte.
 
 Tests 141/141 (neu test/karteikarten.mjs; Ruhe-, Welle-3-, Atelier-Vertrag).
+
+## 22. Der Schreibtisch und der Lesestapel (23. August 2026, VANI 5.15.0)
+
+### Entscheidung zu den Büchern
+Die Nutzerin wollte zehn Bücher (King, Tolkien, Funke …) als PDFs „auf den
+Schreibtisch legen" und sie im Repo mitliefern, mit der Angabe persönlicher
+Erlaubnis. Die Dateinamen im Ordner tragen z-library-Marker. **Nichts davon
+liegt im Repo oder im Build** (Vertrag prüft: keine `.pdf` in den Buildlisten,
+kein `buecher/`-Ordner). Stattdessen: Bücher sind Dokumente vom Typ `buch` mit
+der PDF im Medienvorrat (`datei`), Cover als `bild` — also lokal, und über den
+E2E-Bereich auf die eigenen Geräte. Das wurde der Nutzerin so gesagt.
+
+### `src/54-schreibtisch.js` — der Raum
+Eigener Raum `schreibtisch` (Leiste, `ALLE_RAEUME` nach Zuhause; Icon
+`IK.schreibtisch`; Tür auf dem Zuhause). Szene aus DOM+CSS+zwei Canvases:
+`baueSternenhimmel` (Sterne, Mond mit echter Phase `mondphase()`),
+`baueLeuchter` (sieben Flammen, Technik aus 45b), Lichtkegel über `--lampe`.
+Dinge = Funktionen: Manuskripte (`schreibtischLetzteTexte`), Tinte (neues
+Blatt), Tasse (`schreibtischTag`: heute + Serie), Glas (`schreibtischFunke`,
+tagesstabil), Brief (`brief`-Docs mit `oeffnen`/`versiegelt`, `briefIstOffen`),
+Karten (Abfragen), Lupe, Stummel, Notizbuch (letztes Heft), Schublade
+(`schubladeOeffnen`: Funde + Wege + „Metall" = alter Schnipsel), Bücherstapel
+(Lesestapel). Fenster hört auf `D.einst.ambience` (`schreibtischWetter`:
+gewitter/regen/wind/grillen/still → Klassen `wetter-*`); Knopf schaltet
+Grillen+Wind. Einrichten: `saubererSchreibtisch` (holz, lampe, kerzen,
+wetterFolgtKlang, unordnung, verse) in `D.einst.schreibtisch`.
+Verse: kurze Zeilen aus `wiederFunde` (kuratiert), nie aus allem.
+
+### `src/55-lesestapel.js` — Bücher und Lesemodus
+pdf.js 6.2.108 legacy-Build in `vendor/pdf.min.js` + `pdf.worker.min.js`
+(**als .js, nicht .mjs** — Dev-Server/andere liefern .mjs als octet-stream,
+dann scheitert `import()`); Apache-2.0-Lizenz liegt bei. Lazy `import()` beim
+ersten Aufschlagen. `buchAuflegenAusBlob`: Titel/Autor aus Metadaten oder
+Dateiname (Tauschbörsen-Klammern raus, „(Nachname, Vorname)" gedreht), Cover
+= Seite 1 bei 480 px als JPEG in `media`. Wege: Datei-Picker, Goodnotes-Archiv
+(PDF-Docs), Desktop-Bücherordner (`vani:buecher-liste`/`vani:buch-lesen`, nur
+aus Dokumente/VANI-Bücher, exe/buecher, userData/buecher; Pfadprüfung).
+Lesemodus `buchOeffnen`: Canvas je Seite (dpr ≤ 2.5, Cache 10), Doppelseite
+auto (≥ 900 px quer), Blättern mit 3D-Übergang, Tippzonen/Wischen/Tasten,
+Schieber, Gliederung (`getOutline` → `getPageIndex`), Lesezeichen (Liste am
+Doc), Zitat (`getTextContent` → kopieren mit Quelle / Schnipsel),
+Einstellungen im `localStorage('vani-lese')` (Helligkeit, Wärme, Nacht =
+invert+hue-rotate, Doppelseite, Zoom, Blättern) — bewusst pro Gerät.
+Seite/Lesezeichen/`zuletzt` am Doc (gesynct).
+
+Tests 146/146 (neu `test/schreibtisch.mjs`, Schreibtisch-Vertrag). Browser:
+Raum mit allen Dingen, Lampe schaltet, Brief versiegelt, Schublade, Buch
+aufgelegt (316 S., Cover, Titel/Autor aus Dateinamen), Lesemodus rendert,
+blättert (Doppelseite „2–3"), Lesezeichen, Gliederung, Zitat mit Text, Nacht.

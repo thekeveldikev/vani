@@ -10,6 +10,8 @@ mkdirSync(join(publicDir, 'icons'), { recursive: true });
 for (const name of ['manifest.json', 'robots.txt']) cpSync(join(wurzel, name), join(publicDir, name));
 /* Die Klangaufnahmen liegen neben der App und werden erst bei Bedarf geholt. */
 try { cpSync(join(wurzel, 'klang'), join(publicDir, 'klang'), { recursive: true }); } catch (e) {}
+/* pdf.js für den Lesestapel — ohne es ließe sich im Rettungsraum kein Buch aufschlagen. */
+try { cpSync(join(wurzel, 'vendor'), join(publicDir, 'vendor'), { recursive: true }); } catch (e) {}
 /* Mitgebrachte Sticker ebenso — der Rettungsraum soll sie auch kennen. */
 try { cpSync(join(wurzel, 'sticker'), join(publicDir, 'sticker'), { recursive: true }); } catch (e) {}
 /* Der frühere Sites-Origin bleibt für die verschlüsselten Pakete erhalten, ist

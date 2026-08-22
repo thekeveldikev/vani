@@ -525,6 +525,200 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .kk-bilanz { font-size: 13px; color: var(--blass); text-align: center; margin-top: 8px; min-height: 1.2em; }
 .kk-optionen { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
 .knopf.klein { padding: 5px 11px; font-size: 13px; }
+/* ===================== DER SCHREIBTISCH ===================== */
+.desk-tuer { display: flex; gap: 14px; align-items: center; text-align: left; width: 100%; margin-top: 14px; background: linear-gradient(135deg, #2b211a, #17110d); color: #f1e4c8; }
+.desk-tuer svg.ik { width: 30px; height: 30px; color: #e8b05a; }
+.desk-tuer b { display: block; font-family: ui-serif, "New York", Georgia, serif; font-size: 18px; }
+.desk-tuer small { color: #c9b48e; font-size: 13px; }
+.desk-szene { position: relative; min-height: calc(var(--vvh, 100dvh) - 2px); overflow: hidden; background: #0d0b0a; color: #e8d9b8; user-select: none; --lampe: .8; --unordnung: .7;
+  display: flex; flex-direction: column; }
+/* Fenster */
+.desk-fenster { position: relative; height: 44%; min-height: 250px; overflow: hidden; background: linear-gradient(#06070c, #0f1220 60%, #171a22); }
+.desk-nacht { position: absolute; inset: 0; }
+.desk-sterne { position: absolute; inset: 0; width: 100%; height: 100%; }
+.desk-garten { position: absolute; left: 0; right: 0; bottom: 0; height: 62%; }
+.desk-garten i { position: absolute; bottom: 0; display: block; background: #0a0d0a; }
+.desk-garten .baum { width: 34%; height: 100%; border-radius: 48% 52% 10% 10% / 70% 70% 10% 10%; background: radial-gradient(ellipse at 50% 30%, #111a12, #070a07 70%); filter: blur(.4px); transform-origin: bottom center; animation: baum-wiegt 9s ease-in-out infinite alternate; }
+.desk-garten .b1 { left: -8%; } .desk-garten .b2 { right: -6%; height: 86%; animation-delay: -4s; animation-duration: 11s; }
+.desk-garten .busch { height: 38%; width: 30%; border-radius: 50% 50% 0 0; background: radial-gradient(ellipse at 50% 40%, #141f14, #0a0f0a 75%); animation: baum-wiegt 7s ease-in-out infinite alternate; transform-origin: bottom center; }
+.desk-garten .s1 { left: 18%; } .desk-garten .s2 { left: 44%; height: 30%; animation-delay: -2s; } .desk-garten .s3 { right: 16%; height: 44%; animation-delay: -5s; }
+.desk-garten .gras { left: 0; right: 0; height: 12%; background: repeating-linear-gradient(90deg, #0b100b 0 3px, transparent 3px 7px), linear-gradient(#0d120d, #0a0d0a); }
+@keyframes baum-wiegt { from { transform: rotate(-.8deg) scaleX(1); } to { transform: rotate(.9deg) scaleX(1.02); } }
+.desk-regen { position: absolute; inset: 0; pointer-events: none; opacity: 0; background-image: repeating-linear-gradient(100deg, transparent 0 14px, rgba(200,215,240,.18) 14px 15px, transparent 15px 31px); background-size: 140px 180px; animation: regen-faellt .55s linear infinite; transition: opacity 1.2s; }
+.wetter-regen .desk-regen, .wetter-gewitter .desk-regen { opacity: .8; }
+.wetter-gewitter .desk-nacht::after { content: ""; position: absolute; inset: 0; background: #dfe6ff; opacity: 0; animation: wetterleuchten 9s ease-in-out infinite; }
+@keyframes regen-faellt { to { background-position: -30px 180px; } }
+@keyframes wetterleuchten { 0%, 91%, 100% { opacity: 0; } 92% { opacity: .5; } 93.5% { opacity: 0; } 95% { opacity: .25; } 96% { opacity: 0; } }
+.wetter-wind .desk-garten .baum, .wetter-wind .desk-garten .busch { animation-duration: 3.2s; }
+.wetter-grillen .desk-garten .busch { animation-duration: 5s; }
+.desk-nebel { position: absolute; left: 0; right: 0; bottom: 0; height: 45%; background: linear-gradient(transparent, rgba(140,150,160,.08)); pointer-events: none; }
+.desk-rahmen { position: absolute; inset: 0; box-shadow: inset 0 0 0 14px #1c140f, inset 0 0 0 17px #3a2a1f, inset 0 0 60px rgba(0,0,0,.55); pointer-events: none; }
+.desk-rahmen .sprosse { position: absolute; background: #1c140f; box-shadow: 0 0 0 1px #3a2a1f; }
+.desk-rahmen .sprosse.v { left: calc(50% - 6px); top: 0; bottom: 0; width: 12px; }
+.desk-rahmen .sprosse.h { top: calc(42% - 5px); left: 0; right: 0; height: 10px; }
+.desk-ranken { position: absolute; left: -4%; right: -4%; top: -10px; height: 90px; pointer-events: none;
+  background: radial-gradient(ellipse 30px 14px at 10% 30%, #10170f 60%, transparent 62%), radial-gradient(ellipse 22px 12px at 22% 60%, #0d140c 60%, transparent 62%), radial-gradient(ellipse 34px 16px at 86% 20%, #10170f 60%, transparent 62%), radial-gradient(ellipse 20px 10px at 94% 55%, #0d140c 60%, transparent 62%), radial-gradient(ellipse 18px 9px at 72% 28%, #0f160e 60%, transparent 62%); }
+.desk-fensterknopf { position: absolute; right: 26px; bottom: 22px; width: 38px; height: 38px; border-radius: 50%; background: rgba(20,16,12,.7); color: #e8c27a; display: grid; place-items: center; box-shadow: 0 0 0 1px rgba(232,194,122,.35); z-index: 3; }
+.desk-fensterknopf svg.ik { width: 20px; height: 20px; }
+/* Platte */
+.desk-platte { position: relative; flex: 1; min-height: 420px; overflow: visible; }
+.desk-holz { position: absolute; inset: 0; background: repeating-linear-gradient(92deg, rgba(0,0,0,.12) 0 2px, transparent 2px 9px, rgba(255,255,255,.02) 9px 10px, transparent 10px 40px), repeating-linear-gradient(88deg, transparent 0 80px, rgba(0,0,0,.08) 80px 83px, transparent 83px 190px), linear-gradient(175deg, #4a3222, #2f2016 45%, #1f1510); box-shadow: inset 0 30px 60px rgba(0,0,0,.55); }
+.holz-ebenholz .desk-holz { background: repeating-linear-gradient(92deg, rgba(255,255,255,.025) 0 2px, transparent 2px 12px), linear-gradient(175deg, #26201d, #151110 45%, #0c0a09); }
+.holz-kirsche .desk-holz { background: repeating-linear-gradient(92deg, rgba(0,0,0,.1) 0 2px, transparent 2px 9px), linear-gradient(175deg, #6e3a2a, #4b261b 45%, #2f1810); }
+.holz-eiche .desk-holz { background: repeating-linear-gradient(92deg, rgba(0,0,0,.1) 0 2px, transparent 2px 8px, rgba(255,255,255,.03) 8px 9px, transparent 9px 30px), linear-gradient(175deg, #7a5a3a, #5a3f28 45%, #3c2a1a); }
+.desk-flecken { position: absolute; inset: 0; pointer-events: none; opacity: calc(.4 + var(--unordnung) * .6);
+  background: radial-gradient(ellipse 60px 26px at 22% 62%, rgba(12,10,22,.55), transparent 70%), radial-gradient(ellipse 14px 10px at 25% 66%, rgba(12,10,22,.7), transparent 70%), radial-gradient(ellipse 8px 6px at 20% 58%, rgba(12,10,22,.8), transparent 70%),
+    radial-gradient(ellipse 40px 16px at 70% 40%, rgba(12,10,22,.35), transparent 70%), radial-gradient(ellipse 110px 40px at 60% 80%, rgba(255,255,255,.05), transparent 70%),
+    radial-gradient(ellipse 24px 20px at 84% 72%, rgba(240,225,180,.18), transparent 70%), radial-gradient(ellipse 10px 18px at 86% 68%, rgba(240,225,180,.22), transparent 70%),
+    repeating-linear-gradient(40deg, transparent 0 57px, rgba(255,255,255,.04) 57px 58px, transparent 58px 141px), repeating-linear-gradient(-25deg, transparent 0 93px, rgba(0,0,0,.12) 93px 94px); }
+.desk-lichtkegel { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 46% 42% at 22% 32%, rgba(255,190,90,calc(.42 * var(--lampe))), rgba(255,170,70,calc(.16 * var(--lampe))) 40%, transparent 72%), linear-gradient(rgba(0,0,0,calc(.55 - .45 * var(--lampe))), rgba(0,0,0,calc(.7 - .5 * var(--lampe)))); }
+.kerzen-an .desk-lichtkegel { background: radial-gradient(ellipse 46% 42% at 22% 32%, rgba(255,190,90,calc(.42 * var(--lampe))), rgba(255,170,70,calc(.16 * var(--lampe))) 40%, transparent 72%), radial-gradient(ellipse 30% 30% at 80% 12%, rgba(255,160,70,.22), transparent 70%), linear-gradient(rgba(0,0,0,calc(.55 - .45 * var(--lampe))), rgba(0,0,0,calc(.7 - .5 * var(--lampe)))); }
+/* Die Dinge */
+.desk-ding, .desk-ding-halter { position: absolute; z-index: 2; transform: rotate(var(--dreh, 0deg)); transition: transform .25s cubic-bezier(.2,.8,.2,1), filter .25s; filter: drop-shadow(0 6px 8px rgba(0,0,0,.55)); }
+.desk-ding:hover { transform: rotate(var(--dreh, 0deg)) translateY(-3px); filter: drop-shadow(0 10px 12px rgba(0,0,0,.6)) brightness(1.06); }
+.desk-ding:active { transform: rotate(var(--dreh, 0deg)) scale(.98); }
+/* Lampe: oben links, mit Schirm */
+.desk-ding.lampe { left: 6%; top: -46px; width: 120px; height: 150px; filter: none; }
+.desk-ding.lampe .schirm { position: absolute; left: 10px; top: 0; width: 100px; height: 46px; border-radius: 8px 8px 50% 50% / 8px 8px 30% 30%; background: linear-gradient(#2a2320, #171311); box-shadow: inset 0 -6px 10px rgba(255,190,90,calc(.8 * var(--lampe))), 0 2px 6px rgba(0,0,0,.5); }
+.desk-ding.lampe .schirm::after { content: ""; position: absolute; left: 14px; right: 14px; top: 42px; height: 110px; clip-path: polygon(0 0, 100% 0, 160% 100%, -60% 100%); background: linear-gradient(rgba(255,200,110,calc(.32 * var(--lampe))), transparent); pointer-events: none; }
+.desk-ding.lampe::before { content: ""; position: absolute; left: 56px; top: 44px; width: 5px; height: 100px; background: linear-gradient(#3a302a, #1a1512); }
+/* Leuchter: rechts hinten */
+.desk-ding.leuchter { right: 4%; top: -62px; width: 150px; height: 150px; filter: none; }
+.leuchter-bild { position: relative; width: 150px; height: 150px; }
+.desk-leuchter-flammen { position: absolute; left: 0; top: 0; }
+.leuchter-fuss { position: absolute; left: 50%; top: 110px; width: 70px; height: 28px; margin-left: -35px; border-radius: 50% 50% 40% 40%; background: radial-gradient(ellipse at 50% 30%, #7a6036, #3a2c18 70%); box-shadow: 0 4px 8px rgba(0,0,0,.6); }
+.leuchter-fuss::before { content: ""; position: absolute; left: 50%; top: -44px; width: 8px; height: 46px; margin-left: -4px; background: linear-gradient(90deg, #3a2c18, #8a6d3c, #3a2c18); }
+.leuchter-fuss::after { content: ""; position: absolute; left: -22px; right: -22px; top: -14px; height: 6px; border-radius: 3px; background: linear-gradient(90deg, #3a2c18, #8a6d3c, #3a2c18); }
+/* Manuskripte: in der Mitte */
+.desk-ding.manuskript { left: 30%; top: 6%; width: min(220px, 30%); aspect-ratio: 3 / 4; }
+.desk-ding.manuskript.m2 { left: 37%; top: 10%; } .desk-ding.manuskript.m3 { left: 26%; top: 16%; }
+.manuskript-papier { width: 100%; height: 100%; padding: 14px 14px 10px; text-align: left; overflow: hidden; border-radius: 2px;
+  background: linear-gradient(170deg, #f6ecd6, #e9dcbf); color: #2c2218; font-family: ui-serif, "New York", Georgia, serif; font-size: 11px; line-height: 1.45; box-shadow: inset 0 0 30px rgba(120,90,40,.15); }
+.manuskript-papier b { display: block; font-size: 12.5px; margin-bottom: 5px; border-bottom: 1px solid rgba(60,40,20,.2); padding-bottom: 3px; }
+.manuskript-papier span { display: -webkit-box; -webkit-line-clamp: 9; -webkit-box-orient: vertical; overflow: hidden; }
+.desk-ding.manuskript.leer .manuskript-papier { color: #7a6a52; font-style: italic; }
+/* Tintenfass & Federn */
+.desk-ding.tinte { left: 58%; top: 4%; width: 90px; height: 90px; }
+.tinte-bild { position: relative; width: 90px; height: 90px; }
+.tinte-bild .fass { position: absolute; left: 30px; bottom: 8px; width: 34px; height: 30px; border-radius: 6px 6px 10px 10px; background: linear-gradient(#1b1f3a, #0b0d1c); box-shadow: inset 0 0 0 2px rgba(255,255,255,.08), inset 0 10px 12px rgba(255,255,255,.08), 0 3px 6px rgba(0,0,0,.6); }
+.tinte-bild .fass::before { content: ""; position: absolute; left: 8px; top: -8px; width: 18px; height: 9px; border-radius: 4px 4px 0 0; background: #2b2f4f; }
+.tinte-bild .feder { position: absolute; width: 8px; height: 64px; border-radius: 50% 50% 10% 10%; background: linear-gradient(#e9dcc2, #cdbfa0); transform-origin: bottom; }
+.tinte-bild .feder.f1 { left: 44px; bottom: 20px; transform: rotate(22deg); } .tinte-bild .feder.f2 { left: 8px; bottom: 2px; transform: rotate(-70deg); background: linear-gradient(#c9b48e, #9d8663); height: 56px; }
+/* Bücherstapel */
+.desk-ding-halter.buecher { left: 3%; top: 46%; width: min(170px, 24%); }
+.buecher-stapel { position: relative; }
+.stapel-buch { position: relative; display: block; width: 100%; aspect-ratio: 3 / 4; margin-top: calc(-90% + 14px); transform: rotate(var(--dreh, 0deg)); border-radius: 2px 5px 5px 2px; overflow: hidden; box-shadow: 0 3px 5px rgba(0,0,0,.55), inset 2px 0 4px rgba(255,255,255,.12); background: #4a3a2a; }
+.stapel-buch:first-child { margin-top: 0; }
+.stapel-buch img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.stapel-buch.ohne-cover span { position: absolute; inset: 0; display: grid; place-items: center; padding: 10px; font-family: ui-serif, "New York", Georgia, serif; font-size: 13px; color: #f1e4c8; text-align: center; }
+.stapel-buch:hover { transform: rotate(var(--dreh, 0deg)) translateY(-6px); z-index: 2; }
+.stapel-fuss { display: block; margin-top: 8px; padding: 4px 10px; border-radius: 8px; background: rgba(255,230,180,.1); color: #e8c27a; font-size: 12px; letter-spacing: .04em; }
+/* Tasse */
+.desk-ding.tasse { right: 10%; top: 44%; width: 76px; height: 80px; }
+.tasse-bild { position: relative; width: 76px; height: 80px; }
+.tasse-bild::before { content: ""; position: absolute; left: 8px; top: 26px; width: 48px; height: 46px; border-radius: 6px 6px 18px 18px; background: linear-gradient(#d8cfc2, #a9a096); box-shadow: inset 0 -12px 14px rgba(0,0,0,.2), inset 0 2px 0 rgba(255,255,255,.4), 0 3px 6px rgba(0,0,0,.55); }
+.tasse-bild::after { content: ""; position: absolute; left: 12px; top: 28px; width: 40px; height: 8px; border-radius: 50%; background: #3b2a1c; }
+.tasse-bild .henkel { position: absolute; left: 52px; top: 34px; width: 18px; height: 24px; border: 6px solid #c7beb1; border-left: 0; border-radius: 0 14px 14px 0; }
+.tasse-bild .dampf { position: absolute; top: 8px; width: 6px; height: 20px; border-radius: 50%; background: rgba(255,255,255,.0); }
+.tasse.dampft .dampf { background: rgba(255,250,240,.35); animation: dampf-steigt 2.8s ease-in-out infinite; }
+.tasse-bild .d1 { left: 22px; } .tasse-bild .d2 { left: 36px; animation-delay: -1.3s !important; }
+@keyframes dampf-steigt { 0% { transform: translateY(6px) scaleX(1); opacity: 0; } 30% { opacity: .7; } 100% { transform: translateY(-16px) scaleX(1.6); opacity: 0; } }
+.tasse-zahl { position: absolute; left: 8px; top: 40px; width: 48px; text-align: center; font-size: 12px; color: #fff8ea; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+/* Glas mit Fundstück */
+.desk-ding.glas { left: 24%; top: 56%; width: 50px; height: 70px; }
+.glas-bild { position: relative; width: 50px; height: 70px; }
+.glaskoerper { position: absolute; left: 4px; top: 10px; width: 42px; height: 56px; border-radius: 6px 6px 12px 12px; background: linear-gradient(90deg, rgba(255,255,255,.22), rgba(255,255,255,.06) 40%, rgba(255,255,255,.18)); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.35), 0 3px 6px rgba(0,0,0,.5); }
+.glaskoerper::before { content: ""; position: absolute; left: 8px; top: -8px; width: 26px; height: 10px; border-radius: 4px; background: #7a6a52; }
+.fundstueck { position: absolute; left: 18px; top: 40px; width: 14px; height: 16px; border-radius: 40% 60% 55% 45%; background: radial-gradient(circle at 40% 35%, #c9a25a, #6b4f25); }
+/* Brief */
+.desk-ding.brief { left: 9%; top: 82%; width: 92px; height: 62px; --dreh: -7deg; }
+.brief-bild { width: 92px; height: 62px; background: linear-gradient(#efe3c8, #dccba6); border-radius: 2px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,.55); }
+.brief-bild::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 0; border-left: 46px solid transparent; border-right: 46px solid transparent; border-top: 30px solid rgba(120,90,50,.22); }
+.brief-bild .siegel { position: absolute; left: 38px; top: 22px; width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #c8352b, #6e1710); box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.desk-ding.brief.bereit .siegel { animation: siegel-pocht 1.6s ease-in-out infinite; box-shadow: 0 0 0 4px rgba(232,194,122,.35); }
+.desk-ding.brief.leer .brief-bild { opacity: .75; }
+@keyframes siegel-pocht { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+/* Karteikarten */
+.desk-ding.karten { right: 24%; top: 70%; width: 70px; height: 48px; --dreh: 4deg; }
+.karten-bild { position: relative; width: 70px; height: 48px; }
+.karten-bild i { position: absolute; left: 0; top: 0; width: 64px; height: 40px; border-radius: 3px; background: repeating-linear-gradient(transparent 0 9px, rgba(120,140,200,.35) 9px 10px), #f5f0e0; box-shadow: 0 1px 3px rgba(0,0,0,.5); }
+.karten-bild i:nth-child(2) { transform: translate(3px, 3px) rotate(3deg); } .karten-bild i:nth-child(3) { transform: translate(6px, 6px) rotate(-2deg); }
+/* Lupe & Stummel */
+.desk-ding.lupe { right: 5%; top: 86%; width: 60px; height: 48px; --dreh: 30deg; }
+.lupe-bild { position: relative; width: 60px; height: 48px; }
+.lupe-bild .linse { position: absolute; left: 0; top: 6px; width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.45), rgba(200,220,255,.12) 60%); box-shadow: inset 0 0 0 4px #8a6d3c, 0 2px 4px rgba(0,0,0,.5); }
+.lupe-bild .griff { position: absolute; left: 32px; top: 24px; width: 26px; height: 7px; border-radius: 4px; background: #3a2a1c; transform: rotate(35deg); transform-origin: left center; }
+.desk-ding.stummel { left: 50%; top: 62%; width: 38px; height: 12px; --dreh: -18deg; }
+.stummel-bild { width: 38px; height: 10px; background: linear-gradient(90deg, #e9b45c 0 22px, #f1dfc0 22px 30px, #2b2520 30px); border-radius: 2px 50% 50% 2px / 2px 50% 50% 2px; box-shadow: 0 1px 3px rgba(0,0,0,.5); }
+/* Notizbuch */
+.desk-ding.notizbuch { right: 8%; top: 64%; width: 96px; height: 64px; --dreh: 6deg; }
+.notizbuch-bild { --heft1: #6f4334; width: 96px; height: 64px; border-radius: 3px 8px 8px 3px; background: linear-gradient(145deg, var(--heft1), color-mix(in srgb, var(--heft1) 70%, #000)); position: relative; box-shadow: 0 3px 6px rgba(0,0,0,.55), inset 6px 0 0 rgba(0,0,0,.25); }
+.notizbuch-bild .zettelchen { position: absolute; top: -6px; width: 18px; height: 12px; background: #f2d98a; box-shadow: 0 1px 2px rgba(0,0,0,.4); }
+.notizbuch-bild .z1 { left: 18px; background: #f2d98a; } .notizbuch-bild .z2 { left: 42px; top: -9px; background: #f3cfd3; } .notizbuch-bild .z3 { left: 66px; background: #cadfea; }
+/* Verse */
+.desk-vers { position: absolute; z-index: 1; font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 13px; color: rgba(235,220,190,.42); max-width: 220px; pointer-events: none; transform: rotate(var(--dreh, -4deg)); text-shadow: 0 1px 1px rgba(0,0,0,.4); }
+.desk-vers.v1 { left: 40%; top: 60%; --dreh: -6deg; } .desk-vers.v2 { left: 62%; top: 36%; --dreh: 3deg; } .desk-vers.v3 { left: 34%; top: 86%; --dreh: -2deg; }
+/* Schublade */
+.desk-schublade { position: absolute; left: 30%; right: 30%; bottom: 0; height: 34px; border-radius: 6px 6px 0 0; background: linear-gradient(#2c1f16, #1b120d); box-shadow: inset 0 2px 0 rgba(255,255,255,.08), 0 -2px 8px rgba(0,0,0,.4); z-index: 2; transition: transform .25s; }
+.desk-schublade:hover { transform: translateY(-4px); }
+.desk-schublade .griffknauf { position: absolute; left: 50%; top: 50%; width: 34px; height: 10px; margin: -5px 0 0 -17px; border-radius: 5px; background: linear-gradient(#c9a25a, #7a5a2a); box-shadow: 0 1px 2px rgba(0,0,0,.6); }
+.desk-einrichten { position: absolute; right: 12px; top: 12px; z-index: 4; background: rgba(20,16,12,.6); color: #e8c27a; }
+/* Unordnung: weniger Dinge bei wenig Unordnung */
+.desk-szene[style*="--unordnung:0"] .desk-vers, .desk-szene[style*="--unordnung:0."] .desk-vers { opacity: calc(var(--unordnung) * 2); }
+@media (max-width: 760px) {
+  .desk-fenster { height: 34%; min-height: 200px; }
+  .desk-ding.manuskript { width: 40%; left: 28%; top: 4%; } .desk-ding.manuskript.m2 { left: 34%; } .desk-ding.manuskript.m3 { left: 22%; top: 12%; }
+  .desk-ding.lampe { left: 2%; top: -50px; transform: scale(.8); }
+  .desk-ding.leuchter { right: -10px; top: -70px; transform: scale(.78); }
+  .desk-ding.tinte { left: 66%; top: 30%; transform: scale(.8); }
+  .desk-ding-halter.buecher { width: 30%; top: 52%; }
+  .desk-ding.tasse { right: 6%; top: 48%; transform: scale(.85); }
+  .desk-ding.glas { left: 36%; top: 60%; } .desk-ding.brief { top: 84%; left: 6%; }
+  .desk-ding.karten { right: 32%; top: 78%; } .desk-ding.lupe { right: 4%; top: 88%; } .desk-ding.stummel { left: 52%; top: 70%; } .desk-ding.notizbuch { right: 6%; top: 66%; transform: scale(.85); }
+  .desk-vers { font-size: 11px; max-width: 150px; }
+}
+/* ===================== LESESTAPEL & LESEMODUS ===================== */
+.modal.lesestapel { width: min(760px, 96vw); max-height: 90dvh; overflow: auto; }
+.lesestapel-raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 16px; margin: 8px 0 14px; }
+.lesestapel-buch { text-align: left; display: grid; gap: 5px; }
+.lesestapel-cover { aspect-ratio: 3 / 4; border-radius: 3px 7px 7px 3px; overflow: hidden; background: #3a2e24; box-shadow: 0 6px 14px rgba(0,0,0,.35), inset 3px 0 5px rgba(255,255,255,.15); position: relative; transition: transform .22s; }
+.lesestapel-buch:hover .lesestapel-cover { transform: translateY(-4px) rotate(-.6deg); }
+.lesestapel-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.lesestapel-buch.ohne-cover .lesestapel-cover span { position: absolute; inset: 0; display: grid; place-items: center; padding: 10px; color: #f1e4c8; font-family: ui-serif, Georgia, serif; text-align: center; font-size: 14px; }
+.lesestapel-titel { font-size: 13.5px; font-weight: 600; line-height: 1.25; }
+.lesestapel-autor { font-size: 12px; color: var(--blass); }
+.lesestapel-balken { height: 4px; border-radius: 2px; background: var(--hg2); overflow: hidden; }
+.lesestapel-balken i { display: block; height: 100%; background: var(--akzent); }
+.lesestapel-stand { font-size: 11.5px; color: var(--blass); }
+.lesemodus { position: fixed; inset: 0; z-index: 80; background: #1b1613; color: #f1e4c8; display: flex; flex-direction: column; --lese-hell: 1; --lese-waerme: .15; }
+.lese-kopf, .lese-fuss { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(20,16,12,.92); transition: opacity .4s, transform .4s; z-index: 2; }
+.lese-kopf { padding-top: calc(env(safe-area-inset-top) + 10px); }
+.lese-fuss { padding-bottom: calc(env(safe-area-inset-bottom) + 10px); }
+.lese-kopf.weg { opacity: 0; transform: translateY(-100%); pointer-events: none; } .lese-fuss.weg { opacity: 0; transform: translateY(100%); pointer-events: none; }
+.lese-kopf .knopf, .lese-fuss .knopf { color: inherit; background: rgba(255,255,255,.08); }
+.lese-kopf .rundknopf, .lese-fuss .rundknopf { color: #f1e4c8; background: rgba(255,255,255,.08); }
+.lese-kopf .rundknopf.an { background: var(--akzent); color: #fff; }
+.lese-titel { flex: 1; font-family: ui-serif, "New York", Georgia, serif; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lese-buehne { flex: 1; position: relative; overflow: hidden; display: grid; place-items: center; perspective: 1600px; touch-action: pan-y; cursor: pointer; }
+.lese-doppel { position: absolute; display: flex; gap: 12px; align-items: center; justify-content: center; inset: 0; transition: transform .42s cubic-bezier(.2,.8,.2,1), opacity .42s; transform-origin: center; }
+.lese-blatt { position: relative; filter: brightness(var(--lese-hell)); box-shadow: 0 14px 40px rgba(0,0,0,.55); border-radius: 2px; overflow: hidden; background: #fff; }
+.lese-blatt::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: rgb(255 176 90); mix-blend-mode: multiply; opacity: calc(var(--lese-waerme) * .45); }
+.lesemodus.nacht .lese-blatt canvas { filter: invert(1) hue-rotate(180deg) contrast(.92); }
+.lesemodus.nacht .lese-blatt { background: #111; }
+.lese-blatt canvas { display: block; max-width: 100%; }
+.lese-seitenzahl { position: absolute; right: 8px; bottom: 6px; font-size: 10px; color: rgba(0,0,0,.45); background: rgba(255,255,255,.6); padding: 1px 6px; border-radius: 6px; }
+.lesemodus.nacht .lese-seitenzahl { color: rgba(255,255,255,.5); background: rgba(0,0,0,.4); }
+.lese-doppel.geht-links { transform: translateX(-40%) rotateY(-22deg); opacity: 0; } .lese-doppel.geht-rechts { transform: translateX(40%) rotateY(22deg); opacity: 0; }
+.lese-doppel.kommt-rechts { animation: blatt-kommt-rechts .42s cubic-bezier(.2,.8,.2,1); } .lese-doppel.kommt-links { animation: blatt-kommt-links .42s cubic-bezier(.2,.8,.2,1); }
+@keyframes blatt-kommt-rechts { from { transform: translateX(30%) rotateY(18deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes blatt-kommt-links { from { transform: translateX(-30%) rotateY(-18deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.lese-balken { flex: 1; accent-color: var(--akzent); }
+.lese-stand { font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; color: #c9b48e; }
+.modal.zitat-kasten textarea { width: 100%; font-size: 14px; line-height: 1.5; }
+.modal.brief-kasten textarea { width: 100%; font-size: 16px; line-height: 1.55; font-family: ui-serif, "New York", Georgia, serif; }
+.brief-wann { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 14px; }
+.brief-wann select { padding: 6px 10px; border-radius: 10px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font: inherit; color: inherit; }
+.brief-text { white-space: pre-wrap; font-size: 17px; line-height: 1.6; max-height: 56dvh; overflow: auto; padding: 6px 2px; }
 .anlage .griff {
   position: absolute; right: -7px; bottom: -7px; width: 26px; height: 26px; border-radius: 50%;
   background: var(--akzent); color: var(--papier); display: none; align-items: center; justify-content: center;
@@ -1810,7 +2004,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.14.0';
+const APP_VERSION = '5.15.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -2001,6 +2195,7 @@ async function teileText(text) {
 const IK = {
   zuhause: '<path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/>',
   sticker: '<path d="M5 7a2 2 0 0 1 2-2h7.5L19 9.5V17a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"/><path d="M14.5 5v4.5H19"/><path d="M8.5 13.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8"/>',
+  schreibtisch: '<path d="M3 14h18"/><path d="M5 14v6M19 14v6"/><path d="M8 14v-3.5a2 2 0 0 1 2-2h1"/><path d="M14 5.5 12.5 10h4L15 5.5h-1Z"/><path d="M13.2 10.5v3.5"/><circle cx="7" cy="10.5" r="1.2"/>',
   lasso: '<path d="M12 4c4.4 0 8 2 8 4.8S16.4 13.6 12 13.6 4 11.6 4 8.8 7.6 4 12 4Z" stroke-dasharray="3 2.2"/><path d="M8.5 13.2c-.6 2.2-.2 4.3 1.4 6.3"/><circle cx="10.4" cy="20" r="1.2"/>',
   gliederung: '<path d="M5 6h3M10 6h9"/><path d="M7 11h3M12 11h7"/><path d="M7 16h3M12 16h7"/><path d="M5 20h3M10 20h9"/>',
   mikro: '<rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M6 11.5a6 6 0 0 0 12 0"/><path d="M12 17.5V21M9 21h6"/>',
@@ -2155,6 +2350,7 @@ function uebernehmeEinstellungen(quelle) {
   D.einst.kurzschrift = D.einst.kurzschrift !== false;
   D.einst.hefteAnsicht = ['karten', 'regal', 'tisch'].includes(D.einst.hefteAnsicht) ? D.einst.hefteAnsicht : 'karten';
   if (typeof saubererTisch === 'function') D.einst.tisch = saubererTisch(D.einst.tisch);
+  if (typeof saubererSchreibtisch === 'function') D.einst.schreibtisch = saubererSchreibtisch(D.einst.schreibtisch);
   D.einst.fadenAbgewaehlt = D.einst.fadenAbgewaehlt === true;
   D.einst.blattSortierung = ['zuletzt', 'aeltest', 'az'].includes(D.einst.blattSortierung) ? D.einst.blattSortierung : 'zuletzt';
   D.einst.schnipselAnsicht = D.einst.schnipselAnsicht === 'frei' ? 'frei' : 'lauf';
@@ -2225,6 +2421,7 @@ function sauberesDokument(quelle) {
     d[k] = v;
   }
   for (const k of ['text', 'rich', 'titel', 'notiz', 'schlagworte', 'dateiname', 'dateityp', 'art', 'vibe', 'farbe', 'farbe2', 'band', 'muster', 'papier', 'papierfarbe', 'ansicht', 'format', 'befestigung', 'label', 'schrift', 'lesezeichen']) {
+    if (k === 'lesezeichen' && d.typ === 'buch') continue;   /* Bücher: Seitenliste, siehe unten */
     if (d[k] != null) d[k] = String(d[k]).slice(0, k === 'text' || k === 'rich' || k === 'notiz' ? 10000000 : 1000);
   }
   for (const k of ['parent', 'projekt', 'projektRef', 'von', 'zu', 'bild', 'skizze', 'datei', 'quelle', 'fingerabdruck', '_geraet']) {
@@ -2269,6 +2466,18 @@ function sauberesDokument(quelle) {
       : null).filter((r) => r && r.seite) : [];
   }
   if (d.dauer != null) d.dauer = begrenze(d.dauer, 0, 36000, 0);
+  /* Bücher und Briefe auf dem Schreibtisch */
+  if (d.typ === 'buch') {
+    if (d.seiten != null) d.seiten = Math.round(begrenze(d.seiten, 0, 100000, 0));
+    if (d.seite != null) d.seite = Math.round(begrenze(d.seite, 1, 100000, 1));
+    if (d.autor != null) d.autor = String(d.autor).slice(0, 200);
+    if (d.zuletzt != null) d.zuletzt = begrenze(d.zuletzt, 0, Date.now() + 86400000, 0);
+    if (d.lesezeichen != null) d.lesezeichen = Array.isArray(d.lesezeichen) ? [...new Set(d.lesezeichen.map((n) => Math.round(Number(n))).filter((n) => Number.isFinite(n) && n >= 1 && n <= 100000))].slice(0, 200) : [];
+  }
+  if (d.typ === 'brief') {
+    if (d.oeffnen != null) d.oeffnen = begrenze(d.oeffnen, 0, 4102444800000, 0);
+    if (d.versiegelt != null) d.versiegelt = d.versiegelt === true;
+  }
   for (const k of ['gewusst', 'verfehlt']) if (d[k] != null) d[k] = Math.round(begrenze(d[k], 0, 100000, 0));
   if (d.abgefragt != null) d.abgefragt = begrenze(d.abgefragt, 0, Date.now() + 86400000, 0);
   if (d.deckel != null) d.deckel = typeof saubererDeckel === 'function' ? saubererDeckel(d.deckel) : undefined;
@@ -4738,6 +4947,7 @@ function zeigeTextFund(doc) {
 const RENDER = {};
 const ALLE_RAEUME = [
   { id: 'zuhause', name: 'Zuhause', icon: 'zuhause', fest: true },
+  { id: 'schreibtisch', name: 'Schreibtisch', icon: 'schreibtisch' },
   { id: 'schnipsel', name: 'Schnipsel', icon: 'schnipsel' },
   { id: 'blaetter', name: 'Blätter', icon: 'blatt' },
   { id: 'hefte', name: 'Hefte', icon: 'hefte' },
@@ -5114,6 +5324,11 @@ RENDER.zuhause = function (haupt) {
       regal);
     zeichneFunde(); gitter.append(karte);
   }
+
+  /* Die Tür zum Schreibtisch */
+  inhalt.append(el('button', { class: 'karte desk-tuer', onclick: () => { location.hash = '#/schreibtisch'; } },
+    el('span', { html: ik('schreibtisch'), style: 'display:flex' }),
+    el('span', {}, el('b', {}, 'Der Schreibtisch'), el('small', {}, 'Lampe an, Fenster zur Nacht, die letzten Texte liegen noch da.'))));
 
   /* Sicherungs-Erinnerung, ganz leise */
   const tageOhneSicherung = D.stats.letzteSicherung ? Math.floor((Date.now() - D.stats.letzteSicherung) / 86400000) : null;
@@ -13608,6 +13823,20 @@ const ANLEITUNG = [
     ]
   },
   {
+    id: 'schreibtisch', titel: 'Der Schreibtisch', icon: 'schreibtisch', raum: 'schreibtisch',
+    kurz: 'Ein schwerer Tisch vor dem Nachtfenster — alles darauf tut etwas.',
+    abschnitte: [
+      { t: 'Was das ist', p: ['Kein Raum zum Einsortieren, sondern der Mittelpunkt. Dunkles Holz, eine Lampe mit bernsteinfarbenem Kegel (kein Deckenlicht, niemals), ein siebenarmiger Leuchter, das Fenster auf den verwilderten Garten bei Nacht, mit echter Mondphase. Nichts darauf ist Dekoration: jedes Ding ist ein Griff in mein Schreiben.'] },
+      { t: 'Die Dinge', p: ['Die Manuskripte in der Mitte sind meine drei zuletzt bearbeiteten Texte — antippen schreibt weiter. Tintenfass und Feder: ein neues Blatt. Die Tasse: der Schreibtag (sie dampft, wenn ich heute geschrieben habe; die Zahl sind die Wörter). Das Glas mit dem Fundstück: der Funke des Tages. Der Brief: eine Zeitkapsel an mich selbst. Die Karteikarten: eine Wortkiste abfragen. Die Lupe: suchen. Der Bleistiftstummel: schnell einen Schnipsel. Das Notizbuch mit den Zetteln: mein letztes Heft. Der Bücherstapel: der Lesestapel. Die Lampe: heller oder dunkler. Der Leuchter: Schreibzeit anzünden — öffnet ein Blatt und die Kerze brennt. Das Fenster: die Grillen und der Wind des Nachtgartens (Klang); spielt im Klangraum Regen, regnet es vor dem Fenster, bei Gewitter wetterleuchtet es.'] },
+      { t: 'Die Schublade', p: ['Unten am Tisch. Darin: drei Fundstücke aus meinen eigenen Texten (wie auf dem Zuhause, nur verstaut), eine winzige Lupe, Bindfaden (Cluster), getrocknete Blätter (die losen Blätter), Briefmarken (etwas hinausschicken), ein Schlüssel ohne Schloss (Feinheiten) — und ein Stück Metall unbekannter Herkunft: ein alter Schnipsel, der entweder bedeutungslos ist oder der Schlüssel zu einem ganzen Roman.'] },
+      { t: 'Brief an mich', p: ['Ich schreibe, wähle „in einem Monat" (oder einer Woche, einem Jahr) — der Brief wird versiegelt und liegt auf dem Tisch. Vor dem Datum lässt er sich nicht öffnen. Ist es so weit, pocht das Siegel. Öffnen, lesen, antworten (wird ein neues Blatt) oder wegwerfen.'], b: 'Am Anfang eines Projekts einen Brief „in drei Monaten": was ich hoffe, was ich fürchte, wo ich stehen will.' },
+      { t: 'Der Lesestapel', p: ['Bücher als PDF auf dem Tisch — sie liegen nur auf meinen Geräten und reisen verschlüsselt über den privaten Bereich, nie übers Netz, nie ins Repo. Das Cover malt VANI aus der ersten Seite (oder ich wähle eine andere). Antippen schlägt auf; lange halten: umbenennen, Cover, von vorn, vom Tisch nehmen.'] },
+      { t: 'Bücher auflegen — drei Wege', s: ['„PDF auflegen" wählt Dateien — am Laptop, am Handy, überall, wo das Gerät Dateien öffnen darf.', 'Auf dem Schul-iPad: Bücher, die schon im Goodnotes-Archiv liegen, mit „Aus dem Goodnotes-Archiv" aufs Lesepult — oder am Handy auflegen, der private Bereich bringt sie aufs iPad.', 'In der Desktop-App: „Aus dem Bücherordner" — alles, was in „Dokumente/VANI-Bücher" oder im Ordner „buecher" neben der App liegt, mit einem Griff.'] },
+      { t: 'Der Lesemodus', p: ['Wie in einem Lesegerät: Tippen rechts blättert vor, links zurück, Mitte zeigt die Leisten; Wischen geht auch, am Laptop die Pfeiltasten (Leertaste vor, Pos1/Ende). Der Schieber unten springt; oben: Inhalt (wenn das Buch eine Gliederung mitbringt), Lesezeichen (mehrere je Buch), Zitat (die Seite als Text — kopieren mit Quelle oder als Schnipsel) und Einstellungen.', 'Einstellungen bleiben am Gerät, weil Helligkeit Gerätesache ist: Helligkeit, Wärme, Nacht (Seiten invertiert), Doppelseite (wie es passt / immer / nie — auf dem iPad quer zwei Seiten, am Handy eine), Größe (ganze Seite / volle Breite), Blättern mit oder ohne Bewegung. Seite, Lesezeichen und Stapel reisen mit.'] },
+      { t: 'Einrichten', p: ['Das Schieberegler-Symbol rechts oben: Holz (Ebenholz, Nussbaum, Kirsche, alte Eiche), Lampe, Leuchter an/aus, ob das Fenster auf den Klang hört, ob eigene Zeilen auf der Platte liegen, und wie viel Unordnung.'] }
+    ]
+  },
+  {
     id: 'schnipsel', titel: 'Schnipsel', icon: 'schnipsel', raum: 'schnipsel',
     kurz: 'Der Chat mit mir selbst.',
     abschnitte: [
@@ -14085,6 +14314,837 @@ function oeffneAnleitung(kapitelId) {
   _anleitung = { bogen, taste };
   baue();
   if (kapitelId) requestAnimationFrame(() => springe(kapitelId));
+}
+
+/* ================================================================
+   VANI — Der Schreibtisch.
+
+   Kein Raum zum Einsortieren, sondern der Mittelpunkt: ein schwerer Tisch aus
+   dunklem Holz vor einem hohen Fenster, dahinter fast völlige Nacht und ein
+   verwilderter Garten; auf dem Tisch eine Lampe mit bernsteinfarbenem Kegel,
+   ein siebenarmiger Leuchter, Tintenfass und Federn, offene Manuskripte,
+   Bücherstapel, eine Tasse, die schon längst gespült gehörte, ein Glas mit
+   einem Fundstück, ein Brief, Karteikarten, eine Lupe, ein Bleistiftstummel —
+   und eine Schublade voller Dinge, die kein vernünftiger Mensch aufbewahren
+   würde. Jedes Ding tut etwas. Nichts ist Dekoration: die Manuskripte sind die
+   zuletzt bearbeiteten Texte, die Bücher der Lesestapel, die Tasse der
+   Schreibtag, das Glas der Funke, der Brief eine Zeitkapsel an mich selbst.
+   Kein Deckenlicht. Niemals.
+   ================================================================ */
+
+const SCHREIBTISCH_HOELZER = [['ebenholz', 'Ebenholz'], ['nuss', 'Nussbaum'], ['kirsche', 'Kirsche'], ['eiche', 'Alte Eiche']];
+
+/* Einrichtung des Tisches — pur, mit Vorgaben. */
+function saubererSchreibtisch(roh) {
+  const q = roh && typeof roh === 'object' && !Array.isArray(roh) ? roh : {};
+  return {
+    holz: SCHREIBTISCH_HOELZER.some((h) => h[0] === q.holz) ? q.holz : 'nuss',
+    lampe: begrenze(q.lampe, .25, 1, .8),
+    kerzen: q.kerzen !== false,
+    wetterFolgtKlang: q.wetterFolgtKlang !== false,
+    unordnung: begrenze(q.unordnung, 0, 1, .7),
+    verse: q.verse !== false
+  };
+}
+
+/* Mondphase 0 … 1 (0 = Neumond, .5 = Vollmond), aus dem Datum. Pur. */
+function mondphase(wann = Date.now()) {
+  const bezug = Date.UTC(2000, 0, 6, 18, 14);      /* ein Neumond */
+  const synodisch = 29.530588853 * 86400000;
+  const t = ((wann - bezug) % synodisch + synodisch) % synodisch;
+  return t / synodisch;
+}
+
+/* Brief an mich: offen, wenn das Öffnungsdatum erreicht ist. Pur. */
+function briefIstOffen(brief, jetzt = Date.now()) {
+  if (!brief) return false;
+  const wann = Number(brief.oeffnen) || 0;
+  return wann <= jetzt;
+}
+
+/* Kurze eigene Zeilen für die „spontanen Verse" auf der Platte — aus den
+   kuratierten Funden, nie aus allem. */
+function schreibtischVerse(max = 3) {
+  if (typeof wiederFunde !== 'function') return [];
+  const funde = wiederFunde();
+  const aus = [];
+  for (const f of funde) {
+    const zeile = (f.auszug || '').split('\n').map((z) => z.trim()).find((z) => z.length >= 12 && z.length <= 64);
+    if (zeile && !aus.includes(zeile)) aus.push(zeile);
+    if (aus.length >= max) break;
+  }
+  return aus;
+}
+
+/* ----- Die Dinge auf dem Tisch ----- */
+
+function schreibtischLetzteTexte(n = 3) {
+  return [...D.docs.values()]
+    .filter((d) => ['szene', 'blatt', 'seite'].includes(d.typ) && (d.text || '').trim().length > 0)
+    .sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0)).slice(0, n);
+}
+
+async function schreibtischNeuesBlatt() {
+  const b = blattAusText('', '');
+  oeffneSchreibraum(b.id);
+}
+
+/* Brief an mich — eine Zeitkapsel. */
+async function briefSchreiben() {
+  const text = el('textarea', { rows: 7, placeholder: 'An die, die das in ein paar Wochen liest …', maxlength: '20000' });
+  const wahl = el('select', {},
+    el('option', { value: '7' }, 'in einer Woche'), el('option', { value: '30' }, 'in einem Monat'), el('option', { value: '90' }, 'in drei Monaten'),
+    el('option', { value: '180' }, 'in einem halben Jahr'), el('option', { value: '365' }, 'in einem Jahr'));
+  wahl.value = '30';
+  let fertig = false;
+  return new Promise((res) => {
+    const kasten = el('div', { class: 'modal brief-kasten' },
+      el('h2', {}, 'Ein Brief an mich'),
+      el('div', { class: 'stickerblock-hinweis' }, 'Er wird versiegelt und liegt auf dem Tisch, bis das Datum kommt. Dann erst lässt er sich öffnen.'),
+      text,
+      el('label', { class: 'brief-wann' }, 'Öffnen ', wahl),
+      el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
+        el('button', { class: 'knopf voll', onclick: () => {
+          const t = text.value.trim(); if (!t) { toast('Ein leerer Brief?'); return; }
+          fertig = true;
+          const brief = neuDoc('brief', { text: t, oeffnen: Date.now() + Number(wahl.value) * 86400000, versiegelt: true });
+          zu(); toast('Versiegelt. Er wartet auf dem Tisch.'); res(brief);
+        } }, 'Versiegeln')));
+    const zu = zeigeDeck(kasten, () => { if (!fertig) res(null); });
+    setTimeout(() => text.focus(), 60);
+  });
+}
+async function briefeZeigen() {
+  const briefe = vomTyp('brief').sort((a, b) => (a.oeffnen || 0) - (b.oeffnen || 0));
+  const punkte = briefe.map((b) => ({
+    text: (briefIstOffen(b) ? (b.versiegelt ? '✉ Darf geöffnet werden' : '✉ Geöffnet') : '✉ Versiegelt bis ' + fmtDatum(b.oeffnen)) + ' · geschrieben ' + fmtDatum(b.angelegt),
+    icon: briefIstOffen(b) ? 'blatt' : 'frieren', wert: b.id
+  }));
+  const wahl = await menue([...punkte, { text: 'Neuen Brief schreiben', icon: 'stift', wert: '_neu' }], briefe.length ? 'Briefe an mich' : 'Noch kein Brief auf dem Tisch');
+  if (!wahl) return;
+  if (wahl === '_neu') { await briefSchreiben(); return; }
+  const b = D.docs.get(wahl);
+  if (!b) return;
+  if (!briefIstOffen(b)) { toast('Noch versiegelt — bis ' + fmtDatum(b.oeffnen) + '. Geduld ist auch eine Schreibtugend.', 4200); return; }
+  if (b.versiegelt) { b.versiegelt = false; speichere(b); }
+  const kasten = el('div', { class: 'modal brief-kasten offen' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('blatt') }), 'GESCHRIEBEN ' + fmtDatum(b.angelegt).toUpperCase()),
+    el('div', { class: 'brief-text serif' }, b.text),
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: async () => { if (await frage('Diesen Brief wegwerfen?', { ja: 'Wegwerfen', gefahr: true })) { await loesche(b.id); zu(); zeichne(); } } }, 'Wegwerfen'),
+      el('button', { class: 'knopf', onclick: () => { zu(); const bl = blattAusText('Antwort auf einen Brief an mich', ''); oeffneSchreibraum(bl.id); } }, 'Antworten'),
+      el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
+  const zu = zeigeDeck(kasten);
+}
+
+/* Die Schublade: Dinge, die kein vernünftiger Mensch aufbewahren würde. */
+async function schubladeOeffnen() {
+  const funde = typeof wiederFunde === 'function' ? wiederFunde().slice(0, 3) : [];
+  const alte = vomTyp('schnipsel').filter((s) => Date.now() - s.angelegt > 14 * 86400000 && (s.text || '').trim());
+  const metall = alte.length ? alte[Math.floor(Math.random() * alte.length)] : null;
+  const wahl = await menue([
+    ...funde.map((f, i) => ({ text: '„' + (f.auszug.split('\n')[0] || '').slice(0, 60) + (f.auszug.length > 60 ? '…' : '') + '" — ' + f.art.toLowerCase(), icon: 'fund', wert: 'fund:' + f.doc.id })),
+    { text: 'Eine winzige Lupe — suchen', icon: 'suche', wert: 'lupe' },
+    { text: 'Bindfaden — wo alles zusammenhängt (Cluster)', icon: 'cluster', wert: 'faden' },
+    { text: 'Getrocknete Blätter — die losen Blätter', icon: 'blatt', wert: 'blaetter' },
+    { text: 'Briefmarken — etwas hinausschicken', icon: 'teilen', wert: 'marken' },
+    { text: 'Ein Schlüssel ohne Schloss — die Feinheiten', icon: 'feinheiten', wert: 'schluessel' },
+    metall ? { text: 'Ein Stück Metall unbekannter Herkunft', icon: 'wuerfel', wert: 'metall' } : null
+  ], 'Die Schublade');
+  if (!wahl) return;
+  if (wahl.startsWith('fund:')) { const d = D.docs.get(wahl.slice(5)); if (d) oeffneDokument(d); return; }
+  if (wahl === 'lupe') { if (typeof oeffneSuche === 'function') oeffneSuche(); return; }
+  if (wahl === 'faden') { location.hash = '#/cluster'; return; }
+  if (wahl === 'blaetter') { location.hash = '#/blaetter'; return; }
+  if (wahl === 'marken') { location.hash = '#/feinheiten'; return; }
+  if (wahl === 'schluessel') { location.hash = '#/feinheiten'; return; }
+  if (wahl === 'metall' && metall) {
+    await zeigeAnkunft('Ein Stück Metall unbekannter Herkunft', ['„' + (metall.text || '').slice(0, 300) + '"'], 'Schnipsel vom ' + fmtDatum(metall.angelegt) + ' — vielleicht bedeutungslos, vielleicht der Schlüssel zu einem ganzen Roman.', () => { location.hash = '#/schnipsel'; });
+  }
+}
+
+/* Das Glas mit dem Fundstück: der Funke des Tages. */
+function schreibtischFunke() {
+  const saat = tagKey();
+  let h = 0; for (const c of saat) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  const arten = ['frage', 'form', 'satz', 'figur', 'wendung', 'kombi'];
+  const art = arten[h % arten.length];
+  return art === 'kombi' ? neuerFunke(true) : neuerFunke(false, art);
+}
+
+/* Die Tasse: der Schreibtag. */
+function schreibtischTag() {
+  const heute = D.stats.tage[tagKey()] || 0;
+  let serie = 0;
+  for (let i = 0; i < 400; i++) {
+    const k = tagKey(Date.now() - i * 86400000);
+    if ((D.stats.tage[k] || 0) > 0) serie++; else if (i > 0) break;
+  }
+  return { heute, serie };
+}
+
+/* Öffnet ein Dokument an seinem Ort. */
+function oeffneDokument(d) {
+  if (!d) return;
+  if (d.typ === 'szene' || d.typ === 'blatt') oeffneSchreibraum(d.id);
+  else if (d.typ === 'seite') { sessionStorage.setItem('zielSeite', d.id); location.hash = '#/heft/' + d.parent; }
+  else if (d.typ === 'schnipsel') location.hash = '#/schnipsel';
+  else if (d.typ === 'faden') { if (typeof merkeFadenZiel === 'function') merkeFadenZiel(d.id); location.hash = '#/faden'; }
+  else if (d.typ === 'blase') location.hash = '#/brett/' + d.parent;
+  else if (d.typ === 'funkeln') location.hash = '#/woerter';
+}
+
+/* Fenster und Klang: der Nachtgarten hört auf den Klangraum. */
+function schreibtischWetter() {
+  const m = (D.einst && D.einst.ambience) || {};
+  const an = (re) => Object.keys(m).some((id) => m[id] > 0 && re.test(id));
+  if (an(/gewitter|donner/)) return 'gewitter';
+  if (an(/regen|wald_regen/)) return 'regen';
+  if (an(/wind|sturm/)) return 'wind';
+  if (an(/grillen|sumpf|nacht/)) return 'grillen';
+  return 'still';
+}
+async function nachtgartenKlang() {
+  if (typeof ambienceMischungAnwenden !== 'function') { location.hash = '#/klang'; return; }
+  const m = { ...(D.einst.ambience || {}) };
+  const an = (m.grillen_fern || 0) > 0 || (m.grillen || 0) > 0;
+  if (an) { for (const id of ['grillen_fern', 'grillen', 'wind_sanft', 'sumpf_nacht']) delete m[id]; toast('Der Garten schweigt.'); }
+  else { m.grillen_fern = .35; m.wind_sanft = .2; toast('Grillen und ein leiser Wind vor dem Fenster.'); }
+  try { await audioFreigeben(); await ambienceMischungAnwenden(m); } catch (e) {}
+  zeichne();
+}
+
+/* ----- Der siebenarmige Leuchter: sieben kleine Flammen auf Canvas ----- */
+function baueLeuchter(einst) {
+  const W = 150, H = 120;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const c = el('canvas', { class: 'desk-leuchter-flammen', width: String(W * dpr), height: String(H * dpr) });
+  c.style.width = W + 'px'; c.style.height = H + 'px';
+  const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const arme = [[14, 40], [35, 28], [56, 18], [75, 10], [94, 18], [115, 28], [136, 40]];
+  let phase = Math.random() * 10, laeuft = true, zug = 0;
+  const zeichne_ = (t) => {
+    if (!c.isConnected) { laeuft = false; return; }
+    phase += .016;
+    ctx.clearRect(0, 0, W, H);
+    arme.forEach(([x, y], i) => {
+      const fl = 1 + .12 * Math.sin(phase * 8 + i * 1.7) + .06 * Math.sin(phase * 17 + i);
+      const neig = Math.sin(phase * .9 + i) * .08 + zug * (i % 2 ? -1 : 1) * .2;
+      const fh = 15 * fl, fw = 4.6;
+      const by = y + 52;
+      /* Kerzenkörper */
+      ctx.fillStyle = '#efe0bd'; ctx.fillRect(x - 3, by, 6, 22 + (i === 3 ? 4 : 0));
+      /* Schein */
+      kerzeSchein(ctx, x, by - fh * .5, 22, 26, [[0, 'rgba(255,170,70,' + (.25 * fl).toFixed(3) + ')'], [1, 'rgba(255,140,50,0)']]);
+      /* Flamme */
+      ctx.beginPath();
+      const sx = x + neig * 14;
+      ctx.moveTo(x - fw * .2, by);
+      for (let k = 1; k <= 10; k++) { const u = k / 10; ctx.lineTo(sx * u + x * (1 - u) - fw * kerzeFlammenBreite(u) * .55, by - fh * u); }
+      for (let k = 10; k >= 1; k--) { const u = k / 10; ctx.lineTo(sx * u + x * (1 - u) + fw * kerzeFlammenBreite(u) * .55, by - fh * u); }
+      ctx.closePath();
+      const g = ctx.createLinearGradient(0, by, 0, by - fh);
+      g.addColorStop(0, 'rgba(255,150,40,.9)'); g.addColorStop(.6, 'rgba(255,200,100,.95)'); g.addColorStop(1, 'rgba(255,245,210,.3)');
+      ctx.fillStyle = g; ctx.fill();
+      ctx.fillStyle = 'rgba(255,252,230,.85)'; ctx.beginPath(); ctx.ellipse(x, by - fh * .3, 1.4, fh * .25, 0, 0, Math.PI * 2); ctx.fill();
+    });
+    zug *= .94;
+    if (laeuft) requestAnimationFrame(zeichne_);
+  };
+  requestAnimationFrame(zeichne_);
+  return { element: c, puste: (s = .5) => { zug += s; } };
+}
+
+/* Sterne hinterm Fenster: einmal gewürfelt, leicht flimmernd. */
+function baueSternenhimmel() {
+  const c = el('canvas', { class: 'desk-sterne' });
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const zuf = kerzeZufall(tagKey().length * 131 + 7);
+  const sterne = Array.from({ length: 70 }, () => ({ x: zuf(), y: zuf() * .7, r: .4 + zuf() * 1.2, ph: zuf() * 6, tw: .4 + zuf() }));
+  let laeuft = true, t = 0;
+  const mond = mondphase();
+  const male = () => {
+    if (!c.isConnected) { laeuft = false; return; }
+    const cr = c.getBoundingClientRect();
+    if (c.width !== Math.round(cr.width * dpr)) { c.width = Math.round(cr.width * dpr); c.height = Math.round(cr.height * dpr); }
+    const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const W = cr.width, H = cr.height; t += .02;
+    ctx.clearRect(0, 0, W, H);
+    for (const s of sterne) {
+      const a = .35 + .45 * Math.abs(Math.sin(t * s.tw + s.ph));
+      ctx.fillStyle = 'rgba(255,248,220,' + a.toFixed(2) + ')';
+      ctx.beginPath(); ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2); ctx.fill();
+    }
+    /* Mond mit echter Phase: eine helle Scheibe, vom Schatten angeschnitten */
+    const mx = W * .74, my = H * .18, mr = Math.min(22, W * .04);
+    ctx.save();
+    kerzeSchein(ctx, mx, my, mr * 4, mr * 4, [[0, 'rgba(255,245,215,.18)'], [1, 'rgba(255,245,215,0)']]);
+    ctx.fillStyle = '#f4ecd6'; ctx.beginPath(); ctx.arc(mx, my, mr, 0, Math.PI * 2); ctx.fill();
+    /* Schatten: Terminator als Ellipse, Seite je nach Phase */
+    const p = mond; const hell = 1 - Math.abs(p - .5) * 2;   /* 0 neu, 1 voll */
+    ctx.fillStyle = '#1a1c26';
+    ctx.beginPath();
+    if (p < .5) { ctx.arc(mx, my, mr, Math.PI / 2, -Math.PI / 2, false); ctx.ellipse(mx, my, mr * Math.abs(1 - 2 * hell), mr, 0, -Math.PI / 2, Math.PI / 2, hell > .5); }
+    else { ctx.arc(mx, my, mr, -Math.PI / 2, Math.PI / 2, false); ctx.ellipse(mx, my, mr * Math.abs(1 - 2 * hell), mr, 0, Math.PI / 2, -Math.PI / 2, hell > .5); }
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+    if (laeuft) setTimeout(() => requestAnimationFrame(male), 120);
+  };
+  requestAnimationFrame(male);
+  return c;
+}
+
+/* ----- Der Raum ----- */
+RENDER.schreibtisch = function (haupt) {
+  const e = saubererSchreibtisch(D.einst.schreibtisch);
+  const wetter = e.wetterFolgtKlang ? schreibtischWetter() : 'still';
+  const szene = el('div', { class: 'desk-szene holz-' + e.holz + ' wetter-' + wetter + (e.kerzen ? ' kerzen-an' : ''), style: '--lampe:' + e.lampe + ';--unordnung:' + e.unordnung });
+
+  /* Fenster */
+  const fenster = el('div', { class: 'desk-fenster' },
+    el('div', { class: 'desk-nacht' }, baueSternenhimmel()),
+    el('div', { class: 'desk-garten' }, el('i', { class: 'baum b1' }), el('i', { class: 'baum b2' }), el('i', { class: 'busch s1' }), el('i', { class: 'busch s2' }), el('i', { class: 'busch s3' }), el('i', { class: 'gras' })),
+    el('div', { class: 'desk-regen' }), el('div', { class: 'desk-nebel' }),
+    el('div', { class: 'desk-rahmen' }, el('i', { class: 'sprosse v' }), el('i', { class: 'sprosse h' })),
+    el('div', { class: 'desk-ranken' }),
+    el('button', { class: 'desk-fensterknopf', title: 'Der Nachtgarten: Grillen und Wind (Klang)', onclick: () => nachtgartenKlang() }, el('span', { html: ik('klang') })));
+
+  /* Tischplatte mit Dingen */
+  const platte = el('div', { class: 'desk-platte' }, el('div', { class: 'desk-holz' }), el('div', { class: 'desk-flecken' }), el('div', { class: 'desk-lichtkegel' }));
+  const ding = (klasse, titel, inhalt, onclick, stil) => {
+    const b = el('button', { class: 'desk-ding ' + klasse, title: titel, 'aria-label': titel, onclick, style: stil || '' }, inhalt);
+    return b;
+  };
+
+  /* Lampe */
+  platte.append(ding('lampe', 'Die Lampe: heller oder dunkler', el('i', { class: 'schirm' }), () => {
+    const stufen = [.35, .55, .8, 1];
+    const i = stufen.findIndex((s) => Math.abs(s - e.lampe) < .01);
+    e.lampe = stufen[(i + 1) % stufen.length];
+    D.einst.schreibtisch = { ...e }; speichereEinst();
+    szene.style.setProperty('--lampe', e.lampe);
+    toast(e.lampe >= 1 ? 'Hell.' : e.lampe >= .8 ? 'Warm.' : e.lampe >= .55 ? 'Gedämpft.' : 'Fast nur noch die Kerzen.');
+  }));
+
+  /* Leuchter */
+  let leuchter = null;
+  if (e.kerzen) {
+    leuchter = baueLeuchter(e);
+    platte.append(ding('leuchter', 'Der Leuchter: eine Kerze anzünden (Schreibzeit)', el('div', { class: 'leuchter-bild' }, leuchter.element, el('i', { class: 'leuchter-fuss' })), async () => {
+      const dauer = await menue([
+        { text: 'Eine kleine Kerze — 10 Minuten', wert: 10 }, { text: 'Eine mittlere — 20 Minuten', wert: 20 }, { text: 'Eine lange — 45 Minuten', wert: 45 }
+      ], 'Der Leuchter: Schreibzeit anzünden');
+      if (!dauer) return;
+      const b = blattAusText('', '');
+      oeffneSchreibraum(b.id);
+      setTimeout(() => starteSprint(dauer), 400);
+    }));
+  }
+
+  /* Manuskripte: die letzten Texte */
+  const letzte = schreibtischLetzteTexte(3);
+  letzte.forEach((d, i) => {
+    const text = (d.text || '').trim().slice(0, 420);
+    platte.append(ding('manuskript m' + (i + 1), 'Weiterschreiben: ' + (d.titel || text.slice(0, 30)), el('div', { class: 'manuskript-papier' }, el('b', {}, d.titel || (d.typ === 'seite' ? 'Heftseite' : d.typ === 'szene' ? 'Szene' : 'Blatt')), el('span', {}, text)), () => oeffneDokument(d), '--dreh:' + ((i * 7) % 9 - 4) + 'deg'));
+  });
+  if (!letzte.length) platte.append(ding('manuskript m1 leer', 'Ein leeres Blatt — anfangen', el('div', { class: 'manuskript-papier' }, el('b', {}, 'Noch nichts'), el('span', {}, 'Ein leeres Blatt. Das beste Versprechen, das es gibt.')), () => schreibtischNeuesBlatt()));
+
+  /* Tintenfass & Feder */
+  platte.append(ding('tinte', 'Tintenfass und Feder: ein neues Blatt', el('div', { class: 'tinte-bild' }, el('i', { class: 'fass' }), el('i', { class: 'feder f1' }), el('i', { class: 'feder f2' })), () => schreibtischNeuesBlatt()));
+
+  /* Bücherstapel (Lesestapel) */
+  const buecher = typeof lesestapelBuecher === 'function' ? lesestapelBuecher() : [];
+  const stapel = el('div', { class: 'buecher-stapel' });
+  buecher.slice(0, 6).forEach((b, i) => {
+    const img = el('img', { alt: b.titel || 'Buch', draggable: 'false' });
+    if (b.bild) setzeBild(img, b.bild);
+    const buch = el('button', { class: 'stapel-buch' + (b.bild ? '' : ' ohne-cover'), title: (b.titel || 'Buch') + (b.seiten ? ' · Seite ' + (b.seite || 1) + ' von ' + b.seiten : ''), style: '--i:' + i + ';--dreh:' + ((i * 11) % 7 - 3) + 'deg', onclick: () => buchOeffnen(b) }, img, b.bild ? null : el('span', {}, b.titel || 'Buch'));
+    stapel.append(buch);
+  });
+  stapel.append(el('button', { class: 'stapel-fuss', title: 'Der Lesestapel: Bücher auflegen, ordnen', onclick: () => lesestapelZeigen() }, buecher.length ? (buecher.length > 6 ? '+' + (buecher.length - 6) + ' · ' : '') + 'Lesestapel' : 'Bücher auflegen'));
+  platte.append(el('div', { class: 'desk-ding-halter buecher' }, stapel));
+
+  /* Tasse: der Schreibtag */
+  const tag = schreibtischTag();
+  platte.append(ding('tasse' + (tag.heute > 0 ? ' dampft' : ''), 'Die Tasse: ' + (tag.heute ? tag.heute + ' Wörter heute' : 'heute noch nichts') + (tag.serie > 1 ? ' · ' + tag.serie + ' Tage in Folge' : ''), el('div', { class: 'tasse-bild' }, el('i', { class: 'dampf d1' }), el('i', { class: 'dampf d2' }), el('i', { class: 'henkel' }), el('span', { class: 'tasse-zahl' }, tag.heute ? String(tag.heute) : '')), () => {
+    toast(tag.heute ? tag.heute + ' Wörter heute' + (tag.serie > 1 ? ' — der ' + tag.serie + '. Tag in Folge.' : '.') : 'Heute noch nichts. Die Tasse wartet.', 3600);
+  }));
+
+  /* Glas mit Fundstück: der Funke */
+  platte.append(ding('glas', 'Das Glas mit dem Fundstück: der Funke des Tages', el('div', { class: 'glas-bild' }, el('i', { class: 'glaskoerper' }), el('i', { class: 'fundstueck' })), async () => {
+    const f = schreibtischFunke();
+    const wahl = await menue([{ text: 'Damit schreiben', icon: 'stift', wert: 'schreiben' }, { text: 'Anderen Funken', icon: 'wuerfel', wert: 'neu' }], f);
+    if (wahl === 'schreiben') { const b = blattAusText('', f + '\n\n'); oeffneSchreibraum(b.id); }
+    else if (wahl === 'neu') { const g = neuerFunke(Math.random() < .4); const w2 = await menue([{ text: 'Damit schreiben', icon: 'stift', wert: 'schreiben' }], g); if (w2) { const b = blattAusText('', g + '\n\n'); oeffneSchreibraum(b.id); } }
+  }));
+
+  /* Brief */
+  const briefe = vomTyp('brief');
+  const offenZumLesen = briefe.some((b) => briefIstOffen(b) && b.versiegelt);
+  platte.append(ding('brief' + (offenZumLesen ? ' bereit' : '') + (briefe.length ? '' : ' leer'), offenZumLesen ? 'Ein Brief an dich darf geöffnet werden' : 'Ein Brief an mich (Zeitkapsel)', el('div', { class: 'brief-bild' }, el('i', { class: 'siegel' })), () => briefeZeigen()));
+
+  /* Karteikarten */
+  platte.append(ding('karten', 'Karteikarten: eine Wortkiste abfragen', el('div', { class: 'karten-bild' }, el('i'), el('i'), el('i')), async () => {
+    const kisten = typeof wortkisten === 'function' ? wortkisten() : [];
+    const wahl = await menue([{ text: 'Alle Wörter', icon: 'woerter', wert: 'alle' }, ...kisten.map((k) => ({ text: k.titel || 'Wortkiste', icon: 'woerter', wert: k.id }))], 'Welche Kiste abfragen?');
+    if (wahl) wortkisteAbfragen(wahl, wahl === 'alle' ? 'Alle Wörter' : (D.docs.get(wahl) || {}).titel);
+  }));
+
+  /* Lupe & Bleistiftstummel */
+  platte.append(ding('lupe', 'Die Lupe: suchen', el('div', { class: 'lupe-bild' }, el('i', { class: 'linse' }), el('i', { class: 'griff' })), () => { if (typeof oeffneSuche === 'function') oeffneSuche(); else location.hash = '#/suche'; }));
+  platte.append(ding('stummel', 'Der Bleistiftstummel: schnell einen Schnipsel', el('div', { class: 'stummel-bild' }), async () => {
+    const t = await eingabe({ titel: 'Schnell notiert', platzhalter: 'ein Satz, ein Wort, ein Gedanke …', mehrzeilig: true, ok: 'Ablegen' });
+    if (t) { neuDoc('schnipsel', { text: t }); toast('Liegt in den Schnipseln.'); }
+  }));
+
+  /* Notizbuch mit Zetteln: das letzte Heft */
+  const letztesHeft = vomTyp('heft').filter((h) => !h.archiv).sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0))[0];
+  if (letztesHeft) platte.append(ding('notizbuch', 'Das Notizbuch mit zu vielen Zetteln: ' + letztesHeft.titel, el('div', { class: 'notizbuch-bild', style: heftDeckelDaten(letztesHeft).style }, el('i', { class: 'zettelchen z1' }), el('i', { class: 'zettelchen z2' }), el('i', { class: 'zettelchen z3' })), () => { location.hash = '#/heft/' + letztesHeft.id; }));
+
+  /* Verse auf der Platte */
+  if (e.verse) {
+    schreibtischVerse(3).forEach((v, i) => platte.append(el('div', { class: 'desk-vers v' + (i + 1) }, v)));
+  }
+  /* Schublade */
+  platte.append(el('button', { class: 'desk-schublade', title: 'Die Schublade', onclick: () => schubladeOeffnen() }, el('i', { class: 'griffknauf' })));
+
+  /* Einrichten */
+  const einrichten = el('button', { class: 'rundknopf zart desk-einrichten', html: ik('feinheiten'), title: 'Schreibtisch einrichten', onclick: () => schreibtischEinrichten(() => zeichne()) });
+
+  szene.append(fenster, platte, einrichten);
+  haupt.append(szene);
+
+  /* Tippen irgendwo im Raum: die Flammen spüren es */
+  szene.addEventListener('pointerdown', () => { if (leuchter) leuchter.puste(.35); });
+};
+
+function schreibtischEinrichten(danach) {
+  const e = saubererSchreibtisch(D.einst.schreibtisch);
+  const alt = { ...e };
+  const wahlgruppe = (liste, lies, setze) => {
+    const g = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
+    for (const [id, name] of liste) g.append(el('button', { class: lies() === id ? 'an' : '', onclick: (ev) => { setze(id); $$('button', g).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); D.einst.schreibtisch = { ...e }; if (danach) danach(); } }, name));
+    return g;
+  };
+  const schalter = (lies, setze) => el('button', { class: 'schalter' + (lies() ? ' an' : ''), onclick: (ev) => { setze(!lies()); ev.currentTarget.classList.toggle('an', lies()); D.einst.schreibtisch = { ...e }; if (danach) danach(); } }, el('i'));
+  const lampe = el('input', { type: 'range', min: '.25', max: '1', step: '.05', value: String(e.lampe) });
+  lampe.addEventListener('input', () => { e.lampe = Number(lampe.value); D.einst.schreibtisch = { ...e }; const s = document.querySelector('.desk-szene'); if (s) s.style.setProperty('--lampe', e.lampe); });
+  const unordnung = el('input', { type: 'range', min: '0', max: '1', step: '.1', value: String(e.unordnung) });
+  unordnung.addEventListener('change', () => { e.unordnung = Number(unordnung.value); D.einst.schreibtisch = { ...e }; if (danach) danach(); });
+  let behalten = false;
+  const zeile = (name, unter, inhalt) => el('div', { class: 'einstellgruppe einstellzeile' }, el('span', { class: 'ename' }, name, unter ? el('div', { style: 'font-size:12.5px;color:var(--blass)' }, unter) : null), inhalt);
+  const kasten = el('div', { class: 'modal tisch-einrichten' },
+    el('h2', {}, 'Den Schreibtisch einrichten'),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Holz'), wahlgruppe(SCHREIBTISCH_HOELZER, () => e.holz, (v) => { e.holz = v; })),
+    zeile('Lampe', 'Kein Deckenlicht. Niemals. Nur dieser Kegel.', lampe),
+    zeile('Leuchter', 'Sieben Flammen — weniger wegen des Lichts als wegen der Gewissheit, dass wenigstens eine Sache sichtbar Zeit verbraucht.', schalter(() => e.kerzen, (v) => { e.kerzen = v; })),
+    zeile('Fenster hört auf den Klang', 'Spielt Regen, regnet es vor dem Fenster; spielen Grillen, raschelt der Garten.', schalter(() => e.wetterFolgtKlang, (v) => { e.wetterFolgtKlang = v; })),
+    zeile('Eigene Zeilen auf der Platte', 'Kurze Sätze aus meinen Funden, wie hingekritzelt.', schalter(() => e.verse, (v) => { e.verse = v; })),
+    zeile('Unordnung', 'Wie viel auf dem Tisch liegt und wie schief.', unordnung),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => { D.einst.schreibtisch = alt; if (danach) danach(); zu(); } }, 'Zurück'),
+      el('button', { class: 'knopf voll', onclick: () => { behalten = true; D.einst.schreibtisch = { ...e }; speichereEinst(); zu(); if (danach) danach(); } }, 'So bleibt es')));
+  const zu = zeigeDeck(kasten, () => { if (!behalten) { D.einst.schreibtisch = alt; if (danach) danach(); } });
+}
+
+/* ================================================================
+   VANI — Der Lesestapel: Bücher auf dem Schreibtisch, und ein Lesemodus.
+
+   Ein Buch ist eine PDF-Datei im eigenen Medienvorrat — sie liegt auf dem
+   Gerät und reist verschlüsselt über den privaten Bereich mit, nie über das
+   Netz und nie ins Repo. Das Cover wird aus der ersten Seite gezeichnet, wenn
+   keines mitkommt. Gelesen wird wie in einem Lesegerät: Seite für Seite,
+   mit Blättern, Lesezeichen, Gliederung (wenn das Buch eine hat), Zitaten,
+   und Einstellungen, die am Gerät bleiben (Helligkeit, Wärme, Nacht,
+   Doppelseite) — auf dem Handy einspaltig und mit Wischen, auf dem iPad
+   quer als Doppelseite, am Laptop mit Pfeiltasten.
+
+   Das Rendern übernimmt pdf.js (Apache-2.0, vendor/pdf.min.js), erst geladen,
+   wenn das erste Buch aufgeschlagen wird.
+   ================================================================ */
+
+let _pdfjs = null;
+async function pdfjsLaden() {
+  if (_pdfjs) return _pdfjs;
+  const modul = await import('./vendor/pdf.min.js');
+  try { modul.GlobalWorkerOptions.workerSrc = new URL('./vendor/pdf.worker.min.js', location.href).toString(); } catch (e) {}
+  _pdfjs = modul;
+  return modul;
+}
+
+function lesestapelBuecher() {
+  return vomTyp('buch').sort((a, b) => (b.zuletzt || b.angelegt || 0) - (a.zuletzt || a.angelegt || 0));
+}
+
+/* Fortschritt in Prozent — pur. */
+function buchFortschritt(seite, seiten) {
+  const s = Number(seiten) || 0, p = Number(seite) || 0;
+  if (s <= 0) return 0;
+  return Math.max(0, Math.min(100, Math.round(p / s * 100)));
+}
+
+/* Leseeinstellungen bleiben am Gerät (Helligkeit ist Gerätesache). Pur. */
+const LESE_VORGABE = { helligkeit: 1, waerme: .15, nacht: false, doppel: 'auto', blaettern: true, zoom: 'seite' };
+function saubereLeseEinstellung(roh) {
+  const q = roh && typeof roh === 'object' ? roh : {};
+  return {
+    helligkeit: begrenze(q.helligkeit, .4, 1, 1),
+    waerme: begrenze(q.waerme, 0, 1, .15),
+    nacht: q.nacht === true,
+    doppel: ['auto', 'an', 'aus'].includes(q.doppel) ? q.doppel : 'auto',
+    blaettern: q.blaettern !== false,
+    zoom: ['seite', 'breite'].includes(q.zoom) ? q.zoom : 'seite'
+  };
+}
+function leseEinstellung() {
+  try { return saubereLeseEinstellung(JSON.parse(localStorage.getItem('vani-lese') || '{}')); } catch (e) { return saubereLeseEinstellung({}); }
+}
+function leseEinstellungSpeichern(e) { try { localStorage.setItem('vani-lese', JSON.stringify(saubereLeseEinstellung(e))); } catch (x) {} }
+
+/* Ein PDF (Datei/Blob) als Buch auflegen: Datei ablegen, zählen, Cover malen. */
+async function buchAuflegenAusBlob(blob, name, { datei = null } = {}) {
+  const pdfjs = await pdfjsLaden();
+  const daten = await blob.arrayBuffer();
+  const dok = await pdfjs.getDocument({ data: daten.slice(0) }).promise;
+  const seiten = dok.numPages;
+  let titel = String(name || 'Buch').replace(/\.pdf$/i, '');
+  /* Dateinamen von Tauschbörsen tragen Klammerzusätze — die braucht kein Titel. */
+  titel = titel.replace(/\s*\((?:[^()]*(?:z-lib|1lib|library|epdf)[^()]*)\)\s*/gi, ' ').replace(/^\[[^\]]*\]\s*•?\s*/, '').replace(/\s+/g, ' ').trim();
+  let autor = '';
+  try {
+    const meta = await dok.getMetadata();
+    if (meta && meta.info) {
+      if (meta.info.Title && String(meta.info.Title).trim().length > 2 && !/untitled|microsoft|word/i.test(meta.info.Title)) titel = String(meta.info.Title).trim().slice(0, 160);
+      if (meta.info.Author && String(meta.info.Author).trim()) autor = String(meta.info.Author).trim().slice(0, 160);
+    }
+  } catch (e) {}
+  if (!autor) { const m = titel.match(/\(([^()]{3,80})\)\s*$/); if (m) { autor = m[1].replace(/^(\w[^,]*),\s*(.+)$/, '$2 $1').trim(); titel = titel.replace(/\s*\([^()]*\)\s*$/, '').trim(); } }
+  const dateiId = datei || await speichereDateiBlob(new File([blob], titel + '.pdf', { type: 'application/pdf' }));
+  /* Cover: erste Seite, etwa 480 px breit */
+  let bild = null;
+  try {
+    const seite = await dok.getPage(1);
+    const vp0 = seite.getViewport({ scale: 1 });
+    const skala = 480 / vp0.width;
+    const vp = seite.getViewport({ scale: skala });
+    const c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+    await seite.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+    bild = await new Promise((res) => c.toBlob(async (b) => { if (!b) return res(null); try { res(await speichereDateiBlob(new File([b], 'cover.jpg', { type: 'image/jpeg' }))); } catch (e) { res(null); } }, 'image/jpeg', .82));
+  } catch (e) {}
+  try { dok.destroy(); } catch (e) {}
+  const buch = neuDoc('buch', { titel, autor, datei: dateiId, bild, seiten, seite: 1, lesezeichen: [], zuletzt: Date.now() });
+  return buch;
+}
+
+async function buecherAuflegenPerDatei() {
+  const inp = el('input', { type: 'file', multiple: 'multiple', accept: '.pdf,application/pdf', style: 'display:none' });
+  document.body.append(inp);
+  inp.addEventListener('change', async () => {
+    const dateien = [...(inp.files || [])]; inp.remove();
+    if (!dateien.length) return;
+    toast(dateien.length === 1 ? 'Lege das Buch auf …' : 'Lege ' + dateien.length + ' Bücher auf …', 3600);
+    let n = 0;
+    for (const f of dateien) {
+      if (f.size > 300 * 1024 * 1024) { toast(f.name + ' ist zu schwer (über 300 MB).'); continue; }
+      try { await buchAuflegenAusBlob(f, f.name); n++; } catch (e) { toast(f.name + ': ließ sich nicht öffnen.'); }
+    }
+    if (n) { toast(n === 1 ? 'Liegt auf dem Tisch.' : n + ' Bücher liegen auf dem Tisch.'); zeichne(); }
+  });
+  inp.click();
+}
+
+/* Aus dem Goodnotes-Archiv: dort liegen PDFs als ganze Dateien. */
+async function buchAusGoodnotesArchiv() {
+  const kandidaten = vomTyp('goodnote').filter((d) => d.art === 'pdf' && d.datei);
+  if (!kandidaten.length) { toast('Im Goodnotes-Archiv liegt keine PDF.'); return; }
+  const wahl = await menue(kandidaten.map((d) => ({ text: d.titel || d.dateiname || 'PDF', icon: 'buchzu', wert: d.id })), 'Welche PDF aufs Lesepult?');
+  if (!wahl) return;
+  const d = D.docs.get(wahl);
+  const blob = await dbGet('media', d.datei);
+  if (!blob) { toast('Die Datei ist nicht da.'); return; }
+  toast('Lege das Buch auf …');
+  try { await buchAuflegenAusBlob(blob, d.titel || d.dateiname || 'Buch', { datei: d.datei }); toast('Liegt auf dem Tisch.'); zeichne(); }
+  catch (e) { toast('Ließ sich nicht öffnen.'); }
+}
+
+/* Desktop: Bücher aus dem Bücherordner neben der App. */
+async function buecherAusOrdner() {
+  const desk = typeof window !== 'undefined' && window.vaniDesktop;
+  if (!desk || !desk.buecherListe) { toast('Den Bücherordner gibt es nur in der Desktop-App.'); return; }
+  let liste = [];
+  try { liste = await desk.buecherListe(); } catch (e) { liste = []; }
+  if (!liste.length) { await zeigeAnkunft('Kein Buch im Ordner', ['Lege PDF-Dateien in den Ordner „VANI-Bücher" in deinen Dokumenten — oder in einen Ordner „buecher" neben der App.'], ''); return; }
+  const da = new Set(lesestapelBuecher().map((b) => b.titel));
+  const wahl = await menue([...liste.map((b) => ({ text: (da.has(b.name.replace(/\.pdf$/i, '')) ? '✓ ' : '') + b.name + ' · ' + formatBytes(b.size), icon: 'buchzu', wert: b.pfad })), { text: 'Alle auflegen', icon: 'plus', wert: '_alle' }], liste.length + ' Bücher im Ordner');
+  if (!wahl) return;
+  const auswahl = wahl === '_alle' ? liste : liste.filter((b) => b.pfad === wahl);
+  let n = 0;
+  for (const b of auswahl) {
+    try {
+      const bytes = await desk.buchLesen(b.pfad);
+      if (!bytes) continue;
+      await buchAuflegenAusBlob(new Blob([bytes], { type: 'application/pdf' }), b.name); n++;
+      toast(n + ' von ' + auswahl.length + ' aufgelegt …', 1800);
+    } catch (e) { toast(b.name + ': ließ sich nicht öffnen.'); }
+  }
+  if (n) { toast(n === 1 ? 'Liegt auf dem Tisch.' : n + ' Bücher liegen auf dem Tisch.'); zeichne(); }
+}
+
+/* Der Lesestapel als Fenster: Cover, Fortschritt, Auflegen. */
+function lesestapelZeigen() {
+  const buecher = lesestapelBuecher();
+  const raster = el('div', { class: 'lesestapel-raster' });
+  for (const b of buecher) {
+    const img = el('img', { alt: '', draggable: 'false' });
+    if (b.bild) setzeBild(img, b.bild);
+    const k = el('button', { class: 'lesestapel-buch' + (b.bild ? '' : ' ohne-cover'), onclick: () => { zu(); buchOeffnen(b); } },
+      el('div', { class: 'lesestapel-cover' }, img, b.bild ? null : el('span', {}, b.titel || 'Buch')),
+      el('div', { class: 'lesestapel-titel' }, b.titel || 'Buch'),
+      b.autor ? el('div', { class: 'lesestapel-autor' }, b.autor) : null,
+      el('div', { class: 'lesestapel-balken' }, el('i', { style: 'width:' + buchFortschritt(b.seite, b.seiten) + '%' })),
+      el('div', { class: 'lesestapel-stand' }, b.seiten ? 'Seite ' + (b.seite || 1) + ' von ' + b.seiten : ''));
+    langdruck(k, async () => {
+      const wahl = await menue([
+        { text: 'Umbenennen', icon: 'stift', wert: 'name' },
+        { text: 'Cover aus einer anderen Seite', icon: 'kamera', wert: 'cover' },
+        { text: 'Von vorn beginnen', icon: 'wieder', wert: 'anfang' },
+        { text: 'Vom Tisch nehmen', icon: 'muell', wert: 'weg', rot: true }
+      ], b.titel || 'Buch');
+      if (wahl === 'name') { const n = await eingabe({ titel: 'Das Buch heißt …', wert: b.titel || '' }); if (n) { b.titel = n; speichere(b); zu(); lesestapelZeigen(); } }
+      else if (wahl === 'cover') { const s = await eingabe({ titel: 'Welche Seite als Cover?', wert: '1', platzhalter: 'Seitenzahl' }); const n = parseInt(s, 10); if (n > 0) { await buchCoverAusSeite(b, n); zu(); lesestapelZeigen(); } }
+      else if (wahl === 'anfang') { b.seite = 1; speichere(b); zu(); lesestapelZeigen(); }
+      else if (wahl === 'weg' && await frage('„' + (b.titel || 'Buch') + '" vom Tisch nehmen? Die Datei geht in den Papierkorb.', { ja: 'Vom Tisch nehmen', gefahr: true })) { await loesche(b.id); zu(); zeichne(); }
+    });
+    raster.append(k);
+  }
+  if (!buecher.length) raster.append(el('div', { class: 'leer klein', style: 'grid-column:1/-1' }, 'Noch kein Buch auf dem Tisch.'));
+  const desk = typeof window !== 'undefined' && window.vaniDesktop && window.vaniDesktop.buecherListe;
+  const kasten = el('div', { class: 'modal lesestapel' },
+    el('h2', {}, 'Der Lesestapel'),
+    el('div', { class: 'stickerblock-hinweis' }, 'Bücher als PDF — sie liegen nur auf deinen Geräten und reisen verschlüsselt über den privaten Bereich. Antippen schlägt auf, lange halten: umbenennen, Cover, von vorn, vom Tisch nehmen.'),
+    raster,
+    el('div', { class: 'reihe', style: 'justify-content:flex-start;flex-wrap:wrap;gap:8px' },
+      el('button', { class: 'knopf voll', onclick: () => { zu(); buecherAuflegenPerDatei(); } }, el('span', { html: ik('plus'), style: 'display:flex' }), 'PDF auflegen'),
+      vomTyp('goodnote').some((d) => d.art === 'pdf') ? el('button', { class: 'knopf', onclick: () => { zu(); buchAusGoodnotesArchiv(); } }, 'Aus dem Goodnotes-Archiv') : null,
+      desk ? el('button', { class: 'knopf', onclick: () => { zu(); buecherAusOrdner(); } }, 'Aus dem Bücherordner') : null,
+      el('span', { class: 'rest' }),
+      el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen')));
+  const zu = zeigeDeck(kasten);
+}
+
+async function buchCoverAusSeite(b, n) {
+  try {
+    const pdfjs = await pdfjsLaden();
+    const blob = await dbGet('media', b.datei); if (!blob) return;
+    const dok = await pdfjs.getDocument({ data: await blob.arrayBuffer() }).promise;
+    const seite = await dok.getPage(Math.max(1, Math.min(dok.numPages, n)));
+    const vp0 = seite.getViewport({ scale: 1 }); const vp = seite.getViewport({ scale: 480 / vp0.width });
+    const c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+    await seite.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+    const id = await new Promise((res) => c.toBlob(async (bl) => res(bl ? await speichereDateiBlob(new File([bl], 'cover.jpg', { type: 'image/jpeg' })) : null), 'image/jpeg', .82));
+    if (id) { b.bild = id; speichere(b); toast('Neues Cover.'); }
+    try { dok.destroy(); } catch (e) {}
+  } catch (e) { toast('Das Cover ließ sich nicht malen.'); }
+}
+
+/* ----- Der Lesemodus ----- */
+let _leser = null;
+async function buchOeffnen(b) {
+  if (_leser) buchSchliessen();
+  const e = leseEinstellung();
+  const raum = el('div', { class: 'lesemodus' + (e.nacht ? ' nacht' : '') });
+  const buehne = el('div', { class: 'lese-buehne' });
+  const titel = el('div', { class: 'lese-titel' }, b.titel || 'Buch');
+  const stand = el('div', { class: 'lese-stand' });
+  const balken = el('input', { type: 'range', min: '1', max: String(Math.max(1, b.seiten || 1)), value: String(b.seite || 1), class: 'lese-balken', 'aria-label': 'Seite' });
+  const kopf = el('div', { class: 'lese-kopf' },
+    el('button', { class: 'knopf', onclick: () => buchSchliessen() }, el('span', { html: ik('zurueck'), style: 'display:flex' }), 'Zurück'),
+    titel,
+    el('button', { class: 'rundknopf zart', html: ik('gliederung'), title: 'Inhalt', onclick: () => leserGliederung() }),
+    el('button', { class: 'rundknopf zart lese-zeichen', html: ik('lesezeichen'), title: 'Lesezeichen', onclick: () => leserLesezeichen() }),
+    el('button', { class: 'rundknopf zart', html: ik('teilen'), title: 'Zitat kopieren / als Schnipsel', onclick: () => leserZitat() }),
+    el('button', { class: 'rundknopf zart', html: ik('feinheiten'), title: 'Leseeinstellungen', onclick: () => leserEinstellungen() }));
+  const fuss = el('div', { class: 'lese-fuss' }, el('button', { class: 'rundknopf zart', html: ik('zurueck'), title: 'Zurückblättern', onclick: () => blaettere(-1) }), balken, stand, el('button', { class: 'rundknopf zart', html: ik('rechts'), title: 'Weiterblättern', onclick: () => blaettere(1) }));
+  raum.append(kopf, buehne, fuss);
+  document.body.append(raum);
+  _leser = { b, raum, buehne, e, dok: null, seite: Math.max(1, Math.min(b.seiten || 1, b.seite || 1)), busy: false, cache: new Map(), kopf, fuss, versteckTimer: null, zuletztGezeigt: 0 };
+  const leser = _leser;
+
+  const zeigeLeisten = () => { kopf.classList.remove('weg'); fuss.classList.remove('weg'); clearTimeout(leser.versteckTimer); leser.versteckTimer = setTimeout(() => { kopf.classList.add('weg'); fuss.classList.add('weg'); }, 2600); };
+  zeigeLeisten();
+
+  toast('Schlage auf …', 1800);
+  try {
+    const pdfjs = await pdfjsLaden();
+    const blob = await dbGet('media', b.datei);
+    if (!blob) throw new Error('Datei fehlt');
+    leser.dok = await pdfjs.getDocument({ data: await blob.arrayBuffer() }).promise;
+    if (leser.dok.numPages !== b.seiten) { b.seiten = leser.dok.numPages; speichereStill(b); balken.max = String(b.seiten); }
+  } catch (x) { toast('Das Buch ließ sich nicht aufschlagen.' + (x && x.message ? ' (' + x.message + ')' : ''), 4200); buchSchliessen(); return; }
+
+  const doppel = () => leser.e.doppel === 'an' || (leser.e.doppel === 'auto' && raum.clientWidth >= 900 && raum.clientWidth > raum.clientHeight);
+  const seitenJetzt = () => { const d = doppel(); if (!d) return [leser.seite]; const links = leser.seite % 2 === 0 ? leser.seite : leser.seite - 1; return [links, links + 1].filter((n) => n >= 1 && n <= b.seiten); };
+
+  async function maleSeite(n, breite, hoehe) {
+    const schl = n + ':' + Math.round(breite) + ':' + Math.round(hoehe) + ':' + leser.e.zoom;
+    if (leser.cache.has(schl)) return leser.cache.get(schl);
+    const seite = await leser.dok.getPage(n);
+    const vp0 = seite.getViewport({ scale: 1 });
+    const skala = leser.e.zoom === 'breite' ? breite / vp0.width : Math.min(breite / vp0.width, hoehe / vp0.height);
+    const dpr = Math.min(2.5, window.devicePixelRatio || 1);
+    const vp = seite.getViewport({ scale: skala * dpr });
+    const c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+    c.style.width = Math.round(vp.width / dpr) + 'px'; c.style.height = Math.round(vp.height / dpr) + 'px';
+    await seite.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+    if (leser.cache.size > 10) leser.cache.delete(leser.cache.keys().next().value);
+    leser.cache.set(schl, c);
+    return c;
+  }
+  async function zeige(richtung) {
+    if (!leser.dok) return;
+    const seiten = seitenJetzt();
+    const d = seiten.length > 1;
+    const breite = (buehne.clientWidth - (d ? 28 : 16)) / (d ? 2 : 1);
+    const hoehe = buehne.clientHeight - 16;
+    const neu = el('div', { class: 'lese-doppel' + (d ? ' zwei' : '') });
+    for (const n of seiten) {
+      const c = await maleSeite(n, breite, hoehe);
+      const blatt = el('div', { class: 'lese-blatt' }, c, el('span', { class: 'lese-seitenzahl' }, String(n)));
+      neu.append(blatt);
+    }
+    const alt = buehne.querySelector('.lese-doppel');
+    if (alt && leser.e.blaettern && richtung) {
+      alt.classList.add(richtung > 0 ? 'geht-links' : 'geht-rechts');
+      neu.classList.add(richtung > 0 ? 'kommt-rechts' : 'kommt-links');
+      buehne.append(neu);
+      setTimeout(() => { alt.remove(); neu.classList.remove('kommt-rechts', 'kommt-links'); }, 420);
+    } else { if (alt) alt.remove(); buehne.append(neu); }
+    stand.textContent = seiten.join('–') + ' / ' + b.seiten + ' · ' + buchFortschritt(seiten[seiten.length - 1], b.seiten) + ' %';
+    balken.value = String(leser.seite);
+    kopf.querySelector('.lese-zeichen').classList.toggle('an', (b.lesezeichen || []).includes(leser.seite));
+    b.seite = leser.seite; b.zuletzt = Date.now(); speichereStill(b);
+    /* Nächste Seiten vorab malen */
+    for (const n of [leser.seite + 1, leser.seite + 2, leser.seite - 1]) if (n >= 1 && n <= b.seiten) maleSeite(n, breite, hoehe).catch(() => {});
+  }
+  function blaettere(richtung) {
+    const schritt = doppel() ? 2 : 1;
+    const ziel = Math.max(1, Math.min(b.seiten, leser.seite + richtung * schritt));
+    if (ziel === leser.seite) { toast(richtung > 0 ? 'Das war die letzte Seite.' : 'Das ist der Anfang.'); return; }
+    leser.seite = ziel; zeige(richtung); zeigeLeisten();
+  }
+  leser.zeige = zeige; leser.blaettere = blaettere; leser.zeigeLeisten = zeigeLeisten;
+  balken.addEventListener('input', () => { stand.textContent = balken.value + ' / ' + b.seiten; zeigeLeisten(); });
+  balken.addEventListener('change', () => { leser.seite = Number(balken.value); zeige(0); });
+  /* Tippen: rechts weiter, links zurück, Mitte Leisten */
+  buehne.addEventListener('click', (ev) => {
+    const r = buehne.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width;
+    if (x > .66) blaettere(1); else if (x < .34) blaettere(-1); else zeigeLeisten();
+  });
+  /* Wischen */
+  let wisch = null;
+  buehne.addEventListener('pointerdown', (ev) => { wisch = { x: ev.clientX, y: ev.clientY, t: Date.now() }; });
+  buehne.addEventListener('pointerup', (ev) => {
+    if (!wisch) return; const dx = ev.clientX - wisch.x, dy = ev.clientY - wisch.y; wisch = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { blaettere(dx < 0 ? 1 : -1); ev.preventDefault(); }
+  });
+  leser.tasten = (ev) => {
+    if (!_leser) return;
+    if (ev.key === 'ArrowRight' || ev.key === 'PageDown' || ev.key === ' ') { ev.preventDefault(); blaettere(1); }
+    else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); blaettere(-1); }
+    else if (ev.key === 'Escape') { ev.preventDefault(); buchSchliessen(); }
+    else if (ev.key === 'Home') { leser.seite = 1; zeige(0); } else if (ev.key === 'End') { leser.seite = b.seiten; zeige(0); }
+  };
+  document.addEventListener('keydown', leser.tasten, true);
+  leser.beiGroesse = () => { leser.cache.clear(); zeige(0); };
+  window.addEventListener('resize', leser.beiGroesse);
+  leserStil();
+  await zeige(0);
+}
+function leserStil() {
+  if (!_leser) return;
+  const { raum, e } = _leser;
+  raum.classList.toggle('nacht', e.nacht);
+  raum.style.setProperty('--lese-hell', e.helligkeit);
+  raum.style.setProperty('--lese-waerme', e.waerme);
+}
+function buchSchliessen() {
+  if (!_leser) return;
+  const l = _leser; _leser = null;
+  document.removeEventListener('keydown', l.tasten, true);
+  window.removeEventListener('resize', l.beiGroesse);
+  clearTimeout(l.versteckTimer);
+  try { if (l.dok) l.dok.destroy(); } catch (e) {}
+  l.raum.remove();
+  zeichne();
+}
+async function leserGliederung() {
+  if (!_leser || !_leser.dok) return;
+  const l = _leser;
+  let gliederung = null;
+  try { gliederung = await l.dok.getOutline(); } catch (e) {}
+  if (!gliederung || !gliederung.length) { toast('Dieses Buch bringt keine Gliederung mit.'); return; }
+  const punkte = [];
+  const sammle = async (eintraege, tiefe) => {
+    for (const g of eintraege.slice(0, 400)) {
+      let seite = null;
+      try {
+        const dest = typeof g.dest === 'string' ? await l.dok.getDestination(g.dest) : g.dest;
+        if (Array.isArray(dest) && dest[0]) seite = (await l.dok.getPageIndex(dest[0])) + 1;
+      } catch (e) {}
+      punkte.push({ titel: g.title, seite, tiefe });
+      if (g.items && g.items.length && tiefe < 3) await sammle(g.items, tiefe + 1);
+    }
+  };
+  await sammle(gliederung, 1);
+  const liste = el('div', { class: 'gliederung' }, punkte.map((p) => el('button', { class: 'gliederung-punkt ebene-' + p.tiefe, onclick: () => { if (p.seite) { zu(); l.seite = p.seite; l.zeige(0); } } }, p.titel + (p.seite ? '  · ' + p.seite : ''))));
+  const kasten = el('div', { class: 'modal gliederung-kasten' }, el('h2', {}, 'Inhalt'), liste, el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Schließen')));
+  const zu = zeigeDeck(kasten);
+}
+async function leserLesezeichen() {
+  if (!_leser) return;
+  const l = _leser, b = l.b;
+  const lz = Array.isArray(b.lesezeichen) ? b.lesezeichen : [];
+  const hier = lz.includes(l.seite);
+  const wahl = await menue([
+    { text: hier ? 'Lesezeichen von Seite ' + l.seite + ' entfernen' : 'Lesezeichen auf Seite ' + l.seite, icon: 'lesezeichen', wert: 'hier' },
+    ...lz.filter((n) => n !== l.seite).sort((a, c) => a - c).map((n) => ({ text: 'Zu Seite ' + n, icon: 'rechts', wert: 'zu:' + n }))
+  ], 'Lesezeichen');
+  if (!wahl) return;
+  if (wahl === 'hier') { b.lesezeichen = hier ? lz.filter((n) => n !== l.seite) : [...lz, l.seite].slice(-200); speichere(b); l.zeige(0); }
+  else if (wahl.startsWith('zu:')) { l.seite = Number(wahl.slice(3)); l.zeige(0); }
+}
+async function leserZitat() {
+  if (!_leser || !_leser.dok) return;
+  const l = _leser;
+  let text = '';
+  try { const tc = await (await l.dok.getPage(l.seite)).getTextContent(); text = tc.items.map((i) => i.str + (i.hasEOL ? '\n' : '')).join('').replace(/[ \t]+\n/g, '\n').trim(); } catch (e) {}
+  if (!text) { toast('Diese Seite trägt keinen Text, den man herausnehmen könnte (vielleicht ein Bild).', 4000); return; }
+  const feld = el('textarea', { rows: 10 }); feld.value = text;
+  const quelle = '— ' + (l.b.titel || 'Buch') + (l.b.autor ? ', ' + l.b.autor : '') + ', S. ' + l.seite;
+  const kasten = el('div', { class: 'modal zitat-kasten' },
+    el('h2', {}, 'Seite ' + l.seite + ' als Text'),
+    el('div', { class: 'stickerblock-hinweis' }, 'Markiere, was du brauchst — oder nimm die ganze Seite. Die Quelle kommt dazu.'),
+    feld,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen'),
+      el('button', { class: 'knopf', onclick: async () => { const t = (feld.selectionStart !== feld.selectionEnd ? feld.value.slice(feld.selectionStart, feld.selectionEnd) : feld.value).trim(); try { await navigator.clipboard.writeText(t + '\n' + quelle); toast('Kopiert, mit Quelle.'); } catch (e) { teileText(t + '\n' + quelle); } } }, 'Kopieren'),
+      el('button', { class: 'knopf voll', onclick: () => { const t = (feld.selectionStart !== feld.selectionEnd ? feld.value.slice(feld.selectionStart, feld.selectionEnd) : feld.value).trim(); neuDoc('schnipsel', { text: t + '\n' + quelle }); toast('Liegt in den Schnipseln — mit Quelle.'); zu(); } }, 'Als Schnipsel')));
+  const zu = zeigeDeck(kasten);
+}
+function leserEinstellungen() {
+  if (!_leser) return;
+  const l = _leser, e = l.e;
+  const regler = (name, schluessel, min, max, schritt) => { const r = el('input', { type: 'range', min: String(min), max: String(max), step: String(schritt), value: String(e[schluessel]) }); r.addEventListener('input', () => { e[schluessel] = Number(r.value); leseEinstellungSpeichern(e); leserStil(); }); return el('div', { class: 'einstellgruppe einstellzeile' }, el('span', { class: 'ename' }, name), r); };
+  const wahl = (name, schluessel, liste, neuMalen) => { const g = el('div', { class: 'wahlgruppe' }); for (const [id, n] of liste) g.append(el('button', { class: e[schluessel] === id ? 'an' : '', onclick: (ev) => { e[schluessel] = id; leseEinstellungSpeichern(e); $$('button', g).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); leserStil(); if (neuMalen) { l.cache.clear(); l.zeige(0); } } }, n)); return el('div', { class: 'einstellgruppe' }, el('b', {}, name), g); };
+  const kasten = el('div', { class: 'modal tisch-einrichten' },
+    el('h2', {}, 'Lesen einstellen'),
+    regler('Helligkeit', 'helligkeit', .4, 1, .05),
+    regler('Wärme', 'waerme', 0, 1, .05),
+    wahl('Nacht', 'nacht', [[false, 'Hell'], [true, 'Dunkel (Seiten invertiert)']]),
+    wahl('Doppelseite', 'doppel', [['auto', 'Wie es passt'], ['an', 'Immer'], ['aus', 'Nie']], true),
+    wahl('Größe', 'zoom', [['seite', 'Ganze Seite'], ['breite', 'Volle Breite']], true),
+    wahl('Blättern', 'blaettern', [[true, 'Mit Bewegung'], [false, 'Ohne']]),
+    el('div', { class: 'stickerblock-hinweis', style: 'margin-top:8px' }, 'Diese Einstellungen bleiben an diesem Gerät — Helligkeit ist Gerätesache. Seite, Lesezeichen und Stapel reisen mit.'),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
+  const zu = zeigeDeck(kasten);
 }
 
 /* ================================================================

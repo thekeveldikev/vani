@@ -134,6 +134,38 @@ ipcMain.handle('vani:geheimnis-loeschen', (event, profilId) => {
   try { fs.unlinkSync(geheimnisPfad(profilId)); } catch (e) { if (e.code !== 'ENOENT') throw e; }
   return true;
 });
+/* Bücherordner: PDFs aus „Dokumente/VANI-Bücher", aus „buecher" neben der App
+   oder aus dem Datenordner — nur lesen, nur dort. */
+function buecherOrdner() {
+  const liste = [];
+  try { liste.push(path.join(app.getPath('documents'), 'VANI-Bücher')); } catch (_) {}
+  try { liste.push(path.join(path.dirname(process.execPath), 'buecher')); } catch (_) {}
+  try { liste.push(path.join(app.getPath('userData'), 'buecher')); } catch (_) {}
+  return liste;
+}
+ipcMain.handle('vani:buecher-liste', (event) => {
+  if (!istVaniAbsender(event)) throw new Error('Nicht erlaubt');
+  const aus = [];
+  for (const ordner of buecherOrdner()) {
+    let eintraege = [];
+    try { eintraege = fs.readdirSync(ordner); } catch (_) { continue; }
+    for (const name of eintraege) {
+      if (!/\.pdf$/i.test(name)) continue;
+      const pfad = path.join(ordner, name);
+      try { const st = fs.statSync(pfad); if (st.isFile() && st.size <= 300 * 1024 * 1024) aus.push({ name, size: st.size, pfad, ordner }); } catch (_) {}
+    }
+  }
+  return aus.slice(0, 500);
+});
+ipcMain.handle('vani:buch-lesen', (event, pfad) => {
+  if (!istVaniAbsender(event) || typeof pfad !== 'string') throw new Error('Nicht erlaubt');
+  const voll = path.resolve(pfad);
+  const erlaubt = buecherOrdner().some((o) => { const w = path.resolve(o); return voll.startsWith(w + path.sep); });
+  if (!erlaubt || !/\.pdf$/i.test(voll)) throw new Error('Nicht erlaubt');
+  const st = fs.statSync(voll);
+  if (!st.isFile() || st.size > 300 * 1024 * 1024) throw new Error('Zu groß');
+  return fs.readFileSync(voll);
+});
 ipcMain.handle('vani:update-suchen', async (event) => {
   if (!istVaniAbsender(event)) throw new Error('Nicht erlaubt');
   if (!updater) return { art: 'nicht-eingerichtet', version: app.getVersion() };

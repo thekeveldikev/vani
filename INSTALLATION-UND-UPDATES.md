@@ -109,3 +109,22 @@ offline entstandene Textänderungen werden zusammengeführt.
 Sehr große Goodnotes-Originaldateien sind separat zuschaltbar. Titel, Notizen
 und die Archivordnung reisen auch ohne diese Option mit. So wird kein iPad
 ungefragt mit hunderten Megabyte gefüllt.
+
+## Bücher auf den Schreibtisch legen
+
+Der Schreibtisch hat einen Lesestapel: Bücher als PDF, mit Cover und einem
+Lesemodus wie in einem Lesegerät. Die Dateien liegen **nur auf deinen
+Geräten** und reisen verschlüsselt über den privaten Bereich — nie über das
+öffentliche Netz, nie im Repo. Drei Wege, ein Buch aufzulegen:
+
+1. **Handy oder Laptop:** Schreibtisch → Bücherstapel → „PDF auflegen" → Datei
+   wählen (mehrere auf einmal geht). Der private Bereich bringt sie aufs iPad.
+2. **Schul-iPad ohne Dateiauswahl:** Bücher, die schon im Goodnotes-Archiv von
+   VANI liegen, mit „Aus dem Goodnotes-Archiv" aufs Lesepult. Oder am Handy
+   auflegen — sie kommen über den Bereich an.
+3. **Desktop-App:** Lege die PDFs in den Ordner `Dokumente\VANI-Bücher` (oder
+   in einen Ordner `buecher` neben der App). Dann: Bücherstapel → „Aus dem
+   Bücherordner" → alle auf einmal.
+
+Große Bücher (über 20 MB) brauchen über den Bereich etwas; 300 MB ist die Grenze
+je Datei.

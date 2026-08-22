@@ -611,6 +611,40 @@ test('Atelier-Vertrag: das Atelier ist ein Fenster, Tisch und Regal lassen sich 
   assert.match(anl, /t: 'Tisch und Regal einrichten'/);
 });
 
+test('Schreibtisch-Vertrag: ein eigener Raum, der Lesestapel liegt lokal, pdf.js reist mit', () => {
+  assert.match(lies('src/40-router.js'), /\{ id: 'schreibtisch', name: 'Schreibtisch', icon: 'schreibtisch' \}/);
+  const d = lies('src/54-schreibtisch.js');
+  for (const f of ['RENDER.schreibtisch', 'function saubererSchreibtisch', 'function mondphase', 'function briefIstOffen', 'function schubladeOeffnen', 'function baueLeuchter', 'function baueSternenhimmel', 'function schreibtischEinrichten']) assert.ok(d.includes(f), f);
+  const l = lies('src/55-lesestapel.js');
+  for (const f of ['function pdfjsLaden', 'function buchAuflegenAusBlob', 'function buchOeffnen', 'function leserGliederung', 'function leserLesezeichen', 'function leserZitat', 'function leserEinstellungen', 'function buecherAusOrdner', 'function buchAusGoodnotesArchiv']) assert.ok(l.includes(f), f);
+  /* pdf.js: als .js (nicht .mjs), sonst liefern Server es als octet-stream und das Modul lädt nicht */
+  assert.match(l, /import\('\.\/vendor\/pdf\.min\.js'\)/);
+  for (const f of ['vendor/pdf.min.js', 'vendor/pdf.worker.min.js', 'vendor/pdf.js-LICENSE.txt']) assert.ok(existsSync(join(wurzel, f)), f + ' fehlt');
+  assert.ok(JSON.parse(lies('package.json')).build.files.includes('vendor/**'), 'vendor/** muss in die Desktop-App');
+  assert.match(lies('hosting/scripts/copy-vani.mjs'), /'vendor'/);
+  /* Bücher liegen nur im Medienvorrat — nie als Dateien im Repo. */
+  const dateien = lies('build.sh') + lies('werkzeug/build-web.mjs');
+  assert.doesNotMatch(dateien, /\.pdf/, 'keine PDF im Build');
+  assert.ok(!existsSync(join(wurzel, 'buecher')), 'kein Bücherordner im Repo');
+  /* Leseeinstellungen bleiben am Gerät (localStorage), Seite/Lesezeichen am Dokument. */
+  assert.match(l, /localStorage\.setItem\('vani-lese'/);
+  assert.match(l, /b\.seite = leser\.seite; b\.zuletzt = Date\.now\(\); speichereStill\(b\);/);
+  /* Desktop: Bücherordner nur lesen, nur dort. */
+  const m = lies('desktop/main.cjs');
+  assert.match(m, /ipcMain\.handle\('vani:buecher-liste'/);
+  assert.match(m, /voll\.startsWith\(w \+ path\.sep\)/, 'nur aus den Bücherordnern lesen');
+  assert.match(lies('desktop/preload.cjs'), /buecherListe: \(\) => ipcRenderer\.invoke\('vani:buecher-liste'\)/);
+  /* Sanitizer kennt Bücher und Briefe */
+  const c = lies('src/30-core.js');
+  assert.match(c, /if \(d\.typ === 'buch'\) \{/);
+  assert.match(c, /if \(d\.typ === 'brief'\) \{/);
+  assert.match(c, /if \(k === 'lesezeichen' && d\.typ === 'buch'\) continue;/);
+  for (const datei of ['werkzeug/build-web.mjs', 'build.sh', 'test/sandkasten.mjs']) { assert.match(lies(datei), /54-schreibtisch\.js/, datei); assert.match(lies(datei), /55-lesestapel\.js/, datei); }
+  const anl = lies('src/52-anleitung.js');
+  assert.match(anl, /id: 'schreibtisch'/);
+  for (const t of ['Die Schublade', 'Brief an mich', 'Der Lesestapel', 'Der Lesemodus']) assert.match(anl, new RegExp("t: '" + t + "'"), 'Anleitung: ' + t);
+});
+
 test('Umzugs-Vertrag: die alte Adresse leitet nicht blind weiter', () => {
   /* Die Umzugsseite zählt erst nach, ob dort noch ein Bestand liegt. Vorher
      leitete sie nach fünf Sekunden weiter — auf einem Schul-iPad ohne
