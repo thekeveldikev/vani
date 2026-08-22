@@ -1630,3 +1630,50 @@ der Rolle bewegt die Sicht nicht mehr, der Cursor bleibt im Bild; weggescrollt +
 getippt holt ihn zurück (Scroll 0 → 2598, Cursor bei 280); Rich-Text ebenso;
 Schreibraum unverändert; alle elf Räume und ein Fenster ohne Fehler, `scrollY`
 bleibt 0.
+
+## 28. Ein Heft ist ein Text, und das Feuer ist gezeichnet (24. August 2026, VANI 5.20.0)
+
+### Rolle und „Am Stück": eine Seite, nicht viele
+- Die Werkzeugreihe (Zettel, Foto, Kritzeln, Ton, Schrift, Mehr) stand in der
+  Rolle bei **jeder** Seite. Jetzt gibt es sie dort — wie in „Am Stück" — genau
+  einmal oben rechts (`klasse: 'fluss-werkzeuge'`, klebt beim Scrollen); sie
+  wirkt auf die Seite, in der gerade geschrieben wird, sonst auf die letzte.
+  `baueSeite` baut keine eigene Reihe mehr, wenn `optionen.rolle` oder
+  `optionen.fluss` gesetzt ist (Vertrag angepasst).
+- Die orangenen „Umrahmungen" in „Am Stück" waren Papier je Seitenstück: die
+  Randlinie (`.papierseite.mit-rand::after`) fing bei jedem Stück neu an, dazu
+  eine Trennlinie zwischen den Stücken und — bei Cornell-Papier — je Stück eine
+  eigene Spalte samt Fußlinie. Jetzt trägt der **Bogen** das Papier: Rolle und
+  `fluss-bogen` bekommen Papierart, Papierfarbe und `mit-rand` als Klasse, die
+  Kinder zeichnen weder Muster noch Randlinie, die Trennlinie ist weg.
+- `.heftrolle` ist damit ein durchgehendes Blatt (ein Schatten, eine Randlinie,
+  eine Karo-/Punkt-/Cornell-Fläche). Mit „Seitengrenzen zeigen" (Heft-Menü)
+  kommt die alte Ansicht zurück.
+
+### Eingefügter Text füllt die Seite
+`seitenUmbruch` (30-core) nahm ein Absatzende bis zu **700 Zeichen** oberhalb der
+Bruchstelle — dadurch blieb bis zu ein Drittel Seite leer. Neue Ordnung: ein
+Absatzende zählt nur noch, wenn es höchstens 200 Zeichen vor dem Ende steht,
+sonst ein Satzende (`. ! ? …`) im selben Abstand, sonst die Wortgrenze (140),
+sonst ein harter Schnitt. Dabei wichtig: `lastIndexOf` liefert −1, und −1 ist
+immer „nahe genug" — ohne Wache (`> 0`) hätte jede Seite hart geschnitten.
+
+### Das Schreibfeuer ist jetzt eine Zeichnung
+Statt zweier CSS-Kästchen auf einem Balken (die Flamme saß neben dem Holz) eine
+gezeichnete Feuerstelle als SVG: `feuerBild(stufe, {staerke, serie, zielErreicht})`
+mit Bodenschein, Aschebett, Scheiten aus einem Holzverlauf, Glutstücken,
+dreilagiger Flamme (außen/innen/Kern), Funken und einem Faden Rauch. Sie
+reagiert auf alles, worauf es ankommt:
+- **Wörter heute** → `feuerStaerke(heute, tagesziel)` skaliert die Flamme in
+  Höhe und Breite (ohne eigenes Ziel gemessen an 800 Wörtern),
+- **Stufe** (`aus` / `glut` / `brennt` / `lodert`) → kalte Scheite mit Rauch,
+  glühendes Bett ohne Flamme, Flamme, hohe Flamme mit Funken,
+- **Tage in Folge** → `feuerScheite(serie)`: ein Scheit, ab zwei Tagen zwei, ab
+  einer Woche drei,
+- **Tagesziel erreicht** → goldene Funken und heller Kern (`.ziel`).
+Alles animiert (Flackern, Glutpulsieren, aufsteigende Funken, Rauch) und bei
+`prefers-reduced-motion` still. Farbverläufe bekommen je Bild eigene Kennungen.
+
+Tests 158/158 (neu: Seitenfüllung, Feuer-Helfer). Browser geprüft: Rolle und
+„Am Stück" mit einer Werkzeugreihe und durchgehendem Papier, Feuer in allen
+fünf Zuständen (aus → Glut → klein → voll → lodernd mit drei Scheiten).

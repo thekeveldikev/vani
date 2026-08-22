@@ -304,7 +304,7 @@ html[data-thema="tinte"] .menue button.rot, html[data-thema="kerze"] .menue butt
 .fund-wann { font-size: 12.5px; color: var(--blass); margin-top: 8px; }
 
 .feuer-zeile { display: flex; align-items: center; gap: 16px; }
-.feuer-flamme { width: 46px; height: 56px; flex: none; }
+.feuer-flamme { width: 56px; height: 62px; flex: none; }
 .feuer-zahlen { flex: 1; }
 .feuer-zahlen .gross { font-size: 26px; font-weight: 700; font-family: ui-serif, "New York", Georgia, serif; }
 .feuer-zahlen .klein { font-size: 13px; color: var(--blass); margin-top: 2px; }
@@ -1081,20 +1081,54 @@ html[data-thema="papier"] .sr-fokus .sr-spiegel, html[data-thema="nebel"] .sr-fo
 @keyframes flackern { 0%,100% { transform: translateX(-50%) scale(1); } 30% { transform: translateX(-52%) scale(1.08, .94); } 60% { transform: translateX(-48%) scale(.95, 1.06); } }
 
 /* Flamme (Schreibfeuer) */
-.flammenbild { position: relative; width: 100%; height: 100%; }
-.flammenbild .f1, .flammenbild .f2 {
-  position: absolute; bottom: 6px; left: 50%; transform-origin: 50% 100%;
-  border-radius: 50% 50% 50% 50% / 66% 66% 34% 34%;
-  animation: flackern 1.9s ease-in-out infinite;
+/* ----- Das Schreibfeuer: eine gezeichnete Feuerstelle ----- */
+.feuerbild { display: block; width: 100%; height: 100%; overflow: visible; color: var(--blass); }
+.feuerbild .flamme { transform-box: fill-box; transform-origin: 50% 100%; animation: feuer-flackern 2.3s ease-in-out infinite alternate; }
+.feuerbild .f-innen { transform-box: fill-box; transform-origin: 50% 100%; animation: feuer-flackern 1.45s ease-in-out infinite alternate-reverse; }
+.feuerbild .f-kern { transform-box: fill-box; transform-origin: 50% 100%; animation: feuer-kern 1.9s ease-in-out infinite alternate; }
+@keyframes feuer-flackern {
+  0% { transform: scale(.965, .93) skewX(2deg); }
+  40% { transform: scale(1.02, 1.05) skewX(-1.5deg); }
+  70% { transform: scale(.99, 1.01) skewX(1deg); }
+  100% { transform: scale(1.03, 1.07) skewX(-.5deg); }
 }
-.flammenbild .f1 { width: 30px; height: 40px; margin-left: -15px; background: radial-gradient(circle at 50% 78%, #ffdf8e, #e8813a 70%, transparent); }
-.flammenbild .f2 { width: 15px; height: 21px; margin-left: -7.5px; background: radial-gradient(circle at 50% 80%, #fff7d6, #ffc860 75%, transparent); animation-delay: -.7s; }
-.flammenbild .holz { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 38px; height: 7px; border-radius: 4px; background: #6e4a2a; box-shadow: 0 2px 2px rgba(0,0,0,.2); }
-.flammenbild.glut .f1 { width: 17px; height: 15px; margin-left: -8.5px; opacity: .65; }
-.flammenbild.glut .f2 { display: none; }
-.flammenbild.aus .f1, .flammenbild.aus .f2 { display: none; }
-.flammenbild.aus .rauch { position: absolute; bottom: 10px; left: 50%; width: 3px; height: 16px; margin-left: -1px; border-radius: 3px; background: var(--blass); opacity: .35; }
-.flammenbild.lodert .f1 { width: 38px; height: 52px; margin-left: -19px; }
+@keyframes feuer-kern { from { opacity: .6; transform: scaleY(.9); } to { opacity: .95; transform: scaleY(1.08); } }
+.feuerbild .glut ellipse { fill: #ff8a3c; animation: feuer-glut 3.1s ease-in-out infinite alternate; }
+.feuerbild .glut ellipse:nth-child(2) { animation-delay: -1.1s; }
+.feuerbild .glut ellipse:nth-child(3) { animation-delay: -2.2s; }
+.feuerbild .glut ellipse:nth-child(4) { animation-delay: -.6s; }
+@keyframes feuer-glut { from { opacity: .45; } to { opacity: .95; } }
+.feuerbild .schein { animation: feuer-schein 3.6s ease-in-out infinite alternate; }
+@keyframes feuer-schein { from { opacity: .75; transform: scale(.94); transform-box: fill-box; transform-origin: 50% 70%; } to { opacity: 1; transform: scale(1.05); transform-box: fill-box; transform-origin: 50% 70%; } }
+/* Funken steigen nur auf, wenn es wirklich brennt */
+.feuerbild .funken circle { fill: #ffcf6b; opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
+.feuerbild.brennt .funken circle, .feuerbild.lodert .funken circle { animation: feuer-funke 2.8s linear infinite; }
+.feuerbild .funken circle:nth-child(2) { animation-delay: -.9s; }
+.feuerbild .funken circle:nth-child(3) { animation-delay: -1.7s; }
+.feuerbild .funken circle:nth-child(4) { animation-delay: -2.3s; }
+@keyframes feuer-funke {
+  0% { opacity: 0; transform: translate(0, 6px) scale(1); }
+  18% { opacity: .95; }
+  100% { opacity: 0; transform: translate(-3px, -22px) scale(.35); }
+}
+/* Ist das Tagesziel erreicht, glimmen die Funken golden und etwas laenger */
+.feuerbild.ziel .funken circle { fill: #ffe08a; }
+.feuerbild.ziel .f-kern { opacity: 1; }
+/* Nur Glut: keine Flamme, dafuer ein warmes Bett */
+.feuerbild.glut .flammenhalter { display: none; }
+.feuerbild.glut .schein { opacity: .5; }
+.feuerbild.glut .funken circle { display: none; }
+/* Aus: kalte Scheite, ein Faden Rauch */
+.feuerbild.aus .flammenhalter, .feuerbild.aus .funken { display: none; }
+.feuerbild.aus .glut ellipse { fill: #6b5a4a; animation: none; opacity: .5; }
+.feuerbild.aus .schein { display: none; }
+.feuerbild.aus .scheit { filter: saturate(.5) brightness(.8); }
+.feuerbild .rauch { display: none; }
+.feuerbild.aus .rauch { display: block; animation: feuer-rauch 5.5s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes feuer-rauch { 0% { opacity: 0; transform: translateY(2px) scaleY(.85); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-6px) scaleY(1.1); } }
+@media (prefers-reduced-motion: reduce) {
+  .feuerbild .flamme, .feuerbild .f-innen, .feuerbild .f-kern, .feuerbild .glut ellipse, .feuerbild .schein, .feuerbild .funken circle, .feuerbild .rauch { animation: none; }
+}
 
 /* ================================================================
    Cluster
@@ -1363,7 +1397,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22p
 
 /* Schreibfeuer, neu gesetzt */
 .feuerkarte .feuer-zeile { display: flex; align-items: center; gap: 18px; }
-.feuer-flamme { width: 44px; height: 52px; flex: none; align-self: flex-end; }
+.feuer-flamme { width: 56px; height: 62px; flex: none; align-self: flex-end; margin-bottom: -2px; }
 .feuer-zahlen .gross { font-size: 30px; line-height: 1.1; font-weight: 700; font-family: ui-serif, "New York", Georgia, serif; font-variant-numeric: tabular-nums; }
 .feuer-zahlen .einheit { font-size: 13px; color: var(--blass); margin-top: 1px; }
 .feuer-zahlen .klein { font-size: 12.5px; color: var(--blass); margin-top: 6px; }
@@ -1783,7 +1817,9 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 .papierseite.breit .schreibflaeche { background-image: repeating-linear-gradient(transparent, transparent 39px, var(--linie) 39px, var(--linie) 40px); background-position-y: 11px; line-height: 40px; }
 .papierseite.punkte { background-image: radial-gradient(var(--linie) 1px, transparent 1.25px); background-size: 23px 23px; }
 .papierseite.blank .schreibflaeche { background: none; }
-.heftrolle { max-width: 840px; margin: 8px auto 70px; display: flex; flex-direction: column; gap: 0; }
+.heftrolle { max-width: 840px; margin: 8px auto 70px; display: flex; flex-direction: column; gap: 0; position: relative; }
+/* Die Werkzeuge stehen einmal oben rechts und bleiben beim Scrollen in Reichweite */
+.heftrolle > .fluss-werkzeuge { align-self: flex-end; }
 .rollen-seite { position: relative; }
 .heftrolle .papierseite:focus-within { position: relative; z-index: 2; }
 /* Ohne Grenzen ist die Rolle ein einziges langes Blatt */
@@ -1791,11 +1827,10 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 .heftrolle:not(.zeigt-grenzen) { box-shadow: 0 4px 18px var(--schein), 0 1px 3px var(--schein); border-radius: 14px; background: var(--papier); }
 .heftrolle:not(.zeigt-grenzen) .rollen-plus { margin: 0 14px 18px; }
 /* Die Formatleiste erscheint nur an der Stelle, an der man schreibt */
-.heftrolle:not(.zeigt-grenzen) .rollen-seite .formatleiste { display: none; }
-.heftrolle:not(.zeigt-grenzen) .rollen-seite .papierseite:focus-within .formatleiste { display: flex; }
+.heftrolle .rollen-seite .formatleiste { display: none; }
+.heftrolle .rollen-seite .papierseite:focus-within .formatleiste { display: flex; }
 /* Die Werkzeuge einer Seite zeigen sich erst beim Schreiben oder Darüberfahren */
-@media (hover: hover) { .heftrolle:not(.zeigt-grenzen) .rollen-seite .seitenwerkzeuge { opacity: 0; transition: opacity .2s; }
-  .heftrolle:not(.zeigt-grenzen) .rollen-seite .papierseite:hover .seitenwerkzeuge, .heftrolle:not(.zeigt-grenzen) .rollen-seite .papierseite:focus-within .seitenwerkzeuge { opacity: 1; } }
+
 .rollen-seite .papierseite { min-height: 0; overflow: visible; border-radius: 0; animation: none; padding-top: 4px; padding-bottom: 4px; }
 .rollen-seite:first-child .papierseite { border-radius: 14px 14px 0 0; padding-top: 27px; }
 .rollen-seite:nth-last-child(2) .papierseite { border-radius: 0 0 14px 14px; padding-bottom: 42px; }
@@ -1989,6 +2024,12 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 }
 .fluss-bogen.kariert { background-image: linear-gradient(var(--linie) 1px, transparent 1px), linear-gradient(90deg, var(--linie) 1px, transparent 1px); background-size: 26px 26px; }
 .fluss-bogen.punkte { background-image: radial-gradient(var(--linie) 1px, transparent 1.25px); background-size: 23px 23px; }
+/* Papier gehoert in Rolle und „Am Stueck" auf den ganzen Bogen — je Seite
+   gezeichnet ergaeben Karo, Punkte und die Cornell-Spalte lauter Kaesten. */
+.heftrolle:not(.zeigt-grenzen) .papierseite { background-image: none; }
+.heftrolle:not(.zeigt-grenzen).kariert { background-image: linear-gradient(var(--linie) 1px, transparent 1px), linear-gradient(90deg, var(--linie) 1px, transparent 1px); background-size: 26px 26px; }
+.heftrolle:not(.zeigt-grenzen).punkte { background-image: radial-gradient(var(--linie) 1px, transparent 1.25px); background-size: 23px 23px; }
+.heftrolle:not(.zeigt-grenzen).cornell, .fluss-bogen.cornell { background-image: linear-gradient(90deg, transparent calc(30% - .5px), var(--linie) calc(30% - .5px), var(--linie) calc(30% + .5px), transparent calc(30% + .5px)); }
 .papierseite.fluss {
   min-height: 0; box-shadow: none; border-radius: 0; background: none;
   background-image: none; padding: 8px 38px 4px; overflow: visible; animation: none;
@@ -2003,13 +2044,9 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
   margin: 0 12px 0 0; z-index: 8;
 }
 .fluss-bogen { padding-top: 4px; }
-.papierseite.fluss + .papierseite.fluss::before {
-  content: ""; position: absolute; left: 38px; right: 38px; top: 0; height: 1px;
-  background: var(--linie); opacity: .35;
-}
+/* Keine Kante zwischen den Stuecken: „Am Stueck" ist eine einzige Seite. */
 @media (max-width: 700px) {
   .papierseite.fluss { padding-inline: 17px; }
-  .papierseite.fluss + .papierseite.fluss::before { left: 17px; right: 17px; }
 }
 
 /* ----- Einfügefeld für große Textmengen aus anderen Apps ----- */
@@ -2120,6 +2157,12 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 
 /* Randlinie wie im Schulheft */
 .papierseite.mit-rand::after { content: ""; position: absolute; top: 0; bottom: 0; left: 30px; width: 1px; background: rgba(176, 85, 47, .42); pointer-events: none; }
+/* In der Rolle und „Am Stueck" laeuft die Randlinie durch den ganzen Bogen —
+   eine Linie je Seitenstueck sah aus wie ein Kasten um jeden Abschnitt. */
+.fluss-bogen .papierseite.mit-rand::after, .heftrolle:not(.zeigt-grenzen) .papierseite.mit-rand::after { display: none; }
+.fluss-bogen.mit-rand::after, .heftrolle:not(.zeigt-grenzen).mit-rand::after { content: ""; position: absolute; top: 0; bottom: 0; left: 38px; width: 1px; background: rgba(176, 85, 47, .42); pointer-events: none; z-index: 1; }
+.fluss-bogen.papierfarbe-nacht.mit-rand::after, .heftrolle.papierfarbe-nacht:not(.zeigt-grenzen).mit-rand::after { background: rgba(217, 138, 84, .5); }
+@media (max-width: 700px) { .fluss-bogen.mit-rand::after, .heftrolle:not(.zeigt-grenzen).mit-rand::after { left: 17px; } }
 .papierseite.mit-rand .schreibflaeche, .papierseite.mit-rand .stitel { padding-left: 10px; }
 .papierseite.papierfarbe-nacht.mit-rand::after { background: rgba(217, 138, 84, .5); }
 @media (max-width: 700px) { .papierseite.mit-rand::after { left: 14px; } }
@@ -2254,7 +2297,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.19.0';
+const APP_VERSION = '5.20.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -2431,9 +2474,22 @@ function seitenUmbruch(text, passt) {
     if (passt(text.slice(0, mitte))) links = mitte; else rechts = mitte - 1;
   }
   if (links < 1) return { hier: '', weiter: text };
-  let trenn = text.lastIndexOf('\n', links);
-  if (trenn < Math.max(0, links - 700)) trenn = text.lastIndexOf(' ', links);
-  if (trenn < Math.max(0, links - 220)) trenn = links;
+  /* Die Seite soll bis unten voll werden. Ein Absatzende weit oberhalb der
+     Bruchstelle liesse ein Drittel Seite leer — darum zaehlt es nur, wenn es
+     nahe genug am Ende steht; sonst ein Satzende, sonst die Wortgrenze. */
+  const NAH = 200, WORT = 140;
+  let trenn = -1;
+  const absatz = text.lastIndexOf('\n', links);
+  if (absatz > 0 && absatz >= links - NAH) trenn = absatz;
+  if (trenn < 0) {
+    const satz = Math.max(text.lastIndexOf('. ', links), text.lastIndexOf('! ', links), text.lastIndexOf('? ', links), text.lastIndexOf('… ', links));
+    if (satz > 0 && satz >= links - NAH) trenn = satz + 1;
+  }
+  if (trenn < 0) {
+    const wort = text.lastIndexOf(' ', links);
+    if (wort > 0 && wort >= links - WORT) trenn = wort;
+  }
+  if (trenn < 1) trenn = links;
   const hier = text.slice(0, trenn).replace(/[ \t]+$/, '');
   const weiter = text.slice(trenn).replace(/^[ \t\n]+/, '');
   return weiter ? { hier, weiter } : null;
@@ -3016,9 +3072,83 @@ function feuerstufe() {
   if (letzte3 > 0) return 'glut';
   return 'aus';
 }
+/* Wie hoch die Flamme steht: 0 bis 1, gemessen am Tagesziel (ohne Ziel an 800
+   Woertern, das ist die Schwelle zum Lodern). Pur. */
+function feuerStaerke(heuteWorte, tagesziel) {
+  const w = Math.max(0, Number(heuteWorte) || 0);
+  const ziel = Number(tagesziel) > 0 ? Number(tagesziel) : 800;
+  return Math.max(0, Math.min(1, w / ziel));
+}
+/* Wie viele Scheite im Feuer liegen: die Tage in Folge. Pur. */
+function feuerScheite(serie) {
+  const s = Math.max(0, Number(serie) || 0);
+  return s >= 7 ? 3 : s >= 2 ? 2 : 1;
+}
+
+/* Die Feuerstelle als gezeichnetes Bild: Scheite, Glutbett, eine Flamme, die
+   mit dem Tag waechst, Funken, wenn es lodert, und ein Faden Rauch, wenn es
+   ausgegangen ist. Pur (bis auf die laufende Nummer fuer die Farbverlaeufe). */
+let _feuerNr = 0;
+function feuerBild(stufe, opt = {}) {
+  const staerke = Math.max(0, Math.min(1, opt.staerke == null ? 1 : opt.staerke));
+  const scheite = feuerScheite(opt.serie);
+  const ziel = !!opt.zielErreicht;
+  const id = 'feuer' + (opt.id != null ? opt.id : ++_feuerNr);
+  const brennt = stufe === 'brennt' || stufe === 'lodert';
+  /* Die Flamme waechst mit dem Tag: klein am Anfang, voll beim Ziel, hoch beim Lodern */
+  const hoehe = stufe === 'lodert' ? 1.12 : .52 + .48 * staerke;
+  const klassen = ['feuerbild', stufe, ziel ? 'ziel' : ''].filter(Boolean).join(' ');
+  const scheit = (dreh, y, breite, hell) =>
+    '<g transform="rotate(' + dreh + ' 24 ' + y + ')">' +
+    '<rect class="scheit" x="' + (24 - breite / 2) + '" y="' + (y - 3.4) + '" width="' + breite + '" height="6.8" rx="3.4" fill="url(#' + id + '-holz)"/>' +
+    '<rect class="maser" x="' + (24 - breite / 2 + 3) + '" y="' + (y - 1.1) + '" width="' + (breite - 6) + '" height="1.1" rx=".55" fill="rgba(255,232,196,' + (hell ? .16 : .09) + ')"/>' +
+    '<ellipse cx="' + (24 - breite / 2 + 1.4) + '" cy="' + y + '" rx="1.5" ry="3.2" fill="rgba(30,18,8,.55)"/></g>';
+  return '<svg class="' + klassen + '" viewBox="0 0 48 60" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">' +
+    '<defs>' +
+      '<linearGradient id="' + id + '-holz" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="#8a5f38"/><stop offset=".55" stop-color="#6b452a"/><stop offset="1" stop-color="#3d2716"/></linearGradient>' +
+      '<linearGradient id="' + id + '-aussen" x1="0" y1="1" x2="0" y2="0">' +
+        '<stop offset="0" stop-color="#e2571f"/><stop offset=".45" stop-color="#f8912f"/><stop offset="1" stop-color="#ffd067" stop-opacity=".85"/></linearGradient>' +
+      '<linearGradient id="' + id + '-innen" x1="0" y1="1" x2="0" y2="0">' +
+        '<stop offset="0" stop-color="#ffc247"/><stop offset=".6" stop-color="#ffe6a0"/><stop offset="1" stop-color="#fff8dd"/></linearGradient>' +
+      '<radialGradient id="' + id + '-schein" cx=".5" cy=".5" r=".5">' +
+        '<stop offset="0" stop-color="#ff9b3d" stop-opacity=".75"/><stop offset=".55" stop-color="#ff7a26" stop-opacity=".28"/><stop offset="1" stop-color="#ff7a26" stop-opacity="0"/></radialGradient>' +
+    '</defs>' +
+    /* Der Schein auf dem Boden */
+    '<ellipse class="schein" cx="24" cy="47" rx="20" ry="10" fill="url(#' + id + '-schein)"/>' +
+    '<ellipse class="asche" cx="24" cy="53.8" rx="16.5" ry="3.4" fill="rgba(90,74,58,.28)"/>' +
+    /* Die Scheite: einer je angefangener Woche am Feuer */
+    '<g class="scheite">' +
+      scheit(-9, 50.5, 32, false) +
+      (scheite >= 2 ? scheit(11, 47.6, 28, true) : '') +
+      (scheite >= 3 ? scheit(41, 52.4, 22, false) : '') +
+    '</g>' +
+    /* Das Glutbett zwischen den Scheiten */
+    '<g class="glut">' +
+      '<ellipse cx="20" cy="48.6" rx="2.6" ry="1.5"/><ellipse cx="26.5" cy="49.4" rx="3.1" ry="1.7"/><ellipse cx="30.5" cy="47.8" rx="2" ry="1.2"/><ellipse cx="16.6" cy="49.8" rx="1.8" ry="1.1"/>' +
+    '</g>' +
+    /* Die Flamme: aussen, innen, Kern — die Hoehe kommt vom Tag */
+    '<g class="flammenhalter" transform="translate(24 49) scale(' + (.8 + .2 * hoehe).toFixed(3) + ' ' + hoehe.toFixed(3) + ') translate(-24 -49)">' +
+      '<g class="flamme">' +
+        '<path class="f-aussen" d="M24 49.5c-9.6-2.4-13.4-9.6-10.6-16.6 1.4-3.6 3.8-6 4.4-9.4.4-2.4-.2-4.8-1.4-7 6 1.8 10.6 6.2 12.8 11.4 1-1.8 1.4-3.8 1.2-6 4 4 6.2 9 6.2 14 0 7.4-4.8 12.2-12.6 13.6z" fill="url(#' + id + '-aussen)"/>' +
+        '<path class="f-innen" d="M24 49.5c-5.4-1.6-7.6-5.6-6.2-9.8.8-2.4 2.4-4 2.8-6.2.3-1.6 0-3.2-.8-4.6 3.8 1.4 6.6 4.4 7.8 7.8.8-1 1.2-2.2 1.2-3.6 2.4 2.8 3.6 6 3.6 9 0 4.6-2.8 7-8.4 7.4z" fill="url(#' + id + '-innen)"/>' +
+        '<ellipse class="f-kern" cx="24" cy="44" rx="2.6" ry="4.2" fill="#fffbe9" opacity=".85"/>' +
+      '</g>' +
+    '</g>' +
+    /* Funken steigen auf, wenn es richtig brennt */
+    '<g class="funken">' +
+      '<circle cx="17" cy="34" r="1.1"/><circle cx="30" cy="30" r=".9"/><circle cx="24" cy="26" r="1.3"/><circle cx="33" cy="38" r=".8"/>' +
+    '</g>' +
+    /* Und ein Faden Rauch, wenn es aus ist */
+    '<g class="rauch"><path d="M24 46c-3 -4 2-6 0-10s2-6 1-9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".3"/></g>' +
+    '</svg>';
+}
 function flammeHTML() {
-  const stufe = feuerstufe();
-  return `<div class="flammenbild ${stufe === 'brennt' ? '' : stufe}"><i class="f1"></i><i class="f2"></i><i class="holz"></i>${stufe === 'aus' ? '<i class="rauch"></i>' : ''}</div>`;
+  return feuerBild(feuerstufe(), {
+    staerke: feuerStaerke(D.stats.tage[tagKey()] || 0, D.einst.tagesziel),
+    serie: straehne(),
+    zielErreicht: D.einst.tagesziel > 0 && (D.stats.tage[tagKey()] || 0) >= D.einst.tagesziel
+  });
 }
 
 /* ----- Thema ----- */
@@ -6767,7 +6897,18 @@ RENDER.heft = function (haupt, heftId) {
   function zeigeRolle() {
     seiten = kinder(heft.id, 'seite');
     { const z = zielAufnehmen(); if (z) springZu = z; }
-    halter.className = 'heftrolle' + (heft.rollenGrenzen ? ' zeigt-grenzen' : ''); fuss.style.display = 'none'; halter.innerHTML = '';
+    halter.className = 'heftrolle ' + (heft.papier || 'liniert') + ' papierfarbe-' + (heft.papierfarbe || 'hell') + (heft.rand ? ' mit-rand' : '') + (heft.rollenGrenzen ? ' zeigt-grenzen' : '');
+    fuss.style.display = 'none'; halter.innerHTML = '';
+    /* Ein Werkzeug für die ganze Rolle: es wirkt auf die Seite, in der gerade
+       geschrieben wird — sonst auf die letzte. */
+    const aktuellesStueck = () => {
+      const aktiv = document.activeElement && document.activeElement.closest ? document.activeElement.closest('.papierseite') : null;
+      const blatt = (aktiv && halter.contains(aktiv)) ? aktiv : $$('.papierseite', halter).pop();
+      if (!blatt) return null;
+      const s = D.docs.get(blatt.dataset.seite);
+      return s ? { seite: s, blatt, heft } : null;
+    };
+    halter.append(seitenWerkzeuge(aktuellesStueck, { neuZeichnen: zeigeRolle, klasse: 'fluss-werkzeuge' }));
     for (let i = 0; i < seiten.length; i++) {
       const seite = seiten[i];
       halter.append(el('section', { class: 'rollen-seite', 'data-seite': seite.id },
@@ -6789,7 +6930,7 @@ RENDER.heft = function (haupt, heftId) {
     seiten = kinder(heft.id, 'seite');
     { const z = zielAufnehmen(); if (z) springZu = z; }
     halter.className = 'heftfluss'; fuss.style.display = 'none'; halter.innerHTML = '';
-    const bogen = el('div', { class: 'fluss-bogen ' + (heft.papier || 'liniert') + ' papierfarbe-' + (heft.papierfarbe || 'hell') });
+    const bogen = el('div', { class: 'fluss-bogen ' + (heft.papier || 'liniert') + ' papierfarbe-' + (heft.papierfarbe || 'hell') + (heft.rand ? ' mit-rand' : '') });
     /* Ein Werkzeug für die ganze lange Seite. Es wirkt auf das Stück, in dem
        gerade geschrieben wird — sonst auf das letzte. */
     const aktuellesStueck = () => {
@@ -7038,7 +7179,9 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
   /* Werkzeuge: auf einer einzelnen Seite oben rechts auf dem Papier. In der
      Ansicht „Am Stück" gibt es sie nur einmal ganz oben — dort ist alles eine
      einzige lange Seite, und eine Werkzeugreihe je Stück wäre bloß Lärm. */
-  const werkzeuge = optionen.fluss ? null : seitenWerkzeuge(
+  /* Eine Werkzeugreihe je Seite gibt es nur in der Einzelansicht. Rolle und
+     „Am Stück" sind ein einziger Text — dort steht sie einmal oben rechts. */
+  const werkzeuge = (optionen.fluss || optionen.rolle) ? null : seitenWerkzeuge(
     () => ({ seite, blatt, heft }), { neuZeichnen, frisch: () => baueAnlagen() });
 
   /* Titel + Text */

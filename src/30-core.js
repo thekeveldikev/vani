@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.19.0';
+const APP_VERSION = '5.20.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -180,9 +180,22 @@ function seitenUmbruch(text, passt) {
     if (passt(text.slice(0, mitte))) links = mitte; else rechts = mitte - 1;
   }
   if (links < 1) return { hier: '', weiter: text };
-  let trenn = text.lastIndexOf('\n', links);
-  if (trenn < Math.max(0, links - 700)) trenn = text.lastIndexOf(' ', links);
-  if (trenn < Math.max(0, links - 220)) trenn = links;
+  /* Die Seite soll bis unten voll werden. Ein Absatzende weit oberhalb der
+     Bruchstelle liesse ein Drittel Seite leer — darum zaehlt es nur, wenn es
+     nahe genug am Ende steht; sonst ein Satzende, sonst die Wortgrenze. */
+  const NAH = 200, WORT = 140;
+  let trenn = -1;
+  const absatz = text.lastIndexOf('\n', links);
+  if (absatz > 0 && absatz >= links - NAH) trenn = absatz;
+  if (trenn < 0) {
+    const satz = Math.max(text.lastIndexOf('. ', links), text.lastIndexOf('! ', links), text.lastIndexOf('? ', links), text.lastIndexOf('… ', links));
+    if (satz > 0 && satz >= links - NAH) trenn = satz + 1;
+  }
+  if (trenn < 0) {
+    const wort = text.lastIndexOf(' ', links);
+    if (wort > 0 && wort >= links - WORT) trenn = wort;
+  }
+  if (trenn < 1) trenn = links;
   const hier = text.slice(0, trenn).replace(/[ \t]+$/, '');
   const weiter = text.slice(trenn).replace(/^[ \t\n]+/, '');
   return weiter ? { hier, weiter } : null;
@@ -765,9 +778,83 @@ function feuerstufe() {
   if (letzte3 > 0) return 'glut';
   return 'aus';
 }
+/* Wie hoch die Flamme steht: 0 bis 1, gemessen am Tagesziel (ohne Ziel an 800
+   Woertern, das ist die Schwelle zum Lodern). Pur. */
+function feuerStaerke(heuteWorte, tagesziel) {
+  const w = Math.max(0, Number(heuteWorte) || 0);
+  const ziel = Number(tagesziel) > 0 ? Number(tagesziel) : 800;
+  return Math.max(0, Math.min(1, w / ziel));
+}
+/* Wie viele Scheite im Feuer liegen: die Tage in Folge. Pur. */
+function feuerScheite(serie) {
+  const s = Math.max(0, Number(serie) || 0);
+  return s >= 7 ? 3 : s >= 2 ? 2 : 1;
+}
+
+/* Die Feuerstelle als gezeichnetes Bild: Scheite, Glutbett, eine Flamme, die
+   mit dem Tag waechst, Funken, wenn es lodert, und ein Faden Rauch, wenn es
+   ausgegangen ist. Pur (bis auf die laufende Nummer fuer die Farbverlaeufe). */
+let _feuerNr = 0;
+function feuerBild(stufe, opt = {}) {
+  const staerke = Math.max(0, Math.min(1, opt.staerke == null ? 1 : opt.staerke));
+  const scheite = feuerScheite(opt.serie);
+  const ziel = !!opt.zielErreicht;
+  const id = 'feuer' + (opt.id != null ? opt.id : ++_feuerNr);
+  const brennt = stufe === 'brennt' || stufe === 'lodert';
+  /* Die Flamme waechst mit dem Tag: klein am Anfang, voll beim Ziel, hoch beim Lodern */
+  const hoehe = stufe === 'lodert' ? 1.12 : .52 + .48 * staerke;
+  const klassen = ['feuerbild', stufe, ziel ? 'ziel' : ''].filter(Boolean).join(' ');
+  const scheit = (dreh, y, breite, hell) =>
+    '<g transform="rotate(' + dreh + ' 24 ' + y + ')">' +
+    '<rect class="scheit" x="' + (24 - breite / 2) + '" y="' + (y - 3.4) + '" width="' + breite + '" height="6.8" rx="3.4" fill="url(#' + id + '-holz)"/>' +
+    '<rect class="maser" x="' + (24 - breite / 2 + 3) + '" y="' + (y - 1.1) + '" width="' + (breite - 6) + '" height="1.1" rx=".55" fill="rgba(255,232,196,' + (hell ? .16 : .09) + ')"/>' +
+    '<ellipse cx="' + (24 - breite / 2 + 1.4) + '" cy="' + y + '" rx="1.5" ry="3.2" fill="rgba(30,18,8,.55)"/></g>';
+  return '<svg class="' + klassen + '" viewBox="0 0 48 60" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">' +
+    '<defs>' +
+      '<linearGradient id="' + id + '-holz" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="#8a5f38"/><stop offset=".55" stop-color="#6b452a"/><stop offset="1" stop-color="#3d2716"/></linearGradient>' +
+      '<linearGradient id="' + id + '-aussen" x1="0" y1="1" x2="0" y2="0">' +
+        '<stop offset="0" stop-color="#e2571f"/><stop offset=".45" stop-color="#f8912f"/><stop offset="1" stop-color="#ffd067" stop-opacity=".85"/></linearGradient>' +
+      '<linearGradient id="' + id + '-innen" x1="0" y1="1" x2="0" y2="0">' +
+        '<stop offset="0" stop-color="#ffc247"/><stop offset=".6" stop-color="#ffe6a0"/><stop offset="1" stop-color="#fff8dd"/></linearGradient>' +
+      '<radialGradient id="' + id + '-schein" cx=".5" cy=".5" r=".5">' +
+        '<stop offset="0" stop-color="#ff9b3d" stop-opacity=".75"/><stop offset=".55" stop-color="#ff7a26" stop-opacity=".28"/><stop offset="1" stop-color="#ff7a26" stop-opacity="0"/></radialGradient>' +
+    '</defs>' +
+    /* Der Schein auf dem Boden */
+    '<ellipse class="schein" cx="24" cy="47" rx="20" ry="10" fill="url(#' + id + '-schein)"/>' +
+    '<ellipse class="asche" cx="24" cy="53.8" rx="16.5" ry="3.4" fill="rgba(90,74,58,.28)"/>' +
+    /* Die Scheite: einer je angefangener Woche am Feuer */
+    '<g class="scheite">' +
+      scheit(-9, 50.5, 32, false) +
+      (scheite >= 2 ? scheit(11, 47.6, 28, true) : '') +
+      (scheite >= 3 ? scheit(41, 52.4, 22, false) : '') +
+    '</g>' +
+    /* Das Glutbett zwischen den Scheiten */
+    '<g class="glut">' +
+      '<ellipse cx="20" cy="48.6" rx="2.6" ry="1.5"/><ellipse cx="26.5" cy="49.4" rx="3.1" ry="1.7"/><ellipse cx="30.5" cy="47.8" rx="2" ry="1.2"/><ellipse cx="16.6" cy="49.8" rx="1.8" ry="1.1"/>' +
+    '</g>' +
+    /* Die Flamme: aussen, innen, Kern — die Hoehe kommt vom Tag */
+    '<g class="flammenhalter" transform="translate(24 49) scale(' + (.8 + .2 * hoehe).toFixed(3) + ' ' + hoehe.toFixed(3) + ') translate(-24 -49)">' +
+      '<g class="flamme">' +
+        '<path class="f-aussen" d="M24 49.5c-9.6-2.4-13.4-9.6-10.6-16.6 1.4-3.6 3.8-6 4.4-9.4.4-2.4-.2-4.8-1.4-7 6 1.8 10.6 6.2 12.8 11.4 1-1.8 1.4-3.8 1.2-6 4 4 6.2 9 6.2 14 0 7.4-4.8 12.2-12.6 13.6z" fill="url(#' + id + '-aussen)"/>' +
+        '<path class="f-innen" d="M24 49.5c-5.4-1.6-7.6-5.6-6.2-9.8.8-2.4 2.4-4 2.8-6.2.3-1.6 0-3.2-.8-4.6 3.8 1.4 6.6 4.4 7.8 7.8.8-1 1.2-2.2 1.2-3.6 2.4 2.8 3.6 6 3.6 9 0 4.6-2.8 7-8.4 7.4z" fill="url(#' + id + '-innen)"/>' +
+        '<ellipse class="f-kern" cx="24" cy="44" rx="2.6" ry="4.2" fill="#fffbe9" opacity=".85"/>' +
+      '</g>' +
+    '</g>' +
+    /* Funken steigen auf, wenn es richtig brennt */
+    '<g class="funken">' +
+      '<circle cx="17" cy="34" r="1.1"/><circle cx="30" cy="30" r=".9"/><circle cx="24" cy="26" r="1.3"/><circle cx="33" cy="38" r=".8"/>' +
+    '</g>' +
+    /* Und ein Faden Rauch, wenn es aus ist */
+    '<g class="rauch"><path d="M24 46c-3 -4 2-6 0-10s2-6 1-9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".3"/></g>' +
+    '</svg>';
+}
 function flammeHTML() {
-  const stufe = feuerstufe();
-  return `<div class="flammenbild ${stufe === 'brennt' ? '' : stufe}"><i class="f1"></i><i class="f2"></i><i class="holz"></i>${stufe === 'aus' ? '<i class="rauch"></i>' : ''}</div>`;
+  return feuerBild(feuerstufe(), {
+    staerke: feuerStaerke(D.stats.tage[tagKey()] || 0, D.einst.tagesziel),
+    serie: straehne(),
+    zielErreicht: D.einst.tagesziel > 0 && (D.stats.tage[tagKey()] || 0) >= D.einst.tagesziel
+  });
 }
 
 /* ----- Thema ----- */

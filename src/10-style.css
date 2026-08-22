@@ -285,7 +285,7 @@ html[data-thema="tinte"] .menue button.rot, html[data-thema="kerze"] .menue butt
 .fund-wann { font-size: 12.5px; color: var(--blass); margin-top: 8px; }
 
 .feuer-zeile { display: flex; align-items: center; gap: 16px; }
-.feuer-flamme { width: 46px; height: 56px; flex: none; }
+.feuer-flamme { width: 56px; height: 62px; flex: none; }
 .feuer-zahlen { flex: 1; }
 .feuer-zahlen .gross { font-size: 26px; font-weight: 700; font-family: ui-serif, "New York", Georgia, serif; }
 .feuer-zahlen .klein { font-size: 13px; color: var(--blass); margin-top: 2px; }
@@ -1062,20 +1062,54 @@ html[data-thema="papier"] .sr-fokus .sr-spiegel, html[data-thema="nebel"] .sr-fo
 @keyframes flackern { 0%,100% { transform: translateX(-50%) scale(1); } 30% { transform: translateX(-52%) scale(1.08, .94); } 60% { transform: translateX(-48%) scale(.95, 1.06); } }
 
 /* Flamme (Schreibfeuer) */
-.flammenbild { position: relative; width: 100%; height: 100%; }
-.flammenbild .f1, .flammenbild .f2 {
-  position: absolute; bottom: 6px; left: 50%; transform-origin: 50% 100%;
-  border-radius: 50% 50% 50% 50% / 66% 66% 34% 34%;
-  animation: flackern 1.9s ease-in-out infinite;
+/* ----- Das Schreibfeuer: eine gezeichnete Feuerstelle ----- */
+.feuerbild { display: block; width: 100%; height: 100%; overflow: visible; color: var(--blass); }
+.feuerbild .flamme { transform-box: fill-box; transform-origin: 50% 100%; animation: feuer-flackern 2.3s ease-in-out infinite alternate; }
+.feuerbild .f-innen { transform-box: fill-box; transform-origin: 50% 100%; animation: feuer-flackern 1.45s ease-in-out infinite alternate-reverse; }
+.feuerbild .f-kern { transform-box: fill-box; transform-origin: 50% 100%; animation: feuer-kern 1.9s ease-in-out infinite alternate; }
+@keyframes feuer-flackern {
+  0% { transform: scale(.965, .93) skewX(2deg); }
+  40% { transform: scale(1.02, 1.05) skewX(-1.5deg); }
+  70% { transform: scale(.99, 1.01) skewX(1deg); }
+  100% { transform: scale(1.03, 1.07) skewX(-.5deg); }
 }
-.flammenbild .f1 { width: 30px; height: 40px; margin-left: -15px; background: radial-gradient(circle at 50% 78%, #ffdf8e, #e8813a 70%, transparent); }
-.flammenbild .f2 { width: 15px; height: 21px; margin-left: -7.5px; background: radial-gradient(circle at 50% 80%, #fff7d6, #ffc860 75%, transparent); animation-delay: -.7s; }
-.flammenbild .holz { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 38px; height: 7px; border-radius: 4px; background: #6e4a2a; box-shadow: 0 2px 2px rgba(0,0,0,.2); }
-.flammenbild.glut .f1 { width: 17px; height: 15px; margin-left: -8.5px; opacity: .65; }
-.flammenbild.glut .f2 { display: none; }
-.flammenbild.aus .f1, .flammenbild.aus .f2 { display: none; }
-.flammenbild.aus .rauch { position: absolute; bottom: 10px; left: 50%; width: 3px; height: 16px; margin-left: -1px; border-radius: 3px; background: var(--blass); opacity: .35; }
-.flammenbild.lodert .f1 { width: 38px; height: 52px; margin-left: -19px; }
+@keyframes feuer-kern { from { opacity: .6; transform: scaleY(.9); } to { opacity: .95; transform: scaleY(1.08); } }
+.feuerbild .glut ellipse { fill: #ff8a3c; animation: feuer-glut 3.1s ease-in-out infinite alternate; }
+.feuerbild .glut ellipse:nth-child(2) { animation-delay: -1.1s; }
+.feuerbild .glut ellipse:nth-child(3) { animation-delay: -2.2s; }
+.feuerbild .glut ellipse:nth-child(4) { animation-delay: -.6s; }
+@keyframes feuer-glut { from { opacity: .45; } to { opacity: .95; } }
+.feuerbild .schein { animation: feuer-schein 3.6s ease-in-out infinite alternate; }
+@keyframes feuer-schein { from { opacity: .75; transform: scale(.94); transform-box: fill-box; transform-origin: 50% 70%; } to { opacity: 1; transform: scale(1.05); transform-box: fill-box; transform-origin: 50% 70%; } }
+/* Funken steigen nur auf, wenn es wirklich brennt */
+.feuerbild .funken circle { fill: #ffcf6b; opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
+.feuerbild.brennt .funken circle, .feuerbild.lodert .funken circle { animation: feuer-funke 2.8s linear infinite; }
+.feuerbild .funken circle:nth-child(2) { animation-delay: -.9s; }
+.feuerbild .funken circle:nth-child(3) { animation-delay: -1.7s; }
+.feuerbild .funken circle:nth-child(4) { animation-delay: -2.3s; }
+@keyframes feuer-funke {
+  0% { opacity: 0; transform: translate(0, 6px) scale(1); }
+  18% { opacity: .95; }
+  100% { opacity: 0; transform: translate(-3px, -22px) scale(.35); }
+}
+/* Ist das Tagesziel erreicht, glimmen die Funken golden und etwas laenger */
+.feuerbild.ziel .funken circle { fill: #ffe08a; }
+.feuerbild.ziel .f-kern { opacity: 1; }
+/* Nur Glut: keine Flamme, dafuer ein warmes Bett */
+.feuerbild.glut .flammenhalter { display: none; }
+.feuerbild.glut .schein { opacity: .5; }
+.feuerbild.glut .funken circle { display: none; }
+/* Aus: kalte Scheite, ein Faden Rauch */
+.feuerbild.aus .flammenhalter, .feuerbild.aus .funken { display: none; }
+.feuerbild.aus .glut ellipse { fill: #6b5a4a; animation: none; opacity: .5; }
+.feuerbild.aus .schein { display: none; }
+.feuerbild.aus .scheit { filter: saturate(.5) brightness(.8); }
+.feuerbild .rauch { display: none; }
+.feuerbild.aus .rauch { display: block; animation: feuer-rauch 5.5s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes feuer-rauch { 0% { opacity: 0; transform: translateY(2px) scaleY(.85); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-6px) scaleY(1.1); } }
+@media (prefers-reduced-motion: reduce) {
+  .feuerbild .flamme, .feuerbild .f-innen, .feuerbild .f-kern, .feuerbild .glut ellipse, .feuerbild .schein, .feuerbild .funken circle, .feuerbild .rauch { animation: none; }
+}
 
 /* ================================================================
    Cluster
@@ -1344,7 +1378,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22p
 
 /* Schreibfeuer, neu gesetzt */
 .feuerkarte .feuer-zeile { display: flex; align-items: center; gap: 18px; }
-.feuer-flamme { width: 44px; height: 52px; flex: none; align-self: flex-end; }
+.feuer-flamme { width: 56px; height: 62px; flex: none; align-self: flex-end; margin-bottom: -2px; }
 .feuer-zahlen .gross { font-size: 30px; line-height: 1.1; font-weight: 700; font-family: ui-serif, "New York", Georgia, serif; font-variant-numeric: tabular-nums; }
 .feuer-zahlen .einheit { font-size: 13px; color: var(--blass); margin-top: 1px; }
 .feuer-zahlen .klein { font-size: 12.5px; color: var(--blass); margin-top: 6px; }
@@ -1764,7 +1798,9 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 .papierseite.breit .schreibflaeche { background-image: repeating-linear-gradient(transparent, transparent 39px, var(--linie) 39px, var(--linie) 40px); background-position-y: 11px; line-height: 40px; }
 .papierseite.punkte { background-image: radial-gradient(var(--linie) 1px, transparent 1.25px); background-size: 23px 23px; }
 .papierseite.blank .schreibflaeche { background: none; }
-.heftrolle { max-width: 840px; margin: 8px auto 70px; display: flex; flex-direction: column; gap: 0; }
+.heftrolle { max-width: 840px; margin: 8px auto 70px; display: flex; flex-direction: column; gap: 0; position: relative; }
+/* Die Werkzeuge stehen einmal oben rechts und bleiben beim Scrollen in Reichweite */
+.heftrolle > .fluss-werkzeuge { align-self: flex-end; }
 .rollen-seite { position: relative; }
 .heftrolle .papierseite:focus-within { position: relative; z-index: 2; }
 /* Ohne Grenzen ist die Rolle ein einziges langes Blatt */
@@ -1772,11 +1808,10 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 .heftrolle:not(.zeigt-grenzen) { box-shadow: 0 4px 18px var(--schein), 0 1px 3px var(--schein); border-radius: 14px; background: var(--papier); }
 .heftrolle:not(.zeigt-grenzen) .rollen-plus { margin: 0 14px 18px; }
 /* Die Formatleiste erscheint nur an der Stelle, an der man schreibt */
-.heftrolle:not(.zeigt-grenzen) .rollen-seite .formatleiste { display: none; }
-.heftrolle:not(.zeigt-grenzen) .rollen-seite .papierseite:focus-within .formatleiste { display: flex; }
+.heftrolle .rollen-seite .formatleiste { display: none; }
+.heftrolle .rollen-seite .papierseite:focus-within .formatleiste { display: flex; }
 /* Die Werkzeuge einer Seite zeigen sich erst beim Schreiben oder Darüberfahren */
-@media (hover: hover) { .heftrolle:not(.zeigt-grenzen) .rollen-seite .seitenwerkzeuge { opacity: 0; transition: opacity .2s; }
-  .heftrolle:not(.zeigt-grenzen) .rollen-seite .papierseite:hover .seitenwerkzeuge, .heftrolle:not(.zeigt-grenzen) .rollen-seite .papierseite:focus-within .seitenwerkzeuge { opacity: 1; } }
+
 .rollen-seite .papierseite { min-height: 0; overflow: visible; border-radius: 0; animation: none; padding-top: 4px; padding-bottom: 4px; }
 .rollen-seite:first-child .papierseite { border-radius: 14px 14px 0 0; padding-top: 27px; }
 .rollen-seite:nth-last-child(2) .papierseite { border-radius: 0 0 14px 14px; padding-bottom: 42px; }
@@ -1970,6 +2005,12 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 }
 .fluss-bogen.kariert { background-image: linear-gradient(var(--linie) 1px, transparent 1px), linear-gradient(90deg, var(--linie) 1px, transparent 1px); background-size: 26px 26px; }
 .fluss-bogen.punkte { background-image: radial-gradient(var(--linie) 1px, transparent 1.25px); background-size: 23px 23px; }
+/* Papier gehoert in Rolle und „Am Stueck" auf den ganzen Bogen — je Seite
+   gezeichnet ergaeben Karo, Punkte und die Cornell-Spalte lauter Kaesten. */
+.heftrolle:not(.zeigt-grenzen) .papierseite { background-image: none; }
+.heftrolle:not(.zeigt-grenzen).kariert { background-image: linear-gradient(var(--linie) 1px, transparent 1px), linear-gradient(90deg, var(--linie) 1px, transparent 1px); background-size: 26px 26px; }
+.heftrolle:not(.zeigt-grenzen).punkte { background-image: radial-gradient(var(--linie) 1px, transparent 1.25px); background-size: 23px 23px; }
+.heftrolle:not(.zeigt-grenzen).cornell, .fluss-bogen.cornell { background-image: linear-gradient(90deg, transparent calc(30% - .5px), var(--linie) calc(30% - .5px), var(--linie) calc(30% + .5px), transparent calc(30% + .5px)); }
 .papierseite.fluss {
   min-height: 0; box-shadow: none; border-radius: 0; background: none;
   background-image: none; padding: 8px 38px 4px; overflow: visible; animation: none;
@@ -1984,13 +2025,9 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
   margin: 0 12px 0 0; z-index: 8;
 }
 .fluss-bogen { padding-top: 4px; }
-.papierseite.fluss + .papierseite.fluss::before {
-  content: ""; position: absolute; left: 38px; right: 38px; top: 0; height: 1px;
-  background: var(--linie); opacity: .35;
-}
+/* Keine Kante zwischen den Stuecken: „Am Stueck" ist eine einzige Seite. */
 @media (max-width: 700px) {
   .papierseite.fluss { padding-inline: 17px; }
-  .papierseite.fluss + .papierseite.fluss::before { left: 17px; right: 17px; }
 }
 
 /* ----- Einfügefeld für große Textmengen aus anderen Apps ----- */
@@ -2101,6 +2138,12 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 
 /* Randlinie wie im Schulheft */
 .papierseite.mit-rand::after { content: ""; position: absolute; top: 0; bottom: 0; left: 30px; width: 1px; background: rgba(176, 85, 47, .42); pointer-events: none; }
+/* In der Rolle und „Am Stueck" laeuft die Randlinie durch den ganzen Bogen —
+   eine Linie je Seitenstueck sah aus wie ein Kasten um jeden Abschnitt. */
+.fluss-bogen .papierseite.mit-rand::after, .heftrolle:not(.zeigt-grenzen) .papierseite.mit-rand::after { display: none; }
+.fluss-bogen.mit-rand::after, .heftrolle:not(.zeigt-grenzen).mit-rand::after { content: ""; position: absolute; top: 0; bottom: 0; left: 38px; width: 1px; background: rgba(176, 85, 47, .42); pointer-events: none; z-index: 1; }
+.fluss-bogen.papierfarbe-nacht.mit-rand::after, .heftrolle.papierfarbe-nacht:not(.zeigt-grenzen).mit-rand::after { background: rgba(217, 138, 84, .5); }
+@media (max-width: 700px) { .fluss-bogen.mit-rand::after, .heftrolle:not(.zeigt-grenzen).mit-rand::after { left: 17px; } }
 .papierseite.mit-rand .schreibflaeche, .papierseite.mit-rand .stitel { padding-left: 10px; }
 .papierseite.papierfarbe-nacht.mit-rand::after { background: rgba(217, 138, 84, .5); }
 @media (max-width: 700px) { .papierseite.mit-rand::after { left: 14px; } }

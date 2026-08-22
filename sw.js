@@ -1,5 +1,5 @@
 /* VANI Service Worker — Seiten frisch aus dem Netz, offline aus dem sicheren Cache. */
-const VERSION = '5.19.0';
+const VERSION = '5.20.0';
 const CACHE = 'vani-v5-' + VERSION;
 const KERN = [
   './',

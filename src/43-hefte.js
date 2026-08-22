@@ -200,7 +200,18 @@ RENDER.heft = function (haupt, heftId) {
   function zeigeRolle() {
     seiten = kinder(heft.id, 'seite');
     { const z = zielAufnehmen(); if (z) springZu = z; }
-    halter.className = 'heftrolle' + (heft.rollenGrenzen ? ' zeigt-grenzen' : ''); fuss.style.display = 'none'; halter.innerHTML = '';
+    halter.className = 'heftrolle ' + (heft.papier || 'liniert') + ' papierfarbe-' + (heft.papierfarbe || 'hell') + (heft.rand ? ' mit-rand' : '') + (heft.rollenGrenzen ? ' zeigt-grenzen' : '');
+    fuss.style.display = 'none'; halter.innerHTML = '';
+    /* Ein Werkzeug für die ganze Rolle: es wirkt auf die Seite, in der gerade
+       geschrieben wird — sonst auf die letzte. */
+    const aktuellesStueck = () => {
+      const aktiv = document.activeElement && document.activeElement.closest ? document.activeElement.closest('.papierseite') : null;
+      const blatt = (aktiv && halter.contains(aktiv)) ? aktiv : $$('.papierseite', halter).pop();
+      if (!blatt) return null;
+      const s = D.docs.get(blatt.dataset.seite);
+      return s ? { seite: s, blatt, heft } : null;
+    };
+    halter.append(seitenWerkzeuge(aktuellesStueck, { neuZeichnen: zeigeRolle, klasse: 'fluss-werkzeuge' }));
     for (let i = 0; i < seiten.length; i++) {
       const seite = seiten[i];
       halter.append(el('section', { class: 'rollen-seite', 'data-seite': seite.id },
@@ -222,7 +233,7 @@ RENDER.heft = function (haupt, heftId) {
     seiten = kinder(heft.id, 'seite');
     { const z = zielAufnehmen(); if (z) springZu = z; }
     halter.className = 'heftfluss'; fuss.style.display = 'none'; halter.innerHTML = '';
-    const bogen = el('div', { class: 'fluss-bogen ' + (heft.papier || 'liniert') + ' papierfarbe-' + (heft.papierfarbe || 'hell') });
+    const bogen = el('div', { class: 'fluss-bogen ' + (heft.papier || 'liniert') + ' papierfarbe-' + (heft.papierfarbe || 'hell') + (heft.rand ? ' mit-rand' : '') });
     /* Ein Werkzeug für die ganze lange Seite. Es wirkt auf das Stück, in dem
        gerade geschrieben wird — sonst auf das letzte. */
     const aktuellesStueck = () => {
@@ -471,7 +482,9 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
   /* Werkzeuge: auf einer einzelnen Seite oben rechts auf dem Papier. In der
      Ansicht „Am Stück" gibt es sie nur einmal ganz oben — dort ist alles eine
      einzige lange Seite, und eine Werkzeugreihe je Stück wäre bloß Lärm. */
-  const werkzeuge = optionen.fluss ? null : seitenWerkzeuge(
+  /* Eine Werkzeugreihe je Seite gibt es nur in der Einzelansicht. Rolle und
+     „Am Stück" sind ein einziger Text — dort steht sie einmal oben rechts. */
+  const werkzeuge = (optionen.fluss || optionen.rolle) ? null : seitenWerkzeuge(
     () => ({ seite, blatt, heft }), { neuZeichnen, frisch: () => baueAnlagen() });
 
   /* Titel + Text */

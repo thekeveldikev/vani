@@ -638,3 +638,29 @@ test('Manuskript: Kapitel, Szenen und Schalter — nichts geht verloren, nichts 
   assert.ok(mitLeeren.includes('(noch leer)'));
   assert.doesNotMatch(k.manuskriptText(p, {}), /\n{4,}/, 'keine Leerzeilenwüsten');
 });
+
+test('seitenUmbruch füllt die Seite bis unten: Absatzenden weit oben zählen nicht mehr', async () => {
+  const k = await frisch();
+  const grenze = 400;
+  const passt = (s) => s.length <= grenze;
+  /* Ein Absatzende ganz weit oben darf die Seite nicht zu einem Drittel leer lassen */
+  const frueh = 'A'.repeat(60) + '\n' + 'wort '.repeat(120);
+  const g1 = roh(k.seitenUmbruch(frueh, passt));
+  assert.ok(g1.hier.length > grenze - 140, 'die Seite ist fast voll: ' + g1.hier.length);
+  assert.ok(g1.hier.length <= grenze);
+  assert.equal((g1.hier + ' ' + g1.weiter).replace(/\s+/g, ' ').trim(), frueh.replace(/\s+/g, ' ').trim());
+  /* Ein Absatzende dicht an der Bruchstelle wird dagegen genommen */
+  const nah = 'x'.repeat(grenze - 30) + '\n' + 'y'.repeat(600);
+  const g2 = roh(k.seitenUmbruch(nah, passt));
+  assert.equal(g2.hier.length, grenze - 30, 'am nahen Absatzende getrennt');
+  /* Sonst ein Satzende */
+  const satz = 'Ein Satz. '.repeat(50);
+  const g3 = roh(k.seitenUmbruch(satz, passt));
+  assert.ok(g3.hier.endsWith('.'), 'am Satzende getrennt: ' + JSON.stringify(g3.hier.slice(-12)));
+  assert.ok(g3.hier.length > grenze - 140);
+  /* Und ohne jede Grenze wird hart geschnitten, ohne Verlust */
+  const ohne = 'z'.repeat(1000);
+  const g4 = roh(k.seitenUmbruch(ohne, passt));
+  assert.equal(g4.hier.length, grenze);
+  assert.equal(g4.hier + g4.weiter, ohne);
+});

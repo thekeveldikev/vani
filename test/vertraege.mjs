@@ -277,10 +277,11 @@ test('Zahlenvertrag: auf schmalen Geräten weniger Tage statt abgeschnittener Ba
   assert.match(fein, /for \(let i = tage - 1; i >= 0; i--\)/);
 });
 
-test('Am-Stück-Vertrag: die Werkzeuge stehen einmal oben, nicht bei jedem Stück', () => {
+test('Am-Stück- und Rollen-Vertrag: die Werkzeuge stehen einmal oben, nicht bei jedem Stück', () => {
   const hefte = lies('src/43-hefte.js');
   assert.match(hefte, /function seitenWerkzeuge\(ziel/, 'eine gemeinsame Werkzeugreihe');
-  assert.match(hefte, /optionen\.fluss \? null : seitenWerkzeuge/, 'im Fluss keine Reihe je Stück');
+  assert.match(hefte, /\(optionen\.fluss \|\| optionen\.rolle\) \? null : seitenWerkzeuge/, 'weder im Fluss noch in der Rolle eine Reihe je Stück');
+  assert.equal((hefte.match(/klasse: 'fluss-werkzeuge'/g) || []).length, 2, 'je eine einzige Reihe für Rolle und Am Stück');
   assert.match(hefte, /klasse: 'fluss-werkzeuge'/, 'dafür eine einzige oben am Bogen');
   assert.match(hefte, /aktuellesStueck/, 'sie muss wissen, welches Stück gemeint ist');
   assert.doesNotMatch(lies('src/10-style.css'), /\.papierseite\.fluss:hover \.seitenwerkzeuge/,

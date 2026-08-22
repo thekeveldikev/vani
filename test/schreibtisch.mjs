@@ -219,3 +219,33 @@ test('caretZiel: der Cursor wird von unten und von oben ins Bild geholt', async 
   assert.equal(k.caretZiel(null, halter), null);
   assert.equal(k.caretZiel({ top: 1, bottom: 2 }, { top: 0, bottom: 0, height: 0, scrollTop: 0 }), null);
 });
+
+test('Schreibfeuer: Flammenhöhe am Tagesziel, Scheite nach Tagen in Folge, Bild je Stufe', async () => {
+  const k = await frisch();
+  /* Ohne eigenes Ziel misst sich die Flamme an 800 Wörtern */
+  assert.equal(k.feuerStaerke(0, 0), 0);
+  assert.equal(k.feuerStaerke(400, 0), .5);
+  assert.equal(k.feuerStaerke(4000, 0), 1, 'mehr als voll gibt es nicht');
+  assert.equal(k.feuerStaerke(150, 300), .5, 'mit Ziel zählt das Ziel');
+  assert.equal(k.feuerStaerke(-20, 300), 0);
+  assert.equal(k.feuerStaerke('keine Zahl', 300), 0);
+  /* Ein Scheit, ab zwei Tagen zwei, ab einer Woche drei */
+  assert.deepEqual([0, 1, 2, 6, 7, 40].map((n) => k.feuerScheite(n)), [1, 1, 2, 2, 3, 3]);
+  assert.equal(k.feuerScheite(null), 1);
+  /* Das Bild trägt seine Stufe und wächst mit dem Tag */
+  const aus = k.feuerBild('aus', { staerke: 0, serie: 0, id: 't1' });
+  assert.match(aus, /class="feuerbild aus"/);
+  assert.match(aus, /class="rauch"/, 'wenn es aus ist, steht ein Faden Rauch');
+  const ziel = k.feuerBild('lodert', { staerke: 1, serie: 9, zielErreicht: true, id: 't2' });
+  assert.match(ziel, /class="feuerbild lodert ziel"/);
+  assert.equal((ziel.match(/class="scheit"/g) || []).length, 3, 'nach einer Woche liegen drei Scheite');
+  assert.equal((k.feuerBild('brennt', { staerke: .5, serie: 0, id: 't3' }).match(/class="scheit"/g) || []).length, 1);
+  /* Die Höhe der Flamme hängt an der Stärke */
+  const klein = k.feuerBild('brennt', { staerke: 0, id: 't4' }).match(/scale\(([\d.]+) ([\d.]+)\)/);
+  const gross = k.feuerBild('brennt', { staerke: 1, id: 't5' }).match(/scale\(([\d.]+) ([\d.]+)\)/);
+  assert.ok(Number(klein[2]) < Number(gross[2]), 'volle Tage brennen höher');
+  assert.ok(Number(klein[1]) < Number(gross[1]), 'und breiter');
+  /* Die Farbverläufe brauchen je Bild eigene Kennungen, sonst mischen sie sich */
+  assert.ok(k.feuerBild('brennt', { id: 'a' }).includes('feuera-aussen'));
+  assert.ok(!k.feuerBild('brennt', { id: 'b' }).includes('feuera-aussen'));
+});
