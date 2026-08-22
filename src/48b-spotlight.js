@@ -5,6 +5,7 @@
 
 const SPOTLIGHT_BEFEHLE = () => [
   ...((typeof ALLE_RAEUME !== 'undefined' ? ALLE_RAEUME : []).map((r) => ({ text: r.name, unter: 'Raum', icon: r.icon, tu: () => { location.hash = '#/' + r.id; } }))),
+  { text: 'Sitzung beginnen', unter: 'Uhr, Klang, Kerze, ein Rat — und die Bilanz danach', icon: 'feuer', tu: () => { if (typeof sitzungBeginnen === 'function') sitzungBeginnen(); } },
   { text: 'Neues Blatt', unter: 'im Schreibraum', icon: 'blatt', tu: () => { const b = blattAusText('', ''); oeffneSchreibraum(b.id); } },
   { text: 'Schneller Schnipsel', unter: 'ein Satz, ein Gedanke', icon: 'schnipsel', tu: async () => { const t = await eingabe({ titel: 'Schnell notiert', platzhalter: 'ein Satz, ein Wort, ein Gedanke …', mehrzeilig: true, ok: 'Ablegen' }); if (t) { neuDoc('schnipsel', { text: t }); toast('Liegt in den Schnipseln.'); } } },
   { text: 'Suche', unter: 'die große Suche mit Gruppen', icon: 'suche', tu: () => { if (typeof oeffneSuche === 'function') oeffneSuche(); } },

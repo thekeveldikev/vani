@@ -607,6 +607,7 @@ RENDER.salon = function (haupt) {
   const kopf = el('div', { class: 'kopf' },
     el('h1', {}, 'Der Salon', el('div', { class: 'unter' }, 'Die Lieblingswand. Sie wissen, wie es geht — und sie reden, wenn man anklopft.')),
     el('button', { class: 'rundknopf zart', html: ik('plus'), title: 'Jemanden an die Wand hängen', onclick: () => salonEigenenAnlegen() }),
+    el('button', { class: 'rundknopf zart', html: ik('klang'), title: 'Salon am Abend: Kaminknistern und die Uhr (Klang)', onclick: () => salonKlang() }),
     el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Über die Bilder', onclick: () => salonUeberBilder() }));
   const frageZeile = el('div', { class: 'salon-fragezeile' }, el('span', { html: ik('suche'), style: 'display:flex;color:var(--blass)' }), frage, el('button', { class: 'knopf voll', onclick: fragen }, 'Die Runde fragen'));
   const platz = (a, i) => {
@@ -616,7 +617,16 @@ RENDER.salon = function (haupt) {
       rat ? el('button', { class: 'salon-tageskarte', onclick: () => salonSprechen(a, { saat: salonHash(heute + ':' + a.id) }) }, el('span', { class: 'st-ueber' }, 'Rat des Tages'), el('span', { class: 'st-text' }, rat.text), el('span', { class: 'st-fuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden — in ' + (a.anrede || a.name) + 's Geist')) : null);
   };
   const haus = alle.filter((a) => !a.gast && !a.eigen), gaeste = alle.filter((a) => a.gast), eigene = alle.filter((a) => a.eigen);
-  const galerie = el('div', { class: 'salon-galerie' }, ...haus.map(platz));
+  const galerie = el('div', { class: 'salon-galerie gemalt' }, ...haus.map(platz));
+  /* Der gemalte Raum hinter der Wand: Tapete, Vertäfelung, Wandleuchter, Kamin */
+  let maler = null;
+  if (typeof salonMaler === 'function') {
+    const leinwand = el('canvas', { class: 'salon-malerei', 'aria-hidden': 'true' });
+    galerie.prepend(leinwand);
+    maler = salonMaler(leinwand);
+    const beobachter = new MutationObserver(() => { if (!leinwand.isConnected) { maler.stopp(); beobachter.disconnect(); } });
+    beobachter.observe(haupt, { childList: true });
+  }
   const gastwand = el('div', { class: 'salon-gaeste' }, el('div', { class: 'salon-abschnitt' }, 'Das Gästezimmer'), el('div', { class: 'salon-galerie klein' }, ...gaeste.map((a, i) => platz(a, i + 4))));
   const eigenwand = eigene.length ? el('div', { class: 'salon-gaeste' }, el('div', { class: 'salon-abschnitt' }, 'Deine Wand'), el('div', { class: 'salon-galerie klein' }, ...eigene.map((a, i) => platz(a, i + 6)))) : null;
   const aufgabeHeute = (() => { const a = SALON_FEST[salonHash(heute + ':aufgabe') % SALON_FEST.length]; const l = a.aufgaben || []; return l.length ? { a, aufgabe: l[salonHash(heute + ':a') % l.length] } : null; })();
@@ -626,6 +636,7 @@ RENDER.salon = function (haupt) {
   wand.append(frageZeile, galerie, aufgabenkarte, gastwand, eigenwand, sockel,
     el('div', { class: 'salon-fuss' }, 'Die Zitate sind echt und tragen ihre Quelle. Die Ratschläge sind erfunden, in ihrem Geist — zusammen ' + alle.reduce((n, a) => n + salonVorrat(a), 0).toLocaleString('de-DE') + ' mögliche, jeden Tag andere.'));
   haupt.append(kopf, wand);
+  if (maler) maler.start();
 };
 
 /* Ein Zitat zeigen: bei englischen Stimmen zuerst das Original, die Übersetzung auf Tipp. */
@@ -780,4 +791,14 @@ function salonEigenenBearbeiten(doc) {
       } }, doc ? 'Speichern' : 'Aufhängen')));
   const zu = zeigeDeck(kasten);
   setTimeout(() => name.focus(), 60);
+}
+
+/* Der Klang des Salons: Kamin und Uhr — an oder aus. */
+async function salonKlang() {
+  if (typeof ambienceMischungAnwenden !== 'function') { location.hash = '#/klang'; return; }
+  const m = { ...(D.einst.ambience || {}) };
+  const an = (m.kamin || 0) > 0 && (m.uhr || 0) > 0;
+  if (an) { delete m.kamin; delete m.uhr; toast('Der Salon wird still.'); }
+  else { m.kamin = .28; m.uhr = .14; toast('Salon am Abend: das Feuer knistert, die Uhr geht.', 3200); }
+  try { await audioFreigeben(); await ambienceMischungAnwenden(m); } catch (e) {}
 }

@@ -1810,3 +1810,41 @@ Tests 160/160 (neu: Gäste/Werke/Aufgaben/`en`/Themenfrage, Orte-Vorgaben). Brow
 sechs Sprechblasen, King-Zitat im Original + Übersetzung auf Klick, Regal mit Gelesen-Häkchen,
 Aufgabe des Tages; Orte an: Diele mit drei Chips, Zettelkasten mit Reitern und Karteikarten,
 Kulissen in Projekte/Klang/Wörter/Feinheiten.
+
+## 32. Der gemalte Salon, die Sitzung, das Diktat, der Wort-Vergleich (24. August 2026, VANI 5.24.0)
+
+### Neue Dateien
+- `src/56b-salon-malerei.js` — `salonMaler(canvas)`: Leinwand hinter der Wand (Damasttapete mit
+  Ranken und Medaillons, Stuckleiste, Holzvertäfelung mit Kassetten, Kamin mit brennendem Feuer
+  und Funken, Sessel, Teetisch, zwei Wandleuchter mit je zwei zitternden Flammen und Schein, Staub
+  im Licht; Helligkeit folgt `schreibtischTageszeitInfo`; pausiert unter Schreibraum/Leser/hidden).
+  In `RENDER.salon` als `.salon-malerei` vor die Galerie gehängt, Stopp per MutationObserver.
+  Kopf-Knopf „Salon am Abend" (`salonKlang`: kamin .28 + uhr .14).
+- `src/45c-diktat.js` — Diktat über `webkitSpeechRecognition` (iPad ≥ 14.5, Chrome): Knopf im
+  Schreibraum-Kopf (nur wenn möglich), `diktatUmschalten` startet eine dauerhafte deutsche
+  Erkennung, `diktatSaeubern` (pur, getestet) macht aus „Punkt/Komma/Fragezeichen/neuer Absatz"
+  Zeichen und schreibt nach Satzende groß; `diktatEinfuegen` fügt an der Schreibstelle ein
+  (Textarea oder contenteditable via execCommand); lange Pause = Absatz; Zwischenanzeige als
+  Pille unten; Neustart bei `onend`, Stopp bei Rechtefehlern.
+- `src/58-sitzung.js` — **Sitzung beginnen** (`sitzungBeginnen`): Dauer (10/20/45/ohne),
+  Wortziel, Woran (neues Blatt oder einer der letzten drei Texte), Klang (still/Tisch/Garten/wie
+  gerade), Kerze, Rat von der Wand (Vorschau, „Anderer Rat"); Einstellungen bleiben in
+  `D.einst.sitzung`. `sitzungStarten` setzt Klang, legt das Blatt an (Rat als erste Zeile),
+  öffnet den Schreibraum und zündet `starteSprint(min)`; ohne Kerze läuft eine eigene Uhr.
+  **Bilanz** (`sitzungBilanz`): Wörter, Minuten, Ziel-Prozent, „Ein Satz von heute"
+  (`sitzungFundsatz`, pur: längster neuer vollständiger Satz) als Fundstück, ein Lob von der Wand
+  (Rat zum Thema ende/routine); wird von `beendeSprint` (45) und von `schliesseSchreibraum`
+  (ohne Kerze) gerufen. Einstieg: Tintenfass-Menü am Tisch, Knopf im Schreibfeuer, Spotlight.
+  **Wort-Diff** (`wortDiff`, pur, getestet): LCS auf Wörtern (Matrix bis 6000×6000, darüber
+  Anfang/Ende-Vergleich), `wortDiffBilanz`, `wortDiffElement` (ins/del), `staendeVergleichen`
+  als Lesebogen — im Schreibraum unter „Frühere Stände" → „Mit jetzt vergleichen".
+- Orte: `raumklang` (Standard aus) in `saubereOrte`; `orteRaumklang` setzt je Ort einen leisen
+  Grundton (Diele: Uhr, Zettelkasten: Café, Papierstapel: Blätter, Lesetisch/Korkwand: Kamin,
+  Tischtuch: Wind, Setzkasten: Uhr, Telefonbank: Regendach) — nur, wenn keine eigene laute
+  Mischung läuft; volle Raumhintergründe je Ort per CSS.
+- `IDEEN.md` „Runde 3 (nach 5.24)": Hören und Stimme, Hand und Körper, Zeit und Gedächtnis,
+  Welt und andere, Werkzeug und Tiefe, Schönheit.
+
+Tests 163/163 (neu: Diktat-Säuberung, Wort-Diff inkl. Grenze, Fundsatz, Raumklang-Vorgabe).
+Browser: gemalter Salon (Leinwand 879×1293 gefüllt), Klangknopf, Sitzungsfenster mit Rat-Vorschau,
+Diktat-Knopf im Schreibraum (Chrome), Raumklang-Schalter in den Feinheiten.

@@ -14,7 +14,7 @@ const ORTE_RAEUME = [
 /* Einstellungen säubern: an (Hauptschalter, Standard aus), tueren, geraeusche, je Raum. Pur. */
 function saubereOrte(roh) {
   const q = roh && typeof roh === 'object' && !Array.isArray(roh) ? roh : {};
-  const o = { an: q.an === true, tueren: q.tueren !== false, geraeusche: q.geraeusche === true };
+  const o = { an: q.an === true, tueren: q.tueren !== false, geraeusche: q.geraeusche === true, raumklang: q.raumklang === true };
   for (const [id] of ORTE_RAEUME) o[id] = q[id] !== false;
   return o;
 }
@@ -162,7 +162,24 @@ function orteAnwenden(haupt, raum) {
     haupt.classList.add('tuer-auf'); setTimeout(() => haupt.classList.remove('tuer-auf'), 520);
     if (o.geraeusche && typeof schreibtischKlick === 'function') schreibtischKlick('klick');
   }
+  if (o.an && o.raumklang) orteRaumklang(raum, an);
   _orteLetzterRaum = raum;
+}
+
+/* Ein leiser Grundton je Ort — nur wenn gewollt, nur wenn sich der Raum ändert. */
+const ORTE_KLANG = { zuhause: { uhr: .16 }, schnipsel: { cafe: .14 }, blaetter: { blaetter: .12 }, hefte: { kamin: .1 }, projekte: { kamin: .14 }, cluster: { wind: .1 }, woerter: { uhr: .1 }, faden: { regendach: .12 }, feinheiten: {} };
+let _orteKlangRaum = null;
+function orteRaumklang(raum, an) {
+  if (typeof ambienceMischungAnwenden !== 'function') return;
+  const r = orteRaumFuer(raum);
+  if (r === _orteKlangRaum) return; _orteKlangRaum = r;
+  if (r === 'klang' || r === 'schreibtisch' || r === 'salon') return;   /* dort regiert der eigene Klang */
+  const ziel = an ? (ORTE_KLANG[r] || {}) : {};
+  const jetzt = D.einst.ambience || {};
+  /* Nicht in etwas hineinreden, das die Nutzerin selbst angestellt hat: nur leise Raumtöne ersetzen */
+  const fremd = Object.keys(jetzt).some((k) => jetzt[k] > .3);
+  if (fremd) return;
+  ambienceMischungAnwenden(ziel).catch(() => {});
 }
 
 /* Die Karte in den Feinheiten: Hauptschalter, Türen, Geräusche, je Raum. */
@@ -177,6 +194,7 @@ function orteKarte() {
     zeile('Räume als Orte', 'Jeder Raum bekommt eine Kulisse und eine Haut: Diele, Zettelkasten, Papierstapel, Korkwand, Tischtuch, Setzkasten, Musikzimmer, Telefonbank, Werkzeugkasten. Alles bleibt bedienbar wie vorher — nur schöner.', schalter(() => o.an, (v) => { o.an = v; liste.classList.toggle('aus', !v); })),
     zeile('Türen gehen auf', 'Beim Raumwechsel schwenkt der Raum kurz herein.', schalter(() => o.tueren, (v) => { o.tueren = v; })),
     zeile('Ein leises Geräusch dazu', 'Ein Klick wie ein Türgriff — nur mit Orten.', schalter(() => o.geraeusche, (v) => { o.geraeusche = v; })),
+    zeile('Raumklang', 'Je Ort ein leiser Grundton (Diele: die Uhr, Zettelkasten: Café, Korkwand: Kamin …). Laute eigene Mischungen bleiben unangetastet.', schalter(() => o.raumklang, (v) => { o.raumklang = v; })),
     liste,
     el('div', { style: 'font-size:12px;color:var(--blass);margin-top:8px' }, 'Schreibtisch und Salon sind immer Orte — sie sind dafür gebaut.'));
 }

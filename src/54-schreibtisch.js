@@ -548,10 +548,12 @@ RENDER.schreibtisch = function (haupt) {
     const liegt = e.blattId && D.docs.get(e.blattId);
     const w = await menue([
       liegt ? { text: 'Das eingespannte Blatt weiterschreiben', icon: 'blatt', wert: 'weiter' } : null,
+      { text: 'Sitzung beginnen — Uhr, Klang, Kerze, ein Rat', icon: 'feuer', wert: 'sitzung' },
       { text: 'Ein neues Blatt einspannen — hier auf dem Tisch', icon: 'blatt', wert: 'einspannen' },
       { text: 'Ein neues Blatt im Schreibraum', icon: 'stift', wert: 'raum' }
     ].filter(Boolean), 'Tinte und Feder');
-    if (w === 'weiter') blattEinspannen(szene, e, e.blattId); else if (w === 'einspannen') blattEinspannen(szene, e, null); else if (w === 'raum') schreibtischNeuesBlatt();
+    if (w === 'sitzung') { if (typeof sitzungBeginnen === 'function') sitzungBeginnen(); }
+    else if (w === 'weiter') blattEinspannen(szene, e, e.blattId); else if (w === 'einspannen') blattEinspannen(szene, e, null); else if (w === 'raum') schreibtischNeuesBlatt();
   }));
 
   /* Das Bücherbord: die Bücher stehen in einer Reihe, leicht gelehnt, jedes

@@ -323,3 +323,39 @@ test('Orte: standardmäßig aus, je Raum schaltbar, Routen finden ihren Ort', as
   assert.equal(k.orteRaumFuer('heft'), 'hefte'); assert.equal(k.orteRaumFuer('projekt'), 'projekte'); assert.equal(k.orteRaumFuer('brett'), 'cluster'); assert.equal(k.orteRaumFuer('klang'), 'klang');
   assert.ok(k.ORTE_RAEUME.length >= 10);
 });
+
+test('Diktat: gesprochene Zeichen, Großschreibung nach Satzende', async () => {
+  const k = await frisch();
+  assert.equal(k.diktatSaeubern('hallo welt punkt wie geht es dir fragezeichen'), 'Hallo welt. Wie geht es dir?');
+  assert.equal(k.diktatSaeubern('erstens komma zweitens neuer absatz drittens'), 'Erstens, zweitens\n\nDrittens');
+  assert.equal(k.diktatSaeubern('  '), '');
+  assert.equal(k.diktatSaeubern('ein Satz ausrufezeichen'), 'Ein Satz!');
+});
+
+test('Wort-Diff: gleich, neu, weg — ohne Verluste, Bilanz stimmt', async () => {
+  const k = await frisch();
+  const a = 'Der Abend gehört den Seiten. Ein Satz reicht.', b = 'Der Abend gehört den Büchern. Ein Satz reicht völlig.';
+  const d = roh(k.wortDiff(a, b));
+  assert.equal(d.filter((x) => x.art === 'gleich').map((x) => x.text).join('').replace(/\s+/g, ' ').trim(), 'Der Abend gehört den Ein Satz');
+  assert.deepEqual(d.filter((x) => x.art === 'weg').map((x) => x.text.trim()), ['Seiten.', 'reicht.']);
+  assert.deepEqual(d.filter((x) => x.art === 'neu').map((x) => x.text.trim()), ['Büchern.', 'reicht völlig.']);
+  assert.deepEqual(roh(k.wortDiffBilanz(d)), { neu: 3, weg: 2 });
+  /* Zusammengesetzt ergibt „neu+gleich" den neuen Text */
+  assert.equal(d.filter((x) => x.art !== 'weg').map((x) => x.text).join('').replace(/\s+/g, ' ').trim(), b);
+  assert.deepEqual(roh(k.wortDiff('', 'Neu')), [{ art: 'neu', text: 'Neu' }]);
+  assert.deepEqual(roh(k.wortDiff('Alt', '')), [{ art: 'weg', text: 'Alt' }]);
+  assert.deepEqual(roh(k.wortDiff('gleich', 'gleich')), [{ art: 'gleich', text: 'gleich' }]);
+  /* Sehr lange Texte: die Grenze greift, aber nichts geht verloren */
+  const lang = 'wort '.repeat(7000), lang2 = lang + 'Ende.';
+  const dl = roh(k.wortDiff(lang, lang2, 100));
+  assert.ok(dl.some((x) => x.art === 'neu' && /Ende/.test(x.text)));
+});
+
+test('Sitzung: der Fundsatz ist der längste neue Satz', async () => {
+  const k = await frisch();
+  const vorher = 'Alter Text. ', nachher = 'Alter Text. Ein kurzer. Dieser Satz hier ist länger und trägt etwas, das man behalten möchte. Noch einer kurz.';
+  assert.equal(k.sitzungFundsatz(vorher, nachher), 'Dieser Satz hier ist länger und trägt etwas, das man behalten möchte.');
+  assert.equal(k.sitzungFundsatz('x', 'x kurz.'), '', 'zu kurz zählt nicht');
+  assert.equal(k.sitzungFundsatz('', ''), '');
+  assert.equal(roh(k.saubereOrte(undefined)).raumklang, false);
+});

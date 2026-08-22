@@ -130,6 +130,74 @@ darüber). Neue Gedanken:
 - Tastaturkürzel-Übersicht; Spotlight-Suche mit Vorschau.
 - Handy: der Schreibtisch als Hochformat-Fassung (Fenster schmal, Dinge in zwei Reihen).
 
+## Runde 3 (nach 5.24): Was noch niemand bedacht hat
+
+Gedacht in Richtungen, die bisher fehlten — Ohr, Hand, Zeit, Körper, Welt. Sterne = zuerst.
+
+**Hören und Stimme**
+- ★ **Diktat, Stufe zwei** (5.24 bringt das Diktat): Stimmbefehle („Streich den letzten Satz",
+  „Neue Szene", „Lies mir den Absatz vor"), Diktat in Heften und Zetteln, Diktat im Salon
+  als Frage an die Wand, Sprechpausen als Absatzlänge lernen.
+- ★ **Das Hörbuch aus dem eigenen Text**: Kapitel nacheinander vorlesen lassen, mit
+  Stimme je Figur (Figuren-Kartei → Stimme), Hintergrundklang aus dem Klangraum, als
+  „Abendlesung" auf dem Schreibtisch — die Lampe dimmt, das Buch liegt offen, es liest.
+- **Eigene Klänge am Tisch**: Tonnotizen als Fundstücke; ein „Geräusch des Tages"; die
+  Schreibmaschine mit echten Tastenklängen je Stimmung (leise Feder, alte Olympia, Bleistift).
+- **Klangkarte je Text**: ein Blatt merkt sich, welche Mischung beim Schreiben lief, und
+  schlägt sie beim Öffnen wieder vor („Damals: Regen am Fenster").
+- **Raumklang in den Orten** (5.24: erster Schritt): je Ort ein leiser Grundton (Diele: Uhr,
+  Zettelkasten: Café, Korkwand: Kamin) — dazu Geräusche der Handlung (Zettel ziehen,
+  Schublade, Nadel in Kork), synthetisch, sehr leise.
+
+**Hand und Körper**
+- **Schreibhaltung**: eine sanfte Erinnerung nach 40 Minuten („Aufstehen, Fenster, Wasser"),
+  als Figur am Tisch (die Tasse dampft nicht mehr), nie als Alarm.
+- **Atmen mit der Kerze**: die Flamme atmet 4–6 im Takt; eine Minute mitatmen vor der Sitzung.
+- **Schreiben im Gehen**: Diktat-Modus fürs Handy in der Tasche — Bildschirm aus, nur Mikro,
+  Pausen werden Absätze, Ankommen = Text liegt als Blatt da.
+- **Handschrift in Hefte** (Kritzeln gibt es): Handschrift erkennen (Apple Scribble hilft schon)
+  → aus Kritzelei Text machen, als Option.
+
+**Zeit und Gedächtnis**
+- ★ **Das Jahr in Ringen**: ein Jahresring-Bild (wie ein Baumquerschnitt) aus den Schreibtagen —
+  dichte Ringe, dünne Ringe, Narben (Lücken), Jahreszeitenfarben; tippen auf einen Ring zeigt
+  die Texte des Monats. Als Bild teilbar.
+- **Heute vor einem Jahr** am Tisch: ein Blatt liegt auf dem Tisch, das genau heute vor einem
+  Jahr geschrieben wurde (Fundstück-Mechanik), mit altem Datum auf dem Papier.
+- **Zeitkapsel für Texte**: ein Blatt versiegeln wie den Brief — erst in einem Jahr lesbar.
+- **Schreibwetter-Tagebuch**: zu jedem Tag ein Satz (wie war es?), automatisch aus Wörtern,
+  Kerzen, Klang, Uhrzeit; als Kalenderblatt; Muster („du schreibst abends bei Regen").
+
+**Welt und andere**
+- **Die zweite Tasse, Stufe zwei**: gemeinsamer Schreibtisch — zwei Profile, zwei Tassen,
+  gemeinsamer Sprint (beide Kerzen brennen, Wörter zählen getrennt), Briefe über Sync.
+- **Lesekreis**: ein Buch im Stapel als „gemeinsam" markieren; Randnotizen beider sichtbar,
+  farbig getrennt; „bis Seite 80 bis Sonntag".
+- **Briefe an echte Menschen**: Brief schreiben, als Bild mit Siegel teilen (WhatsApp),
+  Handschrift-Font, Papier wählbar.
+- **Öffentliche Wand**: eigene Zitate/Merksätze als Bild (Rahmen aus dem Salon) exportieren.
+
+**Werkzeug und Tiefe**
+- ★ **Stände-Vergleich, Stufe zwei** (5.24 bringt den Wort-Diff): Zeitleiste aller Stände mit
+  Wortkurve, „wann habe ich gekürzt?", zwei beliebige Stände wählen, Diff als Bild.
+- **Figuren-Stimmen prüfen**: alle Dialogzeilen einer Figur hintereinander (aus Szenen
+  gefiltert) — klingt sie gleich? Wortwolke je Figur.
+- **Wortwiederholungen** im Text markieren (dreimal „plötzlich" auf einer Seite), Satzlängen-
+  Rhythmus als Balken am Rand, Adverb-Zähler (King lässt grüßen) — alles optional, nie Schule.
+- **Normseiten und Exposé**: Projekt als Manuskript (Normseiten, Zeichen, Seitenzahl) exportieren;
+  Exposé-Ansicht aus den Szenen-Rückseiten.
+- **Recherche-Zettel**: Zettel mit Link/Quelle, die in Heften kleben; offline gecacht als Text.
+
+**Schönheit**
+- ★ **Salon, Stufe drei** (5.24 malt den Raum): Kamin reagiert auf Klang (Kamin-Ambience = das
+  Feuer brennt höher), Gäste kommen abends (die Rahmen leuchten nach 20 Uhr stärker), ein
+  Grammophon spielt die Lesung, Sessel tippen = „Setz dich" (Sitzung beginnen im Salon).
+- **Orte, Stufe drei**: Zettel wirklich aus dem Kasten ziehen (Animation), Korkwand mit
+  Fäden zwischen Szenen, Setzkasten: Wörter als Lettern setzen (Wortkisten), Musikzimmer mit
+  Platten = Klangbilder (Nadel aufsetzen startet), Diele mit Jahreszeitendeko.
+- **Ein eigenes Thema malen**: Farben aus einem Foto ziehen (Canvas-Mittelwerte) → Thema.
+- **Ladebildschirm**: die Lampe geht an, wenn die App startet (kurz, 600 ms).
+
 ## Das große Brainstorm (nach 5.22): Der Salon, und wie jeder Raum ein Ort wird
 
 Gedacht wie der Schreibtisch: jeder Bereich soll sich anfühlen wie ein Zimmer,

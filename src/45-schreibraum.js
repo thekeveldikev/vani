@@ -89,6 +89,7 @@ function oeffneSchreibraum(docId) {
     kerzenhalter,
     worteAnzeige,
     vorleseKnopf,
+    typeof diktatKnopf === 'function' ? diktatKnopf(() => (_sr ? _sr.ta : null)) : null,
     klangKnopf,
     /* Ältere Texte sind noch schlicht. Ein Tipp, und sie lassen sich formatieren. */
     istRich ? null : el('button', { class: 'rundknopf zart', title: 'Text formatieren (fett, kursiv, Überschriften …)', onclick: () => {
@@ -214,6 +215,7 @@ function srSetzeText(text) {
 
 function schliesseSchreibraum(zurueck) {
   if (!_sr) return;
+  const sitzungOffen = typeof _sitzung !== 'undefined' && _sitzung && !_sr.sprint;
   if (typeof vorlesenStopp === 'function') vorlesenStopp();
   _sr.sichern && _sr.sichern.sofort();
   if (_sr.titelSichern) { _sr.titelSichern.sofort(); if (_sr.titelSichern.loesen) _sr.titelSichern.loesen(); }
@@ -226,6 +228,7 @@ function schliesseSchreibraum(zurueck) {
   _sr = null;
   if (zurueck && geschrieben > 30) toast('+' + geschrieben + ' Wörter. Gut gemacht.');
   zeichne();
+  if (sitzungOffen && typeof sitzungBilanz === 'function') setTimeout(() => sitzungBilanz(true), 250);
 }
 
 function wendeSchriftAn() {
@@ -393,6 +396,7 @@ function zeigeStaende() {
         const wahl = await menue([
           { text: 'Zurückholen (Jetziges wird eingefroren)', icon: 'wieder', wert: 'zurueck' },
           { text: 'Nur ansehen', icon: 'lesen', wert: 'sehen' },
+          { text: 'Mit jetzt vergleichen — Wort für Wort', icon: 'suche', wert: 'diff' },
           { text: 'Diesen Stand vergessen', icon: 'muell', wert: 'weg', rot: true }
         ], fmtDatum(st.wann) + ', ' + fmtZeit(st.wann));
         if (wahl === 'zurueck') {
@@ -411,6 +415,8 @@ function zeigeStaende() {
           const leiste2 = el('div', { class: 'schwebeleiste' },
             el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Stand schließen', onclick: () => { bogen.remove(); leiste2.remove(); } }));
           document.body.append(bogen, leiste2);
+        } else if (wahl === 'diff') {
+          if (typeof staendeVergleichen === 'function') staendeVergleichen(doc, st, srAktuellerText());
         } else if (wahl === 'weg') {
           doc.staende = doc.staende.filter((x) => x !== st);
           speichereStill(doc);
@@ -504,6 +510,8 @@ function beendeSprint(abgebrochen) {
       : m.brandung ? ' Das Meer bleibt da.' : '';
     toast('Ein Atemzug Rauch. ' + geschrieben + ' Wörter in ' + sp.minuten + ' Minuten.' + klangDazu, 4200);
   }
+  /* Lief eine Sitzung, kommt jetzt ihre Bilanz */
+  if (typeof sitzungBilanz === 'function') setTimeout(() => sitzungBilanz(!!abgebrochen), abgebrochen ? 0 : 900);
 }
 
 /* ----- Verknüpfungen ----- */

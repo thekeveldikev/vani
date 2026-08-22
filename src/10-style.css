@@ -2451,3 +2451,51 @@ html[data-thema="tinte"] #raum[data-ort="schnipsel"] .schnipsel-lauf .blase, htm
 html[data-thema="tinte"] #raum[data-ort="projekte"] .inhalt, html[data-thema="kerze"] #raum[data-ort="projekte"] .inhalt { background-color: #4a3a2a; }
 html[data-thema="tinte"] #raum[data-ort="cluster"] .inhalt, html[data-thema="kerze"] #raum[data-ort="cluster"] .inhalt { background-color: #2a2622; }
 @media (prefers-reduced-motion: reduce) { #raum.tuer-auf > * { animation: none; } .ort-platte.dreht, .ort-schal, .ort-schnur, .ort-lichtkegel { animation: none; } }
+
+/* ----- Salon, gemalt ----- */
+.salon-galerie.gemalt { position: relative; overflow: hidden; }
+.salon-malerei { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; border-radius: 22px; }
+.salon-galerie.gemalt > *:not(.salon-malerei) { position: relative; z-index: 1; }
+.salon-galerie.gemalt .salon-kurz { color: rgba(255,240,215,.82); text-shadow: 0 1px 2px rgba(0,0,0,.4); }
+.salon-galerie.gemalt::before { display: none; }
+/* ----- Diktat ----- */
+.diktat-knopf.hoert { color: #b0352b; animation: diktat-puls 1.4s ease-in-out infinite; }
+@keyframes diktat-puls { 0%, 100% { box-shadow: 0 0 0 0 rgba(176,53,43,.35); } 50% { box-shadow: 0 0 0 8px rgba(176,53,43,0); } }
+.diktat-zwischen { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 78px); transform: translateX(-50%); z-index: 210; display: flex; align-items: center; gap: 10px; max-width: min(520px, 92vw); padding: 8px 14px; border-radius: 100px; background: rgba(20,16,12,.9); color: #f1e4c8; font-size: 13.5px; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+.diktat-zwischen i { width: 10px; height: 10px; border-radius: 50%; background: #e74c3c; flex: none; animation: diktat-puls 1.4s ease-in-out infinite; }
+.diktat-zwischen span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; }
+/* ----- Sitzung ----- */
+.sitzung-fenster { width: min(520px, calc(100vw - 32px)); }
+.sitzung-fenster .einstellgruppe { margin-bottom: 10px; }
+.sitzung-fenster input[type="text"] { width: 120px; padding: 8px 12px; border-radius: 10px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.sitzung-rat { display: grid; gap: 4px; padding: 12px 14px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); margin-top: 6px; }
+.sitzung-rat i { font: italic 14.5px/1.45 ui-serif, "New York", Georgia, serif; }
+.sitzung-rat small { font-size: 11.5px; color: var(--blass); }
+.sitzung-bilanz { width: min(480px, calc(100vw - 32px)); }
+.sitzung-zahlen { display: flex; gap: 18px; margin: 6px 0 12px; }
+.sitzung-zahlen > div { display: grid; gap: 2px; }
+.sitzung-zahlen b { font: 700 30px ui-serif, "New York", Georgia, serif; font-variant-numeric: tabular-nums; }
+.sitzung-zahlen span { font-size: 12px; color: var(--blass); }
+.sitzung-fund { display: grid; gap: 6px; padding: 12px 14px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); margin-bottom: 10px; }
+.sitzung-fund .st-ueber { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--blass); }
+.sitzung-fund i { font: italic 15px/1.5 ui-serif, "New York", Georgia, serif; }
+.sitzung-fund .knopf { justify-self: start; padding: 4px 10px; font-size: 12.5px; }
+.sitzung-lob { font: italic 13.5px/1.5 ui-serif, "New York", Georgia, serif; color: var(--blass); padding: 4px 2px; }
+/* ----- Wort-Diff ----- */
+.wortdiff { white-space: pre-wrap; }
+.wortdiff ins { text-decoration: none; background: rgba(95,119,82,.22); border-radius: 3px; box-shadow: inset 0 -2px 0 rgba(95,119,82,.5); }
+.wortdiff del { background: rgba(176,53,43,.14); color: rgba(176,53,43,.9); border-radius: 3px; text-decoration: line-through; }
+/* ----- Orte, volle Räume ----- */
+#raum[data-ort="zuhause"] { background: linear-gradient(180deg, color-mix(in srgb, var(--hg) 94%, #6b4a32), var(--hg) 260px); }
+#raum[data-ort="schnipsel"] { background: linear-gradient(180deg, color-mix(in srgb, var(--hg) 92%, #6b4a32), var(--hg) 220px); }
+#raum[data-ort="blaetter"] .inhalt { background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--hg) 88%, #fff), transparent 70%); }
+#raum[data-ort="hefte"] { background: linear-gradient(180deg, color-mix(in srgb, var(--hg) 92%, #6b4a32), var(--hg) 200px); }
+#raum[data-ort="klang"] { background: linear-gradient(180deg, color-mix(in srgb, var(--hg) 90%, #3a2818), var(--hg) 240px); }
+#raum[data-ort="faden"] { background: linear-gradient(180deg, color-mix(in srgb, var(--hg) 90%, #6b4a32), var(--hg) 220px); }
+#raum[data-ort="feinheiten"] { background: linear-gradient(180deg, color-mix(in srgb, var(--hg) 90%, #8a2a22), var(--hg) 200px); }
+#raum[data-ort="woerter"] { background: linear-gradient(180deg, color-mix(in srgb, var(--hg) 88%, #2b2b2e), var(--hg) 220px); }
+#raum[data-ort] .kopf { background: none; }
+#raum[data-ort] .kopf h1 { text-shadow: 0 1px 0 rgba(255,255,255,.25); }
+#raum[data-ort="zuhause"] .karte, #raum[data-ort="hefte"] .karte { box-shadow: 0 8px 20px var(--schein), inset 0 0 0 1px var(--linie); }
+/* Die Lettern des Setzkastens kippen beim Darüberfahren */
+#raum[data-ort="woerter"] .wortkarte:hover { transform: translateY(-3px) rotate(var(--dreh, 0deg)); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 -2px 0 rgba(0,0,0,.4), 0 8px 14px rgba(0,0,0,.35); }

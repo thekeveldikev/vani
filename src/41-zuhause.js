@@ -198,6 +198,7 @@ RENDER.zuhause = function (haupt) {
         heutigeWorte >= D.einst.tagesziel ? 'Tagesziel erreicht. Der Rest ist Geschenk.' : 'noch ' + (D.einst.tagesziel - heutigeWorte).toLocaleString('de-DE') + ' bis zum Tagesziel')
     ) : null
   );
+  if (typeof sitzungBeginnen === 'function') feuerKarte.append(el('div', { class: 'reihe', style: 'justify-content:flex-start;margin-top:12px' }, el('button', { class: 'knopf', onclick: () => sitzungBeginnen() }, el('span', { html: ik('feuer'), style: 'display:flex' }), 'Sitzung beginnen')));
   gitter.append(feuerKarte);
   /* Aus dem Salon: jeden Tag rät jemand anderes von der Wand */
   if (typeof SALON_AUTOREN !== 'undefined' && SALON_AUTOREN.length) {
