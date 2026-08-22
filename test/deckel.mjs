@@ -42,6 +42,14 @@ test('saubererDeckel: Sticker behalten Bild und Lage, Unsinn fliegt, höchstens 
   assert.deepEqual(d.sticker[2].pos, { x: 50, y: 50, rot: 0, w: 34 }, 'ohne Lage: Mitte');
 });
 
+test('saubererTisch: Platte, Größe, Reihenfolge, Unordnung — mit Vorgaben', async () => {
+  const k = await frisch();
+  assert.deepEqual(roh(k.saubererTisch(undefined)), { platte: 'eiche', groesse: 'mittel', unordnung: true, sortierung: 'zuletzt' });
+  assert.deepEqual(roh(k.saubererTisch({ platte: 'leder', groesse: 'riesig', unordnung: false, sortierung: 'az' })), { platte: 'leder', groesse: 'mittel', unordnung: false, sortierung: 'az' });
+  assert.equal(roh(k.saubererTisch('x')).platte, 'eiche');
+  assert.equal(new Set(roh(k.TISCH_PLATTEN).map((e) => e[0])).size, 5);
+});
+
 test('Listen der Stoffe, Etiketten und Ansichten sind eindeutig benannt', async () => {
   const k = await frisch();
   for (const liste of [k.DECKEL_STOFFE, k.DECKEL_ETIKETTEN, k.HEFTE_ANSICHTEN]) {

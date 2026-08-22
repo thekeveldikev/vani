@@ -57,6 +57,15 @@ test('formErkennen: Linie, Ellipse, Rechteck — und Handschrift bleibt Handschr
   const r = roh(k.formErkennen(strich(rechteck).punkte));
   assert.equal(r && r.art, 'rechteck');
   assert.equal(r.punkte.length, 5);
+  /* Pfeil: gerader Schaft, am Ende ein Haken zurück */
+  const pfeil = [];
+  for (let i = 0; i <= 24; i++) pfeil.push([.1 + i * .02, .5 + Math.sin(i) * .001]);          /* Schaft nach rechts */
+  for (let i = 1; i <= 6; i++) pfeil.push([.58 - i * .012, .5 + i * .012]);                    /* Haken zurück, nach unten */
+  const pf = roh(k.formErkennen(strich(pfeil).punkte));
+  assert.equal(pf && pf.art, 'pfeil');
+  assert.equal(pf.punkte.length, 5, 'Schaft, Spitze, Flügel, Spitze, Flügel');
+  assert.ok(Math.abs(pf.punkte[1].x - .58) < .03 && Math.abs(pf.punkte[1].y - .5) < .02, 'die Spitze sitzt am Knick');
+  assert.ok(pf.punkte[2].x < pf.punkte[1].x && pf.punkte[4].x < pf.punkte[1].x, 'die Flügel zeigen zurück');
   /* Eine Schleife wie ein „e" — nichts davon */
   const schnoerkel = []; for (let i = 0; i <= 30; i++) { const t = i / 30 * 4; schnoerkel.push([.2 + t * .1 + Math.sin(t * 3) * .05, .4 + Math.cos(t * 2.3) * .08]); }
   assert.equal(k.formErkennen(strich(schnoerkel).punkte), null);

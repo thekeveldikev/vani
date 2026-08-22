@@ -1290,3 +1290,46 @@ Tests 135/135 (neu `test/deckel.mjs`, Hefte-Vertrag). Im Browser: drei
 Ansichten, Stoffe, Gummiband, Cover-Sticker (Schmu), Seitenblock, FLIP beim
 Wegstellen (Heft landet auf dem „IM REGAL"-Brett), Atelier mit acht Gruppen,
 Würfeln ändert Stoff/Etikett, Minideckel im Heftkopf.
+
+## 21. Ruhe beim Schreiben, Welle 3, Atelier-Fenster (22. August 2026, 5.13.0 → 5.14.0)
+
+### Drei Fehler, eine Wurzel (5.13.0)
+
+`syncUebernehmeAusY` ersetzte bei **jeder** hereinkommenden Änderung (Poll alle
+2,5 s) alle Dokumente durch neue Objekte und rief `zeichne()`. Folgen: Heftseite
+verliert beim Tippen den Fokus (iPad-Tastatur klappt zu — „schließt sich
+ganz"), hinter dem Schreibraum fährt der Raum neu hoch, offene Editoren halten
+ein verwaistes Objekt. Jetzt: nur Unterschiede (`syncGleich` per JSON),
+`Object.assign` in das vorhandene Objekt, `zeichne()` nur bei `veraendert > 0`
+und nie, solange `syncSchreibtGerade()` (Schreibraum offen, aktives
+Textfeld, Kritzeln, Dialog) — dann `zeichnenAusstehend` + Nachholen bei
+`focusout`/nach 6 s/`hashchange` verwirft.
+
+Schreibraum, formatierter Text: iPad-Safari scrollt das Fenster statt des
+Containers → `zentriereZeileRich` (Caret-Rect gegen `.sr-mitte`, Schreibmaschine
+bei 42 %, sonst „im Blick halten"), `srFensterZurueck` auf `scroll`.
+
+Hefte, volle Seite mit Cursor mittendrin: Überhang wandert **still** an den
+Anfang der nächsten Seite (`autoWeiter({..., still: true})`), Seite/Fokus/
+Cursor bleiben; nur am Ende folgt der Cursor dem Text. Für rich (Caret per
+Textoffset zurücksetzen) und plain.
+
+### Welle 3 (5.14.0)
+- **Karteikarten** (`src/47b-karteikarten.js`): `karteikartenReihenfolge`
+  (Verfehlt ×2 − Gewusst + Zeit/20 + Zufall), `karteikartenBilanz`,
+  `wortkisteAbfragen(kistenId, titel)` — Karte mit 3D-Flip, Gewusst/Nochmal,
+  rückwärts, nur-mit-Notiz, Tastatur (Leer/→/←). Zähler `gewusst/verfehlt/
+  abgefragt` am Wort (Sanitizer). Knopf in `.wortkisten-titelzeile` ab 2 Wörtern.
+- **Pfeil** in `formErkennen`: Knick im letzten Viertel mit > 105°, Schaft
+  gerade (Abstand/Sehne < .1) → Schaft + zwei Flügel (18 % der Sehne, 140°).
+
+### Atelier als Fenster, Tisch einrichten (5.14.0)
+- Atelier-DOM wird nach dem Bau umgehängt: `.atelier-raster` mit
+  `.atelier-links` (sticky Vorschau 300 px) und `.atelier-felder` (scrollt);
+  < 760 px untereinander, Vorschau klein.
+- `D.einst.tisch = saubererTisch({platte, groesse, unordnung, sortierung})`;
+  `tischEinrichten(danach)` zeigt jede Wahl sofort (danach = zeichne);
+  Klassen `platte-*`, `groesse-*`, `ordentlich` auf `.inhalt`; Regalbretter
+  folgen der Platte.
+
+Tests 141/141 (neu test/karteikarten.mjs; Ruhe-, Welle-3-, Atelier-Vertrag).

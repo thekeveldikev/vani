@@ -490,6 +490,22 @@ html[data-thema="tinte"] .menue button.rot, html[data-thema="kerze"] .menue butt
 .papierseite.cornell { background-image: linear-gradient(90deg, transparent calc(30% - .5px), var(--linie) calc(30% - .5px), var(--linie) calc(30% + .5px), transparent calc(30% + .5px)), linear-gradient(transparent calc(100% - 96px), var(--linie) calc(100% - 96px), var(--linie) calc(100% - 95px), transparent calc(100% - 95px)); }
 .papierseite.storyboard { background-image: linear-gradient(90deg, transparent calc(50% - .5px), var(--linie) calc(50% - .5px), var(--linie) calc(50% + .5px), transparent calc(50% + .5px)), repeating-linear-gradient(transparent 0 calc(33.33% - .5px), var(--linie) calc(33.33% - .5px) calc(33.33% + .5px)); background-clip: content-box; }
 .papierseite.dialog { background-image: linear-gradient(90deg, transparent calc(50% - .5px), var(--linie) calc(50% - .5px), var(--linie) calc(50% + .5px), transparent calc(50% + .5px)); }
+/* Karteikarten */
+.modal.karteikasten { width: min(520px, calc(100vw - 40px)); }
+.kk-zaehler { font-size: 12.5px; color: var(--blass); margin: 6px 0 10px; min-height: 1.2em; }
+.kk-karte { display: block; width: 100%; aspect-ratio: 5 / 3; perspective: 1100px; text-align: center; }
+.kk-innen { position: relative; width: 100%; height: 100%; transition: transform .55s cubic-bezier(.2,.8,.2,1); transform-style: preserve-3d; }
+.kk-karte.umgedreht .kk-innen { transform: rotateY(180deg); }
+.kk-seite { position: absolute; inset: 0; display: grid; place-items: center; padding: 22px 26px; border-radius: 16px; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 24px; line-height: 1.35; overflow: auto; overflow-wrap: anywhere;
+  background: var(--karte); box-shadow: 0 6px 22px var(--schein), inset 0 0 0 1px var(--linie); }
+.kk-vorn::before, .kk-hinten::before { content: ""; position: absolute; left: 18px; right: 18px; top: 16px; height: 1px; background: var(--akzent); opacity: .55; }
+.kk-hinten { transform: rotateY(180deg); font-size: 18px; font-family: ui-rounded, -apple-system, system-ui, sans-serif; background: #fbf6e6; color: #2c251c; }
+html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { background: #3a3128; color: #ece3d1; }
+.kk-knoepfe { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+.kk-bilanz { font-size: 13px; color: var(--blass); text-align: center; margin-top: 8px; min-height: 1.2em; }
+.kk-optionen { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+.knopf.klein { padding: 5px 11px; font-size: 13px; }
 .anlage .griff {
   position: absolute; right: -7px; bottom: -7px; width: 26px; height: 26px; border-radius: 50%;
   background: var(--akzent); color: var(--papier); display: none; align-items: center; justify-content: center;
@@ -1276,7 +1292,42 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 .heftruecken.stoff-marmor .rtitel { text-shadow: none; }
 .regal-leer { font-size: 13px; color: #fff6e0; opacity: .7; align-self: center; padding: 20px; }
 @media (max-width: 640px) { .heft-tisch { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; padding: 20px 14px 26px; } .heft-stapel .heft-halter { width: 120px; margin-left: -86px; } }
-.heft-atelier { max-height: min(880px, 90dvh); overflow: auto; }
+/* Das Atelier als Fenster: Vorschau links, Felder rechts; schmal: untereinander */
+.modal.heft-atelier { width: min(980px, 96vw); max-height: 92dvh; padding: 18px 22px 16px; overflow: hidden; display: flex; flex-direction: column; }
+.atelier-raster { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 6px 26px; min-height: 0; flex: 1; }
+.atelier-links { position: sticky; top: 0; align-self: start; }
+.atelier-felder { overflow: auto; min-height: 0; max-height: calc(92dvh - 96px); padding-right: 8px; overscroll-behavior: contain; }
+.atelier-felder .einstellgruppe:first-child { border-top: 0; padding-top: 4px; }
+.heftdeckel.gross { width: 100%; max-width: 280px; font-size: 18px; }
+@media (max-width: 760px) {
+  .modal.heft-atelier { overflow: auto; padding: 16px 16px 14px; }
+  .atelier-raster { grid-template-columns: 1fr; gap: 4px; }
+  .atelier-links { position: static; display: grid; place-items: center; }
+  .heftdeckel.gross { width: min(190px, 54vw); font-size: 15px; margin: 2px auto 10px; }
+  .atelier-felder { max-height: none; overflow: visible; padding-right: 0; }
+}
+/* Tisch und Regal einrichten: Platten, Größen, Ordnung */
+.modal.tisch-einrichten { width: min(520px, calc(100vw - 40px)); }
+.modal.tisch-einrichten .einstellgruppe { display: grid; gap: 9px; padding: 12px 0; border-top: 1px solid var(--linie); }
+.modal.tisch-einrichten .einstellzeile { display: flex; align-items: center; justify-content: space-between; }
+.platte-nuss .heft-tisch { background: repeating-linear-gradient(90deg, rgba(0,0,0,.06) 0 2px, transparent 2px 58px), linear-gradient(160deg, #7a4e31, #563420 60%, #3f2516); }
+.platte-leder .heft-tisch { background: radial-gradient(rgba(0,0,0,.14) .7px, transparent 1.4px) 0 0/6px 6px, linear-gradient(160deg, #6e3b2e, #4c2419 60%, #3a1a11); }
+.platte-leinen .heft-tisch { background: repeating-linear-gradient(2deg, transparent 0 3px, rgba(255,255,255,.06) 3px 4px), repeating-linear-gradient(92deg, transparent 0 4px, rgba(0,0,0,.05) 4px 5px), linear-gradient(160deg, #d9cdb4, #bfb197 60%, #a79878); }
+.platte-dunkel .heft-tisch { background: linear-gradient(160deg, #3b3f46, #25282e 60%, #1b1d22); }
+.platte-nuss .regalbrett .brettrand { background: linear-gradient(#8d5d3b, #5e3a22 50%, #40261a); }
+.platte-leder .regalbrett .brettrand { background: linear-gradient(#7a4537, #4f271c 50%, #341911); }
+.platte-leinen .regalbrett .brettrand { background: linear-gradient(#e4d9c3, #c3b599 50%, #a39577); }
+.platte-leinen .brettschild, .platte-leinen .regal-leer { color: #4a4033; }
+.platte-dunkel .regalbrett .brettrand { background: linear-gradient(#4d525a, #2b2f35 50%, #1b1d22); }
+.groesse-klein .heft-tisch { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 22px 16px; }
+.groesse-gross .heft-tisch { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 36px 28px; }
+.groesse-klein .regal { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+.groesse-gross .regal { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.groesse-klein .heftruecken { transform: scale(.85); transform-origin: bottom; } .groesse-gross .heftruecken { transform: scale(1.18); transform-origin: bottom; }
+.groesse-klein .heftruecken:hover, .groesse-klein .heftruecken.zieht { transform: scale(.85) translateY(-12px) rotate(-1.5deg); }
+.groesse-gross .heftruecken:hover, .groesse-gross .heftruecken.zieht { transform: scale(1.18) translateY(-12px) rotate(-1.5deg); }
+.ordentlich .heft-halter { --dreh: 0deg !important; }
+.ordentlich .heft-stapel .heft-halter { transform: translateY(calc(var(--lage, 0) * -3px)); }
 .heft-atelier .einstellgruppe { display: grid; gap: 9px; padding: 13px 0; border-top: 1px solid var(--linie); }
 .heft-farben { display: flex; gap: 7px; flex-wrap: wrap; }
 .heft-farbpunkt { width: 29px; height: 29px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.16), 0 1px 3px var(--schein); transition: transform .18s ease; }

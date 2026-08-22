@@ -580,6 +580,37 @@ test('Ruhe-Vertrag: Sync zeichnet nicht mitten ins Schreiben, volle Seiten reich
   assert.match(h, /naechste\.rich = paket\.rich \+ \(naechste\.rich \|\| ''\)/, 'stiller Überhang kommt VOR den Anfang der nächsten Seite');
 });
 
+test('Welle-3-Vertrag: Karteikarten und Pfeile', () => {
+  const w = lies('src/47-woerter.js');
+  assert.match(w, /wortkisteAbfragen\(aktiveKiste, titel\)/, 'der Abfragen-Knopf an der Kiste');
+  assert.match(w, /woerterInKiste\(aktiveKiste\)\.length >= 2 \?/, 'erst ab zwei Wörtern');
+  const kk = lies('src/47b-karteikarten.js');
+  assert.match(kk, /function karteikartenReihenfolge/);
+  assert.match(kk, /function karteikartenBilanz/);
+  assert.match(kk, /w\.abgefragt = Date\.now\(\);/, 'Stand liegt am Wort');
+  assert.match(lies('src/30-core.js'), /for \(const k of \['gewusst', 'verfehlt'\]\)/, 'Zähler werden bereinigt');
+  assert.match(lies('src/43c-kritzel.js'), /art: 'pfeil'/);
+  for (const datei of ['werkzeug/build-web.mjs', 'build.sh', 'test/sandkasten.mjs']) assert.match(lies(datei), /47b-karteikarten\.js/, datei);
+  const anl = lies('src/52-anleitung.js');
+  for (const t of ['Abfragen (Karteikarten)', 'Pfeile']) assert.match(anl, new RegExp("t: '" + t.replace(/[()]/g, '\\$&') + "'"), 'Anleitung: ' + t);
+});
+
+test('Atelier-Vertrag: das Atelier ist ein Fenster, Tisch und Regal lassen sich einrichten', () => {
+  const d = lies('src/43e-deckel.js');
+  assert.match(d, /class: 'atelier-raster'/);
+  assert.match(d, /class: 'atelier-felder'/);
+  assert.match(d, /function tischEinrichten/);
+  assert.match(d, /function saubererTisch/);
+  assert.match(d, /tischEinrichten\(\(\) => zeichne\(\)\)/, 'jede Wahl zeigt sich sofort hinter dem Fenster');
+  assert.match(d, /' platte-' \+ tisch\.platte \+ ' groesse-' \+ tisch\.groesse/);
+  assert.match(lies('src/30-core.js'), /D\.einst\.tisch = saubererTisch\(D\.einst\.tisch\)/);
+  const css = lies('src/10-style.css');
+  for (const k of ['.atelier-raster { display: grid; grid-template-columns: 300px', '.atelier-links { position: sticky;', '.atelier-felder { overflow: auto;', '.platte-nuss .heft-tisch', '.groesse-gross .heft-tisch', '.ordentlich .heft-halter']) assert.ok(css.includes(k), 'CSS fehlt: ' + k);
+  assert.match(css, /@media \(max-width: 760px\) \{\s*\.modal\.heft-atelier \{ overflow: auto;/, 'schmal: untereinander und scrollbar');
+  const anl = lies('src/52-anleitung.js');
+  assert.match(anl, /t: 'Tisch und Regal einrichten'/);
+});
+
 test('Umzugs-Vertrag: die alte Adresse leitet nicht blind weiter', () => {
   /* Die Umzugsseite zählt erst nach, ob dort noch ein Bestand liegt. Vorher
      leitete sie nach fünf Sekunden weiter — auf einem Schul-iPad ohne

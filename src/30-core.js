@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.13.0';
+const APP_VERSION = '5.14.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -347,6 +347,7 @@ function uebernehmeEinstellungen(quelle) {
   D.einst.goodnotesSync = D.einst.goodnotesSync === true;
   D.einst.kurzschrift = D.einst.kurzschrift !== false;
   D.einst.hefteAnsicht = ['karten', 'regal', 'tisch'].includes(D.einst.hefteAnsicht) ? D.einst.hefteAnsicht : 'karten';
+  if (typeof saubererTisch === 'function') D.einst.tisch = saubererTisch(D.einst.tisch);
   D.einst.fadenAbgewaehlt = D.einst.fadenAbgewaehlt === true;
   D.einst.blattSortierung = ['zuletzt', 'aeltest', 'az'].includes(D.einst.blattSortierung) ? D.einst.blattSortierung : 'zuletzt';
   D.einst.schnipselAnsicht = D.einst.schnipselAnsicht === 'frei' ? 'frei' : 'lauf';
@@ -461,6 +462,8 @@ function sauberesDokument(quelle) {
       : null).filter((r) => r && r.seite) : [];
   }
   if (d.dauer != null) d.dauer = begrenze(d.dauer, 0, 36000, 0);
+  for (const k of ['gewusst', 'verfehlt']) if (d[k] != null) d[k] = Math.round(begrenze(d[k], 0, 100000, 0));
+  if (d.abgefragt != null) d.abgefragt = begrenze(d.abgefragt, 0, Date.now() + 86400000, 0);
   if (d.deckel != null) d.deckel = typeof saubererDeckel === 'function' ? saubererDeckel(d.deckel) : undefined;
   if (d.mime != null) d.mime = String(d.mime).slice(0, 60);
   /* Gruppen und Bilder auf Brettern liegen in Weltkoordinaten und brauchen

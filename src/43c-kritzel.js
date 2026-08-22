@@ -64,16 +64,48 @@ function formErkennen(punkte) {
   const w = p.reduce((n, q) => n + (q.w || 0), 0) / p.length || .004;
   const a = p[0], z = p[p.length - 1];
   const geschlossen = Math.hypot(z.x - a.x, z.y - a.y) < .18 * diag;
-  if (!geschlossen) {
-    const sehne = Math.hypot(z.x - a.x, z.y - a.y);
-    if (sehne < .02) return null;
-    let maxAbstand = 0;
-    for (const q of p) {
-      const t = ((q.x - a.x) * (z.x - a.x) + (q.y - a.y) * (z.y - a.y)) / (sehne * sehne);
-      const fx = a.x + (z.x - a.x) * t, fy = a.y + (z.y - a.y) * t;
-      maxAbstand = Math.max(maxAbstand, Math.hypot(q.x - fx, q.y - fy));
+  const abstandZurSehne = (liste, von, bis) => {
+    const sehne = Math.hypot(bis.x - von.x, bis.y - von.y);
+    if (sehne < .02) return { sehne, max: Infinity };
+    let max = 0;
+    for (const q of liste) {
+      const t = ((q.x - von.x) * (bis.x - von.x) + (q.y - von.y) * (bis.y - von.y)) / (sehne * sehne);
+      const fx = von.x + (bis.x - von.x) * t, fy = von.y + (bis.y - von.y) * t;
+      max = Math.max(max, Math.hypot(q.x - fx, q.y - fy));
     }
-    if (maxAbstand / sehne < .09) return { art: 'linie', punkte: [{ x: a.x, y: a.y, w }, { x: z.x, y: z.y, w }] };
+    return { sehne, max };
+  };
+  if (!geschlossen) {
+    /* Pfeil: ein gerader Schaft, der am Ende einen Haken zurückschlägt. Der
+       Knick liegt im letzten Viertel; der Schwanz kehrt scharf um (> 105°). */
+    let laenge = 0; const bogen = [0];
+    for (let i = 1; i < p.length; i++) { laenge += Math.hypot(p[i].x - p[i - 1].x, p[i].y - p[i - 1].y); bogen.push(laenge); }
+    if (laenge > .04) {
+      let knick = -1;
+      for (let i = p.length - 2; i > 0; i--) { if (bogen[i] <= laenge * .78) break; knick = i; }
+      let bester = -1, groesste = 0;
+      for (let i = Math.max(2, knick); i < p.length - 1; i++) {
+        const v1x = p[i].x - p[Math.max(0, i - 2)].x, v1y = p[i].y - p[Math.max(0, i - 2)].y;
+        const v2x = p[Math.min(p.length - 1, i + 2)].x - p[i].x, v2y = p[Math.min(p.length - 1, i + 2)].y - p[i].y;
+        const l1 = Math.hypot(v1x, v1y), l2 = Math.hypot(v2x, v2y);
+        if (l1 < 1e-6 || l2 < 1e-6) continue;
+        const winkel = Math.acos(Math.max(-1, Math.min(1, (v1x * v2x + v1y * v2y) / (l1 * l2)))) * 180 / Math.PI;
+        if (winkel > groesste) { groesste = winkel; bester = i; }
+      }
+      if (bester > 0 && groesste > 105 && bogen[bester] > laenge * .6) {
+        const spitze = p[bester];
+        const schaft = abstandZurSehne(p.slice(0, bester + 1), a, spitze);
+        if (schaft.sehne > .03 && schaft.max / schaft.sehne < .1) {
+          const dx = (spitze.x - a.x) / schaft.sehne, dy = (spitze.y - a.y) / schaft.sehne;
+          const fl = Math.max(.02, schaft.sehne * .18), wk = Math.PI * .78;
+          const fluegel = (s) => ({ x: spitze.x + (dx * Math.cos(wk * s) - dy * Math.sin(wk * s)) * fl, y: spitze.y + (dx * Math.sin(wk * s) + dy * Math.cos(wk * s)) * fl, w });
+          return { art: 'pfeil', punkte: [{ x: a.x, y: a.y, w }, { x: spitze.x, y: spitze.y, w }, fluegel(1), { x: spitze.x, y: spitze.y, w }, fluegel(-1)] };
+        }
+      }
+    }
+    const ganz = abstandZurSehne(p, a, z);
+    if (ganz.sehne < .02) return null;
+    if (ganz.max / ganz.sehne < .09) return { art: 'linie', punkte: [{ x: a.x, y: a.y, w }, { x: z.x, y: z.y, w }] };
     return null;
   }
   const cx = (box.x0 + box.x1) / 2, cy = (box.y0 + box.y1) / 2;

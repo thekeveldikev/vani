@@ -509,6 +509,22 @@ html[data-thema="tinte"] .menue button.rot, html[data-thema="kerze"] .menue butt
 .papierseite.cornell { background-image: linear-gradient(90deg, transparent calc(30% - .5px), var(--linie) calc(30% - .5px), var(--linie) calc(30% + .5px), transparent calc(30% + .5px)), linear-gradient(transparent calc(100% - 96px), var(--linie) calc(100% - 96px), var(--linie) calc(100% - 95px), transparent calc(100% - 95px)); }
 .papierseite.storyboard { background-image: linear-gradient(90deg, transparent calc(50% - .5px), var(--linie) calc(50% - .5px), var(--linie) calc(50% + .5px), transparent calc(50% + .5px)), repeating-linear-gradient(transparent 0 calc(33.33% - .5px), var(--linie) calc(33.33% - .5px) calc(33.33% + .5px)); background-clip: content-box; }
 .papierseite.dialog { background-image: linear-gradient(90deg, transparent calc(50% - .5px), var(--linie) calc(50% - .5px), var(--linie) calc(50% + .5px), transparent calc(50% + .5px)); }
+/* Karteikarten */
+.modal.karteikasten { width: min(520px, calc(100vw - 40px)); }
+.kk-zaehler { font-size: 12.5px; color: var(--blass); margin: 6px 0 10px; min-height: 1.2em; }
+.kk-karte { display: block; width: 100%; aspect-ratio: 5 / 3; perspective: 1100px; text-align: center; }
+.kk-innen { position: relative; width: 100%; height: 100%; transition: transform .55s cubic-bezier(.2,.8,.2,1); transform-style: preserve-3d; }
+.kk-karte.umgedreht .kk-innen { transform: rotateY(180deg); }
+.kk-seite { position: absolute; inset: 0; display: grid; place-items: center; padding: 22px 26px; border-radius: 16px; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 24px; line-height: 1.35; overflow: auto; overflow-wrap: anywhere;
+  background: var(--karte); box-shadow: 0 6px 22px var(--schein), inset 0 0 0 1px var(--linie); }
+.kk-vorn::before, .kk-hinten::before { content: ""; position: absolute; left: 18px; right: 18px; top: 16px; height: 1px; background: var(--akzent); opacity: .55; }
+.kk-hinten { transform: rotateY(180deg); font-size: 18px; font-family: ui-rounded, -apple-system, system-ui, sans-serif; background: #fbf6e6; color: #2c251c; }
+html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { background: #3a3128; color: #ece3d1; }
+.kk-knoepfe { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+.kk-bilanz { font-size: 13px; color: var(--blass); text-align: center; margin-top: 8px; min-height: 1.2em; }
+.kk-optionen { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+.knopf.klein { padding: 5px 11px; font-size: 13px; }
 .anlage .griff {
   position: absolute; right: -7px; bottom: -7px; width: 26px; height: 26px; border-radius: 50%;
   background: var(--akzent); color: var(--papier); display: none; align-items: center; justify-content: center;
@@ -1295,7 +1311,42 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 .heftruecken.stoff-marmor .rtitel { text-shadow: none; }
 .regal-leer { font-size: 13px; color: #fff6e0; opacity: .7; align-self: center; padding: 20px; }
 @media (max-width: 640px) { .heft-tisch { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; padding: 20px 14px 26px; } .heft-stapel .heft-halter { width: 120px; margin-left: -86px; } }
-.heft-atelier { max-height: min(880px, 90dvh); overflow: auto; }
+/* Das Atelier als Fenster: Vorschau links, Felder rechts; schmal: untereinander */
+.modal.heft-atelier { width: min(980px, 96vw); max-height: 92dvh; padding: 18px 22px 16px; overflow: hidden; display: flex; flex-direction: column; }
+.atelier-raster { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 6px 26px; min-height: 0; flex: 1; }
+.atelier-links { position: sticky; top: 0; align-self: start; }
+.atelier-felder { overflow: auto; min-height: 0; max-height: calc(92dvh - 96px); padding-right: 8px; overscroll-behavior: contain; }
+.atelier-felder .einstellgruppe:first-child { border-top: 0; padding-top: 4px; }
+.heftdeckel.gross { width: 100%; max-width: 280px; font-size: 18px; }
+@media (max-width: 760px) {
+  .modal.heft-atelier { overflow: auto; padding: 16px 16px 14px; }
+  .atelier-raster { grid-template-columns: 1fr; gap: 4px; }
+  .atelier-links { position: static; display: grid; place-items: center; }
+  .heftdeckel.gross { width: min(190px, 54vw); font-size: 15px; margin: 2px auto 10px; }
+  .atelier-felder { max-height: none; overflow: visible; padding-right: 0; }
+}
+/* Tisch und Regal einrichten: Platten, Größen, Ordnung */
+.modal.tisch-einrichten { width: min(520px, calc(100vw - 40px)); }
+.modal.tisch-einrichten .einstellgruppe { display: grid; gap: 9px; padding: 12px 0; border-top: 1px solid var(--linie); }
+.modal.tisch-einrichten .einstellzeile { display: flex; align-items: center; justify-content: space-between; }
+.platte-nuss .heft-tisch { background: repeating-linear-gradient(90deg, rgba(0,0,0,.06) 0 2px, transparent 2px 58px), linear-gradient(160deg, #7a4e31, #563420 60%, #3f2516); }
+.platte-leder .heft-tisch { background: radial-gradient(rgba(0,0,0,.14) .7px, transparent 1.4px) 0 0/6px 6px, linear-gradient(160deg, #6e3b2e, #4c2419 60%, #3a1a11); }
+.platte-leinen .heft-tisch { background: repeating-linear-gradient(2deg, transparent 0 3px, rgba(255,255,255,.06) 3px 4px), repeating-linear-gradient(92deg, transparent 0 4px, rgba(0,0,0,.05) 4px 5px), linear-gradient(160deg, #d9cdb4, #bfb197 60%, #a79878); }
+.platte-dunkel .heft-tisch { background: linear-gradient(160deg, #3b3f46, #25282e 60%, #1b1d22); }
+.platte-nuss .regalbrett .brettrand { background: linear-gradient(#8d5d3b, #5e3a22 50%, #40261a); }
+.platte-leder .regalbrett .brettrand { background: linear-gradient(#7a4537, #4f271c 50%, #341911); }
+.platte-leinen .regalbrett .brettrand { background: linear-gradient(#e4d9c3, #c3b599 50%, #a39577); }
+.platte-leinen .brettschild, .platte-leinen .regal-leer { color: #4a4033; }
+.platte-dunkel .regalbrett .brettrand { background: linear-gradient(#4d525a, #2b2f35 50%, #1b1d22); }
+.groesse-klein .heft-tisch { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 22px 16px; }
+.groesse-gross .heft-tisch { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 36px 28px; }
+.groesse-klein .regal { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+.groesse-gross .regal { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.groesse-klein .heftruecken { transform: scale(.85); transform-origin: bottom; } .groesse-gross .heftruecken { transform: scale(1.18); transform-origin: bottom; }
+.groesse-klein .heftruecken:hover, .groesse-klein .heftruecken.zieht { transform: scale(.85) translateY(-12px) rotate(-1.5deg); }
+.groesse-gross .heftruecken:hover, .groesse-gross .heftruecken.zieht { transform: scale(1.18) translateY(-12px) rotate(-1.5deg); }
+.ordentlich .heft-halter { --dreh: 0deg !important; }
+.ordentlich .heft-stapel .heft-halter { transform: translateY(calc(var(--lage, 0) * -3px)); }
 .heft-atelier .einstellgruppe { display: grid; gap: 9px; padding: 13px 0; border-top: 1px solid var(--linie); }
 .heft-farben { display: flex; gap: 7px; flex-wrap: wrap; }
 .heft-farbpunkt { width: 29px; height: 29px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.16), 0 1px 3px var(--schein); transition: transform .18s ease; }
@@ -1759,7 +1810,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.13.0';
+const APP_VERSION = '5.14.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -2103,6 +2154,7 @@ function uebernehmeEinstellungen(quelle) {
   D.einst.goodnotesSync = D.einst.goodnotesSync === true;
   D.einst.kurzschrift = D.einst.kurzschrift !== false;
   D.einst.hefteAnsicht = ['karten', 'regal', 'tisch'].includes(D.einst.hefteAnsicht) ? D.einst.hefteAnsicht : 'karten';
+  if (typeof saubererTisch === 'function') D.einst.tisch = saubererTisch(D.einst.tisch);
   D.einst.fadenAbgewaehlt = D.einst.fadenAbgewaehlt === true;
   D.einst.blattSortierung = ['zuletzt', 'aeltest', 'az'].includes(D.einst.blattSortierung) ? D.einst.blattSortierung : 'zuletzt';
   D.einst.schnipselAnsicht = D.einst.schnipselAnsicht === 'frei' ? 'frei' : 'lauf';
@@ -2217,6 +2269,8 @@ function sauberesDokument(quelle) {
       : null).filter((r) => r && r.seite) : [];
   }
   if (d.dauer != null) d.dauer = begrenze(d.dauer, 0, 36000, 0);
+  for (const k of ['gewusst', 'verfehlt']) if (d[k] != null) d[k] = Math.round(begrenze(d[k], 0, 100000, 0));
+  if (d.abgefragt != null) d.abgefragt = begrenze(d.abgefragt, 0, Date.now() + 86400000, 0);
   if (d.deckel != null) d.deckel = typeof saubererDeckel === 'function' ? saubererDeckel(d.deckel) : undefined;
   if (d.mime != null) d.mime = String(d.mime).slice(0, 60);
   /* Gruppen und Bilder auf Brettern liegen in Weltkoordinaten und brauchen
@@ -7223,16 +7277,48 @@ function formErkennen(punkte) {
   const w = p.reduce((n, q) => n + (q.w || 0), 0) / p.length || .004;
   const a = p[0], z = p[p.length - 1];
   const geschlossen = Math.hypot(z.x - a.x, z.y - a.y) < .18 * diag;
-  if (!geschlossen) {
-    const sehne = Math.hypot(z.x - a.x, z.y - a.y);
-    if (sehne < .02) return null;
-    let maxAbstand = 0;
-    for (const q of p) {
-      const t = ((q.x - a.x) * (z.x - a.x) + (q.y - a.y) * (z.y - a.y)) / (sehne * sehne);
-      const fx = a.x + (z.x - a.x) * t, fy = a.y + (z.y - a.y) * t;
-      maxAbstand = Math.max(maxAbstand, Math.hypot(q.x - fx, q.y - fy));
+  const abstandZurSehne = (liste, von, bis) => {
+    const sehne = Math.hypot(bis.x - von.x, bis.y - von.y);
+    if (sehne < .02) return { sehne, max: Infinity };
+    let max = 0;
+    for (const q of liste) {
+      const t = ((q.x - von.x) * (bis.x - von.x) + (q.y - von.y) * (bis.y - von.y)) / (sehne * sehne);
+      const fx = von.x + (bis.x - von.x) * t, fy = von.y + (bis.y - von.y) * t;
+      max = Math.max(max, Math.hypot(q.x - fx, q.y - fy));
     }
-    if (maxAbstand / sehne < .09) return { art: 'linie', punkte: [{ x: a.x, y: a.y, w }, { x: z.x, y: z.y, w }] };
+    return { sehne, max };
+  };
+  if (!geschlossen) {
+    /* Pfeil: ein gerader Schaft, der am Ende einen Haken zurückschlägt. Der
+       Knick liegt im letzten Viertel; der Schwanz kehrt scharf um (> 105°). */
+    let laenge = 0; const bogen = [0];
+    for (let i = 1; i < p.length; i++) { laenge += Math.hypot(p[i].x - p[i - 1].x, p[i].y - p[i - 1].y); bogen.push(laenge); }
+    if (laenge > .04) {
+      let knick = -1;
+      for (let i = p.length - 2; i > 0; i--) { if (bogen[i] <= laenge * .78) break; knick = i; }
+      let bester = -1, groesste = 0;
+      for (let i = Math.max(2, knick); i < p.length - 1; i++) {
+        const v1x = p[i].x - p[Math.max(0, i - 2)].x, v1y = p[i].y - p[Math.max(0, i - 2)].y;
+        const v2x = p[Math.min(p.length - 1, i + 2)].x - p[i].x, v2y = p[Math.min(p.length - 1, i + 2)].y - p[i].y;
+        const l1 = Math.hypot(v1x, v1y), l2 = Math.hypot(v2x, v2y);
+        if (l1 < 1e-6 || l2 < 1e-6) continue;
+        const winkel = Math.acos(Math.max(-1, Math.min(1, (v1x * v2x + v1y * v2y) / (l1 * l2)))) * 180 / Math.PI;
+        if (winkel > groesste) { groesste = winkel; bester = i; }
+      }
+      if (bester > 0 && groesste > 105 && bogen[bester] > laenge * .6) {
+        const spitze = p[bester];
+        const schaft = abstandZurSehne(p.slice(0, bester + 1), a, spitze);
+        if (schaft.sehne > .03 && schaft.max / schaft.sehne < .1) {
+          const dx = (spitze.x - a.x) / schaft.sehne, dy = (spitze.y - a.y) / schaft.sehne;
+          const fl = Math.max(.02, schaft.sehne * .18), wk = Math.PI * .78;
+          const fluegel = (s) => ({ x: spitze.x + (dx * Math.cos(wk * s) - dy * Math.sin(wk * s)) * fl, y: spitze.y + (dx * Math.sin(wk * s) + dy * Math.cos(wk * s)) * fl, w });
+          return { art: 'pfeil', punkte: [{ x: a.x, y: a.y, w }, { x: spitze.x, y: spitze.y, w }, fluegel(1), { x: spitze.x, y: spitze.y, w }, fluegel(-1)] };
+        }
+      }
+    }
+    const ganz = abstandZurSehne(p, a, z);
+    if (ganz.sehne < .02) return null;
+    if (ganz.max / ganz.sehne < .09) return { art: 'linie', punkte: [{ x: a.x, y: a.y, w }, { x: z.x, y: z.y, w }] };
     return null;
   }
   const cx = (box.x0 + box.x1) / 2, cy = (box.y0 + box.y1) / 2;
@@ -7664,8 +7750,49 @@ async function heftAtelier(h, danach) {
     el('div', { class: 'einstellgruppe einstellzeile' }, el('span', { class: 'ename' }, 'Randlinie', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Eine Linie am linken Rand wie im Schulheft — Platz für Notizen.')), rand),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
       el('button', { class: 'knopf voll', onclick: () => { behalten = true; speichere(h); zu(); if (danach) danach(); } }, 'So bleibt es')));
+  /* Als Fenster: links die Vorschau (bleibt stehen), rechts die Felder (scrollen).
+     Auf schmalen Schirmen untereinander, mit kleinerer Vorschau. */
+  const kopfEl = kasten.querySelector('.atelier-kopf');
+  const felder = el('div', { class: 'atelier-felder' });
+  for (const kind of [...kasten.children]) if (kind !== kopfEl && kind !== buehne) felder.append(kind);
+  kasten.append(el('div', { class: 'atelier-raster' }, el('div', { class: 'atelier-links' }, buehne), felder));
   const zu = zeigeDeck(kasten, () => { if (!behalten) { Object.assign(h, alt); if (danach) danach(); } });
   aktualisiere();
+}
+
+/* ----- Tisch und Regal einrichten ----- */
+const TISCH_PLATTEN = [['eiche', 'Eiche'], ['nuss', 'Nussbaum'], ['leder', 'Leder'], ['leinen', 'Leinen'], ['dunkel', 'Dunkel']];
+const TISCH_GROESSEN = [['klein', 'Klein'], ['mittel', 'Mittel'], ['gross', 'Groß']];
+const TISCH_SORTIERUNGEN = [['zuletzt', 'Zuletzt benutzt'], ['az', 'A–Z'], ['farbe', 'Nach Farbe']];
+function saubererTisch(roh) {
+  const q = roh && typeof roh === 'object' && !Array.isArray(roh) ? roh : {};
+  const wahl = (wert, liste, vorgabe) => liste.some((e) => e[0] === wert) ? wert : vorgabe;
+  return {
+    platte: wahl(q.platte, TISCH_PLATTEN, 'eiche'),
+    groesse: wahl(q.groesse, TISCH_GROESSEN, 'mittel'),
+    unordnung: q.unordnung !== false,
+    sortierung: wahl(q.sortierung, TISCH_SORTIERUNGEN, 'zuletzt')
+  };
+}
+function tischEinrichten(danach) {
+  const t = saubererTisch(D.einst.tisch);
+  const alt = { ...t };
+  let behalten = false;
+  const wahlgruppe = (liste, lies, setze) => {
+    const g = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
+    for (const [id, name] of liste) g.append(el('button', { class: lies() === id ? 'an' : '', onclick: (e) => { setze(id); $$('button', g).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); D.einst.tisch = { ...t }; if (danach) danach(); } }, name));
+    return g;
+  };
+  const unordnung = el('button', { class: 'schalter' + (t.unordnung ? ' an' : ''), onclick: (e) => { t.unordnung = !t.unordnung; e.currentTarget.classList.toggle('an', t.unordnung); D.einst.tisch = { ...t }; if (danach) danach(); } }, el('i'));
+  const kasten = el('div', { class: 'modal tisch-einrichten' },
+    el('h2', {}, 'Tisch und Regal einrichten'),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Platte und Bretter'), wahlgruppe(TISCH_PLATTEN, () => t.platte, (v) => { t.platte = v; })),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Größe der Hefte'), wahlgruppe(TISCH_GROESSEN, () => t.groesse, (v) => { t.groesse = v; })),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Reihenfolge'), wahlgruppe(TISCH_SORTIERUNGEN, () => t.sortierung, (v) => { t.sortierung = v; })),
+    el('div', { class: 'einstellgruppe einstellzeile' }, el('span', { class: 'ename' }, 'Unordnung', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Hefte liegen leicht verdreht — wie auf einem echten Tisch.')), unordnung),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => { D.einst.tisch = alt; if (danach) danach(); zu(); } }, 'Zurück'),
+      el('button', { class: 'knopf voll', onclick: () => { behalten = true; D.einst.tisch = { ...t }; speichereEinst(); zu(); if (danach) danach(); } }, 'So bleibt es')));
+  const zu = zeigeDeck(kasten, () => { if (!behalten) { D.einst.tisch = alt; if (danach) danach(); } });
 }
 
 /* ----- Die Übersicht: Karten, Regal, Tisch ----- */
@@ -7704,7 +7831,9 @@ function renderHefteRegal(haupt) {
   const ansicht = HEFTE_ANSICHTEN.some((a) => a[0] === D.einst.hefteAnsicht) ? D.einst.hefteAnsicht : 'karten';
   const wahl = el('div', { class: 'heft-ansichtswahl', role: 'group', 'aria-label': 'Ansicht der Hefte' },
     HEFTE_ANSICHTEN.map(([id, name]) => el('button', { class: ansicht === id ? 'an' : '', onclick: () => { D.einst.hefteAnsicht = id; speichereEinst(); zeichne(); } }, name)));
+  const tisch = saubererTisch(D.einst.tisch);
   haupt.append(raumkopf('Hefte', null, wahl,
+    ansicht !== 'karten' ? el('button', { class: 'rundknopf zart', html: ik('feinheiten'), title: 'Tisch und Regal einrichten', onclick: () => tischEinrichten(() => zeichne()) }) : null,
     el('button', {
       class: 'rundknopf voll', html: ik('plus'), title: 'Neues Heft', onclick: async () => {
         const name = await eingabe({ titel: 'Ein neues Heft', platzhalter: 'Wie soll es heißen?' });
@@ -7714,8 +7843,11 @@ function renderHefteRegal(haupt) {
       }
     })
   ));
-  const inhalt = el('div', { class: 'inhalt hefte-' + ansicht });
-  const alle = vomTyp('heft').sort((a, b) => b.geaendert - a.geaendert);
+  const inhalt = el('div', { class: 'inhalt hefte-' + ansicht + ' platte-' + tisch.platte + ' groesse-' + tisch.groesse + (tisch.unordnung ? '' : ' ordentlich') });
+  const sortiere = (a, b) => tisch.sortierung === 'az' ? String(a.titel || '').localeCompare(String(b.titel || ''), 'de')
+    : tisch.sortierung === 'farbe' ? String(a.farbe || '').localeCompare(String(b.farbe || '')) || b.geaendert - a.geaendert
+    : b.geaendert - a.geaendert;
+  const alle = vomTyp('heft').sort(sortiere);
   const aktive = alle.filter((h) => !h.archiv);
   const imRegal = alle.filter((h) => h.archiv);
   if (!alle.length) {
@@ -10151,7 +10283,9 @@ RENDER.woerter = function (haupt) {
     arbeitskarte.append(
       el('div', { class: 'wortkisten-titelzeile' },
         el('div', {}, el('h2', {}, titel), beschreibung ? el('p', {}, beschreibung) : null),
-        kiste ? el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Kiste bearbeiten', onclick: () => kistenMenue(kiste) }) : null),
+        el('div', { style: 'display:flex;gap:6px;align-items:center' },
+          woerterInKiste(aktiveKiste).length >= 2 ? el('button', { class: 'knopf zart', title: 'Karteikarten: Wort vorn, Notiz hinten', onclick: () => wortkisteAbfragen(aktiveKiste, titel).then(() => baueAlles()) }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Abfragen') : null,
+          kiste ? el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Kiste bearbeiten', onclick: () => kistenMenue(kiste) }) : null)),
       el('div', { class: 'wortkisten-filter' }, el('span', { html: ik('suche') }), suchfeld, sort),
       gitter,
       el('div', { class: 'wortzugabe wortzugabe-mehrfach' }, zugabefeld,
@@ -10203,6 +10337,113 @@ RENDER.woerter = function (haupt) {
 
   haupt.append(inhalt);
 };
+
+/* ================================================================
+   VANI — Karteikarten: Wortkisten abfragen.
+
+   Eine Wortkiste ist fast schon ein Karteikasten: vorn das Wort, hinten die
+   Notiz. „Abfragen" zeigt die Vorderseite, ein Tipp dreht die Karte, dann
+   „Gewusst" oder „Nochmal". Was man verfehlt, kommt öfter; was man sicher
+   weiß, seltener — eine leichte Form des Karteikasten-Prinzips, ohne Zwang und
+   ohne Kalender. Wer mag, fragt rückwärts (Notiz → Wort). Stand und Zähler
+   liegen am Wort selbst und reisen über Sicherung und Sync mit.
+   ================================================================ */
+
+/* Reihenfolge fürs Abfragen, pur: Verfehltes und lange nicht Gefragtes nach
+   vorn, sicher Gewusstes nach hinten, mit etwas Zufall, damit es nicht jedes
+   Mal dieselbe Reihe ist. */
+function karteikartenReihenfolge(woerter, zufall = Math.random, jetzt = Date.now()) {
+  const liste = (woerter || []).filter((w) => w && (w.text || '').trim());
+  const gewicht = (w) => {
+    const g = Number(w.gewusst) || 0, v = Number(w.verfehlt) || 0;
+    const tage = w.abgefragt ? Math.min(60, (jetzt - w.abgefragt) / 86400000) : 60;
+    /* Verfehlt zählt doppelt, Zeit seit der letzten Abfrage ein wenig, nie gefragt ganz vorn. */
+    return (v * 2 - g) + tage / 20 + zufall() * 1.5;
+  };
+  return liste.map((w) => ({ w, g: gewicht(w) })).sort((a, b) => b.g - a.g).map((x) => x.w);
+}
+
+/* Zusammenfassung nach einer Runde: wie viele, wie sicher. Pur. */
+function karteikartenBilanz(ergebnisse) {
+  const e = ergebnisse || [];
+  const gewusst = e.filter((x) => x === true).length;
+  const nochmal = e.filter((x) => x === false).length;
+  const quote = e.length ? Math.round(gewusst / e.length * 100) : 0;
+  const wort = !e.length ? 'Nichts abgefragt.'
+    : quote === 100 ? 'Alles gewusst. Die Kiste sitzt.'
+    : quote >= 75 ? 'Fast alles sitzt — ' + nochmal + ' noch einmal.'
+    : quote >= 40 ? 'Die Hälfte sitzt, der Rest kommt wieder.'
+    : 'Das meiste kommt wieder. Gut, dass es Karten gibt.';
+  return { gewusst, nochmal, quote, wort };
+}
+
+/* Die Abfrage als Fenster. kistenId: 'alle', 'lose' oder eine Kiste. */
+function wortkisteAbfragen(kistenId, titel) {
+  const alle = woerterInKiste(kistenId);
+  const mitNotiz = alle.filter((w) => (w.notiz || '').trim());
+  if (alle.length < 2) { toast('Zum Abfragen braucht es mindestens zwei Wörter.'); return Promise.resolve(null); }
+  return new Promise((res) => {
+    let rueckwaerts = false, nurMitNotiz = mitNotiz.length >= 2;
+    let karten = [], nr = 0, umgedreht = false, ergebnisse = [], fertig = false;
+    const bau = () => { karten = karteikartenReihenfolge(nurMitNotiz ? mitNotiz : alle); nr = 0; umgedreht = false; ergebnisse = []; zeige(); };
+    const zaehler = el('div', { class: 'kk-zaehler' });
+    const karte = el('button', { class: 'kk-karte', 'aria-live': 'polite' });
+    const vorn = el('div', { class: 'kk-seite kk-vorn' });
+    const hinten = el('div', { class: 'kk-seite kk-hinten' });
+    karte.append(el('div', { class: 'kk-innen' }, vorn, hinten));
+    const gewusst = el('button', { class: 'knopf voll', onclick: () => bewerte(true) }, '✓ Gewusst');
+    const nochmal = el('button', { class: 'knopf', onclick: () => bewerte(false) }, '↻ Nochmal');
+    const drehen = el('button', { class: 'knopf zart', onclick: () => { umgedreht = !umgedreht; karte.classList.toggle('umgedreht', umgedreht); } }, 'Umdrehen');
+    const bilanzFeld = el('div', { class: 'kk-bilanz' });
+    const richtungKnopf = el('button', { class: 'knopf zart klein', onclick: () => { rueckwaerts = !rueckwaerts; richtungKnopf.textContent = rueckwaerts ? 'Rückwärts: Notiz → Wort' : 'Vorwärts: Wort → Notiz'; bau(); } }, 'Vorwärts: Wort → Notiz');
+    const notizKnopf = el('button', { class: 'knopf zart klein', onclick: () => { nurMitNotiz = !nurMitNotiz; notizKnopf.textContent = nurMitNotiz ? 'Nur Karten mit Notiz' : 'Alle Karten'; bau(); } }, nurMitNotiz ? 'Nur Karten mit Notiz' : 'Alle Karten');
+    if (mitNotiz.length < 2) notizKnopf.style.display = 'none';
+
+    const zeige = () => {
+      const w = karten[nr];
+      karte.classList.remove('umgedreht'); umgedreht = false;
+      if (!w) { schluss(); return; }
+      const a = rueckwaerts ? (w.notiz || '—') : w.text;
+      const b = rueckwaerts ? w.text : (w.notiz || 'Noch keine Notiz — hinten wäre Platz für Bedeutung, Synonym, Beispielsatz.');
+      vorn.textContent = a; hinten.textContent = b;
+      zaehler.textContent = (nr + 1) + ' von ' + karten.length + (w.verfehlt ? ' · ' + w.verfehlt + '× verfehlt' : '') + (w.gewusst ? ' · ' + w.gewusst + '× gewusst' : '');
+      bilanzFeld.textContent = '';
+      gewusst.disabled = false; nochmal.disabled = false;
+    };
+    const bewerte = (ok) => {
+      const w = karten[nr]; if (!w) return;
+      w.abgefragt = Date.now();
+      if (ok) w.gewusst = (Number(w.gewusst) || 0) + 1; else w.verfehlt = (Number(w.verfehlt) || 0) + 1;
+      speichereStill(w);
+      ergebnisse.push(ok);
+      nr++;
+      zeige();
+    };
+    const schluss = () => {
+      const b = karteikartenBilanz(ergebnisse);
+      vorn.textContent = b.wort; hinten.textContent = b.wort;
+      zaehler.textContent = b.gewusst + ' gewusst · ' + b.nochmal + ' nochmal · ' + b.quote + ' %';
+      bilanzFeld.textContent = b.nochmal ? 'Die verfehlten kommen beim nächsten Mal zuerst.' : '';
+      gewusst.disabled = true; nochmal.disabled = true;
+    };
+    karte.addEventListener('click', () => { if (karten[nr]) { umgedreht = !umgedreht; karte.classList.toggle('umgedreht', umgedreht); } });
+    const tasten = (e) => {
+      if (e.key === ' ') { e.preventDefault(); karte.click(); }
+      else if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); bewerte(true); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); bewerte(false); }
+    };
+    document.addEventListener('keydown', tasten, true);
+    const kasten = el('div', { class: 'modal karteikasten' },
+      el('div', { class: 'kartenkopf' }, el('span', { html: ik('woerter') }), 'ABFRAGEN · ' + (titel || 'Wortkiste').toUpperCase()),
+      zaehler, karte,
+      el('div', { class: 'kk-knoepfe' }, nochmal, drehen, gewusst),
+      bilanzFeld,
+      el('div', { class: 'kk-optionen' }, richtungKnopf, notizKnopf, el('button', { class: 'knopf zart klein', onclick: () => bau() }, 'Neue Runde')),
+      el('div', { class: 'reihe' }, el('button', { class: 'knopf', onclick: () => { fertig = true; zu(); } }, 'Fertig')));
+    const zu = zeigeDeck(kasten, () => { document.removeEventListener('keydown', tasten, true); res(ergebnisse); });
+    bau();
+  });
+}
 
 /* ================================================================
    VANI — Suche: ein Feld, alles. Mit Filtern und Nachsicht
@@ -13448,12 +13689,14 @@ const ANLEITUNG = [
         'Von links nach rechts: 📌 Nadel = Zettel ankleben · Kamera = Foto einkleben · Stift = Kritzeln · Aa = Text formatieren · drei Punkte = Mehr (Im Schreibraum öffnen, Hinzufügen & verbinden, Als loses Blatt herausnehmen, Seite herausreißen).',
         'Der Zettel hat also einen eigenen Knopf und steckt in keinem Menü.'
       ], tipp: 'Wenn ich diese Knöpfe nicht sehe: In den Feinheiten auf „VANI jetzt aktualisieren" tippen. Dann ist die neueste Fassung da.' },
-      { t: 'Der Umschlag', p: ['Der kleine Deckel oben links im Heft (oder lange halten → „Umschlag & Papier gestalten") öffnet das Atelier mit großer Vorschau. Stoff: Leinen, Leder, Kraftpapier, Samt, Marmor, Glatt. Farben: Grundton, Zweitton, Band. Muster. Etikett: Schild, Tesastreifen, Handschrift, Prägung — und die Schrift dazu. Ecken (rund, eckig, Metallecken), Gummiband in eigener Farbe, „Abgegriffen" als Regler für Kanten, die schon viel erlebt haben. Der Seitenblock an der Kante wächst mit den Seiten.', 'Aufkleben & kritzeln: Sticker aus der Kiste (und mein „Schmu!") aufs Cover, oder direkt aufs Cover kritzeln. Auf der Vorschau ziehen verschiebt, lange halten dreht, vergrößert oder macht ab. „Würfeln" schlägt einen ganzen Look vor.'], b: 'Dunkles Leder, Metallecken, ein rotes Gummiband, Prägung als Etikett — und quer drüber ein Schmu!-Sticker.' },
+      { t: 'Der Umschlag', p: ['Das Atelier ist ein Fenster: links der Deckel groß und immer im Blick, rechts die Felder zum Scrollen (auf dem Handy untereinander). Der kleine Deckel oben links im Heft (oder lange halten → „Umschlag & Papier gestalten") öffnet das Atelier mit großer Vorschau. Stoff: Leinen, Leder, Kraftpapier, Samt, Marmor, Glatt. Farben: Grundton, Zweitton, Band. Muster. Etikett: Schild, Tesastreifen, Handschrift, Prägung — und die Schrift dazu. Ecken (rund, eckig, Metallecken), Gummiband in eigener Farbe, „Abgegriffen" als Regler für Kanten, die schon viel erlebt haben. Der Seitenblock an der Kante wächst mit den Seiten.', 'Aufkleben & kritzeln: Sticker aus der Kiste (und mein „Schmu!") aufs Cover, oder direkt aufs Cover kritzeln. Auf der Vorschau ziehen verschiebt, lange halten dreht, vergrößert oder macht ab. „Würfeln" schlägt einen ganzen Look vor.'], b: 'Dunkles Leder, Metallecken, ein rotes Gummiband, Prägung als Etikett — und quer drüber ein Schmu!-Sticker.' },
+      { t: 'Tisch und Regal einrichten', p: ['In Regal und Tisch gibt es oben das Schieberegler-Symbol: Platte und Bretter (Eiche, Nussbaum, Leder, Leinen, Dunkel), Größe der Hefte (klein, mittel, groß), Reihenfolge (zuletzt benutzt, A–Z, nach Farbe) und „Unordnung" — ob die Hefte leicht verdreht liegen. Jede Wahl zeigt sich sofort hinter dem Fenster.'] },
       { t: 'Karten, Regal, Tisch', p: ['Die Hefteübersicht hat drei Ansichten (oben im Kopf): Karten (die Deckel in Reihen), Regal (ein echtes Bücherregal: die Hefte stehen mit dem Rücken nach vorn auf Brettern, unterschiedlich hoch und dick; was ich ins Regal gestellt habe, steht ein Brett tiefer) und Tisch (die Hefte liegen verstreut auf einer Holzplatte, leicht gedreht, das Weggestellte als Stapel). „Ins Regal stellen" und „Zurück auf den Tisch" sind animiert: das Heft gleitet wirklich hinüber. Antippen zieht es kurz heraus und schlägt es auf.'] },
       { t: 'Zettel', p: ['Kleine farbige Notizzettel auf der Seite — auch über den Seitenrand hinaus, wie im echten Heft. Ziehen verschiebt, der Griff unten rechts ändert die Größe, der runde Griff oben dreht frei, Tippen macht ihn beschreibbar. Lange halten: Andere Farbe (acht Töne), Schrift (Handschrift, Klar, Serife), Form (schmal, normal, breit), Befestigung (Tesa, Reißzwecke, lose aufgelegt), Etwas drehen, Gerade rücken, Abmachen.'], b: 'Eine Figurenbeschreibung als gelber Zettel schräg an den Rand der Seite — mit Tesa. Die Seite selbst bleibt frei für die Szene.' },
       { t: 'Fotos', p: ['„Foto einkleben" legt ein Bild auf die Seite, leicht schräg wie eingeklebt. Es lässt sich genauso ziehen, drehen, vergrößern und befestigen wie ein Zettel.'] },
       { t: 'Sticker', p: ['Das Sticker-Symbol in den Seitenwerkzeugen öffnet den Stickerblock: eine kleine Zeichenfläche mit Stiften (rot zuerst), Dicke, Radierer, Zurück. Was ich zeichne, wird so groß wie das Gezeichnete — der Rest bleibt durchsichtig — und klebt dann lose auf der Seite: ziehen, am Griff unten rechts größer und kleiner, am runden Griff oben frei drehen (nahe null rastet es gerade ein), lange halten zum Abmachen.', 'Sticker dürfen wie Zettel über den Seitenrand hinausragen. „Seite verdoppeln" nimmt sie mit.'], b: 'Ein rotes „SCHMU!" einmal gezeichnet — und ab jetzt in jedem Heft an der richtigen Stelle.' },
       { t: 'Die Stickerkiste', p: ['Das Sticker-Symbol öffnet zuerst die Kiste: oben „Meine" (was ich gezeichnet habe), darunter „Mitgebracht" — mein rotes „Schmu!" ist schon dabei, als echtes Bild mit durchsichtigem Grund. Antippen klebt auf, lange drücken nimmt einen eigenen heraus, „Neuen zeichnen" öffnet den Block. Beim Zeichnen ist „Auch in die Stickerkiste legen" angehakt. Ein schon aufgeklebter Sticker kommt per langem Halten nachträglich in die Kiste („In die Stickerkiste legen") oder gleich noch einmal auf die Seite („Noch einmal aufkleben").'] },
+      { t: 'Pfeile', p: ['Ein gerader Strich mit einem Haken am Ende — kurz stehen bleiben — wird ein Pfeil mit sauberer Spitze. Für Verbindungen, Verweise, „hier weiter".'] },
       { t: 'Lasso und Formen', p: ['Das Lasso-Symbol in der Kritzelleiste: eine Schlinge um Striche ziehen — sie sind ausgewählt (gestrichelter Rahmen). Dann anfassen und verschieben, mit dem Kreuz löschen, mit dem Farbknopf in die aktuelle Stiftfarbe umfärben, Haken hebt die Auswahl auf. Das geht auch nach Tagen noch, weil VANI Striche als Punktfolgen speichert, nicht als Bild.', 'Formen: Bleibt der Stift am Ende eines Strichs einen halben Atemzug stehen, wird der Strich zur Form — eine gerade Linie, eine Ellipse, ein Rechteck. Was keine Form ist, bleibt Handschrift.'], b: 'Schnell einen Kreis um ein Wort ziehen, kurz stehen bleiben — ein sauberer Kreis. Später mit dem Lasso ein Stück nach rechts rücken.' },
       { t: 'Tonnotiz', p: ['Das Mikrofon in den Seitenwerkzeugen nimmt auf (bis fünf Minuten, mit Pegel und Uhr). Die Aufnahme liegt dann als kleine Kassette auf der Seite: antippen spielt ab, noch einmal hält an. Lange halten: Beschriften, drehen, abmachen. Sie reist mit Sicherung und Sync wie ein Foto.'], b: 'Den Tonfall einer Figur einsprechen, bevor ich ihn vergesse — direkt neben der Szene.' },
       { t: 'Reiter', p: ['Im Seitenmenü „Farbigen Reiter anheften": Farbe wählen, ein Wort draufschreiben. Alle Reiter eines Hefts stehen als farbige Zungen unter dem Titel und springen zu ihrer Seite — in jeder Ansicht. Mehrere Reiter je Heft, das Lesezeichen (wo das Heft aufgeht) bleibt eigenständig.'] },
@@ -13527,6 +13770,7 @@ const ANLEITUNG = [
     id: 'woerter', titel: 'Wörter', icon: 'woerter', raum: 'woerter',
     kurz: 'Wortkisten, Schütteln und Funken.',
     abschnitte: [
+      { t: 'Abfragen (Karteikarten)', p: ['Neben dem Titel einer Kiste: „Abfragen". Vorn steht das Wort, ein Tipp dreht die Karte, hinten steht die Notiz. Dann „Gewusst" oder „Nochmal" — was ich verfehle, kommt beim nächsten Mal zuerst, was sicher sitzt, seltener. „Rückwärts" fragt von der Notiz zum Wort. Mit Tastatur: Leertaste dreht, Pfeil rechts gewusst, Pfeil links nochmal. Am Ende eine kleine Bilanz.'], b: 'Die Kiste „Wörter für Wetter": zehn Karten, sieben gewusst — die drei anderen kommen morgen zuerst.' },
       { t: 'Wortkisten', p: ['Kleine Sammlungen: Synonyme, Lieblingsverben, Figurenwörter, Wörter für einen Vibe. „＋ Neue Kiste" legt eine an. „Alle Wörter" zeigt den ganzen Schrank, „Lose Wörter" alles ohne Kiste. Das Kisten-Menü: Name, Notiz & Farbe ändern · Nur Kiste löschen (die Wörter bleiben lose) · Kiste und ihre Wörter löschen.'] },
       { t: 'Wörter hinzufügen', p: ['Das Feld nimmt mehrere Wörter auf einmal — durch Zeilenumbruch, Komma oder Semikolon getrennt. Strg/⌘ + Enter oder das Plus fügt hinzu. Doppelte werden still übersprungen, Wörter werden auf 160 Zeichen begrenzt, höchstens 500 auf einmal.'], b: 'Kiste „Wörter für Licht": flirren, Lichtsaum, seidenmatt, Splittergold — in einer Zeile mit Kommas eingeben, einmal Strg+Enter.' },
       { t: 'Suchen, sortieren, Favoriten', p: ['Die Suche filtert innerhalb der gewählten Kiste. Sortierung: zuletzt, A–Z, älteste. Im Wortzettel („Wortzettel bearbeiten") gibt es „Oben anheften" — angeheftete Wörter stehen in jeder Sortierung oben, dazu Platz für eine Notiz. Das Wort-Menü: Damit schreiben · Wortzettel bearbeiten · In eine andere Kiste verschieben · In eine Kiste kopieren · Aus der Sammlung nehmen.'] },

@@ -216,8 +216,49 @@ async function heftAtelier(h, danach) {
     el('div', { class: 'einstellgruppe einstellzeile' }, el('span', { class: 'ename' }, 'Randlinie', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Eine Linie am linken Rand wie im Schulheft — Platz für Notizen.')), rand),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
       el('button', { class: 'knopf voll', onclick: () => { behalten = true; speichere(h); zu(); if (danach) danach(); } }, 'So bleibt es')));
+  /* Als Fenster: links die Vorschau (bleibt stehen), rechts die Felder (scrollen).
+     Auf schmalen Schirmen untereinander, mit kleinerer Vorschau. */
+  const kopfEl = kasten.querySelector('.atelier-kopf');
+  const felder = el('div', { class: 'atelier-felder' });
+  for (const kind of [...kasten.children]) if (kind !== kopfEl && kind !== buehne) felder.append(kind);
+  kasten.append(el('div', { class: 'atelier-raster' }, el('div', { class: 'atelier-links' }, buehne), felder));
   const zu = zeigeDeck(kasten, () => { if (!behalten) { Object.assign(h, alt); if (danach) danach(); } });
   aktualisiere();
+}
+
+/* ----- Tisch und Regal einrichten ----- */
+const TISCH_PLATTEN = [['eiche', 'Eiche'], ['nuss', 'Nussbaum'], ['leder', 'Leder'], ['leinen', 'Leinen'], ['dunkel', 'Dunkel']];
+const TISCH_GROESSEN = [['klein', 'Klein'], ['mittel', 'Mittel'], ['gross', 'Groß']];
+const TISCH_SORTIERUNGEN = [['zuletzt', 'Zuletzt benutzt'], ['az', 'A–Z'], ['farbe', 'Nach Farbe']];
+function saubererTisch(roh) {
+  const q = roh && typeof roh === 'object' && !Array.isArray(roh) ? roh : {};
+  const wahl = (wert, liste, vorgabe) => liste.some((e) => e[0] === wert) ? wert : vorgabe;
+  return {
+    platte: wahl(q.platte, TISCH_PLATTEN, 'eiche'),
+    groesse: wahl(q.groesse, TISCH_GROESSEN, 'mittel'),
+    unordnung: q.unordnung !== false,
+    sortierung: wahl(q.sortierung, TISCH_SORTIERUNGEN, 'zuletzt')
+  };
+}
+function tischEinrichten(danach) {
+  const t = saubererTisch(D.einst.tisch);
+  const alt = { ...t };
+  let behalten = false;
+  const wahlgruppe = (liste, lies, setze) => {
+    const g = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
+    for (const [id, name] of liste) g.append(el('button', { class: lies() === id ? 'an' : '', onclick: (e) => { setze(id); $$('button', g).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); D.einst.tisch = { ...t }; if (danach) danach(); } }, name));
+    return g;
+  };
+  const unordnung = el('button', { class: 'schalter' + (t.unordnung ? ' an' : ''), onclick: (e) => { t.unordnung = !t.unordnung; e.currentTarget.classList.toggle('an', t.unordnung); D.einst.tisch = { ...t }; if (danach) danach(); } }, el('i'));
+  const kasten = el('div', { class: 'modal tisch-einrichten' },
+    el('h2', {}, 'Tisch und Regal einrichten'),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Platte und Bretter'), wahlgruppe(TISCH_PLATTEN, () => t.platte, (v) => { t.platte = v; })),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Größe der Hefte'), wahlgruppe(TISCH_GROESSEN, () => t.groesse, (v) => { t.groesse = v; })),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Reihenfolge'), wahlgruppe(TISCH_SORTIERUNGEN, () => t.sortierung, (v) => { t.sortierung = v; })),
+    el('div', { class: 'einstellgruppe einstellzeile' }, el('span', { class: 'ename' }, 'Unordnung', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Hefte liegen leicht verdreht — wie auf einem echten Tisch.')), unordnung),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => { D.einst.tisch = alt; if (danach) danach(); zu(); } }, 'Zurück'),
+      el('button', { class: 'knopf voll', onclick: () => { behalten = true; D.einst.tisch = { ...t }; speichereEinst(); zu(); if (danach) danach(); } }, 'So bleibt es')));
+  const zu = zeigeDeck(kasten, () => { if (!behalten) { D.einst.tisch = alt; if (danach) danach(); } });
 }
 
 /* ----- Die Übersicht: Karten, Regal, Tisch ----- */
@@ -256,7 +297,9 @@ function renderHefteRegal(haupt) {
   const ansicht = HEFTE_ANSICHTEN.some((a) => a[0] === D.einst.hefteAnsicht) ? D.einst.hefteAnsicht : 'karten';
   const wahl = el('div', { class: 'heft-ansichtswahl', role: 'group', 'aria-label': 'Ansicht der Hefte' },
     HEFTE_ANSICHTEN.map(([id, name]) => el('button', { class: ansicht === id ? 'an' : '', onclick: () => { D.einst.hefteAnsicht = id; speichereEinst(); zeichne(); } }, name)));
+  const tisch = saubererTisch(D.einst.tisch);
   haupt.append(raumkopf('Hefte', null, wahl,
+    ansicht !== 'karten' ? el('button', { class: 'rundknopf zart', html: ik('feinheiten'), title: 'Tisch und Regal einrichten', onclick: () => tischEinrichten(() => zeichne()) }) : null,
     el('button', {
       class: 'rundknopf voll', html: ik('plus'), title: 'Neues Heft', onclick: async () => {
         const name = await eingabe({ titel: 'Ein neues Heft', platzhalter: 'Wie soll es heißen?' });
@@ -266,8 +309,11 @@ function renderHefteRegal(haupt) {
       }
     })
   ));
-  const inhalt = el('div', { class: 'inhalt hefte-' + ansicht });
-  const alle = vomTyp('heft').sort((a, b) => b.geaendert - a.geaendert);
+  const inhalt = el('div', { class: 'inhalt hefte-' + ansicht + ' platte-' + tisch.platte + ' groesse-' + tisch.groesse + (tisch.unordnung ? '' : ' ordentlich') });
+  const sortiere = (a, b) => tisch.sortierung === 'az' ? String(a.titel || '').localeCompare(String(b.titel || ''), 'de')
+    : tisch.sortierung === 'farbe' ? String(a.farbe || '').localeCompare(String(b.farbe || '')) || b.geaendert - a.geaendert
+    : b.geaendert - a.geaendert;
+  const alle = vomTyp('heft').sort(sortiere);
   const aktive = alle.filter((h) => !h.archiv);
   const imRegal = alle.filter((h) => h.archiv);
   if (!alle.length) {

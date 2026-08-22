@@ -343,7 +343,9 @@ RENDER.woerter = function (haupt) {
     arbeitskarte.append(
       el('div', { class: 'wortkisten-titelzeile' },
         el('div', {}, el('h2', {}, titel), beschreibung ? el('p', {}, beschreibung) : null),
-        kiste ? el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Kiste bearbeiten', onclick: () => kistenMenue(kiste) }) : null),
+        el('div', { style: 'display:flex;gap:6px;align-items:center' },
+          woerterInKiste(aktiveKiste).length >= 2 ? el('button', { class: 'knopf zart', title: 'Karteikarten: Wort vorn, Notiz hinten', onclick: () => wortkisteAbfragen(aktiveKiste, titel).then(() => baueAlles()) }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Abfragen') : null,
+          kiste ? el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Kiste bearbeiten', onclick: () => kistenMenue(kiste) }) : null)),
       el('div', { class: 'wortkisten-filter' }, el('span', { html: ik('suche') }), suchfeld, sort),
       gitter,
       el('div', { class: 'wortzugabe wortzugabe-mehrfach' }, zugabefeld,

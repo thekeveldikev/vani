@@ -48,11 +48,11 @@ Schreiben. Nicht alles gehört herüber; das hier schon:
 | Seitenvorlagen (Linien, Kästchen, Punkte, Cornell) | Cornell, Storyboard (2×3), Dialogblatt (zwei Spalten) im Heft-Atelier | **da (5.11)** |
 | Favoriten / Tabs | Farbige Reiter je Heft (mehrere), als Zungen unter dem Titel, springen zur Seite | **da (5.11)** |
 | Gliederung aus Überschriften | Heft: Gliederung aller H1–H3, springt zur Seite und scrollt zur Überschrift; Projekt: Kapitel → Szenen → Überschriften | **da (5.11)** |
-| Lasso: Pfeil als Form | Offener Strich mit Haken am Ende → Pfeil | Welle 3 |
+| Lasso: Pfeil als Form | Offener Strich mit Haken am Ende → Pfeil mit Spitze | **da (5.14)** |
 | Zoom-Schreibfenster | nein — Tastatur ist der Normalfall | — |
 | Handschrift durchsuchen | nein — keine Erkennung ohne Netz; Goodnotes-PDFs mit Texterkennung werden ohnehin durchsucht | — |
 | Präsentationsmodus / Laserpointer | nein | — |
-| Karteikarten | Wortkisten sind schon fast das: „Abfragen"-Modus für Wortkisten (Vorderseite Wort, Rückseite Notiz) | Welle 3 |
+| Karteikarten | „Abfragen" in jeder Wortkiste: Wort vorn, Notiz hinten, Gewusst/Nochmal, Verfehltes zuerst, rückwärts, Tastatur | **da (5.14)** |
 
 ---
 
