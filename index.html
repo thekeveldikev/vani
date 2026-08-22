@@ -2519,6 +2519,70 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .inhalt, html[data-thema="ker
 /* Die Lettern des Setzkastens kippen beim Darüberfahren */
 #raum[data-ort="woerter"] .wortkarte:hover { transform: translateY(-3px) rotate(var(--dreh, 0deg)); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 -2px 0 rgba(0,0,0,.4), 0 8px 14px rgba(0,0,0,.35); }
 
+/* ----- Salon, Stufe drei: die Wand ist ein Zimmer ----- */
+.salon-galerie.zimmer { display: block; padding: 30px 26px 150px; min-height: 520px; }
+.salon-reihe { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 26px 22px; justify-items: center; max-width: 1000px; margin: 0 auto; }
+.salon-reihe.haus .salon-rahmen { max-width: 230px; }
+.salon-reihe.gaeste { margin-top: 30px; grid-template-columns: repeat(auto-fit, minmax(140px, 170px)); justify-content: center; }
+.salon-reihe.gaeste .salon-rahmen { max-width: 170px; padding: 12px 12px 10px; }
+.salon-reihe.gaeste .salon-passepartout { padding: 8px; }
+.salon-reihe.gaeste .salon-schild b { font-size: 11.5px; } .salon-reihe.gaeste .salon-schild span { font-size: 8.5px; }
+.salon-reihe.gaeste .salon-lampe { width: 52px; margin-left: -26px; }
+.salon-sessel { position: absolute; z-index: 2; left: calc(50% - 18% - 260px); bottom: 16px; width: 100px; height: 120px; border-radius: 16px; background: transparent; cursor: pointer; }
+.salon-sessel:hover, .salon-sessel:focus-visible { box-shadow: 0 0 0 2px rgba(255,220,150,.35), 0 0 30px rgba(255,200,120,.3); outline: none; }
+.salon-sessel::after { content: "Setz dich"; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); font-size: 11px; letter-spacing: .08em; color: rgba(255,240,215,.75); white-space: nowrap; opacity: 0; transition: opacity .2s; }
+.salon-sessel:hover::after { opacity: 1; }
+.salon-kaminknopf { position: absolute; z-index: 2; left: calc(50% - 90px); bottom: 8px; width: 180px; height: 110px; background: transparent; border-radius: 8px; cursor: pointer; }
+.salon-kaminknopf:hover { box-shadow: 0 0 0 2px rgba(255,200,120,.3); }
+@media (max-width: 760px) { .salon-sessel { display: none; } .salon-galerie.zimmer { padding-bottom: 130px; } }
+.salon-konsole { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-top: 14px; }
+.salon-konsole .salon-tageskarte { max-width: none; transform: none; background: var(--karte); color: var(--tinte); box-shadow: 0 1px 5px var(--schein), inset 0 0 0 1px var(--linie); }
+.salon-konsole .st-kopf { display: flex; align-items: center; gap: 8px; }
+.st-mini { width: 26px; height: 32px; border-radius: 2px; overflow: hidden; flex: none; box-shadow: 0 0 0 2px #a8832f; background: #2a2422; display: inline-block; }
+.st-mini img { width: 100%; height: 100%; object-fit: cover; display: block; } .st-mini .salon-monogramm { font-size: 18px; }
+.salon-konsole .st-ueber { color: var(--blass); }
+.salon-konsole .st-fuss { color: var(--blass); }
+.salon-briefe { margin-top: 18px; }
+.salon-brief { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 10px 12px; margin-bottom: 6px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.salon-brief b { display: block; font-size: 14px; } .salon-brief small { font-size: 12px; color: var(--blass); }
+/* ----- Altes Blatt auf dem Tisch ----- */
+.desk-ding.altesblatt { left: 12%; top: calc(44% + 178px); width: 118px; height: 150px; --dreh: -5deg; }
+.altesblatt-papier { position: relative; width: 118px; height: 150px; padding: 26px 10px 10px; border-radius: 2px; background: linear-gradient(170deg, #efe2c2, #d9c79c); box-shadow: 0 3px 8px rgba(0,0,0,.55), inset 0 0 30px rgba(120,90,40,.25); color: #3a2a18; overflow: hidden; font-family: ui-serif, "New York", Georgia, serif; }
+.altesblatt-papier .ab-datum { position: absolute; left: 10px; top: 8px; font-size: 9px; letter-spacing: .08em; color: rgba(60,40,20,.7); }
+.altesblatt-papier b { display: block; font-size: 11px; line-height: 1.2; margin-bottom: 4px; }
+.altesblatt-papier .ab-text { display: block; font-size: 8px; line-height: 1.35; color: rgba(60,40,20,.75); max-height: 72px; overflow: hidden; }
+.altesblatt-papier .ab-stempel { position: absolute; right: 6px; bottom: 8px; padding: 2px 6px; border: 1.5px solid rgba(176,53,43,.6); border-radius: 3px; color: rgba(176,53,43,.75); font: 8px ui-rounded, system-ui, sans-serif; letter-spacing: .06em; text-transform: uppercase; transform: rotate(-8deg); }
+@media (max-width: 760px) { .desk-ding.altesblatt { left: 56%; top: calc(44% + 40%); transform: scale(.8); } }
+/* ----- Jahresringe ----- */
+.ringe-fenster { width: min(520px, calc(100vw - 32px)); max-height: min(88dvh, calc(var(--vvh, 100dvh) - 32px)); overflow: auto; }
+.ringe-jahre { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.ringe-bild { display: grid; place-items: center; margin: 4px 0; }
+.ringe-bild svg { max-width: 100%; height: auto; }
+.ringe-bild .ring { cursor: pointer; transition: opacity .2s; } .ringe-bild .ring:hover { opacity: 1 !important; filter: brightness(1.1); }
+.ringe-unter { font: italic 14px/1.5 ui-serif, "New York", Georgia, serif; text-align: center; margin: 4px 0 8px; }
+.ringe-hinweis { font-size: 12px; color: var(--blass); text-align: center; }
+.ringe-liste { margin-top: 10px; } .ringe-liste .gruppe { font-size: 11.5px; letter-spacing: .08em; color: var(--blass); margin: 8px 0 4px; }
+.ringe-eintrag { display: grid; width: 100%; text-align: left; padding: 8px 10px; border-radius: 10px; } .ringe-eintrag:hover { background: var(--karte); }
+.ringe-eintrag b { font-weight: 600; font-size: 14px; } .ringe-eintrag small { font-size: 12px; color: var(--blass); }
+.ringe-leer { font-style: italic; color: var(--blass); padding: 8px 10px; }
+/* ----- Textlupe ----- */
+.lupe-fenster { width: min(560px, calc(100vw - 32px)); max-height: min(88dvh, calc(var(--vvh, 100dvh) - 32px)); overflow: auto; }
+.lupe-zahlen { display: flex; flex-wrap: wrap; gap: 14px 20px; margin: 4px 0 12px; }
+.lupe-zahl { display: grid; gap: 1px; } .lupe-zahl b { font: 700 22px ui-serif, "New York", Georgia, serif; font-variant-numeric: tabular-nums; } .lupe-zahl span { font-size: 11.5px; color: var(--blass); }
+.lupe-titel { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--blass); margin: 12px 0 6px; }
+.lupe-rhythmus { display: flex; align-items: flex-end; gap: 2px; height: 60px; padding: 2px 0; overflow: hidden; }
+.lupe-rhythmus i { width: 4px; flex: none; border-radius: 2px 2px 0 0; background: var(--akzent2); opacity: .8; }
+.lupe-hinweis { font-size: 12.5px; color: var(--blass); margin-top: 6px; }
+.lupe-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.lupe-chips .suchchip.fuell { background: rgba(176,53,43,.1); }
+mark.lupe-wdh { background: rgba(255,196,90,.45); color: inherit; border-radius: 3px; } mark.lupe-fuell { background: rgba(176,53,43,.18); color: inherit; border-radius: 3px; }
+/* ----- Atem ----- */
+.atem-fenster { width: min(380px, calc(100vw - 32px)); text-align: center; }
+.atem-kreis { --atem: .6; width: 180px; height: 180px; margin: 10px auto; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle, rgba(255,200,120,.35), rgba(255,200,120,0) 70%); }
+.atem-kreis i { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle at 50% 40%, #ffe7b0, #e8a94e 60%, #b0552f); box-shadow: 0 0 40px rgba(255,180,90,.6); transform: scale(var(--atem)); transition: transform .12s linear; }
+.atem-wort { font: 600 24px ui-serif, "New York", Georgia, serif; }
+.atem-rest { font-size: 12.5px; color: var(--blass); margin-top: 4px; }
+
 </style>
 </head>
 <body>
@@ -2545,7 +2609,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.24.0';
+const APP_VERSION = '5.25.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -2757,6 +2821,7 @@ async function teileText(text) {
 const IK = {
   zuhause: '<path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/>',
   sticker: '<path d="M5 7a2 2 0 0 1 2-2h7.5L19 9.5V17a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"/><path d="M14.5 5v4.5H19"/><path d="M8.5 13.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8"/>',
+  brief: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3.5 7l8.5 6.5L20.5 7"/><path d="M3.5 18l6-5.5M20.5 18l-6-5.5"/>',
   rahmen: '<rect x="4" y="3" width="16" height="18" rx="1.5"/><rect x="7.5" y="6.5" width="9" height="10"/><path d="M9 21v1.5M15 21v1.5"/><path d="M10.5 12.5c1-1.5 2-1.5 3 0"/>',
   schreibtisch: '<path d="M3 14h18"/><path d="M5 14v6M19 14v6"/><path d="M8 14v-3.5a2 2 0 0 1 2-2h1"/><path d="M14 5.5 12.5 10h4L15 5.5h-1Z"/><path d="M13.2 10.5v3.5"/><circle cx="7" cy="10.5" r="1.2"/>',
   lasso: '<path d="M12 4c4.4 0 8 2 8 4.8S16.4 13.6 12 13.6 4 11.6 4 8.8 7.6 4 12 4Z" stroke-dasharray="3 2.2"/><path d="M8.5 13.2c-.6 2.2-.2 4.3 1.4 6.3"/><circle cx="10.4" cy="20" r="1.2"/>',
@@ -2884,7 +2949,7 @@ const STANDARD_EINST = {
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
   stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
   ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95,
-  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null, sitzung: null
+  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null, sitzung: null, salonBriefe: [], pausenErinnerung: true
 };
 const D = {
   docs: new Map(),
@@ -3084,6 +3149,11 @@ function sauberesDokument(quelle) {
   if (d.sicht != null) {
     const s = d.sicht && typeof d.sicht === 'object' && !Array.isArray(d.sicht) ? d.sicht : {};
     d.sicht = { x: begrenze(s.x, -100000, 100000, 60), y: begrenze(s.y, -100000, 100000, 60), z: begrenze(s.z, .1, 5, 1) };
+  }
+  if (d.klang != null) {
+    const k = d.klang && typeof d.klang === 'object' && !Array.isArray(d.klang) ? d.klang : {};
+    const sauber = {}; for (const [id, v] of Object.entries(k).slice(0, 12)) if (typeof id === 'string' && Number.isFinite(Number(v))) sauber[id.slice(0, 40)] = begrenze(Number(v), 0, 1, 0);
+    d.klang = sauber;
   }
   if (d.typ === 'mentor') {
     const zeilen = (a) => (Array.isArray(a) ? a : []).filter((s) => typeof s === 'string').map((s) => s.slice(0, 600)).slice(0, 80);
@@ -9702,7 +9772,7 @@ function oeffneSchreibraum(docId) {
   const istRich = doc.format === 'rich';
   let richPaket = null;
   const ta = istRich
-    ? (richPaket = baueRichEditor(doc, { class: 'sr-text', platzhalter: 'Schreib einfach. Der Rest der Welt wartet draußen.', warten: 500 })).editor
+    ? (richPaket = baueRichEditor(doc, { beiSpeichern: (d) => { if (typeof klangkarteMerken === 'function') klangkarteMerken(d); }, class: 'sr-text', platzhalter: 'Schreib einfach. Der Rest der Welt wartet draußen.', warten: 500 })).editor
     : el('textarea', { class: 'sr-text text', placeholder: 'Schreib einfach. Der Rest der Welt wartet draußen.' });
   if (!istRich) ta.value = doc.text || '';
   const spiegel = el('div', { class: 'sr-spiegel text', 'aria-hidden': 'true' });
@@ -9759,10 +9829,13 @@ function oeffneSchreibraum(docId) {
 
   const sichern = istRich ? richPaket.sichern : entprellt(() => {
     doc.text = ta.value;
+    if (typeof klangkarteMerken === 'function') klangkarteMerken(doc);
     speichere(doc);
     zaehleWorte(doc.id, doc.text);
   }, 500, true);
   _sr.sichern = sichern;
+  if (typeof klangkarteAnbieten === 'function') setTimeout(() => klangkarteAnbieten(doc), 900);
+  if (typeof pauseErinnerungStart === 'function') pauseErinnerungStart();
   /* Jeder Anschlag ist ein kleiner Luftzug für die Kerze. */
   ta.addEventListener('input', () => { if (_sr && _sr.sprint && _sr.sprint.kerze) _sr.sprint.kerze.puste(.22); });
 
@@ -9847,6 +9920,8 @@ function srSetzeText(text) {
 
 function schliesseSchreibraum(zurueck) {
   if (!_sr) return;
+  if (typeof pauseErinnerungStopp === 'function') pauseErinnerungStopp();
+  if (typeof _diktat !== 'undefined' && _diktat && typeof diktatStopp === 'function') diktatStopp();
   const sitzungOffen = typeof _sitzung !== 'undefined' && _sitzung && !_sr.sprint;
   if (typeof vorlesenStopp === 'function') vorlesenStopp();
   _sr.sichern && _sr.sichern.sofort();
@@ -9981,9 +10056,11 @@ function srEinstellungen() {
     zeileFuer('„Kluge Zeichen"', wahl([[true, 'An'], [false, 'Aus']], s.ersetzungen, (v) => { s.ersetzungen = v; })),
     zeileFuer('Autokorrektur', wahl([[true, 'An'], [false, 'Aus']], s.autokorrektur, (v) => { s.autokorrektur = v; })),
     zeileFuer('Vorlesetempo', wahl([[.8, 'Ruhig'], [.95, 'Normal'], [1.15, 'Zügig']], begrenze(s.vorleseTempo, .6, 1.4, .95), (v) => { s.vorleseTempo = v; })),
+    zeileFuer('Pause nach 40 Minuten', wahl([[true, 'Erinnern'], [false, 'Aus']], s.pausenErinnerung !== false, (v) => { s.pausenErinnerung = v; })),
     el('div', { class: 'reihe', style: 'justify-content:flex-start;flex-wrap:wrap;gap:8px' },
       el('button', { class: 'knopf', onclick: () => { zu(); sucheErsetze(); } }, el('span', { html: ik('suche'), style: 'display:flex' }), 'Suchen & Ersetzen'),
       el('button', { class: 'knopf', onclick: () => { zu(); friereEin(); } }, el('span', { html: ik('frieren'), style: 'display:flex' }), 'Stand einfrieren'),
+      typeof zeigeTextlupe === 'function' ? el('button', { class: 'knopf', onclick: () => { zu(); zeigeTextlupe(doc, srAktuellerText()); } }, el('span', { html: ik('suche'), style: 'display:flex' }), 'Textlupe') : null,
       (doc.staende && doc.staende.length) ? el('button', { class: 'knopf', onclick: () => { zu(); zeigeStaende(); } }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Frühere Stände (' + doc.staende.length + ')') : null,
       doc.format !== 'rich' ? el('button', { class: 'knopf', onclick: () => {
         doc.format = 'rich'; doc.rich = richAusText(srAktuellerText()); speichere(doc); zu();
@@ -10532,6 +10609,95 @@ function diktatKnopf(zielHolen) {
   k.addEventListener('click', () => diktatUmschalten(k, zielHolen));
   return k;
 }
+
+/* ===================== 45d — DIE TEXTLUPE, DIE KLANGKARTE, DIE PAUSE =====================
+   Textlupe: ein Blick auf den eigenen Text wie ein freundlicher Lektor —
+   Wiederholungen, Füll- und Verstärkerwörter, Satzlängen als Rhythmus.
+   Nie Schule, immer Angebot. Klangkarte: ein Text merkt sich, welche
+   Mischung beim Schreiben lief, und schlägt sie beim Öffnen wieder vor.
+   Pause: nach vierzig Minuten eine leise Erinnerung — keine Sirene. */
+
+const LUPE_FUELL = ['sehr', 'wirklich', 'eigentlich', 'irgendwie', 'ziemlich', 'plötzlich', 'total', 'absolut', 'einfach', 'halt', 'quasi', 'sozusagen', 'natürlich', 'offensichtlich', 'tatsächlich', 'durchaus', 'gewissermaßen', 'letztendlich', 'letztlich', 'irgendwo', 'irgendwas', 'etwas', 'ganz', 'echt', 'voll', 'mega', 'extrem', 'unglaublich', 'wahnsinnig', 'genau', 'eben'];
+const LUPE_STOPP = new Set(['und', 'der', 'die', 'das', 'ein', 'eine', 'einen', 'einem', 'einer', 'eines', 'in', 'im', 'an', 'am', 'auf', 'aus', 'zu', 'zum', 'zur', 'mit', 'von', 'vom', 'für', 'ich', 'du', 'er', 'sie', 'es', 'wir', 'ihr', 'mich', 'mir', 'dich', 'dir', 'sich', 'ihm', 'ihn', 'uns', 'euch', 'ihnen', 'ihrer', 'ihre', 'ihren', 'sein', 'seine', 'seinen', 'seiner', 'mein', 'meine', 'dein', 'deine', 'ist', 'war', 'waren', 'bin', 'bist', 'sind', 'hat', 'hatte', 'hatten', 'haben', 'wird', 'wurde', 'werden', 'nicht', 'kein', 'keine', 'auch', 'noch', 'nur', 'so', 'wie', 'als', 'dass', 'ob', 'wenn', 'denn', 'aber', 'oder', 'doch', 'dann', 'da', 'hier', 'dort', 'was', 'wer', 'wo', 'man', 'schon', 'mehr', 'sehr', 'über', 'unter', 'vor', 'nach', 'bei', 'bis', 'durch', 'um', 'ohne', 'gegen', 'den', 'dem', 'des', 'je', 'ja', 'nein', 'nun', 'also', 'mal', 'etwas', 'alles', 'nichts', 'viel', 'wieder', 'immer', 'nie', 'jetzt', 'heute', 'dieser', 'diese', 'dieses', 'jener', 'jene', 'sei', 'würde', 'könnte', 'kann', 'konnte', 'muss', 'musste', 'soll', 'sollte', 'will', 'wollte', 'darf', 'durfte', 'mag', 'mochte', 'habe', 'hab', 'ihr', 'hast', 'ganz', 'weil', 'seit', 'während', 'zwischen', 'hinter', 'neben', 'worden', 'gewesen', 'einmal', 'sagte', 'sagt', 'sage']);
+/* Die Lupe: Wiederholungen (Wörter ≥ 4 Zeichen, keine Stoppwörter), Füllwörter,
+   Satzlängen, Absätze. Pur. */
+function textLupe(text) {
+  const t = String(text || '');
+  const woerterListe = t.toLowerCase().replace(/[„“”"»«'’\-–—…]/g, ' ').match(/[a-zäöüß]+/g) || [];
+  const zaehl = new Map();
+  for (const w of woerterListe) { if (w.length < 4 || LUPE_STOPP.has(w)) continue; zaehl.set(w, (zaehl.get(w) || 0) + 1); }
+  const wiederholungen = [...zaehl.entries()].filter(([, n]) => n >= 3).sort((a, b) => b[1] - a[1]).slice(0, 12).map(([wort, n]) => ({ wort, n }));
+  const fuell = LUPE_FUELL.map((f) => ({ wort: f, n: woerterListe.filter((w) => w === f).length })).filter((x) => x.n > 0).sort((a, b) => b.n - a.n).slice(0, 10);
+  const saetze = (t.replace(/\s+/g, ' ').match(/[^.!?…]+[.!?…]+|[^.!?…]+$/g) || []).map((s) => s.trim()).filter((s) => s.length > 1);
+  const laengen = saetze.map((s) => (s.match(/[a-zäöüß]+/gi) || []).length).filter((n) => n > 0);
+  const mittel = laengen.length ? laengen.reduce((a, b) => a + b, 0) / laengen.length : 0;
+  const laengster = laengen.length ? Math.max(...laengen) : 0;
+  const kuerzester = laengen.length ? Math.min(...laengen) : 0;
+  const absaetze = t.split(/\n\s*\n/).filter((p) => p.trim()).length;
+  /* Wie abwechslungsreich der Rhythmus ist: Streuung der Satzlängen, 0 = gleichförmig, 1 = sehr bewegt */
+  const streuung = laengen.length > 1 ? Math.min(1, Math.sqrt(laengen.reduce((s, n) => s + (n - mittel) ** 2, 0) / laengen.length) / Math.max(1, mittel)) : 0;
+  const gesamt = woerterListe.length;
+  const fuellAnteil = gesamt ? fuell.reduce((s, f) => s + f.n, 0) / gesamt : 0;
+  return { woerter: gesamt, saetze: laengen.length, absaetze, mittel: Math.round(mittel * 10) / 10, laengster, kuerzester, streuung: Math.round(streuung * 100) / 100, wiederholungen, fuell, fuellAnteil: Math.round(fuellAnteil * 1000) / 10, laengen };
+}
+/* Ein Lesebogen, in dem die Wiederholungen und Füllwörter markiert sind. */
+function zeigeTextlupe(doc, text) {
+  const t = text != null ? text : (doc.text || '');
+  const lupe = textLupe(t);
+  const markiert = (() => {
+    const rep = new Set(lupe.wiederholungen.map((w) => w.wort)), fu = new Set(lupe.fuell.map((w) => w.wort));
+    return esc(t).replace(/[A-Za-zÄÖÜäöüß]+/g, (w) => { const k = w.toLowerCase(); if (rep.has(k)) return '<mark class="lupe-wdh">' + w + '</mark>'; if (fu.has(k)) return '<mark class="lupe-fuell">' + w + '</mark>'; return w; }).replace(/\n/g, '<br>');
+  })();
+  const rhythmus = el('div', { class: 'lupe-rhythmus', title: 'Satzlängen der Reihe nach — jede Linie ein Satz' }, ...lupe.laengen.slice(0, 160).map((n) => el('i', { style: 'height:' + Math.min(56, 4 + n * 1.6) + 'px' })));
+  const zahl = (z, l) => el('div', { class: 'lupe-zahl' }, el('b', {}, String(z)), el('span', {}, l));
+  const sagen = lupe.saetze ? (lupe.streuung < .25 ? 'Die Sätze sind alle ähnlich lang — ein kurzer dazwischen wäre ein Hammer.' : lupe.streuung > .6 ? 'Der Rhythmus ist lebendig: lange und kurze Sätze wechseln.' : 'Ein ruhiger Rhythmus mit ein paar Ausschlägen.') : '';
+  const kasten = el('div', { class: 'modal lupe-fenster' }, el('h2', {}, 'Die Textlupe'),
+    el('div', { class: 'lupe-zahlen' }, zahl(lupe.woerter, 'Wörter'), zahl(lupe.saetze, 'Sätze'), zahl(lupe.mittel, 'Wörter je Satz'), zahl(lupe.laengster, 'längster'), zahl(lupe.absaetze, 'Absätze'), zahl(lupe.fuellAnteil + ' %', 'Füllwörter')),
+    el('div', { class: 'lupe-titel' }, 'Rhythmus'), rhythmus, el('div', { class: 'lupe-hinweis' }, sagen),
+    lupe.wiederholungen.length ? el('div', { class: 'lupe-titel' }, 'Wörter, die oft kommen') : null,
+    lupe.wiederholungen.length ? el('div', { class: 'lupe-chips' }, ...lupe.wiederholungen.map((w) => el('span', { class: 'suchchip' }, w.wort + ' · ' + w.n))) : null,
+    lupe.fuell.length ? el('div', { class: 'lupe-titel' }, 'Füll- und Verstärkerwörter') : null,
+    lupe.fuell.length ? el('div', { class: 'lupe-chips' }, ...lupe.fuell.map((w) => el('span', { class: 'suchchip fuell' }, w.wort + ' · ' + w.n))) : null,
+    el('div', { class: 'lupe-hinweis' }, 'Nur ein Blick, kein Urteil. King würde die Adverbien zählen, Kästner die Adjektive — du entscheidest, was bleibt.'),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf', onclick: () => { zu(); const bogen = el('div', { class: 'lesebogen' }, el('div', { class: 'innen' }, el('h1', {}, doc && doc.titel ? doc.titel : 'Unter der Lupe'), el('div', { class: 'lmeta' }, 'Wiederholungen gelb, Füllwörter rosa'), el('div', { class: 'lesetext', html: markiert }))); const leiste = el('div', { class: 'schwebeleiste' }, el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Schließen', onclick: () => { bogen.remove(); leiste.remove(); } })); document.body.append(bogen, leiste); } }, 'Im Text markieren'), el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
+  const zu = zeigeDeck(kasten);
+}
+
+/* ----- Klangkarte: welche Mischung lief, als der Text entstand ----- */
+function klangkarteMerken(doc) {
+  if (!doc) return;
+  const m = D.einst.ambience || {};
+  const an = Object.keys(m).filter((k) => m[k] > 0);
+  if (!an.length) return;
+  const karte = {}; for (const k of an.slice(0, 8)) karte[k] = Math.round(m[k] * 100) / 100;
+  const alt = JSON.stringify(doc.klang || {});
+  if (alt !== JSON.stringify(karte)) { doc.klang = karte; }
+}
+function klangkarteName(karte) {
+  const ids = Object.keys(karte || {}).sort((a, b) => karte[b] - karte[a]).slice(0, 2);
+  return ids.map((id) => { const a = typeof ambienceFinde === 'function' ? ambienceFinde(id) : null; return a ? a.name : id; }).join(' und ');
+}
+/* Beim Öffnen: liegt eine Klangkarte am Text und spielt gerade nichts, bieten wir sie an. */
+function klangkarteAnbieten(doc) {
+  if (!doc || !doc.klang || !Object.keys(doc.klang).length) return;
+  const m = D.einst.ambience || {};
+  if (Object.values(m).some((v) => v > 0)) return;
+  if (typeof toastMitAktion !== 'function' || typeof ambienceMischungAnwenden !== 'function') return;
+  toastMitAktion('Damals lief: ' + klangkarteName(doc.klang) + '.', 'Wieder an', async () => { try { await audioFreigeben(); await ambienceMischungAnwenden({ ...doc.klang }); } catch (e) {} }, 6000);
+}
+
+/* ----- Die Pause: nach vierzig Minuten am Stück ein leises Wort ----- */
+let _pauseTimer = null;
+function pauseErinnerungStart() {
+  clearTimeout(_pauseTimer);
+  if (D.einst.pausenErinnerung === false) return;
+  _pauseTimer = setTimeout(() => {
+    if (typeof _sr === 'undefined' || !_sr) return;
+    toast('Vierzig Minuten. Aufstehen, Fenster, ein Schluck Wasser — der Text wartet.', 6000);
+    _pauseTimer = setTimeout(() => { if (typeof _sr !== 'undefined' && _sr) toast('Noch einmal vierzig. Die Schultern runter.', 5000); }, 40 * 60000);
+  }, 40 * 60000);
+}
+function pauseErinnerungStopp() { clearTimeout(_pauseTimer); _pauseTimer = null; }
 
 /* ================================================================
    VANI — Cluster: Denken auf Brettern
@@ -12101,6 +12267,7 @@ RENDER.feinheiten = function (haupt) {
   /* Ein Jahr aus Punkten: jeder Tag ein Kästchen, je dunkler, desto mehr Wörter. */
   const rasterWochen = (typeof innerWidth === 'number' && innerWidth < 620) ? 26 : 53;
   const raster = jahresRaster(D.stats.tage, rasterWochen);
+  const ringeKnopf = typeof zeigeJahresringe === 'function' ? el('button', { class: 'knopf', style: 'margin:6px 0 10px', onclick: () => zeigeJahresringe() }, 'Das Jahr in Ringen') : null;
   const jahr = el('div', { class: 'jahresraster', role: 'img', 'aria-label': 'Schreibtage der letzten ' + rasterWochen + ' Wochen' });
   for (const spalte of raster.spalten) {
     const sp = el('div', { class: 'jr-woche' });
@@ -12111,7 +12278,7 @@ RENDER.feinheiten = function (haupt) {
   inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Zahlen'),
     el('div', { class: 'karte' },
       el('div', { class: 'jahresraster-kopf' }, el('span', {}, rasterWochen === 53 ? 'Das letzte Jahr' : 'Das letzte halbe Jahr'), el('span', { class: 'jr-legende' }, schreibtage + (schreibtage === 1 ? ' Schreibtag' : ' Schreibtage') + ' insgesamt')),
-      jahr,
+      ringeKnopf, jahr,
       balken,
       el('div', { class: 'zahlenreihe' },
         el('div', { class: 'z' }, el('b', {}, gesamt.toLocaleString('de-DE')), el('span', {}, 'Wörter insgesamt')),
@@ -15378,6 +15545,8 @@ function oeffneAnleitung(kapitelId) {
 const SPOTLIGHT_BEFEHLE = () => [
   ...((typeof ALLE_RAEUME !== 'undefined' ? ALLE_RAEUME : []).map((r) => ({ text: r.name, unter: 'Raum', icon: r.icon, tu: () => { location.hash = '#/' + r.id; } }))),
   { text: 'Sitzung beginnen', unter: 'Uhr, Klang, Kerze, ein Rat — und die Bilanz danach', icon: 'feuer', tu: () => { if (typeof sitzungBeginnen === 'function') sitzungBeginnen(); } },
+  { text: 'Das Jahr in Ringen', unter: 'Schreibtage als Baumquerschnitt', icon: 'feinheiten', tu: () => { if (typeof zeigeJahresringe === 'function') zeigeJahresringe(); } },
+  { text: 'Brief an die Wand', unter: 'an King, Kästner, Funke, Rothfuss … — Antwort in drei Tagen', icon: 'brief', tu: () => { if (typeof salonBriefSchreiben === 'function') salonBriefSchreiben(); } },
   { text: 'Neues Blatt', unter: 'im Schreibraum', icon: 'blatt', tu: () => { const b = blattAusText('', ''); oeffneSchreibraum(b.id); } },
   { text: 'Schneller Schnipsel', unter: 'ein Satz, ein Gedanke', icon: 'schnipsel', tu: async () => { const t = await eingabe({ titel: 'Schnell notiert', platzhalter: 'ein Satz, ein Wort, ein Gedanke …', mehrzeilig: true, ok: 'Ablegen' }); if (t) { neuDoc('schnipsel', { text: t }); toast('Liegt in den Schnipseln.'); } } },
   { text: 'Suche', unter: 'die große Suche mit Gruppen', icon: 'suche', tu: () => { if (typeof oeffneSuche === 'function') oeffneSuche(); } },
@@ -16529,7 +16698,8 @@ function schreibtischSignatur() {
     briefe.length, briefe.some((b) => briefIstOffen(b) && b.versiegelt), heft ? heft.id + ':' + (heft.geaendert || 0) : '',
     fund ? fund.id : '', typeof schreibtischKlangName === 'function' ? schreibtischKlangName() : '',
     typeof syncFremdAktiv === 'function' ? syncFremdAktiv() : false, (typeof teelichterWoche === 'function' ? teelichterWoche(D.stats.tage, D.einst.tagesziel) : []).map((t) => t.erreicht),
-    typeof papierkorbZahl === 'function' ? papierkorbZahl() : 0
+    typeof papierkorbZahl === 'function' ? papierkorbZahl() : 0,
+    (() => { const f = typeof heuteVorEinemJahr === 'function' ? heuteVorEinemJahr([...D.docs.values()]) : null; return f ? f.doc.id : ''; })()
   ]);
 }
 RENDER.schreibtisch = function (haupt) {
@@ -16624,6 +16794,9 @@ RENDER.schreibtisch = function (haupt) {
   });
   bord.append(el('button', { class: 'bord-fuss', title: 'Der Lesestapel: Bücher auflegen, ordnen', onclick: () => lesestapelZeigen() }, buecher.length ? (buecher.length > zeigbar ? '+' + (buecher.length - zeigbar) + ' · ' : '') + 'Lesestapel' : 'Bücher auflegen'));
   dinge.append(el('div', { class: 'desk-ding-halter buecher' }, bord, el('i', { class: 'bordbrett' })));
+  /* Heute vor einem Jahr: ein altes Blatt liegt auf dem Tisch */
+  const altesBlatt = typeof heuteVorEinemJahr === 'function' ? heuteVorEinemJahr([...D.docs.values()]) : null;
+  if (altesBlatt) dinge.append(baueAltesBlatt(altesBlatt));
   /* Das aufgeschlagene Buch: das zuletzt gelesene liegt offen da */
   if (buecher.length && e.offenesBuch) dinge.append(baueOffenesBuch(buecher[0], szene));
 
@@ -16967,6 +17140,25 @@ function blattEinspannen(szene, e, blattId, fokus = true) {
   szene.classList.add('blatt-liegt');
   if (fokus) setTimeout(() => { feld.focus(); feld.setSelectionRange(feld.value.length, feld.value.length); }, 80);
   return blatt;
+}
+
+/* Heute vor einem Jahr: ein Text, der genau heute vor einem (oder mehr) Jahren entstand. Pur. */
+function heuteVorEinemJahr(docs, jetzt = Date.now()) {
+  const d = new Date(jetzt); const tag = d.getDate(), monat = d.getMonth(), jahr = d.getFullYear();
+  const treffer = [];
+  for (const x of docs || []) {
+    if (!x || !['blatt', 'szene', 'seite', 'schnipsel'].includes(x.typ) || !(x.text || '').trim()) continue;
+    const a = new Date(x.angelegt || 0);
+    if (a.getDate() === tag && a.getMonth() === monat && a.getFullYear() < jahr) treffer.push({ doc: x, jahre: jahr - a.getFullYear() });
+  }
+  treffer.sort((p, q) => p.jahre - q.jahre || worte(q.doc.text) - worte(p.doc.text));
+  return treffer[0] || null;
+}
+function baueAltesBlatt(fund) {
+  const d = fund.doc, a = new Date(d.angelegt || 0);
+  const datum = String(a.getDate()).padStart(2, '0') + '.' + String(a.getMonth() + 1).padStart(2, '0') + '.' + a.getFullYear();
+  return el('button', { class: 'desk-ding altesblatt', title: 'Heute vor ' + (fund.jahre === 1 ? 'einem Jahr' : fund.jahre + ' Jahren') + ': ' + (d.titel || (d.text || '').slice(0, 40)), onclick: () => oeffneDokument(d) },
+    el('div', { class: 'altesblatt-papier' }, el('span', { class: 'ab-datum' }, datum), el('b', {}, d.titel || (d.text || '').split('\n')[0].slice(0, 28) || 'Ohne Titel'), el('span', { class: 'ab-text' }, (d.text || '').replace(/\s+/g, ' ').slice(0, 150)), el('i', { class: 'ab-stempel' }, 'vor ' + (fund.jahre === 1 ? 'einem Jahr' : fund.jahre + ' Jahren'))));
 }
 
 /* ================================================================
@@ -18767,7 +18959,7 @@ function salonRahmen(a, i, onclick) {
     el('div', { class: 'salon-schild' }, el('b', {}, a.name), el('span', {}, [a.jahre, a.woher].filter(Boolean).join(' · '))));
 }
 
-/* ----- Der Raum ----- */
+/* ----- Der Raum, Stufe drei: die Wand als gemaltes Zimmer, darunter die Konsole ----- */
 RENDER.salon = function (haupt) {
   const alle = salonAlle();
   const heute = tagKey();
@@ -18778,19 +18970,17 @@ RENDER.salon = function (haupt) {
   frage.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); fragen(); } });
   const kopf = el('div', { class: 'kopf' },
     el('h1', {}, 'Der Salon', el('div', { class: 'unter' }, 'Die Lieblingswand. Sie wissen, wie es geht — und sie reden, wenn man anklopft.')),
+    el('button', { class: 'rundknopf zart', html: ik('brief'), title: 'Einen Brief an die Wand schreiben', onclick: () => salonBriefSchreiben() }),
     el('button', { class: 'rundknopf zart', html: ik('plus'), title: 'Jemanden an die Wand hängen', onclick: () => salonEigenenAnlegen() }),
     el('button', { class: 'rundknopf zart', html: ik('klang'), title: 'Salon am Abend: Kaminknistern und die Uhr (Klang)', onclick: () => salonKlang() }),
     el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Über die Bilder', onclick: () => salonUeberBilder() }));
-  const frageZeile = el('div', { class: 'salon-fragezeile' }, el('span', { html: ik('suche'), style: 'display:flex;color:var(--blass)' }), frage, el('button', { class: 'knopf voll', onclick: fragen }, 'Die Runde fragen'));
-  const platz = (a, i) => {
-    const rat = salonRatDesTages(a, heute);
-    return el('div', { class: 'salon-platz' }, salonRahmen(a, i, () => salonSprechen(a)),
-      el('div', { class: 'salon-kurz' }, a.kurz || ''),
-      rat ? el('button', { class: 'salon-tageskarte', onclick: () => salonSprechen(a, { saat: salonHash(heute + ':' + a.id) }) }, el('span', { class: 'st-ueber' }, 'Rat des Tages'), el('span', { class: 'st-text' }, rat.text), el('span', { class: 'st-fuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden — in ' + (a.anrede || a.name) + 's Geist')) : null);
-  };
   const haus = alle.filter((a) => !a.gast && !a.eigen), gaeste = alle.filter((a) => a.gast), eigene = alle.filter((a) => a.eigen);
-  const galerie = el('div', { class: 'salon-galerie gemalt' }, ...haus.map(platz));
-  /* Der gemalte Raum hinter der Wand: Tapete, Vertäfelung, Wandleuchter, Kamin */
+  /* Die Wand: nur die Rahmen — oben die Hausherren, darunter kleiner die Gäste und die eigenen */
+  const reihe1 = el('div', { class: 'salon-reihe haus' }, ...haus.map((a, i) => salonRahmen(a, i, () => salonSprechen(a))));
+  const reihe2 = el('div', { class: 'salon-reihe gaeste' }, ...[...gaeste, ...eigene].map((a, i) => salonRahmen(a, i + 4, () => salonSprechen(a))));
+  const sessel = el('button', { class: 'salon-sessel', title: 'Setz dich: eine Sitzung beginnen', 'aria-label': 'Setz dich — Sitzung beginnen', onclick: () => { if (typeof sitzungBeginnen === 'function') sitzungBeginnen(); } });
+  const kamin = el('button', { class: 'salon-kaminknopf', title: 'Das Feuer: Klang an oder aus', 'aria-label': 'Kaminfeuer und Klang', onclick: () => salonKlang() });
+  const galerie = el('div', { class: 'salon-galerie gemalt zimmer' }, reihe1, reihe2, sessel, kamin);
   let maler = null;
   if (typeof salonMaler === 'function') {
     const leinwand = el('canvas', { class: 'salon-malerei', 'aria-hidden': 'true' });
@@ -18799,17 +18989,73 @@ RENDER.salon = function (haupt) {
     const beobachter = new MutationObserver(() => { if (!leinwand.isConnected) { maler.stopp(); beobachter.disconnect(); } });
     beobachter.observe(haupt, { childList: true });
   }
-  const gastwand = el('div', { class: 'salon-gaeste' }, el('div', { class: 'salon-abschnitt' }, 'Das Gästezimmer'), el('div', { class: 'salon-galerie klein' }, ...gaeste.map((a, i) => platz(a, i + 4))));
-  const eigenwand = eigene.length ? el('div', { class: 'salon-gaeste' }, el('div', { class: 'salon-abschnitt' }, 'Deine Wand'), el('div', { class: 'salon-galerie klein' }, ...eigene.map((a, i) => platz(a, i + 6)))) : null;
+  /* Die Konsole unter der Wand: Rat des Tages je Person, Aufgabe, Briefe */
+  const karten = el('div', { class: 'salon-konsole' });
+  for (const a of alle) {
+    const rat = salonRatDesTages(a, heute); if (!rat) continue;
+    karten.append(el('button', { class: 'salon-tageskarte', onclick: () => salonSprechen(a, { saat: salonHash(heute + ':' + a.id) }) },
+      el('span', { class: 'st-kopf' }, el('span', { class: 'st-mini' }, salonPortraet(a)), el('span', { class: 'st-ueber' }, 'Rat des Tages · ' + a.name.split(' ').pop())),
+      el('span', { class: 'st-text' }, rat.text), el('span', { class: 'st-fuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden — in ' + (a.anrede || a.name) + 's Geist')));
+  }
   const aufgabeHeute = (() => { const a = SALON_FEST[salonHash(heute + ':aufgabe') % SALON_FEST.length]; const l = a.aufgaben || []; return l.length ? { a, aufgabe: l[salonHash(heute + ':a') % l.length] } : null; })();
   const aufgabenkarte = aufgabeHeute ? el('button', { class: 'salon-aufgabe-heute', onclick: () => salonAufgabeAnnehmen(aufgabeHeute.a, aufgabeHeute.aufgabe) },
     el('span', { class: 'sa-foto' }, salonPortraet(aufgabeHeute.a)), el('span', { class: 'sa-text' }, el('b', {}, 'Schreibaufgabe des Tages · ' + aufgabeHeute.a.name), el('i', {}, aufgabeHeute.aufgabe.t), el('small', {}, (aufgabeHeute.aufgabe.min ? aufgabeHeute.aufgabe.min + ' Minuten' : 'ohne Uhr') + (aufgabeHeute.aufgabe.ziel ? ' · etwa ' + aufgabeHeute.aufgabe.ziel + ' Wörter' : '') + ' · tippen nimmt sie an'))) : null;
-  const sockel = el('div', { class: 'salon-sockel' });
-  wand.append(frageZeile, galerie, aufgabenkarte, gastwand, eigenwand, sockel,
+  const briefe = salonBriefeKarte();
+  const frageZeile = el('div', { class: 'salon-fragezeile' }, el('span', { html: ik('suche'), style: 'display:flex;color:var(--blass)' }), frage, el('button', { class: 'knopf voll', onclick: fragen }, 'Die Runde fragen'));
+  wand.append(galerie, frageZeile, karten, aufgabenkarte, briefe,
     el('div', { class: 'salon-fuss' }, 'Die Zitate sind echt und tragen ihre Quelle. Die Ratschläge sind erfunden, in ihrem Geist — zusammen ' + alle.reduce((n, a) => n + salonVorrat(a), 0).toLocaleString('de-DE') + ' mögliche, jeden Tag andere.'));
   haupt.append(kopf, wand);
   if (maler) maler.start();
+  salonBriefeNachsehen();
 };
+
+/* ----- Briefe an die Wand: man schreibt, und nach drei Tagen antwortet die Person ----- */
+function saubereSalonBriefe(roh) {
+  return (Array.isArray(roh) ? roh : []).filter((b) => b && typeof b === 'object' && typeof b.an === 'string').slice(-40).map((b) => ({ an: b.an.slice(0, 40), docId: typeof b.docId === 'string' ? b.docId.slice(0, 80) : '', wann: begrenze(b.wann, 0, 4102444800000, 0), beantwortet: b.beantwortet === true, frage: String(b.frage || '').slice(0, 200) }));
+}
+function salonBriefe() { return saubereSalonBriefe(D.einst.salonBriefe); }
+function salonBriefeSpeichern(liste) { D.einst.salonBriefe = saubereSalonBriefe(liste); speichereEinst(); }
+const SALON_ANTWORT_TAGE = 3;
+function salonBriefSchreiben(vorgewaehlt) {
+  const stimmen = SALON_FEST;
+  let an = vorgewaehlt || stimmen[0].id;
+  const wahl = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
+  for (const a of stimmen) wahl.append(el('button', { class: an === a.id ? 'an' : '', onclick: (ev) => { an = a.id; $$('button', wahl).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); } }, a.name.split(' ').pop()));
+  const kasten = el('div', { class: 'modal' }, el('h2', {}, 'Ein Brief an die Wand'),
+    el('p', { style: 'font-size:14px;line-height:1.5;color:var(--blass)' }, 'Du schreibst einen Brief — an wen du willst. Er landet bei deinen Blättern. Nach ' + SALON_ANTWORT_TAGE + ' Tagen liegt eine Antwort auf der Konsole: erfunden, in der Stimme der Person, aber zu dem, was du gefragt hast.'),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'An'), wahl),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Nicht jetzt'), el('button', { class: 'knopf voll', onclick: () => {
+      const a = salonFinde(an) || stimmen[0];
+      const b = blattAusText('Brief an ' + a.name, 'Liebe' + (a.id === 'funke' || a.id === 'lindgren' ? ' ' : 'r ') + (a.anrede || a.name) + ',\n\n');
+      salonBriefeSpeichern([...salonBriefe(), { an: a.id, docId: b.id, wann: Date.now(), beantwortet: false, frage: '' }]);
+      zu(); oeffneSchreibraum(b.id);
+      toast('Der Brief liegt bei den Blättern. In ' + SALON_ANTWORT_TAGE + ' Tagen kommt Antwort.', 3600);
+    } }, 'Schreiben')));
+  const zu = zeigeDeck(kasten);
+}
+/* Antworten, die fällig sind, werden als Schnipsel abgelegt — einmal. */
+function salonBriefeNachsehen() {
+  const liste = salonBriefe(); let geaendert = false;
+  for (const b of liste) {
+    if (b.beantwortet || Date.now() - b.wann < SALON_ANTWORT_TAGE * 86400000) continue;
+    const a = salonFinde(b.an); if (!a) { b.beantwortet = true; geaendert = true; continue; }
+    const brief = D.docs.get(b.docId);
+    const thema = brief ? salonThemaAusFrage(brief.text || '') : null;
+    const r1 = salonRat(a, salonHash(b.docId + ':1'), thema), r2 = salonRat(a, salonHash(b.docId + ':2'), null);
+    const anrede = brief && brief.titel ? '' : '';
+    const text = 'Antwort von ' + a.name + (brief ? ' auf „' + (brief.titel || 'deinen Brief') + '“' : '') + '\n\n' + (r1 ? r1.text : '') + (r2 && r2.text !== (r1 || {}).text ? '\n\n' + r2.text : '') + '\n\n— ' + (a.anrede || a.name) + ' (erfunden, in seinem Geist — aus dem Salon)' + anrede;
+    neuDoc('schnipsel', { text });
+    b.beantwortet = true; geaendert = true;
+    toast('Post von der Wand: ' + a.name + ' hat geantwortet — sie liegt in den Schnipseln.', 5000);
+  }
+  if (geaendert) salonBriefeSpeichern(liste);
+}
+function salonBriefeKarte() {
+  const offen = salonBriefe().filter((b) => !b.beantwortet);
+  if (!offen.length) return null;
+  return el('div', { class: 'salon-briefe' }, el('div', { class: 'salon-abschnitt' }, 'Briefe unterwegs'),
+    ...offen.map((b) => { const a = salonFinde(b.an); const rest = Math.max(0, Math.ceil((b.wann + SALON_ANTWORT_TAGE * 86400000 - Date.now()) / 86400000)); return el('button', { class: 'salon-brief', onclick: () => { const d = D.docs.get(b.docId); if (d) oeffneDoc(d); } }, el('span', { class: 'st-mini' }, a ? salonPortraet(a) : null), el('span', {}, el('b', {}, 'An ' + (a ? a.name : b.an)), el('small', {}, rest ? 'Antwort in ' + rest + (rest === 1 ? ' Tag' : ' Tagen') : 'Antwort kommt beim nächsten Besuch'))); }));
+}
 
 /* Ein Zitat zeigen: bei englischen Stimmen zuerst das Original, die Übersetzung auf Tipp. */
 function salonZitatElement(a, z, mitLesung) {
@@ -19087,7 +19333,10 @@ function salonMaler(canvas) {
     ctx.save(); ctx.beginPath(); ctx.rect(kx - kb * .34, ky + 26, kb * .68, kh - 30); ctx.clip();
     kerzeSchein(ctx, kx, fy - 10, kb * .7, kh * .9, [[0, 'rgba(255,150,60,.55)'], [.5, 'rgba(255,110,40,.25)'], [1, 'rgba(255,110,40,0)']]);
     ctx.fillStyle = '#3a2414'; for (const d of [-26, 0, 24]) { ctx.save(); ctx.translate(kx + d, fy - 6); ctx.rotate(d * .01); ctx.fillRect(-30, -5, 60, 10); ctx.restore(); }
-    for (const [dx, h, w, ph] of [[-22, 44, 16, 1], [-8, 58, 20, 2], [8, 52, 18, 3], [24, 40, 14, 4], [0, 30, 10, 5]]) flamme(kx + dx, fy - 10, h, w, ph);
+    /* Spielt das Kaminknistern, brennt das Feuer höher */
+    const kaminKlang = (D.einst && D.einst.ambience && D.einst.ambience.kamin) || 0;
+    const hoch = 1 + Math.min(.7, kaminKlang * 1.2);
+    for (const [dx, h, w, ph] of [[-22, 44, 16, 1], [-8, 58, 20, 2], [8, 52, 18, 3], [24, 40, 14, 4], [0, 30, 10, 5]]) flamme(kx + dx, fy - 10, h * hoch, w, ph);
     for (const f of funken) {
       f.y -= f.v * dt; f.x += Math.sin(t * 2 + f.ph) * .0015; if (f.y < 0) { f.y = 1; f.x = .3 + zuf() * .4; }
       const px = kx - kb * .3 + f.x * kb * .6, py = ky + 26 + f.y * (kh - 40);
@@ -19154,6 +19403,8 @@ function orteKulisse(raum, haupt) {
       '<rect x="60" y="22" width="300" height="10" rx="3" fill="#c9a25a"/><g fill="#8a6a2e">' + [90, 150, 210, 270, 330].map((x) => '<circle cx="' + x + '" cy="38" r="4"/><rect x="' + (x - 2) + '" y="38" width="4" height="10"/>').join('') + '</g>' +
       '<path d="M130 48c-18 0-26 14-26 26h52c0-12-8-26-26-26z" fill="#2c2218"/><rect x="96" y="72" width="68" height="6" rx="3" fill="#2c2218"/>' +
       '<path class="ort-schal" d="M272 48c-6 20-2 40 4 60M284 48c6 20 2 40-4 60" stroke="#b0552f" stroke-width="9" fill="none" stroke-linecap="round"/>' +
+      /* Jahreszeit an der Garderobe: Zweig im Winter, Blüte im Frühling, Strohhut im Sommer, Blatt im Herbst */
+      (() => { const jz = typeof schreibtischJahreszeit === 'function' ? schreibtischJahreszeit() : 'sommer'; return jz === 'winter' ? '<path d="M210 48l0 40M210 60l-10-8M210 60l10-8M210 74l-10-8M210 74l10-8" stroke="#4a7a46" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="210" cy="52" r="4" fill="#c0392b"/>' : jz === 'fruehling' ? '<g fill="#e9a9b8"><circle cx="205" cy="52" r="5"/><circle cx="215" cy="52" r="5"/><circle cx="210" cy="46" r="5"/><circle cx="210" cy="58" r="5"/><circle cx="210" cy="52" r="3" fill="#f2d98a"/></g><path d="M210 60v26" stroke="#4a7a46" stroke-width="2.5"/>' : jz === 'sommer' ? '<ellipse cx="210" cy="58" rx="26" ry="7" fill="#d9b463"/><path d="M196 58c0-12 6-18 14-18s14 6 14 18" fill="#e8c878"/><path d="M196 56h28" stroke="#b0352b" stroke-width="3"/>' : '<path d="M210 46c-14 6-16 22-4 30 12-8 10-24 4-30z" fill="#c8873a"/><path d="M208 50l-2 26" stroke="#8a4a22" stroke-width="1.2"/>'; })() +
       /* Spiegel */
       '<ellipse cx="520" cy="60" rx="44" ry="52" fill="#d9e0e4"/><ellipse cx="520" cy="60" rx="40" ry="48" fill="url(#ortspiegel)"/><defs><linearGradient id="ortspiegel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3f6f5"/><stop offset=".5" stop-color="#cfd8db"/><stop offset="1" stop-color="#e8eeee"/></linearGradient></defs><ellipse cx="520" cy="60" rx="44" ry="52" fill="none" stroke="#c9a25a" stroke-width="5"/>' +
       /* Konsole mit Briefen */
@@ -19215,8 +19466,12 @@ function orteKulisse(raum, haupt) {
     ));
   } else if (r === 'woerter') {
     /* Setzkasten: Lettern aus den ersten Buchstaben der letzten Titel */
-    const buchstaben = [...new Set([...D.docs.values()].filter((d) => d.titel).sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0)).map((d) => d.titel.trim().slice(0, 1).toUpperCase()).filter((c) => /[A-ZÄÖÜ]/.test(c)))].slice(0, 12);
+    /* Lettern aus den Wörtern der Wortkisten — die neuesten zuerst; fehlen welche, aus den Titeln */
+    const woerterDa = typeof woerterInKiste === 'function' ? woerterInKiste('alle', '', 'neu').map((w) => String(w.text || '').trim()).filter(Boolean) : [];
+    const buchstaben = [...new Set(woerterDa.map((w) => w.slice(0, 1).toUpperCase()).filter((c) => /[A-ZÄÖÜ]/.test(c)))].slice(0, 12);
+    for (const d of [...D.docs.values()].filter((d) => d.titel).sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0))) { if (buchstaben.length >= 12) break; const c = d.titel.trim().slice(0, 1).toUpperCase(); if (/[A-ZÄÖÜ]/.test(c) && !buchstaben.includes(c)) buchstaben.push(c); }
     while (buchstaben.length < 12) buchstaben.push('VANISCHREIBT'[buchstaben.length]);
+    wrap.dataset.woerter = woerterDa.slice(0, 3).join(' · ');
     wrap.append(svg(
       '<rect x="40" y="14" width="720" height="96" rx="4" fill="#5a4326"/><rect x="46" y="20" width="708" height="84" fill="#3a2a18"/>' +
       buchstaben.map((c, i) => { const x = 62 + i * 57, y = 30 + (i % 2) * 30; return '<g><rect x="' + x + '" y="' + y + '" width="44" height="38" rx="3" fill="#2b2b2e"/><rect x="' + (x + 3) + '" y="' + (y + 3) + '" width="38" height="32" rx="2" fill="#3d3d42"/><text x="' + (x + 22) + '" y="' + (y + 27) + '" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-weight="700" font-size="22" fill="#d9d4c8" transform="scale(-1 1) translate(-' + (2 * x + 44) + ' 0)">' + c + '</text></g>'; }).join('')
@@ -19231,6 +19486,13 @@ function orteKulisse(raum, haupt) {
       /* Plattenhüllen links */
       [0, 1, 2, 3].map((i) => '<rect x="' + (80 + i * 28) + '" y="' + (40 + (i % 2) * 4) + '" width="26" height="70" rx="2" fill="' + ['#b0552f', '#5f7752', '#b8923f', '#4f7587'][i] + '" transform="rotate(' + (-6 + i * 3) + ' ' + (93 + i * 28) + ' 110)"/>').join('')
     ));
+    /* Die Platten sind Klangbilder: eine auflegen startet sie */
+    if (typeof KLANG_SZENEN !== 'undefined' && typeof mischungAnwenden === 'function') {
+      const platten = el('div', { class: 'ort-chips' });
+      for (const sz of KLANG_SZENEN.slice(0, 5)) platten.append(el('button', { class: 'ort-chip', onclick: async () => { try { await audioFreigeben(); mischungAnwenden({ ...sz.pegel }); toast('Die Nadel setzt auf: ' + sz.name, 2600); zeichne(); } catch (e) {} } }, '♪ ' + sz.name));
+      platten.append(el('button', { class: 'ort-chip still', onclick: async () => { try { mischungAnwenden({}); if (typeof ambienceMischungAnwenden === 'function') await ambienceMischungAnwenden({}); toast('Die Nadel hebt ab.'); zeichne(); } catch (e) {} } }, 'Nadel heben'));
+      wrap.append(platten);
+    }
   } else if (r === 'faden') {
     wrap.append(svg(
       '<rect x="0" y="104" width="800" height="16" fill="#6b4a32"/>' +
@@ -19388,7 +19650,7 @@ function staendeVergleichen(doc, stand, jetztText) {
 
 /* ----- Die Sitzung ----- */
 function sitzungBeginnen(vorgabe = {}) {
-  const e = Object.assign({ minuten: 20, ziel: D.einst.tagesziel ? Math.min(D.einst.tagesziel, 500) : 300, klang: 'behalten', rat: true, kerze: true, woran: 'neu' }, D.einst.sitzung || {}, vorgabe);
+  const e = Object.assign({ minuten: 20, ziel: D.einst.tagesziel ? Math.min(D.einst.tagesziel, 500) : 300, klang: 'behalten', rat: true, kerze: true, woran: 'neu', atmen: false }, D.einst.sitzung || {}, vorgabe);
   const letzte = typeof schreibtischLetzteTexte === 'function' ? schreibtischLetzteTexte(3) : [];
   const wahl = (liste, lies, setze) => { const g = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' }); for (const [id, n] of liste) g.append(el('button', { class: lies() === id ? 'an' : '', onclick: (ev) => { setze(id); $$('button', g).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); } }, n)); return g; };
   const ziel = el('input', { type: 'text', inputmode: 'numeric', value: String(e.ziel || ''), placeholder: 'Wörter' });
@@ -19404,13 +19666,16 @@ function sitzungBeginnen(vorgabe = {}) {
     zeile('Klang', wahl(SITZUNG_KLANG, () => e.klang, (v) => { e.klang = v; })),
     el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, 'Kerze anzünden'), schalter(() => e.kerze, (v) => { e.kerze = v; })),
     el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, 'Ein Rat von der Wand'), schalter(() => e.rat, (v) => { e.rat = v; ratVorschau.style.display = v ? '' : 'none'; })),
+    el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, 'Eine Minute atmen vorher', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Vier ein, sechs aus — die Kerze atmet mit.')), schalter(() => e.atmen, (v) => { e.atmen = v; })),
     ratVorschau, el('button', { class: 'knopf zart', style: 'margin-top:4px', onclick: ratNeu }, 'Anderer Rat'),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Nicht jetzt'),
       el('button', { class: 'knopf voll', onclick: async () => {
         e.ziel = parseInt(ziel.value, 10) || 0;
-        D.einst.sitzung = { minuten: e.minuten, ziel: e.ziel, klang: e.klang, rat: e.rat, kerze: e.kerze, woran: 'neu' }; speichereEinst();
+        D.einst.sitzung = { minuten: e.minuten, ziel: e.ziel, klang: e.klang, rat: e.rat, kerze: e.kerze, woran: 'neu', atmen: e.atmen }; speichereEinst();
         zu();
-        await sitzungStarten(e, ratVorschau.querySelector('i') ? ratVorschau.querySelector('i').textContent : '');
+        const ratText = ratVorschau.querySelector('i') ? ratVorschau.querySelector('i').textContent : '';
+        if (e.atmen) await sitzungAtmen();
+        await sitzungStarten(e, ratText);
       } }, 'Los')));
   const zu = zeigeDeck(kasten);
 }
@@ -19447,6 +19712,111 @@ function sitzungBilanz(abgebrochen) {
     el('div', { class: 'reihe' }, el('button', { class: 'knopf', onclick: () => { zu(); sitzungBeginnen({ woran: s.docId }); } }, 'Noch eine Sitzung'), el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut so')));
   const zu = zeigeDeck(kasten);
   return true;
+}
+
+/* Eine Minute atmen: vier Sekunden ein, sechs aus, sechsmal. Die Flamme atmet mit. */
+function sitzungAtmen(sekunden = 60) {
+  return new Promise((fertig) => {
+    const kreis = el('div', { class: 'atem-kreis' }, el('i'));
+    const wort = el('div', { class: 'atem-wort' }, 'Ein');
+    const rest = el('div', { class: 'atem-rest' }, sekunden + ' Sekunden');
+    const kasten = el('div', { class: 'modal atem-fenster' }, el('h2', {}, 'Eine Minute atmen'), kreis, wort, rest, el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => ende() }, 'Überspringen')));
+    let laeuft = true, t0 = performance.now(), raf = 0;
+    const ende = () => { if (!laeuft) return; laeuft = false; cancelAnimationFrame(raf); zu(); fertig(); };
+    const zu = zeigeDeck(kasten, () => { if (laeuft) { laeuft = false; cancelAnimationFrame(raf); fertig(); } });
+    const tick = (jetzt) => {
+      if (!laeuft) return;
+      const s = (jetzt - t0) / 1000;
+      if (s >= sekunden) { ende(); return; }
+      const z = s % 10, ein = z < 4;                     /* 4 ein, 6 aus */
+      const u = ein ? z / 4 : 1 - (z - 4) / 6;
+      kreis.style.setProperty('--atem', (.55 + .45 * (ein ? Math.sin(u * Math.PI / 2) : Math.sin(u * Math.PI / 2))).toFixed(3));
+      wort.textContent = ein ? 'Ein' : 'Aus';
+      rest.textContent = Math.ceil(sekunden - s) + ' Sekunden';
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+  });
+}
+
+/* ===================== 59 — DAS JAHR IN RINGEN =====================
+   Ein Baumquerschnitt aus den Schreibtagen: zwölf Ringe, einer je Monat,
+   dicke Ringe für viele Wörter, dünne für wenige, Narben, wo nichts war,
+   Jahreszeitenfarben. Ein Tipp auf einen Ring zeigt, was in dem Monat
+   entstand. Als Bild ansehbar, von Jahr zu Jahr blätterbar. */
+
+const RINGE_MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+/* Zwölf Monate eines Jahres aus den Tageszählern. Pur. */
+function jahresringeDaten(tage, jahr) {
+  const aus = RINGE_MONATE.map((name, m) => ({ monat: m, name, worte: 0, tage: 0, jahreszeit: m <= 1 || m === 11 ? 'winter' : m <= 4 ? 'fruehling' : m <= 7 ? 'sommer' : 'herbst' }));
+  for (const [k, n] of Object.entries(tage || {})) {
+    const mm = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k); if (!mm || Number(mm[1]) !== Number(jahr)) continue;
+    const m = Number(mm[2]) - 1, w = Number(n) || 0; if (m < 0 || m > 11) continue;
+    aus[m].worte += w; if (w > 0) aus[m].tage++;
+  }
+  const max = Math.max(1, ...aus.map((a) => a.worte));
+  for (const a of aus) a.anteil = a.worte / max;
+  return { jahr: Number(jahr), monate: aus, gesamt: aus.reduce((s, a) => s + a.worte, 0), tage: aus.reduce((s, a) => s + a.tage, 0), max };
+}
+/* Welche Jahre Zähler haben — für das Blättern. Pur. */
+function jahresringeJahre(tage) {
+  const j = new Set(); for (const k of Object.keys(tage || {})) { const m = /^(\d{4})-/.exec(k); if (m && (tage[k] || 0) > 0) j.add(Number(m[1])); }
+  const jetzt = new Date().getFullYear(); j.add(jetzt);
+  return [...j].sort((a, b) => a - b);
+}
+/* Das Bild: Ringe von innen (Januar) nach außen (Dezember). Pur (liefert SVG-Text). */
+function jahresringeSVG(daten, { groesse = 360, hell = true } = {}) {
+  const mitte = groesse / 2, innen = groesse * .07, aussen = groesse * .47;
+  const farben = { winter: ['#b9c3cc', '#7f8f9c'], fruehling: ['#b7d3a0', '#6f9a5a'], sommer: ['#d8c48a', '#a8893d'], herbst: ['#d7a26c', '#a0612e'] };
+  let r = innen, teile = '';
+  const dicken = daten.monate.map((m) => 3 + m.anteil * 26);
+  const summe = dicken.reduce((a, b) => a + b, 0), skala = (aussen - innen) / summe;
+  daten.monate.forEach((m, i) => {
+    const d = dicken[i] * skala, r2 = r + d;
+    const [f1, f2] = farben[m.jahreszeit];
+    const kraft = .35 + .65 * m.anteil;
+    /* ein Ring aus mehreren leicht unrunden Linien, wie gewachsen */
+    const pfad = (rad, wobbel) => { let s = ''; for (let k = 0; k <= 72; k++) { const w = k / 72 * 6.2832; const rr = rad + Math.sin(w * 3 + i) * wobbel + Math.sin(w * 7 + i * 2) * wobbel * .5; const x = mitte + Math.cos(w) * rr, y = mitte + Math.sin(w) * rr; s += (k ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1); } return s + 'Z'; };
+    teile += '<path class="ring" data-monat="' + i + '" d="' + pfad(r2, 1.2) + ' ' + pfad(r, 1.2) + '" fill-rule="evenodd" fill="' + f1 + '" opacity="' + kraft.toFixed(2) + '"><title>' + m.name + ': ' + m.worte.toLocaleString('de-DE') + ' Wörter an ' + m.tage + ' Tagen</title></path>';
+    teile += '<path d="' + pfad(r2, .8) + '" fill="none" stroke="' + f2 + '" stroke-width="' + (m.worte ? 1 : .4) + '" opacity=".75"/>';
+    /* Narbe: ein Monat ohne ein einziges Wort bekommt eine dunkle Kerbe */
+    if (!m.worte) { const w = (i / 12) * 6.2832 - 1.57; teile += '<path d="M' + (mitte + Math.cos(w) * r).toFixed(1) + ' ' + (mitte + Math.sin(w) * r).toFixed(1) + 'L' + (mitte + Math.cos(w + .06) * r2).toFixed(1) + ' ' + (mitte + Math.sin(w + .06) * r2).toFixed(1) + '" stroke="rgba(60,40,20,.45)" stroke-width="1.5"/>'; }
+    r = r2;
+  });
+  const kern = '<circle cx="' + mitte + '" cy="' + mitte + '" r="' + innen + '" fill="#5a4326"/><circle cx="' + mitte + '" cy="' + mitte + '" r="' + (innen * .45) + '" fill="#3a2a18"/>';
+  const rinde = '<circle cx="' + mitte + '" cy="' + mitte + '" r="' + (aussen + 3) + '" fill="none" stroke="#4a3420" stroke-width="6"/><circle cx="' + mitte + '" cy="' + mitte + '" r="' + (aussen + 7) + '" fill="none" stroke="#2c1e10" stroke-width="3" stroke-dasharray="3 2"/>';
+  const beschriftung = daten.monate.map((m, i) => { const w = (i / 12) * 6.2832 - 1.57 + .26; const rr = aussen + 20; return '<text x="' + (mitte + Math.cos(w) * rr).toFixed(1) + '" y="' + (mitte + Math.sin(w) * rr + 4).toFixed(1) + '" text-anchor="middle" font-size="10" font-family="ui-rounded, system-ui, sans-serif" fill="' + (hell ? '#6b5a42' : '#cdbb93') + '">' + m.name.slice(0, 3) + '</text>'; }).join('');
+  return '<svg class="jahresringe" viewBox="0 0 ' + groesse + ' ' + groesse + '" width="' + groesse + '" height="' + groesse + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Das Jahr ' + daten.jahr + ' in Ringen">' + rinde + teile + kern + beschriftung + '</svg>';
+}
+/* Das Fenster: Jahr wählen, Ringe ansehen, Monat antippen. */
+function zeigeJahresringe(jahr) {
+  const jahre = jahresringeJahre(D.stats.tage);
+  let aktuell = jahr || jahre[jahre.length - 1];
+  const bild = el('div', { class: 'ringe-bild' });
+  const unter = el('div', { class: 'ringe-unter' });
+  const liste = el('div', { class: 'ringe-liste' });
+  const titel = el('h2', {}, '');
+  const male = () => {
+    const daten = jahresringeDaten(D.stats.tage, aktuell);
+    titel.textContent = 'Das Jahr ' + aktuell + ' in Ringen';
+    bild.innerHTML = jahresringeSVG(daten, { groesse: Math.min(360, Math.max(240, (window.innerWidth || 400) - 80)), hell: !['tinte', 'kerze'].includes(D.einst.thema) });
+    unter.textContent = daten.gesamt ? daten.gesamt.toLocaleString('de-DE') + ' Wörter an ' + daten.tage + ' Tagen — der dickste Ring: ' + daten.monate.reduce((a, b) => (b.worte > a.worte ? b : a)).name : 'In diesem Jahr noch kein Wort — der Baum wartet.';
+    liste.innerHTML = '';
+    bild.querySelectorAll('.ring').forEach((p) => p.addEventListener('click', () => zeigeMonat(Number(p.dataset.monat))));
+  };
+  const zeigeMonat = (m) => {
+    const von = new Date(aktuell, m, 1).getTime(), bis = new Date(aktuell, m + 1, 1).getTime();
+    const docs = [...D.docs.values()].filter((d) => ['blatt', 'szene', 'seite', 'schnipsel'].includes(d.typ) && (d.text || '').trim() && ((d.angelegt >= von && d.angelegt < bis) || (d.geaendert >= von && d.geaendert < bis))).sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0)).slice(0, 30);
+    liste.innerHTML = '';
+    liste.append(el('div', { class: 'gruppe' }, RINGE_MONATE[m].toUpperCase() + ' ' + aktuell + ' · ' + docs.length + (docs.length === 1 ? ' Text' : ' Texte')));
+    if (!docs.length) liste.append(el('div', { class: 'ringe-leer' }, 'Nichts aus diesem Monat.'));
+    for (const d of docs) liste.append(el('button', { class: 'ringe-eintrag', onclick: () => { zu(); oeffneDoc(d); } }, el('b', {}, (d.titel || (d.text || '').split('\n')[0] || 'Ohne Titel').slice(0, 60)), el('small', {}, fmtDatum(d.geaendert || d.angelegt) + ' · ' + worte(d.text) + ' Wörter')));
+  };
+  const blaettern = el('div', { class: 'ringe-jahre' }, ...jahre.map((j) => el('button', { class: 'suchchip' + (j === aktuell ? ' an' : ''), onclick: (ev) => { aktuell = j; $$('button', blaettern).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); male(); } }, String(j))));
+  const kasten = el('div', { class: 'modal ringe-fenster' }, titel, blaettern, bild, unter, el('div', { class: 'ringe-hinweis' }, 'Jeder Ring ein Monat, von innen nach außen. Dick = viele Wörter, dünn = wenige, eine Kerbe = kein einziges. Tippen zeigt die Texte des Monats.'), liste,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf', onclick: async () => { try { const svg = bild.innerHTML; await navigator.clipboard.writeText(svg); toast('Das Bild liegt als SVG in der Zwischenablage.'); } catch (e) { toast('Kopieren ging hier nicht.'); } } }, 'Als SVG kopieren'), el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
+  const zu = zeigeDeck(kasten);
+  male();
 }
 
 /* ================================================================

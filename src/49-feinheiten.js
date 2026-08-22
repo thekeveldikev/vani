@@ -240,6 +240,7 @@ RENDER.feinheiten = function (haupt) {
   /* Ein Jahr aus Punkten: jeder Tag ein Kästchen, je dunkler, desto mehr Wörter. */
   const rasterWochen = (typeof innerWidth === 'number' && innerWidth < 620) ? 26 : 53;
   const raster = jahresRaster(D.stats.tage, rasterWochen);
+  const ringeKnopf = typeof zeigeJahresringe === 'function' ? el('button', { class: 'knopf', style: 'margin:6px 0 10px', onclick: () => zeigeJahresringe() }, 'Das Jahr in Ringen') : null;
   const jahr = el('div', { class: 'jahresraster', role: 'img', 'aria-label': 'Schreibtage der letzten ' + rasterWochen + ' Wochen' });
   for (const spalte of raster.spalten) {
     const sp = el('div', { class: 'jr-woche' });
@@ -250,7 +251,7 @@ RENDER.feinheiten = function (haupt) {
   inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Zahlen'),
     el('div', { class: 'karte' },
       el('div', { class: 'jahresraster-kopf' }, el('span', {}, rasterWochen === 53 ? 'Das letzte Jahr' : 'Das letzte halbe Jahr'), el('span', { class: 'jr-legende' }, schreibtage + (schreibtage === 1 ? ' Schreibtag' : ' Schreibtage') + ' insgesamt')),
-      jahr,
+      ringeKnopf, jahr,
       balken,
       el('div', { class: 'zahlenreihe' },
         el('div', { class: 'z' }, el('b', {}, gesamt.toLocaleString('de-DE')), el('span', {}, 'Wörter insgesamt')),

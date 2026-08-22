@@ -359,3 +359,51 @@ test('Sitzung: der Fundsatz ist der längste neue Satz', async () => {
   assert.equal(k.sitzungFundsatz('', ''), '');
   assert.equal(roh(k.saubereOrte(undefined)).raumklang, false);
 });
+
+test('Textlupe: Wiederholungen, Füllwörter, Rhythmus — pur', async () => {
+  const k = await frisch();
+  const l = roh(k.textLupe('Der Nebel kam plötzlich. Der Nebel blieb. Der Nebel ging sehr langsam, wirklich sehr langsam. Ein kurzer.'));
+  assert.equal(l.saetze, 4);
+  assert.ok(l.wiederholungen.some((w) => w.wort === 'nebel' && w.n === 3), 'nebel dreimal');
+  assert.ok(l.fuell.some((w) => w.wort === 'sehr' && w.n === 2));
+  assert.ok(l.laengster >= 7 && l.kuerzester === 2);
+  assert.ok(l.fuellAnteil > 0 && l.fuellAnteil < 50);
+  const leer = roh(k.textLupe(''));
+  assert.equal(leer.woerter, 0); assert.equal(leer.saetze, 0); assert.deepEqual(leer.wiederholungen, []);
+});
+
+test('Jahresringe: zwölf Monate, Anteile, Narben, Jahre; das Bild ist ein SVG mit zwölf Ringen', async () => {
+  const k = await frisch();
+  const tage = { '2025-01-03': 500, '2025-01-09': 300, '2025-07-20': 1600, '2024-12-31': 40, '2026-02-02': 10 };
+  const d = roh(k.jahresringeDaten(tage, 2025));
+  assert.equal(d.monate.length, 12); assert.equal(d.gesamt, 2400); assert.equal(d.tage, 3);
+  assert.equal(d.monate[0].worte, 800); assert.equal(d.monate[0].tage, 2); assert.equal(d.monate[6].anteil, 1);
+  assert.equal(d.monate[6].jahreszeit, 'sommer'); assert.equal(d.monate[11].jahreszeit, 'winter');
+  assert.deepEqual(roh(k.jahresringeJahre(tage)).slice(0, 3), [2024, 2025, 2026]);
+  const svg = k.jahresringeSVG(d, { groesse: 300 });
+  assert.ok(svg.startsWith('<svg') && (svg.match(/class="ring"/g) || []).length === 12);
+  assert.ok(svg.includes('Juli'));
+});
+
+test('Heute vor einem Jahr: nur gleicher Tag und Monat, ältere Jahre, das nächste zuerst', async () => {
+  const k = await frisch();
+  const heute = new Date(2026, 7, 24, 15).getTime();
+  const docs = [
+    { id: 'a', typ: 'blatt', text: 'vor einem Jahr geschrieben, lang genug', angelegt: new Date(2025, 7, 24, 9).getTime() },
+    { id: 'b', typ: 'blatt', text: 'vor zwei Jahren', angelegt: new Date(2024, 7, 24, 9).getTime() },
+    { id: 'c', typ: 'blatt', text: 'gestern', angelegt: new Date(2025, 7, 23, 9).getTime() },
+    { id: 'd', typ: 'heft', text: 'falscher Typ', angelegt: new Date(2025, 7, 24, 9).getTime() },
+    { id: 'e', typ: 'blatt', text: '', angelegt: new Date(2025, 7, 24, 9).getTime() }
+  ];
+  const f = roh(k.heuteVorEinemJahr(docs, heute));
+  assert.equal(f.doc.id, 'a'); assert.equal(f.jahre, 1);
+  assert.equal(k.heuteVorEinemJahr([], heute), null);
+  assert.equal(roh(k.heuteVorEinemJahr(docs.filter((x) => x.id !== 'a'), heute)).doc.id, 'b');
+});
+
+test('Salon-Briefe: Liste wird gesäubert und begrenzt', async () => {
+  const k = await frisch();
+  const l = roh(k.saubereSalonBriefe([{ an: 'king', docId: 'x', wann: 5, beantwortet: 'ja', frage: 'f' }, null, 'nix', { an: 7 }]));
+  assert.equal(l.length, 1); assert.equal(l[0].beantwortet, false); assert.equal(l[0].an, 'king');
+  assert.deepEqual(roh(k.saubereSalonBriefe(undefined)), []);
+});

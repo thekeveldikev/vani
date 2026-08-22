@@ -481,7 +481,8 @@ function schreibtischSignatur() {
     briefe.length, briefe.some((b) => briefIstOffen(b) && b.versiegelt), heft ? heft.id + ':' + (heft.geaendert || 0) : '',
     fund ? fund.id : '', typeof schreibtischKlangName === 'function' ? schreibtischKlangName() : '',
     typeof syncFremdAktiv === 'function' ? syncFremdAktiv() : false, (typeof teelichterWoche === 'function' ? teelichterWoche(D.stats.tage, D.einst.tagesziel) : []).map((t) => t.erreicht),
-    typeof papierkorbZahl === 'function' ? papierkorbZahl() : 0
+    typeof papierkorbZahl === 'function' ? papierkorbZahl() : 0,
+    (() => { const f = typeof heuteVorEinemJahr === 'function' ? heuteVorEinemJahr([...D.docs.values()]) : null; return f ? f.doc.id : ''; })()
   ]);
 }
 RENDER.schreibtisch = function (haupt) {
@@ -576,6 +577,9 @@ RENDER.schreibtisch = function (haupt) {
   });
   bord.append(el('button', { class: 'bord-fuss', title: 'Der Lesestapel: Bücher auflegen, ordnen', onclick: () => lesestapelZeigen() }, buecher.length ? (buecher.length > zeigbar ? '+' + (buecher.length - zeigbar) + ' · ' : '') + 'Lesestapel' : 'Bücher auflegen'));
   dinge.append(el('div', { class: 'desk-ding-halter buecher' }, bord, el('i', { class: 'bordbrett' })));
+  /* Heute vor einem Jahr: ein altes Blatt liegt auf dem Tisch */
+  const altesBlatt = typeof heuteVorEinemJahr === 'function' ? heuteVorEinemJahr([...D.docs.values()]) : null;
+  if (altesBlatt) dinge.append(baueAltesBlatt(altesBlatt));
   /* Das aufgeschlagene Buch: das zuletzt gelesene liegt offen da */
   if (buecher.length && e.offenesBuch) dinge.append(baueOffenesBuch(buecher[0], szene));
 

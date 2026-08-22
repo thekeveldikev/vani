@@ -72,7 +72,7 @@ function staendeVergleichen(doc, stand, jetztText) {
 
 /* ----- Die Sitzung ----- */
 function sitzungBeginnen(vorgabe = {}) {
-  const e = Object.assign({ minuten: 20, ziel: D.einst.tagesziel ? Math.min(D.einst.tagesziel, 500) : 300, klang: 'behalten', rat: true, kerze: true, woran: 'neu' }, D.einst.sitzung || {}, vorgabe);
+  const e = Object.assign({ minuten: 20, ziel: D.einst.tagesziel ? Math.min(D.einst.tagesziel, 500) : 300, klang: 'behalten', rat: true, kerze: true, woran: 'neu', atmen: false }, D.einst.sitzung || {}, vorgabe);
   const letzte = typeof schreibtischLetzteTexte === 'function' ? schreibtischLetzteTexte(3) : [];
   const wahl = (liste, lies, setze) => { const g = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' }); for (const [id, n] of liste) g.append(el('button', { class: lies() === id ? 'an' : '', onclick: (ev) => { setze(id); $$('button', g).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); } }, n)); return g; };
   const ziel = el('input', { type: 'text', inputmode: 'numeric', value: String(e.ziel || ''), placeholder: 'Wörter' });
@@ -88,13 +88,16 @@ function sitzungBeginnen(vorgabe = {}) {
     zeile('Klang', wahl(SITZUNG_KLANG, () => e.klang, (v) => { e.klang = v; })),
     el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, 'Kerze anzünden'), schalter(() => e.kerze, (v) => { e.kerze = v; })),
     el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, 'Ein Rat von der Wand'), schalter(() => e.rat, (v) => { e.rat = v; ratVorschau.style.display = v ? '' : 'none'; })),
+    el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, 'Eine Minute atmen vorher', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Vier ein, sechs aus — die Kerze atmet mit.')), schalter(() => e.atmen, (v) => { e.atmen = v; })),
     ratVorschau, el('button', { class: 'knopf zart', style: 'margin-top:4px', onclick: ratNeu }, 'Anderer Rat'),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Nicht jetzt'),
       el('button', { class: 'knopf voll', onclick: async () => {
         e.ziel = parseInt(ziel.value, 10) || 0;
-        D.einst.sitzung = { minuten: e.minuten, ziel: e.ziel, klang: e.klang, rat: e.rat, kerze: e.kerze, woran: 'neu' }; speichereEinst();
+        D.einst.sitzung = { minuten: e.minuten, ziel: e.ziel, klang: e.klang, rat: e.rat, kerze: e.kerze, woran: 'neu', atmen: e.atmen }; speichereEinst();
         zu();
-        await sitzungStarten(e, ratVorschau.querySelector('i') ? ratVorschau.querySelector('i').textContent : '');
+        const ratText = ratVorschau.querySelector('i') ? ratVorschau.querySelector('i').textContent : '';
+        if (e.atmen) await sitzungAtmen();
+        await sitzungStarten(e, ratText);
       } }, 'Los')));
   const zu = zeigeDeck(kasten);
 }
@@ -131,4 +134,29 @@ function sitzungBilanz(abgebrochen) {
     el('div', { class: 'reihe' }, el('button', { class: 'knopf', onclick: () => { zu(); sitzungBeginnen({ woran: s.docId }); } }, 'Noch eine Sitzung'), el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut so')));
   const zu = zeigeDeck(kasten);
   return true;
+}
+
+/* Eine Minute atmen: vier Sekunden ein, sechs aus, sechsmal. Die Flamme atmet mit. */
+function sitzungAtmen(sekunden = 60) {
+  return new Promise((fertig) => {
+    const kreis = el('div', { class: 'atem-kreis' }, el('i'));
+    const wort = el('div', { class: 'atem-wort' }, 'Ein');
+    const rest = el('div', { class: 'atem-rest' }, sekunden + ' Sekunden');
+    const kasten = el('div', { class: 'modal atem-fenster' }, el('h2', {}, 'Eine Minute atmen'), kreis, wort, rest, el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => ende() }, 'Überspringen')));
+    let laeuft = true, t0 = performance.now(), raf = 0;
+    const ende = () => { if (!laeuft) return; laeuft = false; cancelAnimationFrame(raf); zu(); fertig(); };
+    const zu = zeigeDeck(kasten, () => { if (laeuft) { laeuft = false; cancelAnimationFrame(raf); fertig(); } });
+    const tick = (jetzt) => {
+      if (!laeuft) return;
+      const s = (jetzt - t0) / 1000;
+      if (s >= sekunden) { ende(); return; }
+      const z = s % 10, ein = z < 4;                     /* 4 ein, 6 aus */
+      const u = ein ? z / 4 : 1 - (z - 4) / 6;
+      kreis.style.setProperty('--atem', (.55 + .45 * (ein ? Math.sin(u * Math.PI / 2) : Math.sin(u * Math.PI / 2))).toFixed(3));
+      wort.textContent = ein ? 'Ein' : 'Aus';
+      rest.textContent = Math.ceil(sekunden - s) + ' Sekunden';
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+  });
 }

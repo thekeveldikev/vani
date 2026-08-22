@@ -595,7 +595,7 @@ function salonRahmen(a, i, onclick) {
     el('div', { class: 'salon-schild' }, el('b', {}, a.name), el('span', {}, [a.jahre, a.woher].filter(Boolean).join(' · '))));
 }
 
-/* ----- Der Raum ----- */
+/* ----- Der Raum, Stufe drei: die Wand als gemaltes Zimmer, darunter die Konsole ----- */
 RENDER.salon = function (haupt) {
   const alle = salonAlle();
   const heute = tagKey();
@@ -606,19 +606,17 @@ RENDER.salon = function (haupt) {
   frage.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); fragen(); } });
   const kopf = el('div', { class: 'kopf' },
     el('h1', {}, 'Der Salon', el('div', { class: 'unter' }, 'Die Lieblingswand. Sie wissen, wie es geht — und sie reden, wenn man anklopft.')),
+    el('button', { class: 'rundknopf zart', html: ik('brief'), title: 'Einen Brief an die Wand schreiben', onclick: () => salonBriefSchreiben() }),
     el('button', { class: 'rundknopf zart', html: ik('plus'), title: 'Jemanden an die Wand hängen', onclick: () => salonEigenenAnlegen() }),
     el('button', { class: 'rundknopf zart', html: ik('klang'), title: 'Salon am Abend: Kaminknistern und die Uhr (Klang)', onclick: () => salonKlang() }),
     el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Über die Bilder', onclick: () => salonUeberBilder() }));
-  const frageZeile = el('div', { class: 'salon-fragezeile' }, el('span', { html: ik('suche'), style: 'display:flex;color:var(--blass)' }), frage, el('button', { class: 'knopf voll', onclick: fragen }, 'Die Runde fragen'));
-  const platz = (a, i) => {
-    const rat = salonRatDesTages(a, heute);
-    return el('div', { class: 'salon-platz' }, salonRahmen(a, i, () => salonSprechen(a)),
-      el('div', { class: 'salon-kurz' }, a.kurz || ''),
-      rat ? el('button', { class: 'salon-tageskarte', onclick: () => salonSprechen(a, { saat: salonHash(heute + ':' + a.id) }) }, el('span', { class: 'st-ueber' }, 'Rat des Tages'), el('span', { class: 'st-text' }, rat.text), el('span', { class: 'st-fuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden — in ' + (a.anrede || a.name) + 's Geist')) : null);
-  };
   const haus = alle.filter((a) => !a.gast && !a.eigen), gaeste = alle.filter((a) => a.gast), eigene = alle.filter((a) => a.eigen);
-  const galerie = el('div', { class: 'salon-galerie gemalt' }, ...haus.map(platz));
-  /* Der gemalte Raum hinter der Wand: Tapete, Vertäfelung, Wandleuchter, Kamin */
+  /* Die Wand: nur die Rahmen — oben die Hausherren, darunter kleiner die Gäste und die eigenen */
+  const reihe1 = el('div', { class: 'salon-reihe haus' }, ...haus.map((a, i) => salonRahmen(a, i, () => salonSprechen(a))));
+  const reihe2 = el('div', { class: 'salon-reihe gaeste' }, ...[...gaeste, ...eigene].map((a, i) => salonRahmen(a, i + 4, () => salonSprechen(a))));
+  const sessel = el('button', { class: 'salon-sessel', title: 'Setz dich: eine Sitzung beginnen', 'aria-label': 'Setz dich — Sitzung beginnen', onclick: () => { if (typeof sitzungBeginnen === 'function') sitzungBeginnen(); } });
+  const kamin = el('button', { class: 'salon-kaminknopf', title: 'Das Feuer: Klang an oder aus', 'aria-label': 'Kaminfeuer und Klang', onclick: () => salonKlang() });
+  const galerie = el('div', { class: 'salon-galerie gemalt zimmer' }, reihe1, reihe2, sessel, kamin);
   let maler = null;
   if (typeof salonMaler === 'function') {
     const leinwand = el('canvas', { class: 'salon-malerei', 'aria-hidden': 'true' });
@@ -627,17 +625,73 @@ RENDER.salon = function (haupt) {
     const beobachter = new MutationObserver(() => { if (!leinwand.isConnected) { maler.stopp(); beobachter.disconnect(); } });
     beobachter.observe(haupt, { childList: true });
   }
-  const gastwand = el('div', { class: 'salon-gaeste' }, el('div', { class: 'salon-abschnitt' }, 'Das Gästezimmer'), el('div', { class: 'salon-galerie klein' }, ...gaeste.map((a, i) => platz(a, i + 4))));
-  const eigenwand = eigene.length ? el('div', { class: 'salon-gaeste' }, el('div', { class: 'salon-abschnitt' }, 'Deine Wand'), el('div', { class: 'salon-galerie klein' }, ...eigene.map((a, i) => platz(a, i + 6)))) : null;
+  /* Die Konsole unter der Wand: Rat des Tages je Person, Aufgabe, Briefe */
+  const karten = el('div', { class: 'salon-konsole' });
+  for (const a of alle) {
+    const rat = salonRatDesTages(a, heute); if (!rat) continue;
+    karten.append(el('button', { class: 'salon-tageskarte', onclick: () => salonSprechen(a, { saat: salonHash(heute + ':' + a.id) }) },
+      el('span', { class: 'st-kopf' }, el('span', { class: 'st-mini' }, salonPortraet(a)), el('span', { class: 'st-ueber' }, 'Rat des Tages · ' + a.name.split(' ').pop())),
+      el('span', { class: 'st-text' }, rat.text), el('span', { class: 'st-fuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden — in ' + (a.anrede || a.name) + 's Geist')));
+  }
   const aufgabeHeute = (() => { const a = SALON_FEST[salonHash(heute + ':aufgabe') % SALON_FEST.length]; const l = a.aufgaben || []; return l.length ? { a, aufgabe: l[salonHash(heute + ':a') % l.length] } : null; })();
   const aufgabenkarte = aufgabeHeute ? el('button', { class: 'salon-aufgabe-heute', onclick: () => salonAufgabeAnnehmen(aufgabeHeute.a, aufgabeHeute.aufgabe) },
     el('span', { class: 'sa-foto' }, salonPortraet(aufgabeHeute.a)), el('span', { class: 'sa-text' }, el('b', {}, 'Schreibaufgabe des Tages · ' + aufgabeHeute.a.name), el('i', {}, aufgabeHeute.aufgabe.t), el('small', {}, (aufgabeHeute.aufgabe.min ? aufgabeHeute.aufgabe.min + ' Minuten' : 'ohne Uhr') + (aufgabeHeute.aufgabe.ziel ? ' · etwa ' + aufgabeHeute.aufgabe.ziel + ' Wörter' : '') + ' · tippen nimmt sie an'))) : null;
-  const sockel = el('div', { class: 'salon-sockel' });
-  wand.append(frageZeile, galerie, aufgabenkarte, gastwand, eigenwand, sockel,
+  const briefe = salonBriefeKarte();
+  const frageZeile = el('div', { class: 'salon-fragezeile' }, el('span', { html: ik('suche'), style: 'display:flex;color:var(--blass)' }), frage, el('button', { class: 'knopf voll', onclick: fragen }, 'Die Runde fragen'));
+  wand.append(galerie, frageZeile, karten, aufgabenkarte, briefe,
     el('div', { class: 'salon-fuss' }, 'Die Zitate sind echt und tragen ihre Quelle. Die Ratschläge sind erfunden, in ihrem Geist — zusammen ' + alle.reduce((n, a) => n + salonVorrat(a), 0).toLocaleString('de-DE') + ' mögliche, jeden Tag andere.'));
   haupt.append(kopf, wand);
   if (maler) maler.start();
+  salonBriefeNachsehen();
 };
+
+/* ----- Briefe an die Wand: man schreibt, und nach drei Tagen antwortet die Person ----- */
+function saubereSalonBriefe(roh) {
+  return (Array.isArray(roh) ? roh : []).filter((b) => b && typeof b === 'object' && typeof b.an === 'string').slice(-40).map((b) => ({ an: b.an.slice(0, 40), docId: typeof b.docId === 'string' ? b.docId.slice(0, 80) : '', wann: begrenze(b.wann, 0, 4102444800000, 0), beantwortet: b.beantwortet === true, frage: String(b.frage || '').slice(0, 200) }));
+}
+function salonBriefe() { return saubereSalonBriefe(D.einst.salonBriefe); }
+function salonBriefeSpeichern(liste) { D.einst.salonBriefe = saubereSalonBriefe(liste); speichereEinst(); }
+const SALON_ANTWORT_TAGE = 3;
+function salonBriefSchreiben(vorgewaehlt) {
+  const stimmen = SALON_FEST;
+  let an = vorgewaehlt || stimmen[0].id;
+  const wahl = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
+  for (const a of stimmen) wahl.append(el('button', { class: an === a.id ? 'an' : '', onclick: (ev) => { an = a.id; $$('button', wahl).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); } }, a.name.split(' ').pop()));
+  const kasten = el('div', { class: 'modal' }, el('h2', {}, 'Ein Brief an die Wand'),
+    el('p', { style: 'font-size:14px;line-height:1.5;color:var(--blass)' }, 'Du schreibst einen Brief — an wen du willst. Er landet bei deinen Blättern. Nach ' + SALON_ANTWORT_TAGE + ' Tagen liegt eine Antwort auf der Konsole: erfunden, in der Stimme der Person, aber zu dem, was du gefragt hast.'),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'An'), wahl),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Nicht jetzt'), el('button', { class: 'knopf voll', onclick: () => {
+      const a = salonFinde(an) || stimmen[0];
+      const b = blattAusText('Brief an ' + a.name, 'Liebe' + (a.id === 'funke' || a.id === 'lindgren' ? ' ' : 'r ') + (a.anrede || a.name) + ',\n\n');
+      salonBriefeSpeichern([...salonBriefe(), { an: a.id, docId: b.id, wann: Date.now(), beantwortet: false, frage: '' }]);
+      zu(); oeffneSchreibraum(b.id);
+      toast('Der Brief liegt bei den Blättern. In ' + SALON_ANTWORT_TAGE + ' Tagen kommt Antwort.', 3600);
+    } }, 'Schreiben')));
+  const zu = zeigeDeck(kasten);
+}
+/* Antworten, die fällig sind, werden als Schnipsel abgelegt — einmal. */
+function salonBriefeNachsehen() {
+  const liste = salonBriefe(); let geaendert = false;
+  for (const b of liste) {
+    if (b.beantwortet || Date.now() - b.wann < SALON_ANTWORT_TAGE * 86400000) continue;
+    const a = salonFinde(b.an); if (!a) { b.beantwortet = true; geaendert = true; continue; }
+    const brief = D.docs.get(b.docId);
+    const thema = brief ? salonThemaAusFrage(brief.text || '') : null;
+    const r1 = salonRat(a, salonHash(b.docId + ':1'), thema), r2 = salonRat(a, salonHash(b.docId + ':2'), null);
+    const anrede = brief && brief.titel ? '' : '';
+    const text = 'Antwort von ' + a.name + (brief ? ' auf „' + (brief.titel || 'deinen Brief') + '“' : '') + '\n\n' + (r1 ? r1.text : '') + (r2 && r2.text !== (r1 || {}).text ? '\n\n' + r2.text : '') + '\n\n— ' + (a.anrede || a.name) + ' (erfunden, in seinem Geist — aus dem Salon)' + anrede;
+    neuDoc('schnipsel', { text });
+    b.beantwortet = true; geaendert = true;
+    toast('Post von der Wand: ' + a.name + ' hat geantwortet — sie liegt in den Schnipseln.', 5000);
+  }
+  if (geaendert) salonBriefeSpeichern(liste);
+}
+function salonBriefeKarte() {
+  const offen = salonBriefe().filter((b) => !b.beantwortet);
+  if (!offen.length) return null;
+  return el('div', { class: 'salon-briefe' }, el('div', { class: 'salon-abschnitt' }, 'Briefe unterwegs'),
+    ...offen.map((b) => { const a = salonFinde(b.an); const rest = Math.max(0, Math.ceil((b.wann + SALON_ANTWORT_TAGE * 86400000 - Date.now()) / 86400000)); return el('button', { class: 'salon-brief', onclick: () => { const d = D.docs.get(b.docId); if (d) oeffneDoc(d); } }, el('span', { class: 'st-mini' }, a ? salonPortraet(a) : null), el('span', {}, el('b', {}, 'An ' + (a ? a.name : b.an)), el('small', {}, rest ? 'Antwort in ' + rest + (rest === 1 ? ' Tag' : ' Tagen') : 'Antwort kommt beim nächsten Besuch'))); }));
+}
 
 /* Ein Zitat zeigen: bei englischen Stimmen zuerst das Original, die Übersetzung auf Tipp. */
 function salonZitatElement(a, z, mitLesung) {

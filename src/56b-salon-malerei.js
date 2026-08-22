@@ -110,7 +110,10 @@ function salonMaler(canvas) {
     ctx.save(); ctx.beginPath(); ctx.rect(kx - kb * .34, ky + 26, kb * .68, kh - 30); ctx.clip();
     kerzeSchein(ctx, kx, fy - 10, kb * .7, kh * .9, [[0, 'rgba(255,150,60,.55)'], [.5, 'rgba(255,110,40,.25)'], [1, 'rgba(255,110,40,0)']]);
     ctx.fillStyle = '#3a2414'; for (const d of [-26, 0, 24]) { ctx.save(); ctx.translate(kx + d, fy - 6); ctx.rotate(d * .01); ctx.fillRect(-30, -5, 60, 10); ctx.restore(); }
-    for (const [dx, h, w, ph] of [[-22, 44, 16, 1], [-8, 58, 20, 2], [8, 52, 18, 3], [24, 40, 14, 4], [0, 30, 10, 5]]) flamme(kx + dx, fy - 10, h, w, ph);
+    /* Spielt das Kaminknistern, brennt das Feuer höher */
+    const kaminKlang = (D.einst && D.einst.ambience && D.einst.ambience.kamin) || 0;
+    const hoch = 1 + Math.min(.7, kaminKlang * 1.2);
+    for (const [dx, h, w, ph] of [[-22, 44, 16, 1], [-8, 58, 20, 2], [8, 52, 18, 3], [24, 40, 14, 4], [0, 30, 10, 5]]) flamme(kx + dx, fy - 10, h * hoch, w, ph);
     for (const f of funken) {
       f.y -= f.v * dt; f.x += Math.sin(t * 2 + f.ph) * .0015; if (f.y < 0) { f.y = 1; f.x = .3 + zuf() * .4; }
       const px = kx - kb * .3 + f.x * kb * .6, py = ky + 26 + f.y * (kh - 40);

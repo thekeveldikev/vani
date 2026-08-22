@@ -1848,3 +1848,48 @@ Kulissen in Projekte/Klang/Wörter/Feinheiten.
 Tests 163/163 (neu: Diktat-Säuberung, Wort-Diff inkl. Grenze, Fundsatz, Raumklang-Vorgabe).
 Browser: gemalter Salon (Leinwand 879×1293 gefüllt), Klangknopf, Sitzungsfenster mit Rat-Vorschau,
 Diktat-Knopf im Schreibraum (Chrome), Raumklang-Schalter in den Feinheiten.
+
+## 33. Das Zimmer, die Ringe, die Lupe — Runde 3 gebaut (24. August 2026, VANI 5.25.0)
+
+### Salon, Stufe drei
+- Die Wand ist ein Zimmer: `RENDER.salon` baut nur noch die Rahmen in die gemalte Galerie
+  (`.salon-galerie.zimmer`: Reihe „haus" mit vier, Reihe „gaeste" mit Gästen und eigenen
+  Leuten, darunter Vertäfelung und Kamin sichtbar); Kurzsätze und Rat des Tages wandern als
+  Karten auf die **Konsole** unter der Wand (`.salon-konsole`, Miniporträt je Karte).
+- **„Setz dich"**: unsichtbare Fläche über dem Sessel (`.salon-sessel`) startet die Sitzung;
+  eine Fläche über dem Kamin schaltet den Salon-Klang. Der **Kamin brennt höher, wenn das
+  Kaminknistern spielt** (Painter liest `D.einst.ambience.kamin`).
+- **Briefe an die Wand**: `salonBriefSchreiben(an)` legt ein Blatt „Brief an …" an (Anrede
+  vorausgefüllt) und merkt sich den Brief in `D.einst.salonBriefe` (`saubereSalonBriefe`, pur).
+  `salonBriefeNachsehen` (beim Betreten des Salons) legt nach drei Tagen eine **Antwort** als
+  Schnipsel ab — zwei Räte in der Stimme, Thema aus dem Brieftext (`salonThemaAusFrage`), klar
+  als erfunden markiert; Karte „Briefe unterwegs" mit Restzeit. Icon `brief` neu im Icon-Satz.
+### Orte, Stufe drei
+- Setzkasten-Lettern kommen aus den **Wörtern der Wortkisten** (`woerterInKiste('alle','','neu')`),
+  die Diele trägt **Jahreszeitendeko** an der Garderobe (Zweig/Blüte/Strohhut/Blatt), im
+  Musikzimmer sind die **Platten Klangbilder** (`KLANG_SZENEN` auflegen, „Nadel heben").
+### Runde 3
+- **Das Jahr in Ringen** (`src/59-jahresringe.js`): `jahresringeDaten(tage, jahr)` (12 Monate,
+  Anteil, Jahreszeit), `jahresringeJahre`, `jahresringeSVG` (unrunde Ringe, Kerbe für leere
+  Monate, Rinde, Monatsnamen); Fenster `zeigeJahresringe` mit Jahreswahl, Tipp auf einen Ring
+  listet die Texte des Monats, „Als SVG kopieren". Knopf in den Feinheiten (Statistik) und
+  Spotlight.
+- **Textlupe** (`src/45d-textlupe.js`): `textLupe(text)` (pur): Wiederholungen (≥ 3, ≥ 4 Zeichen,
+  Stoppwortliste), Füll-/Verstärkerwörter, Satzlängen (Mittel, längster, kürzester, Streuung),
+  Absätze; `zeigeTextlupe` mit Rhythmus-Balken, Chips und „Im Text markieren" (gelb/rosa im
+  Lesebogen). Im Schreibraum-Menü neben „Stand einfrieren".
+- **Klangkarte je Text**: `klangkarteMerken(doc)` beim Speichern (Textarea und Rich-Editor
+  über `beiSpeichern`), `doc.klang` (Sanitizer), `klangkarteAnbieten` beim Öffnen („Damals
+  lief: … — Wieder an"), wenn gerade nichts spielt.
+- **Pause nach 40 Minuten**: `pauseErinnerungStart/Stopp` (Schreibraum auf/zu), Einstellung
+  „Pause nach 40 Minuten" im Schreibraum (`D.einst.pausenErinnerung`, Standard an), leise Toasts.
+- **Atemminute vor der Sitzung**: Schalter „Eine Minute atmen vorher" (`e.atmen`),
+  `sitzungAtmen` — Kreis atmet 4 ein / 6 aus, sechsmal, überspringbar.
+- **Heute vor einem Jahr**: `heuteVorEinemJahr(docs, jetzt)` (pur) sucht einen Text vom selben
+  Tag und Monat aus einem früheren Jahr; `baueAltesBlatt` legt ihn als vergilbtes Blatt mit
+  Datum und Stempel „vor einem Jahr" auf den Tisch (links vorn); Tipp öffnet ihn. In der Signatur.
+- Diktat wird beim Schließen des Schreibraums sauber beendet.
+
+Tests 167/167 (neu: Textlupe, Jahresringe-Daten/Jahre/SVG, Heute-vor-einem-Jahr, Salon-Briefe).
+Browser: Zimmer mit zwei Rahmenreihen, Sessel- und Kaminfläche, sechs Konsolenkarten, Brief-Fenster,
+Jahresringe (12 Ringe, „841 Wörter an 1 Tagen"), Textlupe (6 Zahlen), altes Blatt auf dem Tisch.

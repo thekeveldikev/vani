@@ -225,3 +225,22 @@ function blattEinspannen(szene, e, blattId, fokus = true) {
   if (fokus) setTimeout(() => { feld.focus(); feld.setSelectionRange(feld.value.length, feld.value.length); }, 80);
   return blatt;
 }
+
+/* Heute vor einem Jahr: ein Text, der genau heute vor einem (oder mehr) Jahren entstand. Pur. */
+function heuteVorEinemJahr(docs, jetzt = Date.now()) {
+  const d = new Date(jetzt); const tag = d.getDate(), monat = d.getMonth(), jahr = d.getFullYear();
+  const treffer = [];
+  for (const x of docs || []) {
+    if (!x || !['blatt', 'szene', 'seite', 'schnipsel'].includes(x.typ) || !(x.text || '').trim()) continue;
+    const a = new Date(x.angelegt || 0);
+    if (a.getDate() === tag && a.getMonth() === monat && a.getFullYear() < jahr) treffer.push({ doc: x, jahre: jahr - a.getFullYear() });
+  }
+  treffer.sort((p, q) => p.jahre - q.jahre || worte(q.doc.text) - worte(p.doc.text));
+  return treffer[0] || null;
+}
+function baueAltesBlatt(fund) {
+  const d = fund.doc, a = new Date(d.angelegt || 0);
+  const datum = String(a.getDate()).padStart(2, '0') + '.' + String(a.getMonth() + 1).padStart(2, '0') + '.' + a.getFullYear();
+  return el('button', { class: 'desk-ding altesblatt', title: 'Heute vor ' + (fund.jahre === 1 ? 'einem Jahr' : fund.jahre + ' Jahren') + ': ' + (d.titel || (d.text || '').slice(0, 40)), onclick: () => oeffneDokument(d) },
+    el('div', { class: 'altesblatt-papier' }, el('span', { class: 'ab-datum' }, datum), el('b', {}, d.titel || (d.text || '').split('\n')[0].slice(0, 28) || 'Ohne Titel'), el('span', { class: 'ab-text' }, (d.text || '').replace(/\s+/g, ' ').slice(0, 150)), el('i', { class: 'ab-stempel' }, 'vor ' + (fund.jahre === 1 ? 'einem Jahr' : fund.jahre + ' Jahren'))));
+}

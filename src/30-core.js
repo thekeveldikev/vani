@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.24.0';
+const APP_VERSION = '5.25.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -215,6 +215,7 @@ async function teileText(text) {
 const IK = {
   zuhause: '<path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/>',
   sticker: '<path d="M5 7a2 2 0 0 1 2-2h7.5L19 9.5V17a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"/><path d="M14.5 5v4.5H19"/><path d="M8.5 13.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8"/>',
+  brief: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3.5 7l8.5 6.5L20.5 7"/><path d="M3.5 18l6-5.5M20.5 18l-6-5.5"/>',
   rahmen: '<rect x="4" y="3" width="16" height="18" rx="1.5"/><rect x="7.5" y="6.5" width="9" height="10"/><path d="M9 21v1.5M15 21v1.5"/><path d="M10.5 12.5c1-1.5 2-1.5 3 0"/>',
   schreibtisch: '<path d="M3 14h18"/><path d="M5 14v6M19 14v6"/><path d="M8 14v-3.5a2 2 0 0 1 2-2h1"/><path d="M14 5.5 12.5 10h4L15 5.5h-1Z"/><path d="M13.2 10.5v3.5"/><circle cx="7" cy="10.5" r="1.2"/>',
   lasso: '<path d="M12 4c4.4 0 8 2 8 4.8S16.4 13.6 12 13.6 4 11.6 4 8.8 7.6 4 12 4Z" stroke-dasharray="3 2.2"/><path d="M8.5 13.2c-.6 2.2-.2 4.3 1.4 6.3"/><circle cx="10.4" cy="20" r="1.2"/>',
@@ -342,7 +343,7 @@ const STANDARD_EINST = {
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
   stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
   ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95,
-  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null, sitzung: null
+  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null, sitzung: null, salonBriefe: [], pausenErinnerung: true
 };
 const D = {
   docs: new Map(),
@@ -542,6 +543,11 @@ function sauberesDokument(quelle) {
   if (d.sicht != null) {
     const s = d.sicht && typeof d.sicht === 'object' && !Array.isArray(d.sicht) ? d.sicht : {};
     d.sicht = { x: begrenze(s.x, -100000, 100000, 60), y: begrenze(s.y, -100000, 100000, 60), z: begrenze(s.z, .1, 5, 1) };
+  }
+  if (d.klang != null) {
+    const k = d.klang && typeof d.klang === 'object' && !Array.isArray(d.klang) ? d.klang : {};
+    const sauber = {}; for (const [id, v] of Object.entries(k).slice(0, 12)) if (typeof id === 'string' && Number.isFinite(Number(v))) sauber[id.slice(0, 40)] = begrenze(Number(v), 0, 1, 0);
+    d.klang = sauber;
   }
   if (d.typ === 'mentor') {
     const zeilen = (a) => (Array.isArray(a) ? a : []).filter((s) => typeof s === 'string').map((s) => s.slice(0, 600)).slice(0, 80);

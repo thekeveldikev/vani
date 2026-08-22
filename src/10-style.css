@@ -2499,3 +2499,67 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .inhalt, html[data-thema="ker
 #raum[data-ort="zuhause"] .karte, #raum[data-ort="hefte"] .karte { box-shadow: 0 8px 20px var(--schein), inset 0 0 0 1px var(--linie); }
 /* Die Lettern des Setzkastens kippen beim Darüberfahren */
 #raum[data-ort="woerter"] .wortkarte:hover { transform: translateY(-3px) rotate(var(--dreh, 0deg)); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 -2px 0 rgba(0,0,0,.4), 0 8px 14px rgba(0,0,0,.35); }
+
+/* ----- Salon, Stufe drei: die Wand ist ein Zimmer ----- */
+.salon-galerie.zimmer { display: block; padding: 30px 26px 150px; min-height: 520px; }
+.salon-reihe { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 26px 22px; justify-items: center; max-width: 1000px; margin: 0 auto; }
+.salon-reihe.haus .salon-rahmen { max-width: 230px; }
+.salon-reihe.gaeste { margin-top: 30px; grid-template-columns: repeat(auto-fit, minmax(140px, 170px)); justify-content: center; }
+.salon-reihe.gaeste .salon-rahmen { max-width: 170px; padding: 12px 12px 10px; }
+.salon-reihe.gaeste .salon-passepartout { padding: 8px; }
+.salon-reihe.gaeste .salon-schild b { font-size: 11.5px; } .salon-reihe.gaeste .salon-schild span { font-size: 8.5px; }
+.salon-reihe.gaeste .salon-lampe { width: 52px; margin-left: -26px; }
+.salon-sessel { position: absolute; z-index: 2; left: calc(50% - 18% - 260px); bottom: 16px; width: 100px; height: 120px; border-radius: 16px; background: transparent; cursor: pointer; }
+.salon-sessel:hover, .salon-sessel:focus-visible { box-shadow: 0 0 0 2px rgba(255,220,150,.35), 0 0 30px rgba(255,200,120,.3); outline: none; }
+.salon-sessel::after { content: "Setz dich"; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); font-size: 11px; letter-spacing: .08em; color: rgba(255,240,215,.75); white-space: nowrap; opacity: 0; transition: opacity .2s; }
+.salon-sessel:hover::after { opacity: 1; }
+.salon-kaminknopf { position: absolute; z-index: 2; left: calc(50% - 90px); bottom: 8px; width: 180px; height: 110px; background: transparent; border-radius: 8px; cursor: pointer; }
+.salon-kaminknopf:hover { box-shadow: 0 0 0 2px rgba(255,200,120,.3); }
+@media (max-width: 760px) { .salon-sessel { display: none; } .salon-galerie.zimmer { padding-bottom: 130px; } }
+.salon-konsole { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-top: 14px; }
+.salon-konsole .salon-tageskarte { max-width: none; transform: none; background: var(--karte); color: var(--tinte); box-shadow: 0 1px 5px var(--schein), inset 0 0 0 1px var(--linie); }
+.salon-konsole .st-kopf { display: flex; align-items: center; gap: 8px; }
+.st-mini { width: 26px; height: 32px; border-radius: 2px; overflow: hidden; flex: none; box-shadow: 0 0 0 2px #a8832f; background: #2a2422; display: inline-block; }
+.st-mini img { width: 100%; height: 100%; object-fit: cover; display: block; } .st-mini .salon-monogramm { font-size: 18px; }
+.salon-konsole .st-ueber { color: var(--blass); }
+.salon-konsole .st-fuss { color: var(--blass); }
+.salon-briefe { margin-top: 18px; }
+.salon-brief { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 10px 12px; margin-bottom: 6px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.salon-brief b { display: block; font-size: 14px; } .salon-brief small { font-size: 12px; color: var(--blass); }
+/* ----- Altes Blatt auf dem Tisch ----- */
+.desk-ding.altesblatt { left: 12%; top: calc(44% + 178px); width: 118px; height: 150px; --dreh: -5deg; }
+.altesblatt-papier { position: relative; width: 118px; height: 150px; padding: 26px 10px 10px; border-radius: 2px; background: linear-gradient(170deg, #efe2c2, #d9c79c); box-shadow: 0 3px 8px rgba(0,0,0,.55), inset 0 0 30px rgba(120,90,40,.25); color: #3a2a18; overflow: hidden; font-family: ui-serif, "New York", Georgia, serif; }
+.altesblatt-papier .ab-datum { position: absolute; left: 10px; top: 8px; font-size: 9px; letter-spacing: .08em; color: rgba(60,40,20,.7); }
+.altesblatt-papier b { display: block; font-size: 11px; line-height: 1.2; margin-bottom: 4px; }
+.altesblatt-papier .ab-text { display: block; font-size: 8px; line-height: 1.35; color: rgba(60,40,20,.75); max-height: 72px; overflow: hidden; }
+.altesblatt-papier .ab-stempel { position: absolute; right: 6px; bottom: 8px; padding: 2px 6px; border: 1.5px solid rgba(176,53,43,.6); border-radius: 3px; color: rgba(176,53,43,.75); font: 8px ui-rounded, system-ui, sans-serif; letter-spacing: .06em; text-transform: uppercase; transform: rotate(-8deg); }
+@media (max-width: 760px) { .desk-ding.altesblatt { left: 56%; top: calc(44% + 40%); transform: scale(.8); } }
+/* ----- Jahresringe ----- */
+.ringe-fenster { width: min(520px, calc(100vw - 32px)); max-height: min(88dvh, calc(var(--vvh, 100dvh) - 32px)); overflow: auto; }
+.ringe-jahre { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.ringe-bild { display: grid; place-items: center; margin: 4px 0; }
+.ringe-bild svg { max-width: 100%; height: auto; }
+.ringe-bild .ring { cursor: pointer; transition: opacity .2s; } .ringe-bild .ring:hover { opacity: 1 !important; filter: brightness(1.1); }
+.ringe-unter { font: italic 14px/1.5 ui-serif, "New York", Georgia, serif; text-align: center; margin: 4px 0 8px; }
+.ringe-hinweis { font-size: 12px; color: var(--blass); text-align: center; }
+.ringe-liste { margin-top: 10px; } .ringe-liste .gruppe { font-size: 11.5px; letter-spacing: .08em; color: var(--blass); margin: 8px 0 4px; }
+.ringe-eintrag { display: grid; width: 100%; text-align: left; padding: 8px 10px; border-radius: 10px; } .ringe-eintrag:hover { background: var(--karte); }
+.ringe-eintrag b { font-weight: 600; font-size: 14px; } .ringe-eintrag small { font-size: 12px; color: var(--blass); }
+.ringe-leer { font-style: italic; color: var(--blass); padding: 8px 10px; }
+/* ----- Textlupe ----- */
+.lupe-fenster { width: min(560px, calc(100vw - 32px)); max-height: min(88dvh, calc(var(--vvh, 100dvh) - 32px)); overflow: auto; }
+.lupe-zahlen { display: flex; flex-wrap: wrap; gap: 14px 20px; margin: 4px 0 12px; }
+.lupe-zahl { display: grid; gap: 1px; } .lupe-zahl b { font: 700 22px ui-serif, "New York", Georgia, serif; font-variant-numeric: tabular-nums; } .lupe-zahl span { font-size: 11.5px; color: var(--blass); }
+.lupe-titel { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--blass); margin: 12px 0 6px; }
+.lupe-rhythmus { display: flex; align-items: flex-end; gap: 2px; height: 60px; padding: 2px 0; overflow: hidden; }
+.lupe-rhythmus i { width: 4px; flex: none; border-radius: 2px 2px 0 0; background: var(--akzent2); opacity: .8; }
+.lupe-hinweis { font-size: 12.5px; color: var(--blass); margin-top: 6px; }
+.lupe-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.lupe-chips .suchchip.fuell { background: rgba(176,53,43,.1); }
+mark.lupe-wdh { background: rgba(255,196,90,.45); color: inherit; border-radius: 3px; } mark.lupe-fuell { background: rgba(176,53,43,.18); color: inherit; border-radius: 3px; }
+/* ----- Atem ----- */
+.atem-fenster { width: min(380px, calc(100vw - 32px)); text-align: center; }
+.atem-kreis { --atem: .6; width: 180px; height: 180px; margin: 10px auto; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle, rgba(255,200,120,.35), rgba(255,200,120,0) 70%); }
+.atem-kreis i { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle at 50% 40%, #ffe7b0, #e8a94e 60%, #b0552f); box-shadow: 0 0 40px rgba(255,180,90,.6); transform: scale(var(--atem)); transition: transform .12s linear; }
+.atem-wort { font: 600 24px ui-serif, "New York", Georgia, serif; }
+.atem-rest { font-size: 12.5px; color: var(--blass); margin-top: 4px; }

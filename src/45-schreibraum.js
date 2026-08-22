@@ -70,7 +70,7 @@ function oeffneSchreibraum(docId) {
   const istRich = doc.format === 'rich';
   let richPaket = null;
   const ta = istRich
-    ? (richPaket = baueRichEditor(doc, { class: 'sr-text', platzhalter: 'Schreib einfach. Der Rest der Welt wartet draußen.', warten: 500 })).editor
+    ? (richPaket = baueRichEditor(doc, { beiSpeichern: (d) => { if (typeof klangkarteMerken === 'function') klangkarteMerken(d); }, class: 'sr-text', platzhalter: 'Schreib einfach. Der Rest der Welt wartet draußen.', warten: 500 })).editor
     : el('textarea', { class: 'sr-text text', placeholder: 'Schreib einfach. Der Rest der Welt wartet draußen.' });
   if (!istRich) ta.value = doc.text || '';
   const spiegel = el('div', { class: 'sr-spiegel text', 'aria-hidden': 'true' });
@@ -127,10 +127,13 @@ function oeffneSchreibraum(docId) {
 
   const sichern = istRich ? richPaket.sichern : entprellt(() => {
     doc.text = ta.value;
+    if (typeof klangkarteMerken === 'function') klangkarteMerken(doc);
     speichere(doc);
     zaehleWorte(doc.id, doc.text);
   }, 500, true);
   _sr.sichern = sichern;
+  if (typeof klangkarteAnbieten === 'function') setTimeout(() => klangkarteAnbieten(doc), 900);
+  if (typeof pauseErinnerungStart === 'function') pauseErinnerungStart();
   /* Jeder Anschlag ist ein kleiner Luftzug für die Kerze. */
   ta.addEventListener('input', () => { if (_sr && _sr.sprint && _sr.sprint.kerze) _sr.sprint.kerze.puste(.22); });
 
@@ -215,6 +218,8 @@ function srSetzeText(text) {
 
 function schliesseSchreibraum(zurueck) {
   if (!_sr) return;
+  if (typeof pauseErinnerungStopp === 'function') pauseErinnerungStopp();
+  if (typeof _diktat !== 'undefined' && _diktat && typeof diktatStopp === 'function') diktatStopp();
   const sitzungOffen = typeof _sitzung !== 'undefined' && _sitzung && !_sr.sprint;
   if (typeof vorlesenStopp === 'function') vorlesenStopp();
   _sr.sichern && _sr.sichern.sofort();
@@ -349,9 +354,11 @@ function srEinstellungen() {
     zeileFuer('„Kluge Zeichen"', wahl([[true, 'An'], [false, 'Aus']], s.ersetzungen, (v) => { s.ersetzungen = v; })),
     zeileFuer('Autokorrektur', wahl([[true, 'An'], [false, 'Aus']], s.autokorrektur, (v) => { s.autokorrektur = v; })),
     zeileFuer('Vorlesetempo', wahl([[.8, 'Ruhig'], [.95, 'Normal'], [1.15, 'Zügig']], begrenze(s.vorleseTempo, .6, 1.4, .95), (v) => { s.vorleseTempo = v; })),
+    zeileFuer('Pause nach 40 Minuten', wahl([[true, 'Erinnern'], [false, 'Aus']], s.pausenErinnerung !== false, (v) => { s.pausenErinnerung = v; })),
     el('div', { class: 'reihe', style: 'justify-content:flex-start;flex-wrap:wrap;gap:8px' },
       el('button', { class: 'knopf', onclick: () => { zu(); sucheErsetze(); } }, el('span', { html: ik('suche'), style: 'display:flex' }), 'Suchen & Ersetzen'),
       el('button', { class: 'knopf', onclick: () => { zu(); friereEin(); } }, el('span', { html: ik('frieren'), style: 'display:flex' }), 'Stand einfrieren'),
+      typeof zeigeTextlupe === 'function' ? el('button', { class: 'knopf', onclick: () => { zu(); zeigeTextlupe(doc, srAktuellerText()); } }, el('span', { html: ik('suche'), style: 'display:flex' }), 'Textlupe') : null,
       (doc.staende && doc.staende.length) ? el('button', { class: 'knopf', onclick: () => { zu(); zeigeStaende(); } }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Frühere Stände (' + doc.staende.length + ')') : null,
       doc.format !== 'rich' ? el('button', { class: 'knopf', onclick: () => {
         doc.format = 'rich'; doc.rich = richAusText(srAktuellerText()); speichere(doc); zu();

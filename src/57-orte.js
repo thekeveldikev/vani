@@ -39,6 +39,8 @@ function orteKulisse(raum, haupt) {
       '<rect x="60" y="22" width="300" height="10" rx="3" fill="#c9a25a"/><g fill="#8a6a2e">' + [90, 150, 210, 270, 330].map((x) => '<circle cx="' + x + '" cy="38" r="4"/><rect x="' + (x - 2) + '" y="38" width="4" height="10"/>').join('') + '</g>' +
       '<path d="M130 48c-18 0-26 14-26 26h52c0-12-8-26-26-26z" fill="#2c2218"/><rect x="96" y="72" width="68" height="6" rx="3" fill="#2c2218"/>' +
       '<path class="ort-schal" d="M272 48c-6 20-2 40 4 60M284 48c6 20 2 40-4 60" stroke="#b0552f" stroke-width="9" fill="none" stroke-linecap="round"/>' +
+      /* Jahreszeit an der Garderobe: Zweig im Winter, Blüte im Frühling, Strohhut im Sommer, Blatt im Herbst */
+      (() => { const jz = typeof schreibtischJahreszeit === 'function' ? schreibtischJahreszeit() : 'sommer'; return jz === 'winter' ? '<path d="M210 48l0 40M210 60l-10-8M210 60l10-8M210 74l-10-8M210 74l10-8" stroke="#4a7a46" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="210" cy="52" r="4" fill="#c0392b"/>' : jz === 'fruehling' ? '<g fill="#e9a9b8"><circle cx="205" cy="52" r="5"/><circle cx="215" cy="52" r="5"/><circle cx="210" cy="46" r="5"/><circle cx="210" cy="58" r="5"/><circle cx="210" cy="52" r="3" fill="#f2d98a"/></g><path d="M210 60v26" stroke="#4a7a46" stroke-width="2.5"/>' : jz === 'sommer' ? '<ellipse cx="210" cy="58" rx="26" ry="7" fill="#d9b463"/><path d="M196 58c0-12 6-18 14-18s14 6 14 18" fill="#e8c878"/><path d="M196 56h28" stroke="#b0352b" stroke-width="3"/>' : '<path d="M210 46c-14 6-16 22-4 30 12-8 10-24 4-30z" fill="#c8873a"/><path d="M208 50l-2 26" stroke="#8a4a22" stroke-width="1.2"/>'; })() +
       /* Spiegel */
       '<ellipse cx="520" cy="60" rx="44" ry="52" fill="#d9e0e4"/><ellipse cx="520" cy="60" rx="40" ry="48" fill="url(#ortspiegel)"/><defs><linearGradient id="ortspiegel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3f6f5"/><stop offset=".5" stop-color="#cfd8db"/><stop offset="1" stop-color="#e8eeee"/></linearGradient></defs><ellipse cx="520" cy="60" rx="44" ry="52" fill="none" stroke="#c9a25a" stroke-width="5"/>' +
       /* Konsole mit Briefen */
@@ -100,8 +102,12 @@ function orteKulisse(raum, haupt) {
     ));
   } else if (r === 'woerter') {
     /* Setzkasten: Lettern aus den ersten Buchstaben der letzten Titel */
-    const buchstaben = [...new Set([...D.docs.values()].filter((d) => d.titel).sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0)).map((d) => d.titel.trim().slice(0, 1).toUpperCase()).filter((c) => /[A-ZÄÖÜ]/.test(c)))].slice(0, 12);
+    /* Lettern aus den Wörtern der Wortkisten — die neuesten zuerst; fehlen welche, aus den Titeln */
+    const woerterDa = typeof woerterInKiste === 'function' ? woerterInKiste('alle', '', 'neu').map((w) => String(w.text || '').trim()).filter(Boolean) : [];
+    const buchstaben = [...new Set(woerterDa.map((w) => w.slice(0, 1).toUpperCase()).filter((c) => /[A-ZÄÖÜ]/.test(c)))].slice(0, 12);
+    for (const d of [...D.docs.values()].filter((d) => d.titel).sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0))) { if (buchstaben.length >= 12) break; const c = d.titel.trim().slice(0, 1).toUpperCase(); if (/[A-ZÄÖÜ]/.test(c) && !buchstaben.includes(c)) buchstaben.push(c); }
     while (buchstaben.length < 12) buchstaben.push('VANISCHREIBT'[buchstaben.length]);
+    wrap.dataset.woerter = woerterDa.slice(0, 3).join(' · ');
     wrap.append(svg(
       '<rect x="40" y="14" width="720" height="96" rx="4" fill="#5a4326"/><rect x="46" y="20" width="708" height="84" fill="#3a2a18"/>' +
       buchstaben.map((c, i) => { const x = 62 + i * 57, y = 30 + (i % 2) * 30; return '<g><rect x="' + x + '" y="' + y + '" width="44" height="38" rx="3" fill="#2b2b2e"/><rect x="' + (x + 3) + '" y="' + (y + 3) + '" width="38" height="32" rx="2" fill="#3d3d42"/><text x="' + (x + 22) + '" y="' + (y + 27) + '" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-weight="700" font-size="22" fill="#d9d4c8" transform="scale(-1 1) translate(-' + (2 * x + 44) + ' 0)">' + c + '</text></g>'; }).join('')
@@ -116,6 +122,13 @@ function orteKulisse(raum, haupt) {
       /* Plattenhüllen links */
       [0, 1, 2, 3].map((i) => '<rect x="' + (80 + i * 28) + '" y="' + (40 + (i % 2) * 4) + '" width="26" height="70" rx="2" fill="' + ['#b0552f', '#5f7752', '#b8923f', '#4f7587'][i] + '" transform="rotate(' + (-6 + i * 3) + ' ' + (93 + i * 28) + ' 110)"/>').join('')
     ));
+    /* Die Platten sind Klangbilder: eine auflegen startet sie */
+    if (typeof KLANG_SZENEN !== 'undefined' && typeof mischungAnwenden === 'function') {
+      const platten = el('div', { class: 'ort-chips' });
+      for (const sz of KLANG_SZENEN.slice(0, 5)) platten.append(el('button', { class: 'ort-chip', onclick: async () => { try { await audioFreigeben(); mischungAnwenden({ ...sz.pegel }); toast('Die Nadel setzt auf: ' + sz.name, 2600); zeichne(); } catch (e) {} } }, '♪ ' + sz.name));
+      platten.append(el('button', { class: 'ort-chip still', onclick: async () => { try { mischungAnwenden({}); if (typeof ambienceMischungAnwenden === 'function') await ambienceMischungAnwenden({}); toast('Die Nadel hebt ab.'); zeichne(); } catch (e) {} } }, 'Nadel heben'));
+      wrap.append(platten);
+    }
   } else if (r === 'faden') {
     wrap.append(svg(
       '<rect x="0" y="104" width="800" height="16" fill="#6b4a32"/>' +
