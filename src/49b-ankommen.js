@@ -25,6 +25,7 @@ function whatsappZerlegen(roh) {
       if (jahr < 100) jahr += 2000;
       const wann = new Date(jahr, Number(m[2]) - 1, Number(m[1]), Number(m[4]), Number(m[5]), Number(m[6] || 0)).getTime();
       nachrichten.push({ wann: Number.isFinite(wann) ? wann : 0, wer: m[7].trim(), text: m[8] });
+    } else if (/^\u200e?\[?\d{1,2}\.\d{1,2}\.\d{2,4},?\s+\d{1,2}:\d{2}/.test(zeile)) { sonst++;   /* datierte Systemzeile mitten im Chat */
     } else if (nachrichten.length && zeile.trim()) {
       nachrichten[nachrichten.length - 1].text += '\n' + zeile;
     } else if (zeile.trim()) sonst++;

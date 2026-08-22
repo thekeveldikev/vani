@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.17.0';
+const APP_VERSION = '5.18.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -57,10 +57,18 @@ function entprellt(fn, ms, notfall) {
   const g = (...a) => { letzteArgs = a; clearTimeout(t); t = setTimeout(() => { letzteArgs = null; fn(...a); }, ms); };
   g.sofort = (...a) => { clearTimeout(t); letzteArgs = null; fn(...a); };
   g.haengt = () => letzteArgs !== null;
-  if (notfall) _spueler.push(() => { if (letzteArgs) { clearTimeout(t); const a = letzteArgs; letzteArgs = null; fn(...a); } });
+  if (notfall) {
+    /* notfall darf eine Funktion sein, die sagt, ob der Besitzer noch lebt — tote Spüler werden ausgetragen */
+    const sp = () => { if (letzteArgs) { clearTimeout(t); const a = letzteArgs; letzteArgs = null; fn(...a); } };
+    sp.lebt = typeof notfall === 'function' ? notfall : null;
+    _spueler.push(sp);
+    g.loesen = () => { const i = _spueler.indexOf(sp); if (i >= 0) _spueler.splice(i, 1); };
+  }
   return g;
 }
-function spueleAlles() { for (const s of _spueler) { try { s(); } catch (e) {} } }
+function spueleAlles() {
+  for (const s of [..._spueler]) { try { s(); } catch (e) {} if (s.lebt && !s.lebt()) { const i = _spueler.indexOf(s); if (i >= 0) _spueler.splice(i, 1); } }
+}
 
 const worte = (t) => { t = (t || '').trim(); return t ? t.split(/\s+/).length : 0; };
 
@@ -319,7 +327,8 @@ const STANDARD_EINST = {
   autoSeitenwechsel: true, schnipselAnsicht: 'lauf', blattSortierung: 'zuletzt', hefteAnsicht: 'karten',
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
   stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
-  ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95
+  ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95,
+  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null
 };
 const D = {
   docs: new Map(),
@@ -340,6 +349,8 @@ function uebernehmeEinstellungen(quelle) {
   D.einst.tagesziel = Math.round(begrenze(D.einst.tagesziel, 0, 10000000, 0));
   D.einst.stiftDicke = begrenze(D.einst.stiftDicke, 1, 24, 3.5);
   D.einst.stiftFarbe = /^#[0-9a-f]{6}$/i.test(D.einst.stiftFarbe || '') ? D.einst.stiftFarbe : '#2c251c';
+  D.einst.stickerDicke = begrenze(D.einst.stickerDicke, 1, 24, 5);
+  D.einst.stickerFarbe = /^#[0-9a-f]{6}$/i.test(D.einst.stickerFarbe || '') ? D.einst.stickerFarbe : '#c8322b';
   D.einst.sperreNachMinuten = Math.round(begrenze(D.einst.sperreNachMinuten, 0, 240, 10));
   D.einst.thema = ['papier', 'tinte', 'kerze', 'nebel', 'weiss'].includes(D.einst.thema) ? D.einst.thema : 'papier';
   D.einst.schrift = ['serife', 'klar', 'mono'].includes(D.einst.schrift) ? D.einst.schrift : 'serife';
@@ -499,11 +510,11 @@ function sauberesDokument(quelle) {
       h: begrenze(q2.h, 40, 6000, 300)
     };
   }
-  if (d.pos != null) {
+  if (d.pos != null && !['gruppe', 'brettbild'].includes(d.typ)) {
     const p = d.pos && typeof d.pos === 'object' && !Array.isArray(d.pos) ? d.pos : {};
     d.pos = {
       x: begrenze(p.x, -100000, 100000, 0), y: begrenze(p.y, -100000, 100000, 0),
-      rot: begrenze(p.rot, -360, 360, 0), w: begrenze(p.w, 8, 2000, 30)
+      rot: begrenze(p.rot, -360, 360, 0), w: begrenze(p.w, 5, 2000, 30)
     };
   }
   if (d.freiPos != null) {
@@ -520,7 +531,7 @@ function sauberesDokument(quelle) {
   if (d.staende != null) {
     d.staende = Array.isArray(d.staende) ? d.staende.slice(-20).filter((s) => s && typeof s === 'object').map((s) => ({
       wann: begrenze(s.wann, 0, Date.now() + 86400000, Date.now()),
-      titel: String(s.titel || '').slice(0, 1000), text: String(s.text || '').slice(0, 10000000)
+      titel: String(s.titel || '').slice(0, 1000), text: String(s.text || '').slice(0, 10000000), ...(s.auto ? { auto: true } : {})
     })) : [];
   }
   if (d.pegel != null) {
@@ -579,7 +590,20 @@ function neuDoc(typ, felder) {
   D.stats.letzte[d.id] = worte(d.text || '');
   return d;
 }
-function speichere(d) { d.geaendert = Date.now(); markiereAenderung(d, false); dbPut('docs', d).catch(() => {}); }
+function speichere(d) { d.geaendert = Date.now(); staendeAutomatisch(d); markiereAenderung(d, false); dbPut('docs', d).catch(() => {}); }
+/* Rückgängig-Verlauf: alle 15 Minuten friert das Speichern den Text still ein (höchstens 20 Stände,
+   automatische weichen zuerst). Pur bis auf die Uhr. */
+const STAENDE_ABSTAND = 15 * 60000;
+function staendeAutomatisch(d, jetzt = Date.now()) {
+  if (!d || typeof d.text !== 'string' || d.text.length < 120) return false;
+  if (!['blatt', 'szene', 'seite', 'schnipsel'].includes(d.typ)) return false;
+  const st = d.staende = Array.isArray(d.staende) ? d.staende : [];
+  const letzter = st[st.length - 1];
+  if (letzter && (jetzt - letzter.wann < STAENDE_ABSTAND || letzter.text === d.text)) return false;
+  st.push({ wann: jetzt, titel: d.titel || '', text: d.text, auto: true });
+  while (st.length > 20) { const i = st.findIndex((s) => s.auto); st.splice(i >= 0 ? i : 0, 1); }
+  return true;
+}
 function speichereStill(d) { markiereAenderung(d, false); dbPut('docs', d).catch(() => {}); }
 
 /* Löschen ist bei VANI nie endgültig: alles wandert erst in den Papierkorb. */
@@ -651,10 +675,10 @@ async function papierkorbLeeren(nurAelterAlsTage) {
   const grenze = nurAelterAlsTage ? Date.now() - nurAelterAlsTage * 86400000 : Infinity;
   for (const b of alle) {
     if (nurAelterAlsTage && b.wann > grenze) continue;
+    /* Medien nur löschen, wenn kein lebendes Dokument sie noch braucht (ein Buch aus dem Goodnotes-Archiv teilt die Datei) */
+    const nochGenutzt = (id) => { for (const x of D.docs.values()) if (x.bild === id || x.skizze === id || x.datei === id || x.skizzeBasis === id) return true; return false; };
     for (const d of b.docs) {
-      if (d.bild) { await dbDel('media', d.bild); if (typeof loeseMedienURL === 'function') loeseMedienURL(d.bild); }
-      if (d.skizze) { await dbDel('media', d.skizze); if (typeof loeseMedienURL === 'function') loeseMedienURL(d.skizze); }
-      if (d.datei) { await dbDel('media', d.datei); if (typeof loeseMedienURL === 'function') loeseMedienURL(d.datei); }
+      for (const feld of ['bild', 'skizze', 'datei', 'skizzeBasis']) { const id = d[feld]; if (id && !nochGenutzt(id)) { await dbDel('media', id); if (typeof loeseMedienURL === 'function') loeseMedienURL(id); } }
       delete D.stats.letzte[d.id];
     }
     await dbDel('papierkorb', b.id);

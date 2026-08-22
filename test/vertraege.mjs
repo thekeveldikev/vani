@@ -560,7 +560,7 @@ test('Ruhe-Vertrag: Sync zeichnet nicht mitten ins Schreiben, volle Seiten reich
   const s = lies('src/31-sync.js');
   /* Nur Unterschiede übernehmen, in das vorhandene Objekt hinein (offene Editoren
      halten es), und neu zeichnen nur, wenn sich etwas änderte — nie beim Tippen. */
-  assert.match(s, /if \(alt && syncGleich\(alt, d\)\) continue;/);
+  assert.match(s, /if \(alt && syncGleich\(ohneIntern\(alt\), ohneIntern\(d\)\)\) continue;/);
   assert.match(s, /Object\.assign\(alt, d\);/);
   assert.match(s, /if \(!veraendert && !_sync\.zeichnenAusstehend\) return;/);
   assert.match(s, /function syncSchreibtGerade/);

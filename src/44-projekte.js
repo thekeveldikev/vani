@@ -102,7 +102,7 @@ async function projektMenue(p, danach) {
   } else if (wahl === 'weg') {
     if (await frage('„' + p.titel + '" mit allem darin in den Papierkorb legen?', { ja: 'In den Papierkorb', gefahr: true })) {
       await loesche(p.id);
-      location.hash = '#/projekte';
+      if (location.hash === '#/projekte') zeichne(); else location.hash = '#/projekte';
       return;
     }
   }
@@ -276,7 +276,7 @@ function baueSzenenkarte(s, p) {
 
   const notizFeld = el('textarea', { placeholder: 'Zweifel, Ideen, Alternativen — nur für dich.' });
   notizFeld.value = s.notiz || '';
-  notizFeld.addEventListener('input', entprellt(() => { s.notiz = notizFeld.value; speichereStill(s); }, 400));
+  notizFeld.addEventListener('input', entprellt(() => { s.notiz = notizFeld.value; speichereStill(s); }, 400, () => notizFeld.isConnected));
   notizFeld.addEventListener('pointerdown', (e) => e.stopPropagation());
 
   const statusFolge = ['funke', 'entwurf', 'steht'];

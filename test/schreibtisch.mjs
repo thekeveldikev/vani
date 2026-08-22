@@ -14,7 +14,7 @@ const roh = (x) => JSON.parse(JSON.stringify(x));
 
 test('saubererSchreibtisch: Vorgaben, Grenzen, nur bekannte Hölzer', async () => {
   const k = await frisch();
-  assert.deepEqual(roh(k.saubererSchreibtisch(undefined)), { holz: 'nuss', lampe: .8, lampeAn: true, kerzen: true, wetterFolgtKlang: true, unordnung: .7, verse: true, uhrTickt: false, wachs: 0, kerzenGewechselt: 0 });
+  assert.deepEqual(roh(k.saubererSchreibtisch(undefined)), { holz: 'nuss', lampe: .8, lampeAn: true, kerzen: true, wetterFolgtKlang: true, unordnung: .7, verse: true, uhrTickt: false, wachs: 0, kerzenGewechselt: 0, kleckse: [], federKratzt: false, offenesBuch: true, blattId: null });
   const w = roh(k.saubererSchreibtisch({ holz: 'plastik', lampe: 9, kerzen: false, unordnung: -1, verse: 'ja', wachs: 99999, lampeAn: false, uhrTickt: true }));
   assert.equal(w.holz, 'nuss'); assert.equal(w.lampe, 1); assert.equal(w.kerzen, false); assert.equal(w.unordnung, 0); assert.equal(w.verse, true);
   assert.equal(w.wachs, 1200, 'Wachs endet bei zwanzig Stunden'); assert.equal(w.lampeAn, false); assert.equal(w.uhrTickt, true);
@@ -84,8 +84,10 @@ test('buchFortschritt und saubereLeseEinstellung', async () => {
   assert.equal(k.buchFortschritt(999, 200), 100);
   assert.equal(k.buchFortschritt(-3, 200), 0);
   const e = roh(k.saubereLeseEinstellung({ helligkeit: 0, waerme: 2, nacht: 'ja', doppel: 'manchmal', zoom: 'riesig', blaettern: false }));
-  assert.deepEqual(e, { helligkeit: .4, waerme: 1, nacht: false, doppel: 'auto', blaettern: false, zoom: 'seite' });
-  assert.deepEqual(roh(k.saubereLeseEinstellung(null)), { helligkeit: 1, waerme: .15, nacht: false, doppel: 'auto', blaettern: true, zoom: 'seite' });
+  const rest = { stimme: null, rand: false, epubSchrift: 'serif', epubGroesse: 19, epubZeile: 1.6, epubRand: 36 };
+  assert.deepEqual(e, { helligkeit: .4, waerme: 1, nacht: false, doppel: 'auto', blaettern: false, zoom: 'seite', ...rest });
+  assert.deepEqual(roh(k.saubereLeseEinstellung(null)), { helligkeit: 1, waerme: .15, nacht: false, doppel: 'auto', blaettern: true, zoom: 'seite', ...rest });
+  assert.deepEqual(roh(k.saubereLeseEinstellung({ stimme: 'Anna', rand: true, epubSchrift: 'sans', epubGroesse: 99, epubZeile: 1, epubRand: 1 })).epubGroesse, 28);
 });
 
 test('isbnZu10 und isbnAusText: Prüfziffer, Bindestriche, Impressumszeilen', async () => {
@@ -107,4 +109,92 @@ test('saubererAutor: Katalogzeilen werden zu Namen', async () => {
   assert.equal(k.saubererAutor('Stephen King'), 'Stephen King');
   assert.equal(k.saubererAutor('Tolkien, John R'), 'John R Tolkien');
   assert.equal(k.saubererAutor(''), '');
+});
+
+/* ----- Die nächste Welle: der Tisch lebt, EPUB, Spotlight, Stände ----- */
+test('schreibtischAlter, leuchterWoche, teelichterWoche, leseSerie, saubereKleckse', async () => {
+  const k = await frisch();
+  assert.deepEqual(roh(k.schreibtischAlter({ a: 50000, b: 70000 })), { worte: 120000, ringe: 2, abnutzung: .48 });
+  assert.equal(k.schreibtischAlter(null).ringe, 1);
+  assert.equal(k.schreibtischAlter({ a: 9e6 }).ringe, 6);
+  /* Mittwoch, 19. August 2026 */
+  const mi = new Date(2026, 7, 19, 12).getTime();
+  const tage = { '2026-08-17': 300, '2026-08-18': 0, '2026-08-19': 120, '2026-08-22': 50 };
+  const w = roh(k.leuchterWoche(tage, mi));
+  assert.equal(w.length, 7);
+  assert.deepEqual(w.map((t) => t.tag), ['2026-08-17', '2026-08-18', '2026-08-19', '2026-08-20', '2026-08-21', '2026-08-22', '2026-08-23']);
+  assert.deepEqual(w.map((t) => t.brennt), [true, false, true, true, true, true, true], 'Dienstag ohne Wörter ist erloschen');
+  assert.ok(w[2].heute && !w[2].zukunft && w[3].zukunft && w[0].vorbei);
+  assert.deepEqual(roh(k.teelichterWoche(tage, 100, mi)).map((t) => t.erreicht), [true, false, true, false, false, false, false]);
+  assert.deepEqual(roh(k.teelichterWoche(tage, 0, mi)), [], 'ohne Ziel keine Teelichter');
+  const heute = new Date(2026, 7, 19, 20).getTime();
+  const ls = roh(k.leseSerie([{ statistik: { '2026-08-19': 3, '2026-08-18': 2 } }, { statistik: { '2026-08-17': 1, '2026-08-19': 1 } }], heute));
+  assert.equal(ls.heute, 4); assert.equal(ls.serie, 3);
+  assert.equal(roh(k.leseSerie([], heute)).serie, 0);
+  assert.deepEqual(roh(k.saubereKleckse([{ x: 2, y: -1, r: 99, s: 5.7 }, null, 'x'])), [{ x: 1, y: 0, r: 9, s: 6 }]);
+  assert.equal(roh(k.saubereKleckse(Array.from({ length: 60 }, (_, i) => ({ x: .5, y: .5, r: 2, s: i })))).length, 40);
+});
+
+test('staendeAutomatisch: alle 15 Minuten ein stiller Stand, höchstens 20, automatische weichen zuerst', async () => {
+  const k = await frisch();
+  const d = { typ: 'blatt', text: 'x'.repeat(200), titel: 'T' };
+  const t0 = 1000000;
+  assert.equal(k.staendeAutomatisch(d, t0), true);
+  assert.equal(k.staendeAutomatisch(d, t0 + 60000), false, 'zu früh');
+  d.text = 'y'.repeat(200);
+  assert.equal(k.staendeAutomatisch(d, t0 + 16 * 60000), true);
+  assert.equal(k.staendeAutomatisch(d, t0 + 40 * 60000), false, 'unveränderter Text');
+  assert.equal(k.staendeAutomatisch({ typ: 'blatt', text: 'kurz' }, t0), false);
+  assert.equal(k.staendeAutomatisch({ typ: 'heft', text: 'x'.repeat(300) }, t0), false);
+  const voll = { typ: 'szene', text: 'a'.repeat(200), staende: [{ wann: 1, titel: '', text: 'hand' }, ...Array.from({ length: 19 }, (_, i) => ({ wann: 2 + i, titel: '', text: 'auto' + i, auto: true }))] };
+  assert.equal(k.staendeAutomatisch(voll, t0 + 1e9), true);
+  assert.equal(voll.staende.length, 20);
+  assert.equal(voll.staende[0].text, 'hand', 'der von Hand eingefrorene bleibt');
+  assert.ok(voll.staende[voll.staende.length - 1].auto);
+});
+
+test('zipEintraege/zipLies: gespeichert und deflate, istEpub', async () => {
+  const k = await frisch();
+  const { deflateRawSync } = await import('node:zlib');
+  const te = new TextEncoder();
+  const eintraege = [['mimetype', te.encode('application/epub+zip'), 0], ['OEBPS/a.xhtml', te.encode('<html><body><p>Hallo Welt</p></body></html>'), 8]];
+  const teile = [], cd = []; let off = 0;
+  const le16 = (n) => [n & 255, n >> 8 & 255], le32 = (n) => [n & 255, n >> 8 & 255, n >> 16 & 255, n >>> 24 & 255];
+  for (const [name, daten, methode] of eintraege) {
+    const nb = te.encode(name), comp = methode === 8 ? new Uint8Array(deflateRawSync(daten)) : daten;
+    const lokal = new Uint8Array([0x50, 0x4b, 3, 4, ...le16(20), ...le16(0), ...le16(methode), ...le16(0), ...le16(0), ...le32(0), ...le32(comp.length), ...le32(daten.length), ...le16(nb.length), ...le16(0), ...nb, ...comp]);
+    cd.push(new Uint8Array([0x50, 0x4b, 1, 2, ...le16(20), ...le16(20), ...le16(0), ...le16(methode), ...le16(0), ...le16(0), ...le32(0), ...le32(comp.length), ...le32(daten.length), ...le16(nb.length), ...le16(0), ...le16(0), ...le16(0), ...le16(0), ...le32(0), ...le32(off), ...nb]));
+    teile.push(lokal); off += lokal.length;
+  }
+  const cdLen = cd.reduce((a, c) => a + c.length, 0);
+  const eocd = new Uint8Array([0x50, 0x4b, 5, 6, ...le16(0), ...le16(0), ...le16(cd.length), ...le16(cd.length), ...le32(cdLen), ...le32(off), ...le16(0)]);
+  const alle = new Uint8Array([...teile.flatMap((t) => [...t]), ...cd.flatMap((c) => [...c]), ...eocd]);
+  const bytes = alle.buffer.slice(alle.byteOffset, alle.byteOffset + alle.byteLength);
+  const z = k.zipEintraege(bytes);
+  assert.deepEqual([...z.keys()], ['mimetype', 'OEBPS/a.xhtml']);
+  assert.equal(z.get('OEBPS/a.xhtml').methode, 8);
+  assert.equal(new TextDecoder().decode(await k.zipLies(bytes, z.get('mimetype'))), 'application/epub+zip');
+  if (typeof DecompressionStream !== 'undefined') {
+    assert.equal(new TextDecoder().decode(await k.zipLies(bytes, z.get('OEBPS/a.xhtml'))), '<html><body><p>Hallo Welt</p></body></html>');
+  }
+  assert.equal(k.istEpub(bytes, 'buch.bin'), true);
+  assert.equal(k.istEpub(new Uint8Array(80).buffer, 'x.pdf'), false);
+  assert.equal(k.istEpub(null, 'roman.epub'), true);
+  assert.throws(() => k.zipEintraege(new Uint8Array(30).buffer), /Kein ZIP/);
+});
+
+test('spotlightTreffer: Titel vor Text, Gruppenname, Grenze', async () => {
+  const k = await frisch();
+  const docs = [
+    { id: '1', typ: 'blatt', titel: 'Der Nebel', text: 'morgens', geaendert: 5 },
+    { id: '2', typ: 'schnipsel', titel: '', text: 'Im Nebel stand ein Haus', geaendert: 9 },
+    { id: '3', typ: 'seite', titel: 'Regen', text: 'nichts', geaendert: 1 },
+    { id: '4', typ: 'heft', titel: 'Nebelheft', text: '', geaendert: 2 }
+  ];
+  const t = roh(k.spotlightTreffer('nebel', docs));
+  assert.equal(t.length, 3, 'Regen passt nicht');
+  assert.deepEqual(t.map((x) => x.d.id), ['1', '4', '2'], 'Titeltreffer zuerst, darin jüngste zuerst, dann Texttreffer');
+  assert.ok(t[2].gruppe);
+  assert.deepEqual(roh(k.spotlightTreffer('n', docs)), []);
+  assert.ok(k.TASTENKUERZEL.length >= 4 && k.TASTENKUERZEL[0][1].some((z) => /Spotlight/.test(z[1])));
 });

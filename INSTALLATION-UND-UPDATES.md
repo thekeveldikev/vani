@@ -139,3 +139,19 @@ und reisen von dort über den privaten Bereich auf Handy und Laptop. Danach darf
 der Koffer aus dem Repo verschwinden. Packen: `node werkzeug/buecherkoffer.mjs
 <Ordner-mit-PDFs>` — das Werkzeug zeigt das Passwort einmal an; es steht
 nirgends sonst.
+
+## EPUB-Bücher, Spotlight, Blatt einspannen (5.18)
+
+- **EPUB**: Lesestapel → „Bücher auflegen" nimmt `.epub` genauso wie PDF; auch über den
+  Bücherkoffer und (Desktop) den Ordner „VANI-Bücher". Der EPUB-Leser setzt den Text selbst
+  (Schrift, Größe, Zeilenabstand, Rand in den Leseeinstellungen), blättert seitenweise,
+  kennt Inhalt, Lesezeichen, Zitat, Randnotizen und Vorlesen.
+- **Spotlight**: ⌘/Strg+K öffnet eine Suchzeile mit Vorschau; ↑↓ wählen, Enter öffnet,
+  „>" zeigt Befehle (Räume, neues Blatt, Sicherung …). „?" außerhalb eines Feldes zeigt
+  alle Tastaturkürzel. ⌘/Strg+⇧+K öffnet die große Suche.
+- **Schreibtisch**: Tintenfass → „Blatt einspannen" legt ein Blatt auf den Tisch, das
+  dort getippt wird (Esc legt es weg; es bleibt bei den Blättern). Das zuletzt gelesene
+  Buch liegt aufgeschlagen da. Mit Tagesziel brennen Teelichter auf der Fensterbank je
+  erreichtem Tag; der Leuchter zeigt die Woche.
+- **Stände**: Alle 15 Minuten friert VANI beim Speichern still einen Stand ein (höchstens
+  20; „Frühere Stände" im Schreibraum zeigt sie mit „· automatisch").

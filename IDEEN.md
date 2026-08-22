@@ -102,7 +102,7 @@ darüber). Neue Gedanken:
   später (eigener Renderer, kein pdf.js).
 - **Siegelwachs**: Brief an mich mit eigenem Siegelbild (Sticker).
 
-## Die nächste große Welle — Brainstorm (nach 5.17)
+## Die nächste große Welle — Brainstorm (nach 5.17) — UMGESETZT in 5.18 (Details: CLAUDE-UEBERNAHME §25)
 
 **Der Schreibtisch als Ort, der lebt**
 - Tag/Nacht auch im Raum: bei Tag fällt graues Licht durchs Fenster auf die Platte (weicher Streifen), die Lampe ist dann fast aus; Dämmerung färbt die Kante der Dinge.

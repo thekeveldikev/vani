@@ -473,7 +473,7 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
 
   /* Titel + Text */
   const titel = el('input', { class: 'stitel serif', type: 'text', value: seite.titel || '', placeholder: 'Überschrift, wenn du magst' });
-  titel.addEventListener('input', entprellt(() => { seite.titel = titel.value; speichere(seite); }, 400));
+  titel.addEventListener('input', entprellt(() => { seite.titel = titel.value; speichere(seite); }, 400, () => titel.isConnected));
 
   let text, formatleiste = null;
   if (seite.format === 'rich') {
@@ -528,7 +528,7 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
       seite.text = text.value;
       speichere(seite);
       zaehleWorte(seite.id, seite.text);
-    }, 400, true);
+    }, 400, () => text.isConnected);
     let blaettert = false;
     text.addEventListener('input', () => {
       sichereText();
@@ -661,7 +661,7 @@ function anlageGesten(elem, a, blatt, neuBauen) {
   });
   griff.addEventListener('pointermove', (e) => {
     if (!groesse) return;
-    a.pos.w = Math.max(a.typ === 'sticker' ? 5 : 12, Math.min(92, groesse.w + (e.clientX - groesse.sx) / groesse.r.width * 100));
+    a.pos.w = Math.max(a.typ === 'sticker' ? 6 : 12, Math.min(92, groesse.w + (e.clientX - groesse.sx) / groesse.r.width * 100));
     elem.style.width = a.pos.w + '%';
   });
   griff.addEventListener('pointerup', () => { if (groesse) speichereStill(a); groesse = null; });
@@ -748,7 +748,7 @@ function baueZettel(a, blatt, neuBauen) {
   const ta = el('textarea', { placeholder: '…', rows: 1 });
   ta.value = a.text || '';
   autogrow(ta);
-  ta.addEventListener('input', entprellt(() => { a.text = ta.value; speichereStill(a); }, 400));
+  ta.addEventListener('input', entprellt(() => { a.text = ta.value; speichereStill(a); }, 400, () => ta.isConnected));
   z.append(ta);
   halter.append(z);
   anlageGesten(halter, a, blatt, neuBauen);
@@ -1022,9 +1022,11 @@ async function starteKritzeln(blatt, seite) {
     }
   });
 
+  const beiWeg = () => aufraeumen();
+  window.addEventListener('hashchange', beiWeg);
   const aufraeumen = () => {
     try { beobachter.disconnect(); } catch (e) {}
-    window.removeEventListener('resize', beiGroesse);
+    window.removeEventListener('resize', beiGroesse); window.removeEventListener('hashchange', beiWeg);
     leiste.remove(); canvas.remove();
   };
   const fertigKnopf = el('button', {
@@ -1033,12 +1035,16 @@ async function starteKritzeln(blatt, seite) {
       /* Ein altes Bild ohne Striche bleibt als Grundlage erhalten — unter
          eigener Kennung, damit das fertige Bild darüber nicht die Grundlage
          überschreibt und beim nächsten Öffnen alles doppelt dasteht. */
+      /* „Alles löschen" gilt auch für die Grundlage: sonst taucht das alte Bild beim nächsten Strich wieder auf */
+      const geleert = striche.some((s) => s && s.leeren);
+      if (geleert) { basis = null; if (seite.skizzeBasis) { dbDel('media', seite.skizzeBasis).catch(() => {}); delete seite.skizzeBasis; } }
       if (basis && seite.skizze && !seite.skizzeBasis) {
         try { const alt = await dbGet('media', seite.skizze); if (alt) { const neuId = uid(); await dbPut('media', alt, neuId); seite.skizzeBasis = neuId; if (typeof syncMediaGeaendert === 'function') syncMediaGeaendert(neuId); } } catch (x) {}
       }
       auswahl = []; lasso = null; alleszeichnen();
       seite.striche = leer ? [] : saubereStriche(striche.map((s) => strichVerdichten(s)));
-      seite.skizze = leer ? seite.skizze : await speichereKritzelei(canvas, seite.skizze);
+      const neuId = leer ? seite.skizze : await speichereKritzelei(canvas, seite.skizze);
+      if (!leer && !neuId) toast('Das Bild ließ sich nicht sichern — die Striche selbst sind gespeichert.'); else seite.skizze = neuId;
       speichere(seite);
       aufraeumen();
       if (altesBild) {
@@ -1100,7 +1106,8 @@ async function starteKritzeln(blatt, seite) {
       if (alt.width && alt.height) basis = alt;
     }
   }
-  if (canvas.isConnected) { messen(); alleszeichnen(); knoepfeAuffrischen(); auswahlLeisteAuffrischen(); }
+  if (!canvas.isConnected) { aufraeumen(); return; }
+  messen(); alleszeichnen(); knoepfeAuffrischen(); auswahlLeisteAuffrischen();
 }
 
 /* ----- Reiter und Gliederung ----- */

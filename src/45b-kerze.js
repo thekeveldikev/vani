@@ -244,7 +244,9 @@ function kerzeAnzuenden({ minuten = 20, beiEnde = null, beiTipp = null, saat = 0
   }
 
   canvas.addEventListener('click', () => { if (beiTipp) beiTipp(); });
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { letzte = performance.now(); if (!fertig) requestAnimationFrame(schleife); } });
+  /* Zurück in den Tab: nur die Uhr stellen — die Schleife läuft von selbst weiter (sonst liefen am Ende mehrere) */
+  const beiSicht = () => { if (document.visibilityState === 'visible') letzte = performance.now(); if (fertig || !canvas.isConnected) document.removeEventListener('visibilitychange', beiSicht); };
+  document.addEventListener('visibilitychange', beiSicht);
   requestAnimationFrame((t) => { letzte = t; schleife(t); });
 
   return {

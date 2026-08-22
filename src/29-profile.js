@@ -106,7 +106,7 @@ function profilTor(erstes, profile) {
       name.value = p.name; name.hidden = true; pass2.hidden = true;
       pass.value = ''; meldung.textContent = ''; pass.focus();
     };
-    for (const p of profile) profilListe.append(el('button', { class: 'profil-wahl', 'data-id': p.id, onclick: () => waehle(p) },
+    if (!erstes) for (const p of profile) profilListe.append(el('button', { class: 'profil-wahl', 'data-id': p.id, onclick: () => waehle(p) },
       el('span', { class: 'profil-monogramm' }, p.name.slice(0, 1).toUpperCase()), el('span', {}, p.name)));
     if (!erstes) profilListe.append(el('button', { class: 'profil-wahl neu', onclick: () => resolve({ neu: true, zu }) },
       el('span', { class: 'profil-monogramm' }, '+'), el('span', {}, 'Neues Profil auf diesem Gerät')));

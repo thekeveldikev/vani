@@ -47,9 +47,10 @@ function schreibtischMaler(canvas, optionen = {}) {
   const saatText = tagKey();
   let saat = 17; for (const c of saatText) saat = (saat * 31 + c.charCodeAt(0)) >>> 0;
   const zuf = kerzeZufall(saat);
-  const opt = Object.assign({ holz: 'nuss', lampe: .8, lampeAn: true, wetter: 'still', kerzen: true, unordnung: .7, fensterAnteil: .44, parallax: { x: 0, y: 0 } }, optionen);
+  const opt = Object.assign({ holz: 'nuss', lampe: .8, lampeAn: true, wetter: 'still', kerzen: true, unordnung: .7, fensterAnteil: .44, parallax: { x: 0, y: 0 }, alter: { worte: 0, ringe: 1, abnutzung: 0 }, kleckse: [] }, optionen);
   let W = 0, H = 0, fensterH = 0, statisch = null, laeuft = false, t = 0, letzte = 0, blitz = 0, blitzWarte = 6 + zuf() * 10;
   let lampeJetzt = opt.lampeAn ? opt.lampe : 0;       /* das Licht schmilzt ein, es springt nicht */
+  let letzteTageszeit = '';
   let para = { x: 0, y: 0 };                          /* geglättete Parallaxe */
   const staub = Array.from({ length: 46 }, () => ({ x: zuf(), y: zuf(), r: .5 + zuf() * 1.1, ph: zuf() * 6.3, v: .004 + zuf() * .008 }));
   let motte = null, motteWarte = 50 + zuf() * 120;
@@ -65,7 +66,7 @@ function schreibtischMaler(canvas, optionen = {}) {
   const buesche = Array.from({ length: 7 }, (_, i) => ({ x: i / 7 + zuf() * .08 - .02, w: .14 + zuf() * .12, h: .22 + zuf() * .2, ph: zuf() * 6 }));
   const graeser = Array.from({ length: 140 }, () => ({ x: zuf(), h: .05 + zuf() * .09, ph: zuf() * 6, n: .6 + zuf() * .8 }));
   const tropfen = Array.from({ length: 180 }, () => ({ x: zuf(), y: zuf(), l: .02 + zuf() * .03, v: .35 + zuf() * .5, a: .18 + zuf() * .3 }));
-  const glasTropfen = Array.from({ length: 14 }, () => ({ x: zuf(), y: zuf(), v: .01 + zuf() * .03, r: 1.5 + zuf() * 2 }));
+  const glasTropfen = Array.from({ length: 18 }, () => ({ x: zuf(), y: zuf(), v: .01 + zuf() * .03, r: 2.5 + zuf() * 3.5 }));
   const flocken = Array.from({ length: 120 }, () => ({ x: zuf(), y: zuf(), r: .8 + zuf() * 2.2, v: .02 + zuf() * .05, ph: zuf() * 6 }));
   const blaetter = Array.from({ length: 22 }, () => ({ x: zuf(), y: zuf(), v: .05 + zuf() * .08, ph: zuf() * 6, rot: zuf() * 6, f: ['#a8562a', '#c8873a', '#8a4a22', '#d9a54a'][Math.floor(zuf() * 4)] }));
   const wuermchen = Array.from({ length: 16 }, () => ({ x: .1 + zuf() * .8, y: .35 + zuf() * .5, ph: zuf() * 6, v: .3 + zuf() * .7 }));
@@ -125,8 +126,9 @@ function schreibtischMaler(canvas, optionen = {}) {
     }
     /* Die Stelle, an der jahrelang die Hand lag: heller, glatter */
     kerzeSchein(g, W * .52, oben + (H - oben) * .78, W * .16, (H - oben) * .2, [[0, 'rgba(255,225,170,.14)'], [1, 'rgba(255,225,170,0)']]);
-    /* Kratzer */
-    for (const k of kratzer) {
+    /* Kratzer: je mehr je geschrieben wurde, desto mehr Spuren trägt die Platte */
+    const abnutzung = (opt.alter && opt.alter.abnutzung) || 0;
+    for (const k of kratzer.slice(0, 8 + Math.round(18 * abnutzung))) {
       g.beginPath(); g.strokeStyle = 'rgba(255,240,210,' + k.a.toFixed(3) + ')'; g.lineWidth = .8;
       const x0 = k.x * W, y0 = oben + k.y * (H - oben);
       g.moveTo(x0, y0); g.lineTo(x0 + Math.cos(k.w) * k.l * W, y0 + Math.sin(k.w) * k.l * W * .4); g.stroke();
@@ -143,15 +145,36 @@ function schreibtischMaler(canvas, optionen = {}) {
     /* Wachs am Leuchter */
     g.fillStyle = 'rgba(245,232,200,.85)';
     for (const w of wachs) { g.beginPath(); g.ellipse(w.x * W, oben + w.y * (H - oben), w.r, w.r * .7, 0, 0, 6.29); g.fill(); }
-    /* Kaffeering unter der Tasse */
-    g.beginPath(); g.ellipse(W * .83, oben + (H - oben) * .52, 30, 14, 0, 0, 6.29); g.strokeStyle = 'rgba(70,40,15,.45)'; g.lineWidth = 3; g.stroke();
-    g.beginPath(); g.ellipse(W * .83, oben + (H - oben) * .52, 30, 14, 0, .4, 2.2); g.strokeStyle = 'rgba(70,40,15,.3)'; g.lineWidth = 6; g.stroke();
+    /* Kaffeeringe unter der Tasse: einer, und alle 100 000 Wörter ein weiterer */
+    const ringe = Math.max(1, Math.min(6, (opt.alter && opt.alter.ringe) || 1));
+    for (let r = 0; r < ringe; r++) {
+      const rx = W * .83 + Math.cos(r * 2.1) * 9 * r, ry = oben + (H - oben) * .52 + Math.sin(r * 2.1) * 5 * r, a = r === 0 ? 1 : .55;
+      g.beginPath(); g.ellipse(rx, ry, 30, 14, 0, 0, 6.29); g.strokeStyle = 'rgba(70,40,15,' + (.45 * a).toFixed(2) + ')'; g.lineWidth = 3; g.stroke();
+      g.beginPath(); g.ellipse(rx, ry, 30, 14, 0, .4 + r, 2.2 + r); g.strokeStyle = 'rgba(70,40,15,' + (.3 * a).toFixed(2) + ')'; g.lineWidth = 6; g.stroke();
+    }
+    /* Kleckse von der Feder: jeder aus seiner eigenen Saat gefranst */
+    for (const kl of (opt.kleckse || [])) {
+      const z = kerzeZufall(kl.s || 1), kx = kl.x * W, ky = oben + kl.y * (H - oben), ph = z() * 6.28;
+      g.fillStyle = 'rgba(14,10,30,.66)'; g.beginPath();
+      for (let i = 0; i <= 26; i++) { const w = i / 26 * 6.283; const rr = kl.r * (1 + .3 * Math.sin(w * 3 + ph) + .16 * Math.sin(w * 7 + ph * 2)); g.lineTo(kx + Math.cos(w) * rr, ky + Math.sin(w) * rr * .7); }
+      g.closePath(); g.fill();
+      const sat = 1 + Math.floor(z() * 3);
+      for (let s = 0; s < sat; s++) { const w = ph + s * 1.7 + z(); const d = kl.r * (1.5 + s * .7 + z()); g.beginPath(); g.ellipse(kx + Math.cos(w) * d, ky + Math.sin(w) * d * .7, .8 + z() * 1.6, .6 + z(), w, 0, 6.29); g.fill(); }
+    }
     g.restore();
     /* Fensterrahmen: schweres Holz mit Sprossen */
     g.fillStyle = '#1a1210'; g.fillRect(0, 0, W, 16); g.fillRect(0, 0, 16, fensterH); g.fillRect(W - 16, 0, 16, fensterH); g.fillRect(0, fensterH - 12, W, 22);
     g.fillStyle = '#3d2b20'; g.fillRect(16, 16, W - 32, 2); g.fillRect(16, 16, 2, fensterH - 28); g.fillRect(W - 18, 16, 2, fensterH - 28);
     g.fillStyle = '#241912'; g.fillRect(W / 2 - 6, 16, 12, fensterH - 28); g.fillRect(16, fensterH * .42 - 5, W - 32, 10);
     g.fillStyle = 'rgba(255,255,255,.07)'; g.fillRect(W / 2 + 4, 16, 1, fensterH - 28); g.fillRect(16, fensterH * .42 + 5, W - 32, 1);
+    /* Im Herbst ein Spinnennetz in der Fensterecke */
+    if (jahreszeit === 'herbst') {
+      g.save(); g.translate(18, 18); g.strokeStyle = 'rgba(235,235,245,.22)'; g.lineWidth = .8; g.lineCap = 'round';
+      for (let k = 0; k <= 6; k++) { const w = k / 6 * Math.PI / 2; g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(w) * 54, Math.sin(w) * 54); g.stroke(); }
+      for (let r = 9; r <= 50; r += 8) { g.beginPath(); for (let k = 0; k <= 6; k++) { const w = k / 6 * Math.PI / 2, rr = r * (1 - .06 * (k % 2)); const px = Math.cos(w) * rr, py = Math.sin(w) * rr; if (k === 0) g.moveTo(px, py); else { const wm = (k - .5) / 6 * Math.PI / 2; g.quadraticCurveTo(Math.cos(wm) * rr * .93, Math.sin(wm) * rr * .93, px, py); } } g.stroke(); }
+      g.fillStyle = 'rgba(40,32,30,.8)'; g.beginPath(); g.ellipse(Math.cos(.5) * 31, Math.sin(.5) * 31, 2.2, 1.6, .5, 0, 6.29); g.fill();
+      g.restore();
+    }
     /* Fensterbank */
     const bank = g.createLinearGradient(0, fensterH + 8, 0, fensterH + 22);
     bank.addColorStop(0, '#3a2a20'); bank.addColorStop(1, '#1a120d');
@@ -276,7 +299,15 @@ function schreibtischMaler(canvas, optionen = {}) {
       for (const g of glasTropfen) {
         g.y += g.v * dt * (.5 + g.r * .2); if (g.y > 1.02) { g.y = -.02; g.x = zuf(); }
         const gx = 16 + g.x * (W - 32), gy = 16 + g.y * (fensterH - 28);
-        ctx.fillStyle = 'rgba(220,230,250,.35)'; ctx.beginPath(); ctx.ellipse(gx, gy, g.r, g.r * 1.5, 0, 0, 6.29); ctx.fill();
+        /* Brechung: der Garten dahinter, vergrößert und auf den Kopf gestellt, im Tropfen */
+        try {
+          ctx.save(); ctx.beginPath(); ctx.ellipse(gx, gy, g.r, g.r * 1.5, 0, 0, 6.29); ctx.clip();
+          ctx.translate(gx, gy); ctx.scale(1.6, -1.6);
+          ctx.drawImage(canvas, Math.max(0, (gx - g.r * 2) * dpr), Math.max(0, (gy - g.r * 3) * dpr), g.r * 4 * dpr, g.r * 6 * dpr, -g.r * 2, -g.r * 3, g.r * 4, g.r * 6);
+          ctx.restore();
+        } catch (e) {}
+        ctx.fillStyle = 'rgba(220,230,250,.22)'; ctx.beginPath(); ctx.ellipse(gx, gy, g.r, g.r * 1.5, 0, 0, 6.29); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = .8; ctx.beginPath(); ctx.ellipse(gx - g.r * .3, gy - g.r * .5, g.r * .35, g.r * .5, -.4, 0, 6.29); ctx.stroke();
         ctx.strokeStyle = 'rgba(220,230,250,.12)'; ctx.lineWidth = g.r * .9; ctx.beginPath(); ctx.moveTo(gx, gy - 40); ctx.lineTo(gx, gy); ctx.stroke();
       }
     }
@@ -297,7 +328,16 @@ function schreibtischMaler(canvas, optionen = {}) {
     lampeJetzt += (ziel - lampeJetzt) * Math.min(1, dt * (ziel > lampeJetzt ? 5 : 9));
     if (Math.abs(ziel - lampeJetzt) < .004) lampeJetzt = ziel;
     const an = lampeJetzt;
-    ctx.fillStyle = 'rgba(0,0,0,' + (.62 - .48 * an).toFixed(3) + ')'; ctx.fillRect(0, oben, W, H - oben);
+    /* Tag im Raum: graues Licht fällt durchs Fenster auf die Platte, die Dunkelheit weicht */
+    const tag = schreibtischTageslicht();
+    const tageszeit = tag >= .45 ? 'tag' : tag > .12 ? 'daemmerung' : 'nacht';
+    if (tageszeit !== letzteTageszeit) { letzteTageszeit = tageszeit; const sz = canvas.parentElement; if (sz) sz.dataset.tageszeit = tageszeit; }
+    ctx.fillStyle = 'rgba(0,0,0,' + Math.max(.06, .62 - .48 * an - .34 * tag).toFixed(3) + ')'; ctx.fillRect(0, oben, W, H - oben);
+    if (tag > .02) {
+      kerzeSchein(ctx, W * .5 + para.x * 6, oben + (H - oben) * .1, W * .56, (H - oben) * .34, [[0, 'rgba(200,214,235,' + (.26 * tag).toFixed(3) + ')'], [.6, 'rgba(190,205,230,' + (.08 * tag).toFixed(3) + ')'], [1, 'rgba(190,205,230,0)']]);
+      /* die Sprossen werfen weiche Streifen */
+      ctx.fillStyle = 'rgba(0,0,0,' + (.08 * tag).toFixed(3) + ')'; ctx.fillRect(W / 2 - 5, oben, 10, (H - oben) * .3);
+    }
     /* Der Schirm hängt links über der Platte; der Teich aus Licht liegt ein Stück rechts darunter */
     const lx = W * .16 + para.x * 4, ly = oben + (H - oben) * .27;
     if (an > .01) {
@@ -341,6 +381,8 @@ function schreibtischMaler(canvas, optionen = {}) {
 
   function bild(jetzt) {
     if (!laeuft) return;
+    /* Verdeckt (Schreibraum, Leser) oder Tab im Hintergrund: nicht malen, nur gelegentlich nachsehen */
+    if ((typeof _sr !== 'undefined' && _sr) || (typeof _leser !== 'undefined' && _leser) || (typeof _epub !== 'undefined' && _epub) || document.visibilityState === 'hidden') { letzte = jetzt; setTimeout(() => requestAnimationFrame(bild), 500); return; }
     const dt = Math.min(.05, (jetzt - letzte) / 1000 || .016); letzte = jetzt; t += dt;
     if (messen() || !statisch) statisch = maleStatisch();
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(statisch, 0, 0);
@@ -352,7 +394,7 @@ function schreibtischMaler(canvas, optionen = {}) {
   return {
     start() { if (laeuft) return; laeuft = true; letzte = performance.now(); requestAnimationFrame(bild); },
     stopp() { laeuft = false; },
-    setze(neu) { Object.assign(opt, neu || {}); if ('holz' in (neu || {})) statisch = null; },
+    setze(neu) { Object.assign(opt, neu || {}); if (neu && ('holz' in neu || 'kleckse' in neu || 'alter' in neu)) statisch = null; },
     opt
   };
 }

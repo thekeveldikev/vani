@@ -1,7 +1,7 @@
 /* ================================================================
    Der Bücherkoffer: PDFs verschlüsselt neben die App legen.
 
-   Aufruf:  node werkzeug/buecherkoffer.mjs <Ordner-mit-PDFs> [Passwort]
+   Aufruf:  node werkzeug/buecherkoffer.mjs <Ordner-mit-PDFs-oder-EPUBs> [Passwort]
 
    Jede PDF wird mit AES-256-GCM verschlüsselt; der Schlüssel kommt aus dem
    Passwort per PBKDF2-SHA-256 (200 000 Runden). Ohne Passwort bleibt alles
@@ -27,7 +27,7 @@ const passwort = process.argv[3] || (Array.from({ length: 4 }, () => WOERTER[ran
 
 const ziel = join(wurzel, 'buecher');
 mkdirSync(ziel, { recursive: true });
-const dateien = readdirSync(quelle).filter((n) => /\.pdf$/i.test(n)).sort();
+const dateien = readdirSync(quelle).filter((n) => /\.(pdf|epub)$/i.test(n)).sort();
 const manifest = [];
 for (const name of dateien) {
   const pfad = join(quelle, name);
@@ -41,8 +41,9 @@ for (const name of dateien) {
   const kennung = 'buch-' + String(manifest.length + 1).padStart(2, '0') + '.enc';
   writeFileSync(join(ziel, kennung), Buffer.concat([Buffer.from('VANIBUCH1', 'ascii'), salz, iv, chiffrat]));
   /* Ein sprechender Name hilft in der App; Tauschbörsen-Zusätze bleiben draußen. */
-  const titel = basename(name, '.pdf').replace(/\s*\((?:[^()]*(?:z-lib|1lib|library|epdf)[^()]*)\)\s*/gi, ' ').replace(/^\[[^\]]*\]\s*•?\s*/, '').replace(/\s+/g, ' ').trim();
-  manifest.push({ datei: kennung, groesse: statSync(pfad).size, name: titel.slice(0, 120) });
+  const art = /\.epub$/i.test(name) ? 'epub' : 'pdf';
+  const titel = basename(name, art === 'epub' ? '.epub' : '.pdf').replace(/\s*\((?:[^()]*(?:z-lib|1lib|library|epdf)[^()]*)\)\s*/gi, ' ').replace(/^\[[^\]]*\]\s*•?\s*/, '').replace(/\s+/g, ' ').trim();
+  manifest.push({ datei: kennung, groesse: statSync(pfad).size, name: titel.slice(0, 120), art });
   console.log(kennung.padEnd(14) + (statSync(pfad).size / 1048576).toFixed(1).padStart(6) + ' MB  ' + titel.slice(0, 70));
 }
 writeFileSync(join(ziel, 'koffer.json'), JSON.stringify({ version: 1, runden: 200000, buecher: manifest }, null, 1) + '\n');

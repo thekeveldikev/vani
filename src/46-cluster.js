@@ -349,7 +349,7 @@ RENDER.brett = function (haupt, bid) {
     const ta = el('textarea', { rows: 1, placeholder: '…', readonly: 'readonly' });
     ta.value = b.text || '';
     autogrow(ta);
-    ta.addEventListener('input', entprellt(() => { b.text = ta.value; speichereStill(b); }, 400));
+    ta.addEventListener('input', entprellt(() => { b.text = ta.value; speichereStill(b); }, 400, true));
     ta.addEventListener('blur', () => ta.setAttribute('readonly', 'readonly'));
     blase.append(ta);
     const quelle = b.quelle && D.docs.get(b.quelle);
@@ -425,7 +425,7 @@ RENDER.brett = function (haupt, bid) {
   const zeiger = new Map();
   let pan = null, kneifen = null, letzterTipp = { t: 0, x: 0, y: 0 };
   raum.addEventListener('pointerdown', (e) => {
-    if (e.target.closest('.denkblase') || e.target.closest('.schwebeleiste') || e.target.closest('.brett-werkzeuge')) return;
+    if (e.target.closest('.denkblase') || e.target.closest('.brettbild') || e.target.closest('.schwebeleiste') || e.target.closest('.brett-werkzeuge')) return;
     zeiger.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (zeiger.size === 1) {
       pan = { sx: e.clientX, sy: e.clientY, px: sicht.x, py: sicht.y };

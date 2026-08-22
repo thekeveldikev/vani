@@ -9,8 +9,10 @@ const SYNC_INTERNE_FELDER = new Set(['_rev', '_geraet', '_syncZeit']);
 let _sync = {
   config: null, ydoc: null, ydocs: null, ystate: null, ymedia: null, persistence: null,
   poll: null, status: { art: 'aus' }, uebernimmt: false, anwendenTimer: null,
-  sendet: false, holt: false, medien: false, generation: 0
+  sendet: false, holt: false, medien: false, generation: 0, fremdZuletzt: 0, nachzug: null
 };
+/* Hat die andere Seite in den letzten Minuten etwas gebracht? (zweite Tasse am Schreibtisch) */
+function syncFremdAktiv(minuten = 20) { return !!_sync.config && _sync.fremdZuletzt > 0 && Date.now() - _sync.fremdZuletzt < minuten * 60000; }
 
 function syncMelde(art, extra) {
   _sync.status = Object.assign({ art, wann: Date.now() }, extra || {});
@@ -216,7 +218,9 @@ function syncLeseDokument(id, y) {
   return sauberesDokument(roh);
 }
 function syncDokumentGeaendert(d, geloescht) {
-  if (!_sync.ydoc || _sync.uebernimmt || !d || !d.id) return;
+  if (!_sync.ydoc || !d || !d.id) return;
+  /* Mitten in einer Übernahme: merken und danach nachziehen — sonst ginge die Änderung verloren */
+  if (_sync.uebernimmt) { (_sync.nachzug = _sync.nachzug || new Map()).set(d.id, { d, geloescht }); return; }
   _sync.ydoc.transact(() => {
     if (geloescht) _sync.ydocs.delete(d.id);
     else syncSchreibeDokument(d);
@@ -257,6 +261,8 @@ async function syncUebernehmeAusY() {
   if (!_sync.ydocs || _sync.uebernimmt) return;
   _sync.uebernimmt = true;
   let veraendert = 0;
+  const start = Date.now();
+  const ohneIntern = (o) => { const k = { ...o }; for (const f of SYNC_INTERNE_FELDER) delete k[f]; return k; };
   try {
     const da = new Set();
     for (const [id, y] of _sync.ydocs.entries()) {
@@ -267,9 +273,11 @@ async function syncUebernehmeAusY() {
       /* Nur was sich wirklich unterscheidet, wird übernommen — und zwar in
          das vorhandene Objekt hinein, damit offene Editoren, die es halten,
          weiterschreiben können, statt ins Leere. */
-      if (alt && syncGleich(alt, d)) continue;
+      if (alt && syncGleich(ohneIntern(alt), ohneIntern(d))) continue;
+      if (alt && _sync.nachzug && _sync.nachzug.has(id)) continue;   /* lokal gerade geändert: lokal gewinnt, kommt gleich nach */
       if (alt) {
-        for (const k of Object.keys(alt)) if (!(k in d)) delete alt[k];
+        for (const k of Object.keys(alt)) if (!(k in d) && !SYNC_INTERNE_FELDER.has(k)) delete alt[k];
+        for (const f of SYNC_INTERNE_FELDER) delete d[f];
         Object.assign(alt, d);
         await dbPut('docs', alt);
       } else {
@@ -277,7 +285,12 @@ async function syncUebernehmeAusY() {
       }
       veraendert++;
     }
-    for (const id of [...D.docs.keys()]) if (!da.has(id)) { D.docs.delete(id); await dbDel('docs', id); veraendert++; }
+    for (const id of [...D.docs.keys()]) {
+      const d = D.docs.get(id);
+      /* Nur löschen, was nicht währenddessen hier entstanden oder angefasst wurde */
+      if (!da.has(id) && !(d && (d.angelegt > start || d.geaendert > start)) && !(_sync.nachzug && _sync.nachzug.has(id))) { D.docs.delete(id); await dbDel('docs', id); veraendert++; }
+    }
+    if (veraendert) _sync.fremdZuletzt = Date.now();
     const einst = _sync.ystate.get('einst');
     if (typeof einst === 'string') try { uebernehmeEinstellungen(JSON.parse(einst)); await dbPut('kv', D.einst, 'einst'); setzeThema(D.einst.thema); } catch (e) {}
     const stats = _sync.ystate.get('stats');
@@ -286,7 +299,11 @@ async function syncUebernehmeAusY() {
       D.stats = { tage: saubereZaehler(s.tage), letzte: saubereZaehler(s.letzte), letzteSicherung: begrenze(s.letzteSicherung, 0, Date.now() + 86400000, 0) };
       await dbPut('kv', D.stats, 'stats');
     } catch (e) {}
-  } finally { _sync.uebernimmt = false; }
+  } finally {
+    _sync.uebernimmt = false;
+    const n = _sync.nachzug; _sync.nachzug = null;
+    if (n) for (const { d, geloescht } of n.values()) syncDokumentGeaendert(d, geloescht);
+  }
   if (!veraendert && !_sync.zeichnenAusstehend) return;
   /* Neu zeichnen nur, wenn sich etwas geändert hat — und nie mitten ins
      Schreiben hinein. Dann wartet es, bis die Hände ruhen. */

@@ -47,7 +47,7 @@ RENDER.blaetter = function (haupt) {
     }
     inhalt.append(wahl);
   }
-  if (vomTyp('blatt').length > 5) inhalt.append(suchfeld);
+  if (vomTyp('blatt').length > 5 || filter) inhalt.append(suchfeld);
 
   if (!alle.length) {
     inhalt.append(el('div', { class: 'leer' }, 'Ein leerer Stapel.',

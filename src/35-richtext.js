@@ -339,7 +339,7 @@ function baueRichEditor(doc, optionen = {}) {
     doc.format = 'rich';
     speichere(doc); zaehleWorte(doc.id, doc.text);
     if (optionen.beiSpeichern) optionen.beiSpeichern(doc, editor);
-  }, optionen.warten || 400, true);
+  }, optionen.warten || 400, () => editor.isConnected);
   editor.addEventListener('input', (e) => {
     if (D.einst.kurzschrift !== false && e && e.inputType === 'insertText' && /[_*~]/.test(e.data || '')) { try { kurzschriftLive(editor); } catch (x) {} }
     sichern(); if (optionen.beiInput) optionen.beiInput(doc, editor, startWorte);

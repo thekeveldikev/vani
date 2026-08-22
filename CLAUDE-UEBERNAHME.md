@@ -1486,3 +1486,72 @@ Tests 151/151 (neu: isbn-Helfer, saubererAutor). Browser: Schnur schräg gezogen
 → schaltet, federt zurück; Koffer holt 6 Bücher (Namen aus dem Koffer), alle
 Cover aus dem Netz; Bord zeigt alle; 1100×900, 1024×768, 768×1024, 740×1000 geprüft.
 Koffer bleibt auf Wunsch vorerst im Repo; das Passwort steht weiter nirgends.
+
+## 25. Der Tisch lebt, EPUB, Spotlight, Stände — und großes Bugfixing (23. August 2026, VANI 5.18.0)
+
+Die Welle „Die nächste große Welle" aus IDEEN.md komplett, plus drei Audit-Durchgänge.
+
+### Neue Dateien
+- `src/54c-schreibtisch-leben.js`: pure Helfer `schreibtischAlter(tage)` (Wörter → Ringe 1–6,
+  Abnutzung 0–1), `leuchterWoche(tage, jetzt)` (Mo–So: heute/vorbei/zukunft/brennt),
+  `teelichterWoche(tage, ziel)`, `leseSerie(buecher)`, `saubereKleckse` (max 40) + Bühne:
+  `schreibtischFederTropft`, `federKratzen` (WebAudio-Rauschen), `schreibtischKlangbild`
+  (uhr/wind/kamin), `schreibtischKlangName`, `baueWetterglas` (Menü: Tisch bei Nacht /
+  Nachtgarten / Klangraum), `baueTeelichter` (nur mit Tagesziel), `baueZweiteTasse`
+  (`syncFremdAktiv`), `baueOffenesBuch(b, szene)` (pdf.js-Doppelseite 104 px, Tippen
+  links/rechts blättert, Mitte öffnet; EPUB als zugeklapptes Cover; räumt über
+  `szene._aufraeumen` auf), `blattEinspannen(szene, e, blattId, fokus)` (Textarea auf dem
+  Tisch, `entprellt(…, 500, true)`, `zaehleWorte`, Esc/✕ legt weg → Klecks, `e.blattId`
+  merkt das Blatt über Raumwechsel).
+- `src/55b-epub.js`: `zipEintraege` (zentrales Verzeichnis), `zipLies` (0/8 via
+  DecompressionStream deflate-raw), `istEpub`, `epubLaden` (container → OPF → spine,
+  Cover, nav/NCX-TOC), `epubKapitelHTML` (Sanitizer, Bilder als Blob-URLs),
+  `buchAuflegenEpub` (art 'epub', seiten 100/seite %, kapitel, anteil, kapitelAnzahl),
+  Leser `epubOeffnen` (CSS-Spalten, 2 Spalten > 900 px, Zeile ≤ 720 px, Fortschritt,
+  Lesezeichen „k:s", Zitat, Randnotizen je Kapitel, Vorlesen, Schrift/Größe/Zeile/Rand).
+- `src/48b-spotlight.js`: ⌘/Strg+K `spotlightOeffnen` (Treffer + Vorschau mit mark,
+  ↑↓/Enter, „>" = Befehle), ⌘/Strg+⇧+K große Suche, „?" `kuerzelZeigen`, `TASTENKUERZEL`,
+  `spotlightTreffer` pur.
+
+### Geändert
+- 54: `saubererSchreibtisch` + kleckse/federKratzt/offenesBuch/blattId; Leuchter mit
+  Woche (erloschene Kerze raucht); Tinte-Menü (einspannen/weiter/Schreibraum); Luftzug-
+  Klasse beim Betreten; Einrichten: Feder kratzt, offenes Buch, Kleckse wegwischen;
+  Lampe zieht jetzt auch skaliert richtig (r.width/240); Klick-AudioContext resume;
+  Leuchter/Malerei pausieren unter Schreibraum/Leser/hidden.
+- 54b: `opt.alter`/`opt.kleckse` (statisch neu bei Änderung), Kratzer nach Abnutzung,
+  Kaffeeringe je 100 000 Wörter, Kleckse gefranst, Spinnennetz im Herbst, Tageslicht
+  im Raum + `data-tageszeit` (tag/daemmerung/nacht, CSS-Kanten), Regentropfen mit
+  Brechung (drawImage der eigenen Leinwand, gespiegelt 1,6×).
+- 55: Leseeinstellung + stimme/rand/epubSchrift/epubGroesse/epubZeile/epubRand;
+  `buchStandText`; EPUB-Weiche in `buchAuflegenAusBlob`/`buchOeffnen`; Randspalte
+  (`leserRandspalte`, `leserRandAktualisieren`, `.lese-rand`); Vorlesen neu mit Sätzen
+  (`leserSaetze`), Markierung über Textstücken (`leserMarkiere`, `c._vp/_dpr/_seite`),
+  Stimme wählbar (`leserStimme`), blättert am Seitenende weiter.
+- 30: `staendeAutomatisch` in `speichere` (15 min, ≤ 20, auto weichen zuerst; Sanitizer
+  behält `auto`); STANDARD_EINST + stickerFarbe/stickerDicke/tisch/schreibtisch (Fix:
+  Schreibtisch-Einstellungen gingen beim Neustart verloren!); `entprellt(fn, ms, notfall)`
+  — notfall darf Lebensprüfung sein, `g.loesen()`, tote Spüler fliegen raus; Gruppen/
+  Brettbilder behalten `pos.h`; Papierkorb löscht Medien nur ohne lebende Referenz.
+- 31: `syncFremdAktiv`, Nachzug lokaler Änderungen während der Übernahme (sonst
+  verloren/gelöscht), Vergleich ohne interne Felder, Löschen nur für nicht währenddessen
+  angefasste Docs.
+- 41: „EIN ZITAT" als Fundart, Lese-Serie unter dem Schreibfeuer, Weiterlesen mit
+  `buchStandText`. 45: Stimme aus der Leseeinstellung, Stände „· automatisch",
+  Titel-Flush beim Schließen. 48: ⌘K → Spotlight, Suche schließt Schreibraum, letzte
+  Suchen je Profil. 43: Kritzelleiste räumt bei hashchange auf, „Alles löschen" löscht
+  Basis, Bild-Fehler nimmt Verweis nicht weg, Notfall-Flush Titel/Zettel, Sticker min 6.
+  43c: y bis 40. 43d: Mikro aus, wenn Dialog schon zu. 43e: Abbrechen stellt fehlende
+  Felder wieder her. 44/46/42b/29/45b/49b/55: kleine Fixes (Projekt löschen zeichnet,
+  Brettbild zieht kein Brett, Blätter-Filter sichtbar, Neues Profil keine Sackgasse,
+  Kerze ohne Listener-Leck, WhatsApp-Systemzeilen, Lesetasten nicht in Feldern,
+  Zurück beim Aufschlagen, ISBN-13:, Mehrfachautoren, Wisch+Klick, Flip-Generation,
+  Goodnotes-Kopie statt geteilter Datei, dok.destroy in finally).
+- Koffer-Werkzeug und Desktop-IPC nehmen `.epub` an (`art` im Manifest).
+
+Tests 155/155 (neu: Alter/Woche/Teelichter/Serie/Kleckse, staendeAutomatisch, ZIP stored+deflate,
+istEpub, spotlightTreffer/Kürzel). Browser: Lampe bleibt nach Reload aus/an; Wetterglas,
+7 Teelichter, offenes Buch gerendert; Blatt eingespannt → 16 Wörter, weggelegt → Klecks;
+Spotlight Treffer+mark, Befehle, Kürzel (20 Zeilen); EPUB (Test-ZIP stored) 2 Kapitel,
+6 Seiten, TOC; Randspalte + Notiz; Vorlesen markiert 10 Stücke des ersten Satzes von 27;
+Leertaste im Randfeld blättert nicht; Lese-Serie auf dem Zuhause.

@@ -35,7 +35,7 @@ function buchFortschritt(seite, seiten) {
 }
 
 /* Leseeinstellungen bleiben am Gerät (Helligkeit ist Gerätesache). Pur. */
-const LESE_VORGABE = { helligkeit: 1, waerme: .15, nacht: false, doppel: 'auto', blaettern: true, zoom: 'seite' };
+const LESE_VORGABE = { helligkeit: 1, waerme: .15, nacht: false, doppel: 'auto', blaettern: true, zoom: 'seite', stimme: null, rand: false, epubSchrift: 'serif', epubGroesse: 19, epubZeile: 1.6, epubRand: 36 };
 function saubereLeseEinstellung(roh) {
   const q = roh && typeof roh === 'object' ? roh : {};
   return {
@@ -44,8 +44,20 @@ function saubereLeseEinstellung(roh) {
     nacht: q.nacht === true,
     doppel: ['auto', 'an', 'aus'].includes(q.doppel) ? q.doppel : 'auto',
     blaettern: q.blaettern !== false,
-    zoom: ['seite', 'breite'].includes(q.zoom) ? q.zoom : 'seite'
+    zoom: ['seite', 'breite'].includes(q.zoom) ? q.zoom : 'seite',
+    stimme: typeof q.stimme === 'string' && q.stimme ? q.stimme.slice(0, 200) : null,
+    rand: q.rand === true,
+    epubSchrift: ['serif', 'sans', 'rund', 'schreib'].includes(q.epubSchrift) ? q.epubSchrift : 'serif',
+    epubGroesse: Math.round(begrenze(q.epubGroesse, 14, 28, 19)),
+    epubZeile: begrenze(q.epubZeile, 1.3, 2, 1.6),
+    epubRand: Math.round(begrenze(q.epubRand, 12, 80, 36))
   };
+}
+/* Wo ein Buch steht, als Text: PDF in Seiten, EPUB in Kapiteln. Pur. */
+function buchStandText(b) {
+  if (!b) return '';
+  if (b.art === 'epub') return 'Kapitel ' + ((b.kapitel || 0) + 1) + (b.kapitelAnzahl ? ' von ' + b.kapitelAnzahl : '');
+  return b.seiten ? 'Seite ' + (b.seite || 1) + ' von ' + b.seiten : '';
 }
 function leseEinstellung() {
   try { return saubereLeseEinstellung(JSON.parse(localStorage.getItem('vani-lese') || '{}')); } catch (e) { return saubereLeseEinstellung({}); }
@@ -66,7 +78,7 @@ function isbnZu10(roh) {
 /* ISBNs aus einem Text (Impressum). Pur. */
 function isbnAusText(text) {
   const aus = [];
-  for (const m of String(text || '').matchAll(/ISBN[\s:–-]*((?:97[89][\s-]?)?\d[\d\s-]{8,16}[\dXx])/gi)) {
+  for (const m of String(text || '').matchAll(/ISBN(?:-1[03])?(?:\s*\([^)]{0,24}\))?[\s:–-]*((?:97[89][\s-]?)?\d[\d\s-]{8,16}[\dXx])/gi)) {
     let k = m[1].replace(/[\s-]/g, '').toUpperCase();
     if (k.length > 13 && /^97[89]/.test(k)) k = k.slice(0, 13);
     if ((k.length === 13 || k.length === 10) && !aus.includes(k)) aus.push(k);
@@ -113,7 +125,7 @@ async function kofferIsbnFuer(b) {
   if (!k) return null;
   const norm = (s) => String(s || '').toLowerCase().replace(/[^a-zäöüß0-9]+/g, ' ').trim();
   const t = norm(b.titel);
-  const e = k.buecher.find((x) => x.isbn && (norm(x.name) === t || (t.length > 4 && (norm(x.name).includes(t) || t.includes(norm(x.name))))));
+  const e = k.buecher.find((x) => x.isbn && x.name && (norm(x.name || '') === t || (t.length > 4 && (norm(x.name || '').includes(t) || t.includes(norm(x.name || ''))))));
   return e ? e.isbn : null;
 }
 /* Versucht, für ein Buch das offizielle Cover zu holen: eigene ISBN, Koffer,
@@ -164,7 +176,7 @@ async function schoeneCoverHolen() {
 function saubererAutor(roh) {
   let a = String(roh || '').replace(/\[[^\]]*\]/g, ' ').replace(/\b(Verfasser(?:in)?|Autor(?:in)?|author|Hrsg\.?|Übersetzer(?:in)?)\b\.?/gi, ' ').replace(/[;|/]+/g, ',').replace(/\s+/g, ' ').trim().replace(/^[,\s]+|[,\s]+$/g, '');
   const m = a.match(/^([^,]+),\s*([^,]+)$/);
-  if (m && !/\s(?:und|and|&)\s/i.test(a)) a = (m[2] + ' ' + m[1]).replace(/\s+/g, ' ').trim();
+  if (m && !/\s(?:und|and|&)\s/i.test(a) && !(m[1].trim().includes(' ') && m[2].trim().includes(' '))) a = (m[2] + ' ' + m[1]).replace(/\s+/g, ' ').trim();
   /* „Silvana de Mari Silvana de Mari" -> einmal reicht */
   const h = a.length >> 1;
   if (a.length > 8 && a.slice(0, h).trim().toLowerCase() === a.slice(h).trim().toLowerCase()) a = a.slice(0, h).trim();
@@ -172,9 +184,12 @@ function saubererAutor(roh) {
 }
 
 async function buchAuflegenAusBlob(blob, name, { datei = null, isbn = null, autorVorgabe = '', titelFest = false } = {}) {
+  /* EPUB? Dann der eigene Leser (55b) */
+  try { const kopf = await blob.slice(0, 64).arrayBuffer(); if (typeof istEpub === 'function' && istEpub(kopf, name)) return await buchAuflegenEpub(blob, name, { datei, isbn, autorVorgabe, titelFest }); } catch (e) { if (/^\.?epub/i.test(String(name || '').split('.').pop())) throw e; }
   const pdfjs = await pdfjsLaden();
   const daten = await blob.arrayBuffer();
   const dok = await pdfjs.getDocument({ data: daten.slice(0) }).promise;
+  try {
   const seiten = dok.numPages;
   let titel = String(name || 'Buch').replace(/\.pdf$/i, '');
   /* Dateinamen von Tauschbörsen tragen Klammerzusätze — die braucht kein Titel. */
@@ -203,7 +218,6 @@ async function buchAuflegenAusBlob(blob, name, { datei = null, isbn = null, auto
   /* ISBN aus dem Impressum — damit später das echte Cover kommt */
   let isbns = [];
   try { isbns = await isbnAusPdf(dok); } catch (e) {}
-  try { dok.destroy(); } catch (e) {}
   if (autorVorgabe) autor = autorVorgabe;   /* eine kuratierte Angabe schlägt Metadaten */
   const buch = neuDoc('buch', { titel, autor, datei: dateiId, bild, seiten, seite: 1, lesezeichen: [], zuletzt: Date.now(), isbn: isbn || isbns[0] || undefined });
   /* Das offizielle Cover aus dem Netz, wenn eines zu finden ist — still, im Hintergrund. */
@@ -213,6 +227,7 @@ async function buchAuflegenAusBlob(blob, name, { datei = null, isbn = null, auto
     }
   })();
   return buch;
+  } finally { try { dok.destroy(); } catch (e) {} }
 }
 
 async function buecherAuflegenPerDatei() {
@@ -242,7 +257,7 @@ async function buchAusGoodnotesArchiv() {
   const blob = await dbGet('media', d.datei);
   if (!blob) { toast('Die Datei ist nicht da.'); return; }
   toast('Lege das Buch auf …');
-  try { await buchAuflegenAusBlob(blob, d.titel || d.dateiname || 'Buch', { datei: d.datei }); toast('Liegt auf dem Tisch.'); zeichne(); }
+  try { await buchAuflegenAusBlob(blob, d.titel || d.dateiname || 'Buch'); toast('Liegt auf dem Tisch.'); zeichne(); }
   catch (e) { toast('Ließ sich nicht öffnen.'); }
 }
 
@@ -254,7 +269,7 @@ async function buecherAusOrdner() {
   try { liste = await desk.buecherListe(); } catch (e) { liste = []; }
   if (!liste.length) { await zeigeAnkunft('Kein Buch im Ordner', ['Lege PDF-Dateien in den Ordner „VANI-Bücher" in deinen Dokumenten — oder in einen Ordner „buecher" neben der App.'], ''); return; }
   const da = new Set(lesestapelBuecher().map((b) => b.titel));
-  const wahl = await menue([...liste.map((b) => ({ text: (da.has(b.name.replace(/\.pdf$/i, '')) ? '✓ ' : '') + b.name + ' · ' + formatBytes(b.size), icon: 'buchzu', wert: b.pfad })), { text: 'Alle auflegen', icon: 'plus', wert: '_alle' }], liste.length + ' Bücher im Ordner');
+  const wahl = await menue([...liste.map((b) => ({ text: (da.has(b.name.replace(/\.(pdf|epub)$/i, '')) ? '✓ ' : '') + b.name + ' · ' + formatBytes(b.size), icon: 'buchzu', wert: b.pfad })), { text: 'Alle auflegen', icon: 'plus', wert: '_alle' }], liste.length + ' Bücher im Ordner');
   if (!wahl) return;
   const auswahl = wahl === '_alle' ? liste : liste.filter((b) => b.pfad === wahl);
   let n = 0;
@@ -359,7 +374,7 @@ function lesestapelZeigen() {
       el('div', { class: 'lesestapel-titel' }, b.titel || 'Buch'),
       b.autor ? el('div', { class: 'lesestapel-autor' }, b.autor) : null,
       el('div', { class: 'lesestapel-balken' }, el('i', { style: 'width:' + buchFortschritt(b.seite, b.seiten) + '%' })),
-      el('div', { class: 'lesestapel-stand' }, (b.seiten ? 'Seite ' + (b.seite || 1) + ' von ' + b.seiten : '') + (buchStatistikWorte(b) ? ' · ' + buchStatistikWorte(b) : '')));
+      el('div', { class: 'lesestapel-stand' }, buchStandText(b) + (buchStatistikWorte(b) ? ' · ' + buchStatistikWorte(b) : '')));
     langdruck(k, async () => {
       const wahl = await menue([
         { text: 'Umbenennen', icon: 'stift', wert: 'name' },
@@ -398,20 +413,23 @@ async function buchCoverAusSeite(b, n) {
     const pdfjs = await pdfjsLaden();
     const blob = await dbGet('media', b.datei); if (!blob) return;
     const dok = await pdfjs.getDocument({ data: await blob.arrayBuffer() }).promise;
+    try {
     const seite = await dok.getPage(Math.max(1, Math.min(dok.numPages, n)));
     const vp0 = seite.getViewport({ scale: 1 }); const vp = seite.getViewport({ scale: 480 / vp0.width });
     const c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
     await seite.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
     const id = await new Promise((res) => c.toBlob(async (bl) => res(bl ? await speichereDateiBlob(new File([bl], 'cover.jpg', { type: 'image/jpeg' })) : null), 'image/jpeg', .82));
     if (id) { b.bild = id; speichere(b); toast('Neues Cover.'); }
-    try { dok.destroy(); } catch (e) {}
+    } finally { try { dok.destroy(); } catch (e) {} }
   } catch (e) { toast('Das Cover ließ sich nicht malen.'); }
 }
 
 /* ----- Der Lesemodus ----- */
 let _leser = null;
 async function buchOeffnen(b) {
+  if (b && b.art === 'epub' && typeof epubOeffnen === 'function') return epubOeffnen(b);
   if (_leser) buchSchliessen();
+  if (typeof _epub !== 'undefined' && _epub && typeof epubSchliessen === 'function') epubSchliessen();
   const e = leseEinstellung();
   const raum = el('div', { class: 'lesemodus' + (e.nacht ? ' nacht' : '') });
   const buehne = el('div', { class: 'lese-buehne' });
@@ -425,13 +443,16 @@ async function buchOeffnen(b) {
     el('button', { class: 'rundknopf zart lese-zeichen', html: ik('lesezeichen'), title: 'Lesezeichen', onclick: () => leserLesezeichen() }),
     el('button', { class: 'rundknopf zart', html: ik('teilen'), title: 'Zitat kopieren / als Schnipsel', onclick: () => leserZitat() }),
     el('button', { class: 'rundknopf zart lese-notiz-knopf', html: ik('pin'), title: 'Randnotiz zu dieser Seite', onclick: () => leserNotizen() }),
+    el('button', { class: 'rundknopf zart lese-rand-knopf' + (e.rand ? ' an' : ''), html: ik('gliederung'), title: 'Randspalte: Notizen neben der Seite', onclick: () => leserRandspalte() }),
     el('button', { class: 'rundknopf zart', html: ik('suche'), title: 'Im Buch suchen', onclick: () => leserSuche() }),
     el('button', { class: 'rundknopf zart', html: ik('vorlesen'), title: 'Diese Seite vorlesen lassen', onclick: (ev) => leserVorlesen(ev.currentTarget) }),
     el('button', { class: 'rundknopf zart', html: ik('feinheiten'), title: 'Leseeinstellungen', onclick: () => leserEinstellungen() }));
   const fuss = el('div', { class: 'lese-fuss' }, el('button', { class: 'rundknopf zart', html: ik('zurueck'), title: 'Zurückblättern', onclick: () => blaettere(-1) }), balken, stand, el('button', { class: 'rundknopf zart', html: ik('rechts'), title: 'Weiterblättern', onclick: () => blaettere(1) }));
-  raum.append(kopf, buehne, fuss);
+  const rand = el('div', { class: 'lese-rand' });
+  raum.append(kopf, buehne, rand, fuss);
+  raum.classList.toggle('mit-rand', !!e.rand);
   document.body.append(raum);
-  _leser = { b, raum, buehne, e, dok: null, seite: Math.max(1, Math.min(b.seiten || 1, b.seite || 1)), busy: false, cache: new Map(), kopf, fuss, versteckTimer: null, zuletztGezeigt: 0 };
+  _leser = { b, raum, buehne, rand, e, dok: null, gen: 0, seite: Math.max(1, Math.min(b.seiten || 1, b.seite || 1)), busy: false, cache: new Map(), kopf, fuss, versteckTimer: null, zuletztGezeigt: 0 };
   const leser = _leser;
 
   const zeigeLeisten = () => { kopf.classList.remove('weg'); fuss.classList.remove('weg'); clearTimeout(leser.versteckTimer); leser.versteckTimer = setTimeout(() => { kopf.classList.add('weg'); fuss.classList.add('weg'); }, 2600); };
@@ -444,7 +465,8 @@ async function buchOeffnen(b) {
     if (!blob) throw new Error('Datei fehlt');
     leser.dok = await pdfjs.getDocument({ data: await blob.arrayBuffer() }).promise;
     if (leser.dok.numPages !== b.seiten) { b.seiten = leser.dok.numPages; speichereStill(b); balken.max = String(b.seiten); }
-  } catch (x) { toast('Das Buch ließ sich nicht aufschlagen.' + (x && x.message ? ' (' + x.message + ')' : ''), 4200); buchSchliessen(); return; }
+  } catch (x) { if (_leser === leser) { toast('Das Buch ließ sich nicht aufschlagen.' + (x && x.message ? ' (' + x.message + ')' : ''), 4200); buchSchliessen(); } return; }
+  if (_leser !== leser) { try { leser.dok.destroy(); } catch (e) {} return; }   /* „Zurück" kam schneller als das Buch */
 
   const doppel = () => leser.e.doppel === 'an' || (leser.e.doppel === 'auto' && raum.clientWidth >= 900 && raum.clientWidth > raum.clientHeight);
   const seitenJetzt = () => { const d = doppel(); if (!d) return [leser.seite]; const links = leser.seite % 2 === 0 ? leser.seite : leser.seite - 1; return [links, links + 1].filter((n) => n >= 1 && n <= b.seiten); };
@@ -460,12 +482,14 @@ async function buchOeffnen(b) {
     const c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
     c.style.width = Math.round(vp.width / dpr) + 'px'; c.style.height = Math.round(vp.height / dpr) + 'px';
     await seite.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+    c._vp = vp; c._dpr = dpr; c._seite = n;
     if (leser.cache.size > 10) leser.cache.delete(leser.cache.keys().next().value);
     leser.cache.set(schl, c);
     return c;
   }
   async function zeige(richtung) {
     if (!leser.dok) return;
+    const meine = ++leser.gen;
     const seiten = seitenJetzt();
     const d = seiten.length > 1;
     const breite = (buehne.clientWidth - (d ? 28 : 16)) / (d ? 2 : 1);
@@ -476,6 +500,8 @@ async function buchOeffnen(b) {
       const blatt = el('div', { class: 'lese-blatt' }, c, el('span', { class: 'lese-seitenzahl' }, String(n)));
       neu.append(blatt);
     }
+    if (meine !== leser.gen || _leser !== leser) return;   /* ein schnellerer Flip hat überholt */
+    buehne.querySelectorAll('.lese-doppel.geht-links, .lese-doppel.geht-rechts').forEach((x) => x.remove());
     const alt = buehne.querySelector('.lese-doppel');
     if (alt && leser.e.blaettern && richtung) {
       alt.classList.add(richtung > 0 ? 'geht-links' : 'geht-rechts');
@@ -491,6 +517,8 @@ async function buchOeffnen(b) {
     kopf.querySelector('.lese-notiz-knopf').classList.toggle('hat-notiz', buchNotizen(b, leser.seite).length > 0);
     if (richtung && leser.seite !== leser.letzteGezaehlt) { leser.letzteGezaehlt = leser.seite; buchSeiteGelesen(b); }
     b.seite = leser.seite; b.zuletzt = Date.now(); speichereStill(b);
+    leserRandAktualisieren();
+    if (leser.liest && leser.liest.weiter && leser.liest.seite !== leser.seite) setTimeout(() => { if (_leser === leser && leser.liest && leser.liest.weiter) leserVorlesen(leser.liest.knopf, true); }, 500);
     /* Nächste Seiten vorab malen */
     for (const n of [leser.seite + 1, leser.seite + 2, leser.seite - 1]) if (n >= 1 && n <= b.seiten) maleSeite(n, breite, hoehe).catch(() => {});
   }
@@ -504,7 +532,9 @@ async function buchOeffnen(b) {
   balken.addEventListener('input', () => { stand.textContent = balken.value + ' / ' + b.seiten; zeigeLeisten(); });
   balken.addEventListener('change', () => { leser.seite = Number(balken.value); zeige(0); });
   /* Tippen: rechts weiter, links zurück, Mitte Leisten */
+  let wischte = false;
   buehne.addEventListener('click', (ev) => {
+    if (wischte) { wischte = false; return; }
     const r = buehne.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width;
     if (x > .66) blaettere(1); else if (x < .34) blaettere(-1); else zeigeLeisten();
   });
@@ -513,10 +543,12 @@ async function buchOeffnen(b) {
   buehne.addEventListener('pointerdown', (ev) => { wisch = { x: ev.clientX, y: ev.clientY, t: Date.now() }; });
   buehne.addEventListener('pointerup', (ev) => {
     if (!wisch) return; const dx = ev.clientX - wisch.x, dy = ev.clientY - wisch.y; wisch = null;
-    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { blaettere(dx < 0 ? 1 : -1); ev.preventDefault(); }
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { wischte = true; blaettere(dx < 0 ? 1 : -1); ev.preventDefault(); }
   });
   leser.tasten = (ev) => {
     if (!_leser) return;
+    const ziel = ev.target;
+    if ((ziel && (/^(INPUT|TEXTAREA|SELECT)$/.test(ziel.tagName) || ziel.isContentEditable)) || document.querySelector('#deck .schleier, .spotlight-bogen')) return;
     if (ev.key === 'ArrowRight' || ev.key === 'PageDown' || ev.key === ' ') { ev.preventDefault(); blaettere(1); }
     else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); blaettere(-1); }
     else if (ev.key === 'Escape') { ev.preventDefault(); buchSchliessen(); }
@@ -532,8 +564,10 @@ function leserStil() {
   if (!_leser) return;
   const { raum, e } = _leser;
   raum.classList.toggle('nacht', e.nacht);
+  raum.classList.toggle('mit-rand', !!e.rand);
   raum.style.setProperty('--lese-hell', e.helligkeit);
   raum.style.setProperty('--lese-waerme', e.waerme);
+  const k = raum.querySelector('.lese-rand-knopf'); if (k) k.classList.toggle('an', !!e.rand);
 }
 function buchSchliessen() {
   if (!_leser) return;
@@ -541,6 +575,7 @@ function buchSchliessen() {
   document.removeEventListener('keydown', l.tasten, true);
   window.removeEventListener('resize', l.beiGroesse);
   clearTimeout(l.versteckTimer);
+  if (l.liest) { l.liest = null; try { speechSynthesis.cancel(); } catch (e) {} document.body.classList.remove('liest-vor'); }
   try { if (l.dok) l.dok.destroy(); } catch (e) {}
   l.raum.remove();
   zeichne();
@@ -620,6 +655,8 @@ function leserEinstellungen() {
     wahl('Doppelseite', 'doppel', [['auto', 'Wie es passt'], ['an', 'Immer'], ['aus', 'Nie']], true),
     wahl('Größe', 'zoom', [['seite', 'Ganze Seite'], ['breite', 'Volle Breite']], true),
     wahl('Blättern', 'blaettern', [[true, 'Mit Bewegung'], [false, 'Ohne']]),
+    wahl('Randspalte', 'rand', [[false, 'Aus'], [true, 'Notizen neben der Seite']], true),
+    (() => { const st = typeof speechSynthesis !== 'undefined' ? (speechSynthesis.getVoices() || []).filter((v) => /^de[-_]/i.test(v.lang)) : []; return st.length ? wahl('Stimme zum Vorlesen', 'stimme', [[null, 'Automatisch'], ...st.slice(0, 12).map((v) => [v.voiceURI, v.name.replace(/\(.*?\)/g, '').trim()])]) : null; })(),
     el('div', { class: 'stickerblock-hinweis', style: 'margin-top:8px' }, 'Diese Einstellungen bleiben an diesem Gerät — Helligkeit ist Gerätesache. Seite, Lesezeichen und Stapel reisen mit.'),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
   const zu = zeigeDeck(kasten);
@@ -685,12 +722,111 @@ async function leserSuche() {
 }
 
 /* Vorlesen: die Textebene der Seite mit der Stimme des Geräts. */
-async function leserVorlesen(knopf) {
-  if (!_leser || !_leser.dok) return;
-  if (typeof vorlesen !== 'function') { toast('Vorlesen gibt es auf diesem Gerät nicht.'); return; }
+/* Vorlesen mit Satz-Hervorhebung: die Textstücke der Seite werden zu Sätzen
+   gebündelt, jeder Satz ist eine Äußerung; während er gesprochen wird, liegt
+   eine warme Markierung über seinen Stücken. Am Seitenende blättert es weiter. */
+function leserStimme() {
+  const stimmen = typeof speechSynthesis !== 'undefined' ? (speechSynthesis.getVoices() || []) : [];
+  const e = leseEinstellung();
+  if (e.stimme) { const v = stimmen.find((s) => s.voiceURI === e.stimme || s.name === e.stimme); if (v) return v; }
+  return stimmen.find((v) => /^de[-_]/i.test(v.lang) && /siri|anna|petra|markus|google|natural|premium/i.test(v.name)) || stimmen.find((v) => /^de[-_]/i.test(v.lang)) || null;
+}
+function leserSaetze(items) {
+  const saetze = []; let akt = { text: '', items: [] };
+  for (const it of items) {
+    const s = String(it.str || ''); if (!s.trim()) { if (it.hasEOL && akt.text && !akt.text.endsWith(' ')) akt.text += ' '; continue; }
+    akt.items.push(it);
+    akt.text += (akt.text && !akt.text.endsWith(' ') && !akt.text.endsWith('-') ? ' ' : '') + s.trim();
+    if (/[.!?…]["“”»«)]?\s*$/.test(s) && akt.text.length > 2) { saetze.push(akt); akt = { text: '', items: [] }; }
+  }
+  if (akt.text.trim()) saetze.push(akt);
+  return saetze;
+}
+function leserMarkiere(items) {
+  if (!_leser) return;
   const l = _leser;
-  let text = '';
-  try { const tc = await (await l.dok.getPage(l.seite)).getTextContent(); text = tc.items.map((i) => i.str + (i.hasEOL ? ' ' : '')).join('').replace(/\s+/g, ' ').trim(); } catch (e) {}
-  if (!text) { toast('Diese Seite trägt keinen Text, den man vorlesen könnte.'); return; }
-  vorlesen(text, knopf);
+  l.buehne.querySelectorAll('.lese-markierung').forEach((m) => m.remove());
+  if (!items || !items.length) return;
+  const c = [...l.buehne.querySelectorAll('.lese-blatt canvas')].find((x) => x._seite === l.liest.seite);
+  if (!c || !c._vp) return;
+  const blatt = c.parentElement, vp = c._vp, dpr = c._dpr || 1;
+  const lage = el('div', { class: 'lese-markierung' });
+  for (const it of items) {
+    const tr = it.transform || [1, 0, 0, 1, 0, 0];
+    const p1 = vp.convertToViewportPoint(tr[4], tr[5]), p2 = vp.convertToViewportPoint(tr[4] + (it.width || 0), tr[5] + (it.height || Math.hypot(tr[2], tr[3]) || 10));
+    const x = Math.min(p1[0], p2[0]) / dpr + c.offsetLeft, y = Math.min(p1[1], p2[1]) / dpr + c.offsetTop;
+    const w = Math.abs(p2[0] - p1[0]) / dpr, h = Math.abs(p2[1] - p1[1]) / dpr;
+    if (w < 1 || h < 1) continue;
+    lage.append(el('i', { style: 'left:' + (x - 2).toFixed(1) + 'px;top:' + (y - 1).toFixed(1) + 'px;width:' + (w + 4).toFixed(1) + 'px;height:' + (h + 2).toFixed(1) + 'px' }));
+  }
+  blatt.append(lage);
+}
+function leserVorlesenStopp() {
+  if (!_leser) return;
+  const l = _leser;
+  if (l.liest && l.liest.knopf) l.liest.knopf.classList.remove('an');
+  l.liest = null;
+  l.buehne.querySelectorAll('.lese-markierung').forEach((m) => m.remove());
+  document.body.classList.remove('liest-vor');
+  try { speechSynthesis.cancel(); } catch (e) {}
+}
+async function leserVorlesen(knopf, weiter = false) {
+  if (!_leser || !_leser.dok) return;
+  if (typeof vorlesenMoeglich !== 'function' || !vorlesenMoeglich()) { toast('Vorlesen gibt es auf diesem Gerät nicht.'); return; }
+  const l = _leser;
+  if (l.liest && !weiter) { leserVorlesenStopp(); return; }
+  const seite = l.seite;
+  let items = [];
+  try { const tc = await (await l.dok.getPage(seite)).getTextContent(); items = tc.items || []; } catch (e) {}
+  const saetze = leserSaetze(items);
+  if (!saetze.length) { if (weiter) { leserVorlesenStopp(); toast('Hier ist nichts mehr zu lesen.'); } else toast('Diese Seite trägt keinen Text, den man vorlesen könnte.'); return; }
+  try { speechSynthesis.cancel(); } catch (e) {}
+  l.liest = { seite, i: 0, saetze, knopf, weiter: true };
+  if (knopf) knopf.classList.add('an');
+  document.body.classList.add('liest-vor');
+  const stimme = leserStimme();
+  const naechster = () => {
+    if (_leser !== l || !l.liest || l.liest.seite !== seite) return;
+    if (l.liest.i >= saetze.length) {
+      /* Seite zu Ende: weiterblättern und dort weiterlesen — oder aufhören */
+      if (l.seite < l.b.seiten) { l.buehne.querySelectorAll('.lese-markierung').forEach((m) => m.remove()); l.blaettere(1); }
+      else leserVorlesenStopp();
+      return;
+    }
+    const s = saetze[l.liest.i++];
+    leserMarkiere(s.items);
+    const u = new SpeechSynthesisUtterance(s.text);
+    if (stimme) { u.voice = stimme; u.lang = stimme.lang; } else u.lang = 'de-DE';
+    u.rate = begrenze(D.einst.vorleseTempo, .6, 1.4, .95);
+    u.onend = naechster;
+    u.onerror = () => { if (l.liest) leserVorlesenStopp(); };
+    try { speechSynthesis.speak(u); } catch (e) { leserVorlesenStopp(); }
+  };
+  naechster();
+}
+
+/* Die Randspalte: Notizen neben der Seite, zum Anschauen und Hinzufügen. */
+function leserRandspalte() {
+  if (!_leser) return;
+  const l = _leser;
+  l.e.rand = !l.e.rand; leseEinstellungSpeichern(l.e); leserStil();
+  leserRandAktualisieren();
+  l.cache.clear(); l.zeige(0);
+}
+function leserRandAktualisieren() {
+  if (!_leser || !_leser.rand) return;
+  const l = _leser, b = l.b;
+  l.rand.innerHTML = '';
+  if (!l.e.rand) return;
+  const seiten = l.e.doppel === 'an' || (l.e.doppel === 'auto' && l.raum.clientWidth >= 900 && l.raum.clientWidth > l.raum.clientHeight) ? [l.seite % 2 === 0 ? l.seite : l.seite - 1, (l.seite % 2 === 0 ? l.seite : l.seite - 1) + 1].filter((n) => n >= 1 && n <= b.seiten) : [l.seite];
+  l.rand.append(el('div', { class: 'lese-rand-titel' }, 'Randnotizen'));
+  for (const n of seiten) {
+    const notizen = buchNotizen(b, n);
+    l.rand.append(el('div', { class: 'lese-rand-seite' }, 'Seite ' + n));
+    for (const no of notizen) l.rand.append(el('div', { class: 'lese-rand-notiz' }, el('span', {}, no.text), el('button', { class: 'rundknopf zart', html: ik('muell'), title: 'Notiz löschen', onclick: () => { loescheDoc(no.id); leserRandAktualisieren(); l.zeige(0); } })));
+    const feld = el('textarea', { rows: 2, placeholder: 'Notiz zu Seite ' + n + ' …' });
+    const hinzu = () => { const t = feld.value.trim(); if (!t) return; neuDoc('buchnotiz', { parent: b.id, seite: n, text: t }); feld.value = ''; leserRandAktualisieren(); l.zeige(0); };
+    feld.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) { ev.preventDefault(); hinzu(); } ev.stopPropagation(); });
+    l.rand.append(feld, el('button', { class: 'knopf zart', onclick: hinzu }, 'Notiz dazu'));
+  }
 }

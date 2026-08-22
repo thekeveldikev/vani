@@ -685,12 +685,12 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .desk-ding.brief.leer .brief-bild { opacity: .75; }
 @keyframes siegel-pocht { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
 /* ---- Karteikarten, Lupe, Stummel, Notizbuch ---- */
-.desk-ding.karten { right: 24%; top: calc(44% + 270px); width: 70px; height: 48px; --dreh: 4deg; }
+.desk-ding.karten { right: 36%; top: calc(44% + 300px); width: 70px; height: 48px; --dreh: 4deg; }
 .karten-bild { position: relative; width: 70px; height: 48px; }
 .karten-bild i { position: absolute; left: 0; top: 0; width: 64px; height: 40px; border-radius: 3px; background: repeating-linear-gradient(transparent 0 9px, rgba(120,140,200,.35) 9px 10px), linear-gradient(#fbf6e8, #eee6d2); box-shadow: 0 1px 3px rgba(0,0,0,.55); }
 .karten-bild i:nth-child(1)::before { content: ""; position: absolute; left: 0; right: 0; top: 9px; height: 1px; background: rgba(200,80,80,.5); }
 .karten-bild i:nth-child(2) { transform: translate(3px, 3px) rotate(3deg); } .karten-bild i:nth-child(3) { transform: translate(6px, 6px) rotate(-2deg); }
-.desk-ding.lupe { right: 5%; top: calc(44% + 330px); width: 62px; height: 50px; --dreh: 30deg; }
+.desk-ding.lupe { right: 2%; bottom: 58px; width: 62px; height: 50px; --dreh: 30deg; }
 .lupe-bild { position: relative; width: 62px; height: 50px; }
 .lupe-bild .linse { position: absolute; left: 0; top: 6px; width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.42), rgba(200,220,255,.14) 60%, rgba(255,255,255,.05)); box-shadow: inset 0 0 0 4px #8a6d3c, inset 0 0 0 5px rgba(255,230,170,.4), 0 2px 4px rgba(0,0,0,.55); }
 .lupe-bild .glanz { position: absolute; left: 9px; top: 12px; width: 9px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.55); transform: rotate(-30deg); }
@@ -700,7 +700,10 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .stummel-bild .holz { position: absolute; left: 0; top: 0; width: 34px; height: 10px; border-radius: 2px 40% 40% 2px / 2px 50% 50% 2px; background: linear-gradient(#e9c36a, #c99a3d); box-shadow: 0 1px 3px rgba(0,0,0,.55); }
 .stummel-bild .holz::after { content: ""; position: absolute; right: 0; top: 1px; width: 9px; height: 8px; border-radius: 0 50% 50% 0; background: linear-gradient(90deg, #f1dfc0, #d8c49c); }
 .stummel-bild .mine { position: absolute; left: 34px; top: 3px; width: 6px; height: 4px; border-radius: 0 3px 3px 0; background: #2b2520; }
-.desk-ding.notizbuch { right: 8%; top: calc(44% + 220px); width: 96px; height: 66px; --dreh: 6deg; }
+.desk-ding.notizbuch { left: 2%; top: calc(44% + 36%); width: 96px; height: 66px; --dreh: 6deg; }
+.desk-ding.tasse.zweite { right: 19%; top: calc(44% + 126px); --dreh: -6deg; transform: rotate(var(--dreh)) scale(.9); opacity: .95; }
+.desk-ding.tasse.zweite .tasse-bild::before { background: linear-gradient(90deg, #8fa3b0, #c9d6dc 40%, #8fa3b0); }
+.desk-ding.tasse.zweite .henkel { border-color: #b7c6cc; }
 .notizbuch-bild { --heft1: #6f4334; width: 96px; height: 66px; border-radius: 3px 8px 8px 3px; background: linear-gradient(145deg, var(--heft1), color-mix(in srgb, var(--heft1) 70%, #000)); position: relative; box-shadow: 0 3px 6px rgba(0,0,0,.6), inset 6px 0 0 rgba(0,0,0,.25); }
 .notizbuch-bild .zettelchen { position: absolute; top: -6px; width: 18px; height: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.4); }
 .notizbuch-bild .z1 { left: 18px; background: #f2d98a; } .notizbuch-bild .z2 { left: 42px; top: -9px; background: #f3cfd3; } .notizbuch-bild .z3 { left: 66px; background: #cadfea; }
@@ -725,12 +728,133 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
   .desk-ding.manuskript { width: 36%; left: 44%; } .desk-ding.manuskript.m2 { left: 50%; } .desk-ding.manuskript.m3 { left: 38%; }
   .desk-ding.tinte { left: 76%; top: calc(44% + 30px); transform: scale(.8); }
   .desk-ding-halter.buecher { left: 4%; width: 40%; top: calc(44% + 14px); }
-  .desk-ding.tasse { right: 4%; top: calc(44% + 27%); transform: scale(.85); }
-  .desk-ding.glas { left: 5%; top: calc(44% + 190px); } .desk-ding.brief { top: calc(44% + 330px); left: 26%; width: 80px; }
-  .desk-ding.karten { right: 30%; top: calc(44% + 40%); } .desk-ding.lupe { right: 4%; top: calc(44% + 46%); } .desk-ding.stummel { left: 58%; top: calc(44% + 290px); } .desk-ding.notizbuch { right: 5%; top: calc(44% + 36%); transform: scale(.85); }
+  .desk-ding.tasse { right: 4%; top: calc(44% + 22%); transform: scale(.85); } .desk-ding.tasse.zweite { right: 22%; top: calc(44% + 20%); transform: rotate(var(--dreh)) scale(.78); }
+  .desk-ding.glas { left: 5%; top: calc(44% + 190px); } .desk-ding.brief { top: calc(44% + 30%); left: 26%; width: 80px; }
+  .desk-ding.karten { right: 34%; top: calc(44% + 42%); } .desk-ding.lupe { left: 30%; right: auto; bottom: 70px; } .desk-ding.stummel { left: 58%; top: calc(44% + 290px); } .desk-ding.notizbuch { left: 3%; top: calc(44% + 34%); transform: scale(.85); }
+  .desk-ding-halter.offenbuch { right: 3%; top: calc(44% + 38%); transform: scale(.8); transform-origin: top right; }
+  .desk-wetterglas { left: 58%; transform: scale(.85); } .desk-teelichter { left: 27%; transform: scale(.85); transform-origin: left bottom; }
+  .desk-blatt { left: 4%; width: 92%; top: calc(44% + 10px); height: calc(56% - 44px); }
   .desk-vers { font-size: 11px; max-width: 150px; } .desk-vers.v1 { left: 8%; top: calc(44% + 150px); }
   .desk-korb { width: 50px; height: 44px; }
 }
+
+/* ---- Der Tisch lebt: Fensterbank (Wetterglas, Teelichter), aufgeschlagenes Buch, eingespanntes Blatt, Luftzug, Tageszeit ---- */
+.desk-wetterglas { position: absolute; left: 56%; top: calc(44% - 66px); width: 40px; height: 66px; z-index: 3; filter: drop-shadow(0 4px 5px rgba(0,0,0,.6)); cursor: pointer; }
+.desk-wetterglas .wg-kugel { position: absolute; left: 5px; top: 18px; width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 32% 30%, rgba(255,255,255,.45), rgba(255,255,255,.08) 40%, rgba(120,140,160,.18) 70%, rgba(255,255,255,.14)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.28), inset -3px -3px 6px rgba(0,0,0,.25); overflow: hidden; }
+.desk-wetterglas .wg-fluessig { position: absolute; left: 7px; top: 30px; width: 26px; height: 16px; border-radius: 0 0 13px 13px; background: linear-gradient(rgba(120,170,200,.35), rgba(90,140,180,.55)); transition: height .6s, top .6s, background .6s; }
+.desk-wetterglas .wg-hals { position: absolute; left: 17px; top: 2px; width: 6px; height: 20px; border-radius: 3px 3px 0 0; background: linear-gradient(90deg, rgba(255,255,255,.3), rgba(255,255,255,.08) 50%, rgba(255,255,255,.25)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+.desk-wetterglas .wg-fuss { position: absolute; left: 4px; bottom: 8px; width: 32px; height: 10px; border-radius: 4px; background: linear-gradient(#6a4a30, #2e1f14); box-shadow: 0 2px 3px rgba(0,0,0,.5); }
+.desk-wetterglas .wg-text { position: absolute; left: 50%; bottom: -2px; transform: translateX(-50%); white-space: nowrap; font-size: 9.5px; letter-spacing: .04em; color: #e8c27a; opacity: 0; transition: opacity .3s; }
+.desk-wetterglas.spielt .wg-text { opacity: .9; }
+.desk-wetterglas.spielt .wg-fluessig { top: 24px; height: 22px; background: linear-gradient(rgba(255,200,110,.45), rgba(255,160,70,.7)); box-shadow: 0 0 12px rgba(255,180,90,.5); animation: wg-blubbert 3.2s ease-in-out infinite; }
+@keyframes wg-blubbert { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.25); } }
+.desk-teelichter { position: absolute; left: 27%; top: calc(44% - 26px); display: flex; gap: 7px; z-index: 3; padding: 0; filter: drop-shadow(0 3px 4px rgba(0,0,0,.6)); cursor: pointer; }
+.teelicht { position: relative; width: 18px; height: 12px; border-radius: 2px 2px 5px 5px; background: linear-gradient(#d8d2c4, #8f897c); box-shadow: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 3px rgba(0,0,0,.25); opacity: .75; }
+.teelicht b { position: absolute; left: 50%; top: 100%; transform: translateX(-50%); font: 8px ui-rounded, system-ui, sans-serif; color: rgba(232,194,122,.7); margin-top: 2px; }
+.teelicht::after { content: ""; position: absolute; left: 50%; top: -8px; width: 5px; height: 9px; margin-left: -2.5px; border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%; background: radial-gradient(ellipse at 50% 70%, #fff4cf, #ffb347 55%, rgba(255,140,40,0) 80%); opacity: 0; transform-origin: bottom; transition: opacity .4s; }
+.teelicht.brennt { opacity: 1; background: linear-gradient(#efe6d2, #a49c8a); box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 0 10px rgba(255,180,90,.45); }
+.teelicht.brennt::after { opacity: 1; animation: teelicht-flackert 1.4s ease-in-out infinite alternate; animation-delay: calc(var(--i, 0) * -.37s); }
+.teelicht.heute { transform: translateY(-1px) scale(1.12); } .teelicht.heute b { color: #e8c27a; }
+.teelicht.kommt { opacity: .45; }
+@keyframes teelicht-flackert { from { transform: scaleY(1) rotate(-3deg); } to { transform: scaleY(1.18) rotate(3deg); } }
+/* Das aufgeschlagene Buch */
+.desk-ding-halter.offenbuch { right: 12%; top: calc(44% + 250px); width: 214px; filter: drop-shadow(0 10px 12px rgba(0,0,0,.6)); --dreh: 3deg; }
+.desk-ding-halter.offenbuch:hover { transform: rotate(var(--dreh)) translateY(-3px); }
+.ob-buch { position: relative; width: 214px; height: 140px; display: flex; gap: 0; perspective: 700px; cursor: pointer; }
+.ob-blatt { position: relative; width: 104px; height: 136px; background: linear-gradient(90deg, #efe6d0, #f8f1e0 30%, #f4ecda); overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,.4); transform-origin: right center; backface-visibility: hidden; }
+.ob-blatt.links { border-radius: 5px 1px 1px 5px; box-shadow: inset -10px 0 14px -10px rgba(0,0,0,.45), 0 2px 4px rgba(0,0,0,.4); margin-top: 4px; }
+.ob-blatt.rechts { border-radius: 1px 5px 5px 1px; box-shadow: inset 10px 0 14px -10px rgba(0,0,0,.45), 0 2px 4px rgba(0,0,0,.4); transform-origin: left center; margin-top: 4px; margin-left: 6px; }
+.ob-seite { display: block; width: 100%; height: 100%; object-fit: contain; }
+.ob-seite.leer { visibility: hidden; }
+.offenbuch:not(.offen):not(.zu) .ob-blatt::after { content: ""; position: absolute; inset: 12px 10px; background: repeating-linear-gradient(transparent 0 9px, rgba(90,70,40,.12) 9px 10px); }
+.ob-ruecken { position: absolute; left: 50%; top: 0; width: 10px; height: 142px; margin-left: -5px; border-radius: 4px; background: linear-gradient(90deg, #3a2416, #7a4a2c 45%, #2c1a10); z-index: 2; box-shadow: 0 3px 6px rgba(0,0,0,.5); }
+.ob-band { position: absolute; left: 62%; top: 100px; width: 5px; height: 52px; background: #b03a2c; border-radius: 0 0 2px 2px; box-shadow: 0 2px 3px rgba(0,0,0,.5); transform: rotate(-6deg); z-index: 3; }
+.ob-titel { position: absolute; left: 50%; top: 100%; transform: translateX(-50%); margin-top: 8px; white-space: nowrap; max-width: 240px; overflow: hidden; text-overflow: ellipsis; padding: 2px 10px; border-radius: 8px; background: rgba(255,230,180,.1); color: #e8c27a; font-size: 11.5px; letter-spacing: .03em; }
+.ob-buch.blatt-vor .ob-blatt.rechts { animation: ob-vor .5s cubic-bezier(.3,.7,.3,1); }
+.ob-buch.blatt-zurueck .ob-blatt.links { animation: ob-zurueck .5s cubic-bezier(.3,.7,.3,1); }
+@keyframes ob-vor { 0% { transform: rotateY(0); filter: brightness(1); } 50% { transform: rotateY(-80deg); filter: brightness(.8); } 51% { transform: rotateY(-80deg); } 100% { transform: rotateY(0); filter: brightness(1); } }
+@keyframes ob-zurueck { 0% { transform: rotateY(0); } 50% { transform: rotateY(80deg); filter: brightness(.8); } 51% { transform: rotateY(80deg); } 100% { transform: rotateY(0); } }
+.offenbuch.zu .ob-blatt, .offenbuch.zu .ob-band { display: none; }
+.offenbuch.zu .ob-ruecken { left: 0; margin-left: 0; border-radius: 4px 1px 1px 4px; }
+.offenbuch.zu .ob-buch img { position: absolute; left: 8px; top: 0; width: 104px; height: 140px; object-fit: cover; border-radius: 2px 6px 6px 2px; box-shadow: 0 4px 8px rgba(0,0,0,.5); }
+.offenbuch.stumm .ob-titel::after { content: " · ließ sich nicht aufschlagen"; opacity: .6; }
+/* Das eingespannte Blatt */
+.desk-blatt { position: absolute; left: 30%; top: calc(44% + 24px); width: min(470px, 54%); height: calc(56% - 50px); min-height: 260px; z-index: 6; display: flex; flex-direction: column; border-radius: 2px; transform: rotate(-.8deg);
+  background: linear-gradient(100deg, #fff8e8 0%, #f7ecd4 48%, #ecdfc2 100%); box-shadow: 0 18px 40px rgba(0,0,0,.6), 0 2px 4px rgba(0,0,0,.4), inset 0 0 40px rgba(120,90,40,.08); color: #2c2218; animation: blatt-kommt .45s cubic-bezier(.2,.8,.2,1); }
+@keyframes blatt-kommt { from { opacity: 0; transform: translateY(14px) rotate(-2deg); } to { opacity: 1; transform: translateY(0) rotate(-.8deg); } }
+.desk-blatt.weg { animation: blatt-geht .32s ease-in both; }
+@keyframes blatt-geht { to { opacity: 0; transform: translateY(18px) rotate(1deg); } }
+.desk-blatt-kopf { display: flex; align-items: center; gap: 8px; padding: 12px 14px 6px; border-bottom: 1px solid rgba(90,70,40,.2); }
+.desk-blatt-titel { flex: 1; min-width: 0; background: none; border: none; outline: none; font: 600 17px ui-serif, "New York", Georgia, serif; color: #2c2218; }
+.desk-blatt-worte { font-size: 11.5px; color: rgba(60,40,20,.6); white-space: nowrap; }
+.desk-blatt-kopf .rundknopf { width: 30px; height: 30px; color: #5a4326; }
+.desk-blatt-text { flex: 1; min-height: 0; resize: none; background: repeating-linear-gradient(transparent 0 27px, rgba(90,70,40,.13) 27px 28px); background-position: 0 5px; border: none; outline: none; padding: 6px 16px 10px; font: 16px/28px ui-serif, "New York", Georgia, serif; color: #2c2218; caret-color: #1a2a6a; }
+.desk-blatt-text::placeholder { color: rgba(60,40,20,.4); font-style: italic; }
+.desk-blatt-fuss { padding: 4px 14px 8px; font-size: 10.5px; color: rgba(60,40,20,.5); }
+.blatt-liegt .desk-ding.manuskript, .blatt-liegt .desk-vers { filter: drop-shadow(0 7px 9px rgba(0,0,0,.6)) brightness(.85); }
+/* Luftzug beim Hereinkommen, Wind am Fenster hebt die Ecken */
+.luftzug .desk-ding.manuskript { animation: papier-hebt 1.7s cubic-bezier(.2,.8,.2,1); }
+@keyframes papier-hebt { 0% { transform: rotate(var(--dreh, 0deg)); } 18% { transform: rotate(calc(var(--dreh, 0deg) + 1.6deg)) translate(2px, -4px); } 45% { transform: rotate(calc(var(--dreh, 0deg) - .9deg)) translate(-1px, -1px); } 100% { transform: rotate(var(--dreh, 0deg)); } }
+.luftzug .desk-vers { animation: vers-weht 1.7s ease-out; }
+@keyframes vers-weht { 30% { opacity: .25; } }
+.wetter-wind .desk-ding.manuskript, .wetter-gewitter .desk-ding.manuskript { animation: papier-flattert 5s ease-in-out infinite; }
+.wetter-wind .desk-ding.manuskript.m2, .wetter-gewitter .desk-ding.manuskript.m2 { animation-delay: -1.7s; } .wetter-wind .desk-ding.manuskript.m3, .wetter-gewitter .desk-ding.manuskript.m3 { animation-delay: -3.1s; }
+@keyframes papier-flattert { 0%, 100% { transform: rotate(var(--dreh, 0deg)); } 30% { transform: rotate(calc(var(--dreh, 0deg) + .7deg)) translateY(-1.5px); } 60% { transform: rotate(calc(var(--dreh, 0deg) - .4deg)); } }
+.wetter-wind .manuskript-papier::after, .wetter-gewitter .manuskript-papier::after { content: ""; position: absolute; right: -1px; top: -1px; width: 0; height: 0; border-style: solid; border-width: 0 0 18px 18px; border-color: transparent transparent #d9caa6 transparent; box-shadow: -2px 2px 3px rgba(0,0,0,.2); animation: ecke-hebt 2.6s ease-in-out infinite alternate; transform-origin: top right; }
+@keyframes ecke-hebt { from { border-width: 0 0 10px 10px; } to { border-width: 0 0 22px 22px; } }
+/* Tageszeit im Raum: am Tag heller, in der Dämmerung eine warme Kante */
+.desk-szene[data-tageszeit="tag"] .desk-ding:not(.lampe):not(.leuchter) { filter: drop-shadow(0 8px 10px rgba(0,0,0,.42)) brightness(1.07); }
+.desk-szene[data-tageszeit="daemmerung"] .desk-ding:not(.lampe):not(.leuchter) { filter: drop-shadow(0 7px 9px rgba(0,0,0,.6)) drop-shadow(-1px -1px 0 rgba(255,160,80,.22)); }
+.desk-szene[data-tageszeit="tag"] .desk-ding.lampe::before, .desk-szene[data-tageszeit="tag"] .desk-ding.lampe .schirm::after { opacity: calc(var(--lampe) * .45); }
+/* Handy, Hochformat: das Fenster schmaler, die Dinge in zwei Reihen */
+@media (max-width: 520px) {
+  .desk-szene { min-height: 640px; }
+  .desk-ding.lampe { left: -22px; transform: scale(.62); transform-origin: top left; }
+  .desk-ding.leuchter { right: -30px; transform: scale(.55); transform-origin: top right; }
+  .desk-ding.uhr { right: 20%; transform: scale(.62); transform-origin: top; }
+  .desk-wetterglas { left: 60%; transform: scale(.75); } .desk-teelichter { left: 22%; top: calc(44% - 20px); transform: scale(.72); transform-origin: left bottom; }
+  .desk-ding-halter.buecher { left: 2%; width: 54%; top: calc(44% + 8px); }
+  .desk-ding.manuskript { width: 38%; left: 58%; top: calc(44% + 10px); } .desk-ding.manuskript.m2 { left: 62%; top: calc(44% + 30px); } .desk-ding.manuskript.m3 { display: none; }
+  .desk-ding.tinte { left: auto; right: -6px; top: calc(44% + 110px); transform: scale(.65); }
+  .desk-ding.glas { left: 4%; top: calc(44% + 150px); transform: scale(.9); }
+  .desk-ding.brief { left: 30%; top: calc(44% + 190px); width: 80px; }
+  .desk-ding.tasse { right: 4%; top: calc(44% + 190px); transform: scale(.8); } .desk-ding.tasse.zweite { right: 28%; top: calc(44% + 186px); transform: rotate(var(--dreh)) scale(.7); }
+  .desk-ding.notizbuch { left: 3%; top: calc(44% + 250px); transform: scale(.8); transform-origin: left top; }
+  .desk-ding-halter.offenbuch { right: 2%; top: calc(44% + 206px); transform: scale(.68); transform-origin: top right; }
+  /* Die Leiste liegt unten über der Szene: Korb, Schublade und Lupe rücken hoch */
+  .desk-korb { bottom: 76px; } .desk-schublade { bottom: 68px; } .desk-ding.lupe { bottom: 104px; } .desk-szene::before { bottom: 64px; }
+  .desk-ding.karten { left: 24%; right: auto; top: calc(44% + 275px); transform: rotate(var(--dreh)) scale(.8); } .desk-ding.stummel { left: 40%; top: calc(44% + 245px); }
+  .desk-ding.lupe { left: 6%; right: auto; bottom: 66px; transform: rotate(var(--dreh)) scale(.85); }
+  .desk-vers { display: none; }
+  .desk-blatt { left: 3%; width: 94%; top: calc(44% + 6px); height: calc(56% - 30px); min-height: 220px; }
+  .desk-blatt-text { font-size: 15px; line-height: 26px; background: repeating-linear-gradient(transparent 0 25px, rgba(90,70,40,.13) 25px 26px); }
+  .desk-einrichten { top: 8px; right: 8px; }
+}
+/* ===================== SPOTLIGHT & KÜRZEL ===================== */
+.spotlight-bogen { position: fixed; inset: 0; z-index: 95; background: rgba(20,16,12,.38); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); display: flex; align-items: flex-start; justify-content: center; padding: 9vh 12px 0; }
+.spotlight { width: min(880px, 96vw); max-height: 72vh; background: var(--karte); color: var(--tinte, inherit); border-radius: 18px; box-shadow: 0 24px 60px rgba(0,0,0,.4), 0 0 0 1px var(--linie); display: flex; flex-direction: column; overflow: hidden; animation: spotlight-kommt .18s ease-out; }
+@keyframes spotlight-kommt { from { opacity: 0; transform: translateY(-8px) scale(.98); } to { opacity: 1; transform: none; } }
+.spotlight-zeile { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--linie); }
+.spotlight-zeile input { flex: 1; min-width: 0; background: none; border: none; outline: none; font: inherit; font-size: 18px; color: inherit; }
+.spotlight-zeile kbd, .spotlight-vhinweis kbd { font: 11px ui-monospace, Menlo, monospace; padding: 2px 7px; border-radius: 6px; background: var(--hg); box-shadow: inset 0 0 0 1px var(--linie); color: var(--blass); }
+.spotlight-koerper { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); min-height: 0; flex: 1; }
+.spotlight-liste { overflow: auto; border-right: 1px solid var(--linie); padding: 6px; min-height: 120px; }
+.spotlight-eintrag { display: flex; gap: 10px; align-items: center; width: 100%; text-align: left; padding: 8px 10px; border-radius: 10px; }
+.spotlight-eintrag.an { background: color-mix(in srgb, var(--blass) 16%, transparent); }
+.spotlight-eintrag .sp-icon { display: flex; color: var(--blass); } .spotlight-eintrag .sp-icon svg { width: 18px; height: 18px; }
+.spotlight-eintrag .sp-text { display: grid; min-width: 0; } .spotlight-eintrag .sp-text b { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .spotlight-eintrag .sp-text small { color: var(--blass); font-size: 12px; }
+.spotlight-vorschau { overflow: auto; padding: 16px 18px; font-family: ui-serif, "New York", Georgia, serif; }
+.spotlight-vtitel { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.spotlight-vmeta { font-size: 12px; color: var(--blass); font-family: ui-rounded, -apple-system, system-ui, sans-serif; margin-bottom: 10px; }
+.spotlight-vtext { font-size: 14.5px; line-height: 1.55; overflow-wrap: anywhere; }
+.spotlight-vtext mark { background: rgba(255,196,90,.45); color: inherit; border-radius: 3px; padding: 0 1px; }
+.spotlight-vhinweis { margin-top: 14px; font-size: 11px; color: var(--blass); font-family: ui-rounded, -apple-system, system-ui, sans-serif; }
+.spotlight-leer { padding: 22px; color: var(--blass); font-style: italic; font-family: ui-serif, Georgia, serif; }
+@media (max-width: 700px) { .spotlight-koerper { grid-template-columns: 1fr; } .spotlight-vorschau { display: none; } .spotlight-liste { border-right: none; } .spotlight-bogen { padding-top: 4vh; } }
+.modal.kuerzel { max-height: 86dvh; overflow: auto; width: min(560px, 94vw); }
+.kuerzel-gruppe { margin: 12px 0 6px; } .kuerzel-gruppe b { display: block; margin-bottom: 5px; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--blass); }
+.kuerzel-zeile { display: flex; gap: 12px; align-items: center; padding: 3px 0; font-size: 14px; } .kuerzel-zeile kbd { min-width: 130px; font: 12px ui-monospace, Menlo, monospace; padding: 3px 8px; border-radius: 6px; background: var(--hg); box-shadow: inset 0 0 0 1px var(--linie); text-align: center; }
+.feuer-zahlen .lese-serie { margin-top: 4px; opacity: .85; }
 /* ===================== LESESTAPEL & LESEMODUS ===================== */
 .modal.lesestapel { width: min(760px, 96vw); max-height: 90dvh; overflow: auto; }
 .lesestapel-raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 16px; margin: 8px 0 14px; }
@@ -756,6 +880,31 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .lese-buehne { flex: 1; position: relative; overflow: hidden; display: grid; place-items: center; perspective: 1600px; touch-action: pan-y; cursor: pointer; }
 .lese-doppel { position: absolute; display: flex; gap: 12px; align-items: center; justify-content: center; inset: 0; transition: transform .42s cubic-bezier(.2,.8,.2,1), opacity .42s; transform-origin: center; }
 .lese-blatt { position: relative; filter: brightness(var(--lese-hell)); box-shadow: 0 14px 40px rgba(0,0,0,.55); border-radius: 2px; overflow: hidden; background: #fff; }
+.lese-markierung { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.lese-markierung i { position: absolute; background: rgba(255,196,90,.42); border-radius: 3px; box-shadow: 0 0 0 1px rgba(255,196,90,.28); mix-blend-mode: multiply; animation: markierung-kommt .18s ease-out; }
+.lesemodus.nacht .lese-markierung i { background: rgba(255,170,60,.35); mix-blend-mode: screen; }
+@keyframes markierung-kommt { from { opacity: 0; } }
+/* Randspalte: Notizen neben der Seite */
+.lese-rand { display: none; position: absolute; right: 0; top: 58px; bottom: 58px; width: 290px; overflow: auto; background: rgba(24,19,15,.96); color: #f1e4c8; z-index: 3; padding: 14px 16px; box-shadow: -8px 0 24px rgba(0,0,0,.35); border-left: 1px solid rgba(255,230,180,.1); }
+.lesemodus.mit-rand .lese-rand { display: block; } .lesemodus.mit-rand .lese-buehne { margin-right: 290px; }
+.lese-rand-titel { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: #c9a25a; margin-bottom: 10px; }
+.lese-rand-seite { font-size: 12px; color: rgba(241,228,200,.6); margin: 12px 0 6px; }
+.lese-rand-notiz { display: flex; gap: 6px; align-items: flex-start; padding: 8px 10px; margin-bottom: 6px; border-radius: 10px; background: rgba(255,230,180,.08); font-family: ui-serif, Georgia, serif; font-size: 14px; line-height: 1.4; }
+.lese-rand-notiz span { flex: 1; white-space: pre-wrap; } .lese-rand-notiz .rundknopf { width: 26px; height: 26px; flex: 0 0 auto; }
+.lese-rand textarea { width: 100%; margin: 4px 0 6px; background: rgba(255,255,255,.06); color: inherit; border: none; border-radius: 10px; padding: 8px 10px; font: 14px ui-serif, Georgia, serif; resize: vertical; box-shadow: inset 0 0 0 1px rgba(255,230,180,.15); }
+.lese-rand .knopf { color: #e8c27a; }
+@media (max-width: 900px) { .lese-rand { top: auto; width: 100%; height: 40%; border-left: none; border-top: 1px solid rgba(255,230,180,.1); box-shadow: 0 -8px 24px rgba(0,0,0,.35); } .lesemodus.mit-rand .lese-buehne { margin-right: 0; margin-bottom: 40%; } }
+/* EPUB: fließender Text in Spalten */
+.lesemodus.epub .lese-buehne { display: block; place-items: initial; overflow: hidden; background: color-mix(in srgb, #f8f1e3, #f1dcb2 calc(var(--lese-waerme) * 100%)); filter: brightness(var(--lese-hell)); cursor: default; --epub-schrift: ui-serif, "New York", Georgia, serif; --epub-groesse: 19px; --epub-zeile: 1.6; --epub-rand: 36px; }
+.lesemodus.epub.nacht .lese-buehne { background: color-mix(in srgb, #15120f, #2a2014 calc(var(--lese-waerme) * 100%)); }
+.epub-inhalt { position: absolute; top: 58px; bottom: 62px; left: var(--epub-rand); right: var(--epub-rand); column-fill: auto; column-gap: 48px; font-family: var(--epub-schrift); font-size: var(--epub-groesse); line-height: var(--epub-zeile); color: #2c2218; will-change: transform; text-rendering: optimizeLegibility; -webkit-hyphens: auto; hyphens: auto; }
+.lesemodus.epub.nacht .epub-inhalt { color: #e6dcc8; }
+.epub-inhalt p { margin: 0 0 .75em; text-align: justify; orphans: 2; widows: 2; } .epub-inhalt h1, .epub-inhalt h2, .epub-inhalt h3, .epub-inhalt h4 { font-family: inherit; line-height: 1.25; margin: 1.1em 0 .5em; break-after: avoid; } .epub-inhalt h1 { font-size: 1.6em; } .epub-inhalt h2 { font-size: 1.35em; } .epub-inhalt h3 { font-size: 1.15em; }
+.epub-inhalt img, .epub-inhalt svg { max-width: 100%; max-height: calc(100dvh - 160px); height: auto; display: block; margin: .4em auto; break-inside: avoid; }
+.epub-inhalt blockquote { margin: .6em 1.2em; font-style: italic; } .epub-inhalt a { color: #7a4a2c; } .lesemodus.epub.nacht .epub-inhalt a { color: #e8c27a; } .epub-inhalt table { max-width: 100%; font-size: .9em; } .epub-inhalt pre { white-space: pre-wrap; font-size: .85em; }
+.epub-inhalt * { max-width: 100%; }
+.epub-kapitel { position: absolute; top: 64px; left: 0; right: 0; text-align: center; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: rgba(60,40,20,.5); pointer-events: none; z-index: 1; } .lesemodus.epub.nacht .epub-kapitel { color: rgba(230,220,200,.45); }
+.lese-gliederung button.an { background: rgba(232,194,122,.14); }
 .lese-blatt::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: rgb(255 176 90); mix-blend-mode: multiply; opacity: calc(var(--lese-waerme) * .45); }
 .lesemodus.nacht .lese-blatt canvas { filter: invert(1) hue-rotate(180deg) contrast(.92); }
 .lesemodus.nacht .lese-blatt { background: #111; }
@@ -2078,7 +2227,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.17.0';
+const APP_VERSION = '5.18.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -2132,10 +2281,18 @@ function entprellt(fn, ms, notfall) {
   const g = (...a) => { letzteArgs = a; clearTimeout(t); t = setTimeout(() => { letzteArgs = null; fn(...a); }, ms); };
   g.sofort = (...a) => { clearTimeout(t); letzteArgs = null; fn(...a); };
   g.haengt = () => letzteArgs !== null;
-  if (notfall) _spueler.push(() => { if (letzteArgs) { clearTimeout(t); const a = letzteArgs; letzteArgs = null; fn(...a); } });
+  if (notfall) {
+    /* notfall darf eine Funktion sein, die sagt, ob der Besitzer noch lebt — tote Spüler werden ausgetragen */
+    const sp = () => { if (letzteArgs) { clearTimeout(t); const a = letzteArgs; letzteArgs = null; fn(...a); } };
+    sp.lebt = typeof notfall === 'function' ? notfall : null;
+    _spueler.push(sp);
+    g.loesen = () => { const i = _spueler.indexOf(sp); if (i >= 0) _spueler.splice(i, 1); };
+  }
   return g;
 }
-function spueleAlles() { for (const s of _spueler) { try { s(); } catch (e) {} } }
+function spueleAlles() {
+  for (const s of [..._spueler]) { try { s(); } catch (e) {} if (s.lebt && !s.lebt()) { const i = _spueler.indexOf(s); if (i >= 0) _spueler.splice(i, 1); } }
+}
 
 const worte = (t) => { t = (t || '').trim(); return t ? t.split(/\s+/).length : 0; };
 
@@ -2394,7 +2551,8 @@ const STANDARD_EINST = {
   autoSeitenwechsel: true, schnipselAnsicht: 'lauf', blattSortierung: 'zuletzt', hefteAnsicht: 'karten',
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
   stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
-  ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95
+  ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95,
+  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null
 };
 const D = {
   docs: new Map(),
@@ -2415,6 +2573,8 @@ function uebernehmeEinstellungen(quelle) {
   D.einst.tagesziel = Math.round(begrenze(D.einst.tagesziel, 0, 10000000, 0));
   D.einst.stiftDicke = begrenze(D.einst.stiftDicke, 1, 24, 3.5);
   D.einst.stiftFarbe = /^#[0-9a-f]{6}$/i.test(D.einst.stiftFarbe || '') ? D.einst.stiftFarbe : '#2c251c';
+  D.einst.stickerDicke = begrenze(D.einst.stickerDicke, 1, 24, 5);
+  D.einst.stickerFarbe = /^#[0-9a-f]{6}$/i.test(D.einst.stickerFarbe || '') ? D.einst.stickerFarbe : '#c8322b';
   D.einst.sperreNachMinuten = Math.round(begrenze(D.einst.sperreNachMinuten, 0, 240, 10));
   D.einst.thema = ['papier', 'tinte', 'kerze', 'nebel', 'weiss'].includes(D.einst.thema) ? D.einst.thema : 'papier';
   D.einst.schrift = ['serife', 'klar', 'mono'].includes(D.einst.schrift) ? D.einst.schrift : 'serife';
@@ -2574,11 +2734,11 @@ function sauberesDokument(quelle) {
       h: begrenze(q2.h, 40, 6000, 300)
     };
   }
-  if (d.pos != null) {
+  if (d.pos != null && !['gruppe', 'brettbild'].includes(d.typ)) {
     const p = d.pos && typeof d.pos === 'object' && !Array.isArray(d.pos) ? d.pos : {};
     d.pos = {
       x: begrenze(p.x, -100000, 100000, 0), y: begrenze(p.y, -100000, 100000, 0),
-      rot: begrenze(p.rot, -360, 360, 0), w: begrenze(p.w, 8, 2000, 30)
+      rot: begrenze(p.rot, -360, 360, 0), w: begrenze(p.w, 5, 2000, 30)
     };
   }
   if (d.freiPos != null) {
@@ -2595,7 +2755,7 @@ function sauberesDokument(quelle) {
   if (d.staende != null) {
     d.staende = Array.isArray(d.staende) ? d.staende.slice(-20).filter((s) => s && typeof s === 'object').map((s) => ({
       wann: begrenze(s.wann, 0, Date.now() + 86400000, Date.now()),
-      titel: String(s.titel || '').slice(0, 1000), text: String(s.text || '').slice(0, 10000000)
+      titel: String(s.titel || '').slice(0, 1000), text: String(s.text || '').slice(0, 10000000), ...(s.auto ? { auto: true } : {})
     })) : [];
   }
   if (d.pegel != null) {
@@ -2654,7 +2814,20 @@ function neuDoc(typ, felder) {
   D.stats.letzte[d.id] = worte(d.text || '');
   return d;
 }
-function speichere(d) { d.geaendert = Date.now(); markiereAenderung(d, false); dbPut('docs', d).catch(() => {}); }
+function speichere(d) { d.geaendert = Date.now(); staendeAutomatisch(d); markiereAenderung(d, false); dbPut('docs', d).catch(() => {}); }
+/* Rückgängig-Verlauf: alle 15 Minuten friert das Speichern den Text still ein (höchstens 20 Stände,
+   automatische weichen zuerst). Pur bis auf die Uhr. */
+const STAENDE_ABSTAND = 15 * 60000;
+function staendeAutomatisch(d, jetzt = Date.now()) {
+  if (!d || typeof d.text !== 'string' || d.text.length < 120) return false;
+  if (!['blatt', 'szene', 'seite', 'schnipsel'].includes(d.typ)) return false;
+  const st = d.staende = Array.isArray(d.staende) ? d.staende : [];
+  const letzter = st[st.length - 1];
+  if (letzter && (jetzt - letzter.wann < STAENDE_ABSTAND || letzter.text === d.text)) return false;
+  st.push({ wann: jetzt, titel: d.titel || '', text: d.text, auto: true });
+  while (st.length > 20) { const i = st.findIndex((s) => s.auto); st.splice(i >= 0 ? i : 0, 1); }
+  return true;
+}
 function speichereStill(d) { markiereAenderung(d, false); dbPut('docs', d).catch(() => {}); }
 
 /* Löschen ist bei VANI nie endgültig: alles wandert erst in den Papierkorb. */
@@ -2726,10 +2899,10 @@ async function papierkorbLeeren(nurAelterAlsTage) {
   const grenze = nurAelterAlsTage ? Date.now() - nurAelterAlsTage * 86400000 : Infinity;
   for (const b of alle) {
     if (nurAelterAlsTage && b.wann > grenze) continue;
+    /* Medien nur löschen, wenn kein lebendes Dokument sie noch braucht (ein Buch aus dem Goodnotes-Archiv teilt die Datei) */
+    const nochGenutzt = (id) => { for (const x of D.docs.values()) if (x.bild === id || x.skizze === id || x.datei === id || x.skizzeBasis === id) return true; return false; };
     for (const d of b.docs) {
-      if (d.bild) { await dbDel('media', d.bild); if (typeof loeseMedienURL === 'function') loeseMedienURL(d.bild); }
-      if (d.skizze) { await dbDel('media', d.skizze); if (typeof loeseMedienURL === 'function') loeseMedienURL(d.skizze); }
-      if (d.datei) { await dbDel('media', d.datei); if (typeof loeseMedienURL === 'function') loeseMedienURL(d.datei); }
+      for (const feld of ['bild', 'skizze', 'datei', 'skizzeBasis']) { const id = d[feld]; if (id && !nochGenutzt(id)) { await dbDel('media', id); if (typeof loeseMedienURL === 'function') loeseMedienURL(id); } }
       delete D.stats.letzte[d.id];
     }
     await dbDel('papierkorb', b.id);
@@ -3190,7 +3363,7 @@ function profilTor(erstes, profile) {
       name.value = p.name; name.hidden = true; pass2.hidden = true;
       pass.value = ''; meldung.textContent = ''; pass.focus();
     };
-    for (const p of profile) profilListe.append(el('button', { class: 'profil-wahl', 'data-id': p.id, onclick: () => waehle(p) },
+    if (!erstes) for (const p of profile) profilListe.append(el('button', { class: 'profil-wahl', 'data-id': p.id, onclick: () => waehle(p) },
       el('span', { class: 'profil-monogramm' }, p.name.slice(0, 1).toUpperCase()), el('span', {}, p.name)));
     if (!erstes) profilListe.append(el('button', { class: 'profil-wahl neu', onclick: () => resolve({ neu: true, zu }) },
       el('span', { class: 'profil-monogramm' }, '+'), el('span', {}, 'Neues Profil auf diesem Gerät')));
@@ -3333,8 +3506,10 @@ const SYNC_INTERNE_FELDER = new Set(['_rev', '_geraet', '_syncZeit']);
 let _sync = {
   config: null, ydoc: null, ydocs: null, ystate: null, ymedia: null, persistence: null,
   poll: null, status: { art: 'aus' }, uebernimmt: false, anwendenTimer: null,
-  sendet: false, holt: false, medien: false, generation: 0
+  sendet: false, holt: false, medien: false, generation: 0, fremdZuletzt: 0, nachzug: null
 };
+/* Hat die andere Seite in den letzten Minuten etwas gebracht? (zweite Tasse am Schreibtisch) */
+function syncFremdAktiv(minuten = 20) { return !!_sync.config && _sync.fremdZuletzt > 0 && Date.now() - _sync.fremdZuletzt < minuten * 60000; }
 
 function syncMelde(art, extra) {
   _sync.status = Object.assign({ art, wann: Date.now() }, extra || {});
@@ -3540,7 +3715,9 @@ function syncLeseDokument(id, y) {
   return sauberesDokument(roh);
 }
 function syncDokumentGeaendert(d, geloescht) {
-  if (!_sync.ydoc || _sync.uebernimmt || !d || !d.id) return;
+  if (!_sync.ydoc || !d || !d.id) return;
+  /* Mitten in einer Übernahme: merken und danach nachziehen — sonst ginge die Änderung verloren */
+  if (_sync.uebernimmt) { (_sync.nachzug = _sync.nachzug || new Map()).set(d.id, { d, geloescht }); return; }
   _sync.ydoc.transact(() => {
     if (geloescht) _sync.ydocs.delete(d.id);
     else syncSchreibeDokument(d);
@@ -3581,6 +3758,8 @@ async function syncUebernehmeAusY() {
   if (!_sync.ydocs || _sync.uebernimmt) return;
   _sync.uebernimmt = true;
   let veraendert = 0;
+  const start = Date.now();
+  const ohneIntern = (o) => { const k = { ...o }; for (const f of SYNC_INTERNE_FELDER) delete k[f]; return k; };
   try {
     const da = new Set();
     for (const [id, y] of _sync.ydocs.entries()) {
@@ -3591,9 +3770,11 @@ async function syncUebernehmeAusY() {
       /* Nur was sich wirklich unterscheidet, wird übernommen — und zwar in
          das vorhandene Objekt hinein, damit offene Editoren, die es halten,
          weiterschreiben können, statt ins Leere. */
-      if (alt && syncGleich(alt, d)) continue;
+      if (alt && syncGleich(ohneIntern(alt), ohneIntern(d))) continue;
+      if (alt && _sync.nachzug && _sync.nachzug.has(id)) continue;   /* lokal gerade geändert: lokal gewinnt, kommt gleich nach */
       if (alt) {
-        for (const k of Object.keys(alt)) if (!(k in d)) delete alt[k];
+        for (const k of Object.keys(alt)) if (!(k in d) && !SYNC_INTERNE_FELDER.has(k)) delete alt[k];
+        for (const f of SYNC_INTERNE_FELDER) delete d[f];
         Object.assign(alt, d);
         await dbPut('docs', alt);
       } else {
@@ -3601,7 +3782,12 @@ async function syncUebernehmeAusY() {
       }
       veraendert++;
     }
-    for (const id of [...D.docs.keys()]) if (!da.has(id)) { D.docs.delete(id); await dbDel('docs', id); veraendert++; }
+    for (const id of [...D.docs.keys()]) {
+      const d = D.docs.get(id);
+      /* Nur löschen, was nicht währenddessen hier entstanden oder angefasst wurde */
+      if (!da.has(id) && !(d && (d.angelegt > start || d.geaendert > start)) && !(_sync.nachzug && _sync.nachzug.has(id))) { D.docs.delete(id); await dbDel('docs', id); veraendert++; }
+    }
+    if (veraendert) _sync.fremdZuletzt = Date.now();
     const einst = _sync.ystate.get('einst');
     if (typeof einst === 'string') try { uebernehmeEinstellungen(JSON.parse(einst)); await dbPut('kv', D.einst, 'einst'); setzeThema(D.einst.thema); } catch (e) {}
     const stats = _sync.ystate.get('stats');
@@ -3610,7 +3796,11 @@ async function syncUebernehmeAusY() {
       D.stats = { tage: saubereZaehler(s.tage), letzte: saubereZaehler(s.letzte), letzteSicherung: begrenze(s.letzteSicherung, 0, Date.now() + 86400000, 0) };
       await dbPut('kv', D.stats, 'stats');
     } catch (e) {}
-  } finally { _sync.uebernimmt = false; }
+  } finally {
+    _sync.uebernimmt = false;
+    const n = _sync.nachzug; _sync.nachzug = null;
+    if (n) for (const { d, geloescht } of n.values()) syncDokumentGeaendert(d, geloescht);
+  }
   if (!veraendert && !_sync.zeichnenAusstehend) return;
   /* Neu zeichnen nur, wenn sich etwas geändert hat — und nie mitten ins
      Schreiben hinein. Dann wartet es, bis die Hände ruhen. */
@@ -4162,7 +4352,7 @@ function baueRichEditor(doc, optionen = {}) {
     doc.format = 'rich';
     speichere(doc); zaehleWorte(doc.id, doc.text);
     if (optionen.beiSpeichern) optionen.beiSpeichern(doc, editor);
-  }, optionen.warten || 400, true);
+  }, optionen.warten || 400, () => editor.isConnected);
   editor.addEventListener('input', (e) => {
     if (D.einst.kurzschrift !== false && e && e.inputType === 'insertText' && /[_*~]/.test(e.data || '')) { try { kurzschriftLive(editor); } catch (x) {} }
     sichern(); if (optionen.beiInput) optionen.beiInput(doc, editor, startWorte);
@@ -5122,7 +5312,8 @@ function wiederFunde(jetzt = Date.now()) {
     if (!typen.has(d.typ) || text.length < 24 || jetzt - d.angelegt < 2 * 86400000) continue;
     const damals = new Date(d.angelegt);
     let art = d.typ === 'funkeln' ? 'FUNKELN' : d.typ === 'faden' ? 'AUS DEM FADEN' : 'LIEGEN GEBLIEBEN';
-    if (damals.getDate() === heute.getDate() && damals.getMonth() === heute.getMonth() && damals.getFullYear() < heute.getFullYear()) {
+    if (/\n— [^\n]{3,120}(?:, S\. \d+|, Kapitel \d+|, [^\n,]{2,60})\s*$/.test(text) && text.length < 1200) art = 'EIN ZITAT';
+    else if (damals.getDate() === heute.getDate() && damals.getMonth() === heute.getMonth() && damals.getFullYear() < heute.getFullYear()) {
       const jahre = heute.getFullYear() - damals.getFullYear(); art = 'HEUTE VOR ' + jahre + (jahre === 1 ? ' JAHR' : ' JAHREN');
     } else if (/\?\s*(?:\n|$)/.test(text)) art = 'EINE OFFENE FRAGE';
     else if (/(?:,|:|…|\.{3}|\b(?:dass|weil|aber|und|oder))\s*$/i.test(text)) art = 'NOCH NICHT FERTIG';
@@ -5283,7 +5474,8 @@ RENDER.zuhause = function (haupt) {
           str >= 2 ? str + ' Tage in Folge am Feuer' :
           heutigeWorte > 0 ? 'Das Feuer brennt.' :
           feuerstufe() === 'glut' ? 'Noch Glut von neulich. Ein Satz genügt.' :
-          'Kalt hier. Ein Satz macht Feuer.')
+          'Kalt hier. Ein Satz macht Feuer.'),
+        (() => { const ls = typeof leseSerie === 'function' && typeof lesestapelBuecher === 'function' ? leseSerie(lesestapelBuecher()) : null; return ls && (ls.serie > 0 || ls.heute > 0) ? el('div', { class: 'klein lese-serie' }, (ls.heute ? ls.heute + (ls.heute === 1 ? ' Seite' : ' Seiten') + ' gelesen heute' : 'Heute noch nicht gelesen') + (ls.serie >= 2 ? ' · ' + ls.serie + ' Lesetage in Folge' : '')) : null; })()
       ),
       (() => {
         const b = el('div', { class: 'wochenbalken' });
@@ -5411,7 +5603,7 @@ RENDER.zuhause = function (haupt) {
   if (buch) {
     const img = el('img', { alt: '' }); if (buch.bild) setzeBild(img, buch.bild);
     inhalt.append(el('button', { class: 'karte weiterlesen-karte', onclick: () => buchOeffnen(buch) }, img,
-      el('span', {}, el('b', {}, 'Weiterlesen: ' + (buch.titel || 'Buch')), el('small', {}, 'Seite ' + buch.seite + ' von ' + buch.seiten + ' · ' + buchFortschritt(buch.seite, buch.seiten) + ' %'))));
+      el('span', {}, el('b', {}, 'Weiterlesen: ' + (buch.titel || 'Buch')), el('small', {}, (typeof buchStandText === 'function' ? buchStandText(buch) : 'Seite ' + buch.seite + ' von ' + buch.seiten) + ' · ' + buchFortschritt(buch.seite, buch.seiten) + ' %'))));
   }
 
   /* Die Tür zum Schreibtisch */
@@ -5809,7 +6001,7 @@ RENDER.blaetter = function (haupt) {
     }
     inhalt.append(wahl);
   }
-  if (vomTyp('blatt').length > 5) inhalt.append(suchfeld);
+  if (vomTyp('blatt').length > 5 || filter) inhalt.append(suchfeld);
 
   if (!alle.length) {
     inhalt.append(el('div', { class: 'leer' }, 'Ein leerer Stapel.',
@@ -6632,7 +6824,7 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
 
   /* Titel + Text */
   const titel = el('input', { class: 'stitel serif', type: 'text', value: seite.titel || '', placeholder: 'Überschrift, wenn du magst' });
-  titel.addEventListener('input', entprellt(() => { seite.titel = titel.value; speichere(seite); }, 400));
+  titel.addEventListener('input', entprellt(() => { seite.titel = titel.value; speichere(seite); }, 400, () => titel.isConnected));
 
   let text, formatleiste = null;
   if (seite.format === 'rich') {
@@ -6687,7 +6879,7 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
       seite.text = text.value;
       speichere(seite);
       zaehleWorte(seite.id, seite.text);
-    }, 400, true);
+    }, 400, () => text.isConnected);
     let blaettert = false;
     text.addEventListener('input', () => {
       sichereText();
@@ -6820,7 +7012,7 @@ function anlageGesten(elem, a, blatt, neuBauen) {
   });
   griff.addEventListener('pointermove', (e) => {
     if (!groesse) return;
-    a.pos.w = Math.max(a.typ === 'sticker' ? 5 : 12, Math.min(92, groesse.w + (e.clientX - groesse.sx) / groesse.r.width * 100));
+    a.pos.w = Math.max(a.typ === 'sticker' ? 6 : 12, Math.min(92, groesse.w + (e.clientX - groesse.sx) / groesse.r.width * 100));
     elem.style.width = a.pos.w + '%';
   });
   griff.addEventListener('pointerup', () => { if (groesse) speichereStill(a); groesse = null; });
@@ -6907,7 +7099,7 @@ function baueZettel(a, blatt, neuBauen) {
   const ta = el('textarea', { placeholder: '…', rows: 1 });
   ta.value = a.text || '';
   autogrow(ta);
-  ta.addEventListener('input', entprellt(() => { a.text = ta.value; speichereStill(a); }, 400));
+  ta.addEventListener('input', entprellt(() => { a.text = ta.value; speichereStill(a); }, 400, () => ta.isConnected));
   z.append(ta);
   halter.append(z);
   anlageGesten(halter, a, blatt, neuBauen);
@@ -7181,9 +7373,11 @@ async function starteKritzeln(blatt, seite) {
     }
   });
 
+  const beiWeg = () => aufraeumen();
+  window.addEventListener('hashchange', beiWeg);
   const aufraeumen = () => {
     try { beobachter.disconnect(); } catch (e) {}
-    window.removeEventListener('resize', beiGroesse);
+    window.removeEventListener('resize', beiGroesse); window.removeEventListener('hashchange', beiWeg);
     leiste.remove(); canvas.remove();
   };
   const fertigKnopf = el('button', {
@@ -7192,12 +7386,16 @@ async function starteKritzeln(blatt, seite) {
       /* Ein altes Bild ohne Striche bleibt als Grundlage erhalten — unter
          eigener Kennung, damit das fertige Bild darüber nicht die Grundlage
          überschreibt und beim nächsten Öffnen alles doppelt dasteht. */
+      /* „Alles löschen" gilt auch für die Grundlage: sonst taucht das alte Bild beim nächsten Strich wieder auf */
+      const geleert = striche.some((s) => s && s.leeren);
+      if (geleert) { basis = null; if (seite.skizzeBasis) { dbDel('media', seite.skizzeBasis).catch(() => {}); delete seite.skizzeBasis; } }
       if (basis && seite.skizze && !seite.skizzeBasis) {
         try { const alt = await dbGet('media', seite.skizze); if (alt) { const neuId = uid(); await dbPut('media', alt, neuId); seite.skizzeBasis = neuId; if (typeof syncMediaGeaendert === 'function') syncMediaGeaendert(neuId); } } catch (x) {}
       }
       auswahl = []; lasso = null; alleszeichnen();
       seite.striche = leer ? [] : saubereStriche(striche.map((s) => strichVerdichten(s)));
-      seite.skizze = leer ? seite.skizze : await speichereKritzelei(canvas, seite.skizze);
+      const neuId = leer ? seite.skizze : await speichereKritzelei(canvas, seite.skizze);
+      if (!leer && !neuId) toast('Das Bild ließ sich nicht sichern — die Striche selbst sind gespeichert.'); else seite.skizze = neuId;
       speichere(seite);
       aufraeumen();
       if (altesBild) {
@@ -7259,7 +7457,8 @@ async function starteKritzeln(blatt, seite) {
       if (alt.width && alt.height) basis = alt;
     }
   }
-  if (canvas.isConnected) { messen(); alleszeichnen(); knoepfeAuffrischen(); auswahlLeisteAuffrischen(); }
+  if (!canvas.isConnected) { aufraeumen(); return; }
+  messen(); alleszeichnen(); knoepfeAuffrischen(); auswahlLeisteAuffrischen();
 }
 
 /* ----- Reiter und Gliederung ----- */
@@ -7695,7 +7894,7 @@ function saubereStriche(roh, maxStriche = 4000, maxPunkte = 24000) {
       if (!q || typeof q !== 'object') continue;
       const x = Number(q.x), y = Number(q.y), w = Number(q.w);
       if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
-      p.push({ x: Math.max(-1, Math.min(2, x)), y: Math.max(-1, Math.min(3, y)), w: Number.isFinite(w) ? Math.max(.0005, Math.min(.2, w)) : .004 });
+      p.push({ x: Math.max(-1, Math.min(2, x)), y: Math.max(-1, Math.min(40, y)), w: Number.isFinite(w) ? Math.max(.0005, Math.min(.2, w)) : .004 });
       if (p.length >= 4000) break;
     }
     if (!p.length) continue;
@@ -7774,6 +7973,7 @@ function tonAufnehmen() {
     const starte = async () => {
       try { strom = await navigator.mediaDevices.getUserMedia({ audio: true }); }
       catch (e) { toast('Kein Zugriff aufs Mikrofon. In den Geräteeinstellungen erlauben.', 4200); return; }
+      if (fertig) { try { strom.getTracks().forEach((t) => t.stop()); } catch (e) {} strom = null; return; }
       stuecke = []; blob = null; aufkleben.disabled = true; anhoeren.disabled = true;
       const mime = tonMime();
       try { rekorder = mime ? new MediaRecorder(strom, { mimeType: mime }) : new MediaRecorder(strom); }
@@ -7942,7 +8142,8 @@ function zufallsLook(h) {
 /* ----- Das Atelier ----- */
 async function heftAtelier(h, danach) {
   h.deckel = saubererDeckel(h.deckel);
-  const alt = JSON.parse(JSON.stringify({ farbe: h.farbe, farbe2: h.farbe2, band: h.band, muster: h.muster, papier: h.papier, papierfarbe: h.papierfarbe, rand: h.rand, deckel: h.deckel }));
+  const ATELIER_FELDER = ['farbe', 'farbe2', 'band', 'muster', 'papier', 'papierfarbe', 'rand', 'deckel'];
+  const alt = {}; for (const k of ATELIER_FELDER) alt[k] = h[k] === undefined ? undefined : JSON.parse(JSON.stringify(h[k]));
   const buehne = el('div', { class: 'atelier-buehne' });
   let behalten = false;
 
@@ -8060,7 +8261,7 @@ async function heftAtelier(h, danach) {
   const felder = el('div', { class: 'atelier-felder' });
   for (const kind of [...kasten.children]) if (kind !== kopfEl && kind !== buehne) felder.append(kind);
   kasten.append(el('div', { class: 'atelier-raster' }, el('div', { class: 'atelier-links' }, buehne), felder));
-  const zu = zeigeDeck(kasten, () => { if (!behalten) { Object.assign(h, alt); if (danach) danach(); } });
+  const zu = zeigeDeck(kasten, () => { if (!behalten) { for (const k of ATELIER_FELDER) { if (alt[k] === undefined) delete h[k]; else h[k] = alt[k]; } if (danach) danach(); } });
   aktualisiere();
 }
 
@@ -8312,7 +8513,7 @@ async function projektMenue(p, danach) {
   } else if (wahl === 'weg') {
     if (await frage('„' + p.titel + '" mit allem darin in den Papierkorb legen?', { ja: 'In den Papierkorb', gefahr: true })) {
       await loesche(p.id);
-      location.hash = '#/projekte';
+      if (location.hash === '#/projekte') zeichne(); else location.hash = '#/projekte';
       return;
     }
   }
@@ -8486,7 +8687,7 @@ function baueSzenenkarte(s, p) {
 
   const notizFeld = el('textarea', { placeholder: 'Zweifel, Ideen, Alternativen — nur für dich.' });
   notizFeld.value = s.notiz || '';
-  notizFeld.addEventListener('input', entprellt(() => { s.notiz = notizFeld.value; speichereStill(s); }, 400));
+  notizFeld.addEventListener('input', entprellt(() => { s.notiz = notizFeld.value; speichereStill(s); }, 400, () => notizFeld.isConnected));
   notizFeld.addEventListener('pointerdown', (e) => e.stopPropagation());
 
   const statusFolge = ['funke', 'entwurf', 'steht'];
@@ -8830,7 +9031,8 @@ function vorlesen(text, knopf) {
   }
   if (puffer.trim()) bloecke.push(puffer.trim());
   const stimmen = (speechSynthesis.getVoices() || []);
-  const deutsch = stimmen.find((v) => /^de[-_]/i.test(v.lang) && /siri|anna|petra|markus|google|natural|premium/i.test(v.name)) || stimmen.find((v) => /^de[-_]/i.test(v.lang)) || null;
+  const gewuenscht = typeof leseEinstellung === 'function' ? leseEinstellung().stimme : null;
+  const deutsch = (gewuenscht && stimmen.find((v) => v.voiceURI === gewuenscht || v.name === gewuenscht)) || stimmen.find((v) => /^de[-_]/i.test(v.lang) && /siri|anna|petra|markus|google|natural|premium/i.test(v.name)) || stimmen.find((v) => /^de[-_]/i.test(v.lang)) || null;
   _vorleser = { bloecke, i: 0 };
   document.body.classList.add('liest-vor');
   if (knopf) knopf.classList.add('an');
@@ -8859,7 +9061,8 @@ function oeffneSchreibraum(docId) {
     class: 'sr-titel', type: 'text', value: doc.titel || '',
     placeholder: doc.typ === 'szene' ? 'Szene ohne Namen' : 'Ohne Titel'
   });
-  titel.addEventListener('input', entprellt(() => { doc.titel = titel.value; speichere(doc); }, 400, true));
+  const titelSichern = entprellt(() => { doc.titel = titel.value; speichere(doc); }, 400, () => titel.isConnected);
+  titel.addEventListener('input', titelSichern);
 
   const worteAnzeige = el('span', { class: 'sr-worte' }, String(startWorte));
   const kerzenhalter = el('div', { class: 'kerzenhalter' });
@@ -8906,7 +9109,7 @@ function oeffneSchreibraum(docId) {
 
   const raum = el('div', { class: 'schreibraum' }, kopf, mitte, leiste);
   document.body.append(raum);
-  _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, sprint: null, klangKnopf, istRich, richPaket };
+  _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, sprint: null, klangKnopf, istRich, richPaket, titelSichern };
 
   wendeSchriftAn();
   wendeTastaturArtAn();
@@ -9013,6 +9216,8 @@ function schliesseSchreibraum(zurueck) {
   if (!_sr) return;
   if (typeof vorlesenStopp === 'function') vorlesenStopp();
   _sr.sichern && _sr.sichern.sofort();
+  if (_sr.titelSichern) { _sr.titelSichern.sofort(); if (_sr.titelSichern.loesen) _sr.titelSichern.loesen(); }
+  if (_sr.sichern && _sr.sichern.loesen) _sr.sichern.loesen();
   document.removeEventListener('selectionchange', _sr.spiegelBeiAuswahl);
   window.removeEventListener('scroll', srFensterZurueck);
   if (_sr.sprint) { const k = _sr.sprint.kerze; beendeSprint(true); if (k) k.entfernen(); }
@@ -9193,7 +9398,7 @@ function zeigeStaende() {
         if (wahl === 'zurueck') {
           friereEin();
           srSetzeText(st.text);
-          _sr.doc.titel = st.titel;
+          _sr.doc.titel = st.titel; const tf = _sr.raum.querySelector('.sr-titel'); if (tf) tf.value = st.titel;
           _sr.sichern.sofort();
           zeichne();
           toast('Zurückgeholt.');
@@ -9201,7 +9406,7 @@ function zeigeStaende() {
           const bogen = el('div', { class: 'lesebogen' },
             el('div', { class: 'innen' },
               el('h1', {}, st.titel || 'Stand vom ' + fmtDatum(st.wann)),
-              el('div', { class: 'lmeta' }, worte(st.text) + ' Wörter · eingefroren ' + fmtDatum(st.wann) + ', ' + fmtZeit(st.wann)),
+              el('div', { class: 'lmeta' }, worte(st.text) + ' Wörter · eingefroren ' + fmtDatum(st.wann) + ', ' + fmtZeit(st.wann) + (st.auto ? ' · automatisch' : '')),
               el('div', { class: 'lesetext' }, st.text)));
           const leiste2 = el('div', { class: 'schwebeleiste' },
             el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Stand schließen', onclick: () => { bogen.remove(); leiste2.remove(); } }));
@@ -9576,7 +9781,9 @@ function kerzeAnzuenden({ minuten = 20, beiEnde = null, beiTipp = null, saat = 0
   }
 
   canvas.addEventListener('click', () => { if (beiTipp) beiTipp(); });
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { letzte = performance.now(); if (!fertig) requestAnimationFrame(schleife); } });
+  /* Zurück in den Tab: nur die Uhr stellen — die Schleife läuft von selbst weiter (sonst liefen am Ende mehrere) */
+  const beiSicht = () => { if (document.visibilityState === 'visible') letzte = performance.now(); if (fertig || !canvas.isConnected) document.removeEventListener('visibilitychange', beiSicht); };
+  document.addEventListener('visibilitychange', beiSicht);
   requestAnimationFrame((t) => { letzte = t; schleife(t); });
 
   return {
@@ -9941,7 +10148,7 @@ RENDER.brett = function (haupt, bid) {
     const ta = el('textarea', { rows: 1, placeholder: '…', readonly: 'readonly' });
     ta.value = b.text || '';
     autogrow(ta);
-    ta.addEventListener('input', entprellt(() => { b.text = ta.value; speichereStill(b); }, 400));
+    ta.addEventListener('input', entprellt(() => { b.text = ta.value; speichereStill(b); }, 400, true));
     ta.addEventListener('blur', () => ta.setAttribute('readonly', 'readonly'));
     blase.append(ta);
     const quelle = b.quelle && D.docs.get(b.quelle);
@@ -10017,7 +10224,7 @@ RENDER.brett = function (haupt, bid) {
   const zeiger = new Map();
   let pan = null, kneifen = null, letzterTipp = { t: 0, x: 0, y: 0 };
   raum.addEventListener('pointerdown', (e) => {
-    if (e.target.closest('.denkblase') || e.target.closest('.schwebeleiste') || e.target.closest('.brett-werkzeuge')) return;
+    if (e.target.closest('.denkblase') || e.target.closest('.brettbild') || e.target.closest('.schwebeleiste') || e.target.closest('.brett-werkzeuge')) return;
     zeiger.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (zeiger.size === 1) {
       pan = { sx: e.clientX, sy: e.clientY, px: sicht.x, py: sicht.y };
@@ -10775,9 +10982,11 @@ const SUCH_GRUPPEN = [
 ];
 
 /* Ein kaputter Eintrag im Browser-Speicher darf die Suche nicht lahmlegen. */
+/* Letzte Suchen je Profil getrennt */
+function suchSchluessel() { const p = typeof D !== 'undefined' && D.profil && D.profil.id ? D.profil.id : (typeof AKTIVES_PROFIL !== 'undefined' && AKTIVES_PROFIL ? AKTIVES_PROFIL.id : ''); return 'vani-suchen' + (p ? ':' + p : ''); }
 function leseLetzteSuchen() {
   try {
-    const roh = JSON.parse(localStorage.getItem('vani-suchen') || '[]');
+    const roh = JSON.parse(localStorage.getItem(suchSchluessel()) || '[]');
     return Array.isArray(roh) ? roh.filter((x) => typeof x === 'string').slice(0, 8) : [];
   } catch (e) { return []; }
 }
@@ -10816,7 +11025,7 @@ function oeffneSuche() {
   setTimeout(() => feld.focus(), 60);
 
   function eintrag(d, umfeldHtml) {
-    return el('button', { onclick: () => { zu(); merkeSuche(feld.value); oeffneDoc(d); } },
+    return el('button', { onclick: () => { zu(); merkeSuche(feld.value); if (typeof _sr !== 'undefined' && _sr && typeof schliesseSchreibraum === 'function') schliesseSchreibraum(); oeffneDoc(d); } },
       el('span', { class: 'ttitel' }, d.titel || ((d.text || '').split('\n')[0] || 'Ohne Titel').slice(0, 50)),
       umfeldHtml ? el('span', { class: 'tprobe', html: umfeldHtml }) : null
     );
@@ -10857,7 +11066,7 @@ function oeffneSuche() {
     if (!q || q.length < 2) return;
     const letzte = leseLetzteSuchen().filter((x) => x !== q);
     letzte.unshift(q);
-    try { localStorage.setItem('vani-suchen', JSON.stringify(letzte.slice(0, 8))); } catch (e) {}
+    try { localStorage.setItem(suchSchluessel(), JSON.stringify(letzte.slice(0, 8))); } catch (e) {}
   }
 
   function suche() {
@@ -10912,9 +11121,7 @@ function oeffneSuche() {
   leererZustand();
 }
 
-document.addEventListener('keydown', (e) => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); oeffneSuche(); }
-});
+/* ⌘/Strg+K öffnet das Spotlight (48b); ⌘/Strg+⇧+K diese Suche. */
 
 /* ================================================================
    VANI — Feinheiten: Thema, Klang, Statistik, Sicherung
@@ -11550,6 +11757,7 @@ function whatsappZerlegen(roh) {
       if (jahr < 100) jahr += 2000;
       const wann = new Date(jahr, Number(m[2]) - 1, Number(m[1]), Number(m[4]), Number(m[5]), Number(m[6] || 0)).getTime();
       nachrichten.push({ wann: Number.isFinite(wann) ? wann : 0, wer: m[7].trim(), text: m[8] });
+    } else if (/^\u200e?\[?\d{1,2}\.\d{1,2}\.\d{2,4},?\s+\d{1,2}:\d{2}/.test(zeile)) { sonst++;   /* datierte Systemzeile mitten im Chat */
     } else if (nachrichten.length && zeile.trim()) {
       nachrichten[nachrichten.length - 1].text += '\n' + zeile;
     } else if (zeile.trim()) sonst++;
@@ -14412,6 +14620,136 @@ function oeffneAnleitung(kapitelId) {
   if (kapitelId) requestAnimationFrame(() => springe(kapitelId));
 }
 
+/* ===================== 48b — SPOTLIGHT UND TASTATURKÜRZEL =====================
+   ⌘/Strg+K: eine Zeile tippen, Treffer mit Vorschau daneben, Pfeile, Enter.
+   „>" davor zeigt Befehle (Räume, Neues, Kerze …). „?" außerhalb eines
+   Feldes zeigt die Kürzel. */
+
+const SPOTLIGHT_BEFEHLE = () => [
+  ...((typeof ALLE_RAEUME !== 'undefined' ? ALLE_RAEUME : []).map((r) => ({ text: r.name, unter: 'Raum', icon: r.icon, tu: () => { location.hash = '#/' + r.id; } }))),
+  { text: 'Neues Blatt', unter: 'im Schreibraum', icon: 'blatt', tu: () => { const b = blattAusText('', ''); oeffneSchreibraum(b.id); } },
+  { text: 'Schneller Schnipsel', unter: 'ein Satz, ein Gedanke', icon: 'schnipsel', tu: async () => { const t = await eingabe({ titel: 'Schnell notiert', platzhalter: 'ein Satz, ein Wort, ein Gedanke …', mehrzeilig: true, ok: 'Ablegen' }); if (t) { neuDoc('schnipsel', { text: t }); toast('Liegt in den Schnipseln.'); } } },
+  { text: 'Suche', unter: 'die große Suche mit Gruppen', icon: 'suche', tu: () => { if (typeof oeffneSuche === 'function') oeffneSuche(); } },
+  { text: 'Tastaturkürzel', unter: 'Übersicht', icon: 'feinheiten', tu: () => kuerzelZeigen() },
+  { text: 'Anleitung', unter: 'alles, was VANI kann', icon: 'lesen', tu: () => { if (typeof oeffneAnleitung === 'function') oeffneAnleitung(); } },
+  { text: 'Sicherung in die Zwischenablage', unter: 'alles, ohne Datei', icon: 'sichern', tu: () => { if (typeof inZwischenablageSichern === 'function') inZwischenablageSichern(); } }
+].filter((b) => b.text);
+
+/* Treffer zu einer Eingabe: Titel- und Textsuche, pro Dokument ein Eintrag. Pur bis auf D.docs. */
+function spotlightTreffer(roh, docs, max = 14) {
+  const q = normalisiere(String(roh || '').trim());
+  if (q.length < 2) return [];
+  const gruppen = typeof SUCH_GRUPPEN !== 'undefined' ? SUCH_GRUPPEN : [];
+  const name = (typ) => { const g = gruppen.find((x) => x[0] === typ); return g ? g[1] : typ; };
+  const funde = [];
+  for (const d of docs) {
+    if (!d || !d.typ || !gruppen.some((g) => g[0] === d.typ)) continue;
+    const titelN = normalisiere(d.titel || ''), text = [d.text, d.notiz].filter(Boolean).join('\n'), textN = normalisiere(text);
+    let wo = titelN.indexOf(q), inTitel = wo >= 0;
+    if (!inTitel) wo = textN.indexOf(q);
+    if (wo < 0) continue;
+    funde.push({ d, inTitel, wo, text, gruppe: name(d.typ), gewicht: (inTitel ? 1000 : 0) + (d.geaendert || 0) / 1e12 });
+  }
+  funde.sort((a, b) => b.gewicht - a.gewicht || (b.d.geaendert || 0) - (a.d.geaendert || 0));
+  return funde.slice(0, max);
+}
+
+function spotlightOeffnen() {
+  if (document.querySelector('.spotlight-bogen')) return;
+  const feld = el('input', { type: 'text', placeholder: 'Suchen … oder > für Befehle', autocomplete: 'off', spellcheck: 'false' });
+  const liste = el('div', { class: 'spotlight-liste' });
+  const vorschau = el('div', { class: 'spotlight-vorschau' });
+  const kasten = el('div', { class: 'spotlight' },
+    el('div', { class: 'spotlight-zeile' }, el('span', { html: ik('suche'), style: 'display:flex;color:var(--blass)' }), feld, el('kbd', {}, 'Esc')),
+    el('div', { class: 'spotlight-koerper' }, liste, vorschau));
+  const bogen = el('div', { class: 'spotlight-bogen' }, kasten);
+  bogen.addEventListener('pointerdown', (e) => { if (e.target === bogen) zu(); });
+  document.body.append(bogen);
+  let eintraege = [], wahl = 0;
+  const zu = () => { document.removeEventListener('keydown', tasten, true); bogen.remove(); };
+  const zeigeVorschau = () => {
+    vorschau.innerHTML = '';
+    const e = eintraege[wahl];
+    if (!e) { vorschau.append(el('div', { class: 'spotlight-leer' }, eintraege.length ? '' : feld.value.trim().length < 2 ? 'Tippe, was du suchst — oder > für Befehle.' : 'Nichts. Vielleicht muss es erst noch geschrieben werden.')); return; }
+    if (e.befehl) { vorschau.append(el('div', { class: 'spotlight-leer' }, el('b', {}, e.befehl.text), el('div', {}, e.befehl.unter || ''))); return; }
+    const d = e.d, q = normalisiere(feld.value.trim());
+    const text = (e.text || '').replace(/\r/g, '');
+    let auszug = text.slice(0, 1400), html;
+    const n = normalisiere(auszug), wo = n.indexOf(q);
+    if (wo >= 0 && normalisiere(auszug.slice(0, wo)).length === wo) {
+      /* normalisiere ändert die Länge nicht, solange keine Ligaturen dabei sind — dann markieren wir sicher */
+      html = esc(auszug.slice(0, wo)) + '<mark>' + esc(auszug.slice(wo, wo + q.length)) + '</mark>' + esc(auszug.slice(wo + q.length));
+    } else html = esc(auszug);
+    vorschau.append(
+      el('div', { class: 'spotlight-vtitel' }, d.titel || (text.split('\n')[0] || 'Ohne Titel').slice(0, 60)),
+      el('div', { class: 'spotlight-vmeta' }, e.gruppe + (d.geaendert ? ' · ' + fmtDatum(d.geaendert) + ', ' + fmtZeit(d.geaendert) : '') + (text ? ' · ' + worte(text) + ' Wörter' : '')),
+      el('div', { class: 'spotlight-vtext', html: html.replace(/\n/g, '<br>') + (text.length > 1400 ? ' …' : '') },),
+      el('div', { class: 'spotlight-vhinweis' }, 'Enter öffnet · ↑↓ wählen'));
+  };
+  const zeigeListe = () => {
+    liste.innerHTML = '';
+    eintraege.forEach((e, i) => {
+      const b = el('button', { class: 'spotlight-eintrag' + (i === wahl ? ' an' : ''), onclick: () => { wahl = i; ausfuehren(); } },
+        el('span', { class: 'sp-icon', html: ik(e.befehl ? e.befehl.icon || 'stern' : SUCH_ICON(e.d.typ)) }),
+        el('span', { class: 'sp-text' }, el('b', {}, e.befehl ? e.befehl.text : (e.d.titel || (e.text || '').split('\n')[0] || 'Ohne Titel').slice(0, 70)), el('small', {}, e.befehl ? e.befehl.unter || '' : e.gruppe)));
+      b.addEventListener('pointerenter', () => { wahl = i; [...liste.children].forEach((c, j) => c.classList.toggle('an', j === wahl)); zeigeVorschau(); });
+      liste.append(b);
+    });
+    zeigeVorschau();
+  };
+  const SUCH_ICON = (typ) => ({ blatt: 'blatt', szene: 'projekte', seite: 'hefte', schnipsel: 'schnipsel', blase: 'cluster', faden: 'faden', funkeln: 'woerter', wortkiste: 'woerter', buch: 'lesen', brief: 'brief' }[typ] || 'suche');
+  const suche = () => {
+    const roh = feld.value;
+    wahl = 0;
+    if (roh.trim().startsWith('>')) {
+      const q = normalisiere(roh.trim().slice(1).trim());
+      eintraege = SPOTLIGHT_BEFEHLE().filter((b) => !q || normalisiere(b.text + ' ' + (b.unter || '')).includes(q)).map((b) => ({ befehl: b }));
+    } else eintraege = spotlightTreffer(roh, [...D.docs.values()]);
+    zeigeListe();
+  };
+  const ausfuehren = () => {
+    const e = eintraege[wahl]; if (!e) return;
+    zu();
+    if (e.befehl) { try { e.befehl.tu(); } catch (x) {} return; }
+    if (typeof _sr !== 'undefined' && _sr && typeof schliesseSchreibraum === 'function') schliesseSchreibraum();
+    oeffneDoc(e.d);
+  };
+  const tasten = (ev) => {
+    if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); zu(); }
+    else if (ev.key === 'ArrowDown') { ev.preventDefault(); if (eintraege.length) { wahl = (wahl + 1) % eintraege.length; zeigeListe(); } }
+    else if (ev.key === 'ArrowUp') { ev.preventDefault(); if (eintraege.length) { wahl = (wahl - 1 + eintraege.length) % eintraege.length; zeigeListe(); } }
+    else if (ev.key === 'Enter') { ev.preventDefault(); ausfuehren(); }
+  };
+  document.addEventListener('keydown', tasten, true);
+  feld.addEventListener('input', entprellt(suche, 90));
+  suche();
+  setTimeout(() => feld.focus(), 40);
+}
+
+/* Die Kürzel, einmal gesammelt. Pur. */
+const TASTENKUERZEL = [
+  ['Überall', [['⌘/Strg + K', 'Spotlight: suchen, springen, Befehle'], ['⌘/Strg + ⇧ + K', 'Die große Suche'], ['?', 'Diese Übersicht (außerhalb eines Feldes)'], ['Esc', 'Fenster, Leser oder Schreibraum schließen']]],
+  ['Spotlight', [['↑ ↓', 'Treffer wählen'], ['Enter', 'Öffnen'], ['> …', 'Befehle statt Treffer']]],
+  ['Schreibraum', [['⌘/Strg + S', 'Stand einfrieren'], ['⌘/Strg + F', 'Suchen und Ersetzen'], ['⌘/Strg + Enter', 'Schließen und speichern'], ['Tab', 'Einrücken (Klartext)'], ['⌘/Strg + B / I / U', 'Fett, kursiv, unterstrichen (Rich-Text)']]],
+  ['Lesen', [['→ / Leertaste', 'Nächste Seite'], ['←', 'Seite zurück'], ['Pos1 / Ende', 'Anfang / Ende (PDF)'], ['Esc', 'Buch zuklappen']]],
+  ['Schreibtisch', [['An der Schnur ziehen', 'Lampe an oder aus'], ['Esc im Blatt', 'Blatt weglegen']]],
+  ['Karteikarten', [['← →', 'Karte umdrehen / weiter'], ['1 / 2 / 3', 'Gewusst, halb, nicht']]]
+];
+function kuerzelZeigen() {
+  const kasten = el('div', { class: 'modal kuerzel' }, el('h2', {}, 'Tastaturkürzel'),
+    ...TASTENKUERZEL.map(([gruppe, liste]) => el('div', { class: 'kuerzel-gruppe' }, el('b', {}, gruppe), ...liste.map(([k, t]) => el('div', { class: 'kuerzel-zeile' }, el('kbd', {}, k), el('span', {}, t))))),
+    el('div', { class: 'stickerblock-hinweis' }, 'Auf dem iPad mit Tastatur gilt ⌘, am Laptop Strg.'),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
+  const zu = zeigeDeck(kasten);
+}
+document.addEventListener('keydown', (e) => {
+  const imFeld = (el_) => !!(el_ && (el_.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"]')));
+  if ((e.metaKey || e.ctrlKey) && !e.altKey && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    if (e.shiftKey) { if (typeof oeffneSuche === 'function') oeffneSuche(); } else spotlightOeffnen();
+  } else if (e.key === '?' && !e.metaKey && !e.ctrlKey && !imFeld(e.target) && !document.querySelector('.schleier, .spotlight-bogen')) { e.preventDefault(); kuerzelZeigen(); }
+});
+
 /* ================================================================
    VANI — Die Malerei hinter dem Schreibtisch.
 
@@ -14461,9 +14799,10 @@ function schreibtischMaler(canvas, optionen = {}) {
   const saatText = tagKey();
   let saat = 17; for (const c of saatText) saat = (saat * 31 + c.charCodeAt(0)) >>> 0;
   const zuf = kerzeZufall(saat);
-  const opt = Object.assign({ holz: 'nuss', lampe: .8, lampeAn: true, wetter: 'still', kerzen: true, unordnung: .7, fensterAnteil: .44, parallax: { x: 0, y: 0 } }, optionen);
+  const opt = Object.assign({ holz: 'nuss', lampe: .8, lampeAn: true, wetter: 'still', kerzen: true, unordnung: .7, fensterAnteil: .44, parallax: { x: 0, y: 0 }, alter: { worte: 0, ringe: 1, abnutzung: 0 }, kleckse: [] }, optionen);
   let W = 0, H = 0, fensterH = 0, statisch = null, laeuft = false, t = 0, letzte = 0, blitz = 0, blitzWarte = 6 + zuf() * 10;
   let lampeJetzt = opt.lampeAn ? opt.lampe : 0;       /* das Licht schmilzt ein, es springt nicht */
+  let letzteTageszeit = '';
   let para = { x: 0, y: 0 };                          /* geglättete Parallaxe */
   const staub = Array.from({ length: 46 }, () => ({ x: zuf(), y: zuf(), r: .5 + zuf() * 1.1, ph: zuf() * 6.3, v: .004 + zuf() * .008 }));
   let motte = null, motteWarte = 50 + zuf() * 120;
@@ -14479,7 +14818,7 @@ function schreibtischMaler(canvas, optionen = {}) {
   const buesche = Array.from({ length: 7 }, (_, i) => ({ x: i / 7 + zuf() * .08 - .02, w: .14 + zuf() * .12, h: .22 + zuf() * .2, ph: zuf() * 6 }));
   const graeser = Array.from({ length: 140 }, () => ({ x: zuf(), h: .05 + zuf() * .09, ph: zuf() * 6, n: .6 + zuf() * .8 }));
   const tropfen = Array.from({ length: 180 }, () => ({ x: zuf(), y: zuf(), l: .02 + zuf() * .03, v: .35 + zuf() * .5, a: .18 + zuf() * .3 }));
-  const glasTropfen = Array.from({ length: 14 }, () => ({ x: zuf(), y: zuf(), v: .01 + zuf() * .03, r: 1.5 + zuf() * 2 }));
+  const glasTropfen = Array.from({ length: 18 }, () => ({ x: zuf(), y: zuf(), v: .01 + zuf() * .03, r: 2.5 + zuf() * 3.5 }));
   const flocken = Array.from({ length: 120 }, () => ({ x: zuf(), y: zuf(), r: .8 + zuf() * 2.2, v: .02 + zuf() * .05, ph: zuf() * 6 }));
   const blaetter = Array.from({ length: 22 }, () => ({ x: zuf(), y: zuf(), v: .05 + zuf() * .08, ph: zuf() * 6, rot: zuf() * 6, f: ['#a8562a', '#c8873a', '#8a4a22', '#d9a54a'][Math.floor(zuf() * 4)] }));
   const wuermchen = Array.from({ length: 16 }, () => ({ x: .1 + zuf() * .8, y: .35 + zuf() * .5, ph: zuf() * 6, v: .3 + zuf() * .7 }));
@@ -14539,8 +14878,9 @@ function schreibtischMaler(canvas, optionen = {}) {
     }
     /* Die Stelle, an der jahrelang die Hand lag: heller, glatter */
     kerzeSchein(g, W * .52, oben + (H - oben) * .78, W * .16, (H - oben) * .2, [[0, 'rgba(255,225,170,.14)'], [1, 'rgba(255,225,170,0)']]);
-    /* Kratzer */
-    for (const k of kratzer) {
+    /* Kratzer: je mehr je geschrieben wurde, desto mehr Spuren trägt die Platte */
+    const abnutzung = (opt.alter && opt.alter.abnutzung) || 0;
+    for (const k of kratzer.slice(0, 8 + Math.round(18 * abnutzung))) {
       g.beginPath(); g.strokeStyle = 'rgba(255,240,210,' + k.a.toFixed(3) + ')'; g.lineWidth = .8;
       const x0 = k.x * W, y0 = oben + k.y * (H - oben);
       g.moveTo(x0, y0); g.lineTo(x0 + Math.cos(k.w) * k.l * W, y0 + Math.sin(k.w) * k.l * W * .4); g.stroke();
@@ -14557,15 +14897,36 @@ function schreibtischMaler(canvas, optionen = {}) {
     /* Wachs am Leuchter */
     g.fillStyle = 'rgba(245,232,200,.85)';
     for (const w of wachs) { g.beginPath(); g.ellipse(w.x * W, oben + w.y * (H - oben), w.r, w.r * .7, 0, 0, 6.29); g.fill(); }
-    /* Kaffeering unter der Tasse */
-    g.beginPath(); g.ellipse(W * .83, oben + (H - oben) * .52, 30, 14, 0, 0, 6.29); g.strokeStyle = 'rgba(70,40,15,.45)'; g.lineWidth = 3; g.stroke();
-    g.beginPath(); g.ellipse(W * .83, oben + (H - oben) * .52, 30, 14, 0, .4, 2.2); g.strokeStyle = 'rgba(70,40,15,.3)'; g.lineWidth = 6; g.stroke();
+    /* Kaffeeringe unter der Tasse: einer, und alle 100 000 Wörter ein weiterer */
+    const ringe = Math.max(1, Math.min(6, (opt.alter && opt.alter.ringe) || 1));
+    for (let r = 0; r < ringe; r++) {
+      const rx = W * .83 + Math.cos(r * 2.1) * 9 * r, ry = oben + (H - oben) * .52 + Math.sin(r * 2.1) * 5 * r, a = r === 0 ? 1 : .55;
+      g.beginPath(); g.ellipse(rx, ry, 30, 14, 0, 0, 6.29); g.strokeStyle = 'rgba(70,40,15,' + (.45 * a).toFixed(2) + ')'; g.lineWidth = 3; g.stroke();
+      g.beginPath(); g.ellipse(rx, ry, 30, 14, 0, .4 + r, 2.2 + r); g.strokeStyle = 'rgba(70,40,15,' + (.3 * a).toFixed(2) + ')'; g.lineWidth = 6; g.stroke();
+    }
+    /* Kleckse von der Feder: jeder aus seiner eigenen Saat gefranst */
+    for (const kl of (opt.kleckse || [])) {
+      const z = kerzeZufall(kl.s || 1), kx = kl.x * W, ky = oben + kl.y * (H - oben), ph = z() * 6.28;
+      g.fillStyle = 'rgba(14,10,30,.66)'; g.beginPath();
+      for (let i = 0; i <= 26; i++) { const w = i / 26 * 6.283; const rr = kl.r * (1 + .3 * Math.sin(w * 3 + ph) + .16 * Math.sin(w * 7 + ph * 2)); g.lineTo(kx + Math.cos(w) * rr, ky + Math.sin(w) * rr * .7); }
+      g.closePath(); g.fill();
+      const sat = 1 + Math.floor(z() * 3);
+      for (let s = 0; s < sat; s++) { const w = ph + s * 1.7 + z(); const d = kl.r * (1.5 + s * .7 + z()); g.beginPath(); g.ellipse(kx + Math.cos(w) * d, ky + Math.sin(w) * d * .7, .8 + z() * 1.6, .6 + z(), w, 0, 6.29); g.fill(); }
+    }
     g.restore();
     /* Fensterrahmen: schweres Holz mit Sprossen */
     g.fillStyle = '#1a1210'; g.fillRect(0, 0, W, 16); g.fillRect(0, 0, 16, fensterH); g.fillRect(W - 16, 0, 16, fensterH); g.fillRect(0, fensterH - 12, W, 22);
     g.fillStyle = '#3d2b20'; g.fillRect(16, 16, W - 32, 2); g.fillRect(16, 16, 2, fensterH - 28); g.fillRect(W - 18, 16, 2, fensterH - 28);
     g.fillStyle = '#241912'; g.fillRect(W / 2 - 6, 16, 12, fensterH - 28); g.fillRect(16, fensterH * .42 - 5, W - 32, 10);
     g.fillStyle = 'rgba(255,255,255,.07)'; g.fillRect(W / 2 + 4, 16, 1, fensterH - 28); g.fillRect(16, fensterH * .42 + 5, W - 32, 1);
+    /* Im Herbst ein Spinnennetz in der Fensterecke */
+    if (jahreszeit === 'herbst') {
+      g.save(); g.translate(18, 18); g.strokeStyle = 'rgba(235,235,245,.22)'; g.lineWidth = .8; g.lineCap = 'round';
+      for (let k = 0; k <= 6; k++) { const w = k / 6 * Math.PI / 2; g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(w) * 54, Math.sin(w) * 54); g.stroke(); }
+      for (let r = 9; r <= 50; r += 8) { g.beginPath(); for (let k = 0; k <= 6; k++) { const w = k / 6 * Math.PI / 2, rr = r * (1 - .06 * (k % 2)); const px = Math.cos(w) * rr, py = Math.sin(w) * rr; if (k === 0) g.moveTo(px, py); else { const wm = (k - .5) / 6 * Math.PI / 2; g.quadraticCurveTo(Math.cos(wm) * rr * .93, Math.sin(wm) * rr * .93, px, py); } } g.stroke(); }
+      g.fillStyle = 'rgba(40,32,30,.8)'; g.beginPath(); g.ellipse(Math.cos(.5) * 31, Math.sin(.5) * 31, 2.2, 1.6, .5, 0, 6.29); g.fill();
+      g.restore();
+    }
     /* Fensterbank */
     const bank = g.createLinearGradient(0, fensterH + 8, 0, fensterH + 22);
     bank.addColorStop(0, '#3a2a20'); bank.addColorStop(1, '#1a120d');
@@ -14690,7 +15051,15 @@ function schreibtischMaler(canvas, optionen = {}) {
       for (const g of glasTropfen) {
         g.y += g.v * dt * (.5 + g.r * .2); if (g.y > 1.02) { g.y = -.02; g.x = zuf(); }
         const gx = 16 + g.x * (W - 32), gy = 16 + g.y * (fensterH - 28);
-        ctx.fillStyle = 'rgba(220,230,250,.35)'; ctx.beginPath(); ctx.ellipse(gx, gy, g.r, g.r * 1.5, 0, 0, 6.29); ctx.fill();
+        /* Brechung: der Garten dahinter, vergrößert und auf den Kopf gestellt, im Tropfen */
+        try {
+          ctx.save(); ctx.beginPath(); ctx.ellipse(gx, gy, g.r, g.r * 1.5, 0, 0, 6.29); ctx.clip();
+          ctx.translate(gx, gy); ctx.scale(1.6, -1.6);
+          ctx.drawImage(canvas, Math.max(0, (gx - g.r * 2) * dpr), Math.max(0, (gy - g.r * 3) * dpr), g.r * 4 * dpr, g.r * 6 * dpr, -g.r * 2, -g.r * 3, g.r * 4, g.r * 6);
+          ctx.restore();
+        } catch (e) {}
+        ctx.fillStyle = 'rgba(220,230,250,.22)'; ctx.beginPath(); ctx.ellipse(gx, gy, g.r, g.r * 1.5, 0, 0, 6.29); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = .8; ctx.beginPath(); ctx.ellipse(gx - g.r * .3, gy - g.r * .5, g.r * .35, g.r * .5, -.4, 0, 6.29); ctx.stroke();
         ctx.strokeStyle = 'rgba(220,230,250,.12)'; ctx.lineWidth = g.r * .9; ctx.beginPath(); ctx.moveTo(gx, gy - 40); ctx.lineTo(gx, gy); ctx.stroke();
       }
     }
@@ -14711,7 +15080,16 @@ function schreibtischMaler(canvas, optionen = {}) {
     lampeJetzt += (ziel - lampeJetzt) * Math.min(1, dt * (ziel > lampeJetzt ? 5 : 9));
     if (Math.abs(ziel - lampeJetzt) < .004) lampeJetzt = ziel;
     const an = lampeJetzt;
-    ctx.fillStyle = 'rgba(0,0,0,' + (.62 - .48 * an).toFixed(3) + ')'; ctx.fillRect(0, oben, W, H - oben);
+    /* Tag im Raum: graues Licht fällt durchs Fenster auf die Platte, die Dunkelheit weicht */
+    const tag = schreibtischTageslicht();
+    const tageszeit = tag >= .45 ? 'tag' : tag > .12 ? 'daemmerung' : 'nacht';
+    if (tageszeit !== letzteTageszeit) { letzteTageszeit = tageszeit; const sz = canvas.parentElement; if (sz) sz.dataset.tageszeit = tageszeit; }
+    ctx.fillStyle = 'rgba(0,0,0,' + Math.max(.06, .62 - .48 * an - .34 * tag).toFixed(3) + ')'; ctx.fillRect(0, oben, W, H - oben);
+    if (tag > .02) {
+      kerzeSchein(ctx, W * .5 + para.x * 6, oben + (H - oben) * .1, W * .56, (H - oben) * .34, [[0, 'rgba(200,214,235,' + (.26 * tag).toFixed(3) + ')'], [.6, 'rgba(190,205,230,' + (.08 * tag).toFixed(3) + ')'], [1, 'rgba(190,205,230,0)']]);
+      /* die Sprossen werfen weiche Streifen */
+      ctx.fillStyle = 'rgba(0,0,0,' + (.08 * tag).toFixed(3) + ')'; ctx.fillRect(W / 2 - 5, oben, 10, (H - oben) * .3);
+    }
     /* Der Schirm hängt links über der Platte; der Teich aus Licht liegt ein Stück rechts darunter */
     const lx = W * .16 + para.x * 4, ly = oben + (H - oben) * .27;
     if (an > .01) {
@@ -14755,6 +15133,8 @@ function schreibtischMaler(canvas, optionen = {}) {
 
   function bild(jetzt) {
     if (!laeuft) return;
+    /* Verdeckt (Schreibraum, Leser) oder Tab im Hintergrund: nicht malen, nur gelegentlich nachsehen */
+    if ((typeof _sr !== 'undefined' && _sr) || (typeof _leser !== 'undefined' && _leser) || (typeof _epub !== 'undefined' && _epub) || document.visibilityState === 'hidden') { letzte = jetzt; setTimeout(() => requestAnimationFrame(bild), 500); return; }
     const dt = Math.min(.05, (jetzt - letzte) / 1000 || .016); letzte = jetzt; t += dt;
     if (messen() || !statisch) statisch = maleStatisch();
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(statisch, 0, 0);
@@ -14766,7 +15146,7 @@ function schreibtischMaler(canvas, optionen = {}) {
   return {
     start() { if (laeuft) return; laeuft = true; letzte = performance.now(); requestAnimationFrame(bild); },
     stopp() { laeuft = false; },
-    setze(neu) { Object.assign(opt, neu || {}); if ('holz' in (neu || {})) statisch = null; },
+    setze(neu) { Object.assign(opt, neu || {}); if (neu && ('holz' in neu || 'kleckse' in neu || 'alter' in neu)) statisch = null; },
     opt
   };
 }
@@ -14806,7 +15186,11 @@ function saubererSchreibtisch(roh) {
     verse: q.verse !== false,
     uhrTickt: q.uhrTickt === true,
     wachs: begrenze(q.wachs, 0, LEUCHTER_STUNDEN * 60, 0),         /* verbrannte Minuten */
-    kerzenGewechselt: begrenze(q.kerzenGewechselt, 0, 4102444800000, 0)
+    kerzenGewechselt: begrenze(q.kerzenGewechselt, 0, 4102444800000, 0),
+    kleckse: typeof saubereKleckse === 'function' ? saubereKleckse(q.kleckse) : [],
+    federKratzt: q.federKratzt === true,
+    offenesBuch: q.offenesBuch !== false,
+    blattId: typeof q.blattId === 'string' && q.blattId ? q.blattId.slice(0, 80) : null
   };
 }
 
@@ -15028,6 +15412,7 @@ function schreibtischKlick(art) {
   try {
     const ctx = typeof audioCtxHolen === 'function' ? audioCtxHolen() : (window.__vaniKlick || (window.__vaniKlick = new (window.AudioContext || window.webkitAudioContext)()));
     if (!ctx) return;
+    if (ctx.state === 'suspended') { try { ctx.resume().catch(() => {}); } catch (e) {} }
     const t0 = ctx.currentTime;
     const o = ctx.createOscillator(), g = ctx.createGain();
     o.type = art === 'tick' ? 'square' : 'triangle';
@@ -15039,7 +15424,7 @@ function schreibtischKlick(art) {
 }
 
 /* ----- Der siebenarmige Leuchter: Messingarme und sieben Flammen ----- */
-function baueLeuchter(einst) {
+function baueLeuchter(einst, woche) {
   const W = 170, H = 150;
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   const c = el('canvas', { class: 'desk-leuchter-flammen', width: String(W * dpr), height: String(H * dpr) });
@@ -15054,6 +15439,8 @@ function baueLeuchter(einst) {
   let phase = Math.random() * 10, laeuft = true, zug = 0;
   const zeichne_ = () => {
     if (!c.isConnected) { laeuft = false; return; }
+    /* Unter Schreibraum oder Leser sieht niemand die Flammen: sparsam weiterlaufen */
+    if ((typeof _sr !== 'undefined' && _sr) || (typeof _leser !== 'undefined' && _leser) || (typeof _epub !== 'undefined' && _epub) || document.visibilityState === 'hidden') { setTimeout(() => requestAnimationFrame(zeichne_), 500); return; }
     phase += .016;
     ctx.clearRect(0, 0, W, H);
     const fuss = 118;
@@ -15076,8 +15463,17 @@ function baueLeuchter(einst) {
       ctx.fillStyle = 'rgba(255,250,236,.9)';
       for (const tr of tropfen[i]) { const ty = by + tr.h * (y + 52 - by); ctx.fillRect(x + tr.s * 3.2 - .7, ty, 1.4, (y + 52 - ty) * tr.l); }
       ctx.fillStyle = 'rgba(120,90,40,.3)'; ctx.beginPath(); ctx.ellipse(x, by, 3.5, 1.4, 0, 0, 6.29); ctx.fill();
-      /* Flamme */
-      const fl = 1 + .12 * Math.sin(phase * 8 + i * 1.7) + .06 * Math.sin(phase * 17 + i);
+      /* Flamme — die Woche: heute höher, Zukunft klein, ein vergangener Tag ohne Wörter erloschen */
+      const wt = woche && woche[i];
+      const faktor = !wt ? 1 : wt.heute ? 1.38 : wt.zukunft ? .72 : wt.worte > 0 ? 1 : 0;
+      if (faktor === 0) {
+        ctx.strokeStyle = '#2b211a'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(x, by); ctx.lineTo(x + .6, by - 3.5); ctx.stroke();
+        /* ein Faden Rauch */
+        ctx.strokeStyle = 'rgba(200,200,210,' + (.12 + .06 * Math.sin(phase * 2 + i)).toFixed(3) + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x + .6, by - 4);
+        for (let k = 1; k <= 6; k++) ctx.lineTo(x + .6 + Math.sin(phase * 1.3 + k * .9 + i) * k * .9, by - 4 - k * 4); ctx.stroke();
+        return;
+      }
+      const fl = faktor * (1 + .12 * Math.sin(phase * 8 + i * 1.7) + .06 * Math.sin(phase * 17 + i));
       const neig = Math.sin(phase * .9 + i) * .08 + zug * (i % 2 ? -1 : 1) * .2;
       const fh = 15 * fl, fw = 4.6;
       kerzeSchein(ctx, x, by - fh * .5, 24, 28, [[0, 'rgba(255,170,70,' + (.24 * fl).toFixed(3) + ')'], [1, 'rgba(255,140,50,0)']]);
@@ -15150,7 +15546,8 @@ function baueLampe(szene, e, maler) {
     ev.stopPropagation(); ev.preventDefault();
     cancelAnimationFrame(raf); raf = 0;
     const r = halter.getBoundingClientRect();
-    zieht = { ox: ev.clientX - (r.left + knaufPos().x), oy: ev.clientY - (r.top + knaufPos().y), r }; maxZug = 0;
+    const s = r.width / 240 || 1;   /* die Lampe ist auf schmalen Geräten skaliert */
+    zieht = { ox: (ev.clientX - r.left) / s - knaufPos().x, oy: (ev.clientY - r.top) / s - knaufPos().y, r, s }; maxZug = 0;
     z.vx = 0; z.vy = 0;
     try { knauf.setPointerCapture(ev.pointerId); } catch (x) {}
     halter.classList.add('zieht');
@@ -15159,7 +15556,7 @@ function baueLampe(szene, e, maler) {
     if (!zieht) return;
     /* Wunschposition des Knaufs, dann an der Schnur gehalten: maximal MAX lang,
        darüber gibt sie nur noch ein wenig nach */
-    let wx = ev.clientX - zieht.ox - zieht.r.left, wy = ev.clientY - zieht.oy - zieht.r.top;
+    let wx = (ev.clientX - zieht.r.left) / zieht.s - zieht.ox, wy = (ev.clientY - zieht.r.top) / zieht.s - zieht.oy;
     let dx = wx - P.x, dy = wy - P.y;
     if (dy < 6) { dy = 6 + (dy - 6) * .08; }       /* nicht über die Aufhängung hinaus */
     const l = Math.hypot(dx, dy);
@@ -15225,7 +15622,7 @@ RENDER.schreibtisch = function (haupt) {
   const wetter = e.wetterFolgtKlang ? schreibtischWetter() : 'still';
   const szene = el('div', { class: 'desk-szene holz-' + e.holz + ' wetter-' + wetter + (e.kerzen ? ' kerzen-an' : '') + (e.lampeAn ? '' : ' lampe-aus'), style: '--lampe:' + e.lampe + ';--unordnung:' + e.unordnung });
   const leinwand = el('canvas', { class: 'desk-malerei' });
-  const maler = schreibtischMaler(leinwand, { holz: e.holz, lampe: e.lampe, lampeAn: e.lampeAn, wetter, kerzen: e.kerzen, unordnung: e.unordnung });
+  const maler = schreibtischMaler(leinwand, { holz: e.holz, lampe: e.lampe, lampeAn: e.lampeAn, wetter, kerzen: e.kerzen, unordnung: e.unordnung, alter: schreibtischAlter(D.stats.tage), kleckse: e.kleckse });
   const dinge = el('div', { class: 'desk-dinge' });
   szene.append(leinwand, dinge);
 
@@ -15236,13 +15633,16 @@ RENDER.schreibtisch = function (haupt) {
 
   /* Lampe mit Zugschnur */
   dinge.append(baueLampe(szene, e, maler));
+  /* Fensterbank: Wetterglas (Klang) und die Teelichter der Woche (Tagesziel) */
+  dinge.append(baueWetterglas());
+  const teelichter = baueTeelichter(); if (teelichter) dinge.append(teelichter);
 
   /* Leuchter */
   let leuchter = null;
   if (e.kerzen) {
-    leuchter = baueLeuchter(e);
+    leuchter = baueLeuchter(e, leuchterWoche(D.stats.tage));
     const stand = leuchterStand(e.wachs);
-    dinge.append(ding('leuchter', stand >= 1 ? 'Die Kerzen sind herunter — neue aufstecken' : 'Der Leuchter: Schreibzeit anzünden (' + Math.round((1 - stand) * 100) + ' % Kerze)', el('div', { class: 'leuchter-bild' }, leuchter.element), async () => {
+    dinge.append(ding('leuchter', stand >= 1 ? 'Die Kerzen sind herunter — neue aufstecken' : 'Der Leuchter: sieben Kerzen, Montag bis Sonntag — heute brennt höher. Tippen: Schreibzeit anzünden (' + Math.round((1 - stand) * 100) + ' % Kerze)', el('div', { class: 'leuchter-bild' }, leuchter.element), async () => {
       if (leuchterStand(e.wachs) >= 1) {
         if (await frage('Die Kerzen sind nach ' + LEUCHTER_STUNDEN + ' Schreibstunden herunter. Neue aufstecken?', { ja: 'Neue Kerzen' })) { e.wachs = 0; e.kerzenGewechselt = Date.now(); D.einst.schreibtisch = { ...e }; speichereEinst(); toast('Sieben neue Kerzen. Frisch und weiß.'); zeichne(); }
         return;
@@ -15272,7 +15672,15 @@ RENDER.schreibtisch = function (haupt) {
   if (!letzte.length) dinge.append(ding('manuskript m1 leer', 'Ein leeres Blatt — anfangen', el('div', { class: 'manuskript-papier' }, el('b', {}, 'Noch nichts'), el('span', {}, 'Ein leeres Blatt. Das beste Versprechen, das es gibt.')), () => schreibtischNeuesBlatt()));
 
   /* Tintenfass & Feder */
-  dinge.append(ding('tinte', 'Tintenfass und Feder: ein neues Blatt', el('div', { class: 'tinte-bild' }, el('i', { class: 'fass' }), el('i', { class: 'fass-glanz' }), el('i', { class: 'feder f1' }), el('i', { class: 'feder f2' })), () => schreibtischNeuesBlatt()));
+  dinge.append(ding('tinte', 'Tintenfass und Feder: ein Blatt einspannen', el('div', { class: 'tinte-bild' }, el('i', { class: 'fass' }), el('i', { class: 'fass-glanz' }), el('i', { class: 'feder f1' }), el('i', { class: 'feder f2' })), async () => {
+    const liegt = e.blattId && D.docs.get(e.blattId);
+    const w = await menue([
+      liegt ? { text: 'Das eingespannte Blatt weiterschreiben', icon: 'blatt', wert: 'weiter' } : null,
+      { text: 'Ein neues Blatt einspannen — hier auf dem Tisch', icon: 'blatt', wert: 'einspannen' },
+      { text: 'Ein neues Blatt im Schreibraum', icon: 'stift', wert: 'raum' }
+    ].filter(Boolean), 'Tinte und Feder');
+    if (w === 'weiter') blattEinspannen(szene, e, e.blattId); else if (w === 'einspannen') blattEinspannen(szene, e, null); else if (w === 'raum') schreibtischNeuesBlatt();
+  }));
 
   /* Das Bücherbord: die Bücher stehen in einer Reihe, leicht gelehnt, jedes
      für sich greifbar — kein Stapel, in dem nur das oberste zu sehen ist. */
@@ -15294,12 +15702,15 @@ RENDER.schreibtisch = function (haupt) {
   });
   bord.append(el('button', { class: 'bord-fuss', title: 'Der Lesestapel: Bücher auflegen, ordnen', onclick: () => lesestapelZeigen() }, buecher.length ? (buecher.length > zeigbar ? '+' + (buecher.length - zeigbar) + ' · ' : '') + 'Lesestapel' : 'Bücher auflegen'));
   dinge.append(el('div', { class: 'desk-ding-halter buecher' }, bord, el('i', { class: 'bordbrett' })));
+  /* Das aufgeschlagene Buch: das zuletzt gelesene liegt offen da */
+  if (buecher.length && e.offenesBuch) dinge.append(baueOffenesBuch(buecher[0], szene));
 
   /* Tasse: der Schreibtag */
   const tag = schreibtischTag();
   dinge.append(ding('tasse' + (tag.heute > 0 ? ' dampft' : ''), 'Die Tasse: ' + (tag.heute ? tag.heute + ' Wörter heute' : 'heute noch nichts') + (tag.serie > 1 ? ' · ' + tag.serie + ' Tage in Folge' : ''), el('div', { class: 'tasse-bild' }, el('i', { class: 'dampf d1' }), el('i', { class: 'dampf d2' }), el('i', { class: 'dampf d3' }), el('i', { class: 'henkel' }), el('span', { class: 'tasse-zahl' }, tag.heute ? (tag.heute >= 10000 ? Math.round(tag.heute / 1000) + 'k' : String(tag.heute)) : '')), () => {
     toast(tag.heute ? tag.heute + ' Wörter heute' + (tag.serie > 1 ? ' — der ' + tag.serie + '. Tag in Folge.' : '.') : 'Heute noch nichts. Die Tasse wartet.', 3600);
   }));
+  const zweite = baueZweiteTasse(); if (zweite) dinge.append(zweite);
 
   /* Glas mit Fundstück: ein eigenes Foto oder der Funke */
   const fundfoto = schreibtischFundfoto();
@@ -15357,8 +15768,13 @@ RENDER.schreibtisch = function (haupt) {
     dinge.style.setProperty('--px', (px * -4).toFixed(1) + 'px'); dinge.style.setProperty('--py', (py * -2).toFixed(1) + 'px');
   });
   maler.start();
+  /* Ein Luftzug, wenn die Tür aufgeht: Papiere heben die Ecken, Flammen ducken sich */
+  szene.classList.add('luftzug'); setTimeout(() => szene.classList.remove('luftzug'), 1900);
+  if (leuchter) setTimeout(() => leuchter.puste(.9), 250);
+  /* Ein eingespanntes Blatt liegt noch da */
+  if (e.blattId && D.docs.get(e.blattId)) blattEinspannen(szene, e, e.blattId, false);
   /* Aufhören, sobald der Raum weg ist */
-  const beobachter = new MutationObserver(() => { if (!szene.isConnected) { maler.stopp(); beobachter.disconnect(); } });
+  const beobachter = new MutationObserver(() => { if (!szene.isConnected) { maler.stopp(); (szene._aufraeumen || []).forEach((f) => { try { f(); } catch (x) {} }); beobachter.disconnect(); } });
   beobachter.observe(haupt, { childList: true });
   szene.addEventListener('pointerdown', () => { if (leuchter) leuchter.puste(.35); });
 };
@@ -15387,10 +15803,241 @@ function schreibtischEinrichten(danach) {
     zeile('Die Uhr tickt', 'Ein leises Ticken, zur vollen Stunde ein Glockenschlag.', schalter(() => e.uhrTickt, (v) => { e.uhrTickt = v; })),
     zeile('Fenster hört auf den Klang', 'Spielt Regen, regnet es vor dem Fenster; bei Gewitter wetterleuchtet es.', schalter(() => e.wetterFolgtKlang, (v) => { e.wetterFolgtKlang = v; })),
     zeile('Eigene Zeilen auf der Platte', 'Kurze Sätze aus meinen Funden, wie hingekritzelt.', schalter(() => e.verse, (v) => { e.verse = v; })),
+    zeile('Die Feder kratzt', 'Ein leises Kratzen beim Tippen auf dem eingespannten Blatt.', schalter(() => e.federKratzt, (v) => { e.federKratzt = v; })),
+    zeile('Aufgeschlagenes Buch', 'Das zuletzt gelesene Buch liegt offen auf dem Tisch; links und rechts tippen blättert.', schalter(() => e.offenesBuch, (v) => { e.offenesBuch = v; })),
+    (e.kleckse && e.kleckse.length) ? zeile('Kleckse', e.kleckse.length + ' Tintenkleckse von der Feder — einer je Sitzung.', el('button', { class: 'knopf zart', onclick: () => { e.kleckse = []; D.einst.schreibtisch = { ...e }; speichereEinst(); toast('Die Platte ist gewischt.'); if (danach) danach(); } }, 'Wegwischen')) : null,
     zeile('Unordnung', 'Wie viel auf dem Tisch liegt und wie schief.', unordnung),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => { D.einst.schreibtisch = alt; if (danach) danach(); zu(); } }, 'Zurück'),
       el('button', { class: 'knopf voll', onclick: () => { behalten = true; D.einst.schreibtisch = { ...e }; speichereEinst(); zu(); if (danach) danach(); } }, 'So bleibt es')));
   const zu = zeigeDeck(kasten, () => { if (!behalten) { D.einst.schreibtisch = alt; if (danach) danach(); } });
+}
+
+/* ===================== 54c — DER SCHREIBTISCH LEBT =====================
+   Der Tisch altert mit den Wörtern, die Feder tropft, der Leuchter zählt die
+   Woche, Teelichter auf der Fensterbank zeigen das Tagesziel, ein Wetterglas
+   zeigt den Klang, ein Buch liegt aufgeschlagen, ein Blatt lässt sich
+   einspannen — und gegenüber dampft manchmal eine zweite Tasse.
+   Die reinen Helfer stehen oben, die Bühnenstücke darunter. */
+
+/* Wie alt der Tisch ist: aus allen je geschriebenen Wörtern. Pur. */
+function schreibtischAlter(tage) {
+  const worte = Object.values(tage || {}).reduce((a, b) => a + (Number(b) || 0), 0);
+  return { worte, ringe: Math.min(6, 1 + Math.floor(worte / 100000)), abnutzung: Math.min(1, worte / 250000) };
+}
+
+/* Die Woche am Leuchter: Montag bis Sonntag. Vergangene Tage mit Wörtern
+   brennen, heute brennt höher, die Zukunft wartet mit kleiner Flamme,
+   vergangene Tage ohne ein Wort sind erloschen. Pur. */
+function leuchterWoche(tage, jetzt = Date.now()) {
+  const d = new Date(jetzt), wt = (d.getDay() + 6) % 7;
+  const montag = new Date(d); montag.setDate(d.getDate() - wt); montag.setHours(0, 0, 0, 0);
+  return [...Array(7)].map((_, i) => {
+    const t = new Date(montag); t.setDate(montag.getDate() + i);
+    const k = tagKey(t), worte = Number((tage || {})[k]) || 0;
+    return { tag: k, worte, heute: i === wt, vorbei: i < wt, zukunft: i > wt, brennt: i >= wt || worte > 0 };
+  });
+}
+/* Teelichter auf der Fensterbank: eines je Tag, es brennt, wenn das Tagesziel stand. Pur. */
+function teelichterWoche(tage, ziel, jetzt = Date.now()) {
+  if (!(Number(ziel) > 0)) return [];
+  return leuchterWoche(tage, jetzt).map((t) => ({ ...t, erreicht: t.worte >= Number(ziel) }));
+}
+/* Lese-Serie: Tage in Folge mit gelesenen Seiten, über alle Bücher. Pur. */
+function leseSerie(buecher, jetzt = Date.now()) {
+  const tage = {};
+  for (const b of buecher || []) for (const [k, n] of Object.entries((b && b.statistik) || {})) tage[k] = (tage[k] || 0) + (Number(n) || 0);
+  const heute = tage[tagKey(jetzt)] || 0;
+  let serie = 0;
+  for (let i = 0; i < 400; i++) { const k = tagKey(jetzt - i * 86400000); if ((tage[k] || 0) > 0) serie++; else if (i > 0) break; }
+  return { heute, serie, tage };
+}
+/* Kleckse auf der Platte: x/y als Anteile, r in Pixeln, s als Saat. Pur. */
+const KLECKSE_MAX = 40;
+function saubereKleckse(liste) {
+  return (Array.isArray(liste) ? liste : []).filter((k) => k && typeof k === 'object').slice(-KLECKSE_MAX)
+    .map((k) => ({ x: begrenze(k.x, 0, 1, .5), y: begrenze(k.y, 0, 1, .5), r: begrenze(k.r, 1, 9, 3), s: Math.round(begrenze(k.s, 0, 1e9, 0)) }));
+}
+/* Die Feder tropft: nach einer Sitzung ein neuer Klecks nahe der Schreibstelle. */
+function schreibtischFederTropft(x, y) {
+  const e = saubererSchreibtisch(D.einst.schreibtisch);
+  e.kleckse = saubereKleckse([...(e.kleckse || []), { x: begrenze(x, .02, .98, .5), y: begrenze(y, .05, .95, .5), r: 1.5 + Math.random() * 4, s: Math.floor(Math.random() * 1e6) }]);
+  D.einst.schreibtisch = e; speichereEinst();
+  return e.kleckse[e.kleckse.length - 1];
+}
+
+/* ----- Klang: Federkratzen beim Tippen, das Klangbild des Tisches ----- */
+function federKratzen() {
+  try {
+    const ctx = typeof audioCtxHolen === 'function' ? audioCtxHolen() : (window.__vaniKlick || (window.__vaniKlick = new (window.AudioContext || window.webkitAudioContext)()));
+    if (!ctx) return;
+    const dauer = .045 + Math.random() * .05, n = Math.floor(ctx.sampleRate * dauer);
+    const buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) { const u = i / n; d[i] = (Math.random() * 2 - 1) * Math.sin(u * Math.PI) * (1 - u * .4); }
+    const q = ctx.createBufferSource(); q.buffer = buf;
+    const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 2200 + Math.random() * 1800; f.Q.value = 1.1;
+    const g = ctx.createGain(); g.gain.value = .04 + Math.random() * .03;
+    q.connect(f); f.connect(g); g.connect(ctx.destination); q.start();
+  } catch (e) {}
+}
+async function schreibtischKlangbild() {
+  if (typeof ambienceMischungAnwenden !== 'function') { location.hash = '#/klang'; return; }
+  const m = { ...(D.einst.ambience || {}) };
+  const an = (m.uhr || 0) > 0 && (m.wind || 0) > 0;
+  if (an) { for (const id of ['uhr', 'wind', 'kamin']) delete m[id]; toast('Der Tisch ist still.'); }
+  else { m.uhr = .22; m.wind = .16; m.kamin = .1; toast('Schreibtisch bei Nacht: die Uhr, ein ferner Wind, Glut im Ofen.', 3600); }
+  try { await audioFreigeben(); await ambienceMischungAnwenden(m); } catch (e) {}
+  zeichne();
+}
+/* Was gerade klingt, als kurzer Name. */
+function schreibtischKlangName() {
+  const m = (D.einst && D.einst.ambience) || {};
+  const ids = Object.keys(m).filter((id) => m[id] > 0).sort((a, b) => m[b] - m[a]);
+  if (!ids.length) return '';
+  const namen = ids.slice(0, 2).map((id) => { const a = typeof ambienceFinde === 'function' ? ambienceFinde(id) : null; return a ? a.name : id; });
+  return namen.join(' · ') + (ids.length > 2 ? ' …' : '');
+}
+
+/* ----- Bühnenstücke ----- */
+/* Das Wetterglas auf der Fensterbank: die Flüssigkeit steht hoch und leuchtet, wenn Klang spielt. */
+function baueWetterglas() {
+  const name = schreibtischKlangName();
+  return el('button', { class: 'desk-wetterglas' + (name ? ' spielt' : ''), title: name ? 'Das Wetterglas: gerade spielt ' + name : 'Das Wetterglas: still. Ein Tipp öffnet den Klangraum', onclick: async () => {
+      const w = await menue([{ text: 'Schreibtisch bei Nacht', icon: 'klang', wert: 'tisch' }, { text: 'Der Nachtgarten: Grillen und Wind', icon: 'klang', wert: 'garten' }, { text: 'Den Klangraum öffnen', icon: 'klang', wert: 'raum' }], name ? 'Gerade spielt ' + name : 'Das Wetterglas ist still');
+      if (w === 'tisch') schreibtischKlangbild(); else if (w === 'garten') nachtgartenKlang(); else if (w === 'raum') location.hash = '#/klang';
+    } },
+    el('i', { class: 'wg-kugel' }), el('i', { class: 'wg-fluessig' }), el('i', { class: 'wg-hals' }), el('i', { class: 'wg-fuss' }),
+    el('span', { class: 'wg-text' }, name ? name.split(' · ')[0] : ''));
+}
+/* Teelichter auf der Fensterbank: die Woche des Tagesziels. */
+function baueTeelichter() {
+  const liste = teelichterWoche(D.stats.tage, D.einst.tagesziel);
+  if (!liste.length) return null;
+  const namen = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+  const reihe = el('button', { class: 'desk-teelichter', title: 'Die Woche auf der Fensterbank: ein Teelicht je Tag — es brennt, wenn das Tagesziel (' + D.einst.tagesziel + ' Wörter) stand', onclick: () => { location.hash = '#/feinheiten'; } });
+  liste.forEach((t, i) => reihe.append(el('i', { class: 'teelicht' + (t.erreicht ? ' brennt' : '') + (t.heute ? ' heute' : '') + (t.zukunft ? ' kommt' : ''), title: namen[i] + (t.erreicht ? ' · Ziel erreicht' : t.zukunft ? '' : ' · ' + t.worte + ' Wörter'), style: '--i:' + i }, el('b', {}, namen[i]))));
+  return reihe;
+}
+/* Die zweite Tasse: gegenüber schreibt gerade jemand (Sync hat eben etwas gebracht). */
+function baueZweiteTasse() {
+  if (typeof syncFremdAktiv !== 'function' || !syncFremdAktiv()) return null;
+  return el('button', { class: 'desk-ding tasse zweite dampft', title: 'Die zweite Tasse: gegenüber schreibt gerade jemand', onclick: () => { toast('Drüben dampft es — vor wenigen Minuten kam etwas an. Der Faden wartet.', 3600); } },
+    el('div', { class: 'tasse-bild' }, el('i', { class: 'dampf d1' }), el('i', { class: 'dampf d2' }), el('i', { class: 'dampf d3' }), el('i', { class: 'henkel' })));
+}
+
+/* Das aufgeschlagene Buch: die Doppelseite des zuletzt gelesenen Buches liegt
+   auf dem Tisch; links/rechts tippen blättert, die Mitte schlägt den Leser auf. */
+function baueOffenesBuch(b, szene) {
+  const halter = el('div', { class: 'desk-ding-halter offenbuch' + (b.art === 'epub' ? ' epub' : ''), title: (b.titel || 'Buch') + (b.art === 'epub' ? '' : ' · Seite ' + (b.seite || 1)) });
+  const links = el('canvas', { class: 'ob-seite links' }), rechts = el('canvas', { class: 'ob-seite rechts' });
+  const buch = el('div', { class: 'ob-buch' }, el('i', { class: 'ob-ruecken' }),
+    el('div', { class: 'ob-blatt links' }, links), el('div', { class: 'ob-blatt rechts' }, rechts), el('i', { class: 'ob-band' }));
+  const titel = el('button', { class: 'ob-titel', onclick: () => buchOeffnen(b) }, (b.titel || 'Buch').slice(0, 40));
+  halter.append(buch, titel);
+  let seite = Math.max(1, b.seite || 1), dok = null;
+  const cache = new Map();
+  async function maleSeite(c, n) {
+    if (!dok || n < 1 || n > dok.numPages) { c.getContext('2d').clearRect(0, 0, c.width, c.height); c.classList.add('leer'); return; }
+    c.classList.remove('leer');
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    let bild = cache.get(n);
+    if (!bild) {
+      const s = await dok.getPage(n);
+      const vp0 = s.getViewport({ scale: 1 });
+      const vp = s.getViewport({ scale: 104 * dpr / vp0.width });
+      bild = document.createElement('canvas'); bild.width = Math.round(vp.width); bild.height = Math.round(vp.height);
+      await s.render({ canvasContext: bild.getContext('2d'), viewport: vp }).promise;
+      if (cache.size > 8) cache.delete(cache.keys().next().value);
+      cache.set(n, bild);
+    }
+    c.width = bild.width; c.height = bild.height; c.style.width = Math.round(bild.width / dpr) + 'px'; c.style.height = Math.round(bild.height / dpr) + 'px';
+    c.getContext('2d').drawImage(bild, 0, 0);
+  }
+  async function male() {
+    if (!dok) return;
+    const l = seite % 2 === 0 ? seite : seite - 1;
+    await Promise.all([maleSeite(links, l), maleSeite(rechts, l + 1)]);
+    halter.title = (b.titel || 'Buch') + ' · Seite ' + seite + ' von ' + dok.numPages;
+  }
+  function blaettere(r) {
+    if (!dok) { buchOeffnen(b); return; }
+    const ziel = Math.max(1, Math.min(dok.numPages, seite + r * 2));
+    if (ziel === seite) { toast(r > 0 ? 'Das war die letzte Seite.' : 'Das ist der Anfang.'); return; }
+    seite = ziel; b.seite = seite; b.zuletzt = Date.now();
+    if (typeof buchSeiteGelesen === 'function') buchSeiteGelesen(b); else speichereStill(b);
+    buch.classList.remove('blatt-vor', 'blatt-zurueck'); void buch.offsetWidth; buch.classList.add(r > 0 ? 'blatt-vor' : 'blatt-zurueck');
+    male();
+  }
+  buch.addEventListener('click', (ev) => {
+    const r = buch.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width;
+    if (x < .32) blaettere(-1); else if (x > .68) blaettere(1); else buchOeffnen(b);
+  });
+  if (b.art === 'epub') { halter.classList.add('zu'); if (b.bild) { const img = el('img', { alt: '', draggable: 'false' }); setzeBild(img, b.bild); buch.append(img); } }
+  else {
+    /* Erst aufschlagen, wenn der Raum steht — der Tisch soll sofort da sein */
+    setTimeout(async () => {
+      if (!halter.isConnected) return;
+      try {
+        const pdfjs = await pdfjsLaden();
+        const blob = await dbGet('media', b.datei);
+        if (!blob || !halter.isConnected) return;
+        dok = await pdfjs.getDocument({ data: await blob.arrayBuffer() }).promise;
+        if (!halter.isConnected) { dok.destroy(); dok = null; return; }
+        await male();
+        halter.classList.add('offen');
+      } catch (e) { halter.classList.add('stumm'); }
+    }, 900);
+    if (szene) (szene._aufraeumen = szene._aufraeumen || []).push(() => { try { if (dok) dok.destroy(); } catch (e) {} dok = null; });
+  }
+  return halter;
+}
+
+/* „Blatt einspannen": ein Blatt liegt wirklich auf dem Tisch und wird dort
+   getippt. Gespeichert wird wie überall (entprellt, beim Weglegen sofort);
+   die Wörter zählen fürs Feuer; am Ende tropft die Feder. */
+function blattEinspannen(szene, e, blattId, fokus = true) {
+  if (!szene || szene.querySelector('.desk-blatt')) return;
+  let doc = blattId ? D.docs.get(blattId) : null;
+  if (!doc || doc.typ !== 'blatt') doc = blattAusText('', '');
+  e.blattId = doc.id; D.einst.schreibtisch = { ...e }; speichereEinst();
+  const worteAnfang = worte(doc.text || '');
+  const feld = el('textarea', { class: 'desk-blatt-text', placeholder: 'Das Blatt liegt im Licht. Schreib.', spellcheck: 'false', autocapitalize: 'sentences' });
+  feld.value = doc.text || '';
+  const titel = el('input', { class: 'desk-blatt-titel', placeholder: 'Ohne Titel', value: doc.titel || '', 'aria-label': 'Titel' });
+  const zahl = el('span', { class: 'desk-blatt-worte' }, worteAnfang ? worteAnfang + ' Wörter' : '');
+  const sichern = entprellt(() => {
+    doc.text = feld.value; doc.titel = titel.value.trim();
+    zaehleWorte(doc.id, doc.text); speichere(doc);
+    const n = worte(doc.text); zahl.textContent = n ? n + (n === 1 ? ' Wort' : ' Wörter') : '';
+  }, 500, true);
+  const weglegen = () => {
+    if (sichern.haengt()) sichern.sofort();
+    const n = worte(doc.text || '');
+    if (n > worteAnfang) {
+      /* Der Klecks landet dort, wo das Blatt lag */
+      const rb = blatt.getBoundingClientRect(), rs = szene.getBoundingClientRect();
+      const x = (rb.left + rb.width * (.2 + Math.random() * .6) - rs.left) / rs.width;
+      const y = (rb.top + rb.height * (.6 + Math.random() * .4) - rs.top) / rs.height;
+      schreibtischFederTropft(x, Math.max(.5, y));
+    }
+    /* frisch lesen: der Klecks von eben steht schon drin */
+    const jetzt = saubererSchreibtisch(D.einst.schreibtisch); jetzt.blattId = null; D.einst.schreibtisch = jetzt; Object.assign(e, jetzt); speichereEinst();
+    blatt.classList.add('weg');
+    setTimeout(() => { blatt.remove(); if (szene.isConnected) zeichne(); }, 320);
+  };
+  const blatt = el('div', { class: 'desk-blatt' },
+    el('div', { class: 'desk-blatt-kopf' }, titel, zahl,
+      el('button', { class: 'rundknopf zart', html: ik('stift'), title: 'Im Schreibraum weiterschreiben', onclick: () => { if (sichern.haengt()) sichern.sofort(); oeffneSchreibraum(doc.id); } }),
+      el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Blatt weglegen (es bleibt bei den Blättern)', onclick: weglegen })),
+    feld,
+    el('div', { class: 'desk-blatt-fuss' }, 'Liegt bei den Blättern. Weglegen mit Esc.'));
+  feld.addEventListener('input', () => { sichern(); if (e.federKratzt) federKratzen(); });
+  titel.addEventListener('input', sichern);
+  feld.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') { ev.preventDefault(); weglegen(); } });
+  titel.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); feld.focus(); } });
+  szene.append(blatt);
+  szene.classList.add('blatt-liegt');
+  if (fokus) setTimeout(() => { feld.focus(); feld.setSelectionRange(feld.value.length, feld.value.length); }, 80);
+  return blatt;
 }
 
 /* ================================================================
@@ -15430,7 +16077,7 @@ function buchFortschritt(seite, seiten) {
 }
 
 /* Leseeinstellungen bleiben am Gerät (Helligkeit ist Gerätesache). Pur. */
-const LESE_VORGABE = { helligkeit: 1, waerme: .15, nacht: false, doppel: 'auto', blaettern: true, zoom: 'seite' };
+const LESE_VORGABE = { helligkeit: 1, waerme: .15, nacht: false, doppel: 'auto', blaettern: true, zoom: 'seite', stimme: null, rand: false, epubSchrift: 'serif', epubGroesse: 19, epubZeile: 1.6, epubRand: 36 };
 function saubereLeseEinstellung(roh) {
   const q = roh && typeof roh === 'object' ? roh : {};
   return {
@@ -15439,8 +16086,20 @@ function saubereLeseEinstellung(roh) {
     nacht: q.nacht === true,
     doppel: ['auto', 'an', 'aus'].includes(q.doppel) ? q.doppel : 'auto',
     blaettern: q.blaettern !== false,
-    zoom: ['seite', 'breite'].includes(q.zoom) ? q.zoom : 'seite'
+    zoom: ['seite', 'breite'].includes(q.zoom) ? q.zoom : 'seite',
+    stimme: typeof q.stimme === 'string' && q.stimme ? q.stimme.slice(0, 200) : null,
+    rand: q.rand === true,
+    epubSchrift: ['serif', 'sans', 'rund', 'schreib'].includes(q.epubSchrift) ? q.epubSchrift : 'serif',
+    epubGroesse: Math.round(begrenze(q.epubGroesse, 14, 28, 19)),
+    epubZeile: begrenze(q.epubZeile, 1.3, 2, 1.6),
+    epubRand: Math.round(begrenze(q.epubRand, 12, 80, 36))
   };
+}
+/* Wo ein Buch steht, als Text: PDF in Seiten, EPUB in Kapiteln. Pur. */
+function buchStandText(b) {
+  if (!b) return '';
+  if (b.art === 'epub') return 'Kapitel ' + ((b.kapitel || 0) + 1) + (b.kapitelAnzahl ? ' von ' + b.kapitelAnzahl : '');
+  return b.seiten ? 'Seite ' + (b.seite || 1) + ' von ' + b.seiten : '';
 }
 function leseEinstellung() {
   try { return saubereLeseEinstellung(JSON.parse(localStorage.getItem('vani-lese') || '{}')); } catch (e) { return saubereLeseEinstellung({}); }
@@ -15461,7 +16120,7 @@ function isbnZu10(roh) {
 /* ISBNs aus einem Text (Impressum). Pur. */
 function isbnAusText(text) {
   const aus = [];
-  for (const m of String(text || '').matchAll(/ISBN[\s:–-]*((?:97[89][\s-]?)?\d[\d\s-]{8,16}[\dXx])/gi)) {
+  for (const m of String(text || '').matchAll(/ISBN(?:-1[03])?(?:\s*\([^)]{0,24}\))?[\s:–-]*((?:97[89][\s-]?)?\d[\d\s-]{8,16}[\dXx])/gi)) {
     let k = m[1].replace(/[\s-]/g, '').toUpperCase();
     if (k.length > 13 && /^97[89]/.test(k)) k = k.slice(0, 13);
     if ((k.length === 13 || k.length === 10) && !aus.includes(k)) aus.push(k);
@@ -15508,7 +16167,7 @@ async function kofferIsbnFuer(b) {
   if (!k) return null;
   const norm = (s) => String(s || '').toLowerCase().replace(/[^a-zäöüß0-9]+/g, ' ').trim();
   const t = norm(b.titel);
-  const e = k.buecher.find((x) => x.isbn && (norm(x.name) === t || (t.length > 4 && (norm(x.name).includes(t) || t.includes(norm(x.name))))));
+  const e = k.buecher.find((x) => x.isbn && x.name && (norm(x.name || '') === t || (t.length > 4 && (norm(x.name || '').includes(t) || t.includes(norm(x.name || ''))))));
   return e ? e.isbn : null;
 }
 /* Versucht, für ein Buch das offizielle Cover zu holen: eigene ISBN, Koffer,
@@ -15559,7 +16218,7 @@ async function schoeneCoverHolen() {
 function saubererAutor(roh) {
   let a = String(roh || '').replace(/\[[^\]]*\]/g, ' ').replace(/\b(Verfasser(?:in)?|Autor(?:in)?|author|Hrsg\.?|Übersetzer(?:in)?)\b\.?/gi, ' ').replace(/[;|/]+/g, ',').replace(/\s+/g, ' ').trim().replace(/^[,\s]+|[,\s]+$/g, '');
   const m = a.match(/^([^,]+),\s*([^,]+)$/);
-  if (m && !/\s(?:und|and|&)\s/i.test(a)) a = (m[2] + ' ' + m[1]).replace(/\s+/g, ' ').trim();
+  if (m && !/\s(?:und|and|&)\s/i.test(a) && !(m[1].trim().includes(' ') && m[2].trim().includes(' '))) a = (m[2] + ' ' + m[1]).replace(/\s+/g, ' ').trim();
   /* „Silvana de Mari Silvana de Mari" -> einmal reicht */
   const h = a.length >> 1;
   if (a.length > 8 && a.slice(0, h).trim().toLowerCase() === a.slice(h).trim().toLowerCase()) a = a.slice(0, h).trim();
@@ -15567,9 +16226,12 @@ function saubererAutor(roh) {
 }
 
 async function buchAuflegenAusBlob(blob, name, { datei = null, isbn = null, autorVorgabe = '', titelFest = false } = {}) {
+  /* EPUB? Dann der eigene Leser (55b) */
+  try { const kopf = await blob.slice(0, 64).arrayBuffer(); if (typeof istEpub === 'function' && istEpub(kopf, name)) return await buchAuflegenEpub(blob, name, { datei, isbn, autorVorgabe, titelFest }); } catch (e) { if (/^\.?epub/i.test(String(name || '').split('.').pop())) throw e; }
   const pdfjs = await pdfjsLaden();
   const daten = await blob.arrayBuffer();
   const dok = await pdfjs.getDocument({ data: daten.slice(0) }).promise;
+  try {
   const seiten = dok.numPages;
   let titel = String(name || 'Buch').replace(/\.pdf$/i, '');
   /* Dateinamen von Tauschbörsen tragen Klammerzusätze — die braucht kein Titel. */
@@ -15598,7 +16260,6 @@ async function buchAuflegenAusBlob(blob, name, { datei = null, isbn = null, auto
   /* ISBN aus dem Impressum — damit später das echte Cover kommt */
   let isbns = [];
   try { isbns = await isbnAusPdf(dok); } catch (e) {}
-  try { dok.destroy(); } catch (e) {}
   if (autorVorgabe) autor = autorVorgabe;   /* eine kuratierte Angabe schlägt Metadaten */
   const buch = neuDoc('buch', { titel, autor, datei: dateiId, bild, seiten, seite: 1, lesezeichen: [], zuletzt: Date.now(), isbn: isbn || isbns[0] || undefined });
   /* Das offizielle Cover aus dem Netz, wenn eines zu finden ist — still, im Hintergrund. */
@@ -15608,6 +16269,7 @@ async function buchAuflegenAusBlob(blob, name, { datei = null, isbn = null, auto
     }
   })();
   return buch;
+  } finally { try { dok.destroy(); } catch (e) {} }
 }
 
 async function buecherAuflegenPerDatei() {
@@ -15637,7 +16299,7 @@ async function buchAusGoodnotesArchiv() {
   const blob = await dbGet('media', d.datei);
   if (!blob) { toast('Die Datei ist nicht da.'); return; }
   toast('Lege das Buch auf …');
-  try { await buchAuflegenAusBlob(blob, d.titel || d.dateiname || 'Buch', { datei: d.datei }); toast('Liegt auf dem Tisch.'); zeichne(); }
+  try { await buchAuflegenAusBlob(blob, d.titel || d.dateiname || 'Buch'); toast('Liegt auf dem Tisch.'); zeichne(); }
   catch (e) { toast('Ließ sich nicht öffnen.'); }
 }
 
@@ -15649,7 +16311,7 @@ async function buecherAusOrdner() {
   try { liste = await desk.buecherListe(); } catch (e) { liste = []; }
   if (!liste.length) { await zeigeAnkunft('Kein Buch im Ordner', ['Lege PDF-Dateien in den Ordner „VANI-Bücher" in deinen Dokumenten — oder in einen Ordner „buecher" neben der App.'], ''); return; }
   const da = new Set(lesestapelBuecher().map((b) => b.titel));
-  const wahl = await menue([...liste.map((b) => ({ text: (da.has(b.name.replace(/\.pdf$/i, '')) ? '✓ ' : '') + b.name + ' · ' + formatBytes(b.size), icon: 'buchzu', wert: b.pfad })), { text: 'Alle auflegen', icon: 'plus', wert: '_alle' }], liste.length + ' Bücher im Ordner');
+  const wahl = await menue([...liste.map((b) => ({ text: (da.has(b.name.replace(/\.(pdf|epub)$/i, '')) ? '✓ ' : '') + b.name + ' · ' + formatBytes(b.size), icon: 'buchzu', wert: b.pfad })), { text: 'Alle auflegen', icon: 'plus', wert: '_alle' }], liste.length + ' Bücher im Ordner');
   if (!wahl) return;
   const auswahl = wahl === '_alle' ? liste : liste.filter((b) => b.pfad === wahl);
   let n = 0;
@@ -15754,7 +16416,7 @@ function lesestapelZeigen() {
       el('div', { class: 'lesestapel-titel' }, b.titel || 'Buch'),
       b.autor ? el('div', { class: 'lesestapel-autor' }, b.autor) : null,
       el('div', { class: 'lesestapel-balken' }, el('i', { style: 'width:' + buchFortschritt(b.seite, b.seiten) + '%' })),
-      el('div', { class: 'lesestapel-stand' }, (b.seiten ? 'Seite ' + (b.seite || 1) + ' von ' + b.seiten : '') + (buchStatistikWorte(b) ? ' · ' + buchStatistikWorte(b) : '')));
+      el('div', { class: 'lesestapel-stand' }, buchStandText(b) + (buchStatistikWorte(b) ? ' · ' + buchStatistikWorte(b) : '')));
     langdruck(k, async () => {
       const wahl = await menue([
         { text: 'Umbenennen', icon: 'stift', wert: 'name' },
@@ -15793,20 +16455,23 @@ async function buchCoverAusSeite(b, n) {
     const pdfjs = await pdfjsLaden();
     const blob = await dbGet('media', b.datei); if (!blob) return;
     const dok = await pdfjs.getDocument({ data: await blob.arrayBuffer() }).promise;
+    try {
     const seite = await dok.getPage(Math.max(1, Math.min(dok.numPages, n)));
     const vp0 = seite.getViewport({ scale: 1 }); const vp = seite.getViewport({ scale: 480 / vp0.width });
     const c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
     await seite.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
     const id = await new Promise((res) => c.toBlob(async (bl) => res(bl ? await speichereDateiBlob(new File([bl], 'cover.jpg', { type: 'image/jpeg' })) : null), 'image/jpeg', .82));
     if (id) { b.bild = id; speichere(b); toast('Neues Cover.'); }
-    try { dok.destroy(); } catch (e) {}
+    } finally { try { dok.destroy(); } catch (e) {} }
   } catch (e) { toast('Das Cover ließ sich nicht malen.'); }
 }
 
 /* ----- Der Lesemodus ----- */
 let _leser = null;
 async function buchOeffnen(b) {
+  if (b && b.art === 'epub' && typeof epubOeffnen === 'function') return epubOeffnen(b);
   if (_leser) buchSchliessen();
+  if (typeof _epub !== 'undefined' && _epub && typeof epubSchliessen === 'function') epubSchliessen();
   const e = leseEinstellung();
   const raum = el('div', { class: 'lesemodus' + (e.nacht ? ' nacht' : '') });
   const buehne = el('div', { class: 'lese-buehne' });
@@ -15820,13 +16485,16 @@ async function buchOeffnen(b) {
     el('button', { class: 'rundknopf zart lese-zeichen', html: ik('lesezeichen'), title: 'Lesezeichen', onclick: () => leserLesezeichen() }),
     el('button', { class: 'rundknopf zart', html: ik('teilen'), title: 'Zitat kopieren / als Schnipsel', onclick: () => leserZitat() }),
     el('button', { class: 'rundknopf zart lese-notiz-knopf', html: ik('pin'), title: 'Randnotiz zu dieser Seite', onclick: () => leserNotizen() }),
+    el('button', { class: 'rundknopf zart lese-rand-knopf' + (e.rand ? ' an' : ''), html: ik('gliederung'), title: 'Randspalte: Notizen neben der Seite', onclick: () => leserRandspalte() }),
     el('button', { class: 'rundknopf zart', html: ik('suche'), title: 'Im Buch suchen', onclick: () => leserSuche() }),
     el('button', { class: 'rundknopf zart', html: ik('vorlesen'), title: 'Diese Seite vorlesen lassen', onclick: (ev) => leserVorlesen(ev.currentTarget) }),
     el('button', { class: 'rundknopf zart', html: ik('feinheiten'), title: 'Leseeinstellungen', onclick: () => leserEinstellungen() }));
   const fuss = el('div', { class: 'lese-fuss' }, el('button', { class: 'rundknopf zart', html: ik('zurueck'), title: 'Zurückblättern', onclick: () => blaettere(-1) }), balken, stand, el('button', { class: 'rundknopf zart', html: ik('rechts'), title: 'Weiterblättern', onclick: () => blaettere(1) }));
-  raum.append(kopf, buehne, fuss);
+  const rand = el('div', { class: 'lese-rand' });
+  raum.append(kopf, buehne, rand, fuss);
+  raum.classList.toggle('mit-rand', !!e.rand);
   document.body.append(raum);
-  _leser = { b, raum, buehne, e, dok: null, seite: Math.max(1, Math.min(b.seiten || 1, b.seite || 1)), busy: false, cache: new Map(), kopf, fuss, versteckTimer: null, zuletztGezeigt: 0 };
+  _leser = { b, raum, buehne, rand, e, dok: null, gen: 0, seite: Math.max(1, Math.min(b.seiten || 1, b.seite || 1)), busy: false, cache: new Map(), kopf, fuss, versteckTimer: null, zuletztGezeigt: 0 };
   const leser = _leser;
 
   const zeigeLeisten = () => { kopf.classList.remove('weg'); fuss.classList.remove('weg'); clearTimeout(leser.versteckTimer); leser.versteckTimer = setTimeout(() => { kopf.classList.add('weg'); fuss.classList.add('weg'); }, 2600); };
@@ -15839,7 +16507,8 @@ async function buchOeffnen(b) {
     if (!blob) throw new Error('Datei fehlt');
     leser.dok = await pdfjs.getDocument({ data: await blob.arrayBuffer() }).promise;
     if (leser.dok.numPages !== b.seiten) { b.seiten = leser.dok.numPages; speichereStill(b); balken.max = String(b.seiten); }
-  } catch (x) { toast('Das Buch ließ sich nicht aufschlagen.' + (x && x.message ? ' (' + x.message + ')' : ''), 4200); buchSchliessen(); return; }
+  } catch (x) { if (_leser === leser) { toast('Das Buch ließ sich nicht aufschlagen.' + (x && x.message ? ' (' + x.message + ')' : ''), 4200); buchSchliessen(); } return; }
+  if (_leser !== leser) { try { leser.dok.destroy(); } catch (e) {} return; }   /* „Zurück" kam schneller als das Buch */
 
   const doppel = () => leser.e.doppel === 'an' || (leser.e.doppel === 'auto' && raum.clientWidth >= 900 && raum.clientWidth > raum.clientHeight);
   const seitenJetzt = () => { const d = doppel(); if (!d) return [leser.seite]; const links = leser.seite % 2 === 0 ? leser.seite : leser.seite - 1; return [links, links + 1].filter((n) => n >= 1 && n <= b.seiten); };
@@ -15855,12 +16524,14 @@ async function buchOeffnen(b) {
     const c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
     c.style.width = Math.round(vp.width / dpr) + 'px'; c.style.height = Math.round(vp.height / dpr) + 'px';
     await seite.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+    c._vp = vp; c._dpr = dpr; c._seite = n;
     if (leser.cache.size > 10) leser.cache.delete(leser.cache.keys().next().value);
     leser.cache.set(schl, c);
     return c;
   }
   async function zeige(richtung) {
     if (!leser.dok) return;
+    const meine = ++leser.gen;
     const seiten = seitenJetzt();
     const d = seiten.length > 1;
     const breite = (buehne.clientWidth - (d ? 28 : 16)) / (d ? 2 : 1);
@@ -15871,6 +16542,8 @@ async function buchOeffnen(b) {
       const blatt = el('div', { class: 'lese-blatt' }, c, el('span', { class: 'lese-seitenzahl' }, String(n)));
       neu.append(blatt);
     }
+    if (meine !== leser.gen || _leser !== leser) return;   /* ein schnellerer Flip hat überholt */
+    buehne.querySelectorAll('.lese-doppel.geht-links, .lese-doppel.geht-rechts').forEach((x) => x.remove());
     const alt = buehne.querySelector('.lese-doppel');
     if (alt && leser.e.blaettern && richtung) {
       alt.classList.add(richtung > 0 ? 'geht-links' : 'geht-rechts');
@@ -15886,6 +16559,8 @@ async function buchOeffnen(b) {
     kopf.querySelector('.lese-notiz-knopf').classList.toggle('hat-notiz', buchNotizen(b, leser.seite).length > 0);
     if (richtung && leser.seite !== leser.letzteGezaehlt) { leser.letzteGezaehlt = leser.seite; buchSeiteGelesen(b); }
     b.seite = leser.seite; b.zuletzt = Date.now(); speichereStill(b);
+    leserRandAktualisieren();
+    if (leser.liest && leser.liest.weiter && leser.liest.seite !== leser.seite) setTimeout(() => { if (_leser === leser && leser.liest && leser.liest.weiter) leserVorlesen(leser.liest.knopf, true); }, 500);
     /* Nächste Seiten vorab malen */
     for (const n of [leser.seite + 1, leser.seite + 2, leser.seite - 1]) if (n >= 1 && n <= b.seiten) maleSeite(n, breite, hoehe).catch(() => {});
   }
@@ -15899,7 +16574,9 @@ async function buchOeffnen(b) {
   balken.addEventListener('input', () => { stand.textContent = balken.value + ' / ' + b.seiten; zeigeLeisten(); });
   balken.addEventListener('change', () => { leser.seite = Number(balken.value); zeige(0); });
   /* Tippen: rechts weiter, links zurück, Mitte Leisten */
+  let wischte = false;
   buehne.addEventListener('click', (ev) => {
+    if (wischte) { wischte = false; return; }
     const r = buehne.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width;
     if (x > .66) blaettere(1); else if (x < .34) blaettere(-1); else zeigeLeisten();
   });
@@ -15908,10 +16585,12 @@ async function buchOeffnen(b) {
   buehne.addEventListener('pointerdown', (ev) => { wisch = { x: ev.clientX, y: ev.clientY, t: Date.now() }; });
   buehne.addEventListener('pointerup', (ev) => {
     if (!wisch) return; const dx = ev.clientX - wisch.x, dy = ev.clientY - wisch.y; wisch = null;
-    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { blaettere(dx < 0 ? 1 : -1); ev.preventDefault(); }
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { wischte = true; blaettere(dx < 0 ? 1 : -1); ev.preventDefault(); }
   });
   leser.tasten = (ev) => {
     if (!_leser) return;
+    const ziel = ev.target;
+    if ((ziel && (/^(INPUT|TEXTAREA|SELECT)$/.test(ziel.tagName) || ziel.isContentEditable)) || document.querySelector('#deck .schleier, .spotlight-bogen')) return;
     if (ev.key === 'ArrowRight' || ev.key === 'PageDown' || ev.key === ' ') { ev.preventDefault(); blaettere(1); }
     else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); blaettere(-1); }
     else if (ev.key === 'Escape') { ev.preventDefault(); buchSchliessen(); }
@@ -15927,8 +16606,10 @@ function leserStil() {
   if (!_leser) return;
   const { raum, e } = _leser;
   raum.classList.toggle('nacht', e.nacht);
+  raum.classList.toggle('mit-rand', !!e.rand);
   raum.style.setProperty('--lese-hell', e.helligkeit);
   raum.style.setProperty('--lese-waerme', e.waerme);
+  const k = raum.querySelector('.lese-rand-knopf'); if (k) k.classList.toggle('an', !!e.rand);
 }
 function buchSchliessen() {
   if (!_leser) return;
@@ -15936,6 +16617,7 @@ function buchSchliessen() {
   document.removeEventListener('keydown', l.tasten, true);
   window.removeEventListener('resize', l.beiGroesse);
   clearTimeout(l.versteckTimer);
+  if (l.liest) { l.liest = null; try { speechSynthesis.cancel(); } catch (e) {} document.body.classList.remove('liest-vor'); }
   try { if (l.dok) l.dok.destroy(); } catch (e) {}
   l.raum.remove();
   zeichne();
@@ -16015,6 +16697,8 @@ function leserEinstellungen() {
     wahl('Doppelseite', 'doppel', [['auto', 'Wie es passt'], ['an', 'Immer'], ['aus', 'Nie']], true),
     wahl('Größe', 'zoom', [['seite', 'Ganze Seite'], ['breite', 'Volle Breite']], true),
     wahl('Blättern', 'blaettern', [[true, 'Mit Bewegung'], [false, 'Ohne']]),
+    wahl('Randspalte', 'rand', [[false, 'Aus'], [true, 'Notizen neben der Seite']], true),
+    (() => { const st = typeof speechSynthesis !== 'undefined' ? (speechSynthesis.getVoices() || []).filter((v) => /^de[-_]/i.test(v.lang)) : []; return st.length ? wahl('Stimme zum Vorlesen', 'stimme', [[null, 'Automatisch'], ...st.slice(0, 12).map((v) => [v.voiceURI, v.name.replace(/\(.*?\)/g, '').trim()])]) : null; })(),
     el('div', { class: 'stickerblock-hinweis', style: 'margin-top:8px' }, 'Diese Einstellungen bleiben an diesem Gerät — Helligkeit ist Gerätesache. Seite, Lesezeichen und Stapel reisen mit.'),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
   const zu = zeigeDeck(kasten);
@@ -16080,14 +16764,469 @@ async function leserSuche() {
 }
 
 /* Vorlesen: die Textebene der Seite mit der Stimme des Geräts. */
-async function leserVorlesen(knopf) {
-  if (!_leser || !_leser.dok) return;
-  if (typeof vorlesen !== 'function') { toast('Vorlesen gibt es auf diesem Gerät nicht.'); return; }
+/* Vorlesen mit Satz-Hervorhebung: die Textstücke der Seite werden zu Sätzen
+   gebündelt, jeder Satz ist eine Äußerung; während er gesprochen wird, liegt
+   eine warme Markierung über seinen Stücken. Am Seitenende blättert es weiter. */
+function leserStimme() {
+  const stimmen = typeof speechSynthesis !== 'undefined' ? (speechSynthesis.getVoices() || []) : [];
+  const e = leseEinstellung();
+  if (e.stimme) { const v = stimmen.find((s) => s.voiceURI === e.stimme || s.name === e.stimme); if (v) return v; }
+  return stimmen.find((v) => /^de[-_]/i.test(v.lang) && /siri|anna|petra|markus|google|natural|premium/i.test(v.name)) || stimmen.find((v) => /^de[-_]/i.test(v.lang)) || null;
+}
+function leserSaetze(items) {
+  const saetze = []; let akt = { text: '', items: [] };
+  for (const it of items) {
+    const s = String(it.str || ''); if (!s.trim()) { if (it.hasEOL && akt.text && !akt.text.endsWith(' ')) akt.text += ' '; continue; }
+    akt.items.push(it);
+    akt.text += (akt.text && !akt.text.endsWith(' ') && !akt.text.endsWith('-') ? ' ' : '') + s.trim();
+    if (/[.!?…]["“”»«)]?\s*$/.test(s) && akt.text.length > 2) { saetze.push(akt); akt = { text: '', items: [] }; }
+  }
+  if (akt.text.trim()) saetze.push(akt);
+  return saetze;
+}
+function leserMarkiere(items) {
+  if (!_leser) return;
   const l = _leser;
-  let text = '';
-  try { const tc = await (await l.dok.getPage(l.seite)).getTextContent(); text = tc.items.map((i) => i.str + (i.hasEOL ? ' ' : '')).join('').replace(/\s+/g, ' ').trim(); } catch (e) {}
-  if (!text) { toast('Diese Seite trägt keinen Text, den man vorlesen könnte.'); return; }
-  vorlesen(text, knopf);
+  l.buehne.querySelectorAll('.lese-markierung').forEach((m) => m.remove());
+  if (!items || !items.length) return;
+  const c = [...l.buehne.querySelectorAll('.lese-blatt canvas')].find((x) => x._seite === l.liest.seite);
+  if (!c || !c._vp) return;
+  const blatt = c.parentElement, vp = c._vp, dpr = c._dpr || 1;
+  const lage = el('div', { class: 'lese-markierung' });
+  for (const it of items) {
+    const tr = it.transform || [1, 0, 0, 1, 0, 0];
+    const p1 = vp.convertToViewportPoint(tr[4], tr[5]), p2 = vp.convertToViewportPoint(tr[4] + (it.width || 0), tr[5] + (it.height || Math.hypot(tr[2], tr[3]) || 10));
+    const x = Math.min(p1[0], p2[0]) / dpr + c.offsetLeft, y = Math.min(p1[1], p2[1]) / dpr + c.offsetTop;
+    const w = Math.abs(p2[0] - p1[0]) / dpr, h = Math.abs(p2[1] - p1[1]) / dpr;
+    if (w < 1 || h < 1) continue;
+    lage.append(el('i', { style: 'left:' + (x - 2).toFixed(1) + 'px;top:' + (y - 1).toFixed(1) + 'px;width:' + (w + 4).toFixed(1) + 'px;height:' + (h + 2).toFixed(1) + 'px' }));
+  }
+  blatt.append(lage);
+}
+function leserVorlesenStopp() {
+  if (!_leser) return;
+  const l = _leser;
+  if (l.liest && l.liest.knopf) l.liest.knopf.classList.remove('an');
+  l.liest = null;
+  l.buehne.querySelectorAll('.lese-markierung').forEach((m) => m.remove());
+  document.body.classList.remove('liest-vor');
+  try { speechSynthesis.cancel(); } catch (e) {}
+}
+async function leserVorlesen(knopf, weiter = false) {
+  if (!_leser || !_leser.dok) return;
+  if (typeof vorlesenMoeglich !== 'function' || !vorlesenMoeglich()) { toast('Vorlesen gibt es auf diesem Gerät nicht.'); return; }
+  const l = _leser;
+  if (l.liest && !weiter) { leserVorlesenStopp(); return; }
+  const seite = l.seite;
+  let items = [];
+  try { const tc = await (await l.dok.getPage(seite)).getTextContent(); items = tc.items || []; } catch (e) {}
+  const saetze = leserSaetze(items);
+  if (!saetze.length) { if (weiter) { leserVorlesenStopp(); toast('Hier ist nichts mehr zu lesen.'); } else toast('Diese Seite trägt keinen Text, den man vorlesen könnte.'); return; }
+  try { speechSynthesis.cancel(); } catch (e) {}
+  l.liest = { seite, i: 0, saetze, knopf, weiter: true };
+  if (knopf) knopf.classList.add('an');
+  document.body.classList.add('liest-vor');
+  const stimme = leserStimme();
+  const naechster = () => {
+    if (_leser !== l || !l.liest || l.liest.seite !== seite) return;
+    if (l.liest.i >= saetze.length) {
+      /* Seite zu Ende: weiterblättern und dort weiterlesen — oder aufhören */
+      if (l.seite < l.b.seiten) { l.buehne.querySelectorAll('.lese-markierung').forEach((m) => m.remove()); l.blaettere(1); }
+      else leserVorlesenStopp();
+      return;
+    }
+    const s = saetze[l.liest.i++];
+    leserMarkiere(s.items);
+    const u = new SpeechSynthesisUtterance(s.text);
+    if (stimme) { u.voice = stimme; u.lang = stimme.lang; } else u.lang = 'de-DE';
+    u.rate = begrenze(D.einst.vorleseTempo, .6, 1.4, .95);
+    u.onend = naechster;
+    u.onerror = () => { if (l.liest) leserVorlesenStopp(); };
+    try { speechSynthesis.speak(u); } catch (e) { leserVorlesenStopp(); }
+  };
+  naechster();
+}
+
+/* Die Randspalte: Notizen neben der Seite, zum Anschauen und Hinzufügen. */
+function leserRandspalte() {
+  if (!_leser) return;
+  const l = _leser;
+  l.e.rand = !l.e.rand; leseEinstellungSpeichern(l.e); leserStil();
+  leserRandAktualisieren();
+  l.cache.clear(); l.zeige(0);
+}
+function leserRandAktualisieren() {
+  if (!_leser || !_leser.rand) return;
+  const l = _leser, b = l.b;
+  l.rand.innerHTML = '';
+  if (!l.e.rand) return;
+  const seiten = l.e.doppel === 'an' || (l.e.doppel === 'auto' && l.raum.clientWidth >= 900 && l.raum.clientWidth > l.raum.clientHeight) ? [l.seite % 2 === 0 ? l.seite : l.seite - 1, (l.seite % 2 === 0 ? l.seite : l.seite - 1) + 1].filter((n) => n >= 1 && n <= b.seiten) : [l.seite];
+  l.rand.append(el('div', { class: 'lese-rand-titel' }, 'Randnotizen'));
+  for (const n of seiten) {
+    const notizen = buchNotizen(b, n);
+    l.rand.append(el('div', { class: 'lese-rand-seite' }, 'Seite ' + n));
+    for (const no of notizen) l.rand.append(el('div', { class: 'lese-rand-notiz' }, el('span', {}, no.text), el('button', { class: 'rundknopf zart', html: ik('muell'), title: 'Notiz löschen', onclick: () => { loescheDoc(no.id); leserRandAktualisieren(); l.zeige(0); } })));
+    const feld = el('textarea', { rows: 2, placeholder: 'Notiz zu Seite ' + n + ' …' });
+    const hinzu = () => { const t = feld.value.trim(); if (!t) return; neuDoc('buchnotiz', { parent: b.id, seite: n, text: t }); feld.value = ''; leserRandAktualisieren(); l.zeige(0); };
+    feld.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) { ev.preventDefault(); hinzu(); } ev.stopPropagation(); });
+    l.rand.append(feld, el('button', { class: 'knopf zart', onclick: hinzu }, 'Notiz dazu'));
+  }
+}
+
+/* ===================== 55b — EPUB: EIGENER LESER =====================
+   Kein Paket, keine Bibliothek: ein ZIP-Leser (zentrales Verzeichnis +
+   DecompressionStream), das OPF-Rückgrat, Kapitel als gesäubertes HTML und
+   Seiten per CSS-Spalten. Schrift, Größe und Zeilenabstand sind frei. */
+
+/* ----- ZIP ----- */
+/* Das zentrale Verzeichnis: Name → { methode, compSize, size, lokal }. Pur. */
+function zipEintraege(bytes) {
+  const dv = new DataView(bytes), n = bytes.byteLength;
+  let eocd = -1;
+  for (let i = n - 22; i >= Math.max(0, n - 65557); i--) { if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; } }
+  if (eocd < 0) throw new Error('Kein ZIP');
+  const anzahl = dv.getUint16(eocd + 10, true), cdOff = dv.getUint32(eocd + 16, true);
+  const eintraege = new Map(), dec = new TextDecoder();
+  let p = cdOff;
+  for (let i = 0; i < anzahl && p + 46 <= n; i++) {
+    if (dv.getUint32(p, true) !== 0x02014b50) break;
+    const methode = dv.getUint16(p + 10, true), compSize = dv.getUint32(p + 20, true), size = dv.getUint32(p + 24, true);
+    const nameLen = dv.getUint16(p + 28, true), extraLen = dv.getUint16(p + 30, true), commLen = dv.getUint16(p + 32, true);
+    const lokal = dv.getUint32(p + 42, true);
+    const name = dec.decode(new Uint8Array(bytes, p + 46, nameLen));
+    eintraege.set(name, { methode, compSize, size, lokal });
+    p += 46 + nameLen + extraLen + commLen;
+  }
+  return eintraege;
+}
+/* Einen Eintrag lesen: gespeichert (0) oder deflate (8). */
+async function zipLies(bytes, eintrag) {
+  const dv = new DataView(bytes), p = eintrag.lokal;
+  if (dv.getUint32(p, true) !== 0x04034b50) throw new Error('ZIP-Eintrag kaputt');
+  const nameLen = dv.getUint16(p + 26, true), extraLen = dv.getUint16(p + 28, true);
+  const start = p + 30 + nameLen + extraLen;
+  const roh = new Uint8Array(bytes, start, eintrag.compSize);
+  if (eintrag.methode === 0) return roh.slice();
+  if (eintrag.methode !== 8) throw new Error('ZIP-Methode ' + eintrag.methode + ' kann ich nicht');
+  if (typeof DecompressionStream === 'undefined') throw new Error('Dieses Gerät kann EPUB noch nicht entpacken (kein DecompressionStream).');
+  const ds = new DecompressionStream('deflate-raw');
+  const w = ds.writable.getWriter(); w.write(roh.slice()); w.close();
+  return new Uint8Array(await new Response(ds.readable).arrayBuffer());
+}
+function istEpub(bytes, name) {
+  if (/\.epub$/i.test(String(name || ''))) return true;
+  if (!bytes || bytes.byteLength < 60) return false;
+  const u = new Uint8Array(bytes, 0, 60);
+  if (u[0] !== 0x50 || u[1] !== 0x4b) return false;
+  return new TextDecoder().decode(u.slice(30, 58)).startsWith('mimetype');
+}
+
+/* ----- EPUB-Struktur ----- */
+async function epubLaden(bytes) {
+  const z = zipEintraege(bytes);
+  const lies = (pfad) => { const e = z.get(pfad) || z.get(decodeURIComponent(pfad)); return e ? zipLies(bytes, e) : Promise.resolve(null); };
+  const text = async (pfad) => { const b = await lies(pfad); if (!b) throw new Error('Im Buch fehlt ' + pfad); return new TextDecoder().decode(b); };
+  const xml = (s) => new DOMParser().parseFromString(s, 'application/xml');
+  const cont = xml(await text('META-INF/container.xml'));
+  const rf = cont.getElementsByTagNameNS('*', 'rootfile')[0];
+  const opfPfad = rf && rf.getAttribute('full-path');
+  if (!opfPfad) throw new Error('Kein Inhaltsverzeichnis (OPF)');
+  const basis = opfPfad.includes('/') ? opfPfad.slice(0, opfPfad.lastIndexOf('/') + 1) : '';
+  const aufloesen = (href, von = basis) => { try { const u = new URL(href, 'epub://x/' + von); return decodeURIComponent(u.pathname.slice(1)).split('#')[0]; } catch (e) { return href; } };
+  const opf = xml(await text(opfPfad));
+  const meta = (n) => { const e = opf.getElementsByTagNameNS('*', n)[0]; return e ? e.textContent.trim() : ''; };
+  const manifest = new Map();
+  for (const it of opf.getElementsByTagNameNS('*', 'item')) manifest.set(it.getAttribute('id'), { id: it.getAttribute('id'), href: it.getAttribute('href') || '', typ: it.getAttribute('media-type') || '', props: it.getAttribute('properties') || '' });
+  const spine = [...opf.getElementsByTagNameNS('*', 'itemref')].filter((r) => r.getAttribute('linear') !== 'no').map((r) => manifest.get(r.getAttribute('idref'))).filter((m) => m && /html|xml/i.test(m.typ)).map((m) => ({ ...m, pfad: aufloesen(m.href) }));
+  if (!spine.length) throw new Error('Das Buch hat keine Kapitel');
+  let coverHref = null;
+  const cm = [...manifest.values()].find((m) => /cover-image/.test(m.props));
+  if (cm) coverHref = cm.href;
+  else { const mc = [...opf.getElementsByTagNameNS('*', 'meta')].find((m) => m.getAttribute('name') === 'cover'); const ziel = mc && manifest.get(mc.getAttribute('content')); if (ziel) coverHref = ziel.href; else { const bild = [...manifest.values()].find((m) => /^image\//.test(m.typ) && /cover/i.test(m.id + m.href)); if (bild) coverHref = bild.href; } }
+  /* Inhaltsverzeichnis: nav (EPUB 3) oder NCX (EPUB 2) */
+  let toc = [];
+  try {
+    const nav = [...manifest.values()].find((m) => /\bnav\b/.test(m.props));
+    if (nav) {
+      const dokNav = new DOMParser().parseFromString(await text(aufloesen(nav.href)), 'text/html');
+      const navEl = [...dokNav.querySelectorAll('nav')].find((n) => /toc/i.test(n.getAttribute('epub:type') || n.getAttribute('type') || '')) || dokNav.querySelector('nav');
+      if (navEl) toc = [...navEl.querySelectorAll('a[href]')].map((a) => ({ titel: a.textContent.replace(/\s+/g, ' ').trim(), pfad: aufloesen(a.getAttribute('href'), aufloesen(nav.href).replace(/[^/]*$/, '')), tiefe: [...(function* (x) { let p = x.parentElement; while (p && p !== navEl) { if (p.tagName === 'OL' || p.tagName === 'UL') yield p; p = p.parentElement; } })(a)].length })).filter((t) => t.titel);
+    } else {
+      const ncx = [...manifest.values()].find((m) => /ncx/i.test(m.typ) || /\.ncx$/i.test(m.href));
+      if (ncx) {
+        const dokNcx = xml(await text(aufloesen(ncx.href)));
+        toc = [...dokNcx.getElementsByTagNameNS('*', 'navPoint')].map((np) => { const l = np.getElementsByTagNameNS('*', 'text')[0], c = np.getElementsByTagNameNS('*', 'content')[0]; return { titel: l ? l.textContent.trim() : '', pfad: c ? aufloesen(c.getAttribute('src') || '', aufloesen(ncx.href).replace(/[^/]*$/, '')) : '', tiefe: 0 }; }).filter((t) => t.titel);
+      }
+    }
+  } catch (e) { toc = []; }
+  return { titel: meta('title'), autor: meta('creator'), sprache: meta('language'), spine, toc, coverPfad: coverHref ? aufloesen(coverHref) : null, lies, text, aufloesen, manifest };
+}
+
+/* Ein Kapitel als gesäubertes HTML-Fragment: Skripte, Formulare, Stile raus;
+   Bilder werden aus dem ZIP geholt (Blob-URLs, die der Leser wieder freigibt). */
+async function epubKapitelHTML(buch, pfad, urls) {
+  const roh = await buch.text(pfad);
+  const dok = new DOMParser().parseFromString(roh, 'text/html');
+  const body = dok.body || dok.documentElement;
+  for (const e of body.querySelectorAll('script, style, link, iframe, object, embed, form, input, button, video, audio, svg foreignObject, noscript')) e.remove();
+  for (const e of body.querySelectorAll('*')) for (const a of [...e.attributes]) { if (/^on/i.test(a.name) || a.name === 'style' && /url\(/i.test(a.value)) e.removeAttribute(a.name); }
+  const ordner = pfad.replace(/[^/]*$/, '');
+  for (const img of body.querySelectorAll('img, image')) {
+    const src = img.getAttribute('src') || img.getAttribute('xlink:href') || img.getAttribute('href');
+    if (!src || /^(https?:|data:)/i.test(src)) { if (!/^data:/i.test(src || '')) img.remove(); continue; }
+    const ziel = buch.aufloesen(src, ordner);
+    try {
+      let url = urls.get(ziel);
+      if (!url) { const bytes = await buch.lies(ziel); if (!bytes) { img.remove(); continue; } const m = [...buch.manifest.values()].find((x) => buch.aufloesen(x.href) === ziel); url = URL.createObjectURL(new Blob([bytes], { type: m && m.typ || 'image/jpeg' })); urls.set(ziel, url); }
+      if (img.tagName.toLowerCase() === 'image') img.setAttribute('href', url); else img.setAttribute('src', url);
+      img.removeAttribute('width'); img.removeAttribute('height');
+    } catch (e) { img.remove(); }
+  }
+  for (const a of body.querySelectorAll('a[href]')) { const h = a.getAttribute('href'); if (/^(https?:|mailto:)/i.test(h)) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); } else { a.dataset.intern = buch.aufloesen(h, ordner); a.removeAttribute('href'); } }
+  return body.innerHTML;
+}
+
+/* Bilder des Leinwand-Covers: erste Bilddatei, sonst nichts. */
+async function epubCoverBlob(buch) {
+  if (!buch.coverPfad) return null;
+  const bytes = await buch.lies(buch.coverPfad);
+  if (!bytes) return null;
+  const m = [...buch.manifest.values()].find((x) => buch.aufloesen(x.href) === buch.coverPfad);
+  return new Blob([bytes], { type: m && m.typ || 'image/jpeg' });
+}
+
+/* Ein EPUB auflegen: Blob → Buch-Dokument mit art 'epub'. */
+async function buchAuflegenEpub(blob, name, { datei = null, autorVorgabe = '', titelFest = false, isbn = null } = {}) {
+  const bytes = await blob.arrayBuffer();
+  const buch = await epubLaden(bytes);
+  let titel = titelFest || !buch.titel ? String(name || 'Buch').replace(/\.epub$/i, '').trim() : buch.titel;
+  titel = titel.replace(/\s*\((?:[^()]*(?:z-lib|1lib|library|epdf)[^()]*)\)\s*/gi, ' ').replace(/\s*\[[^\]]*\]\s*•?\s*/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
+  const autor = autorVorgabe || (typeof saubererAutor === 'function' ? saubererAutor(buch.autor) : buch.autor) || '';
+  const dateiId = datei || await speichereDateiBlob(new File([blob], titel + '.epub', { type: 'application/epub+zip' }));
+  let bild = null;
+  try { const c = await epubCoverBlob(buch); if (c && c.size > 2000) bild = await speichereDateiBlob(new File([c], 'cover.jpg', { type: c.type })); } catch (e) {}
+  const doc = neuDoc('buch', { titel, autor, art: 'epub', datei: dateiId, bild, seiten: 100, seite: 0, kapitel: 0, anteil: 0, kapitelAnzahl: buch.spine.length, lesezeichen: [], zuletzt: Date.now(), isbn: isbn || undefined });
+  if (isbn && typeof coverVonIsbn === 'function' && !bild) (async () => { try { const c = await coverVonIsbn(isbn); if (c) { await buchCoverSetzen(doc, c, true); zeichne(); } } catch (e) {} })();
+  return doc;
+}
+
+/* ----- Der Leser ----- */
+let _epub = null;
+const EPUB_SCHRIFTEN = [['serif', 'Serif (New York)', 'ui-serif, "New York", Georgia, "Times New Roman", serif'], ['sans', 'Sans (System)', '-apple-system, system-ui, "Helvetica Neue", sans-serif'], ['rund', 'Rund', 'ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif'], ['schreib', 'Schreibmaschine', 'ui-monospace, "SF Mono", Menlo, monospace']];
+
+async function epubOeffnen(b) {
+  if (_epub) epubSchliessen();
+  if (typeof buchSchliessen === 'function' && typeof _leser !== 'undefined' && _leser) buchSchliessen();
+  const e = leseEinstellung();
+  const raum = el('div', { class: 'lesemodus epub' + (e.nacht ? ' nacht' : '') });
+  const buehne = el('div', { class: 'lese-buehne' });
+  const inhalt = el('div', { class: 'epub-inhalt' });
+  const titel = el('div', { class: 'lese-titel' }, b.titel || 'Buch');
+  const stand = el('div', { class: 'lese-stand' });
+  const balken = el('input', { type: 'range', min: '0', max: '1000', value: '0', class: 'lese-balken', 'aria-label': 'Stelle im Buch' });
+  const kopf = el('div', { class: 'lese-kopf' },
+    el('button', { class: 'knopf', onclick: () => epubSchliessen() }, el('span', { html: ik('zurueck'), style: 'display:flex' }), 'Zurück'),
+    titel,
+    el('button', { class: 'rundknopf zart', html: ik('gliederung'), title: 'Inhalt', onclick: () => epubInhalt() }),
+    el('button', { class: 'rundknopf zart lese-zeichen', html: ik('lesezeichen'), title: 'Lesezeichen', onclick: () => epubLesezeichen() }),
+    el('button', { class: 'rundknopf zart', html: ik('teilen'), title: 'Zitat: Markiertes oder diese Seite als Schnipsel', onclick: () => epubZitat() }),
+    el('button', { class: 'rundknopf zart lese-notiz-knopf', html: ik('pin'), title: 'Randnotiz zu dieser Stelle', onclick: () => epubNotizen() }),
+    el('button', { class: 'rundknopf zart', html: ik('vorlesen'), title: 'Diese Seite vorlesen', onclick: (ev) => epubVorlesen(ev.currentTarget) }),
+    el('button', { class: 'rundknopf zart', html: ik('feinheiten'), title: 'Schrift und Lesen einstellen', onclick: () => epubEinstellungen() }));
+  const kapitelName = el('span', { class: 'epub-kapitel' });
+  const fuss = el('div', { class: 'lese-fuss' }, el('button', { class: 'rundknopf zart', html: ik('zurueck'), title: 'Zurück', onclick: () => blaettere(-1) }), balken, stand, el('button', { class: 'rundknopf zart', html: ik('rechts'), title: 'Weiter', onclick: () => blaettere(1) }));
+  buehne.append(inhalt, kapitelName);
+  raum.append(kopf, buehne, fuss);
+  document.body.append(raum);
+  const urls = new Map();
+  _epub = { b, raum, buehne, inhalt, e, kapitel: Math.max(0, b.kapitel || 0), seite: 0, seiten: 1, buch: null, urls, kopf, fuss, versteckTimer: null, htmlCache: new Map(), busy: false, balken, stand, kapitelName };
+  const L = _epub;
+  const zeigeLeisten = () => { kopf.classList.remove('weg'); fuss.classList.remove('weg'); clearTimeout(L.versteckTimer); L.versteckTimer = setTimeout(() => { kopf.classList.add('weg'); fuss.classList.add('weg'); }, 2600); };
+  zeigeLeisten();
+  toast('Schlage auf …', 1600);
+  try {
+    const blob = await dbGet('media', b.datei);
+    if (!blob) throw new Error('Datei fehlt');
+    L.buch = await epubLaden(await blob.arrayBuffer());
+    if (L.buch.spine.length !== b.kapitelAnzahl) { b.kapitelAnzahl = L.buch.spine.length; speichereStill(b); }
+  } catch (x) { toast('Das Buch ließ sich nicht aufschlagen.' + (x && x.message ? ' (' + x.message + ')' : ''), 4200); epubSchliessen(); return; }
+  epubStil();
+
+  const spaltenBreite = () => Math.max(200, inhalt.clientWidth);
+  const schritt = () => spaltenBreite() + 48;
+  async function ladeKapitel(i, anteil = 0, richtung = 0) {
+    if (!L.buch || L.busy) return;
+    L.busy = true;
+    const k = Math.max(0, Math.min(L.buch.spine.length - 1, i));
+    let html = L.htmlCache.get(k);
+    if (html == null) { try { html = await epubKapitelHTML(L.buch, L.buch.spine[k].pfad, urls); } catch (x) { html = '<p><i>Dieses Kapitel ließ sich nicht lesen.</i></p>'; } L.htmlCache.set(k, html); }
+    L.kapitel = k;
+    inhalt.style.transition = 'none';
+    inhalt.innerHTML = html;
+    /* Breite Bühne: zwei Spalten je Seite; schmale: eine, nie breiter als eine gute Zeile */
+    const breit = buehne.clientWidth, zwei = breit > 900;
+    const rand = zwei ? L.e.epubRand : Math.max(L.e.epubRand, Math.round((breit - 720) / 2));
+    inhalt.style.left = rand + 'px'; inhalt.style.right = rand + 'px';
+    await new Promise((r) => requestAnimationFrame(r));
+    inhalt.style.columnWidth = (zwei ? (spaltenBreite() - 48) / 2 : spaltenBreite()) + 'px'; inhalt.style.columnGap = '48px';
+    await new Promise((r) => requestAnimationFrame(r));
+    L.seiten = Math.max(1, Math.round((inhalt.scrollWidth + 48) / schritt()));
+    L.seite = anteil >= 1 ? L.seiten - 1 : Math.min(L.seiten - 1, Math.round(anteil * L.seiten));
+    stelleSeite(richtung, true);
+    /* Interne Sprünge: Links auf andere Kapitel */
+    inhalt.querySelectorAll('a[data-intern]').forEach((a) => a.addEventListener('click', (ev) => { ev.preventDefault(); const ziel = L.buch.spine.findIndex((s) => s.pfad === a.dataset.intern); if (ziel >= 0) ladeKapitel(ziel, 0, 1); }));
+    L.busy = false;
+  }
+  function stelleSeite(richtung, frisch) {
+    inhalt.style.transition = frisch || !L.e.blaettern ? 'none' : 'transform .34s cubic-bezier(.2,.8,.2,1)';
+    inhalt.style.transform = 'translateX(' + (-L.seite * schritt()) + 'px)';
+    const ges = L.buch.spine.length;
+    const fortschritt = (L.kapitel + (L.seiten > 1 ? L.seite / (L.seiten - 1) : 1) * .999) / ges;
+    b.kapitel = L.kapitel; b.anteil = L.seiten > 1 ? L.seite / (L.seiten - 1) : 0; b.seiten = 100; b.seite = Math.max(1, Math.round(fortschritt * 100)); b.zuletzt = Date.now();
+    if (richtung && typeof buchSeiteGelesen === 'function') buchSeiteGelesen(b); else speichereStill(b);
+    stand.textContent = 'Kapitel ' + (L.kapitel + 1) + ' / ' + ges + ' · ' + Math.round(fortschritt * 100) + ' %';
+    balken.value = String(Math.round(fortschritt * 1000));
+    const t = epubKapitelTitel(L.kapitel); kapitelName.textContent = t || '';
+    const marke = L.kapitel + ':' + L.seite;
+    kopf.querySelector('.lese-zeichen').classList.toggle('an', (b.lesezeichen || []).map(String).includes(marke));
+    kopf.querySelector('.lese-notiz-knopf').classList.toggle('hat-notiz', buchNotizen(b, L.kapitel).length > 0);
+  }
+  async function blaettere(r) {
+    if (!L.buch || L.busy) return;
+    if (r > 0 && L.seite < L.seiten - 1) { L.seite++; stelleSeite(1); }
+    else if (r < 0 && L.seite > 0) { L.seite--; stelleSeite(-1); }
+    else if (r > 0 && L.kapitel < L.buch.spine.length - 1) await ladeKapitel(L.kapitel + 1, 0, 1);
+    else if (r < 0 && L.kapitel > 0) await ladeKapitel(L.kapitel - 1, 1, -1);
+    else toast(r > 0 ? 'Das war die letzte Seite.' : 'Das ist der Anfang.');
+    zeigeLeisten();
+  }
+  L.ladeKapitel = ladeKapitel; L.blaettere = blaettere; L.stelleSeite = stelleSeite; L.zeigeLeisten = zeigeLeisten;
+  L.neuSetzen = () => { const a = L.seiten > 1 ? L.seite / (L.seiten - 1) : 0; L.htmlCache.size; ladeKapitel(L.kapitel, a, 0); };
+  balken.addEventListener('change', () => { const v = Number(balken.value) / 1000; const ges = L.buch.spine.length; const k = Math.min(ges - 1, Math.floor(v * ges)); ladeKapitel(k, (v * ges) - k, 0); });
+  buehne.addEventListener('click', (ev) => {
+    if (ev.target.closest('a')) return;
+    const sel = window.getSelection && window.getSelection(); if (sel && String(sel).trim()) return;
+    const r = buehne.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width;
+    if (x > .66) blaettere(1); else if (x < .34) blaettere(-1); else zeigeLeisten();
+  });
+  let wisch = null;
+  buehne.addEventListener('pointerdown', (ev) => { wisch = { x: ev.clientX, y: ev.clientY }; });
+  buehne.addEventListener('pointerup', (ev) => { if (!wisch) return; const dx = ev.clientX - wisch.x, dy = ev.clientY - wisch.y; wisch = null; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) blaettere(dx < 0 ? 1 : -1); });
+  L.tasten = (ev) => {
+    if (!_epub) return;
+    if (ev.key === 'ArrowRight' || ev.key === 'PageDown' || ev.key === ' ') { ev.preventDefault(); blaettere(1); }
+    else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); blaettere(-1); }
+    else if (ev.key === 'Escape') { ev.preventDefault(); epubSchliessen(); }
+  };
+  document.addEventListener('keydown', L.tasten, true);
+  L.beiGroesse = entprellt(() => { if (_epub === L) L.neuSetzen(); }, 200);
+  window.addEventListener('resize', L.beiGroesse);
+  await ladeKapitel(L.kapitel, begrenze(b.anteil, 0, 1, 0), 0);
+}
+function epubKapitelTitel(k) {
+  if (!_epub || !_epub.buch) return '';
+  const pfad = _epub.buch.spine[k] && _epub.buch.spine[k].pfad;
+  const t = _epub.buch.toc.find((x) => x.pfad === pfad);
+  return t ? t.titel : '';
+}
+function epubStil() {
+  if (!_epub) return;
+  const { raum, e } = _epub;
+  raum.classList.toggle('nacht', e.nacht);
+  raum.style.setProperty('--lese-hell', e.helligkeit);
+  raum.style.setProperty('--lese-waerme', e.waerme);
+  const schrift = EPUB_SCHRIFTEN.find((s) => s[0] === e.epubSchrift) || EPUB_SCHRIFTEN[0];
+  raum.style.setProperty('--epub-schrift', schrift[2]);
+  raum.style.setProperty('--epub-groesse', e.epubGroesse + 'px');
+  raum.style.setProperty('--epub-zeile', String(e.epubZeile));
+  raum.style.setProperty('--epub-rand', e.epubRand + 'px');
+}
+function epubSchliessen() {
+  if (!_epub) return;
+  const L = _epub; _epub = null;
+  document.removeEventListener('keydown', L.tasten, true);
+  window.removeEventListener('resize', L.beiGroesse);
+  clearTimeout(L.versteckTimer);
+  for (const u of L.urls.values()) { try { URL.revokeObjectURL(u); } catch (e) {} }
+  if (typeof vorlesenStopp === 'function') vorlesenStopp();
+  L.raum.remove();
+}
+function epubInhalt() {
+  if (!_epub || !_epub.buch) return;
+  const L = _epub;
+  const punkte = L.buch.toc.length ? L.buch.toc : L.buch.spine.map((s, i) => ({ titel: 'Kapitel ' + (i + 1), pfad: s.pfad, tiefe: 0 }));
+  const kasten = el('div', { class: 'menue lese-gliederung' }, el('div', { class: 'mtitel' }, 'INHALT'),
+    punkte.slice(0, 400).map((t) => { const i = L.buch.spine.findIndex((s) => s.pfad === t.pfad); return el('button', { class: i === L.kapitel ? 'an' : '', style: 'padding-left:' + (14 + (t.tiefe || 0) * 14) + 'px', onclick: () => { zu(); if (i >= 0) L.ladeKapitel(i, 0, 1); } }, t.titel); }));
+  const zu = zeigeDeck(kasten);
+}
+function epubLesezeichen() {
+  if (!_epub) return;
+  const L = _epub, b = L.b, marke = L.kapitel + ':' + L.seite;
+  b.lesezeichen = (b.lesezeichen || []).map(String);
+  const da = b.lesezeichen.includes(marke);
+  const punkte = [{ text: da ? 'Lesezeichen hier entfernen' : 'Lesezeichen hier hinein', icon: 'lesezeichen', wert: 'toggle' }, ...b.lesezeichen.map((m) => { const [k, s] = m.split(':').map(Number); return { text: (epubKapitelTitel(k) || 'Kapitel ' + (k + 1)) + ' · Seite ' + (s + 1), icon: 'lesezeichen', wert: 'geh:' + m }; })];
+  menue(punkte, 'Lesezeichen').then((w) => {
+    if (!w) return;
+    if (w === 'toggle') { b.lesezeichen = da ? b.lesezeichen.filter((m) => m !== marke) : [...b.lesezeichen, marke]; speichereStill(b); L.stelleSeite(0); toast(da ? 'Lesezeichen entfernt.' : 'Lesezeichen liegt drin.'); }
+    else if (w.startsWith('geh:')) { const [k, s] = w.slice(4).split(':').map(Number); L.ladeKapitel(k, 0, 0).then(() => { L.seite = Math.min(L.seiten - 1, s); L.stelleSeite(0); }); }
+  });
+}
+function epubSeitenText() {
+  if (!_epub) return '';
+  const sel = window.getSelection && window.getSelection();
+  if (sel && String(sel).trim()) return String(sel).trim();
+  /* Text der sichtbaren Spalte: alles, dessen Box in der Bühne liegt */
+  const L = _epub, r = L.buehne.getBoundingClientRect(); const teile = [];
+  for (const p of L.inhalt.querySelectorAll('p, h1, h2, h3, h4, li, blockquote, div')) { if (p.children.length && !p.textContent.trim()) continue; const q = p.getBoundingClientRect(); if (q.width && q.left >= r.left - 4 && q.right <= r.right + 4 && !(p.closest('p, li, blockquote') && p.tagName === 'DIV')) teile.push(p.textContent.replace(/\s+/g, ' ').trim()); }
+  return teile.filter(Boolean).join('\n');
+}
+function epubZitat() {
+  if (!_epub) return;
+  const L = _epub, text = epubSeitenText();
+  if (!text) { toast('Hier steht nichts, was man herausnehmen könnte.'); return; }
+  const feld = el('textarea', { rows: 10 }); feld.value = text;
+  const quelle = '— ' + (L.b.titel || 'Buch') + (L.b.autor ? ', ' + L.b.autor : '') + (epubKapitelTitel(L.kapitel) ? ', ' + epubKapitelTitel(L.kapitel) : ', Kapitel ' + (L.kapitel + 1));
+  const kasten = el('div', { class: 'modal zitat-kasten' }, el('h2', {}, 'Als Text'),
+    el('div', { class: 'stickerblock-hinweis' }, 'Markiere, was du brauchst — die Quelle kommt dazu.'), feld,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen'),
+      el('button', { class: 'knopf', onclick: async () => { const t = (feld.selectionStart !== feld.selectionEnd ? feld.value.slice(feld.selectionStart, feld.selectionEnd) : feld.value).trim(); try { await navigator.clipboard.writeText(t + '\n' + quelle); toast('Kopiert, mit Quelle.'); } catch (x) { toast('Kopieren ging hier nicht.'); } } }, 'Kopieren'),
+      el('button', { class: 'knopf voll', onclick: () => { const t = (feld.selectionStart !== feld.selectionEnd ? feld.value.slice(feld.selectionStart, feld.selectionEnd) : feld.value).trim(); neuDoc('schnipsel', { text: t + '\n' + quelle }); zu(); toast('Liegt als Zitat in den Schnipseln.'); } }, 'Als Schnipsel')));
+  const zu = zeigeDeck(kasten);
+}
+function epubNotizen() {
+  if (!_epub) return;
+  const L = _epub, b = L.b;
+  const feld = el('textarea', { rows: 3, placeholder: 'Ein Gedanke zu dieser Stelle …' });
+  const liste = el('div', { class: 'lese-notizen' });
+  const bauen = () => { liste.innerHTML = ''; for (const n of buchNotizen(b, L.kapitel)) liste.append(el('div', { class: 'lese-notiz' }, el('span', {}, n.text), el('button', { class: 'rundknopf zart', html: ik('muell'), title: 'Notiz löschen', onclick: () => { loescheDoc(n.id); bauen(); L.stelleSeite(0); } }))); };
+  bauen();
+  const kasten = el('div', { class: 'modal' }, el('h2', {}, 'Randnotizen · ' + (epubKapitelTitel(L.kapitel) || 'Kapitel ' + (L.kapitel + 1))), liste, feld,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen'),
+      el('button', { class: 'knopf voll', onclick: () => { const t = feld.value.trim(); if (!t) return; neuDoc('buchnotiz', { parent: b.id, seite: L.kapitel, text: t }); feld.value = ''; bauen(); L.stelleSeite(0); } }, 'Notiz dazu')));
+  const zu = zeigeDeck(kasten);
+}
+function epubVorlesen(knopf) {
+  if (!_epub) return;
+  const text = epubSeitenText();
+  if (!text) { toast('Hier steht nichts zum Vorlesen.'); return; }
+  if (typeof vorlesen === 'function') vorlesen(text, knopf);
+}
+function epubEinstellungen() {
+  if (!_epub) return;
+  const L = _epub, e = L.e;
+  const regler = (name, schluessel, min, max, schritt, danach) => { const r = el('input', { type: 'range', min: String(min), max: String(max), step: String(schritt), value: String(e[schluessel]) }); r.addEventListener('input', () => { e[schluessel] = Number(r.value); leseEinstellungSpeichern(e); epubStil(); }); r.addEventListener('change', () => { if (danach) danach(); }); return el('div', { class: 'einstellgruppe einstellzeile' }, el('span', { class: 'ename' }, name), r); };
+  const wahl = (name, schluessel, liste, danach) => { const g = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' }); for (const [id, n] of liste) g.append(el('button', { class: e[schluessel] === id ? 'an' : '', onclick: (ev) => { e[schluessel] = id; leseEinstellungSpeichern(e); epubStil(); $$('button', g).forEach((x) => x.classList.toggle('an', x === ev.currentTarget)); if (danach) danach(); } }, n)); return el('div', { class: 'einstellgruppe' }, el('b', {}, name), g); };
+  const kasten = el('div', { class: 'modal tisch-einrichten' }, el('h2', {}, 'Schrift und Lesen'),
+    wahl('Schrift', 'epubSchrift', EPUB_SCHRIFTEN.map((s) => [s[0], s[1]]), () => L.neuSetzen()),
+    regler('Größe', 'epubGroesse', 14, 28, 1, () => L.neuSetzen()),
+    regler('Zeilenabstand', 'epubZeile', 1.3, 2, .05, () => L.neuSetzen()),
+    regler('Rand', 'epubRand', 12, 80, 2, () => L.neuSetzen()),
+    regler('Helligkeit', 'helligkeit', .4, 1, .05),
+    regler('Wärme', 'waerme', 0, 1, .05),
+    wahl('Nacht', 'nacht', [[false, 'Hell'], [true, 'Dunkel']]),
+    wahl('Blättern', 'blaettern', [[true, 'Mit Bewegung'], [false, 'Ohne']]),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
+  const zu = zeigeDeck(kasten);
 }
 
 /* ================================================================

@@ -31,7 +31,8 @@ function vorlesen(text, knopf) {
   }
   if (puffer.trim()) bloecke.push(puffer.trim());
   const stimmen = (speechSynthesis.getVoices() || []);
-  const deutsch = stimmen.find((v) => /^de[-_]/i.test(v.lang) && /siri|anna|petra|markus|google|natural|premium/i.test(v.name)) || stimmen.find((v) => /^de[-_]/i.test(v.lang)) || null;
+  const gewuenscht = typeof leseEinstellung === 'function' ? leseEinstellung().stimme : null;
+  const deutsch = (gewuenscht && stimmen.find((v) => v.voiceURI === gewuenscht || v.name === gewuenscht)) || stimmen.find((v) => /^de[-_]/i.test(v.lang) && /siri|anna|petra|markus|google|natural|premium/i.test(v.name)) || stimmen.find((v) => /^de[-_]/i.test(v.lang)) || null;
   _vorleser = { bloecke, i: 0 };
   document.body.classList.add('liest-vor');
   if (knopf) knopf.classList.add('an');
@@ -60,7 +61,8 @@ function oeffneSchreibraum(docId) {
     class: 'sr-titel', type: 'text', value: doc.titel || '',
     placeholder: doc.typ === 'szene' ? 'Szene ohne Namen' : 'Ohne Titel'
   });
-  titel.addEventListener('input', entprellt(() => { doc.titel = titel.value; speichere(doc); }, 400, true));
+  const titelSichern = entprellt(() => { doc.titel = titel.value; speichere(doc); }, 400, () => titel.isConnected);
+  titel.addEventListener('input', titelSichern);
 
   const worteAnzeige = el('span', { class: 'sr-worte' }, String(startWorte));
   const kerzenhalter = el('div', { class: 'kerzenhalter' });
@@ -107,7 +109,7 @@ function oeffneSchreibraum(docId) {
 
   const raum = el('div', { class: 'schreibraum' }, kopf, mitte, leiste);
   document.body.append(raum);
-  _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, sprint: null, klangKnopf, istRich, richPaket };
+  _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, sprint: null, klangKnopf, istRich, richPaket, titelSichern };
 
   wendeSchriftAn();
   wendeTastaturArtAn();
@@ -214,6 +216,8 @@ function schliesseSchreibraum(zurueck) {
   if (!_sr) return;
   if (typeof vorlesenStopp === 'function') vorlesenStopp();
   _sr.sichern && _sr.sichern.sofort();
+  if (_sr.titelSichern) { _sr.titelSichern.sofort(); if (_sr.titelSichern.loesen) _sr.titelSichern.loesen(); }
+  if (_sr.sichern && _sr.sichern.loesen) _sr.sichern.loesen();
   document.removeEventListener('selectionchange', _sr.spiegelBeiAuswahl);
   window.removeEventListener('scroll', srFensterZurueck);
   if (_sr.sprint) { const k = _sr.sprint.kerze; beendeSprint(true); if (k) k.entfernen(); }
@@ -394,7 +398,7 @@ function zeigeStaende() {
         if (wahl === 'zurueck') {
           friereEin();
           srSetzeText(st.text);
-          _sr.doc.titel = st.titel;
+          _sr.doc.titel = st.titel; const tf = _sr.raum.querySelector('.sr-titel'); if (tf) tf.value = st.titel;
           _sr.sichern.sofort();
           zeichne();
           toast('Zurückgeholt.');
@@ -402,7 +406,7 @@ function zeigeStaende() {
           const bogen = el('div', { class: 'lesebogen' },
             el('div', { class: 'innen' },
               el('h1', {}, st.titel || 'Stand vom ' + fmtDatum(st.wann)),
-              el('div', { class: 'lmeta' }, worte(st.text) + ' Wörter · eingefroren ' + fmtDatum(st.wann) + ', ' + fmtZeit(st.wann)),
+              el('div', { class: 'lmeta' }, worte(st.text) + ' Wörter · eingefroren ' + fmtDatum(st.wann) + ', ' + fmtZeit(st.wann) + (st.auto ? ' · automatisch' : '')),
               el('div', { class: 'lesetext' }, st.text)));
           const leiste2 = el('div', { class: 'schwebeleiste' },
             el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Stand schließen', onclick: () => { bogen.remove(); leiste2.remove(); } }));

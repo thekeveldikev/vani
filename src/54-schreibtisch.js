@@ -33,7 +33,11 @@ function saubererSchreibtisch(roh) {
     verse: q.verse !== false,
     uhrTickt: q.uhrTickt === true,
     wachs: begrenze(q.wachs, 0, LEUCHTER_STUNDEN * 60, 0),         /* verbrannte Minuten */
-    kerzenGewechselt: begrenze(q.kerzenGewechselt, 0, 4102444800000, 0)
+    kerzenGewechselt: begrenze(q.kerzenGewechselt, 0, 4102444800000, 0),
+    kleckse: typeof saubereKleckse === 'function' ? saubereKleckse(q.kleckse) : [],
+    federKratzt: q.federKratzt === true,
+    offenesBuch: q.offenesBuch !== false,
+    blattId: typeof q.blattId === 'string' && q.blattId ? q.blattId.slice(0, 80) : null
   };
 }
 
@@ -255,6 +259,7 @@ function schreibtischKlick(art) {
   try {
     const ctx = typeof audioCtxHolen === 'function' ? audioCtxHolen() : (window.__vaniKlick || (window.__vaniKlick = new (window.AudioContext || window.webkitAudioContext)()));
     if (!ctx) return;
+    if (ctx.state === 'suspended') { try { ctx.resume().catch(() => {}); } catch (e) {} }
     const t0 = ctx.currentTime;
     const o = ctx.createOscillator(), g = ctx.createGain();
     o.type = art === 'tick' ? 'square' : 'triangle';
@@ -266,7 +271,7 @@ function schreibtischKlick(art) {
 }
 
 /* ----- Der siebenarmige Leuchter: Messingarme und sieben Flammen ----- */
-function baueLeuchter(einst) {
+function baueLeuchter(einst, woche) {
   const W = 170, H = 150;
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   const c = el('canvas', { class: 'desk-leuchter-flammen', width: String(W * dpr), height: String(H * dpr) });
@@ -281,6 +286,8 @@ function baueLeuchter(einst) {
   let phase = Math.random() * 10, laeuft = true, zug = 0;
   const zeichne_ = () => {
     if (!c.isConnected) { laeuft = false; return; }
+    /* Unter Schreibraum oder Leser sieht niemand die Flammen: sparsam weiterlaufen */
+    if ((typeof _sr !== 'undefined' && _sr) || (typeof _leser !== 'undefined' && _leser) || (typeof _epub !== 'undefined' && _epub) || document.visibilityState === 'hidden') { setTimeout(() => requestAnimationFrame(zeichne_), 500); return; }
     phase += .016;
     ctx.clearRect(0, 0, W, H);
     const fuss = 118;
@@ -303,8 +310,17 @@ function baueLeuchter(einst) {
       ctx.fillStyle = 'rgba(255,250,236,.9)';
       for (const tr of tropfen[i]) { const ty = by + tr.h * (y + 52 - by); ctx.fillRect(x + tr.s * 3.2 - .7, ty, 1.4, (y + 52 - ty) * tr.l); }
       ctx.fillStyle = 'rgba(120,90,40,.3)'; ctx.beginPath(); ctx.ellipse(x, by, 3.5, 1.4, 0, 0, 6.29); ctx.fill();
-      /* Flamme */
-      const fl = 1 + .12 * Math.sin(phase * 8 + i * 1.7) + .06 * Math.sin(phase * 17 + i);
+      /* Flamme — die Woche: heute höher, Zukunft klein, ein vergangener Tag ohne Wörter erloschen */
+      const wt = woche && woche[i];
+      const faktor = !wt ? 1 : wt.heute ? 1.38 : wt.zukunft ? .72 : wt.worte > 0 ? 1 : 0;
+      if (faktor === 0) {
+        ctx.strokeStyle = '#2b211a'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(x, by); ctx.lineTo(x + .6, by - 3.5); ctx.stroke();
+        /* ein Faden Rauch */
+        ctx.strokeStyle = 'rgba(200,200,210,' + (.12 + .06 * Math.sin(phase * 2 + i)).toFixed(3) + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x + .6, by - 4);
+        for (let k = 1; k <= 6; k++) ctx.lineTo(x + .6 + Math.sin(phase * 1.3 + k * .9 + i) * k * .9, by - 4 - k * 4); ctx.stroke();
+        return;
+      }
+      const fl = faktor * (1 + .12 * Math.sin(phase * 8 + i * 1.7) + .06 * Math.sin(phase * 17 + i));
       const neig = Math.sin(phase * .9 + i) * .08 + zug * (i % 2 ? -1 : 1) * .2;
       const fh = 15 * fl, fw = 4.6;
       kerzeSchein(ctx, x, by - fh * .5, 24, 28, [[0, 'rgba(255,170,70,' + (.24 * fl).toFixed(3) + ')'], [1, 'rgba(255,140,50,0)']]);
@@ -377,7 +393,8 @@ function baueLampe(szene, e, maler) {
     ev.stopPropagation(); ev.preventDefault();
     cancelAnimationFrame(raf); raf = 0;
     const r = halter.getBoundingClientRect();
-    zieht = { ox: ev.clientX - (r.left + knaufPos().x), oy: ev.clientY - (r.top + knaufPos().y), r }; maxZug = 0;
+    const s = r.width / 240 || 1;   /* die Lampe ist auf schmalen Geräten skaliert */
+    zieht = { ox: (ev.clientX - r.left) / s - knaufPos().x, oy: (ev.clientY - r.top) / s - knaufPos().y, r, s }; maxZug = 0;
     z.vx = 0; z.vy = 0;
     try { knauf.setPointerCapture(ev.pointerId); } catch (x) {}
     halter.classList.add('zieht');
@@ -386,7 +403,7 @@ function baueLampe(szene, e, maler) {
     if (!zieht) return;
     /* Wunschposition des Knaufs, dann an der Schnur gehalten: maximal MAX lang,
        darüber gibt sie nur noch ein wenig nach */
-    let wx = ev.clientX - zieht.ox - zieht.r.left, wy = ev.clientY - zieht.oy - zieht.r.top;
+    let wx = (ev.clientX - zieht.r.left) / zieht.s - zieht.ox, wy = (ev.clientY - zieht.r.top) / zieht.s - zieht.oy;
     let dx = wx - P.x, dy = wy - P.y;
     if (dy < 6) { dy = 6 + (dy - 6) * .08; }       /* nicht über die Aufhängung hinaus */
     const l = Math.hypot(dx, dy);
@@ -452,7 +469,7 @@ RENDER.schreibtisch = function (haupt) {
   const wetter = e.wetterFolgtKlang ? schreibtischWetter() : 'still';
   const szene = el('div', { class: 'desk-szene holz-' + e.holz + ' wetter-' + wetter + (e.kerzen ? ' kerzen-an' : '') + (e.lampeAn ? '' : ' lampe-aus'), style: '--lampe:' + e.lampe + ';--unordnung:' + e.unordnung });
   const leinwand = el('canvas', { class: 'desk-malerei' });
-  const maler = schreibtischMaler(leinwand, { holz: e.holz, lampe: e.lampe, lampeAn: e.lampeAn, wetter, kerzen: e.kerzen, unordnung: e.unordnung });
+  const maler = schreibtischMaler(leinwand, { holz: e.holz, lampe: e.lampe, lampeAn: e.lampeAn, wetter, kerzen: e.kerzen, unordnung: e.unordnung, alter: schreibtischAlter(D.stats.tage), kleckse: e.kleckse });
   const dinge = el('div', { class: 'desk-dinge' });
   szene.append(leinwand, dinge);
 
@@ -463,13 +480,16 @@ RENDER.schreibtisch = function (haupt) {
 
   /* Lampe mit Zugschnur */
   dinge.append(baueLampe(szene, e, maler));
+  /* Fensterbank: Wetterglas (Klang) und die Teelichter der Woche (Tagesziel) */
+  dinge.append(baueWetterglas());
+  const teelichter = baueTeelichter(); if (teelichter) dinge.append(teelichter);
 
   /* Leuchter */
   let leuchter = null;
   if (e.kerzen) {
-    leuchter = baueLeuchter(e);
+    leuchter = baueLeuchter(e, leuchterWoche(D.stats.tage));
     const stand = leuchterStand(e.wachs);
-    dinge.append(ding('leuchter', stand >= 1 ? 'Die Kerzen sind herunter — neue aufstecken' : 'Der Leuchter: Schreibzeit anzünden (' + Math.round((1 - stand) * 100) + ' % Kerze)', el('div', { class: 'leuchter-bild' }, leuchter.element), async () => {
+    dinge.append(ding('leuchter', stand >= 1 ? 'Die Kerzen sind herunter — neue aufstecken' : 'Der Leuchter: sieben Kerzen, Montag bis Sonntag — heute brennt höher. Tippen: Schreibzeit anzünden (' + Math.round((1 - stand) * 100) + ' % Kerze)', el('div', { class: 'leuchter-bild' }, leuchter.element), async () => {
       if (leuchterStand(e.wachs) >= 1) {
         if (await frage('Die Kerzen sind nach ' + LEUCHTER_STUNDEN + ' Schreibstunden herunter. Neue aufstecken?', { ja: 'Neue Kerzen' })) { e.wachs = 0; e.kerzenGewechselt = Date.now(); D.einst.schreibtisch = { ...e }; speichereEinst(); toast('Sieben neue Kerzen. Frisch und weiß.'); zeichne(); }
         return;
@@ -499,7 +519,15 @@ RENDER.schreibtisch = function (haupt) {
   if (!letzte.length) dinge.append(ding('manuskript m1 leer', 'Ein leeres Blatt — anfangen', el('div', { class: 'manuskript-papier' }, el('b', {}, 'Noch nichts'), el('span', {}, 'Ein leeres Blatt. Das beste Versprechen, das es gibt.')), () => schreibtischNeuesBlatt()));
 
   /* Tintenfass & Feder */
-  dinge.append(ding('tinte', 'Tintenfass und Feder: ein neues Blatt', el('div', { class: 'tinte-bild' }, el('i', { class: 'fass' }), el('i', { class: 'fass-glanz' }), el('i', { class: 'feder f1' }), el('i', { class: 'feder f2' })), () => schreibtischNeuesBlatt()));
+  dinge.append(ding('tinte', 'Tintenfass und Feder: ein Blatt einspannen', el('div', { class: 'tinte-bild' }, el('i', { class: 'fass' }), el('i', { class: 'fass-glanz' }), el('i', { class: 'feder f1' }), el('i', { class: 'feder f2' })), async () => {
+    const liegt = e.blattId && D.docs.get(e.blattId);
+    const w = await menue([
+      liegt ? { text: 'Das eingespannte Blatt weiterschreiben', icon: 'blatt', wert: 'weiter' } : null,
+      { text: 'Ein neues Blatt einspannen — hier auf dem Tisch', icon: 'blatt', wert: 'einspannen' },
+      { text: 'Ein neues Blatt im Schreibraum', icon: 'stift', wert: 'raum' }
+    ].filter(Boolean), 'Tinte und Feder');
+    if (w === 'weiter') blattEinspannen(szene, e, e.blattId); else if (w === 'einspannen') blattEinspannen(szene, e, null); else if (w === 'raum') schreibtischNeuesBlatt();
+  }));
 
   /* Das Bücherbord: die Bücher stehen in einer Reihe, leicht gelehnt, jedes
      für sich greifbar — kein Stapel, in dem nur das oberste zu sehen ist. */
@@ -521,12 +549,15 @@ RENDER.schreibtisch = function (haupt) {
   });
   bord.append(el('button', { class: 'bord-fuss', title: 'Der Lesestapel: Bücher auflegen, ordnen', onclick: () => lesestapelZeigen() }, buecher.length ? (buecher.length > zeigbar ? '+' + (buecher.length - zeigbar) + ' · ' : '') + 'Lesestapel' : 'Bücher auflegen'));
   dinge.append(el('div', { class: 'desk-ding-halter buecher' }, bord, el('i', { class: 'bordbrett' })));
+  /* Das aufgeschlagene Buch: das zuletzt gelesene liegt offen da */
+  if (buecher.length && e.offenesBuch) dinge.append(baueOffenesBuch(buecher[0], szene));
 
   /* Tasse: der Schreibtag */
   const tag = schreibtischTag();
   dinge.append(ding('tasse' + (tag.heute > 0 ? ' dampft' : ''), 'Die Tasse: ' + (tag.heute ? tag.heute + ' Wörter heute' : 'heute noch nichts') + (tag.serie > 1 ? ' · ' + tag.serie + ' Tage in Folge' : ''), el('div', { class: 'tasse-bild' }, el('i', { class: 'dampf d1' }), el('i', { class: 'dampf d2' }), el('i', { class: 'dampf d3' }), el('i', { class: 'henkel' }), el('span', { class: 'tasse-zahl' }, tag.heute ? (tag.heute >= 10000 ? Math.round(tag.heute / 1000) + 'k' : String(tag.heute)) : '')), () => {
     toast(tag.heute ? tag.heute + ' Wörter heute' + (tag.serie > 1 ? ' — der ' + tag.serie + '. Tag in Folge.' : '.') : 'Heute noch nichts. Die Tasse wartet.', 3600);
   }));
+  const zweite = baueZweiteTasse(); if (zweite) dinge.append(zweite);
 
   /* Glas mit Fundstück: ein eigenes Foto oder der Funke */
   const fundfoto = schreibtischFundfoto();
@@ -584,8 +615,13 @@ RENDER.schreibtisch = function (haupt) {
     dinge.style.setProperty('--px', (px * -4).toFixed(1) + 'px'); dinge.style.setProperty('--py', (py * -2).toFixed(1) + 'px');
   });
   maler.start();
+  /* Ein Luftzug, wenn die Tür aufgeht: Papiere heben die Ecken, Flammen ducken sich */
+  szene.classList.add('luftzug'); setTimeout(() => szene.classList.remove('luftzug'), 1900);
+  if (leuchter) setTimeout(() => leuchter.puste(.9), 250);
+  /* Ein eingespanntes Blatt liegt noch da */
+  if (e.blattId && D.docs.get(e.blattId)) blattEinspannen(szene, e, e.blattId, false);
   /* Aufhören, sobald der Raum weg ist */
-  const beobachter = new MutationObserver(() => { if (!szene.isConnected) { maler.stopp(); beobachter.disconnect(); } });
+  const beobachter = new MutationObserver(() => { if (!szene.isConnected) { maler.stopp(); (szene._aufraeumen || []).forEach((f) => { try { f(); } catch (x) {} }); beobachter.disconnect(); } });
   beobachter.observe(haupt, { childList: true });
   szene.addEventListener('pointerdown', () => { if (leuchter) leuchter.puste(.35); });
 };
@@ -614,6 +650,9 @@ function schreibtischEinrichten(danach) {
     zeile('Die Uhr tickt', 'Ein leises Ticken, zur vollen Stunde ein Glockenschlag.', schalter(() => e.uhrTickt, (v) => { e.uhrTickt = v; })),
     zeile('Fenster hört auf den Klang', 'Spielt Regen, regnet es vor dem Fenster; bei Gewitter wetterleuchtet es.', schalter(() => e.wetterFolgtKlang, (v) => { e.wetterFolgtKlang = v; })),
     zeile('Eigene Zeilen auf der Platte', 'Kurze Sätze aus meinen Funden, wie hingekritzelt.', schalter(() => e.verse, (v) => { e.verse = v; })),
+    zeile('Die Feder kratzt', 'Ein leises Kratzen beim Tippen auf dem eingespannten Blatt.', schalter(() => e.federKratzt, (v) => { e.federKratzt = v; })),
+    zeile('Aufgeschlagenes Buch', 'Das zuletzt gelesene Buch liegt offen auf dem Tisch; links und rechts tippen blättert.', schalter(() => e.offenesBuch, (v) => { e.offenesBuch = v; })),
+    (e.kleckse && e.kleckse.length) ? zeile('Kleckse', e.kleckse.length + ' Tintenkleckse von der Feder — einer je Sitzung.', el('button', { class: 'knopf zart', onclick: () => { e.kleckse = []; D.einst.schreibtisch = { ...e }; speichereEinst(); toast('Die Platte ist gewischt.'); if (danach) danach(); } }, 'Wegwischen')) : null,
     zeile('Unordnung', 'Wie viel auf dem Tisch liegt und wie schief.', unordnung),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => { D.einst.schreibtisch = alt; if (danach) danach(); zu(); } }, 'Zurück'),
       el('button', { class: 'knopf voll', onclick: () => { behalten = true; D.einst.schreibtisch = { ...e }; speichereEinst(); zu(); if (danach) danach(); } }, 'So bleibt es')));

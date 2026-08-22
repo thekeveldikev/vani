@@ -150,7 +150,7 @@ ipcMain.handle('vani:buecher-liste', (event) => {
     let eintraege = [];
     try { eintraege = fs.readdirSync(ordner); } catch (_) { continue; }
     for (const name of eintraege) {
-      if (!/\.pdf$/i.test(name)) continue;
+      if (!/\.(pdf|epub)$/i.test(name)) continue;
       const pfad = path.join(ordner, name);
       try { const st = fs.statSync(pfad); if (st.isFile() && st.size <= 300 * 1024 * 1024) aus.push({ name, size: st.size, pfad, ordner }); } catch (_) {}
     }
@@ -161,7 +161,7 @@ ipcMain.handle('vani:buch-lesen', (event, pfad) => {
   if (!istVaniAbsender(event) || typeof pfad !== 'string') throw new Error('Nicht erlaubt');
   const voll = path.resolve(pfad);
   const erlaubt = buecherOrdner().some((o) => { const w = path.resolve(o); return voll.startsWith(w + path.sep); });
-  if (!erlaubt || !/\.pdf$/i.test(voll)) throw new Error('Nicht erlaubt');
+  if (!erlaubt || !/\.(pdf|epub)$/i.test(voll)) throw new Error('Nicht erlaubt');
   const st = fs.statSync(voll);
   if (!st.isFile() || st.size > 300 * 1024 * 1024) throw new Error('Zu groß');
   return fs.readFileSync(voll);

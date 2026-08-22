@@ -16,7 +16,8 @@ function wiederFunde(jetzt = Date.now()) {
     if (!typen.has(d.typ) || text.length < 24 || jetzt - d.angelegt < 2 * 86400000) continue;
     const damals = new Date(d.angelegt);
     let art = d.typ === 'funkeln' ? 'FUNKELN' : d.typ === 'faden' ? 'AUS DEM FADEN' : 'LIEGEN GEBLIEBEN';
-    if (damals.getDate() === heute.getDate() && damals.getMonth() === heute.getMonth() && damals.getFullYear() < heute.getFullYear()) {
+    if (/\n— [^\n]{3,120}(?:, S\. \d+|, Kapitel \d+|, [^\n,]{2,60})\s*$/.test(text) && text.length < 1200) art = 'EIN ZITAT';
+    else if (damals.getDate() === heute.getDate() && damals.getMonth() === heute.getMonth() && damals.getFullYear() < heute.getFullYear()) {
       const jahre = heute.getFullYear() - damals.getFullYear(); art = 'HEUTE VOR ' + jahre + (jahre === 1 ? ' JAHR' : ' JAHREN');
     } else if (/\?\s*(?:\n|$)/.test(text)) art = 'EINE OFFENE FRAGE';
     else if (/(?:,|:|…|\.{3}|\b(?:dass|weil|aber|und|oder))\s*$/i.test(text)) art = 'NOCH NICHT FERTIG';
@@ -177,7 +178,8 @@ RENDER.zuhause = function (haupt) {
           str >= 2 ? str + ' Tage in Folge am Feuer' :
           heutigeWorte > 0 ? 'Das Feuer brennt.' :
           feuerstufe() === 'glut' ? 'Noch Glut von neulich. Ein Satz genügt.' :
-          'Kalt hier. Ein Satz macht Feuer.')
+          'Kalt hier. Ein Satz macht Feuer.'),
+        (() => { const ls = typeof leseSerie === 'function' && typeof lesestapelBuecher === 'function' ? leseSerie(lesestapelBuecher()) : null; return ls && (ls.serie > 0 || ls.heute > 0) ? el('div', { class: 'klein lese-serie' }, (ls.heute ? ls.heute + (ls.heute === 1 ? ' Seite' : ' Seiten') + ' gelesen heute' : 'Heute noch nicht gelesen') + (ls.serie >= 2 ? ' · ' + ls.serie + ' Lesetage in Folge' : '')) : null; })()
       ),
       (() => {
         const b = el('div', { class: 'wochenbalken' });
@@ -305,7 +307,7 @@ RENDER.zuhause = function (haupt) {
   if (buch) {
     const img = el('img', { alt: '' }); if (buch.bild) setzeBild(img, buch.bild);
     inhalt.append(el('button', { class: 'karte weiterlesen-karte', onclick: () => buchOeffnen(buch) }, img,
-      el('span', {}, el('b', {}, 'Weiterlesen: ' + (buch.titel || 'Buch')), el('small', {}, 'Seite ' + buch.seite + ' von ' + buch.seiten + ' · ' + buchFortschritt(buch.seite, buch.seiten) + ' %'))));
+      el('span', {}, el('b', {}, 'Weiterlesen: ' + (buch.titel || 'Buch')), el('small', {}, (typeof buchStandText === 'function' ? buchStandText(buch) : 'Seite ' + buch.seite + ' von ' + buch.seiten) + ' · ' + buchFortschritt(buch.seite, buch.seiten) + ' %'))));
   }
 
   /* Die Tür zum Schreibtisch */

@@ -23,9 +23,11 @@ const SUCH_GRUPPEN = [
 ];
 
 /* Ein kaputter Eintrag im Browser-Speicher darf die Suche nicht lahmlegen. */
+/* Letzte Suchen je Profil getrennt */
+function suchSchluessel() { const p = typeof D !== 'undefined' && D.profil && D.profil.id ? D.profil.id : (typeof AKTIVES_PROFIL !== 'undefined' && AKTIVES_PROFIL ? AKTIVES_PROFIL.id : ''); return 'vani-suchen' + (p ? ':' + p : ''); }
 function leseLetzteSuchen() {
   try {
-    const roh = JSON.parse(localStorage.getItem('vani-suchen') || '[]');
+    const roh = JSON.parse(localStorage.getItem(suchSchluessel()) || '[]');
     return Array.isArray(roh) ? roh.filter((x) => typeof x === 'string').slice(0, 8) : [];
   } catch (e) { return []; }
 }
@@ -64,7 +66,7 @@ function oeffneSuche() {
   setTimeout(() => feld.focus(), 60);
 
   function eintrag(d, umfeldHtml) {
-    return el('button', { onclick: () => { zu(); merkeSuche(feld.value); oeffneDoc(d); } },
+    return el('button', { onclick: () => { zu(); merkeSuche(feld.value); if (typeof _sr !== 'undefined' && _sr && typeof schliesseSchreibraum === 'function') schliesseSchreibraum(); oeffneDoc(d); } },
       el('span', { class: 'ttitel' }, d.titel || ((d.text || '').split('\n')[0] || 'Ohne Titel').slice(0, 50)),
       umfeldHtml ? el('span', { class: 'tprobe', html: umfeldHtml }) : null
     );
@@ -105,7 +107,7 @@ function oeffneSuche() {
     if (!q || q.length < 2) return;
     const letzte = leseLetzteSuchen().filter((x) => x !== q);
     letzte.unshift(q);
-    try { localStorage.setItem('vani-suchen', JSON.stringify(letzte.slice(0, 8))); } catch (e) {}
+    try { localStorage.setItem(suchSchluessel(), JSON.stringify(letzte.slice(0, 8))); } catch (e) {}
   }
 
   function suche() {
@@ -160,6 +162,4 @@ function oeffneSuche() {
   leererZustand();
 }
 
-document.addEventListener('keydown', (e) => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); oeffneSuche(); }
-});
+/* ⌘/Strg+K öffnet das Spotlight (48b); ⌘/Strg+⇧+K diese Suche. */

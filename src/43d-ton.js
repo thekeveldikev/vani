@@ -65,6 +65,7 @@ function tonAufnehmen() {
     const starte = async () => {
       try { strom = await navigator.mediaDevices.getUserMedia({ audio: true }); }
       catch (e) { toast('Kein Zugriff aufs Mikrofon. In den Geräteeinstellungen erlauben.', 4200); return; }
+      if (fertig) { try { strom.getTracks().forEach((t) => t.stop()); } catch (e) {} strom = null; return; }
       stuecke = []; blob = null; aufkleben.disabled = true; anhoeren.disabled = true;
       const mime = tonMime();
       try { rekorder = mime ? new MediaRecorder(strom, { mimeType: mime }) : new MediaRecorder(strom); }

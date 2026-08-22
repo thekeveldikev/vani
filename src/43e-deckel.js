@@ -104,7 +104,8 @@ function zufallsLook(h) {
 /* ----- Das Atelier ----- */
 async function heftAtelier(h, danach) {
   h.deckel = saubererDeckel(h.deckel);
-  const alt = JSON.parse(JSON.stringify({ farbe: h.farbe, farbe2: h.farbe2, band: h.band, muster: h.muster, papier: h.papier, papierfarbe: h.papierfarbe, rand: h.rand, deckel: h.deckel }));
+  const ATELIER_FELDER = ['farbe', 'farbe2', 'band', 'muster', 'papier', 'papierfarbe', 'rand', 'deckel'];
+  const alt = {}; for (const k of ATELIER_FELDER) alt[k] = h[k] === undefined ? undefined : JSON.parse(JSON.stringify(h[k]));
   const buehne = el('div', { class: 'atelier-buehne' });
   let behalten = false;
 
@@ -222,7 +223,7 @@ async function heftAtelier(h, danach) {
   const felder = el('div', { class: 'atelier-felder' });
   for (const kind of [...kasten.children]) if (kind !== kopfEl && kind !== buehne) felder.append(kind);
   kasten.append(el('div', { class: 'atelier-raster' }, el('div', { class: 'atelier-links' }, buehne), felder));
-  const zu = zeigeDeck(kasten, () => { if (!behalten) { Object.assign(h, alt); if (danach) danach(); } });
+  const zu = zeigeDeck(kasten, () => { if (!behalten) { for (const k of ATELIER_FELDER) { if (alt[k] === undefined) delete h[k]; else h[k] = alt[k]; } if (danach) danach(); } });
   aktualisiere();
 }
 

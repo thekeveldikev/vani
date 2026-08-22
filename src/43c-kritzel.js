@@ -178,7 +178,7 @@ function saubereStriche(roh, maxStriche = 4000, maxPunkte = 24000) {
       if (!q || typeof q !== 'object') continue;
       const x = Number(q.x), y = Number(q.y), w = Number(q.w);
       if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
-      p.push({ x: Math.max(-1, Math.min(2, x)), y: Math.max(-1, Math.min(3, y)), w: Number.isFinite(w) ? Math.max(.0005, Math.min(.2, w)) : .004 });
+      p.push({ x: Math.max(-1, Math.min(2, x)), y: Math.max(-1, Math.min(40, y)), w: Number.isFinite(w) ? Math.max(.0005, Math.min(.2, w)) : .004 });
       if (p.length >= 4000) break;
     }
     if (!p.length) continue;
