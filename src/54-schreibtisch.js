@@ -462,11 +462,31 @@ function baueUhr(e) {
   return uhr;
 }
 
-/* ----- Der Raum ----- */
+/* Woraus die Szene gebaut ist — ändert sich davon nichts, bleibt sie stehen. Lampe,
+   Wachs, Kleckse und das eingespannte Blatt pflegt die Szene selbst, sie zählen nicht. */
+function schreibtischSignatur() {
+  const e = saubererSchreibtisch(D.einst.schreibtisch);
+  const buecher = typeof lesestapelBuecher === 'function' ? lesestapelBuecher() : [];
+  const briefe = vomTyp('brief');
+  const heft = vomTyp('heft').filter((h) => !h.archiv).sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0))[0];
+  const tag = schreibtischTag();
+  const fund = schreibtischFundfoto();
+  return JSON.stringify([
+    e.holz, e.kerzen, e.wetterFolgtKlang, e.unordnung, e.verse, e.uhrTickt, e.kerzenGewechselt, e.federKratzt, e.offenesBuch,
+    e.wetterFolgtKlang ? schreibtischWetter() : 'still', D.einst.tagesziel, tag.heute, tag.serie,
+    buecher.slice(0, 9).map((b) => b.id + ':' + (b.seite || 0) + ':' + (b.bild || '') + ':' + (b.titel || '')),
+    schreibtischLetzteTexte(3).map((d) => d.id + ':' + (d.geaendert || 0)),
+    briefe.length, briefe.some((b) => briefIstOffen(b) && b.versiegelt), heft ? heft.id + ':' + (heft.geaendert || 0) : '',
+    fund ? fund.id : '', typeof schreibtischKlangName === 'function' ? schreibtischKlangName() : '',
+    typeof syncFremdAktiv === 'function' ? syncFremdAktiv() : false, (typeof teelichterWoche === 'function' ? teelichterWoche(D.stats.tage, D.einst.tagesziel) : []).map((t) => t.erreicht),
+    typeof papierkorbZahl === 'function' ? papierkorbZahl() : 0
+  ]);
+}
 RENDER.schreibtisch = function (haupt) {
   if (!sessionStorage.getItem('vani-session-start')) sessionStorage.setItem('vani-session-start', String(Date.now()));
   const e = saubererSchreibtisch(D.einst.schreibtisch);
   const wetter = e.wetterFolgtKlang ? schreibtischWetter() : 'still';
+  const erstesMal = !sessionStorage.getItem('vani-desk-gesehen');
   const szene = el('div', { class: 'desk-szene holz-' + e.holz + ' wetter-' + wetter + (e.kerzen ? ' kerzen-an' : '') + (e.lampeAn ? '' : ' lampe-aus'), style: '--lampe:' + e.lampe + ';--unordnung:' + e.unordnung });
   const leinwand = el('canvas', { class: 'desk-malerei' });
   const maler = schreibtischMaler(leinwand, { holz: e.holz, lampe: e.lampe, lampeAn: e.lampeAn, wetter, kerzen: e.kerzen, unordnung: e.unordnung, alter: schreibtischAlter(D.stats.tage), kleckse: e.kleckse });
@@ -602,9 +622,12 @@ RENDER.schreibtisch = function (haupt) {
   dinge.append(el('button', { class: 'desk-schublade', title: 'Die Schublade', onclick: () => schubladeOeffnen() }, el('i', { class: 'griffknauf' })));
   dinge.append(el('button', { class: 'rundknopf zart desk-einrichten', html: ik('feinheiten'), title: 'Schreibtisch einrichten', onclick: () => schreibtischEinrichten(() => zeichne()) }));
 
+  szene._sig = schreibtischSignatur(); szene._maler = maler;
   haupt.append(szene);
-  /* Auftritt: die Dinge kommen gestaffelt auf den Tisch */
-  $$('.desk-ding, .desk-ding-halter', dinge).forEach((d, i) => { d.style.setProperty('--n', String(i)); d.classList.add('tritt-auf'); });
+  /* Auftritt: die Dinge kommen gestaffelt auf den Tisch — nur beim ersten Betreten in
+     dieser Sitzung; danach steht der Tisch einfach da (weich eingeblendet). */
+  if (erstesMal) $$('.desk-ding, .desk-ding-halter', dinge).forEach((d, i) => { d.style.setProperty('--n', String(i)); d.classList.add('tritt-auf'); });
+  else szene.classList.add('weich');
   /* Parallaxe: der Blick wandert ein wenig mit dem Zeiger — das Fenster weiter
      hinten bewegt sich anders als der Tisch. */
   szene.addEventListener('pointermove', (ev) => {
@@ -616,8 +639,7 @@ RENDER.schreibtisch = function (haupt) {
   });
   maler.start();
   /* Ein Luftzug, wenn die Tür aufgeht: Papiere heben die Ecken, Flammen ducken sich */
-  szene.classList.add('luftzug'); setTimeout(() => szene.classList.remove('luftzug'), 1900);
-  if (leuchter) setTimeout(() => leuchter.puste(.9), 250);
+  if (erstesMal) { szene.classList.add('luftzug'); setTimeout(() => szene.classList.remove('luftzug'), 1900); if (leuchter) setTimeout(() => leuchter.puste(.9), 250); sessionStorage.setItem('vani-desk-gesehen', '1'); }
   /* Ein eingespanntes Blatt liegt noch da */
   if (e.blattId && D.docs.get(e.blattId)) blattEinspannen(szene, e, e.blattId, false);
   /* Aufhören, sobald der Raum weg ist */
@@ -658,3 +680,5 @@ function schreibtischEinrichten(danach) {
       el('button', { class: 'knopf voll', onclick: () => { behalten = true; D.einst.schreibtisch = { ...e }; speichereEinst(); zu(); if (danach) danach(); } }, 'So bleibt es')));
   const zu = zeigeDeck(kasten, () => { if (!behalten) { D.einst.schreibtisch = alt; if (danach) danach(); } });
 }
+/* Der Tisch bleibt stehen, solange seine Signatur stimmt. */
+RENDER.schreibtisch.behalten = (haupt) => { const sz = haupt.querySelector('.desk-szene'); return !!(sz && sz._sig && sz._sig === schreibtischSignatur()); };

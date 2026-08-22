@@ -526,6 +526,8 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .desk-dinge { --px: 0px; --py: 0px; }
 .desk-ding, .desk-ding-halter { position: absolute; z-index: 2; transform: rotate(var(--dreh, 0deg)); transition: transform .25s cubic-bezier(.2,.8,.2,1), filter .25s; filter: drop-shadow(0 7px 9px rgba(0,0,0,.6)); text-align: left; }
 .desk-ding.tritt-auf, .desk-ding-halter.tritt-auf { animation: ding-landet .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--n, 0) * 45ms); }
+.desk-szene.weich { animation: szene-weich .28s ease-out; }
+@keyframes szene-weich { from { opacity: .6; } to { opacity: 1; } }
 @keyframes ding-landet { from { opacity: 0; transform: translateY(10px) rotate(var(--dreh, 0deg)) scale(.96); } to { opacity: 1; transform: translateY(0) rotate(var(--dreh, 0deg)) scale(1); } }
 .desk-ding.lampe.tritt-auf, .desk-ding.leuchter.tritt-auf, .desk-ding.uhr.tritt-auf, .desk-ding.stuhl.tritt-auf { animation-name: ding-kommt; }
 @keyframes ding-kommt { from { opacity: 0; } to { opacity: 1; } }

@@ -61,9 +61,16 @@ function zeichne() {
   const raum = teile[0] || 'zuhause';
   const arg = teile[1];
   const haupt = $('#raum');
+  const fn = RENDER[raum] || RENDER.zuhause;
+  /* Ein Raum darf stehen bleiben, wenn sich nichts geändert hat (der Schreibtisch
+     vergleicht seine Signatur) — sonst würde jedes Sync-Häppchen ihn neu aufbauen. */
+  if (typeof fn.behalten === 'function' && haupt.firstElementChild && fn.behalten(haupt, arg)) {
+    const aktiv0 = { heft: 'hefte', projekt: 'projekte', brett: 'cluster' }[raum] || raum;
+    $$('#leiste .lknopf').forEach((k) => k.classList.toggle('an', k.dataset.raum === aktiv0));
+    return;
+  }
   haupt.innerHTML = '';
   haupt.scrollTop = 0;
-  const fn = RENDER[raum] || RENDER.zuhause;
   fn(haupt, arg);
   const aktiv = { heft: 'hefte', projekt: 'projekte', brett: 'cluster' }[raum] || raum;
   $$('#leiste .lknopf').forEach((k) => k.classList.toggle('an', k.dataset.raum === aktiv));

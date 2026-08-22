@@ -208,7 +208,7 @@ function blattEinspannen(szene, e, blattId, fokus = true) {
     /* frisch lesen: der Klecks von eben steht schon drin */
     const jetzt = saubererSchreibtisch(D.einst.schreibtisch); jetzt.blattId = null; D.einst.schreibtisch = jetzt; Object.assign(e, jetzt); speichereEinst();
     blatt.classList.add('weg');
-    setTimeout(() => { blatt.remove(); if (szene.isConnected) zeichne(); }, 320);
+    setTimeout(() => { blatt.remove(); szene.classList.remove('blatt-liegt'); if (szene._maler) szene._maler.setze({ kleckse: jetzt.kleckse }); else if (szene.isConnected) zeichne(); }, 320);
   };
   const blatt = el('div', { class: 'desk-blatt' },
     el('div', { class: 'desk-blatt-kopf' }, titel, zahl,
