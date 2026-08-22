@@ -1572,3 +1572,14 @@ Leertaste im Randfeld blättert nicht; Lese-Serie auf dem Zuhause.
 - **Leser-Fenster** (Notizen/Zitat/Suche/Einstellungen): solange ein Fenster offen ist,
   bleiben Kopf- und Fußleiste des Lesers verborgen (`.lesemodus.deck-offen`).
 - IDEEN.md: Abschnitt „Die übernächste Welle" (A–E, mit Reihenfolge-Vorschlag).
+
+### 5.18.2 — Der Tisch bleibt stehen
+`zeichne()` fragt einen Raum jetzt zuerst `RENDER[raum].behalten(haupt, arg)`; der
+Schreibtisch vergleicht `szene._sig` mit `schreibtischSignatur()` (Holz, Kerzen, Wetter,
+Tagesziel, Tasse, Bücher, letzte Texte, Briefe, Notizbuch, Fundfoto, Klangname,
+Fremdaktivität, Teelichter, Papierkorb) — Lampe, Wachs, Kleckse und Blatt pflegt die
+Szene selbst. Stimmt die Signatur, bleibt das Element (Maler läuft weiter), d. h.
+Sync-Übernahmen und Rückwege aus Fenstern bauen den Tisch nicht mehr neu. Auftritt
+(`tritt-auf`) und Luftzug nur beim ersten Betreten pro Sitzung (`sessionStorage
+vani-desk-gesehen`), sonst `.desk-szene.weich` (kurzes Einblenden). Weglegen des
+Blattes malt den Klecks über `szene._maler.setze({kleckse})` ein statt neu zu zeichnen.
