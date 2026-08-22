@@ -73,6 +73,8 @@ function zeichne() {
   haupt.innerHTML = '';
   haupt.scrollTop = 0;
   fn(haupt, arg);
+  /* Räume als Orte: Kulisse davor, Haut anlegen, Tür aufgehen lassen (wenn eingeschaltet) */
+  if (typeof orteAnwenden === 'function') { try { orteAnwenden(haupt, raum); } catch (e) {} }
   const aktiv = { heft: 'hefte', projekt: 'projekte', brett: 'cluster' }[raum] || raum;
   $$('#leiste .lknopf').forEach((k) => k.classList.toggle('an', k.dataset.raum === aktiv));
 }

@@ -2356,6 +2356,121 @@ html[data-thema="tinte"] .salon-galerie, html[data-thema="kerze"] .salon-galerie
 @media (max-width: 420px) { .salon-galerie { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .salon-rahmen { animation: none; } }
 
+/* ----- Salon, Stufe zwei: Fragezeile, Gäste, Ecken, Aufgaben, Regal, Runde, Original zuerst ----- */
+.salon-fragezeile { display: flex; align-items: center; gap: 10px; margin: 4px 0 16px; padding: 8px 10px 8px 16px; border-radius: 16px; background: var(--karte); box-shadow: 0 1px 5px var(--schein), inset 0 0 0 1px var(--linie); }
+.salon-fragezeile input { flex: 1; min-width: 0; font-size: 16px; padding: 8px 0; }
+.salon-fragezeile .knopf { white-space: nowrap; }
+@media (max-width: 600px) { .salon-fragezeile { flex-wrap: wrap; } .salon-fragezeile .knopf { width: 100%; justify-content: center; } }
+.salon[data-licht="nacht"] .salon-galerie { background: radial-gradient(ellipse at 50% 0%, rgba(255,210,150,.16), transparent 60%), repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 2px, transparent 2px 58px), linear-gradient(180deg, #2a2019, #16110d); }
+.salon[data-licht="nacht"] .salon-kurz { color: rgba(255,240,215,.78); }
+.salon[data-licht="nacht"] .salon-lampe::after { background: linear-gradient(rgba(255,220,150,.42), rgba(255,220,150,.1) 50%, transparent); }
+.salon[data-licht="abend"] .salon-galerie { background: radial-gradient(ellipse at 50% 0%, rgba(255,200,140,.22), transparent 60%), repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 2px, transparent 2px 58px), linear-gradient(180deg, color-mix(in srgb, var(--hg2) 80%, #6a4a30), color-mix(in srgb, var(--hg2) 70%, #3a2818)); }
+/* Zierecken an den Rahmen */
+.salon-ecke { position: absolute; width: 18px; height: 18px; pointer-events: none; background: radial-gradient(circle at 50% 50%, rgba(255,235,190,.55), rgba(255,235,190,.12) 45%, transparent 60%); }
+.salon-ecke.e1 { left: 3px; top: 3px; } .salon-ecke.e2 { right: 3px; top: 3px; } .salon-ecke.e3 { left: 3px; bottom: 3px; } .salon-ecke.e4 { right: 3px; bottom: 3px; }
+.salon-rahmen.gold .salon-ecke, .salon-rahmen.kupfer .salon-ecke { background: radial-gradient(circle at 50% 50%, rgba(255,250,220,.9), rgba(255,240,190,.25) 40%, transparent 60%); }
+.salon-galerie.klein { padding: 22px 20px 28px; gap: 24px 20px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.salon-galerie.klein .salon-rahmen { max-width: 210px; }
+.salon-gaeste { margin-top: 22px; }
+.salon-abschnitt { font: 600 12px ui-rounded, -apple-system, system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--blass); margin: 0 0 8px 6px; }
+.salon-rahmen.gast .salon-schild { background: linear-gradient(#d8d2c4, #8f897c); }
+/* Schreibaufgabe des Tages */
+.salon-aufgabe-heute { display: flex; gap: 14px; align-items: center; width: 100%; margin-top: 18px; padding: 14px 16px; border-radius: 16px; text-align: left; background: var(--karte); box-shadow: 0 1px 5px var(--schein), inset 0 0 0 1px var(--linie); transition: transform .2s; }
+.salon-aufgabe-heute:hover { transform: translateY(-2px); }
+.salon-aufgabe-heute .sa-foto { width: 52px; height: 64px; border-radius: 3px; overflow: hidden; flex: none; box-shadow: 0 0 0 3px #a8832f, 0 3px 8px rgba(0,0,0,.3); background: #2a2422; }
+.salon-aufgabe-heute .sa-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.salon-aufgabe-heute .sa-text { display: grid; gap: 3px; min-width: 0; }
+.salon-aufgabe-heute .sa-text b { font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--blass); }
+.salon-aufgabe-heute .sa-text i { font: italic 15.5px/1.45 ui-serif, "New York", Georgia, serif; }
+.salon-aufgabe-heute .sa-text small { font-size: 12px; color: var(--blass); }
+.salon-sockel { height: 14px; margin-top: 18px; border-radius: 3px; background: linear-gradient(#7a5636, #3a2818); box-shadow: 0 6px 14px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.14); }
+/* Aufgaben im Fenster */
+.salon-aufgabe { display: grid; gap: 4px; width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.salon-aufgabe:hover { background: color-mix(in srgb, var(--karte) 85%, var(--akzent)); }
+.salon-aufgabe i { font: italic 15px/1.45 ui-serif, "New York", Georgia, serif; }
+.salon-aufgabe small { font-size: 12px; color: var(--blass); }
+.salon-hinweis { font-size: 12.5px; color: var(--blass); margin-bottom: 10px; }
+/* Das Regal */
+.salon-regal { position: relative; padding: 10px 6px 0; }
+.salon-bretter { display: flex; align-items: flex-end; gap: 3px; flex-wrap: wrap; padding: 0 8px; }
+.salon-buchruecken { position: relative; width: 34px; height: var(--h, 160px); border-radius: 2px 2px 1px 1px; text-align: left; cursor: pointer; overflow: hidden; transform: rotate(calc((var(--i, 0) % 3 - 1) * .6deg)); transform-origin: bottom; transition: transform .2s;
+  background: linear-gradient(90deg, rgba(0,0,0,.25), transparent 30%, rgba(255,255,255,.08) 70%, rgba(0,0,0,.2)), hsl(calc(var(--i, 0) * 47), 32%, 36%); box-shadow: 0 2px 4px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.2); color: #f3e7c9; }
+.salon-buchruecken:hover { transform: translateY(-6px); }
+.salon-buchruecken span { position: absolute; left: 50%; top: 10px; bottom: 22px; writing-mode: vertical-rl; transform: translateX(-50%); font: 600 11px ui-serif, "New York", Georgia, serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .02em; }
+.salon-buchruecken small { position: absolute; left: 0; right: 0; bottom: 4px; text-align: center; font-size: 8.5px; opacity: .8; }
+.salon-buchruecken.gelesen { box-shadow: 0 2px 4px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.2), 0 0 0 2px #c9a25a; }
+.salon-buchruecken.gelesen::after { content: "✓"; position: absolute; right: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: #c9a25a; color: #2b1d0c; font-size: 10px; line-height: 14px; text-align: center; font-weight: 700; }
+.salon-regalbrett { display: block; height: 10px; margin-top: 0; border-radius: 2px; background: linear-gradient(#7a5636, #3a2818); box-shadow: 0 5px 10px rgba(0,0,0,.3); }
+.salon-regalzahl { margin-top: 8px; font-size: 12.5px; color: var(--blass); }
+/* Die Runde */
+.modal.salon-rundenfenster { width: min(680px, calc(100vw - 32px)); max-height: min(86dvh, calc(var(--vvh, 100dvh) - 32px)); display: flex; flex-direction: column; }
+.salon-runde-kopf { display: flex; align-items: flex-start; gap: 10px; } .salon-runde-kopf > div:first-child { flex: 1; min-width: 0; } .salon-runde-kopf h2 { margin-bottom: 2px; }
+.salon-runde { flex: 1; min-height: 160px; overflow: auto; margin: 12px 0 4px; display: grid; gap: 12px; align-content: start; }
+.salon-blase { display: flex; gap: 12px; align-items: flex-start; animation: hochkommen .25s ease; }
+.salon-blase-foto { width: 44px; height: 56px; border-radius: 3px; overflow: hidden; flex: none; box-shadow: 0 0 0 3px #a8832f, 0 3px 8px rgba(0,0,0,.3); background: #2a2422; }
+.salon-blase.gold .salon-blase-foto { box-shadow: 0 0 0 3px #d9b463, 0 3px 8px rgba(0,0,0,.3); } .salon-blase.kupfer .salon-blase-foto { box-shadow: 0 0 0 3px #b8744a, 0 3px 8px rgba(0,0,0,.3); } .salon-blase.dunkel .salon-blase-foto { box-shadow: 0 0 0 3px #3a3432, 0 3px 8px rgba(0,0,0,.3); }
+.salon-blase-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.salon-blase-inhalt { flex: 1; min-width: 0; padding: 10px 14px; border-radius: 14px 14px 14px 4px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.salon-blase-inhalt b { display: block; font-size: 12px; letter-spacing: .06em; color: var(--blass); margin-bottom: 3px; }
+.salon-blase-inhalt .sr-text { font: 15.5px/1.5 ui-serif, "New York", Georgia, serif; min-height: 22px; }
+.salon-blase-inhalt small { display: block; margin-top: 5px; font-size: 11px; color: var(--blass); }
+/* Zitate: Original zuerst */
+.sz-text.en { font-style: italic; }
+.sz-uebersetzung { margin-top: 6px; padding: 8px 12px; border-left: 3px solid var(--gold); font: 14.5px/1.5 ui-serif, "New York", Georgia, serif; color: var(--tinte); background: color-mix(in srgb, var(--karte) 70%, transparent); border-radius: 0 8px 8px 0; animation: hochkommen .2s ease; }
+.salon-fenster.liest .salon-fenster-foto { box-shadow: 0 0 0 3px rgba(255,255,255,.35), 0 0 26px rgba(255,200,120,.7), 0 4px 10px rgba(0,0,0,.4); transition: box-shadow .4s; }
+.salon-fenster .salon-reiter { flex-wrap: wrap; }
+
+/* ===================== RÄUME ALS ORTE (zuschaltbar) ===================== */
+.ort-kulisse { position: relative; margin: 0 0 -6px; overflow: hidden; }
+.ort-kulisse .ort-bild { display: block; width: 100%; height: 120px; }
+.ort-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 22px 4px; }
+.ort-chip { padding: 5px 11px; border-radius: 100px; font-size: 12.5px; background: var(--karte); color: var(--tinte); box-shadow: inset 0 0 0 1px var(--linie); }
+.ort-chip.still { color: var(--blass); box-shadow: none; background: none; }
+.ort-schal { animation: ort-schal 5s ease-in-out infinite alternate; transform-origin: 278px 48px; } @keyframes ort-schal { to { transform: rotate(2deg); } }
+.ort-lichtkegel { animation: ort-kegel 3.5s ease-in-out infinite alternate; } @keyframes ort-kegel { to { opacity: .6; } }
+.ort-platte.dreht { animation: ort-dreht 4s linear infinite; } @keyframes ort-dreht { to { transform: rotate(360deg); } }
+.ort-schnur { animation: ort-schnur 4s ease-in-out infinite alternate; transform-origin: 660px 78px; } @keyframes ort-schnur { to { transform: rotate(3deg); } }
+/* Türen */
+#raum.tuer-auf > *:not(.ort-kulisse) { animation: tuer-auf .5s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes tuer-auf { from { opacity: 0; transform: perspective(1000px) rotateY(-5deg) translateX(-14px); } to { opacity: 1; transform: none; } }
+/* Diele */
+#raum[data-ort="zuhause"] .ort-kulisse { box-shadow: 0 8px 20px var(--schein); }
+/* Zettelkasten: Schnipsel als Karteikarten */
+#raum[data-ort="schnipsel"] .schnipsel-lauf .blase { border-radius: 3px; background-image: repeating-linear-gradient(transparent 0 25px, rgba(90,110,170,.18) 25px 26px), linear-gradient(#fbf6e8, #f3eadb); background-position-y: 12px; box-shadow: 0 2px 5px var(--schein), inset 0 0 0 1px rgba(90,74,52,.14); border-top: 3px solid rgba(200,80,80,.45); transform: rotate(calc((var(--n, 0) - 1) * .3deg)); }
+#raum[data-ort="schnipsel"] .schnipsel-lauf .blase:nth-child(2n) { transform: rotate(-.3deg); }
+/* Papierstapel */
+#raum[data-ort="blaetter"] .blattliste > * { position: relative; border-radius: 2px; background: linear-gradient(170deg, #fbf6e8, #f1e6d0); box-shadow: 0 1px 0 #e5d9c0, 0 3px 0 -1px #f5ecd9, 0 4px 0 -1px #e5d9c0, 0 10px 20px var(--schein); }
+#raum[data-ort="blaetter"] .blattliste > *::after { content: ""; position: absolute; right: 0; top: 0; width: 0; height: 0; border-style: solid; border-width: 0 18px 18px 0; border-color: transparent var(--hg) transparent transparent; filter: drop-shadow(-1px 1px 1px rgba(0,0,0,.15)); }
+/* Korkwand */
+#raum[data-ort="projekte"] .inhalt { background: #c9a878 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Ccircle cx='6' cy='9' r='1.6' fill='rgba(90,60,30,.22)'/%3E%3Ccircle cx='19' cy='20' r='1.2' fill='rgba(90,60,30,.18)'/%3E%3Ccircle cx='23' cy='5' r='1' fill='rgba(255,240,210,.3)'/%3E%3C/svg%3E"); border-radius: 14px; padding-top: 18px; }
+#raum[data-ort="projekte"] .projektliste > *, #raum[data-ort="projekte"] .szkarte { position: relative; transform: rotate(calc((var(--n, 0) - 1) * .6deg)); box-shadow: 0 6px 14px rgba(0,0,0,.25); }
+#raum[data-ort="projekte"] .projektliste > *::before, #raum[data-ort="projekte"] .szkarte::before { content: ""; position: absolute; left: 50%; top: -6px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #e74c3c, #8a1c12); box-shadow: 0 2px 3px rgba(0,0,0,.4); z-index: 3; }
+#raum[data-ort="projekte"] .projektliste > *:nth-child(2n) { transform: rotate(-.7deg); }
+/* Tischtuch */
+#raum[data-ort="cluster"] .inhalt { background: #ebe5d6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M0 3h6M3 0v6' stroke='rgba(90,74,52,.08)'/%3E%3C/svg%3E"); border-radius: 14px; padding-top: 18px; }
+#raum[data-ort="cluster"] .brettliste .brettkarte { border-radius: 50% 46% 52% 48% / 48% 52% 46% 54%; background: linear-gradient(135deg, #fbf7ee, #e9e0cc); box-shadow: 0 6px 14px rgba(0,0,0,.18), inset 0 0 0 1px rgba(90,74,52,.12); padding: 22px 24px; }
+/* Setzkasten */
+#raum[data-ort="woerter"] .wortkarte { background: linear-gradient(#3d3d42, #2b2b2e); color: #e9e4d8; border-radius: 4px; box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 -2px 0 rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.3); }
+#raum[data-ort="woerter"] .wortkiste-ruecken { background: linear-gradient(90deg, #5a4326, #8a6a3e 50%, #5a4326); color: #f3e7c9; }
+/* Musikzimmer */
+#raum[data-ort="klang"] .ambience-zeile { border-radius: 6px; background: linear-gradient(135deg, var(--karte), color-mix(in srgb, var(--karte) 85%, #000)); box-shadow: inset 0 0 0 1px var(--linie), 0 2px 6px var(--schein); }
+/* Telefonbank */
+#raum[data-ort="faden"] .schnipsel-lauf .blase { border-radius: 2px; background: repeating-linear-gradient(transparent 0 23px, rgba(90,74,52,.12) 23px 24px), #f7efe0; box-shadow: 0 2px 4px var(--schein); }
+/* Werkzeugkasten */
+#raum[data-ort="feinheiten"] .abschnitt > .karte { position: relative; background: linear-gradient(#8a6a3e, #6b4a32); color: #f3e7c9; box-shadow: inset 0 2px 0 rgba(255,255,255,.12), 0 4px 10px rgba(0,0,0,.3); --blass: #d8c7a6; --linie: rgba(255,230,180,.16); --karte: rgba(0,0,0,.18); }
+#raum[data-ort="feinheiten"] .abschnitt > .karte::after { content: ""; position: absolute; right: 16px; top: 10px; width: 36px; height: 8px; border-radius: 4px; background: linear-gradient(#d9b463, #7a5a2a); box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+#raum[data-ort="feinheiten"] .abschnitt > .karte input, #raum[data-ort="feinheiten"] .abschnitt > .karte textarea { color: #f3e7c9; }
+.orte-liste.aus { opacity: .45; pointer-events: none; }
+/* Zettel schütteln */
+.ort-zettel { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 10px 0; }
+.ort-zettelkarte { width: 150px; min-height: 120px; padding: 12px; border-radius: 3px; text-align: left; background: repeating-linear-gradient(transparent 0 21px, rgba(90,110,170,.16) 21px 22px), #fbf6e8; color: #2c2218; box-shadow: 0 6px 14px rgba(0,0,0,.2); transform: rotate(var(--dreh, 0deg)); font: 13px/22px ui-serif, Georgia, serif; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; }
+.ort-zettelkarte small { font-size: 10.5px; color: #8a7a62; font-family: ui-rounded, system-ui, sans-serif; }
+html[data-thema="tinte"] #raum[data-ort="blaetter"] .blattliste > *, html[data-thema="kerze"] #raum[data-ort="blaetter"] .blattliste > * { background: linear-gradient(170deg, #2a241e, #211c17); box-shadow: 0 1px 0 #15110f, 0 3px 0 -1px #2a241e, 0 4px 0 -1px #15110f, 0 10px 20px rgba(0,0,0,.5); }
+html[data-thema="tinte"] #raum[data-ort="schnipsel"] .schnipsel-lauf .blase, html[data-thema="kerze"] #raum[data-ort="schnipsel"] .schnipsel-lauf .blase { background-image: repeating-linear-gradient(transparent 0 25px, rgba(120,140,200,.16) 25px 26px), linear-gradient(#2a241e, #221d18); }
+html[data-thema="tinte"] #raum[data-ort="projekte"] .inhalt, html[data-thema="kerze"] #raum[data-ort="projekte"] .inhalt { background-color: #4a3a2a; }
+html[data-thema="tinte"] #raum[data-ort="cluster"] .inhalt, html[data-thema="kerze"] #raum[data-ort="cluster"] .inhalt { background-color: #2a2622; }
+@media (prefers-reduced-motion: reduce) { #raum.tuer-auf > * { animation: none; } .ort-platte.dreht, .ort-schal, .ort-schnur, .ort-lichtkegel { animation: none; } }
+
 </style>
 </head>
 <body>
@@ -2382,7 +2497,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.22.0';
+const APP_VERSION = '5.23.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -2721,7 +2836,7 @@ const STANDARD_EINST = {
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
   stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
   ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95,
-  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null
+  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null
 };
 const D = {
   docs: new Map(),
@@ -2754,6 +2869,7 @@ function uebernehmeEinstellungen(quelle) {
   D.einst.hefteAnsicht = ['karten', 'regal', 'tisch'].includes(D.einst.hefteAnsicht) ? D.einst.hefteAnsicht : 'karten';
   if (typeof saubererTisch === 'function') D.einst.tisch = saubererTisch(D.einst.tisch);
   if (typeof saubererSchreibtisch === 'function') D.einst.schreibtisch = saubererSchreibtisch(D.einst.schreibtisch);
+  if (typeof saubereOrte === 'function') D.einst.orte = saubereOrte(D.einst.orte);
   D.einst.fadenAbgewaehlt = D.einst.fadenAbgewaehlt === true;
   D.einst.blattSortierung = ['zuletzt', 'aeltest', 'az'].includes(D.einst.blattSortierung) ? D.einst.blattSortierung : 'zuletzt';
   D.einst.schnipselAnsicht = D.einst.schnipselAnsicht === 'frei' ? 'frei' : 'lauf';
@@ -5717,6 +5833,8 @@ function zeichne() {
   haupt.innerHTML = '';
   haupt.scrollTop = 0;
   fn(haupt, arg);
+  /* Räume als Orte: Kulisse davor, Haut anlegen, Tür aufgehen lassen (wenn eingeschaltet) */
+  if (typeof orteAnwenden === 'function') { try { orteAnwenden(haupt, raum); } catch (e) {} }
   const aktiv = { heft: 'hefte', projekt: 'projekte', brett: 'cluster' }[raum] || raum;
   $$('#leiste .lknopf').forEach((k) => k.classList.toggle('an', k.dataset.raum === aktiv));
 }
@@ -11764,6 +11882,9 @@ RENDER.feinheiten = function (haupt) {
           }
         }, el('i')))
     )));
+
+  /* Räume als Orte: Kulissen und Häute, zuschaltbar */
+  if (typeof orteKarte === 'function') inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Orte'), orteKarte()));
 
   /* Räume: an/aus und Reihenfolge */
   const raumkarte = el('div', { class: 'karte' });
@@ -18255,6 +18376,175 @@ const SALON_AUTOREN = [
   }
 ];
 
+/* Zusatzdaten für den Salon: Werke, Aufgaben, Gäste. Wird von patch42 in 56-salon.js eingefügt. */
+const SALON_ZUSATZ = {
+  king: {
+    en: true,
+    werke: [['Carrie', 1974], ['Brennen muss Salem', 1975], ['Shining', 1977], ['The Stand', 1978], ['Es', 1986], ['Misery', 1987], ['Der dunkle Turm (Reihe)', 1982], ['The Green Mile', 1996], ['Das Leben und das Schreiben', 2000], ['Der Anschlag (11/22/63)', 2011], ['Billy Summers', 2021]],
+    aufgaben: [
+      { t: 'Schreib 300 Wörter über ein Geräusch im Keller. Kein einziges Adverb. Die Tür bleibt zu.', min: 15, ziel: 300 },
+      { t: 'Eine Figur betritt ein Zimmer, in dem jemand fehlt. Zeig mir, wer fehlt, ohne es zu sagen.', min: 20, ziel: 400 },
+      { t: 'Ein Dialog, in dem zwei Leute über das Wetter reden und einer davon Angst hat. Das Wort Angst kommt nicht vor.', min: 15, ziel: 250 },
+      { t: 'Nimm die Szene, die du gestern geschrieben hast, und streich zehn Prozent. Zähl nach.', min: 20, ziel: 0 },
+      { t: 'Der erste Satz eines Romans, den du nie schreiben wirst. Dann der zweite. Dann die erste Seite.', min: 25, ziel: 350 },
+      { t: 'Beschreib einen Menschen nur über das, was er in den Taschen trägt.', min: 10, ziel: 180 }
+    ]
+  },
+  kaestner: {
+    werke: [['Herz auf Taille', 1928], ['Emil und die Detektive', 1929], ['Pünktchen und Anton', 1931], ['Fabian', 1931], ['Das fliegende Klassenzimmer', 1933], ['Drei Männer im Schnee', 1934], ['Die verschwundene Miniatur', 1935], ['Das doppelte Lottchen', 1949], ['Die Konferenz der Tiere', 1949], ['Als ich ein kleiner Junge war', 1957], ['Der kleine Mann', 1963]],
+    aufgaben: [
+      { t: 'Ein Gedicht mit vier Strophen über eine Straßenbahn. Reim erlaubt, Kitsch verboten.', min: 20, ziel: 120 },
+      { t: 'Erzähl eine traurige Sache so, dass man an einer Stelle lachen muss — ohne die Traurigkeit zu verraten.', min: 20, ziel: 300 },
+      { t: 'Ein Kind erklärt einem Erwachsenen, warum er unrecht hat. Der Erwachsene begreift es am Ende. Kein Wort zu viel.', min: 15, ziel: 250 },
+      { t: 'Beschreib dein Mietshaus (oder deine Straße) in zwölf Sätzen. Jeder Satz eine Tatsache, keine Stimmung.', min: 15, ziel: 200 },
+      { t: 'Schreib einen Brief an dich selbst mit zehn Jahren. Höflich, genau, ohne Ratschlag.', min: 20, ziel: 300 },
+      { t: 'Eine Moral in einer Zeile — und dann die Geschichte, die sie überflüssig macht.', min: 25, ziel: 350 }
+    ]
+  },
+  funke: {
+    werke: [['Drachenreiter', 1997], ['Herr der Diebe', 2000], ['Tintenherz', 2003], ['Tintenblut', 2005], ['Tintentod', 2007], ['Reckless — Steinernes Fleisch', 2010], ['Geisterritter', 2011], ['Die Wilden Hühner (Reihe)', 1993], ['Das Labyrinth des Fauns', 2019], ['Die Farbe der Rache', 2023]],
+    aufgaben: [
+      { t: 'Beschreib einen Ort nur über Gerüche. Kein einziges Farbwort.', min: 12, ziel: 200 },
+      { t: 'Ein Gegenstand, den alle wollen, liegt bei der falschen Person. Schreib die erste Szene.', min: 20, ziel: 350 },
+      { t: 'Zeichne (oder kritzle) deine Figur — dann schreib, wie sie spricht. Drei Sätze reichen.', min: 15, ziel: 120 },
+      { t: 'Schreib eine Tür, vor der jemand steht. Was dahinter ist, verrätst du nicht — aber man ahnt es.', min: 15, ziel: 250 },
+      { t: 'Ein Bösewicht, der etwas liebt. Zeig das Geliebte, bevor du das Böse zeigst.', min: 20, ziel: 300 },
+      { t: 'Ein Märchen in deinem Alltag: Was wäre, wenn die Straßenbahn heute nicht hält?', min: 20, ziel: 300 }
+    ]
+  },
+  rothfuss: {
+    en: true,
+    werke: [['Der Name des Windes', 2007], ['Die Furcht des Weisen', 2011], ['Die Musik der Stille', 2014], ['The Narrow Road Between Desires', 2023]],
+    aufgaben: [
+      { t: 'Ein Absatz, in dem niemand spricht und alles gesagt wird. Drei Teile Stille.', min: 15, ziel: 200 },
+      { t: 'Erzähl die Legende von deiner Figur — was die Leute sagen. Dann einen Absatz, wie es wirklich war.', min: 25, ziel: 400 },
+      { t: 'Schreib einen Satz zwanzigmal um, bis er klingt wie eine gespannte Saite. Behalte alle zwanzig.', min: 20, ziel: 0 },
+      { t: 'Jemand lernt ein Handwerk. Zeig drei Handgriffe so genau, dass man sie nachmachen könnte.', min: 20, ziel: 300 },
+      { t: 'Gib einem Ding einen Namen — und erzähl, was passiert, wenn man ihn ausspricht.', min: 15, ziel: 250 },
+      { t: 'Eine Frage, die die Geschichte nie beantwortet. Schreib die Szene, in der sie gestellt wird.', min: 15, ziel: 250 }
+    ]
+  }
+};
+
+const SALON_GAESTE = [
+  {
+    id: 'pratchett', gast: true, en: true, name: 'Terry Pratchett', jahre: '1948–2015', woher: 'Beaconsfield · Wiltshire', bild: 'autoren/pratchett.jpg', lage: '50% 22%',
+    foto: { urheber: 'Luigi Novi', lizenz: 'CC BY 3.0', lizenzUrl: 'https://creativecommons.org/licenses/by/3.0/', seite: 'https://commons.wikimedia.org/wiki/File:10.12.12TerryPratchettByLuigiNovi1b.jpg' },
+    kurz: 'Der Scheibenwelt-Erfinder. Lacht, damit man hinschaut, und schreibt über Menschen, auch wenn es Trolle sind.',
+    rahmen: 'dunkel', anrede: 'Terry',
+    zitate: [
+      { t: 'Die Feder ist mächtiger als das Schwert, wenn das Schwert sehr kurz und die Feder sehr spitz ist.', o: 'The pen is mightier than the sword if the sword is very short, and the pen is very sharp.', q: 'The Light Fantastic, 1986' },
+      { t: 'Geschichten aus der Fantasie neigen dazu, die zu beunruhigen, die keine haben.', o: 'Stories of imagination tend to upset those without one.', q: 'zugeschrieben' },
+      { t: 'Etwas ist es nicht wert, getan zu werden, wenn nicht irgendjemand irgendwo viel lieber hätte, dass man es nicht tut.', o: 'It’s not worth doing something unless someone, somewhere, would much rather you weren’t doing it.', q: 'zugeschrieben' },
+      { t: 'Weisheit kommt aus Erfahrung. Erfahrung ist oft das Ergebnis fehlender Weisheit.', o: 'Wisdom comes from experience. Experience is often a result of lack of wisdom.', q: 'zugeschrieben' },
+      { t: 'Gib einem Mann Feuer, und er hat es einen Tag lang warm. Zünde ihn an, und er hat es für den Rest seines Lebens warm.', o: 'Give a man a fire and he’s warm for a day, but set fire to him and he’s warm for the rest of his life.', q: 'Jingo (Fliegende Fetzen), 1997' },
+      { t: 'Das Problem mit einem offenen Geist ist natürlich, dass die Leute darauf bestehen, vorbeizukommen und Dinge hineinzulegen.', o: 'The trouble with having an open mind, of course, is that people will insist on coming along and trying to put things in it.', q: 'Diggers (Trucker-Trilogie), 1990' },
+      { t: 'Das Licht glaubt, es sei schneller als alles andere, aber es irrt sich. Egal wie schnell das Licht reist, es findet die Dunkelheit immer schon dort vor — und sie wartet.', o: 'Light thinks it travels faster than anything but it is wrong. No matter how fast light travels, it finds the darkness has always got there first, and is waiting for it.', q: 'Reaper Man (Alles Sense!), 1991' },
+      { t: 'Ein Mensch ist nicht tot, solange sein Name noch gesprochen wird.', o: 'A man is not dead while his name is still spoken.', q: 'Going Postal (Ab die Post), 2004' },
+      { t: 'Manchmal ist es besser, einen Flammenwerfer anzuzünden, als die Dunkelheit zu verfluchen.', o: 'Sometimes it’s better to light a flamethrower than curse the darkness.', q: 'Men at Arms (Helle Barden), 1993' },
+      { t: 'Echte Dummheit schlägt künstliche Intelligenz jedes Mal.', o: 'Real stupidity beats artificial intelligence every time.', q: 'Hogfather (Schweinsgalopp), 1996' }
+    ],
+    saetze: [
+      'Schreib die Fußnote. Wenn sie lustiger ist als der Satz, war der Satz die Fußnote.',
+      'Ein Witz ist eine Wahrheit, die sich nicht ernst nehmen lässt. Also nimm sie ernst — nur später.',
+      'Die Trolle sind Menschen. Die Zwerge sind Menschen. Die Menschen sind auch Menschen, aber das merkt man erst, wenn man sie neben Trolle stellt.',
+      'Dein Held muss nicht gut sein. Er muss sich weigern, schlecht zu sein, wenn es leicht wäre. Das ist Heldentum auf der Scheibe und sonstwo.',
+      'Wenn du eine Regel für deine Welt machst, brich sie genau einmal — und erklär, warum das alles kostete.',
+      'Der Tod redet in Großbuchstaben, weil er es nicht nötig hat, laut zu sein. Schreib deine mächtigen Figuren leise.',
+      'Satire ist nicht: über Leute lachen. Satire ist: genau hinsehen und dann den Hut abnehmen.',
+      'Jede Stadt braucht eine Wache, einen Markt und jemanden, der nachts die Laternen anzündet. Fang bei dem an.',
+      'Schreib 400 Wörter am Tag, auch wenn sie schlecht sind. Am Ende des Jahres hast du ein schlechtes Buch — und das ist mehr, als die meisten haben. Dann machst du es gut.',
+      'Lass die Nebenfigur ihre eigene Geschichte haben. Sie weiß nicht, dass sie Nebenfigur ist, und das macht sie interessant.',
+      'Kopfschmuck und Mäntel verraten mehr über eine Gesellschaft als ihre Gesetze. Beschreib die Hüte.',
+      'Der beste Zauber ist der, der Geld kostet. Magie ohne Preis ist Tapete.',
+      'Wenn du nicht weißt, was deine Figur tun soll, frag dich, was sie gerade sicher nicht will. Dann lass genau das passieren.',
+      'Ein Buch darf klug sein, solange es dabei lacht. Kluge Bücher ohne Lachen sind Vorträge.',
+      'Die Leser merken, wenn du sie für dumm hältst. Sie merken auch, wenn du sie für klug hältst. Halt sie für klug.'
+    ],
+    anfang: ['Also, pass auf:', 'Kleine Beobachtung:', 'Die Scheibenwelt hat mich gelehrt:', 'Fußnote dazu:', 'Im Ernst — na ja, fast:', 'Hör zu, junger Schreiberling:', 'Das ist kein Witz, obwohl es so klingt:', 'Ein Gedanke mit Hut:'],
+    kern: [
+      ['anfang', 'Fang bei der Wache an, beim Markt oder bei dem, der die Laternen anzündet. Große Geschichten beginnen bei kleinen Leuten mit Schichtdienst.'],
+      ['zweifel', 'Zweifel ist nur Intelligenz, die sich langweilt. Gib ihr Arbeit: den nächsten Absatz.'],
+      ['routine', 'Vierhundert Wörter am Tag. Schlechte reichen. Am Ende des Jahres hast du ein Buch, und dann machst du es gut.'],
+      ['figuren', 'Deine Figur weiß nicht, dass sie Nebenfigur ist. Schreib sie so, dann ist sie keine.'],
+      ['dialog', 'Lass die Mächtigen leise reden. Wer laut ist, hat etwas zu verbergen, meist seine Unsicherheit.'],
+      ['stil', 'Die Fußnote ist das Fenster, durch das die Wahrheit hereinlacht. Öffne es ab und zu.'],
+      ['ueberarbeiten', 'Wenn der Witz den Satz rettet, war der Satz nicht gut genug. Streich den Satz, behalt den Witz.'],
+      ['angst', 'Der Tod ist nicht gruselig. Gruselig ist ein Beamter mit einem Formular. Schreib den Beamten.'],
+      ['lesen', 'Lies Geschichtsbücher. Die Menschheit hat sich alle Plots schon selbst ausgedacht, meist schlimmer.'],
+      ['ende', 'Das Ende darf ein Lachen sein. Aber eins, in dem etwas mitschwingt, das nicht lacht.'],
+      ['pause', 'Geh in die Küche. Die meisten Probleme der Literatur lösen sich beim Zwiebelschneiden.']
+    ],
+    schluss: ['Oder so ähnlich.', 'Das mit den Hüten stimmt wirklich.', 'Kein Zauber, nur Arbeit mit Humor.', 'Und jetzt vierhundert Wörter.', 'Die Scheibe dreht sich weiter.', 'Mehr weiß ich nicht, ich habe nur geschrieben.']
+  },
+  {
+    id: 'lindgren', gast: true, name: 'Astrid Lindgren', jahre: '1907–2002', woher: 'Vimmerby · Stockholm', bild: 'autoren/lindgren.jpg', lage: '50% 20%',
+    foto: { urheber: 'unbekannt (gemeinfrei)', lizenz: 'Public Domain', lizenzUrl: 'https://commons.wikimedia.org/wiki/Template:PD-old', seite: 'https://commons.wikimedia.org/wiki/File:Astrid_Lindgren_(cropped).jpg' },
+    kurz: 'Die Mutter von Pippi, Michel und den Brüdern Löwenherz. Nimmt Kinder ernst und das Leben dazu.',
+    rahmen: 'gold', anrede: 'Astrid',
+    zitate: [
+      { t: 'Das hab ich noch nie vorher versucht, also bin ich völlig sicher, dass ich es schaffe!', q: 'Pippi in Taka-Tuka-Land (Pippi Langstrumpf), 1948' },
+      { t: 'Es gibt Dinge, die muss man einfach tun, sonst ist man kein Mensch, sondern nur ein Häufchen Dreck.', q: 'Die Brüder Löwenherz, 1973' },
+      { t: 'Und dann muss man ja auch noch Zeit haben, einfach dazusitzen und vor sich hin zu schauen.', q: 'zugeschrieben (Interview)' },
+      { t: 'Alles, was an Großem in der Welt geschah, vollzog sich zuerst in der Phantasie eines Menschen.', q: 'zugeschrieben (Rede zum Friedenspreis des Deutschen Buchhandels, 1978)' },
+      { t: 'Niemals Gewalt!', q: 'Rede zum Friedenspreis des Deutschen Buchhandels, 1978' },
+      { t: 'Ich will für ein Publikum schreiben, das Wunder vollbringen kann. Kinder vollbringen Wunder, wenn sie lesen.', q: 'zugeschrieben' }
+    ],
+    saetze: [
+      'Schreib für das Kind, das du warst. Es sitzt noch da drinnen und wartet, ob du es ernst nimmst.',
+      'Lass das Kind im Buch stärker sein als die Erwachsenen. Nicht, weil es wahr wäre — weil es gebraucht wird.',
+      'Ein Abenteuer braucht einen Hof, einen Zaun und eine Kirschbaumleiter. Das Übrige kommt von allein.',
+      'Hab keine Angst vor traurigen Geschichten. Kinder weinen und stehen wieder auf. Erwachsene weinen nicht und bleiben liegen.',
+      'Schreib am Morgen im Bett, mit Bleistift, in Kurzschrift. Die Welt ist dann noch nicht da, nur die Geschichte.',
+      'Die Fantasie ist kein Spielzeug. Sie ist der Ort, an dem alles Große zuerst passiert. Behandle sie wie einen Arbeitsplatz.',
+      'Jeder Michel braucht einen Tischlerschuppen. Gib deiner Figur einen Ort, an dem sie allein sein und etwas schnitzen kann.',
+      'Der schönste Satz der Welt ist nichts gegen einen Satz, den ein Kind laut vorlesen will.',
+      'Lass deine Helden ungehorsam sein, wenn es darauf ankommt. Gehorsam hat noch nie ein Abenteuer erlebt.',
+      'Schreib nicht über das Glück. Schreib über den Samstagabend, an dem man einfach dasitzt und es nicht merkt.',
+      'Wenn jemand sagt, das geht nicht: Das hab ich noch nie versucht, also bin ich sicher, dass ich es schaffe. Auch beim Schreiben.',
+      'Erst wenn dein Bösewicht auch einmal friert, darf er böse sein.',
+      'Mut heißt nicht, keine Angst zu haben. Mut heißt, trotzdem über die Brücke zu gehen. Schreib die Brücke.',
+      'Ein Buch für Kinder darf nicht lügen. Es darf trösten — aber nur mit der Wahrheit.',
+      'Das Ende darf wehtun, wenn es eine Tür offen lässt. Nangijala ist eine offene Tür.'
+    ],
+    anfang: ['Weißt du,', 'Ich sag dir was, mein Kind:', 'So ist das:', 'Das hat mir Pippi beigebracht:', 'Aus Bullerbü weiß ich:', 'Ganz einfach:', 'Hör mal:', 'Glaub einer alten Frau:'],
+    kern: [
+      ['anfang', 'Fang mit einem Kind an, das etwas nicht darf. Dann tut es das. Fertig ist der Anfang.'],
+      ['zweifel', 'Das hab ich noch nie versucht — also bin ich sicher, dass ich es schaffe. Sag dir das und schreib.'],
+      ['routine', 'Morgens im Bett, mit Bleistift, bevor der Tag laut wird. Da gehört die Geschichte noch dir.'],
+      ['figuren', 'Gib deiner Figur einen Ort, an dem sie allein ist und etwas tut. Da lernst du sie kennen.'],
+      ['dialog', 'Kinder sagen, was sie meinen, und meinen mehr, als sie sagen. Schreib beides.'],
+      ['stil', 'Schreib so, dass man es laut vorlesen will. Das ist der ganze Stil.'],
+      ['ueberarbeiten', 'Lies es einem Kind vor. Wo es zappelt, streichst du. Wo es still wird, lässt du alles.'],
+      ['angst', 'Traurig darf es sein. Kinder halten mehr aus, als Erwachsene glauben — wenn die Geschichte ehrlich ist.'],
+      ['lesen', 'Lies Märchen und Zeitung, beides. Die Wunder stehen in den Märchen, die Gründe in der Zeitung.'],
+      ['ende', 'Lass eine Tür offen am Ende. Eine, durch die man hinaus ins Licht geht.'],
+      ['pause', 'Setz dich hin und schau vor dich hin. Das ist keine Pause vom Schreiben, das ist Schreiben ohne Bleistift.']
+    ],
+    schluss: ['Und dann lauf los.', 'Mehr braucht es nicht.', 'So hab ich es gemacht.', 'Versprich es mir.', 'Das genügt für einen Sommer.', 'Und sei ungehorsam dabei.']
+  }
+];
+
+/* Stichworte einer Frage → Thema. Pur. */
+const SALON_STICHWORTE = [
+  ['anfang', /anfang|beginn|erste[rn]? satz|starten|losleg|einstieg|erste seite/i],
+  ['zweifel', /zweifel|schlecht|nicht gut|unsicher|kann nicht|tauge|talent|aufgeben|zu dumm|versag/i],
+  ['routine', /täglich|jeden tag|routine|diszipl|dranbleib|gewohnheit|zeit finden|keine zeit|regelmäß|durchhalt/i],
+  ['figuren', /figur|held|charakter|person|protagonist|bösewicht|antagonist|name/i],
+  ['dialog', /dialog|gespräch|sprechen|reden|sagen|stimme/i],
+  ['stil', /stil|sprache|satz|wort|adjektiv|adverb|klang|rhythmus|schön/i],
+  ['ueberarbeiten', /überarbeit|kürzen|streich|zweite fassung|lektor|edit|korrig|umschreib|zu lang/i],
+  ['angst', /angst|furcht|trau|mut|horror|grusel|dunkel/i],
+  ['lesen', /lesen|buch|bücher|lektüre/i],
+  ['ende', /ende|schluss|abschluss|fertig|zu ende/i],
+  ['pause', /pause|müde|erschöpft|blockade|leer|nichts mehr|ausgebrannt|kraft/i]
+];
+function salonThemaAusFrage(frage) {
+  const f = String(frage || '');
+  for (const [thema, rx] of SALON_STICHWORTE) if (rx.test(f)) return thema;
+  return null;
+}
+
 /* Kleine Saat → Zahlenfolge, wiederholbar. Pur. */
 function salonZufall(saat) {
   /* Erst mischen: nebeneinanderliegende Saaten (1, 2, 3 …) wuerden sonst fast dieselben Folgen geben */
@@ -18292,97 +18582,185 @@ function salonRat(autor, saat = 1, thema = null) {
 /* Der Rat des Tages: je Person und Tag einer. Pur. */
 function salonRatDesTages(autor, tagSchluessel) { return salonRat(autor, salonHash((tagSchluessel || '') + ':' + (autor && autor.id)), null); }
 
+/* Zusatzdaten einmischen: Werke, Aufgaben, Sprachkennung */
+for (const a of SALON_AUTOREN) { const z = SALON_ZUSATZ[a.id]; if (z) Object.assign(a, z); }
+const SALON_FEST = [...SALON_AUTOREN, ...SALON_GAESTE];
+
 /* Eigene Menschen an der Wand: Dokumente vom Typ 'mentor'. */
 function salonEigene() { return vomTyp('mentor').sort((a, b) => (a.angelegt || 0) - (b.angelegt || 0)); }
 function salonAlle() {
-  return [...SALON_AUTOREN, ...salonEigene().map((d) => ({ id: d.id, eigen: true, doc: d, name: d.titel || 'Ohne Namen', jahre: d.jahre || '', woher: d.woher || '', bild: null, bildId: d.bild || null, kurz: d.notiz || '', rahmen: d.rahmen || 'nuss', zitate: (d.zitate || []).map((t) => ({ t, q: d.titel || '' })), saetze: d.rat || [], anfang: [], kern: [], schluss: [] }))];
+  return [...SALON_FEST, ...salonEigene().map((d) => ({ id: d.id, eigen: true, doc: d, name: d.titel || 'Ohne Namen', jahre: d.jahre || '', woher: d.woher || '', bild: null, bildId: d.bild || null, kurz: d.notiz || '', rahmen: d.rahmen || 'nuss', zitate: (d.zitate || []).map((t) => ({ t, q: d.titel || '' })), saetze: d.rat || [], anfang: [], kern: [], schluss: [], werke: [], aufgaben: [] }))];
+}
+function salonFinde(id) { return salonAlle().find((a) => a.id === id) || null; }
+/* Gelesene Werke: je Person eine Liste — lebt in den Einstellungen (reist mit). */
+function salonGelesen(a) { const g = (D.einst.salonGelesen || {})[a.id]; return Array.isArray(g) ? g : []; }
+function salonGelesenSetzen(a, titel, an) {
+  const alle = Object.assign({}, D.einst.salonGelesen || {});
+  const liste = new Set(salonGelesen(a)); if (an) liste.add(titel); else liste.delete(titel);
+  alle[a.id] = [...liste].slice(0, 200); D.einst.salonGelesen = alle; speichereEinst();
+}
+function salonPortraet(a, klasse) {
+  if (a.bild) return el('img', { class: klasse || '', src: a.bild, alt: a.name, draggable: 'false', style: 'object-position:' + (a.lage || '50% 30%') });
+  if (a.bildId) { const img = el('img', { class: klasse || '', alt: a.name, draggable: 'false' }); setzeBild(img, a.bildId); return img; }
+  return el('div', { class: 'salon-monogramm ' + (klasse || '') }, (a.name || '?').slice(0, 1));
+}
+function salonRahmen(a, i, onclick) {
+  return el('button', { class: 'salon-rahmen ' + (a.rahmen || 'nuss') + (a.eigen ? ' eigen' : '') + (a.gast ? ' gast' : ''), style: '--n:' + i, onclick, title: a.name + ': anklopfen', 'aria-label': a.name + ' anklopfen' },
+    el('i', { class: 'salon-lampe' }), el('i', { class: 'salon-ecke e1' }), el('i', { class: 'salon-ecke e2' }), el('i', { class: 'salon-ecke e3' }), el('i', { class: 'salon-ecke e4' }),
+    el('div', { class: 'salon-passepartout' }, el('div', { class: 'salon-foto' }, salonPortraet(a), el('i', { class: 'salon-glas' }))),
+    el('div', { class: 'salon-schild' }, el('b', {}, a.name), el('span', {}, [a.jahre, a.woher].filter(Boolean).join(' · '))));
 }
 
 /* ----- Der Raum ----- */
 RENDER.salon = function (haupt) {
   const alle = salonAlle();
-  const wand = el('div', { class: 'salon' });
+  const heute = tagKey();
+  const info = typeof schreibtischTageszeitInfo === 'function' ? schreibtischTageszeitInfo() : { licht: 1 };
+  const wand = el('div', { class: 'salon', 'data-licht': info.licht > .5 ? 'tag' : info.licht > .15 ? 'abend' : 'nacht' });
+  const frage = el('input', { type: 'text', placeholder: 'Frag die Wand — „Mein Anfang ist langweilig", „Wie bleibe ich dran?" …', 'aria-label': 'Frage an die Wand' });
+  const fragen = () => { const f = frage.value.trim(); if (!f) { frage.focus(); return; } salonRunde(f); };
+  frage.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); fragen(); } });
   const kopf = el('div', { class: 'kopf' },
-    el('h1', {}, 'Der Salon', el('div', { class: 'unter' }, 'Die Lieblingswand. Vier, die wissen, wie es geht — und die, die du dazuhängst.')),
+    el('h1', {}, 'Der Salon', el('div', { class: 'unter' }, 'Die Lieblingswand. Sie wissen, wie es geht — und sie reden, wenn man anklopft.')),
     el('button', { class: 'rundknopf zart', html: ik('plus'), title: 'Jemanden an die Wand hängen', onclick: () => salonEigenenAnlegen() }),
     el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Über die Bilder', onclick: () => salonUeberBilder() }));
-  const galerie = el('div', { class: 'salon-galerie' });
-  const heute = tagKey();
-  alle.forEach((a, i) => {
+  const frageZeile = el('div', { class: 'salon-fragezeile' }, el('span', { html: ik('suche'), style: 'display:flex;color:var(--blass)' }), frage, el('button', { class: 'knopf voll', onclick: fragen }, 'Die Runde fragen'));
+  const platz = (a, i) => {
     const rat = salonRatDesTages(a, heute);
-    const bild = a.bild ? el('img', { src: a.bild, alt: a.name, draggable: 'false', style: 'object-position:' + (a.lage || '50% 30%') }) : (a.bildId ? (() => { const img = el('img', { alt: a.name, draggable: 'false' }); setzeBild(img, a.bildId); return img; })() : el('div', { class: 'salon-monogramm' }, (a.name || '?').slice(0, 1)));
-    const rahmen = el('button', { class: 'salon-rahmen ' + (a.rahmen || 'nuss') + (a.eigen ? ' eigen' : ''), style: '--n:' + i, onclick: () => salonSprechen(a), title: a.name + ': anklopfen' },
-      el('i', { class: 'salon-lampe' }),
-      el('div', { class: 'salon-passepartout' }, el('div', { class: 'salon-foto' }, bild, el('i', { class: 'salon-glas' }))),
-      el('div', { class: 'salon-schild' }, el('b', {}, a.name), el('span', {}, [a.jahre, a.woher].filter(Boolean).join(' · '))));
-    const karte = el('div', { class: 'salon-platz' }, rahmen,
+    return el('div', { class: 'salon-platz' }, salonRahmen(a, i, () => salonSprechen(a)),
       el('div', { class: 'salon-kurz' }, a.kurz || ''),
-      rat ? el('button', { class: 'salon-tageskarte', onclick: () => salonSprechen(a, { thema: null, saat: salonHash(heute + ':' + a.id) }) }, el('span', { class: 'st-ueber' }, 'Rat des Tages' + (rat.art === 'satz' ? '' : '')), el('span', { class: 'st-text' }, rat.text), el('span', { class: 'st-fuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden — in ' + (a.anrede || a.name) + 's Geist')) : null);
-    galerie.append(karte);
-  });
-  wand.append(galerie);
-  wand.append(el('div', { class: 'salon-fuss' }, 'Die Zitate sind echt und tragen ihre Quelle. Die Ratschläge sind erfunden, in ihrem Geist — zusammen ' + alle.reduce((n, a) => n + salonVorrat(a), 0).toLocaleString('de-DE') + ' mögliche, jeden Tag andere.'));
+      rat ? el('button', { class: 'salon-tageskarte', onclick: () => salonSprechen(a, { saat: salonHash(heute + ':' + a.id) }) }, el('span', { class: 'st-ueber' }, 'Rat des Tages'), el('span', { class: 'st-text' }, rat.text), el('span', { class: 'st-fuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden — in ' + (a.anrede || a.name) + 's Geist')) : null);
+  };
+  const haus = alle.filter((a) => !a.gast && !a.eigen), gaeste = alle.filter((a) => a.gast), eigene = alle.filter((a) => a.eigen);
+  const galerie = el('div', { class: 'salon-galerie' }, ...haus.map(platz));
+  const gastwand = el('div', { class: 'salon-gaeste' }, el('div', { class: 'salon-abschnitt' }, 'Das Gästezimmer'), el('div', { class: 'salon-galerie klein' }, ...gaeste.map((a, i) => platz(a, i + 4))));
+  const eigenwand = eigene.length ? el('div', { class: 'salon-gaeste' }, el('div', { class: 'salon-abschnitt' }, 'Deine Wand'), el('div', { class: 'salon-galerie klein' }, ...eigene.map((a, i) => platz(a, i + 6)))) : null;
+  const aufgabeHeute = (() => { const a = SALON_FEST[salonHash(heute + ':aufgabe') % SALON_FEST.length]; const l = a.aufgaben || []; return l.length ? { a, aufgabe: l[salonHash(heute + ':a') % l.length] } : null; })();
+  const aufgabenkarte = aufgabeHeute ? el('button', { class: 'salon-aufgabe-heute', onclick: () => salonAufgabeAnnehmen(aufgabeHeute.a, aufgabeHeute.aufgabe) },
+    el('span', { class: 'sa-foto' }, salonPortraet(aufgabeHeute.a)), el('span', { class: 'sa-text' }, el('b', {}, 'Schreibaufgabe des Tages · ' + aufgabeHeute.a.name), el('i', {}, aufgabeHeute.aufgabe.t), el('small', {}, (aufgabeHeute.aufgabe.min ? aufgabeHeute.aufgabe.min + ' Minuten' : 'ohne Uhr') + (aufgabeHeute.aufgabe.ziel ? ' · etwa ' + aufgabeHeute.aufgabe.ziel + ' Wörter' : '') + ' · tippen nimmt sie an'))) : null;
+  const sockel = el('div', { class: 'salon-sockel' });
+  wand.append(frageZeile, galerie, aufgabenkarte, gastwand, eigenwand, sockel,
+    el('div', { class: 'salon-fuss' }, 'Die Zitate sind echt und tragen ihre Quelle. Die Ratschläge sind erfunden, in ihrem Geist — zusammen ' + alle.reduce((n, a) => n + salonVorrat(a), 0).toLocaleString('de-DE') + ' mögliche, jeden Tag andere.'));
   haupt.append(kopf, wand);
 };
 
-/* Die Person spricht: ein Fenster mit Rat, Zitaten und „Frag nach". */
-function salonSprechen(a, { thema = null, saat = null } = {}) {
+/* Ein Zitat zeigen: bei englischen Stimmen zuerst das Original, die Übersetzung auf Tipp. */
+function salonZitatElement(a, z, mitLesung) {
+  const en = !!(a.en && z.o);
+  const haupt = el('div', { class: 'sz-text' + (en ? ' en' : '') }, en ? '“' + z.o + '”' : '„' + z.t + '“');
+  const ueb = en ? el('div', { class: 'sz-uebersetzung', hidden: 'hidden' }, '„' + z.t + '“') : (z.o ? el('div', { class: 'sz-original' }, z.o) : null);
+  const knoepfe = el('div', { class: 'sz-knoepfe' },
+    en ? el('button', { class: 'knopf zart', onclick: (ev) => { ueb.hidden = !ueb.hidden; ev.currentTarget.textContent = ueb.hidden ? 'Übersetzung' : 'Übersetzung verbergen'; } }, 'Übersetzung') : null,
+    el('button', { class: 'knopf zart', onclick: () => { neuDoc('schnipsel', { text: (en ? '“' + z.o + '”\n„' + z.t + '“' : '„' + z.t + '“') + '\n— ' + a.name + (z.q ? ', ' + z.q : '') }); toast('Liegt als Zitat in den Schnipseln.'); } }, 'Als Schnipsel'),
+    el('button', { class: 'knopf zart', onclick: async () => { try { await navigator.clipboard.writeText((en ? '“' + z.o + '” — ' : '„' + z.t + '“ — ') + a.name + (z.q ? ', ' + z.q : '')); toast('Kopiert.'); } catch (e) { toast('Kopieren ging hier nicht.'); } } }, 'Kopieren'),
+    mitLesung && typeof vorlesen === 'function' ? el('button', { class: 'knopf zart', onclick: (ev) => { const f = ev.currentTarget.closest('.modal'); if (f) { f.classList.add('liest'); setTimeout(() => f.classList.remove('liest'), 6000); } vorlesen(z.t + '. ' + a.name, ev.currentTarget); } }, 'Lesung') : null);
+  return el('div', { class: 'salon-zitat' }, haupt, ueb, el('div', { class: 'sz-quelle' }, '— ' + a.name + (z.q ? ', ' + z.q : '')), knoepfe);
+}
+
+/* Die Person spricht: Fenster mit Rat, Zitaten, Aufgaben, Werken und Über. */
+function salonSprechen(a, { thema = null, saat = null, reiterStart = 'rat' } = {}) {
   let themaJetzt = thema, zaehler = 0;
   let saatJetzt = saat != null ? saat : Math.floor(Math.random() * 1e9);
   const sprech = el('div', { class: 'salon-sprech' });
   const chips = el('div', { class: 'salon-themen' });
+  const tippe = (ziel, text, fertig) => { const w = text.split(' '); let i = 0; const tick = () => { if (!ziel.isConnected) return; ziel.textContent = w.slice(0, ++i).join(' '); if (i < w.length) setTimeout(tick, 26 + Math.random() * 38); else if (fertig) fertig(); }; tick(); };
   const zeigeRat = () => {
     const r = salonRat(a, saatJetzt + zaehler * 7919, themaJetzt);
     sprech.innerHTML = '';
     if (!r) { sprech.append(el('div', { class: 'salon-leer' }, a.eigen ? 'Noch kein Rat hinterlegt — beim Bearbeiten kannst du Sätze in ' + a.name + 's Stimme eintragen.' : 'Dazu fällt mir gerade nichts ein.')); return; }
     const text = el('div', { class: 'salon-rat' });
     sprech.append(text, el('div', { class: 'salon-ratfuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden, in ' + (a.anrede || a.name) + 's Geist' + (r.thema ? ' · ' + (SALON_THEMEN.find((t) => t[0] === r.thema) || [])[1] : '')));
-    /* Schreibmaschine: der Rat erscheint Wort für Wort */
-    const woerter = r.text.split(' '); let i = 0;
-    const tick = () => { if (!text.isConnected) return; text.textContent = woerter.slice(0, ++i).join(' '); if (i < woerter.length) setTimeout(tick, 28 + Math.random() * 40); };
-    tick();
+    tippe(text, r.text);
   };
   const baueChips = () => {
     chips.innerHTML = '';
     chips.append(el('button', { class: 'suchchip' + (themaJetzt ? '' : ' an'), onclick: () => { themaJetzt = null; zaehler++; baueChips(); zeigeRat(); } }, 'Egal was'));
-    for (const [id, name] of SALON_THEMEN) {
-      if (!a.eigen && !(a.kern || []).some((k) => k[0] === id)) continue;
-      if (a.eigen) continue;
+    if (!a.eigen) for (const [id, name] of SALON_THEMEN) {
+      if (!(a.kern || []).some((k) => k[0] === id)) continue;
       chips.append(el('button', { class: 'suchchip' + (themaJetzt === id ? ' an' : ''), onclick: () => { themaJetzt = id; zaehler++; baueChips(); zeigeRat(); } }, name));
     }
   };
   baueChips();
   const zitate = el('div', { class: 'salon-zitate' });
-  const baueZitate = () => {
-    zitate.innerHTML = '';
-    if (!(a.zitate || []).length) { zitate.append(el('div', { class: 'salon-leer' }, 'Noch keine Zitate.')); return; }
-    for (const z of a.zitate) zitate.append(el('div', { class: 'salon-zitat' }, el('div', { class: 'sz-text' }, '„' + z.t + '“'), z.o ? el('div', { class: 'sz-original' }, z.o) : null, el('div', { class: 'sz-quelle' }, '— ' + a.name + (z.q ? ', ' + z.q : '')),
-      el('div', { class: 'sz-knoepfe' }, el('button', { class: 'knopf zart', onclick: () => { neuDoc('schnipsel', { text: '„' + z.t + '“\n— ' + a.name + (z.q ? ', ' + z.q : '') }); toast('Liegt als Zitat in den Schnipseln.'); } }, 'Als Schnipsel'),
-        el('button', { class: 'knopf zart', onclick: async () => { try { await navigator.clipboard.writeText('„' + z.t + '“ — ' + a.name + (z.q ? ', ' + z.q : '')); toast('Kopiert.'); } catch (e) { toast('Kopieren ging hier nicht.'); } } }, 'Kopieren'))));
+  if (!(a.zitate || []).length) zitate.append(el('div', { class: 'salon-leer' }, 'Noch keine Zitate.'));
+  else { if (a.en) zitate.append(el('div', { class: 'salon-hinweis' }, 'Im Original. „Übersetzung" zeigt die deutsche Fassung.')); for (const z of a.zitate) zitate.append(salonZitatElement(a, z, true)); }
+  const aufgaben = el('div', { class: 'salon-aufgaben' });
+  if (!(a.aufgaben || []).length) aufgaben.append(el('div', { class: 'salon-leer' }, a.eigen ? 'Eigene Leute stellen (noch) keine Aufgaben.' : 'Keine Aufgaben.'));
+  else for (const au of a.aufgaben) aufgaben.append(el('button', { class: 'salon-aufgabe', onclick: () => { zu(); salonAufgabeAnnehmen(a, au); } }, el('i', {}, au.t), el('small', {}, (au.min ? au.min + ' Minuten' : 'ohne Uhr') + (au.ziel ? ' · etwa ' + au.ziel + ' Wörter' : '') + ' · annehmen')));
+  const werke = el('div', { class: 'salon-regal' });
+  const baueWerke = () => {
+    werke.innerHTML = '';
+    if (!(a.werke || []).length) { werke.append(el('div', { class: 'salon-leer' }, 'Kein Regal.')); return; }
+    const gelesen = salonGelesen(a);
+    const brett = el('div', { class: 'salon-bretter' });
+    a.werke.forEach(([t, j], i) => brett.append(el('button', { class: 'salon-buchruecken' + (gelesen.includes(t) ? ' gelesen' : ''), style: '--i:' + i + ';--h:' + (150 + ((i * 37) % 40)) + 'px', title: t + (j ? ' (' + j + ')' : '') + ' — tippen: gelesen/ungelesen', onclick: (ev) => { const an = !ev.currentTarget.classList.contains('gelesen'); salonGelesenSetzen(a, t, an); ev.currentTarget.classList.toggle('gelesen', an); zahl.textContent = salonGelesen(a).length + ' von ' + a.werke.length + ' gelesen'; } }, el('span', {}, t), el('small', {}, j ? String(j) : ''))));
+    const zahl = el('div', { class: 'salon-regalzahl' }, gelesen.length + ' von ' + a.werke.length + ' gelesen');
+    werke.append(brett, el('i', { class: 'salon-regalbrett' }), zahl, el('div', { class: 'salon-hinweis' }, 'Tippen markiert ein Buch als gelesen. Die Liste reist mit den Einstellungen.'));
   };
-  baueZitate();
+  baueWerke();
   const reiter = el('div', { class: 'salon-reiter' });
-  const seiten = { rat: el('div', { class: 'salon-seite an' }, chips, sprech, el('div', { class: 'reihe', style: 'justify-content:flex-start' },
+  const seiten = {
+    rat: el('div', { class: 'salon-seite' }, chips, sprech, el('div', { class: 'reihe', style: 'justify-content:flex-start' },
       el('button', { class: 'knopf voll', onclick: () => { zaehler++; zeigeRat(); } }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Noch einen Rat'),
       el('button', { class: 'knopf', onclick: () => { const t = sprech.querySelector('.salon-rat'); if (!t) return; neuDoc('schnipsel', { text: t.textContent + '\n— ' + a.name + ' (erfundener Rat aus dem Salon)' }); toast('Liegt in den Schnipseln.'); } }, 'Merken'),
       el('button', { class: 'knopf', onclick: () => { const t = sprech.querySelector('.salon-rat'); if (!t) return; const b = blattAusText('', '„' + t.textContent + '“ — ' + a.name + '\n\n'); zu(); oeffneSchreibraum(b.id); } }, 'Damit schreiben'))),
     zitate: el('div', { class: 'salon-seite' }, zitate),
+    aufgaben: el('div', { class: 'salon-seite' }, el('div', { class: 'salon-hinweis' }, 'Erfundene Übungen in dieser Stimme. Annehmen legt ein Blatt an und startet die Uhr.'), aufgaben),
+    werke: el('div', { class: 'salon-seite' }, werke),
     ueber: el('div', { class: 'salon-seite' }, el('div', { class: 'salon-ueber' }, el('p', {}, a.kurz || ''), a.foto ? el('p', { class: 'salon-lizenz' }, 'Foto: ' + a.foto.urheber + ', ' + a.foto.lizenz + ' (Wikimedia Commons).') : null,
-      a.eigen ? el('div', { class: 'reihe', style: 'justify-content:flex-start' }, el('button', { class: 'knopf', onclick: () => { zu(); salonEigenenBearbeiten(a.doc); } }, 'Bearbeiten'), el('button', { class: 'knopf zart', onclick: async () => { if (await frage(a.name + ' von der Wand nehmen?', { ja: 'Abnehmen', gefahr: true })) { await loesche(a.doc.id); zu(); zeichne(); } } }, 'Abnehmen')) : null)) };
-  const reiterKnopf = (id, name) => el('button', { class: 'salon-reiterknopf' + (id === 'rat' ? ' an' : ''), onclick: (ev) => { for (const k of Object.keys(seiten)) seiten[k].classList.toggle('an', k === id); $$('.salon-reiterknopf', reiter).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); } }, name);
-  reiter.append(reiterKnopf('rat', 'Rat'), reiterKnopf('zitate', 'Zitate (' + (a.zitate || []).length + ')'), reiterKnopf('ueber', 'Über'));
-  const kopfbild = a.bild ? el('img', { src: a.bild, alt: '', draggable: 'false', style: 'object-position:' + (a.lage || '50% 30%') }) : (a.bildId ? (() => { const img = el('img', { alt: '' }); setzeBild(img, a.bildId); return img; })() : el('div', { class: 'salon-monogramm' }, (a.name || '?').slice(0, 1)));
+      a.eigen ? el('div', { class: 'reihe', style: 'justify-content:flex-start' }, el('button', { class: 'knopf', onclick: () => { zu(); salonEigenenBearbeiten(a.doc); } }, 'Bearbeiten'), el('button', { class: 'knopf zart', onclick: async () => { if (await frage(a.name + ' von der Wand nehmen?', { ja: 'Abnehmen', gefahr: true })) { await loesche(a.doc.id); zu(); zeichne(); } } }, 'Abnehmen')) : null))
+  };
+  const reiterKnopf = (id, name) => el('button', { class: 'salon-reiterknopf' + (id === reiterStart ? ' an' : ''), onclick: (ev) => { for (const k of Object.keys(seiten)) seiten[k].classList.toggle('an', k === id); $$('.salon-reiterknopf', reiter).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); } }, name);
+  seiten[reiterStart].classList.add('an');
+  reiter.append(reiterKnopf('rat', 'Rat'), reiterKnopf('zitate', 'Zitate (' + (a.zitate || []).length + ')'), reiterKnopf('aufgaben', 'Aufgaben'), reiterKnopf('werke', 'Werke'), reiterKnopf('ueber', 'Über'));
   const kasten = el('div', { class: 'modal salon-fenster ' + (a.rahmen || 'nuss') },
-    el('div', { class: 'salon-fenster-kopf' }, el('div', { class: 'salon-fenster-foto' }, kopfbild), el('div', {}, el('h2', {}, a.name), el('div', { class: 'salon-fenster-unter' }, [a.jahre, a.woher].filter(Boolean).join(' · '))), el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Schließen', onclick: () => zu() })),
-    reiter, seiten.rat, seiten.zitate, seiten.ueber);
+    el('div', { class: 'salon-fenster-kopf' }, el('div', { class: 'salon-fenster-foto' }, salonPortraet(a)), el('div', {}, el('h2', {}, a.name), el('div', { class: 'salon-fenster-unter' }, [a.jahre, a.woher].filter(Boolean).join(' · '))), el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Schließen', onclick: () => zu() })),
+    reiter, seiten.rat, seiten.zitate, seiten.aufgaben, seiten.werke, seiten.ueber);
   const zu = zeigeDeck(kasten);
-  zeigeRat();
+  if (reiterStart === 'rat') zeigeRat();
+}
+
+/* Eine Aufgabe annehmen: Blatt mit Kopfzeile, Schreibraum, Uhr. */
+function salonAufgabeAnnehmen(a, au) {
+  const kopf = 'Schreibaufgabe von ' + a.name + ':\n' + au.t + (au.ziel ? ' (etwa ' + au.ziel + ' Wörter)' : '') + '\n\n';
+  const b = blattAusText('Aufgabe · ' + a.name, kopf);
+  oeffneSchreibraum(b.id);
+  if (au.min && typeof starteSprint === 'function') setTimeout(() => starteSprint(au.min), 500);
+  toast(a.anrede ? a.anrede + ' schaut zu.' : 'Die Wand schaut zu.', 2600);
+}
+
+/* Die Runde: alle antworten nacheinander, jede in ihrer Stimme. */
+function salonRunde(frageText) {
+  const thema = salonThemaAusFrage(frageText);
+  const stimmen = SALON_FEST.filter((a) => (a.kern || []).length);
+  const liste = el('div', { class: 'salon-runde' });
+  const kasten = el('div', { class: 'modal salon-rundenfenster' },
+    el('div', { class: 'salon-runde-kopf' }, el('div', {}, el('h2', {}, 'Die Runde'), el('div', { class: 'salon-fenster-unter' }, '„' + frageText.slice(0, 120) + '“' + (thema ? ' · Thema: ' + (SALON_THEMEN.find((t) => t[0] === thema) || [])[1] : ''))), el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Schließen', onclick: () => zu() })),
+    liste,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf', onclick: () => { liste.innerHTML = ''; runde(Math.floor(Math.random() * 1e9)); } }, 'Noch eine Runde'), el('button', { class: 'knopf voll', onclick: () => zu() }, 'Danke')));
+  const zu = zeigeDeck(kasten);
+  const runde = (saat) => {
+    let i = 0;
+    const naechste = () => {
+      if (!liste.isConnected || i >= stimmen.length) return;
+      const a = stimmen[i++];
+      const r = salonRat(a, salonHash(frageText + ':' + a.id + ':' + saat), thema) || salonRat(a, saat + i);
+      const text = el('div', { class: 'sr-text' });
+      const blase = el('div', { class: 'salon-blase ' + (a.rahmen || 'nuss') }, el('div', { class: 'salon-blase-foto' }, salonPortraet(a)), el('div', { class: 'salon-blase-inhalt' }, el('b', {}, a.name), text, el('small', {}, 'erfunden, in ' + (a.anrede || a.name) + 's Geist')));
+      liste.append(blase); blase.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      const w = (r ? r.text : '…').split(' '); let k = 0;
+      const tick = () => { if (!text.isConnected) return; text.textContent = w.slice(0, ++k).join(' '); if (k < w.length) setTimeout(tick, 22 + Math.random() * 30); else setTimeout(naechste, 420); };
+      tick();
+    };
+    naechste();
+  };
+  runde(salonHash(frageText));
 }
 
 function salonUeberBilder() {
   const kasten = el('div', { class: 'modal' }, el('h2', {}, 'Über die Bilder'),
-    el('p', { style: 'font-size:14px;line-height:1.5' }, 'Die Porträts stammen von Wikimedia Commons und stehen unter freien Lizenzen. Die Zitate sind echt und tragen ihre Quelle; Übersetzungen sind eigene, das Original steht dabei. Die Ratschläge sind erfunden — geschrieben in der Stimme der jeweiligen Person, als Inspiration, nie als Zitat.'),
-    ...SALON_AUTOREN.map((a) => el('div', { class: 'salon-lizenz' }, el('b', {}, a.name), ': ' + a.foto.urheber + ', ' + a.foto.lizenz + ' — ', el('a', { href: a.foto.seite, target: '_blank', rel: 'noopener' }, 'Commons'))),
+    el('p', { style: 'font-size:14px;line-height:1.5' }, 'Die Porträts stammen von Wikimedia Commons und stehen unter freien Lizenzen. Die Zitate sind echt und tragen ihre Quelle; Übersetzungen sind eigene, das Original steht dabei. Die Ratschläge und Aufgaben sind erfunden — geschrieben in der Stimme der jeweiligen Person, als Inspiration, nie als Zitat.'),
+    ...SALON_FEST.map((a) => el('div', { class: 'salon-lizenz' }, el('b', {}, a.name), ': ' + a.foto.urheber + ', ' + a.foto.lizenz + ' — ', el('a', { href: a.foto.seite, target: '_blank', rel: 'noopener' }, 'Commons'))),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
   const zu = zeigeDeck(kasten);
 }
@@ -18418,6 +18796,189 @@ function salonEigenenBearbeiten(doc) {
       } }, doc ? 'Speichern' : 'Aufhängen')));
   const zu = zeigeDeck(kasten);
   setTimeout(() => name.focus(), 60);
+}
+
+/* ===================== 57 — RÄUME ALS ORTE =====================
+   Jeder Raum bekommt eine Kulisse und eine Haut: das Zuhause wird Diele, die
+   Schnipsel ein Zettelkasten, die Blätter ein Papierstapel, die Projekte eine
+   Korkwand, das Cluster ein Tischtuch, die Wörter ein Setzkasten, der Klang
+   ein Musikzimmer, der Faden eine Telefonbank, die Feinheiten ein Werkzeug-
+   kasten. Alles ist zuschaltbar (Feinheiten → „Räume als Orte"), standard-
+   mäßig aus, je Raum einzeln — und die Türen dürfen beim Wechsel aufgehen. */
+
+const ORTE_RAEUME = [
+  ['zuhause', 'Zuhause als Diele'], ['schnipsel', 'Schnipsel als Zettelkasten'], ['blaetter', 'Blätter als Papierstapel'],
+  ['hefte', 'Hefte mit Lesetisch'], ['projekte', 'Projekte als Korkwand'], ['cluster', 'Cluster auf dem Tischtuch'],
+  ['woerter', 'Wörter als Setzkasten'], ['klang', 'Klang als Musikzimmer'], ['faden', 'Faden als Telefonbank'], ['feinheiten', 'Feinheiten als Werkzeugkasten']
+];
+/* Einstellungen säubern: an (Hauptschalter, Standard aus), tueren, geraeusche, je Raum. Pur. */
+function saubereOrte(roh) {
+  const q = roh && typeof roh === 'object' && !Array.isArray(roh) ? roh : {};
+  const o = { an: q.an === true, tueren: q.tueren !== false, geraeusche: q.geraeusche === true };
+  for (const [id] of ORTE_RAEUME) o[id] = q[id] !== false;
+  return o;
+}
+/* Welcher Ort zu einem Routen-Raum gehört (heft → hefte usw.). Pur. */
+function orteRaumFuer(raum) { return { heft: 'hefte', projekt: 'projekte', brett: 'cluster' }[raum] || raum; }
+function orteAktiv(raum) {
+  const o = saubereOrte(D.einst.orte), r = orteRaumFuer(raum);
+  return o.an && o[r] === true && ORTE_RAEUME.some((x) => x[0] === r);
+}
+
+/* ----- Die Kulissen: kleine Bühnenbilder oben im Raum ----- */
+const ORTE_SVG = 'xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"';
+function orteKulisse(raum, haupt) {
+  const r = orteRaumFuer(raum);
+  const wrap = el('div', { class: 'ort-kulisse ort-' + r });
+  const svg = (inner, vb = '0 0 800 120') => { const d = document.createElement('div'); d.innerHTML = '<svg ' + ORTE_SVG + ' viewBox="' + vb + '" class="ort-bild">' + inner + '</svg>'; return d.firstElementChild; };
+  if (r === 'zuhause') {
+    wrap.append(svg(
+      '<rect width="800" height="120" fill="url(#ortw)"/>' +
+      '<defs><linearGradient id="ortw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b4a32"/><stop offset="1" stop-color="#3a2818"/></linearGradient></defs>' +
+      /* Garderobenleiste mit Haken, Hut und Schal */
+      '<rect x="60" y="22" width="300" height="10" rx="3" fill="#c9a25a"/><g fill="#8a6a2e">' + [90, 150, 210, 270, 330].map((x) => '<circle cx="' + x + '" cy="38" r="4"/><rect x="' + (x - 2) + '" y="38" width="4" height="10"/>').join('') + '</g>' +
+      '<path d="M130 48c-18 0-26 14-26 26h52c0-12-8-26-26-26z" fill="#2c2218"/><rect x="96" y="72" width="68" height="6" rx="3" fill="#2c2218"/>' +
+      '<path class="ort-schal" d="M272 48c-6 20-2 40 4 60M284 48c6 20 2 40-4 60" stroke="#b0552f" stroke-width="9" fill="none" stroke-linecap="round"/>' +
+      /* Spiegel */
+      '<ellipse cx="520" cy="60" rx="44" ry="52" fill="#d9e0e4"/><ellipse cx="520" cy="60" rx="40" ry="48" fill="url(#ortspiegel)"/><defs><linearGradient id="ortspiegel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3f6f5"/><stop offset=".5" stop-color="#cfd8db"/><stop offset="1" stop-color="#e8eeee"/></linearGradient></defs><ellipse cx="520" cy="60" rx="44" ry="52" fill="none" stroke="#c9a25a" stroke-width="5"/>' +
+      /* Konsole mit Briefen */
+      '<rect x="620" y="74" width="150" height="8" rx="2" fill="#c9a25a"/><rect x="628" y="82" width="6" height="38" fill="#8a6a2e"/><rect x="756" y="82" width="6" height="38" fill="#8a6a2e"/>' +
+      '<g transform="rotate(-6 680 64)"><rect x="650" y="54" width="60" height="22" fill="#f1e4c8"/><path d="M650 54l30 14 30-14" fill="none" stroke="#c9a25a" stroke-width="1.5"/></g><g transform="rotate(5 700 66)"><rect x="672" y="58" width="60" height="22" fill="#f6ecd6"/><circle cx="702" cy="69" r="4" fill="#b0552f"/></g>'
+    ));
+    /* Neuigkeiten: was in den Räumen wartet */
+    const chips = el('div', { class: 'ort-chips' });
+    try {
+      if (typeof SALON_AUTOREN !== 'undefined') { const tag = tagKey(); const wer = SALON_AUTOREN[salonHash(tag) % SALON_AUTOREN.length]; chips.append(el('button', { class: 'ort-chip', onclick: () => { location.hash = '#/salon'; } }, 'Im Salon rät heute ' + wer.name.split(' ').pop())); }
+      const briefe = vomTyp('brief').filter((b) => typeof briefIstOffen === 'function' && briefIstOffen(b) && b.versiegelt).length;
+      if (briefe) chips.append(el('button', { class: 'ort-chip', onclick: () => { location.hash = '#/schreibtisch'; } }, briefe === 1 ? 'Ein Brief darf geöffnet werden' : briefe + ' Briefe dürfen geöffnet werden'));
+      const buch = typeof lesestapelBuecher === 'function' ? lesestapelBuecher()[0] : null;
+      if (buch && buch.seiten) chips.append(el('button', { class: 'ort-chip', onclick: () => buchOeffnen(buch) }, 'Weiterlesen: ' + (buch.titel || 'Buch').slice(0, 28) + ' · ' + buchFortschritt(buch.seite, buch.seiten) + ' %'));
+      const heute = D.stats.tage[tagKey()] || 0;
+      chips.append(el('span', { class: 'ort-chip still' }, heute ? heute + ' Wörter heute' : 'Heute noch kein Wort — die Tasse wartet'));
+    } catch (e) {}
+    wrap.append(chips);
+  } else if (r === 'schnipsel') {
+    /* Zettelkasten: ein Holzkasten mit sieben Karteireitern — ein Reiter je Tag der letzten Woche */
+    const tage = []; for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); tage.push(d); }
+    const alle = vomTyp('schnipsel');
+    const zahlen = tage.map((d) => { const k = tagKey(d); return alle.filter((s) => tagKey(s.angelegt || 0) === k).length; });
+    const namen = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+    wrap.append(svg(
+      '<rect x="40" y="46" width="720" height="74" rx="6" fill="#6b4a32"/><rect x="40" y="46" width="720" height="8" fill="#8a6a3e"/>' +
+      tage.map((d, i) => { const x = 70 + i * 98; const n = zahlen[i]; return '<g><rect x="' + x + '" y="' + (n ? 18 : 28) + '" width="84" height="40" rx="3" fill="' + (n ? '#f3e7c9' : '#d8cfb8') + '" stroke="#b39b6a"/><text x="' + (x + 42) + '" y="' + (n ? 40 : 50) + '" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-size="13" fill="#5a4326">' + namen[d.getDay()] + (n ? ' · ' + n : '') + '</text></g>'; }).join('')
+    ));
+    wrap.append(el('div', { class: 'ort-chips' }, el('button', { class: 'ort-chip', onclick: () => orteKastenSchuetteln() }, 'Kasten schütteln — drei Zettel')));
+  } else if (r === 'blaetter') {
+    const n = vomTyp('blatt').length; const oben = vomTyp('blatt').sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0))[0];
+    wrap.append(svg(
+      [0, 1, 2, 3, 4].map((i) => '<g transform="translate(' + (330 + i * 3) + ' ' + (90 - i * 7) + ') rotate(' + ((i % 2 ? 1 : -1) * (i * .8)) + ')"><rect x="-120" y="-70" width="240" height="76" fill="#f7efe0" stroke="#d9caa6"/><path d="M100 -70l20 20h-20z" fill="#e3d5b4"/></g>').join('') +
+      '<text x="330" y="58" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-size="14" fill="#5a4326">' + (oben ? (oben.titel || (oben.text || '').split('\n')[0] || 'Ohne Titel').slice(0, 40).replace(/[<&]/g, '') : 'Ein leerer Stapel') + '</text>' +
+      '<text x="330" y="82" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-size="11" fill="#8a7a62">' + n + (n === 1 ? ' Blatt' : ' Blätter') + ' auf dem Stapel</text>'
+    ));
+  } else if (r === 'hefte') {
+    wrap.append(svg(
+      '<rect x="0" y="100" width="800" height="20" fill="#6b4a32"/><rect x="0" y="96" width="800" height="6" fill="#8a6a3e"/>' +
+      /* Leselampe */
+      '<rect x="118" y="40" width="6" height="58" fill="#8a6a2e"/><path d="M90 44h62l-10-22H100z" fill="#2f6b4f"/><ellipse cx="121" cy="98" rx="22" ry="5" fill="#8a6a2e"/><path class="ort-lichtkegel" d="M90 44h62l50 56H40z" fill="rgba(255,220,150,.25)"/>' +
+      /* Pflanze */
+      '<rect x="640" y="70" width="40" height="28" rx="3" fill="#a3562f"/><path d="M660 70c-6-18-22-26-34-26 4 16 16 26 34 26zm0 0c6-18 22-26 34-26-4 16-16 26-34 26zm0 0c-2-22 4-34 10-44 6 14 4 30-10 44z" fill="#4a7a46"/>' +
+      /* eine Brille */
+      '<g stroke="#2c2218" stroke-width="2" fill="none"><circle cx="380" cy="90" r="9"/><circle cx="404" cy="90" r="9"/><path d="M389 90h6M371 88l-14-4M413 88l14-4"/></g>'
+    ));
+  } else if (r === 'projekte') {
+    wrap.append(svg(
+      '<rect width="800" height="120" fill="#b8915e"/><rect width="800" height="120" fill="url(#ortkork)"/><defs><pattern id="ortkork" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="6" cy="9" r="1.6" fill="rgba(90,60,30,.25)"/><circle cx="19" cy="20" r="1.2" fill="rgba(90,60,30,.2)"/><circle cx="23" cy="5" r="1" fill="rgba(255,240,210,.25)"/></pattern></defs>' +
+      /* Karten mit Nadeln und roter Schnur */
+      [[120, 30, -4], [300, 48, 3], [500, 26, -2], [660, 52, 4]].map(([x, y, d]) => '<g transform="rotate(' + d + ' ' + (x + 45) + ' ' + (y + 28) + ')"><rect x="' + x + '" y="' + y + '" width="90" height="56" fill="#f7efe0" stroke="#d9caa6"/><line x1="' + (x + 10) + '" y1="' + (y + 18) + '" x2="' + (x + 70) + '" y2="' + (y + 18) + '" stroke="#c9bda0"/><line x1="' + (x + 10) + '" y1="' + (y + 30) + '" x2="' + (x + 60) + '" y2="' + (y + 30) + '" stroke="#c9bda0"/><circle cx="' + (x + 45) + '" cy="' + (y + 4) + '" r="5" fill="#c0392b"/><circle cx="' + (x + 43) + '" cy="' + (y + 2) + '" r="1.5" fill="#fff" opacity=".6"/></g>').join('') +
+      '<path d="M165 34 Q 260 10 345 52 T 545 30 T 705 56" fill="none" stroke="#b0352b" stroke-width="1.6"/>'
+    ));
+  } else if (r === 'cluster') {
+    wrap.append(svg(
+      '<rect width="800" height="120" fill="#e9e2d2"/><rect width="800" height="120" fill="url(#ortleinen)"/><defs><pattern id="ortleinen" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 3h6M3 0v6" stroke="rgba(90,74,52,.08)"/></pattern></defs>' +
+      [[160, 70, 26, '#8a8f96'], [260, 56, 18, '#b0552f'], [400, 72, 30, '#5f7752'], [560, 52, 20, '#b8923f'], [660, 74, 24, '#6f6c66']].map(([x, y, rr, f]) => '<ellipse cx="' + x + '" cy="' + (y + 6) + '" rx="' + (rr + 4) + '" ry="' + (rr * .4) + '" fill="rgba(0,0,0,.12)"/><ellipse cx="' + x + '" cy="' + y + '" rx="' + rr + '" ry="' + (rr * .75) + '" fill="' + f + '"/>').join('') +
+      '<path d="M186 70 Q 220 40 244 58 M290 56 Q 340 90 372 72 M430 70 Q 500 40 542 54 M580 54 Q 620 90 638 74" fill="none" stroke="#8a6a2e" stroke-width="1.4"/>'
+    ));
+  } else if (r === 'woerter') {
+    /* Setzkasten: Lettern aus den ersten Buchstaben der letzten Titel */
+    const buchstaben = [...new Set([...D.docs.values()].filter((d) => d.titel).sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0)).map((d) => d.titel.trim().slice(0, 1).toUpperCase()).filter((c) => /[A-ZÄÖÜ]/.test(c)))].slice(0, 12);
+    while (buchstaben.length < 12) buchstaben.push('VANISCHREIBT'[buchstaben.length]);
+    wrap.append(svg(
+      '<rect x="40" y="14" width="720" height="96" rx="4" fill="#5a4326"/><rect x="46" y="20" width="708" height="84" fill="#3a2a18"/>' +
+      buchstaben.map((c, i) => { const x = 62 + i * 57, y = 30 + (i % 2) * 30; return '<g><rect x="' + x + '" y="' + y + '" width="44" height="38" rx="3" fill="#2b2b2e"/><rect x="' + (x + 3) + '" y="' + (y + 3) + '" width="38" height="32" rx="2" fill="#3d3d42"/><text x="' + (x + 22) + '" y="' + (y + 27) + '" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-weight="700" font-size="22" fill="#d9d4c8" transform="scale(-1 1) translate(-' + (2 * x + 44) + ' 0)">' + c + '</text></g>'; }).join('')
+    ));
+  } else if (r === 'klang') {
+    const spielt = Object.values((D.einst && D.einst.ambience) || {}).some((v) => v > 0);
+    wrap.append(svg(
+      '<rect x="240" y="20" width="320" height="90" rx="6" fill="#6b4a32"/><rect x="240" y="20" width="320" height="8" fill="#8a6a3e"/>' +
+      '<g class="ort-platte' + (spielt ? ' dreht' : '') + '" style="transform-origin:340px 66px"><circle cx="340" cy="66" r="38" fill="#141110"/><circle cx="340" cy="66" r="30" fill="none" stroke="rgba(255,255,255,.06)"/><circle cx="340" cy="66" r="22" fill="none" stroke="rgba(255,255,255,.05)"/><circle cx="340" cy="66" r="12" fill="#b0552f"/><circle cx="340" cy="66" r="2" fill="#141110"/></g>' +
+      '<path d="M470 34l-40 36" stroke="#c9a25a" stroke-width="4" stroke-linecap="round"/><circle cx="470" cy="34" r="7" fill="#8a6a2e"/>' +
+      '<rect x="490" y="50" width="40" height="40" rx="3" fill="#3a2818"/><circle cx="510" cy="70" r="9" fill="#c9a25a"/>' +
+      /* Plattenhüllen links */
+      [0, 1, 2, 3].map((i) => '<rect x="' + (80 + i * 28) + '" y="' + (40 + (i % 2) * 4) + '" width="26" height="70" rx="2" fill="' + ['#b0552f', '#5f7752', '#b8923f', '#4f7587'][i] + '" transform="rotate(' + (-6 + i * 3) + ' ' + (93 + i * 28) + ' 110)"/>').join('')
+    ));
+  } else if (r === 'faden') {
+    wrap.append(svg(
+      '<rect x="0" y="104" width="800" height="16" fill="#6b4a32"/>' +
+      /* Bank */
+      '<rect x="250" y="70" width="300" height="14" rx="4" fill="#8a6a3e"/><rect x="262" y="84" width="10" height="22" fill="#6b4a32"/><rect x="528" y="84" width="10" height="22" fill="#6b4a32"/><rect x="250" y="40" width="300" height="30" rx="8" fill="#a3562f"/>' +
+      /* Telefon */
+      '<rect x="590" y="60" width="70" height="26" rx="6" fill="#2c2218"/><path d="M596 58c0-8 10-12 29-12s29 4 29 12" fill="none" stroke="#2c2218" stroke-width="8" stroke-linecap="round"/><path class="ort-schnur" d="M660 78c10 8 6 22 16 26" fill="none" stroke="#2c2218" stroke-width="2"/>' +
+      /* Lampe */
+      '<rect x="160" y="14" width="6" height="90" fill="#8a6a2e"/><path d="M128 24h70l-12-18H140z" fill="#e8c27a"/><path class="ort-lichtkegel" d="M128 24h70l60 80H70z" fill="rgba(255,220,150,.22)"/>'
+    ));
+  } else if (r === 'feinheiten') {
+    wrap.append(svg(
+      '<rect x="240" y="40" width="320" height="70" rx="6" fill="#b0352b"/><rect x="240" y="40" width="320" height="10" fill="#8a2a22"/><rect x="370" y="28" width="60" height="14" rx="4" fill="#2c2218"/>' +
+      '<g stroke="#d9d4c8" stroke-width="5" stroke-linecap="round" fill="none"><path d="M270 62l30 30M300 62l-30 30"/><path d="M340 64v30"/><rect x="332" y="56" width="16" height="10" rx="2" fill="#d9d4c8"/><path d="M390 64l26 26"/><circle cx="392" cy="66" r="7"/><path d="M470 62h40M490 62v30" /><path d="M520 64l20 20"/></g>'
+    ));
+  } else return null;
+  return wrap;
+}
+
+/* Drei Zettel aus dem Kasten — zufällig, nebeneinander. */
+function orteKastenSchuetteln() {
+  const alle = vomTyp('schnipsel').filter((s) => (s.text || '').trim());
+  if (alle.length < 1) { toast('Der Kasten ist leer.'); return; }
+  const drei = []; const rest = [...alle];
+  while (drei.length < 3 && rest.length) drei.push(rest.splice(Math.floor(Math.random() * rest.length), 1)[0]);
+  const kasten = el('div', { class: 'modal ort-zettelfenster' }, el('h2', {}, 'Geschüttelt'),
+    el('div', { class: 'ort-zettel' }, ...drei.map((s, i) => el('button', { class: 'ort-zettelkarte', style: '--dreh:' + ((i - 1) * 2.5) + 'deg', onclick: () => { zu(); oeffneDoc(s); } }, el('span', {}, (s.text || '').slice(0, 220)), el('small', {}, fmtDatum(s.angelegt || 0))))),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf', onclick: () => { zu(); orteKastenSchuetteln(); } }, 'Noch einmal schütteln'), el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
+  const zu = zeigeDeck(kasten);
+}
+
+/* Beim Zeichnen eines Raums: Kulisse davor, Haut anlegen, Tür aufgehen lassen. */
+let _orteLetzterRaum = null;
+function orteAnwenden(haupt, raum) {
+  const o = saubereOrte(D.einst.orte);
+  document.documentElement.dataset.orte = o.an ? 'an' : 'aus';
+  haupt.dataset.raum = raum;
+  const an = orteAktiv(raum);
+  haupt.dataset.ort = an ? orteRaumFuer(raum) : '';
+  if (an) {
+    try { const k = orteKulisse(raum, haupt); if (k) haupt.prepend(k); } catch (e) {}
+  }
+  if (o.an && o.tueren && _orteLetzterRaum !== null && _orteLetzterRaum !== raum) {
+    haupt.classList.add('tuer-auf'); setTimeout(() => haupt.classList.remove('tuer-auf'), 520);
+    if (o.geraeusche && typeof schreibtischKlick === 'function') schreibtischKlick('klick');
+  }
+  _orteLetzterRaum = raum;
+}
+
+/* Die Karte in den Feinheiten: Hauptschalter, Türen, Geräusche, je Raum. */
+function orteKarte() {
+  const o = saubereOrte(D.einst.orte);
+  const speichern = () => { D.einst.orte = o; speichereEinst(); document.documentElement.dataset.orte = o.an ? 'an' : 'aus'; };
+  const schalter = (lies, setze) => el('button', { class: 'schalter' + (lies() ? ' an' : ''), onclick: (e) => { setze(!lies()); e.currentTarget.classList.toggle('an', lies()); speichern(); } }, el('i'));
+  const zeile = (name, unter, s) => el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, name, unter ? el('div', { style: 'font-size:12.5px;color:var(--blass)' }, unter) : null), s);
+  const liste = el('div', { class: 'orte-liste' + (o.an ? '' : ' aus') });
+  for (const [id, name] of ORTE_RAEUME) liste.append(zeile(name, null, schalter(() => o[id], (v) => { o[id] = v; })));
+  return el('div', { class: 'karte' },
+    zeile('Räume als Orte', 'Jeder Raum bekommt eine Kulisse und eine Haut: Diele, Zettelkasten, Papierstapel, Korkwand, Tischtuch, Setzkasten, Musikzimmer, Telefonbank, Werkzeugkasten. Alles bleibt bedienbar wie vorher — nur schöner.', schalter(() => o.an, (v) => { o.an = v; liste.classList.toggle('aus', !v); })),
+    zeile('Türen gehen auf', 'Beim Raumwechsel schwenkt der Raum kurz herein.', schalter(() => o.tueren, (v) => { o.tueren = v; })),
+    zeile('Ein leises Geräusch dazu', 'Ein Klick wie ein Türgriff — nur mit Orten.', schalter(() => o.geraeusche, (v) => { o.geraeusche = v; })),
+    liste,
+    el('div', { style: 'font-size:12px;color:var(--blass);margin-top:8px' }, 'Schreibtisch und Salon sind immer Orte — sie sind dafür gebaut.'));
 }
 
 /* ================================================================

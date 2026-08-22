@@ -175,6 +175,9 @@ RENDER.feinheiten = function (haupt) {
         }, el('i')))
     )));
 
+  /* Räume als Orte: Kulissen und Häute, zuschaltbar */
+  if (typeof orteKarte === 'function') inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Orte'), orteKarte()));
+
   /* Räume: an/aus und Reihenfolge */
   const raumkarte = el('div', { class: 'karte' });
   function baueRaumliste() {

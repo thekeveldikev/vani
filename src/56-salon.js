@@ -360,6 +360,175 @@ const SALON_AUTOREN = [
   }
 ];
 
+/* Zusatzdaten für den Salon: Werke, Aufgaben, Gäste. Wird von patch42 in 56-salon.js eingefügt. */
+const SALON_ZUSATZ = {
+  king: {
+    en: true,
+    werke: [['Carrie', 1974], ['Brennen muss Salem', 1975], ['Shining', 1977], ['The Stand', 1978], ['Es', 1986], ['Misery', 1987], ['Der dunkle Turm (Reihe)', 1982], ['The Green Mile', 1996], ['Das Leben und das Schreiben', 2000], ['Der Anschlag (11/22/63)', 2011], ['Billy Summers', 2021]],
+    aufgaben: [
+      { t: 'Schreib 300 Wörter über ein Geräusch im Keller. Kein einziges Adverb. Die Tür bleibt zu.', min: 15, ziel: 300 },
+      { t: 'Eine Figur betritt ein Zimmer, in dem jemand fehlt. Zeig mir, wer fehlt, ohne es zu sagen.', min: 20, ziel: 400 },
+      { t: 'Ein Dialog, in dem zwei Leute über das Wetter reden und einer davon Angst hat. Das Wort Angst kommt nicht vor.', min: 15, ziel: 250 },
+      { t: 'Nimm die Szene, die du gestern geschrieben hast, und streich zehn Prozent. Zähl nach.', min: 20, ziel: 0 },
+      { t: 'Der erste Satz eines Romans, den du nie schreiben wirst. Dann der zweite. Dann die erste Seite.', min: 25, ziel: 350 },
+      { t: 'Beschreib einen Menschen nur über das, was er in den Taschen trägt.', min: 10, ziel: 180 }
+    ]
+  },
+  kaestner: {
+    werke: [['Herz auf Taille', 1928], ['Emil und die Detektive', 1929], ['Pünktchen und Anton', 1931], ['Fabian', 1931], ['Das fliegende Klassenzimmer', 1933], ['Drei Männer im Schnee', 1934], ['Die verschwundene Miniatur', 1935], ['Das doppelte Lottchen', 1949], ['Die Konferenz der Tiere', 1949], ['Als ich ein kleiner Junge war', 1957], ['Der kleine Mann', 1963]],
+    aufgaben: [
+      { t: 'Ein Gedicht mit vier Strophen über eine Straßenbahn. Reim erlaubt, Kitsch verboten.', min: 20, ziel: 120 },
+      { t: 'Erzähl eine traurige Sache so, dass man an einer Stelle lachen muss — ohne die Traurigkeit zu verraten.', min: 20, ziel: 300 },
+      { t: 'Ein Kind erklärt einem Erwachsenen, warum er unrecht hat. Der Erwachsene begreift es am Ende. Kein Wort zu viel.', min: 15, ziel: 250 },
+      { t: 'Beschreib dein Mietshaus (oder deine Straße) in zwölf Sätzen. Jeder Satz eine Tatsache, keine Stimmung.', min: 15, ziel: 200 },
+      { t: 'Schreib einen Brief an dich selbst mit zehn Jahren. Höflich, genau, ohne Ratschlag.', min: 20, ziel: 300 },
+      { t: 'Eine Moral in einer Zeile — und dann die Geschichte, die sie überflüssig macht.', min: 25, ziel: 350 }
+    ]
+  },
+  funke: {
+    werke: [['Drachenreiter', 1997], ['Herr der Diebe', 2000], ['Tintenherz', 2003], ['Tintenblut', 2005], ['Tintentod', 2007], ['Reckless — Steinernes Fleisch', 2010], ['Geisterritter', 2011], ['Die Wilden Hühner (Reihe)', 1993], ['Das Labyrinth des Fauns', 2019], ['Die Farbe der Rache', 2023]],
+    aufgaben: [
+      { t: 'Beschreib einen Ort nur über Gerüche. Kein einziges Farbwort.', min: 12, ziel: 200 },
+      { t: 'Ein Gegenstand, den alle wollen, liegt bei der falschen Person. Schreib die erste Szene.', min: 20, ziel: 350 },
+      { t: 'Zeichne (oder kritzle) deine Figur — dann schreib, wie sie spricht. Drei Sätze reichen.', min: 15, ziel: 120 },
+      { t: 'Schreib eine Tür, vor der jemand steht. Was dahinter ist, verrätst du nicht — aber man ahnt es.', min: 15, ziel: 250 },
+      { t: 'Ein Bösewicht, der etwas liebt. Zeig das Geliebte, bevor du das Böse zeigst.', min: 20, ziel: 300 },
+      { t: 'Ein Märchen in deinem Alltag: Was wäre, wenn die Straßenbahn heute nicht hält?', min: 20, ziel: 300 }
+    ]
+  },
+  rothfuss: {
+    en: true,
+    werke: [['Der Name des Windes', 2007], ['Die Furcht des Weisen', 2011], ['Die Musik der Stille', 2014], ['The Narrow Road Between Desires', 2023]],
+    aufgaben: [
+      { t: 'Ein Absatz, in dem niemand spricht und alles gesagt wird. Drei Teile Stille.', min: 15, ziel: 200 },
+      { t: 'Erzähl die Legende von deiner Figur — was die Leute sagen. Dann einen Absatz, wie es wirklich war.', min: 25, ziel: 400 },
+      { t: 'Schreib einen Satz zwanzigmal um, bis er klingt wie eine gespannte Saite. Behalte alle zwanzig.', min: 20, ziel: 0 },
+      { t: 'Jemand lernt ein Handwerk. Zeig drei Handgriffe so genau, dass man sie nachmachen könnte.', min: 20, ziel: 300 },
+      { t: 'Gib einem Ding einen Namen — und erzähl, was passiert, wenn man ihn ausspricht.', min: 15, ziel: 250 },
+      { t: 'Eine Frage, die die Geschichte nie beantwortet. Schreib die Szene, in der sie gestellt wird.', min: 15, ziel: 250 }
+    ]
+  }
+};
+
+const SALON_GAESTE = [
+  {
+    id: 'pratchett', gast: true, en: true, name: 'Terry Pratchett', jahre: '1948–2015', woher: 'Beaconsfield · Wiltshire', bild: 'autoren/pratchett.jpg', lage: '50% 22%',
+    foto: { urheber: 'Luigi Novi', lizenz: 'CC BY 3.0', lizenzUrl: 'https://creativecommons.org/licenses/by/3.0/', seite: 'https://commons.wikimedia.org/wiki/File:10.12.12TerryPratchettByLuigiNovi1b.jpg' },
+    kurz: 'Der Scheibenwelt-Erfinder. Lacht, damit man hinschaut, und schreibt über Menschen, auch wenn es Trolle sind.',
+    rahmen: 'dunkel', anrede: 'Terry',
+    zitate: [
+      { t: 'Die Feder ist mächtiger als das Schwert, wenn das Schwert sehr kurz und die Feder sehr spitz ist.', o: 'The pen is mightier than the sword if the sword is very short, and the pen is very sharp.', q: 'The Light Fantastic, 1986' },
+      { t: 'Geschichten aus der Fantasie neigen dazu, die zu beunruhigen, die keine haben.', o: 'Stories of imagination tend to upset those without one.', q: 'zugeschrieben' },
+      { t: 'Etwas ist es nicht wert, getan zu werden, wenn nicht irgendjemand irgendwo viel lieber hätte, dass man es nicht tut.', o: 'It’s not worth doing something unless someone, somewhere, would much rather you weren’t doing it.', q: 'zugeschrieben' },
+      { t: 'Weisheit kommt aus Erfahrung. Erfahrung ist oft das Ergebnis fehlender Weisheit.', o: 'Wisdom comes from experience. Experience is often a result of lack of wisdom.', q: 'zugeschrieben' },
+      { t: 'Gib einem Mann Feuer, und er hat es einen Tag lang warm. Zünde ihn an, und er hat es für den Rest seines Lebens warm.', o: 'Give a man a fire and he’s warm for a day, but set fire to him and he’s warm for the rest of his life.', q: 'Jingo (Fliegende Fetzen), 1997' },
+      { t: 'Das Problem mit einem offenen Geist ist natürlich, dass die Leute darauf bestehen, vorbeizukommen und Dinge hineinzulegen.', o: 'The trouble with having an open mind, of course, is that people will insist on coming along and trying to put things in it.', q: 'Diggers (Trucker-Trilogie), 1990' },
+      { t: 'Das Licht glaubt, es sei schneller als alles andere, aber es irrt sich. Egal wie schnell das Licht reist, es findet die Dunkelheit immer schon dort vor — und sie wartet.', o: 'Light thinks it travels faster than anything but it is wrong. No matter how fast light travels, it finds the darkness has always got there first, and is waiting for it.', q: 'Reaper Man (Alles Sense!), 1991' },
+      { t: 'Ein Mensch ist nicht tot, solange sein Name noch gesprochen wird.', o: 'A man is not dead while his name is still spoken.', q: 'Going Postal (Ab die Post), 2004' },
+      { t: 'Manchmal ist es besser, einen Flammenwerfer anzuzünden, als die Dunkelheit zu verfluchen.', o: 'Sometimes it’s better to light a flamethrower than curse the darkness.', q: 'Men at Arms (Helle Barden), 1993' },
+      { t: 'Echte Dummheit schlägt künstliche Intelligenz jedes Mal.', o: 'Real stupidity beats artificial intelligence every time.', q: 'Hogfather (Schweinsgalopp), 1996' }
+    ],
+    saetze: [
+      'Schreib die Fußnote. Wenn sie lustiger ist als der Satz, war der Satz die Fußnote.',
+      'Ein Witz ist eine Wahrheit, die sich nicht ernst nehmen lässt. Also nimm sie ernst — nur später.',
+      'Die Trolle sind Menschen. Die Zwerge sind Menschen. Die Menschen sind auch Menschen, aber das merkt man erst, wenn man sie neben Trolle stellt.',
+      'Dein Held muss nicht gut sein. Er muss sich weigern, schlecht zu sein, wenn es leicht wäre. Das ist Heldentum auf der Scheibe und sonstwo.',
+      'Wenn du eine Regel für deine Welt machst, brich sie genau einmal — und erklär, warum das alles kostete.',
+      'Der Tod redet in Großbuchstaben, weil er es nicht nötig hat, laut zu sein. Schreib deine mächtigen Figuren leise.',
+      'Satire ist nicht: über Leute lachen. Satire ist: genau hinsehen und dann den Hut abnehmen.',
+      'Jede Stadt braucht eine Wache, einen Markt und jemanden, der nachts die Laternen anzündet. Fang bei dem an.',
+      'Schreib 400 Wörter am Tag, auch wenn sie schlecht sind. Am Ende des Jahres hast du ein schlechtes Buch — und das ist mehr, als die meisten haben. Dann machst du es gut.',
+      'Lass die Nebenfigur ihre eigene Geschichte haben. Sie weiß nicht, dass sie Nebenfigur ist, und das macht sie interessant.',
+      'Kopfschmuck und Mäntel verraten mehr über eine Gesellschaft als ihre Gesetze. Beschreib die Hüte.',
+      'Der beste Zauber ist der, der Geld kostet. Magie ohne Preis ist Tapete.',
+      'Wenn du nicht weißt, was deine Figur tun soll, frag dich, was sie gerade sicher nicht will. Dann lass genau das passieren.',
+      'Ein Buch darf klug sein, solange es dabei lacht. Kluge Bücher ohne Lachen sind Vorträge.',
+      'Die Leser merken, wenn du sie für dumm hältst. Sie merken auch, wenn du sie für klug hältst. Halt sie für klug.'
+    ],
+    anfang: ['Also, pass auf:', 'Kleine Beobachtung:', 'Die Scheibenwelt hat mich gelehrt:', 'Fußnote dazu:', 'Im Ernst — na ja, fast:', 'Hör zu, junger Schreiberling:', 'Das ist kein Witz, obwohl es so klingt:', 'Ein Gedanke mit Hut:'],
+    kern: [
+      ['anfang', 'Fang bei der Wache an, beim Markt oder bei dem, der die Laternen anzündet. Große Geschichten beginnen bei kleinen Leuten mit Schichtdienst.'],
+      ['zweifel', 'Zweifel ist nur Intelligenz, die sich langweilt. Gib ihr Arbeit: den nächsten Absatz.'],
+      ['routine', 'Vierhundert Wörter am Tag. Schlechte reichen. Am Ende des Jahres hast du ein Buch, und dann machst du es gut.'],
+      ['figuren', 'Deine Figur weiß nicht, dass sie Nebenfigur ist. Schreib sie so, dann ist sie keine.'],
+      ['dialog', 'Lass die Mächtigen leise reden. Wer laut ist, hat etwas zu verbergen, meist seine Unsicherheit.'],
+      ['stil', 'Die Fußnote ist das Fenster, durch das die Wahrheit hereinlacht. Öffne es ab und zu.'],
+      ['ueberarbeiten', 'Wenn der Witz den Satz rettet, war der Satz nicht gut genug. Streich den Satz, behalt den Witz.'],
+      ['angst', 'Der Tod ist nicht gruselig. Gruselig ist ein Beamter mit einem Formular. Schreib den Beamten.'],
+      ['lesen', 'Lies Geschichtsbücher. Die Menschheit hat sich alle Plots schon selbst ausgedacht, meist schlimmer.'],
+      ['ende', 'Das Ende darf ein Lachen sein. Aber eins, in dem etwas mitschwingt, das nicht lacht.'],
+      ['pause', 'Geh in die Küche. Die meisten Probleme der Literatur lösen sich beim Zwiebelschneiden.']
+    ],
+    schluss: ['Oder so ähnlich.', 'Das mit den Hüten stimmt wirklich.', 'Kein Zauber, nur Arbeit mit Humor.', 'Und jetzt vierhundert Wörter.', 'Die Scheibe dreht sich weiter.', 'Mehr weiß ich nicht, ich habe nur geschrieben.']
+  },
+  {
+    id: 'lindgren', gast: true, name: 'Astrid Lindgren', jahre: '1907–2002', woher: 'Vimmerby · Stockholm', bild: 'autoren/lindgren.jpg', lage: '50% 20%',
+    foto: { urheber: 'unbekannt (gemeinfrei)', lizenz: 'Public Domain', lizenzUrl: 'https://commons.wikimedia.org/wiki/Template:PD-old', seite: 'https://commons.wikimedia.org/wiki/File:Astrid_Lindgren_(cropped).jpg' },
+    kurz: 'Die Mutter von Pippi, Michel und den Brüdern Löwenherz. Nimmt Kinder ernst und das Leben dazu.',
+    rahmen: 'gold', anrede: 'Astrid',
+    zitate: [
+      { t: 'Das hab ich noch nie vorher versucht, also bin ich völlig sicher, dass ich es schaffe!', q: 'Pippi in Taka-Tuka-Land (Pippi Langstrumpf), 1948' },
+      { t: 'Es gibt Dinge, die muss man einfach tun, sonst ist man kein Mensch, sondern nur ein Häufchen Dreck.', q: 'Die Brüder Löwenherz, 1973' },
+      { t: 'Und dann muss man ja auch noch Zeit haben, einfach dazusitzen und vor sich hin zu schauen.', q: 'zugeschrieben (Interview)' },
+      { t: 'Alles, was an Großem in der Welt geschah, vollzog sich zuerst in der Phantasie eines Menschen.', q: 'zugeschrieben (Rede zum Friedenspreis des Deutschen Buchhandels, 1978)' },
+      { t: 'Niemals Gewalt!', q: 'Rede zum Friedenspreis des Deutschen Buchhandels, 1978' },
+      { t: 'Ich will für ein Publikum schreiben, das Wunder vollbringen kann. Kinder vollbringen Wunder, wenn sie lesen.', q: 'zugeschrieben' }
+    ],
+    saetze: [
+      'Schreib für das Kind, das du warst. Es sitzt noch da drinnen und wartet, ob du es ernst nimmst.',
+      'Lass das Kind im Buch stärker sein als die Erwachsenen. Nicht, weil es wahr wäre — weil es gebraucht wird.',
+      'Ein Abenteuer braucht einen Hof, einen Zaun und eine Kirschbaumleiter. Das Übrige kommt von allein.',
+      'Hab keine Angst vor traurigen Geschichten. Kinder weinen und stehen wieder auf. Erwachsene weinen nicht und bleiben liegen.',
+      'Schreib am Morgen im Bett, mit Bleistift, in Kurzschrift. Die Welt ist dann noch nicht da, nur die Geschichte.',
+      'Die Fantasie ist kein Spielzeug. Sie ist der Ort, an dem alles Große zuerst passiert. Behandle sie wie einen Arbeitsplatz.',
+      'Jeder Michel braucht einen Tischlerschuppen. Gib deiner Figur einen Ort, an dem sie allein sein und etwas schnitzen kann.',
+      'Der schönste Satz der Welt ist nichts gegen einen Satz, den ein Kind laut vorlesen will.',
+      'Lass deine Helden ungehorsam sein, wenn es darauf ankommt. Gehorsam hat noch nie ein Abenteuer erlebt.',
+      'Schreib nicht über das Glück. Schreib über den Samstagabend, an dem man einfach dasitzt und es nicht merkt.',
+      'Wenn jemand sagt, das geht nicht: Das hab ich noch nie versucht, also bin ich sicher, dass ich es schaffe. Auch beim Schreiben.',
+      'Erst wenn dein Bösewicht auch einmal friert, darf er böse sein.',
+      'Mut heißt nicht, keine Angst zu haben. Mut heißt, trotzdem über die Brücke zu gehen. Schreib die Brücke.',
+      'Ein Buch für Kinder darf nicht lügen. Es darf trösten — aber nur mit der Wahrheit.',
+      'Das Ende darf wehtun, wenn es eine Tür offen lässt. Nangijala ist eine offene Tür.'
+    ],
+    anfang: ['Weißt du,', 'Ich sag dir was, mein Kind:', 'So ist das:', 'Das hat mir Pippi beigebracht:', 'Aus Bullerbü weiß ich:', 'Ganz einfach:', 'Hör mal:', 'Glaub einer alten Frau:'],
+    kern: [
+      ['anfang', 'Fang mit einem Kind an, das etwas nicht darf. Dann tut es das. Fertig ist der Anfang.'],
+      ['zweifel', 'Das hab ich noch nie versucht — also bin ich sicher, dass ich es schaffe. Sag dir das und schreib.'],
+      ['routine', 'Morgens im Bett, mit Bleistift, bevor der Tag laut wird. Da gehört die Geschichte noch dir.'],
+      ['figuren', 'Gib deiner Figur einen Ort, an dem sie allein ist und etwas tut. Da lernst du sie kennen.'],
+      ['dialog', 'Kinder sagen, was sie meinen, und meinen mehr, als sie sagen. Schreib beides.'],
+      ['stil', 'Schreib so, dass man es laut vorlesen will. Das ist der ganze Stil.'],
+      ['ueberarbeiten', 'Lies es einem Kind vor. Wo es zappelt, streichst du. Wo es still wird, lässt du alles.'],
+      ['angst', 'Traurig darf es sein. Kinder halten mehr aus, als Erwachsene glauben — wenn die Geschichte ehrlich ist.'],
+      ['lesen', 'Lies Märchen und Zeitung, beides. Die Wunder stehen in den Märchen, die Gründe in der Zeitung.'],
+      ['ende', 'Lass eine Tür offen am Ende. Eine, durch die man hinaus ins Licht geht.'],
+      ['pause', 'Setz dich hin und schau vor dich hin. Das ist keine Pause vom Schreiben, das ist Schreiben ohne Bleistift.']
+    ],
+    schluss: ['Und dann lauf los.', 'Mehr braucht es nicht.', 'So hab ich es gemacht.', 'Versprich es mir.', 'Das genügt für einen Sommer.', 'Und sei ungehorsam dabei.']
+  }
+];
+
+/* Stichworte einer Frage → Thema. Pur. */
+const SALON_STICHWORTE = [
+  ['anfang', /anfang|beginn|erste[rn]? satz|starten|losleg|einstieg|erste seite/i],
+  ['zweifel', /zweifel|schlecht|nicht gut|unsicher|kann nicht|tauge|talent|aufgeben|zu dumm|versag/i],
+  ['routine', /täglich|jeden tag|routine|diszipl|dranbleib|gewohnheit|zeit finden|keine zeit|regelmäß|durchhalt/i],
+  ['figuren', /figur|held|charakter|person|protagonist|bösewicht|antagonist|name/i],
+  ['dialog', /dialog|gespräch|sprechen|reden|sagen|stimme/i],
+  ['stil', /stil|sprache|satz|wort|adjektiv|adverb|klang|rhythmus|schön/i],
+  ['ueberarbeiten', /überarbeit|kürzen|streich|zweite fassung|lektor|edit|korrig|umschreib|zu lang/i],
+  ['angst', /angst|furcht|trau|mut|horror|grusel|dunkel/i],
+  ['lesen', /lesen|buch|bücher|lektüre/i],
+  ['ende', /ende|schluss|abschluss|fertig|zu ende/i],
+  ['pause', /pause|müde|erschöpft|blockade|leer|nichts mehr|ausgebrannt|kraft/i]
+];
+function salonThemaAusFrage(frage) {
+  const f = String(frage || '');
+  for (const [thema, rx] of SALON_STICHWORTE) if (rx.test(f)) return thema;
+  return null;
+}
+
 /* Kleine Saat → Zahlenfolge, wiederholbar. Pur. */
 function salonZufall(saat) {
   /* Erst mischen: nebeneinanderliegende Saaten (1, 2, 3 …) wuerden sonst fast dieselben Folgen geben */
@@ -397,97 +566,185 @@ function salonRat(autor, saat = 1, thema = null) {
 /* Der Rat des Tages: je Person und Tag einer. Pur. */
 function salonRatDesTages(autor, tagSchluessel) { return salonRat(autor, salonHash((tagSchluessel || '') + ':' + (autor && autor.id)), null); }
 
+/* Zusatzdaten einmischen: Werke, Aufgaben, Sprachkennung */
+for (const a of SALON_AUTOREN) { const z = SALON_ZUSATZ[a.id]; if (z) Object.assign(a, z); }
+const SALON_FEST = [...SALON_AUTOREN, ...SALON_GAESTE];
+
 /* Eigene Menschen an der Wand: Dokumente vom Typ 'mentor'. */
 function salonEigene() { return vomTyp('mentor').sort((a, b) => (a.angelegt || 0) - (b.angelegt || 0)); }
 function salonAlle() {
-  return [...SALON_AUTOREN, ...salonEigene().map((d) => ({ id: d.id, eigen: true, doc: d, name: d.titel || 'Ohne Namen', jahre: d.jahre || '', woher: d.woher || '', bild: null, bildId: d.bild || null, kurz: d.notiz || '', rahmen: d.rahmen || 'nuss', zitate: (d.zitate || []).map((t) => ({ t, q: d.titel || '' })), saetze: d.rat || [], anfang: [], kern: [], schluss: [] }))];
+  return [...SALON_FEST, ...salonEigene().map((d) => ({ id: d.id, eigen: true, doc: d, name: d.titel || 'Ohne Namen', jahre: d.jahre || '', woher: d.woher || '', bild: null, bildId: d.bild || null, kurz: d.notiz || '', rahmen: d.rahmen || 'nuss', zitate: (d.zitate || []).map((t) => ({ t, q: d.titel || '' })), saetze: d.rat || [], anfang: [], kern: [], schluss: [], werke: [], aufgaben: [] }))];
+}
+function salonFinde(id) { return salonAlle().find((a) => a.id === id) || null; }
+/* Gelesene Werke: je Person eine Liste — lebt in den Einstellungen (reist mit). */
+function salonGelesen(a) { const g = (D.einst.salonGelesen || {})[a.id]; return Array.isArray(g) ? g : []; }
+function salonGelesenSetzen(a, titel, an) {
+  const alle = Object.assign({}, D.einst.salonGelesen || {});
+  const liste = new Set(salonGelesen(a)); if (an) liste.add(titel); else liste.delete(titel);
+  alle[a.id] = [...liste].slice(0, 200); D.einst.salonGelesen = alle; speichereEinst();
+}
+function salonPortraet(a, klasse) {
+  if (a.bild) return el('img', { class: klasse || '', src: a.bild, alt: a.name, draggable: 'false', style: 'object-position:' + (a.lage || '50% 30%') });
+  if (a.bildId) { const img = el('img', { class: klasse || '', alt: a.name, draggable: 'false' }); setzeBild(img, a.bildId); return img; }
+  return el('div', { class: 'salon-monogramm ' + (klasse || '') }, (a.name || '?').slice(0, 1));
+}
+function salonRahmen(a, i, onclick) {
+  return el('button', { class: 'salon-rahmen ' + (a.rahmen || 'nuss') + (a.eigen ? ' eigen' : '') + (a.gast ? ' gast' : ''), style: '--n:' + i, onclick, title: a.name + ': anklopfen', 'aria-label': a.name + ' anklopfen' },
+    el('i', { class: 'salon-lampe' }), el('i', { class: 'salon-ecke e1' }), el('i', { class: 'salon-ecke e2' }), el('i', { class: 'salon-ecke e3' }), el('i', { class: 'salon-ecke e4' }),
+    el('div', { class: 'salon-passepartout' }, el('div', { class: 'salon-foto' }, salonPortraet(a), el('i', { class: 'salon-glas' }))),
+    el('div', { class: 'salon-schild' }, el('b', {}, a.name), el('span', {}, [a.jahre, a.woher].filter(Boolean).join(' · '))));
 }
 
 /* ----- Der Raum ----- */
 RENDER.salon = function (haupt) {
   const alle = salonAlle();
-  const wand = el('div', { class: 'salon' });
+  const heute = tagKey();
+  const info = typeof schreibtischTageszeitInfo === 'function' ? schreibtischTageszeitInfo() : { licht: 1 };
+  const wand = el('div', { class: 'salon', 'data-licht': info.licht > .5 ? 'tag' : info.licht > .15 ? 'abend' : 'nacht' });
+  const frage = el('input', { type: 'text', placeholder: 'Frag die Wand — „Mein Anfang ist langweilig", „Wie bleibe ich dran?" …', 'aria-label': 'Frage an die Wand' });
+  const fragen = () => { const f = frage.value.trim(); if (!f) { frage.focus(); return; } salonRunde(f); };
+  frage.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); fragen(); } });
   const kopf = el('div', { class: 'kopf' },
-    el('h1', {}, 'Der Salon', el('div', { class: 'unter' }, 'Die Lieblingswand. Vier, die wissen, wie es geht — und die, die du dazuhängst.')),
+    el('h1', {}, 'Der Salon', el('div', { class: 'unter' }, 'Die Lieblingswand. Sie wissen, wie es geht — und sie reden, wenn man anklopft.')),
     el('button', { class: 'rundknopf zart', html: ik('plus'), title: 'Jemanden an die Wand hängen', onclick: () => salonEigenenAnlegen() }),
     el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Über die Bilder', onclick: () => salonUeberBilder() }));
-  const galerie = el('div', { class: 'salon-galerie' });
-  const heute = tagKey();
-  alle.forEach((a, i) => {
+  const frageZeile = el('div', { class: 'salon-fragezeile' }, el('span', { html: ik('suche'), style: 'display:flex;color:var(--blass)' }), frage, el('button', { class: 'knopf voll', onclick: fragen }, 'Die Runde fragen'));
+  const platz = (a, i) => {
     const rat = salonRatDesTages(a, heute);
-    const bild = a.bild ? el('img', { src: a.bild, alt: a.name, draggable: 'false', style: 'object-position:' + (a.lage || '50% 30%') }) : (a.bildId ? (() => { const img = el('img', { alt: a.name, draggable: 'false' }); setzeBild(img, a.bildId); return img; })() : el('div', { class: 'salon-monogramm' }, (a.name || '?').slice(0, 1)));
-    const rahmen = el('button', { class: 'salon-rahmen ' + (a.rahmen || 'nuss') + (a.eigen ? ' eigen' : ''), style: '--n:' + i, onclick: () => salonSprechen(a), title: a.name + ': anklopfen' },
-      el('i', { class: 'salon-lampe' }),
-      el('div', { class: 'salon-passepartout' }, el('div', { class: 'salon-foto' }, bild, el('i', { class: 'salon-glas' }))),
-      el('div', { class: 'salon-schild' }, el('b', {}, a.name), el('span', {}, [a.jahre, a.woher].filter(Boolean).join(' · '))));
-    const karte = el('div', { class: 'salon-platz' }, rahmen,
+    return el('div', { class: 'salon-platz' }, salonRahmen(a, i, () => salonSprechen(a)),
       el('div', { class: 'salon-kurz' }, a.kurz || ''),
-      rat ? el('button', { class: 'salon-tageskarte', onclick: () => salonSprechen(a, { thema: null, saat: salonHash(heute + ':' + a.id) }) }, el('span', { class: 'st-ueber' }, 'Rat des Tages' + (rat.art === 'satz' ? '' : '')), el('span', { class: 'st-text' }, rat.text), el('span', { class: 'st-fuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden — in ' + (a.anrede || a.name) + 's Geist')) : null);
-    galerie.append(karte);
-  });
-  wand.append(galerie);
-  wand.append(el('div', { class: 'salon-fuss' }, 'Die Zitate sind echt und tragen ihre Quelle. Die Ratschläge sind erfunden, in ihrem Geist — zusammen ' + alle.reduce((n, a) => n + salonVorrat(a), 0).toLocaleString('de-DE') + ' mögliche, jeden Tag andere.'));
+      rat ? el('button', { class: 'salon-tageskarte', onclick: () => salonSprechen(a, { saat: salonHash(heute + ':' + a.id) }) }, el('span', { class: 'st-ueber' }, 'Rat des Tages'), el('span', { class: 'st-text' }, rat.text), el('span', { class: 'st-fuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden — in ' + (a.anrede || a.name) + 's Geist')) : null);
+  };
+  const haus = alle.filter((a) => !a.gast && !a.eigen), gaeste = alle.filter((a) => a.gast), eigene = alle.filter((a) => a.eigen);
+  const galerie = el('div', { class: 'salon-galerie' }, ...haus.map(platz));
+  const gastwand = el('div', { class: 'salon-gaeste' }, el('div', { class: 'salon-abschnitt' }, 'Das Gästezimmer'), el('div', { class: 'salon-galerie klein' }, ...gaeste.map((a, i) => platz(a, i + 4))));
+  const eigenwand = eigene.length ? el('div', { class: 'salon-gaeste' }, el('div', { class: 'salon-abschnitt' }, 'Deine Wand'), el('div', { class: 'salon-galerie klein' }, ...eigene.map((a, i) => platz(a, i + 6)))) : null;
+  const aufgabeHeute = (() => { const a = SALON_FEST[salonHash(heute + ':aufgabe') % SALON_FEST.length]; const l = a.aufgaben || []; return l.length ? { a, aufgabe: l[salonHash(heute + ':a') % l.length] } : null; })();
+  const aufgabenkarte = aufgabeHeute ? el('button', { class: 'salon-aufgabe-heute', onclick: () => salonAufgabeAnnehmen(aufgabeHeute.a, aufgabeHeute.aufgabe) },
+    el('span', { class: 'sa-foto' }, salonPortraet(aufgabeHeute.a)), el('span', { class: 'sa-text' }, el('b', {}, 'Schreibaufgabe des Tages · ' + aufgabeHeute.a.name), el('i', {}, aufgabeHeute.aufgabe.t), el('small', {}, (aufgabeHeute.aufgabe.min ? aufgabeHeute.aufgabe.min + ' Minuten' : 'ohne Uhr') + (aufgabeHeute.aufgabe.ziel ? ' · etwa ' + aufgabeHeute.aufgabe.ziel + ' Wörter' : '') + ' · tippen nimmt sie an'))) : null;
+  const sockel = el('div', { class: 'salon-sockel' });
+  wand.append(frageZeile, galerie, aufgabenkarte, gastwand, eigenwand, sockel,
+    el('div', { class: 'salon-fuss' }, 'Die Zitate sind echt und tragen ihre Quelle. Die Ratschläge sind erfunden, in ihrem Geist — zusammen ' + alle.reduce((n, a) => n + salonVorrat(a), 0).toLocaleString('de-DE') + ' mögliche, jeden Tag andere.'));
   haupt.append(kopf, wand);
 };
 
-/* Die Person spricht: ein Fenster mit Rat, Zitaten und „Frag nach". */
-function salonSprechen(a, { thema = null, saat = null } = {}) {
+/* Ein Zitat zeigen: bei englischen Stimmen zuerst das Original, die Übersetzung auf Tipp. */
+function salonZitatElement(a, z, mitLesung) {
+  const en = !!(a.en && z.o);
+  const haupt = el('div', { class: 'sz-text' + (en ? ' en' : '') }, en ? '“' + z.o + '”' : '„' + z.t + '“');
+  const ueb = en ? el('div', { class: 'sz-uebersetzung', hidden: 'hidden' }, '„' + z.t + '“') : (z.o ? el('div', { class: 'sz-original' }, z.o) : null);
+  const knoepfe = el('div', { class: 'sz-knoepfe' },
+    en ? el('button', { class: 'knopf zart', onclick: (ev) => { ueb.hidden = !ueb.hidden; ev.currentTarget.textContent = ueb.hidden ? 'Übersetzung' : 'Übersetzung verbergen'; } }, 'Übersetzung') : null,
+    el('button', { class: 'knopf zart', onclick: () => { neuDoc('schnipsel', { text: (en ? '“' + z.o + '”\n„' + z.t + '“' : '„' + z.t + '“') + '\n— ' + a.name + (z.q ? ', ' + z.q : '') }); toast('Liegt als Zitat in den Schnipseln.'); } }, 'Als Schnipsel'),
+    el('button', { class: 'knopf zart', onclick: async () => { try { await navigator.clipboard.writeText((en ? '“' + z.o + '” — ' : '„' + z.t + '“ — ') + a.name + (z.q ? ', ' + z.q : '')); toast('Kopiert.'); } catch (e) { toast('Kopieren ging hier nicht.'); } } }, 'Kopieren'),
+    mitLesung && typeof vorlesen === 'function' ? el('button', { class: 'knopf zart', onclick: (ev) => { const f = ev.currentTarget.closest('.modal'); if (f) { f.classList.add('liest'); setTimeout(() => f.classList.remove('liest'), 6000); } vorlesen(z.t + '. ' + a.name, ev.currentTarget); } }, 'Lesung') : null);
+  return el('div', { class: 'salon-zitat' }, haupt, ueb, el('div', { class: 'sz-quelle' }, '— ' + a.name + (z.q ? ', ' + z.q : '')), knoepfe);
+}
+
+/* Die Person spricht: Fenster mit Rat, Zitaten, Aufgaben, Werken und Über. */
+function salonSprechen(a, { thema = null, saat = null, reiterStart = 'rat' } = {}) {
   let themaJetzt = thema, zaehler = 0;
   let saatJetzt = saat != null ? saat : Math.floor(Math.random() * 1e9);
   const sprech = el('div', { class: 'salon-sprech' });
   const chips = el('div', { class: 'salon-themen' });
+  const tippe = (ziel, text, fertig) => { const w = text.split(' '); let i = 0; const tick = () => { if (!ziel.isConnected) return; ziel.textContent = w.slice(0, ++i).join(' '); if (i < w.length) setTimeout(tick, 26 + Math.random() * 38); else if (fertig) fertig(); }; tick(); };
   const zeigeRat = () => {
     const r = salonRat(a, saatJetzt + zaehler * 7919, themaJetzt);
     sprech.innerHTML = '';
     if (!r) { sprech.append(el('div', { class: 'salon-leer' }, a.eigen ? 'Noch kein Rat hinterlegt — beim Bearbeiten kannst du Sätze in ' + a.name + 's Stimme eintragen.' : 'Dazu fällt mir gerade nichts ein.')); return; }
     const text = el('div', { class: 'salon-rat' });
     sprech.append(text, el('div', { class: 'salon-ratfuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden, in ' + (a.anrede || a.name) + 's Geist' + (r.thema ? ' · ' + (SALON_THEMEN.find((t) => t[0] === r.thema) || [])[1] : '')));
-    /* Schreibmaschine: der Rat erscheint Wort für Wort */
-    const woerter = r.text.split(' '); let i = 0;
-    const tick = () => { if (!text.isConnected) return; text.textContent = woerter.slice(0, ++i).join(' '); if (i < woerter.length) setTimeout(tick, 28 + Math.random() * 40); };
-    tick();
+    tippe(text, r.text);
   };
   const baueChips = () => {
     chips.innerHTML = '';
     chips.append(el('button', { class: 'suchchip' + (themaJetzt ? '' : ' an'), onclick: () => { themaJetzt = null; zaehler++; baueChips(); zeigeRat(); } }, 'Egal was'));
-    for (const [id, name] of SALON_THEMEN) {
-      if (!a.eigen && !(a.kern || []).some((k) => k[0] === id)) continue;
-      if (a.eigen) continue;
+    if (!a.eigen) for (const [id, name] of SALON_THEMEN) {
+      if (!(a.kern || []).some((k) => k[0] === id)) continue;
       chips.append(el('button', { class: 'suchchip' + (themaJetzt === id ? ' an' : ''), onclick: () => { themaJetzt = id; zaehler++; baueChips(); zeigeRat(); } }, name));
     }
   };
   baueChips();
   const zitate = el('div', { class: 'salon-zitate' });
-  const baueZitate = () => {
-    zitate.innerHTML = '';
-    if (!(a.zitate || []).length) { zitate.append(el('div', { class: 'salon-leer' }, 'Noch keine Zitate.')); return; }
-    for (const z of a.zitate) zitate.append(el('div', { class: 'salon-zitat' }, el('div', { class: 'sz-text' }, '„' + z.t + '“'), z.o ? el('div', { class: 'sz-original' }, z.o) : null, el('div', { class: 'sz-quelle' }, '— ' + a.name + (z.q ? ', ' + z.q : '')),
-      el('div', { class: 'sz-knoepfe' }, el('button', { class: 'knopf zart', onclick: () => { neuDoc('schnipsel', { text: '„' + z.t + '“\n— ' + a.name + (z.q ? ', ' + z.q : '') }); toast('Liegt als Zitat in den Schnipseln.'); } }, 'Als Schnipsel'),
-        el('button', { class: 'knopf zart', onclick: async () => { try { await navigator.clipboard.writeText('„' + z.t + '“ — ' + a.name + (z.q ? ', ' + z.q : '')); toast('Kopiert.'); } catch (e) { toast('Kopieren ging hier nicht.'); } } }, 'Kopieren'))));
+  if (!(a.zitate || []).length) zitate.append(el('div', { class: 'salon-leer' }, 'Noch keine Zitate.'));
+  else { if (a.en) zitate.append(el('div', { class: 'salon-hinweis' }, 'Im Original. „Übersetzung" zeigt die deutsche Fassung.')); for (const z of a.zitate) zitate.append(salonZitatElement(a, z, true)); }
+  const aufgaben = el('div', { class: 'salon-aufgaben' });
+  if (!(a.aufgaben || []).length) aufgaben.append(el('div', { class: 'salon-leer' }, a.eigen ? 'Eigene Leute stellen (noch) keine Aufgaben.' : 'Keine Aufgaben.'));
+  else for (const au of a.aufgaben) aufgaben.append(el('button', { class: 'salon-aufgabe', onclick: () => { zu(); salonAufgabeAnnehmen(a, au); } }, el('i', {}, au.t), el('small', {}, (au.min ? au.min + ' Minuten' : 'ohne Uhr') + (au.ziel ? ' · etwa ' + au.ziel + ' Wörter' : '') + ' · annehmen')));
+  const werke = el('div', { class: 'salon-regal' });
+  const baueWerke = () => {
+    werke.innerHTML = '';
+    if (!(a.werke || []).length) { werke.append(el('div', { class: 'salon-leer' }, 'Kein Regal.')); return; }
+    const gelesen = salonGelesen(a);
+    const brett = el('div', { class: 'salon-bretter' });
+    a.werke.forEach(([t, j], i) => brett.append(el('button', { class: 'salon-buchruecken' + (gelesen.includes(t) ? ' gelesen' : ''), style: '--i:' + i + ';--h:' + (150 + ((i * 37) % 40)) + 'px', title: t + (j ? ' (' + j + ')' : '') + ' — tippen: gelesen/ungelesen', onclick: (ev) => { const an = !ev.currentTarget.classList.contains('gelesen'); salonGelesenSetzen(a, t, an); ev.currentTarget.classList.toggle('gelesen', an); zahl.textContent = salonGelesen(a).length + ' von ' + a.werke.length + ' gelesen'; } }, el('span', {}, t), el('small', {}, j ? String(j) : ''))));
+    const zahl = el('div', { class: 'salon-regalzahl' }, gelesen.length + ' von ' + a.werke.length + ' gelesen');
+    werke.append(brett, el('i', { class: 'salon-regalbrett' }), zahl, el('div', { class: 'salon-hinweis' }, 'Tippen markiert ein Buch als gelesen. Die Liste reist mit den Einstellungen.'));
   };
-  baueZitate();
+  baueWerke();
   const reiter = el('div', { class: 'salon-reiter' });
-  const seiten = { rat: el('div', { class: 'salon-seite an' }, chips, sprech, el('div', { class: 'reihe', style: 'justify-content:flex-start' },
+  const seiten = {
+    rat: el('div', { class: 'salon-seite' }, chips, sprech, el('div', { class: 'reihe', style: 'justify-content:flex-start' },
       el('button', { class: 'knopf voll', onclick: () => { zaehler++; zeigeRat(); } }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Noch einen Rat'),
       el('button', { class: 'knopf', onclick: () => { const t = sprech.querySelector('.salon-rat'); if (!t) return; neuDoc('schnipsel', { text: t.textContent + '\n— ' + a.name + ' (erfundener Rat aus dem Salon)' }); toast('Liegt in den Schnipseln.'); } }, 'Merken'),
       el('button', { class: 'knopf', onclick: () => { const t = sprech.querySelector('.salon-rat'); if (!t) return; const b = blattAusText('', '„' + t.textContent + '“ — ' + a.name + '\n\n'); zu(); oeffneSchreibraum(b.id); } }, 'Damit schreiben'))),
     zitate: el('div', { class: 'salon-seite' }, zitate),
+    aufgaben: el('div', { class: 'salon-seite' }, el('div', { class: 'salon-hinweis' }, 'Erfundene Übungen in dieser Stimme. Annehmen legt ein Blatt an und startet die Uhr.'), aufgaben),
+    werke: el('div', { class: 'salon-seite' }, werke),
     ueber: el('div', { class: 'salon-seite' }, el('div', { class: 'salon-ueber' }, el('p', {}, a.kurz || ''), a.foto ? el('p', { class: 'salon-lizenz' }, 'Foto: ' + a.foto.urheber + ', ' + a.foto.lizenz + ' (Wikimedia Commons).') : null,
-      a.eigen ? el('div', { class: 'reihe', style: 'justify-content:flex-start' }, el('button', { class: 'knopf', onclick: () => { zu(); salonEigenenBearbeiten(a.doc); } }, 'Bearbeiten'), el('button', { class: 'knopf zart', onclick: async () => { if (await frage(a.name + ' von der Wand nehmen?', { ja: 'Abnehmen', gefahr: true })) { await loesche(a.doc.id); zu(); zeichne(); } } }, 'Abnehmen')) : null)) };
-  const reiterKnopf = (id, name) => el('button', { class: 'salon-reiterknopf' + (id === 'rat' ? ' an' : ''), onclick: (ev) => { for (const k of Object.keys(seiten)) seiten[k].classList.toggle('an', k === id); $$('.salon-reiterknopf', reiter).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); } }, name);
-  reiter.append(reiterKnopf('rat', 'Rat'), reiterKnopf('zitate', 'Zitate (' + (a.zitate || []).length + ')'), reiterKnopf('ueber', 'Über'));
-  const kopfbild = a.bild ? el('img', { src: a.bild, alt: '', draggable: 'false', style: 'object-position:' + (a.lage || '50% 30%') }) : (a.bildId ? (() => { const img = el('img', { alt: '' }); setzeBild(img, a.bildId); return img; })() : el('div', { class: 'salon-monogramm' }, (a.name || '?').slice(0, 1)));
+      a.eigen ? el('div', { class: 'reihe', style: 'justify-content:flex-start' }, el('button', { class: 'knopf', onclick: () => { zu(); salonEigenenBearbeiten(a.doc); } }, 'Bearbeiten'), el('button', { class: 'knopf zart', onclick: async () => { if (await frage(a.name + ' von der Wand nehmen?', { ja: 'Abnehmen', gefahr: true })) { await loesche(a.doc.id); zu(); zeichne(); } } }, 'Abnehmen')) : null))
+  };
+  const reiterKnopf = (id, name) => el('button', { class: 'salon-reiterknopf' + (id === reiterStart ? ' an' : ''), onclick: (ev) => { for (const k of Object.keys(seiten)) seiten[k].classList.toggle('an', k === id); $$('.salon-reiterknopf', reiter).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); } }, name);
+  seiten[reiterStart].classList.add('an');
+  reiter.append(reiterKnopf('rat', 'Rat'), reiterKnopf('zitate', 'Zitate (' + (a.zitate || []).length + ')'), reiterKnopf('aufgaben', 'Aufgaben'), reiterKnopf('werke', 'Werke'), reiterKnopf('ueber', 'Über'));
   const kasten = el('div', { class: 'modal salon-fenster ' + (a.rahmen || 'nuss') },
-    el('div', { class: 'salon-fenster-kopf' }, el('div', { class: 'salon-fenster-foto' }, kopfbild), el('div', {}, el('h2', {}, a.name), el('div', { class: 'salon-fenster-unter' }, [a.jahre, a.woher].filter(Boolean).join(' · '))), el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Schließen', onclick: () => zu() })),
-    reiter, seiten.rat, seiten.zitate, seiten.ueber);
+    el('div', { class: 'salon-fenster-kopf' }, el('div', { class: 'salon-fenster-foto' }, salonPortraet(a)), el('div', {}, el('h2', {}, a.name), el('div', { class: 'salon-fenster-unter' }, [a.jahre, a.woher].filter(Boolean).join(' · '))), el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Schließen', onclick: () => zu() })),
+    reiter, seiten.rat, seiten.zitate, seiten.aufgaben, seiten.werke, seiten.ueber);
   const zu = zeigeDeck(kasten);
-  zeigeRat();
+  if (reiterStart === 'rat') zeigeRat();
+}
+
+/* Eine Aufgabe annehmen: Blatt mit Kopfzeile, Schreibraum, Uhr. */
+function salonAufgabeAnnehmen(a, au) {
+  const kopf = 'Schreibaufgabe von ' + a.name + ':\n' + au.t + (au.ziel ? ' (etwa ' + au.ziel + ' Wörter)' : '') + '\n\n';
+  const b = blattAusText('Aufgabe · ' + a.name, kopf);
+  oeffneSchreibraum(b.id);
+  if (au.min && typeof starteSprint === 'function') setTimeout(() => starteSprint(au.min), 500);
+  toast(a.anrede ? a.anrede + ' schaut zu.' : 'Die Wand schaut zu.', 2600);
+}
+
+/* Die Runde: alle antworten nacheinander, jede in ihrer Stimme. */
+function salonRunde(frageText) {
+  const thema = salonThemaAusFrage(frageText);
+  const stimmen = SALON_FEST.filter((a) => (a.kern || []).length);
+  const liste = el('div', { class: 'salon-runde' });
+  const kasten = el('div', { class: 'modal salon-rundenfenster' },
+    el('div', { class: 'salon-runde-kopf' }, el('div', {}, el('h2', {}, 'Die Runde'), el('div', { class: 'salon-fenster-unter' }, '„' + frageText.slice(0, 120) + '“' + (thema ? ' · Thema: ' + (SALON_THEMEN.find((t) => t[0] === thema) || [])[1] : ''))), el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Schließen', onclick: () => zu() })),
+    liste,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf', onclick: () => { liste.innerHTML = ''; runde(Math.floor(Math.random() * 1e9)); } }, 'Noch eine Runde'), el('button', { class: 'knopf voll', onclick: () => zu() }, 'Danke')));
+  const zu = zeigeDeck(kasten);
+  const runde = (saat) => {
+    let i = 0;
+    const naechste = () => {
+      if (!liste.isConnected || i >= stimmen.length) return;
+      const a = stimmen[i++];
+      const r = salonRat(a, salonHash(frageText + ':' + a.id + ':' + saat), thema) || salonRat(a, saat + i);
+      const text = el('div', { class: 'sr-text' });
+      const blase = el('div', { class: 'salon-blase ' + (a.rahmen || 'nuss') }, el('div', { class: 'salon-blase-foto' }, salonPortraet(a)), el('div', { class: 'salon-blase-inhalt' }, el('b', {}, a.name), text, el('small', {}, 'erfunden, in ' + (a.anrede || a.name) + 's Geist')));
+      liste.append(blase); blase.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      const w = (r ? r.text : '…').split(' '); let k = 0;
+      const tick = () => { if (!text.isConnected) return; text.textContent = w.slice(0, ++k).join(' '); if (k < w.length) setTimeout(tick, 22 + Math.random() * 30); else setTimeout(naechste, 420); };
+      tick();
+    };
+    naechste();
+  };
+  runde(salonHash(frageText));
 }
 
 function salonUeberBilder() {
   const kasten = el('div', { class: 'modal' }, el('h2', {}, 'Über die Bilder'),
-    el('p', { style: 'font-size:14px;line-height:1.5' }, 'Die Porträts stammen von Wikimedia Commons und stehen unter freien Lizenzen. Die Zitate sind echt und tragen ihre Quelle; Übersetzungen sind eigene, das Original steht dabei. Die Ratschläge sind erfunden — geschrieben in der Stimme der jeweiligen Person, als Inspiration, nie als Zitat.'),
-    ...SALON_AUTOREN.map((a) => el('div', { class: 'salon-lizenz' }, el('b', {}, a.name), ': ' + a.foto.urheber + ', ' + a.foto.lizenz + ' — ', el('a', { href: a.foto.seite, target: '_blank', rel: 'noopener' }, 'Commons'))),
+    el('p', { style: 'font-size:14px;line-height:1.5' }, 'Die Porträts stammen von Wikimedia Commons und stehen unter freien Lizenzen. Die Zitate sind echt und tragen ihre Quelle; Übersetzungen sind eigene, das Original steht dabei. Die Ratschläge und Aufgaben sind erfunden — geschrieben in der Stimme der jeweiligen Person, als Inspiration, nie als Zitat.'),
+    ...SALON_FEST.map((a) => el('div', { class: 'salon-lizenz' }, el('b', {}, a.name), ': ' + a.foto.urheber + ', ' + a.foto.lizenz + ' — ', el('a', { href: a.foto.seite, target: '_blank', rel: 'noopener' }, 'Commons'))),
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
   const zu = zeigeDeck(kasten);
 }

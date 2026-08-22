@@ -44,6 +44,28 @@
    "lizenzUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
    "seite": "https://commons.wikimedia.org/wiki/File:Erich_K%C3%A4stner_1961_(cropped).jpg",
    "quelle": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Erich_K%C3%A4stner_1961_%28cropped%29.jpg/960px-Erich_K%C3%A4stner_1961_%28cropped%29.jpg"
+  },
+  {
+   "id": "pratchett",
+   "name": "Terry Pratchett",
+   "datei": "autoren/pratchett.jpg",
+   "titel": "10.12.12TerryPratchettByLuigiNovi1b.jpg",
+   "urheber": "Luigi Novi",
+   "lizenz": "CC BY 3.0",
+   "lizenzUrl": "https://creativecommons.org/licenses/by/3.0/",
+   "seite": "https://commons.wikimedia.org/wiki/File:10.12.12TerryPratchettByLuigiNovi1b.jpg",
+   "quelle": "https://upload.wikimedia.org/wikipedia/commons/0/0d/10.12.12TerryPratchettByLuigiNovi1b.jpg"
+  },
+  {
+   "id": "lindgren",
+   "name": "Astrid Lindgren",
+   "datei": "autoren/lindgren.jpg",
+   "titel": "Astrid Lindgren (cropped).jpg",
+   "urheber": "unbekannt (gemeinfrei)",
+   "lizenz": "Public Domain",
+   "lizenzUrl": "https://commons.wikimedia.org/wiki/Template:PD-old",
+   "seite": "https://commons.wikimedia.org/wiki/File:Astrid_Lindgren_(cropped).jpg",
+   "quelle": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Astrid_Lindgren_%28cropped%29.jpg"
   }
  ]
 }

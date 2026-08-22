@@ -2336,3 +2336,118 @@ html[data-thema="tinte"] .salon-galerie, html[data-thema="kerze"] .salon-galerie
 @media (max-width: 700px) { .salon { padding-inline: 12px; } .salon-galerie { padding: 22px 14px 30px; gap: 26px 16px; grid-template-columns: repeat(2, 1fr); } .salon-rahmen { padding: 12px 12px 10px; } .salon-passepartout { padding: 8px; } .salon-kurz { font-size: 12px; } .salon-tageskarte { max-width: none; } }
 @media (max-width: 420px) { .salon-galerie { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .salon-rahmen { animation: none; } }
+
+/* ----- Salon, Stufe zwei: Fragezeile, Gäste, Ecken, Aufgaben, Regal, Runde, Original zuerst ----- */
+.salon-fragezeile { display: flex; align-items: center; gap: 10px; margin: 4px 0 16px; padding: 8px 10px 8px 16px; border-radius: 16px; background: var(--karte); box-shadow: 0 1px 5px var(--schein), inset 0 0 0 1px var(--linie); }
+.salon-fragezeile input { flex: 1; min-width: 0; font-size: 16px; padding: 8px 0; }
+.salon-fragezeile .knopf { white-space: nowrap; }
+@media (max-width: 600px) { .salon-fragezeile { flex-wrap: wrap; } .salon-fragezeile .knopf { width: 100%; justify-content: center; } }
+.salon[data-licht="nacht"] .salon-galerie { background: radial-gradient(ellipse at 50% 0%, rgba(255,210,150,.16), transparent 60%), repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 2px, transparent 2px 58px), linear-gradient(180deg, #2a2019, #16110d); }
+.salon[data-licht="nacht"] .salon-kurz { color: rgba(255,240,215,.78); }
+.salon[data-licht="nacht"] .salon-lampe::after { background: linear-gradient(rgba(255,220,150,.42), rgba(255,220,150,.1) 50%, transparent); }
+.salon[data-licht="abend"] .salon-galerie { background: radial-gradient(ellipse at 50% 0%, rgba(255,200,140,.22), transparent 60%), repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 2px, transparent 2px 58px), linear-gradient(180deg, color-mix(in srgb, var(--hg2) 80%, #6a4a30), color-mix(in srgb, var(--hg2) 70%, #3a2818)); }
+/* Zierecken an den Rahmen */
+.salon-ecke { position: absolute; width: 18px; height: 18px; pointer-events: none; background: radial-gradient(circle at 50% 50%, rgba(255,235,190,.55), rgba(255,235,190,.12) 45%, transparent 60%); }
+.salon-ecke.e1 { left: 3px; top: 3px; } .salon-ecke.e2 { right: 3px; top: 3px; } .salon-ecke.e3 { left: 3px; bottom: 3px; } .salon-ecke.e4 { right: 3px; bottom: 3px; }
+.salon-rahmen.gold .salon-ecke, .salon-rahmen.kupfer .salon-ecke { background: radial-gradient(circle at 50% 50%, rgba(255,250,220,.9), rgba(255,240,190,.25) 40%, transparent 60%); }
+.salon-galerie.klein { padding: 22px 20px 28px; gap: 24px 20px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.salon-galerie.klein .salon-rahmen { max-width: 210px; }
+.salon-gaeste { margin-top: 22px; }
+.salon-abschnitt { font: 600 12px ui-rounded, -apple-system, system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--blass); margin: 0 0 8px 6px; }
+.salon-rahmen.gast .salon-schild { background: linear-gradient(#d8d2c4, #8f897c); }
+/* Schreibaufgabe des Tages */
+.salon-aufgabe-heute { display: flex; gap: 14px; align-items: center; width: 100%; margin-top: 18px; padding: 14px 16px; border-radius: 16px; text-align: left; background: var(--karte); box-shadow: 0 1px 5px var(--schein), inset 0 0 0 1px var(--linie); transition: transform .2s; }
+.salon-aufgabe-heute:hover { transform: translateY(-2px); }
+.salon-aufgabe-heute .sa-foto { width: 52px; height: 64px; border-radius: 3px; overflow: hidden; flex: none; box-shadow: 0 0 0 3px #a8832f, 0 3px 8px rgba(0,0,0,.3); background: #2a2422; }
+.salon-aufgabe-heute .sa-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.salon-aufgabe-heute .sa-text { display: grid; gap: 3px; min-width: 0; }
+.salon-aufgabe-heute .sa-text b { font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--blass); }
+.salon-aufgabe-heute .sa-text i { font: italic 15.5px/1.45 ui-serif, "New York", Georgia, serif; }
+.salon-aufgabe-heute .sa-text small { font-size: 12px; color: var(--blass); }
+.salon-sockel { height: 14px; margin-top: 18px; border-radius: 3px; background: linear-gradient(#7a5636, #3a2818); box-shadow: 0 6px 14px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.14); }
+/* Aufgaben im Fenster */
+.salon-aufgabe { display: grid; gap: 4px; width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.salon-aufgabe:hover { background: color-mix(in srgb, var(--karte) 85%, var(--akzent)); }
+.salon-aufgabe i { font: italic 15px/1.45 ui-serif, "New York", Georgia, serif; }
+.salon-aufgabe small { font-size: 12px; color: var(--blass); }
+.salon-hinweis { font-size: 12.5px; color: var(--blass); margin-bottom: 10px; }
+/* Das Regal */
+.salon-regal { position: relative; padding: 10px 6px 0; }
+.salon-bretter { display: flex; align-items: flex-end; gap: 3px; flex-wrap: wrap; padding: 0 8px; }
+.salon-buchruecken { position: relative; width: 34px; height: var(--h, 160px); border-radius: 2px 2px 1px 1px; text-align: left; cursor: pointer; overflow: hidden; transform: rotate(calc((var(--i, 0) % 3 - 1) * .6deg)); transform-origin: bottom; transition: transform .2s;
+  background: linear-gradient(90deg, rgba(0,0,0,.25), transparent 30%, rgba(255,255,255,.08) 70%, rgba(0,0,0,.2)), hsl(calc(var(--i, 0) * 47), 32%, 36%); box-shadow: 0 2px 4px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.2); color: #f3e7c9; }
+.salon-buchruecken:hover { transform: translateY(-6px); }
+.salon-buchruecken span { position: absolute; left: 50%; top: 10px; bottom: 22px; writing-mode: vertical-rl; transform: translateX(-50%); font: 600 11px ui-serif, "New York", Georgia, serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .02em; }
+.salon-buchruecken small { position: absolute; left: 0; right: 0; bottom: 4px; text-align: center; font-size: 8.5px; opacity: .8; }
+.salon-buchruecken.gelesen { box-shadow: 0 2px 4px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.2), 0 0 0 2px #c9a25a; }
+.salon-buchruecken.gelesen::after { content: "✓"; position: absolute; right: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: #c9a25a; color: #2b1d0c; font-size: 10px; line-height: 14px; text-align: center; font-weight: 700; }
+.salon-regalbrett { display: block; height: 10px; margin-top: 0; border-radius: 2px; background: linear-gradient(#7a5636, #3a2818); box-shadow: 0 5px 10px rgba(0,0,0,.3); }
+.salon-regalzahl { margin-top: 8px; font-size: 12.5px; color: var(--blass); }
+/* Die Runde */
+.modal.salon-rundenfenster { width: min(680px, calc(100vw - 32px)); max-height: min(86dvh, calc(var(--vvh, 100dvh) - 32px)); display: flex; flex-direction: column; }
+.salon-runde-kopf { display: flex; align-items: flex-start; gap: 10px; } .salon-runde-kopf > div:first-child { flex: 1; min-width: 0; } .salon-runde-kopf h2 { margin-bottom: 2px; }
+.salon-runde { flex: 1; min-height: 160px; overflow: auto; margin: 12px 0 4px; display: grid; gap: 12px; align-content: start; }
+.salon-blase { display: flex; gap: 12px; align-items: flex-start; animation: hochkommen .25s ease; }
+.salon-blase-foto { width: 44px; height: 56px; border-radius: 3px; overflow: hidden; flex: none; box-shadow: 0 0 0 3px #a8832f, 0 3px 8px rgba(0,0,0,.3); background: #2a2422; }
+.salon-blase.gold .salon-blase-foto { box-shadow: 0 0 0 3px #d9b463, 0 3px 8px rgba(0,0,0,.3); } .salon-blase.kupfer .salon-blase-foto { box-shadow: 0 0 0 3px #b8744a, 0 3px 8px rgba(0,0,0,.3); } .salon-blase.dunkel .salon-blase-foto { box-shadow: 0 0 0 3px #3a3432, 0 3px 8px rgba(0,0,0,.3); }
+.salon-blase-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.salon-blase-inhalt { flex: 1; min-width: 0; padding: 10px 14px; border-radius: 14px 14px 14px 4px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.salon-blase-inhalt b { display: block; font-size: 12px; letter-spacing: .06em; color: var(--blass); margin-bottom: 3px; }
+.salon-blase-inhalt .sr-text { font: 15.5px/1.5 ui-serif, "New York", Georgia, serif; min-height: 22px; }
+.salon-blase-inhalt small { display: block; margin-top: 5px; font-size: 11px; color: var(--blass); }
+/* Zitate: Original zuerst */
+.sz-text.en { font-style: italic; }
+.sz-uebersetzung { margin-top: 6px; padding: 8px 12px; border-left: 3px solid var(--gold); font: 14.5px/1.5 ui-serif, "New York", Georgia, serif; color: var(--tinte); background: color-mix(in srgb, var(--karte) 70%, transparent); border-radius: 0 8px 8px 0; animation: hochkommen .2s ease; }
+.salon-fenster.liest .salon-fenster-foto { box-shadow: 0 0 0 3px rgba(255,255,255,.35), 0 0 26px rgba(255,200,120,.7), 0 4px 10px rgba(0,0,0,.4); transition: box-shadow .4s; }
+.salon-fenster .salon-reiter { flex-wrap: wrap; }
+
+/* ===================== RÄUME ALS ORTE (zuschaltbar) ===================== */
+.ort-kulisse { position: relative; margin: 0 0 -6px; overflow: hidden; }
+.ort-kulisse .ort-bild { display: block; width: 100%; height: 120px; }
+.ort-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 22px 4px; }
+.ort-chip { padding: 5px 11px; border-radius: 100px; font-size: 12.5px; background: var(--karte); color: var(--tinte); box-shadow: inset 0 0 0 1px var(--linie); }
+.ort-chip.still { color: var(--blass); box-shadow: none; background: none; }
+.ort-schal { animation: ort-schal 5s ease-in-out infinite alternate; transform-origin: 278px 48px; } @keyframes ort-schal { to { transform: rotate(2deg); } }
+.ort-lichtkegel { animation: ort-kegel 3.5s ease-in-out infinite alternate; } @keyframes ort-kegel { to { opacity: .6; } }
+.ort-platte.dreht { animation: ort-dreht 4s linear infinite; } @keyframes ort-dreht { to { transform: rotate(360deg); } }
+.ort-schnur { animation: ort-schnur 4s ease-in-out infinite alternate; transform-origin: 660px 78px; } @keyframes ort-schnur { to { transform: rotate(3deg); } }
+/* Türen */
+#raum.tuer-auf > *:not(.ort-kulisse) { animation: tuer-auf .5s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes tuer-auf { from { opacity: 0; transform: perspective(1000px) rotateY(-5deg) translateX(-14px); } to { opacity: 1; transform: none; } }
+/* Diele */
+#raum[data-ort="zuhause"] .ort-kulisse { box-shadow: 0 8px 20px var(--schein); }
+/* Zettelkasten: Schnipsel als Karteikarten */
+#raum[data-ort="schnipsel"] .schnipsel-lauf .blase { border-radius: 3px; background-image: repeating-linear-gradient(transparent 0 25px, rgba(90,110,170,.18) 25px 26px), linear-gradient(#fbf6e8, #f3eadb); background-position-y: 12px; box-shadow: 0 2px 5px var(--schein), inset 0 0 0 1px rgba(90,74,52,.14); border-top: 3px solid rgba(200,80,80,.45); transform: rotate(calc((var(--n, 0) - 1) * .3deg)); }
+#raum[data-ort="schnipsel"] .schnipsel-lauf .blase:nth-child(2n) { transform: rotate(-.3deg); }
+/* Papierstapel */
+#raum[data-ort="blaetter"] .blattliste > * { position: relative; border-radius: 2px; background: linear-gradient(170deg, #fbf6e8, #f1e6d0); box-shadow: 0 1px 0 #e5d9c0, 0 3px 0 -1px #f5ecd9, 0 4px 0 -1px #e5d9c0, 0 10px 20px var(--schein); }
+#raum[data-ort="blaetter"] .blattliste > *::after { content: ""; position: absolute; right: 0; top: 0; width: 0; height: 0; border-style: solid; border-width: 0 18px 18px 0; border-color: transparent var(--hg) transparent transparent; filter: drop-shadow(-1px 1px 1px rgba(0,0,0,.15)); }
+/* Korkwand */
+#raum[data-ort="projekte"] .inhalt { background: #c9a878 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Ccircle cx='6' cy='9' r='1.6' fill='rgba(90,60,30,.22)'/%3E%3Ccircle cx='19' cy='20' r='1.2' fill='rgba(90,60,30,.18)'/%3E%3Ccircle cx='23' cy='5' r='1' fill='rgba(255,240,210,.3)'/%3E%3C/svg%3E"); border-radius: 14px; padding-top: 18px; }
+#raum[data-ort="projekte"] .projektliste > *, #raum[data-ort="projekte"] .szkarte { position: relative; transform: rotate(calc((var(--n, 0) - 1) * .6deg)); box-shadow: 0 6px 14px rgba(0,0,0,.25); }
+#raum[data-ort="projekte"] .projektliste > *::before, #raum[data-ort="projekte"] .szkarte::before { content: ""; position: absolute; left: 50%; top: -6px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #e74c3c, #8a1c12); box-shadow: 0 2px 3px rgba(0,0,0,.4); z-index: 3; }
+#raum[data-ort="projekte"] .projektliste > *:nth-child(2n) { transform: rotate(-.7deg); }
+/* Tischtuch */
+#raum[data-ort="cluster"] .inhalt { background: #ebe5d6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M0 3h6M3 0v6' stroke='rgba(90,74,52,.08)'/%3E%3C/svg%3E"); border-radius: 14px; padding-top: 18px; }
+#raum[data-ort="cluster"] .brettliste .brettkarte { border-radius: 50% 46% 52% 48% / 48% 52% 46% 54%; background: linear-gradient(135deg, #fbf7ee, #e9e0cc); box-shadow: 0 6px 14px rgba(0,0,0,.18), inset 0 0 0 1px rgba(90,74,52,.12); padding: 22px 24px; }
+/* Setzkasten */
+#raum[data-ort="woerter"] .wortkarte { background: linear-gradient(#3d3d42, #2b2b2e); color: #e9e4d8; border-radius: 4px; box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 -2px 0 rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.3); }
+#raum[data-ort="woerter"] .wortkiste-ruecken { background: linear-gradient(90deg, #5a4326, #8a6a3e 50%, #5a4326); color: #f3e7c9; }
+/* Musikzimmer */
+#raum[data-ort="klang"] .ambience-zeile { border-radius: 6px; background: linear-gradient(135deg, var(--karte), color-mix(in srgb, var(--karte) 85%, #000)); box-shadow: inset 0 0 0 1px var(--linie), 0 2px 6px var(--schein); }
+/* Telefonbank */
+#raum[data-ort="faden"] .schnipsel-lauf .blase { border-radius: 2px; background: repeating-linear-gradient(transparent 0 23px, rgba(90,74,52,.12) 23px 24px), #f7efe0; box-shadow: 0 2px 4px var(--schein); }
+/* Werkzeugkasten */
+#raum[data-ort="feinheiten"] .abschnitt > .karte { position: relative; background: linear-gradient(#8a6a3e, #6b4a32); color: #f3e7c9; box-shadow: inset 0 2px 0 rgba(255,255,255,.12), 0 4px 10px rgba(0,0,0,.3); --blass: #d8c7a6; --linie: rgba(255,230,180,.16); --karte: rgba(0,0,0,.18); }
+#raum[data-ort="feinheiten"] .abschnitt > .karte::after { content: ""; position: absolute; right: 16px; top: 10px; width: 36px; height: 8px; border-radius: 4px; background: linear-gradient(#d9b463, #7a5a2a); box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+#raum[data-ort="feinheiten"] .abschnitt > .karte input, #raum[data-ort="feinheiten"] .abschnitt > .karte textarea { color: #f3e7c9; }
+.orte-liste.aus { opacity: .45; pointer-events: none; }
+/* Zettel schütteln */
+.ort-zettel { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 10px 0; }
+.ort-zettelkarte { width: 150px; min-height: 120px; padding: 12px; border-radius: 3px; text-align: left; background: repeating-linear-gradient(transparent 0 21px, rgba(90,110,170,.16) 21px 22px), #fbf6e8; color: #2c2218; box-shadow: 0 6px 14px rgba(0,0,0,.2); transform: rotate(var(--dreh, 0deg)); font: 13px/22px ui-serif, Georgia, serif; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; }
+.ort-zettelkarte small { font-size: 10.5px; color: #8a7a62; font-family: ui-rounded, system-ui, sans-serif; }
+html[data-thema="tinte"] #raum[data-ort="blaetter"] .blattliste > *, html[data-thema="kerze"] #raum[data-ort="blaetter"] .blattliste > * { background: linear-gradient(170deg, #2a241e, #211c17); box-shadow: 0 1px 0 #15110f, 0 3px 0 -1px #2a241e, 0 4px 0 -1px #15110f, 0 10px 20px rgba(0,0,0,.5); }
+html[data-thema="tinte"] #raum[data-ort="schnipsel"] .schnipsel-lauf .blase, html[data-thema="kerze"] #raum[data-ort="schnipsel"] .schnipsel-lauf .blase { background-image: repeating-linear-gradient(transparent 0 25px, rgba(120,140,200,.16) 25px 26px), linear-gradient(#2a241e, #221d18); }
+html[data-thema="tinte"] #raum[data-ort="projekte"] .inhalt, html[data-thema="kerze"] #raum[data-ort="projekte"] .inhalt { background-color: #4a3a2a; }
+html[data-thema="tinte"] #raum[data-ort="cluster"] .inhalt, html[data-thema="kerze"] #raum[data-ort="cluster"] .inhalt { background-color: #2a2622; }
+@media (prefers-reduced-motion: reduce) { #raum.tuer-auf > * { animation: none; } .ort-platte.dreht, .ort-schal, .ort-schnur, .ort-lichtkegel { animation: none; } }

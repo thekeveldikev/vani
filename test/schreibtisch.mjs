@@ -276,6 +276,18 @@ test('Schreibfeuer: Flammenhöhe am Tagesziel, Scheite nach Tagen in Folge, Bild
 test('Salon: vier Stimmen, echte Zitate mit Quelle, Rat wiederholbar und unerschöpflich', async () => {
   const k = await frisch();
   assert.equal(k.SALON_AUTOREN.length, 4);
+  assert.equal(k.SALON_GAESTE.length, 2);
+  assert.equal(k.SALON_FEST.length, 6);
+  for (const g of k.SALON_GAESTE) { assert.ok(g.gast && g.zitate.length >= 5 && g.saetze.length >= 12 && g.kern.length >= 10 && g.foto && g.foto.lizenz, g.name + ' als Gast vollständig'); }
+  /* Werke und Aufgaben bei den Hausherren */
+  for (const a of k.SALON_AUTOREN) { assert.ok(a.werke.length >= 4, a.name + ' hat ein Regal'); assert.ok(a.aufgaben.length >= 5, a.name + ' stellt Aufgaben'); for (const au of a.aufgaben) assert.ok(au.t.length > 20 && typeof au.min === 'number'); }
+  assert.ok(k.SALON_AUTOREN.filter((a) => a.en).length === 2, 'King und Rothfuss sind englische Stimmen');
+  for (const a of k.SALON_AUTOREN.filter((x) => x.en)) for (const z of a.zitate) assert.ok(z.o, a.name + ': englische Zitate tragen das Original');
+  /* Fragen finden ihr Thema */
+  assert.equal(k.salonThemaAusFrage('Mein Anfang ist langweilig'), 'anfang');
+  assert.equal(k.salonThemaAusFrage('Wie bleibe ich jeden Tag dran?'), 'routine');
+  assert.equal(k.salonThemaAusFrage('Ich bin müde und blockiert'), 'pause');
+  assert.equal(k.salonThemaAusFrage('Hallo'), null);
   for (const a of k.SALON_AUTOREN) {
     assert.ok(a.zitate.length >= 5, a.name + ' hat Zitate');
     for (const z of a.zitate) { assert.ok(z.t.length > 10); assert.ok(z.q && z.q.length > 2, a.name + ': jedes Zitat trägt eine Quelle'); }
@@ -298,4 +310,16 @@ test('Salon: vier Stimmen, echte Zitate mit Quelle, Rat wiederholbar und unersch
   assert.notEqual(k.salonRatDesTages(king, '2026-08-24').text, k.salonRatDesTages(k.SALON_AUTOREN[1], '2026-08-24').text);
   assert.equal(k.salonRat(null, 1), null);
   assert.equal(typeof k.salonHash('abc'), 'number');
+});
+
+test('Orte: standardmäßig aus, je Raum schaltbar, Routen finden ihren Ort', async () => {
+  const k = await frisch();
+  const o = roh(k.saubereOrte(undefined));
+  assert.equal(o.an, false, 'Orte sind standardmäßig aus');
+  assert.equal(o.tueren, true); assert.equal(o.geraeusche, false);
+  for (const [id] of k.ORTE_RAEUME) assert.equal(o[id], true, id + ' ist vorbereitet, sobald man einschaltet');
+  const o2 = roh(k.saubereOrte({ an: true, schnipsel: false, geraeusche: true, unsinn: 3 }));
+  assert.equal(o2.an, true); assert.equal(o2.schnipsel, false); assert.equal(o2.geraeusche, true); assert.equal(o2.unsinn, undefined);
+  assert.equal(k.orteRaumFuer('heft'), 'hefte'); assert.equal(k.orteRaumFuer('projekt'), 'projekte'); assert.equal(k.orteRaumFuer('brett'), 'cluster'); assert.equal(k.orteRaumFuer('klang'), 'klang');
+  assert.ok(k.ORTE_RAEUME.length >= 10);
 });

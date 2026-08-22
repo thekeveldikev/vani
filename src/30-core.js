@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.22.0';
+const APP_VERSION = '5.23.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -342,7 +342,7 @@ const STANDARD_EINST = {
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
   stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
   ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95,
-  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null
+  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null
 };
 const D = {
   docs: new Map(),
@@ -375,6 +375,7 @@ function uebernehmeEinstellungen(quelle) {
   D.einst.hefteAnsicht = ['karten', 'regal', 'tisch'].includes(D.einst.hefteAnsicht) ? D.einst.hefteAnsicht : 'karten';
   if (typeof saubererTisch === 'function') D.einst.tisch = saubererTisch(D.einst.tisch);
   if (typeof saubererSchreibtisch === 'function') D.einst.schreibtisch = saubererSchreibtisch(D.einst.schreibtisch);
+  if (typeof saubereOrte === 'function') D.einst.orte = saubereOrte(D.einst.orte);
   D.einst.fadenAbgewaehlt = D.einst.fadenAbgewaehlt === true;
   D.einst.blattSortierung = ['zuletzt', 'aeltest', 'az'].includes(D.einst.blattSortierung) ? D.einst.blattSortierung : 'zuletzt';
   D.einst.schnipselAnsicht = D.einst.schnipselAnsicht === 'frei' ? 'frei' : 'lauf';

@@ -1769,3 +1769,44 @@ Raum). `CODEX-UEBERGABE.md`: alles seit 5.9 für das Sites-Hosting (Ordner `auto
 Tests 159/159 (neu: Salon-Vertrag: 4 Stimmen, ≥ 5 Zitate mit Quelle, ≥ 3000 Vorrat, alle Themen
 je Stimme, Wiederholbarkeit, Vielfalt, Themenfilter). Browser: vier Rahmen mit Bildern, Rat des
 Tages je Person, Sprechfenster (Kästner: 12 Chips, Dialog-Rat, 14 Zitate mit Quelle).
+
+## 31. Salon, Stufe zwei — und Räume als Orte (24. August 2026, VANI 5.23.0)
+
+### Salon
+- **Frag die Wand**: Eingabezeile oben; `salonThemaAusFrage` (Stichwort → Thema, pur) und
+  `salonRunde(frage)`: alle sechs Stimmen antworten nacheinander als Sprechblasen mit
+  Porträt, Wort für Wort; „Noch eine Runde".
+- **Schreibaufgaben** je Hausherr (6), Reiter „Aufgaben" im Fenster und „Schreibaufgabe
+  des Tages" auf der Wand; `salonAufgabeAnnehmen` legt ein Blatt mit Kopfzeile an, öffnet
+  den Schreibraum und startet `starteSprint(min)`.
+- **Werkregal**: Reiter „Werke" mit gezeichneten Buchrücken (Titel, Jahr); Tipp = gelesen
+  (`D.einst.salonGelesen[id]`, STANDARD_EINST, reist mit).
+- **Lesung**: Knopf am Zitat liest die deutsche Fassung vor (`vorlesen`), das Foto im
+  Fensterkopf leuchtet (`.salon-fenster.liest`).
+- **Zitate im Original zuerst** (King, Rothfuss, Pratchett: `en: true`): englischer Text,
+  „Übersetzung" klappt die deutsche Fassung auf; Kopieren/Schnipsel nehmen beides.
+- **Gästezimmer**: Terry Pratchett (CC BY 3.0, Luigi Novi) und Astrid Lindgren (gemeinfrei)
+  mit je ≥ 5 Zitaten, ≥ 12 Sätzen, 11 Kernen; `SALON_GAESTE`, `SALON_FEST`.
+- Wand: Zierecken an den Rahmen, Licht der Wand folgt der Tageszeit (`data-licht`),
+  Sockelleiste, Fragezeile, Aufgabenkarte, Abschnitte „Gästezimmer"/„Deine Wand".
+- Daten liegen in `SALON_ZUSATZ` (Werke, Aufgaben, `en`) und werden beim Laden in
+  `SALON_AUTOREN` gemischt.
+
+### Räume als Orte (`src/57-orte.js`, Standard **aus**)
+- `saubereOrte` (pur): `an` (aus), `tueren` (an), `geraeusche` (aus), je Raum ein Schalter;
+  `orteRaumFuer` (heft→hefte, projekt→projekte, brett→cluster); `orteAktiv(raum)`.
+- Router ruft nach jedem Zeichnen `orteAnwenden(haupt, raum)`: setzt `data-orte` am
+  `html`, `data-raum`/`data-ort` am `#raum`, hängt `orteKulisse(raum)` davor (SVG-Bühnen:
+  Diele mit Garderobe/Spiegel/Konsole + Neuigkeiten-Chips, Zettelkasten mit Wochenreitern +
+  „Kasten schütteln" (drei zufällige Zettel), Papierstapel mit oberstem Titel, Lesetisch,
+  Korkwand mit Nadeln und roter Schnur, Tischtuch mit Steinen, Setzkasten mit gespiegelten
+  Lettern aus den letzten Titeln, Musikzimmer mit Plattenspieler (dreht, wenn Klang
+  spielt), Telefonbank, Werkzeugkasten) und lässt die Tür aufgehen (`.tuer-auf`, optional
+  Klick). Häute per CSS: Karteikarten, Papierstapel mit Eselsohr, angepinnte Karten auf
+  Kork, Steine auf Leinen, Bleilettern, Plattenhüllen, Papierstreifen, Schubladenfronten.
+- Feinheiten: neuer Abschnitt „Orte" (`orteKarte`): Hauptschalter, Türen, Geräusch, je Raum.
+
+Tests 160/160 (neu: Gäste/Werke/Aufgaben/`en`/Themenfrage, Orte-Vorgaben). Browser: Runde mit
+sechs Sprechblasen, King-Zitat im Original + Übersetzung auf Klick, Regal mit Gelesen-Häkchen,
+Aufgabe des Tages; Orte an: Diele mit drei Chips, Zettelkasten mit Reitern und Karteikarten,
+Kulissen in Projekte/Klang/Wörter/Feinheiten.

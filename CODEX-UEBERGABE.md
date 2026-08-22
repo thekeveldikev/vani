@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.22.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.23.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -33,7 +33,8 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
 | `src/49b-ankommen.js` | Umzug ohne Datei (Zwischenablage, Umzugshelfer) |
 | `src/54-schreibtisch.js`, `54b-schreibtisch-malerei.js`, `54c-schreibtisch-leben.js` | der Raum „Schreibtisch": Canvas-Malerei mit echtem Tag/Nacht- und Jahreszeiten-Zyklus, Lampe mit Zugschnur, Leuchter, Uhr, Bücherbord, offenes Buch, Blatt einspannen, Teelichter, Wetterglas |
 | `src/55-lesestapel.js`, `55b-epub.js` | Lesestapel (PDF über pdf.js, EPUB über eigenen ZIP-Leser), Lesemodus mit Notizen/Suche/Vorlesen/Randspalte |
-| `src/56-salon.js` | der Raum „Salon": vier Porträts, echte Zitate, Rat-Generator in vier Stimmen, eigene Leute |
+| `src/56-salon.js` | der Raum Salon: sechs Porträts (vier Hausherren, zwei Gäste), echte Zitate (Original zuerst), Rat-Generator, Frag die Wand, Schreibaufgaben, Werkregal, Lesung, eigene Leute |
+| `src/57-orte.js` | Räume als Orte: Kulissen und Häute je Raum, zuschaltbar (Feinheiten → Orte), Standard aus |
 | `vendor/pdf.min.js`, `vendor/pdf.worker.min.js`, `vendor/wasm/*` | pdf.js 6.2.108 + Decoder (Lizenzen liegen daneben) |
 | `autoren/*.jpg`, `autoren/quellen.json` | Porträts King/Kästner/Funke/Rothfuss (Wikimedia Commons, CC BY-SA 4.0 / CC0 / CC BY-SA 3.0 / CC BY-SA 3.0) |
 | `werkzeug/buecherkoffer.mjs`, `buecher/` | Bücherkoffer (AES-256-GCM, PBKDF2); nimmt PDF und EPUB |
@@ -63,6 +64,8 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   Feuerblut lesbar (WASM-Decoder), `:focus-visible`-Rahmen auf Textfeldern aus.
 - **5.22** Der Salon (Lieblingswand) + Karte „Aus dem Salon" auf dem Zuhause; Brainstorm in
   `IDEEN.md` („Das große Brainstorm").
+- **5.23** Salon Stufe zwei (Runde, Aufgaben, Werkregal, Lesung, Gäste Pratchett/Lindgren) und
+  Räume als Orte (Kulissen je Raum, zuschaltbar, Standard aus). `autoren/` hat jetzt sechs Fotos.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 
@@ -81,4 +84,4 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
 
 ## 5. Tests
 
-`npm test` → 159 grün (Stand 5.22.0). Hosting: `node --test hosting/tests/*.test.mjs` → 2 grün.
+`npm test` → 160 grün (Stand 5.23.0). Hosting: `node --test hosting/tests/*.test.mjs` → 2 grün.
