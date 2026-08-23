@@ -5441,3 +5441,198 @@ html[data-thema="tinte"] .knopf.gefahr, html[data-thema="kerze"] .knopf.gefahr {
 .tep-pilzhut { fill: #d3c9ac; stroke: #a2977a; stroke-width: .6; }
 .tep-pilzstiel { fill: #e2dac0; stroke: #a2977a; stroke-width: .55; }
 .tep-unterholz { filter: drop-shadow(0 1.5px 2px rgba(0,0,0,.45)); }
+
+/* Der Grund, in dem die Wurzeln verschwinden. Ohne ihn hören sie einfach auf. */
+/* Der Grund ist kein Balken, sondern ein weicher Saum — die Wurzeln
+   verschwinden darin, statt an einer Kante abgeschnitten zu werden. */
+.tep-grundflaeche { fill: url(#tep-grundverlauf); }
+.tep-grundkante { fill: none; stroke: rgba(0,0,0,.22); stroke-width: 2.2; }
+.tep-gras { fill: none; stroke: #b6c2a0; stroke-width: 1.1; stroke-linecap: round; opacity: .55; }
+.tep-astschatten.duenn { stroke-width: .8; opacity: .38; }
+
+/* ----- Die Fäden -----
+   Am Ende geht es um sie. Ein dunkler Saum unter jeder Linie hebt sie vom
+   hellen Holz ab; ein Knoten zeigt, wo sie ausgeht. */
+.tep-rankesaum { fill: none; stroke: rgba(8,12,8,.62); stroke-width: 5.4; stroke-linecap: round; }
+.tep-rankelinie { fill: none; stroke: var(--fadenfarbe, #999); stroke-width: 2.6; stroke-linecap: round; }
+.tep-rankelinie.strich-gestrichelt { stroke-dasharray: 9 6; }
+.tep-rankelinie.strich-gepunktet { stroke-dasharray: 0.1 6.2; stroke-width: 3.2; }
+.tep-rankelinie.strich-perlen { stroke-dasharray: 3.2 5.4; stroke-width: 3.6; }
+.tep-rankelinie.doppelt-unten { stroke-width: 4.6; }
+.tep-rankelinie.doppelt-oben { stroke: rgba(8,12,8,.62); stroke-width: 1.5; }
+.tep-ranke.schwer .tep-rankelinie { stroke-width: 3.4; }
+.tep-ranke.schwer .tep-rankesaum { stroke-width: 6.4; }
+.tep-rankeknoten { fill: var(--fadenfarbe, #999); stroke: rgba(8,12,8,.6); stroke-width: 1; }
+.tep-spitze { fill: var(--fadenfarbe, #999); stroke: rgba(8,12,8,.6); stroke-width: .8; }
+.tep-ranken { filter: drop-shadow(0 1px 1.5px rgba(0,0,0,.5)); }
+
+/* Ist eine Person im Blick, treten die anderen Fäden zurück. */
+.tep-ranke.zurueck { opacity: .12; }
+.tep-ranke.imblick .tep-rankelinie { stroke-width: 3.6; }
+.tep-ranke.imblick .tep-rankesaum { stroke-width: 7; }
+.tep-ranke:focus-visible { outline: none; }
+.tep-ranke:focus-visible .tep-rankelinie { stroke-width: 4.2; }
+
+/* ===================== DIE BEDIENUNG AM TEPPICH ===================== */
+
+/* Zwei Werkzeuge: die Hand und der Faden. */
+.tep-werkzeuge { display: inline-flex; gap: 2px; padding: 2px; border-radius: 10px; background: var(--hg2); border: 1px solid var(--rand); }
+.tep-wz {
+  display: inline-flex; align-items: center; gap: 5px; border: 0; background: none; cursor: pointer;
+  color: var(--blass); border-radius: 8px; padding: 4px 10px; font-size: 11.5px;
+  transition: background .18s, color .18s;
+}
+.tep-wz.an { background: var(--akzent); color: #fff; }
+.tep-wzbild { display: inline-flex; }
+
+/* Der Faden, der beim Spinnen dem Finger folgt. */
+.tep-zugsaum { fill: none; stroke: rgba(8,12,8,.6); stroke-width: 6; stroke-linecap: round; }
+.tep-zuglinie { fill: none; stroke: #e0b26a; stroke-width: 2.8; stroke-linecap: round; stroke-dasharray: 8 6; }
+.tep-zugende { fill: #e0b26a; stroke: rgba(8,12,8,.6); stroke-width: 1; }
+.tep-person.spinnt .tep-bandgrund { stroke: #e0b26a; stroke-width: 2; }
+
+/* Die Legende, nach Gruppen gebündelt. */
+.tep-legende { display: flex; flex-direction: column; gap: 5px; padding: 0 14px 10px; align-items: flex-start; }
+.tep-lggruppe { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.tep-lgname {
+  border: 0; background: none; cursor: pointer; padding: 2px 2px 2px 0;
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--blass);
+  min-width: 62px; text-align: left;
+}
+.tep-lgname.stumm { opacity: .4; text-decoration: line-through; }
+.tep-lgsolo {
+  border: 1px dashed var(--rand); background: none; color: var(--blass); cursor: pointer;
+  border-radius: 999px; padding: 1px 7px; font-size: 9.5px; letter-spacing: .06em;
+}
+
+/* Die Karte zur Person im Blick. */
+.tep-personenkarte {
+  position: absolute; left: 18px; bottom: 46px; z-index: 6;
+  width: min(320px, 42vw); max-height: 58%; overflow-y: auto;
+  border-radius: 10px; padding: 12px 14px;
+  background: linear-gradient(180deg, rgba(30,26,20,.96), rgba(20,17,13,.96));
+  border: 1px solid rgba(214,176,106,.4);
+  box-shadow: 0 14px 34px rgba(0,0,0,.55);
+  color: #ece5d2;
+  animation: tep-pkkommt .3s cubic-bezier(.2,.9,.3,1);
+}
+@keyframes tep-pkkommt { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.tep-pkkopf { display: flex; align-items: baseline; gap: 8px; }
+.tep-pkkopf b { flex: 1; font-family: ui-serif, "New York", Georgia, serif; font-size: 16px; letter-spacing: .03em; }
+.tep-pkkopf small { font-size: 11px; color: rgba(236,229,210,.6); font-variant-numeric: tabular-nums; }
+.tep-pkzu { border: 0; background: none; color: rgba(236,229,210,.6); cursor: pointer; font-size: 17px; line-height: 1; padding: 0 2px; }
+.tep-pknotiz { font-size: 12px; line-height: 1.5; color: rgba(236,229,210,.75); margin: 6px 0 0; font-style: italic; }
+.tep-pkleer { font-size: 12px; color: rgba(236,229,210,.5); margin: 8px 0 0; }
+.tep-pkfaeden { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; }
+.tep-pkfaden {
+  display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; width: 100%; text-align: left;
+  border: 0; background: none; cursor: pointer; color: #ece5d2; padding: 5px 6px; border-radius: 7px;
+  border-left: 3px solid var(--fadenfarbe, #999);
+  transition: background .18s;
+}
+.tep-pkfaden b { font-size: 11px; font-weight: 600; color: var(--fadenfarbe, #ece5d2); }
+.tep-pkfaden span { font-size: 13px; }
+.tep-pkfaden small { flex-basis: 100%; font-size: 11px; color: rgba(236,229,210,.55); font-style: italic; }
+.tep-pkfuss { display: flex; gap: 6px; margin-top: 10px; }
+.tep-pkfuss .knopf { background: rgba(255,255,255,.07); color: #ece5d2; box-shadow: none; }
+
+/* Die Heimat einer eigenen Fadenart. */
+.stb-heimat { display: flex; flex-direction: column; gap: 6px; }
+.stb-heimatwahl {
+  text-align: left; border: 1px solid var(--rand); background: var(--karte); border-radius: 10px;
+  padding: 9px 12px; cursor: pointer; color: var(--tinte); transition: border-color .18s, background .18s;
+}
+.stb-heimatwahl b { display: block; font-size: 13.5px; }
+.stb-heimatwahl small { display: block; font-size: 11.5px; color: var(--blass); margin-top: 2px; line-height: 1.45; }
+.stb-heimatwahl.an { border-color: var(--akzent); background: color-mix(in srgb, var(--akzent) 10%, var(--karte)); }
+.stb-heimatwahl.an b::after { content: "  ✓"; color: var(--akzent); }
+.stb-fheimat { font-style: normal; font-size: 9px; opacity: .6; margin-left: 2px; }
+.stb-farbfrei { width: 28px; height: 28px; padding: 0; border: 1px solid var(--rand); border-radius: 50%; cursor: pointer; background: none; }
+.stb-fneu.bib { border-style: solid; color: var(--blass); }
+
+/* Die Vorschau einer eigenen Fadenart. */
+.stb-artvorschau {
+  border: 1px solid var(--rand); border-radius: 10px; padding: 10px 12px;
+  background: linear-gradient(160deg, #1e3524, #16281a);
+  display: flex; flex-direction: column; gap: 6px; align-items: center;
+}
+.stb-avbild { width: 100%; height: auto; max-width: 260px; }
+.stb-artvorschau b { font-family: ui-serif, "New York", Georgia, serif; font-size: 13.5px; font-weight: 500; color: #e6dfc9; text-align: center; }
+
+/* Die neuen Strichbilder auch in den Listen. */
+.stb-fstrich.strich-doppelt { border-top-style: double; border-top-width: 4px; }
+.stb-fstrich.strich-wellig {
+  border-top: 0; height: 6px;
+  background: repeating-linear-gradient(90deg, transparent 0 1px, transparent 1px 2px);
+  -webkit-mask: radial-gradient(circle at 25% 100%, transparent 2.4px, #000 2.5px) 0 0/8px 6px repeat-x;
+  mask: radial-gradient(circle at 25% 100%, transparent 2.4px, #000 2.5px) 0 0/8px 6px repeat-x;
+  border-bottom: 2px solid var(--fadenfarbe, #999);
+}
+.stb-fstrich.strich-perlen { border-top-style: dotted; border-top-width: 3.5px; }
+.tep-lg i.strich-doppelt { border-top-style: double; border-top-width: 4px; }
+.tep-lg i.strich-wellig { border-top-style: dashed; border-top-width: 2.5px; }
+.tep-lg i.strich-perlen { border-top-style: dotted; border-top-width: 3.5px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .tep-wz:hover { color: var(--tinte); }
+  .tep-wz.an:hover { color: #fff; }
+  .tep-lgsolo:hover, .tep-lgname:hover { color: var(--tinte); border-color: var(--akzent); }
+  .tep-pkfaden:hover { background: rgba(255,255,255,.08); }
+  .tep-pkzu:hover { color: #ece5d2; }
+  .stb-heimatwahl:hover { border-color: var(--akzent); }
+}
+@media (max-width: 760px) {
+  .tep-personenkarte { width: calc(100% - 24px); left: 12px; bottom: 12px; max-height: 44%; }
+  .tep-werkzeuge { order: -1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tep-personenkarte { animation: none; }
+}
+
+/* Die Wurzeln liegen jetzt alle hinter dem Stamm und wachsen aus seinen
+   Anläufen. Die alte Trennung vorn/hinten gibt es nicht mehr. */
+.tep-wurzelwerk .tep-wurzel { fill: #dcd4ba; stroke: #a89e81; }
+.tep-farnlinie { stroke-width: 1.55; opacity: .85; }
+
+/* Die Grate der Wurzelanläufe: eine helle Kante auf dem Rücken, ein
+   Schatten in jeder Kehle. Ohne sie wäre der Fuß eine leere Fläche. */
+.tep-gratkante { fill: none; stroke: #f4eeda; stroke-width: 1.5; stroke-linecap: round; opacity: .5; }
+.tep-kehle { fill: none; stroke: #8d846c; stroke-width: 2.6; stroke-linecap: round; opacity: .42; }
+.tep-grate { pointer-events: none; }
+
+/* ----- Gewebe statt Vektor -----
+   Der entscheidende Unterschied zur Vorlage: Stamm und Äste sind mit einem
+   Brokatmuster gefüllt und dunkel umrandet. Flaches Cremefarben mit heller
+   Kante sieht aus wie ein Diagramm; ein Rautengitter mit dunklem Rand sieht
+   aus wie etwas, das jemand gewebt hat. */
+.tep-stammkoerper {
+  fill: url(#tep-brokat); stroke: #4a4030; stroke-width: 2; stroke-linejoin: round;
+}
+.tep-ast { fill: url(#tep-brokat-fein); stroke: #4a4030; stroke-width: 1.3; stroke-linejoin: round; }
+.tep-ast.zweig { stroke-width: 1; }
+.tep-wurzel { fill: url(#tep-brokat); stroke: #4a4030; stroke-width: 1.5; }
+.tep-wurzelwerk .tep-wurzel { fill: url(#tep-brokat); stroke: #4a4030; }
+.tep-astkante { stroke: rgba(255,250,235,.55); stroke-width: 1.2; }
+.tep-astschatten { stroke: rgba(50,42,30,.42); stroke-width: 1.4; }
+.tep-rinde { stroke: #6b6047; opacity: .5; stroke-width: 1.2; }
+.tep-rindefein { stroke: #6b6047; opacity: .34; }
+.tep-gratkante { stroke: rgba(255,250,235,.6); }
+.tep-kehle { stroke: rgba(50,42,30,.4); }
+.tep-triebranke { stroke: #cec6ac; stroke-width: 1.5; }
+.tep-zweig { stroke: #cec6ac; stroke-width: 1.7; }
+.tep-wurzelhaar { stroke: #c2b99e; }
+.tep-astlochrand { fill: #a89e81; stroke: #4a4030; stroke-width: 1.2; }
+.tep-astlochtief { fill: #3a3226; }
+/* Auch das Getier bekommt den dunklen Rand — sonst schwimmt es. */
+.tep-tierkoerper { fill: url(#tep-brokat-fein); stroke: #4a4030; stroke-width: 1.2; }
+.tep-tierhinten { fill: #c2b99e; stroke: #4a4030; stroke-width: 1; }
+.tep-tierfluegel { fill: #cbc2a7; stroke: #4a4030; stroke-width: 1; }
+.tep-tierohr { fill: #c9c0a5; stroke: #4a4030; stroke-width: 1; }
+.tep-tierlinie { stroke: #4a4030; opacity: .8; }
+.tep-tierauge, .tep-tierauge.dunkel { fill: #2e281e; }
+.tep-schuppen { stroke: #6b6047; opacity: .6; }
+/* Und das Laub */
+.tep-blattform { stroke: #4a4030; stroke-width: .75; }
+.tep-blattader { stroke: rgba(74,64,48,.55); }
+.tep-eichelfrucht { stroke: #4a4030; stroke-width: .8; }
+.tep-eichelkappe { stroke: #4a4030; stroke-width: .8; }

@@ -317,16 +317,21 @@ async function teppichInsAlbum(doc, personId, danach) {
 function teppichFadenSpinnen(doc, vonId, danach, vorgabeArt) {
   teppichFadenFenster(doc, null, vonId, danach, vorgabeArt);
 }
+/* Vom Tuch aus: von einem Namen zum anderen gezogen. Beide Enden stehen
+   schon fest, nur die Art fehlt noch. */
+function teppichFadenSpinnenZu(doc, vonId, zuId, danach) {
+  teppichFadenFenster(doc, null, vonId, danach, null, zuId);
+}
 function teppichFadenBearbeiten(doc, faden, danach) {
   teppichFadenFenster(doc, faden, faden.von, danach);
 }
 
-function teppichFadenFenster(doc, vorhandener, vonId, danach, vorgabeArt) {
+function teppichFadenFenster(doc, vorhandener, vonId, danach, vorgabeArt, zielId) {
   const baum = saubererStammbaum(doc);
   const stand = {
     art: vorhandener ? vorhandener.art : (vorgabeArt || 'kind'),
     von: vorhandener ? vorhandener.von : vonId,
-    zu: vorhandener ? vorhandener.zu : '',
+    zu: vorhandener ? vorhandener.zu : (zielId || ''),
     wort: vorhandener ? vorhandener.wort : ''
   };
   let gruppe = fadenArt(stand.art, baum).gruppe;
@@ -338,26 +343,30 @@ function teppichFadenFenster(doc, vorhandener, vonId, danach, vorgabeArt) {
   const artenkasten = el('div', { class: 'stb-farten' });
   const reiterZeichnen = () => {
     reiter.innerHTML = '';
+    const alle = fadenAlleArten(baum);
     for (const [gid, gname] of FADEN_GRUPPEN) {
-      reiter.append(el('button', { class: 'stb-fr' + (gruppe === gid ? ' an' : ''), onclick: () => { gruppe = gid; reiterZeichnen(); artenZeichnen(); } }, gname));
+      const n = alle.filter((a) => a.gruppe === gid).length;
+      reiter.append(el('button', { class: 'stb-fr' + (gruppe === gid ? ' an' : ''), onclick: () => { gruppe = gid; reiterZeichnen(); artenZeichnen(); } },
+        gname, el('i', {}, String(n))));
     }
-    const eigene = baum.eigeneArten || [];
+    const eigene = alle.filter((a) => a.eigen || a.bibliothek);
     reiter.append(el('button', { class: 'stb-fr' + (gruppe === 'eigen' ? ' an' : ''), onclick: () => { gruppe = 'eigen'; reiterZeichnen(); artenZeichnen(); } },
       'Eigene', eigene.length ? el('i', {}, String(eigene.length)) : null));
   };
   const artenZeichnen = () => {
     artenkasten.innerHTML = '';
-    const liste = gruppe === 'eigen'
-      ? (baum.eigeneArten || []).map((a) => fadenArt(a.id, baum))
-      : FADEN_ARTEN.filter((a) => a.gruppe === gruppe);
+    const alle = fadenAlleArten(baum);
+    const liste = gruppe === 'eigen' ? alle.filter((a) => a.eigen || a.bibliothek) : alle.filter((a) => a.gruppe === gruppe);
     if (!liste.length) {
-      artenkasten.append(el('div', { class: 'leer klein' }, 'Noch keine eigene Fadenart. Leg eine an — sie gehört dann diesem Teppich.'));
+      artenkasten.append(el('div', { class: 'leer klein' }, 'Noch keine eigene Fadenart. Leg eine an — du entscheidest dabei, ob sie nur zu diesem Teppich gehört oder in die Bibliothek geht.'));
     }
     for (const a of liste) {
       artenkasten.append(el('button', {
         class: 'stb-fart' + (stand.art === a.id ? ' an' : ''), style: '--fadenfarbe:' + a.farbe,
+        title: a.hilfe || a.satz.replace('{a}', 'Jemand').replace('{b}', 'jemand anderem'),
         onclick: () => { stand.art = a.id; artenZeichnen(); satzAuffrischen(); }
-      }, el('i', { class: 'stb-fstrich strich-' + a.strich }), a.name));
+      }, el('i', { class: 'stb-fstrich strich-' + a.strich }), a.name,
+        a.bibliothek ? el('b', { class: 'stb-fheimat' }, '◆') : a.eigen ? el('b', { class: 'stb-fheimat teppich' }, '◇') : null));
     }
     if (gruppe === 'eigen') {
       artenkasten.append(el('button', { class: 'stb-fneu', onclick: () => teppichArtAnlegen(doc, (id) => {
@@ -365,6 +374,7 @@ function teppichFadenFenster(doc, vorhandener, vonId, danach, vorgabeArt) {
         baum.eigeneArten = frisch.eigeneArten;
         stand.art = id; artenZeichnen(); reiterZeichnen(); satzAuffrischen();
       }) }, '+ Eine eigene Fadenart'));
+      artenkasten.append(el('small', { class: 'stb-hilfe' }, '◆ steht in der Bibliothek und gilt in allen Stammbäumen.  ◇ gehört nur diesem Teppich.'));
     }
   };
 
@@ -467,68 +477,175 @@ function teppichFadenFenster(doc, vorhandener, vonId, danach, vorgabeArt) {
   setTimeout(() => suchfeld.focus(), 60);
 }
 
-/* ----- Eine eigene Fadenart ----- */
-function teppichArtAnlegen(doc, danach) {
-  const stand = { name: '', satz: '', farbe: FADEN_FARBEN[0], strich: 'gestrichelt', gruppe: 'band', gerichtet: true };
-  const namensfeld = el('input', { type: 'text', placeholder: 'z. B. „Hat den Fluch geerbt von“', maxlength: '60' });
-  const satzfeld = el('input', { type: 'text', placeholder: '{a} hat den Fluch geerbt von {b}', maxlength: '120' });
-  namensfeld.addEventListener('input', () => {
-    stand.name = namensfeld.value;
-    if (!satzfeld.value.trim()) satzfeld.placeholder = '{a} — ' + (stand.name || '…') + ' — {b}';
-  });
-  satzfeld.addEventListener('input', () => { stand.satz = satzfeld.value; });
+/* ----- Eine eigene Fadenart -----
+   Zwei Fragen entscheiden alles: Wie liest sie sich? Und wo gehört sie hin?
+   Nur zu DIESEM Teppich — oder in die Bibliothek, wo sie in jedem Stammbaum
+   zur Verfügung steht. Beides ist richtig; man weiß nur vorher nicht immer,
+   welches. Deshalb lässt es sich später umhängen. */
+function teppichArtAnlegen(doc, danach, vorlage) {
+  const stand = Object.assign({
+    name: '', satz: '', hilfe: '', worthilfe: '',
+    farbe: FADEN_FARBEN[0], strich: 'gestrichelt', gruppe: 'band',
+    gerichtet: true, heimat: 'teppich'
+  }, vorlage || {});
 
+  const namensfeld = el('input', { type: 'text', value: stand.name, placeholder: 'z. B. „Hat den Fluch geerbt von“', maxlength: '60' });
+  const satzfeld = el('input', { type: 'text', value: stand.satz, placeholder: '{a} hat den Fluch geerbt von {b}', maxlength: '120' });
+  const hilfefeld = el('input', { type: 'text', value: stand.hilfe, placeholder: 'Wofür ist das da? (steht später als Hinweis dran)', maxlength: '200' });
+  const worthilfefeld = el('input', { type: 'text', value: stand.worthilfe, placeholder: 'Was soll ins Feld „Dazu“? (z. B. „Welcher Fluch?“)', maxlength: '200' });
+  namensfeld.addEventListener('input', () => { stand.name = namensfeld.value; vorschauZeichnen(); });
+  satzfeld.addEventListener('input', () => { stand.satz = satzfeld.value; vorschauZeichnen(); });
+  hilfefeld.addEventListener('input', () => { stand.hilfe = hilfefeld.value; });
+  worthilfefeld.addEventListener('input', () => { stand.worthilfe = worthilfefeld.value; });
+
+  /* --- Farbe: die Auswahl plus jede beliebige --- */
   const farbreihe = el('div', { class: 'stb-farben' });
+  const freieFarbe = el('input', { type: 'color', class: 'stb-farbfrei', value: stand.farbe, title: 'Eine ganz eigene Farbe' });
+  freieFarbe.addEventListener('input', () => { stand.farbe = fadenFarbeSauber(freieFarbe.value); farbenZeichnen(); vorschauZeichnen(); });
   const farbenZeichnen = () => {
     farbreihe.innerHTML = '';
     for (const f of FADEN_FARBEN) {
-      farbreihe.append(el('button', { class: 'stb-farbe' + (stand.farbe === f ? ' an' : ''), style: 'background:' + f, onclick: () => { stand.farbe = f; farbenZeichnen(); } }));
+      farbreihe.append(el('button', { class: 'stb-farbe' + (stand.farbe === f ? ' an' : ''), style: 'background:' + f, title: f, onclick: () => { stand.farbe = f; freieFarbe.value = f; farbenZeichnen(); vorschauZeichnen(); } }));
     }
+    farbreihe.append(freieFarbe);
   };
+
+  /* --- Strichbild --- */
   const strichreihe = el('div', { class: 'stb-striche' });
   const stricheZeichnen = () => {
     strichreihe.innerHTML = '';
-    for (const s of FADEN_STRICHE) {
-      strichreihe.append(el('button', { class: 'stb-strichwahl' + (stand.strich === s ? ' an' : ''), style: '--fadenfarbe:' + stand.farbe, onclick: () => { stand.strich = s; stricheZeichnen(); } },
-        el('i', { class: 'stb-fstrich strich-' + s })));
+    for (const st of FADEN_STRICHE) {
+      strichreihe.append(el('button', {
+        class: 'stb-strichwahl' + (stand.strich === st ? ' an' : ''), style: '--fadenfarbe:' + stand.farbe,
+        title: FADEN_STRICH_NAMEN[st] || st,
+        onclick: () => { stand.strich = st; stricheZeichnen(); vorschauZeichnen(); }
+      }, el('i', { class: 'stb-fstrich strich-' + st })));
     }
   };
+
+  /* --- Gruppe --- */
   const gruppenreihe = el('div', { class: 'stb-fgruppenwahl' });
   const gruppenZeichnen = () => {
     gruppenreihe.innerHTML = '';
-    for (const [gid, gname] of FADEN_GRUPPEN) {
+    for (const [gid, gname, gtext] of FADEN_GRUPPEN) {
       if (gid === 'blut') continue;   /* Blut baut den Baum; das bleibt VANIs Sache */
-      gruppenreihe.append(el('button', { class: 'stb-fr' + (stand.gruppe === gid ? ' an' : ''), onclick: () => { stand.gruppe = gid; gruppenZeichnen(); } }, gname));
+      gruppenreihe.append(el('button', { class: 'stb-fr' + (stand.gruppe === gid ? ' an' : ''), title: gtext, onclick: () => { stand.gruppe = gid; gruppenZeichnen(); } }, gname));
     }
+  };
+
+  /* --- Richtung --- */
+  const richtungreihe = el('div', { class: 'stb-fgruppenwahl' });
+  const richtungZeichnen = () => {
+    richtungreihe.innerHTML = '';
+    for (const [wert, name, hilfe] of [[true, 'Hat eine Richtung', 'A tut etwas mit B — umgekehrt wäre es etwas anderes'], [false, 'Gilt in beide', 'Was für A gilt, gilt auch für B']]) {
+      richtungreihe.append(el('button', { class: 'stb-fr' + (stand.gerichtet === wert ? ' an' : ''), title: hilfe, onclick: () => { stand.gerichtet = wert; richtungZeichnen(); vorschauZeichnen(); } }, name));
+    }
+  };
+
+  /* --- Wohin sie gehört --- */
+  const heimatreihe = el('div', { class: 'stb-heimat' });
+  const heimatZeichnen = () => {
+    heimatreihe.innerHTML = '';
+    for (const [wert, name, text] of [
+      ['teppich', 'Nur dieser Teppich', 'Sie gehört zu diesem einen Stammbaum und taucht sonst nirgends auf.'],
+      ['bibliothek', 'In die Bibliothek', 'Sie steht danach in JEDEM Stammbaum zur Auswahl — auch in denen, die du erst noch webst.']
+    ]) {
+      heimatreihe.append(el('button', { class: 'stb-heimatwahl' + (stand.heimat === wert ? ' an' : ''), onclick: () => { stand.heimat = wert; heimatZeichnen(); } },
+        el('b', {}, name), el('small', {}, text)));
+    }
+  };
+
+  /* --- Die Vorschau: so wird der Faden aussehen und sich lesen --- */
+  const vorschau = el('div', { class: 'stb-artvorschau' });
+  const vorschauZeichnen = () => {
+    vorschau.innerHTML = '';
+    const name = stand.name.trim() || 'Deine Fadenart';
+    const satz = (stand.satz.trim() || '{a} — ' + name + ' — {b}').replace('{a}', 'Alma').replace('{b}', 'Halvar');
+    const svgns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgns, 'svg');
+    svg.setAttribute('viewBox', '0 0 240 44');
+    svg.setAttribute('class', 'stb-avbild');
+    svg.style.setProperty('--fadenfarbe', stand.farbe);
+    const mach = (art, attrs) => { const k = document.createElementNS(svgns, art); for (const q of Object.keys(attrs)) k.setAttribute(q, String(attrs[q])); return k; };
+    const d = 'M 18 30 Q 120 -4 222 30';
+    svg.append(mach('path', { d, class: 'tep-rankesaum' }));
+    if (stand.strich === 'doppelt') {
+      svg.append(mach('path', { d, class: 'tep-rankelinie doppelt-unten' }));
+      svg.append(mach('path', { d, class: 'tep-rankelinie doppelt-oben' }));
+    } else {
+      svg.append(mach('path', { d, class: 'tep-rankelinie strich-' + stand.strich }));
+    }
+    svg.append(mach('circle', { cx: 18, cy: 30, r: 4, class: 'tep-rankeknoten' }));
+    if (stand.gerichtet) svg.append(mach('path', { d: 'M 0 0 L -11 -5 L -7.5 0 L -11 5 Z', class: 'tep-spitze', transform: 'translate(222 30) rotate(18)' }));
+    else svg.append(mach('circle', { cx: 222, cy: 30, r: 4, class: 'tep-rankeknoten' }));
+    vorschau.append(svg, el('b', {}, satz));
   };
 
   const kasten = el('div', { class: 'modal stb-artfenster' },
     el('div', { class: 'kartenkopf' }, 'EINE EIGENE FADENART'),
-    el('p', { class: 'stb-vor' }, 'Sie gehört diesem Teppich und steht danach in der Auswahl wie jede andere. Blut lässt sich nicht selbst erfinden — daran hängt der Bau des Baumes.'),
+    el('p', { class: 'stb-vor' }, 'Blut lässt sich nicht selbst erfinden — daran hängt der Bau des Baumes. Alles andere schon.'),
     el('div', { class: 'stb-abschnitt' }, 'Wie heißt sie'), namensfeld,
     el('div', { class: 'stb-abschnitt' }, 'Wie liest sie sich'), satzfeld,
     el('small', { class: 'stb-hilfe' }, '{a} ist, von wem der Faden ausgeht, {b} ist der andere. Lässt du es leer, baut VANI den Satz selbst.'),
-    el('div', { class: 'stb-abschnitt' }, 'Wohin gehört sie'), gruppenreihe,
+    el('div', { class: 'stb-abschnitt' }, 'Wofür ist sie da'), hilfefeld, worthilfefeld,
+    el('div', { class: 'stb-abschnitt' }, 'Wohin gehört sie'), heimatreihe,
+    el('div', { class: 'stb-abschnitt' }, 'Wohin im Verzeichnis'), gruppenreihe,
+    el('div', { class: 'stb-abschnitt' }, 'Richtung'), richtungreihe,
     el('div', { class: 'stb-abschnitt' }, 'Farbe und Strich'), farbreihe, strichreihe,
+    el('div', { class: 'stb-abschnitt' }, 'So sieht sie aus'), vorschau,
     el('div', { class: 'reihe' },
       el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
       el('button', { class: 'knopf voll', onclick: async () => {
         const name = stand.name.trim();
         if (!name) { toast('Ohne Namen lässt sich der Faden später nicht wiederfinden.'); namensfeld.focus(); return; }
-        const id = 'eigen-' + uid().slice(0, 8);
-        await teppichSchreiben(doc, (b) => {
-          b.eigeneArten = (b.eigeneArten || []).concat([{
-            id, name, gruppe: stand.gruppe,
-            satz: stand.satz.trim() || ('{a} — ' + name + ' — {b}'),
-            farbe: stand.farbe, strich: stand.strich, gerichtet: true
-          }]);
-          return b;
-        });
-        zu(); if (danach) danach(id);
+        const art = {
+          id: 'eigen-' + uid().slice(0, 8), name, gruppe: stand.gruppe,
+          satz: stand.satz.trim() || ('{a} — ' + name + ' — {b}'),
+          hilfe: stand.hilfe.trim(), worthilfe: stand.worthilfe.trim(),
+          farbe: stand.farbe, strich: stand.strich, gerichtet: stand.gerichtet
+        };
+        if (stand.heimat === 'bibliothek') {
+          if (!fadenBibliothekHinzu(art)) { toast('Das hat gerade nicht geklappt.'); return; }
+          toast('Steht jetzt in der Bibliothek — in jedem Stammbaum.', 5200);
+        } else {
+          await teppichSchreiben(doc, (b) => { b.eigeneArten = (b.eigeneArten || []).concat([art]); return b; });
+          toast('Gehört jetzt zu diesem Teppich.', 4200);
+        }
+        zu(); if (danach) danach(art.id);
       } }, 'Anlegen')));
   const zu = zeigeDeck(kasten);
-  farbenZeichnen(); stricheZeichnen(); gruppenZeichnen();
+  farbenZeichnen(); stricheZeichnen(); gruppenZeichnen(); richtungZeichnen(); heimatZeichnen(); vorschauZeichnen();
   setTimeout(() => namensfeld.focus(), 60);
+}
+
+/* ----- Die Bibliothek verwalten ----- */
+function teppichBibliothekFenster(doc, danach) {
+  const liste = el('div', { class: 'stb-eigenarten' });
+  const zeichne = () => {
+    liste.innerHTML = '';
+    const bib = fadenBibliothek();
+    if (!bib.length) liste.append(el('div', { class: 'leer klein' }, 'Die Bibliothek ist noch leer. Was du hier ablegst, steht in jedem Stammbaum zur Auswahl.'));
+    for (const a of bib) {
+      const wieoft = stammbaeume().reduce((n, b) => n + saubererStammbaum(b).faeden.filter((f) => f.art === a.id).length, 0);
+      liste.append(el('div', { class: 'stb-eazeile', style: '--fadenfarbe:' + a.farbe },
+        el('i', { class: 'stb-fstrich strich-' + a.strich }),
+        el('b', {}, a.name),
+        el('small', {}, wieoft ? wieoft + (wieoft === 1 ? ' Faden' : ' Fäden') : 'unbenutzt'),
+        el('button', {
+          class: 'stb-fweg', title: wieoft ? 'Geht nicht — es hängen noch Fäden daran' : 'Aus der Bibliothek nehmen',
+          disabled: wieoft ? '' : null,
+          onclick: () => { fadenBibliothekSetzen(fadenBibliothek().filter((x) => x.id !== a.id)); zeichne(); if (danach) danach(); }
+        }, '×')));
+    }
+    liste.append(el('button', { class: 'stb-fneu', onclick: () => teppichArtAnlegen(doc, () => { zeichne(); if (danach) danach(); }, { heimat: 'bibliothek' }) }, '+ Eine Fadenart in die Bibliothek'));
+  };
+  const kasten = el('div', { class: 'modal stb-rahmenfenster' },
+    el('div', { class: 'kartenkopf' }, 'DIE BIBLIOTHEK'),
+    el('p', { class: 'stb-vor' }, 'Fadenarten, die in JEDEM Stammbaum zur Auswahl stehen — auch in denen, die du erst noch webst. Was nur zu einem Teppich gehört, steht dort und nicht hier.'),
+    liste,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Fertig')));
+  const zu = zeigeDeck(kasten);
+  zeichne();
 }
 
 /* ================= DAS VERZEICHNIS ================= */
@@ -641,6 +758,8 @@ function teppichEinstellungen(doc, danach, frisch) {
           onclick: async () => { await teppichSchreiben(doc, (bb) => { bb.eigeneArten = bb.eigeneArten.filter((x) => x.id !== a.id); return bb; }); artenZeichnen(); if (danach) danach(); } }, '×')));
     }
     artenkasten.append(el('button', { class: 'stb-fneu', onclick: () => teppichArtAnlegen(doc, () => { artenZeichnen(); if (danach) danach(); }) }, '+ Eine eigene Fadenart'));
+    artenkasten.append(el('button', { class: 'stb-fneu bib', onclick: () => teppichBibliothekFenster(doc, () => { artenZeichnen(); if (danach) danach(); }) },
+      'Die Bibliothek — ' + fadenBibliothek().length + (fadenBibliothek().length === 1 ? ' Art für alle Stammbäume' : ' Arten für alle Stammbäume')));
   };
 
   const kasten = el('div', { class: 'modal stb-rahmenfenster' },

@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.36.0 (23. August 2026)
+# Übergabe an Codex — Stand VANI 5.37.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -117,6 +117,15 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   zieht EINEN Ast zum Kind statt zwei fast gleicher. Dazu Laubbüschel, Zweiglein, Schlange und Hund am Fuß
   des Stammes — und Namen lassen sich von Hand ziehen (person.festX/festY, Rasterschritte); der Rundpfeil
   in der Leiste holt alle wieder in die gerechnete Ordnung.
+- **5.37** Der Wandteppich, dritte Runde. Zeichnen: alle Umrisse laufen als Kurven (Catmull-Rom nach
+  Bézier) statt als Vielecke — damit verschwinden die Facetten beim Zoomen. Wurzeln mit Breitenprofil,
+  Gabelung, Rindenrissen und Haarwurzeln, dazu ein Grundsaum mit Gras, in dem sie verschwinden.
+  Fäden: 63 Arten in sechs Gruppen (neu: Schicksal), sechs Strichbilder (neu: doppelt, wellig, Perlen),
+  dunkler Saum unter jeder Linie, Knoten am Ausgang, Versatz bei mehreren Fäden zwischen denselben zwei.
+  Eigene Fadenarten: `D.einst.fadenBibliothek` gilt in ALLEN Stammbäumen, `baum.eigeneArten` nur im
+  eigenen; der Teppich schlägt die Bibliothek. Bedienung: Werkzeuge Hand/Faden, Ziehen von Name zu Name
+  legt einen Faden an, ein Tipp nimmt eine Person in den Blick (Personenkarte unten links), die Legende
+  ist nach Gruppen gebündelt mit Solo-Knopf.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

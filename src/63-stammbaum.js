@@ -25,7 +25,8 @@ const FADEN_GRUPPEN = [
   ['bund', 'Bund', 'Wer mit wem zusammensteht, mit oder ohne Trauschein.'],
   ['herz', 'Herz', 'Was zwischen zweien ist, ob sie es wissen oder nicht.'],
   ['klinge', 'Klinge', 'Was einer dem anderen angetan hat.'],
-  ['band', 'Band', 'Alles andere, was zwei Menschen verbindet.']
+  ['band', 'Band', 'Alles andere, was zwei Menschen verbindet.'],
+  ['schicksal', 'Schicksal', 'Was über zweien liegt, ohne dass einer es gewählt hätte.']
 ];
 
 const FADEN_ARTEN = [
@@ -66,21 +67,148 @@ const FADEN_ARTEN = [
   { id: 'haelt', gruppe: 'band', name: 'Hält ein Geheimnis über', satz: '{a} hält ein Geheimnis über {b}', farbe: '#5a6a72', strich: 'gepunktet', gerichtet: true, worthilfe: 'Welches?' },
   { id: 'erbt', gruppe: 'band', name: 'Erbt von', satz: '{a} erbt von {b}', farbe: '#9a8a4a', strich: 'voll', gerichtet: true },
   { id: 'nachfolge', gruppe: 'band', name: 'Folgt nach', satz: '{a} folgt {b} nach', farbe: '#9a8a4a', strich: 'gestrichelt', gerichtet: true },
-  { id: 'kennt', gruppe: 'band', name: 'Kennt', satz: '{a} kennt {b}', farbe: '#7a7a70', strich: 'gepunktet', gerichtet: false }
+  { id: 'kennt', gruppe: 'band', name: 'Kennt', satz: '{a} kennt {b}', farbe: '#7a7a70', strich: 'gepunktet', gerichtet: false },
+  { id: 'nieBegegnet', gruppe: 'band', name: 'Ist nie begegnet', satz: '{a} und {b} sind einander nie begegnet', farbe: '#5f6068', strich: 'gepunktet', gerichtet: false },
+  { id: 'schrieb', gruppe: 'band', name: 'Schreibt an', satz: '{a} schreibt an {b}', farbe: '#7f8aa0', strich: 'perlen', gerichtet: true },
+  { id: 'pflegt', gruppe: 'band', name: 'Pflegt', satz: '{a} pflegt {b}', farbe: '#7f9a86', strich: 'voll', gerichtet: true },
+  { id: 'heilte', gruppe: 'band', name: 'Hat geheilt', satz: '{a} hat {b} geheilt', farbe: '#6f9a8a', strich: 'voll', gerichtet: true },
+  { id: 'arbeitetFuer', gruppe: 'band', name: 'Arbeitet für', satz: '{a} arbeitet für {b}', farbe: '#6f8aa0', strich: 'gestrichelt', gerichtet: true },
+  { id: 'benanntNach', gruppe: 'band', name: 'Benannt nach', satz: '{a} ist benannt nach {b}', farbe: '#9a8a4a', strich: 'gepunktet', gerichtet: true },
+  { id: 'teiltGeheimnis', gruppe: 'band', name: 'Teilt ein Geheimnis mit', satz: '{a} teilt ein Geheimnis mit {b}', farbe: '#5a6a72', strich: 'doppelt', gerichtet: false, worthilfe: 'Welches?' },
+  { id: 'erbfeind', gruppe: 'band', name: 'Erbfeind von', satz: '{a} und {b} sind Erbfeinde', farbe: '#8a4030', strich: 'doppelt', gerichtet: false },
+
+  /* --- Blut, was noch fehlte --- */
+  { id: 'zwilling', gruppe: 'blut', name: 'Zwilling von', satz: '{a} und {b} sind Zwillinge', farbe: '#c9c3a8', strich: 'doppelt', gerichtet: false },
+  { id: 'halbgeschwister', gruppe: 'blut', name: 'Halbgeschwister von', satz: '{a} und {b} sind Halbgeschwister', farbe: '#b8b299', strich: 'gestrichelt', gerichtet: false },
+  { id: 'unehelich', gruppe: 'blut', name: 'Uneheliches Kind von', satz: '{a} ist das uneheliche Kind von {b}', farbe: '#c9c3a8', strich: 'perlen', gerichtet: true, geruest: true },
+  { id: 'ahne', gruppe: 'blut', name: 'Stammt ab von', satz: '{a} stammt ab von {b}', farbe: '#b8b299', strich: 'gepunktet', gerichtet: true, worthilfe: 'Wie viele Generationen dazwischen?' },
+
+  /* --- Bund, was noch fehlte --- */
+  { id: 'geschieden', gruppe: 'bund', name: 'Geschieden von', satz: '{a} und {b} sind geschieden', farbe: '#9c8f74', strich: 'gestrichelt', gerichtet: false },
+  { id: 'verwitwet', gruppe: 'bund', name: 'Verwitwet nach', satz: '{a} ist verwitwet nach {b}', farbe: '#8a8270', strich: 'gepunktet', gerichtet: true },
+  { id: 'heimlich', gruppe: 'bund', name: 'Heimlich zusammen mit', satz: '{a} und {b} sind heimlich zusammen', farbe: '#a06a86', strich: 'gepunktet', gerichtet: false, paar: false },
+  { id: 'versprochen', gruppe: 'bund', name: 'Versprochen an', satz: '{a} ist {b} versprochen', farbe: '#c8b273', strich: 'perlen', gerichtet: true },
+
+  /* --- Herz, was noch fehlte --- */
+  { id: 'unerwidert', gruppe: 'herz', name: 'Liebt vergeblich', satz: '{a} liebt {b} vergeblich', farbe: '#b0505f', strich: 'gepunktet', gerichtet: true },
+  { id: 'verzeiht', gruppe: 'herz', name: 'Hat verziehen', satz: '{a} hat {b} verziehen', farbe: '#7f9a86', strich: 'wellig', gerichtet: true },
+  { id: 'vermisst', gruppe: 'herz', name: 'Vermisst', satz: '{a} vermisst {b}', farbe: '#8a7fa0', strich: 'gepunktet', gerichtet: true },
+  { id: 'beschuetzt', gruppe: 'herz', name: 'Beschützt', satz: '{a} beschützt {b}', farbe: '#6f9a8a', strich: 'voll', gerichtet: true },
+  { id: 'eifersucht', gruppe: 'herz', name: 'Ist eifersüchtig auf', satz: '{a} ist eifersüchtig auf {b}', farbe: '#96683a', strich: 'wellig', gerichtet: true },
+
+  /* --- Klinge, was noch fehlte --- */
+  { id: 'belogen', gruppe: 'klinge', name: 'Hat belogen', satz: '{a} hat {b} belogen', farbe: '#8f5a22', strich: 'gepunktet', gerichtet: true, worthilfe: 'Worin?' },
+  { id: 'bestohlen', gruppe: 'klinge', name: 'Hat bestohlen', satz: '{a} hat {b} bestohlen', farbe: '#8f5a22', strich: 'gestrichelt', gerichtet: true, worthilfe: 'Was?' },
+  { id: 'erpresst', gruppe: 'klinge', name: 'Erpresst', satz: '{a} erpresst {b}', farbe: '#7a3020', strich: 'wellig', gerichtet: true, worthilfe: 'Womit?' },
+  { id: 'verletzte', gruppe: 'klinge', name: 'Hat verletzt', satz: '{a} hat {b} verletzt', farbe: '#a44a30', strich: 'voll', gerichtet: true, schwer: true },
+  { id: 'verjagte', gruppe: 'klinge', name: 'Hat vertrieben', satz: '{a} hat {b} vertrieben', farbe: '#8a5030', strich: 'gestrichelt', gerichtet: true },
+  { id: 'raechtSich', gruppe: 'klinge', name: 'Rächt sich an', satz: '{a} rächt sich an {b}', farbe: '#8f2f22', strich: 'wellig', gerichtet: true, schwer: true },
+
+  /* --- Schicksal --- */
+  { id: 'traeumtVon', gruppe: 'schicksal', name: 'Träumt von', satz: '{a} träumt von {b}', farbe: '#6a6ea8', strich: 'wellig', gerichtet: true },
+  { id: 'siehtIn', gruppe: 'schicksal', name: 'Sieht in', satz: '{a} sieht in {b}', farbe: '#7a6aa0', strich: 'gepunktet', gerichtet: true, worthilfe: 'Wen oder was? — „ihre Mutter“, „eine Bedrohung“' },
+  { id: 'fluch', gruppe: 'schicksal', name: 'Liegt unter dem Fluch von', satz: '{a} liegt unter dem Fluch von {b}', farbe: '#5a3a6a', strich: 'wellig', gerichtet: true, schwer: true, worthilfe: 'Welcher Fluch?' },
+  { id: 'weissagung', gruppe: 'schicksal', name: 'Wurde vorhergesagt von', satz: '{a} wurde von {b} vorhergesagt', farbe: '#6a5a8a', strich: 'perlen', gerichtet: true, worthilfe: 'Was wurde gesagt?' },
+  { id: 'wiedergaenger', gruppe: 'schicksal', name: 'Geht um bei', satz: '{a} geht um bei {b}', farbe: '#4a5a6a', strich: 'wellig', gerichtet: true },
+  { id: 'gebunden', gruppe: 'schicksal', name: 'Ist gebunden an', satz: '{a} ist an {b} gebunden', farbe: '#6a6ea8', strich: 'doppelt', gerichtet: false, worthilfe: 'Wodurch?' },
+  { id: 'schuldetLeben', gruppe: 'schicksal', name: 'Verdankt sein Leben', satz: '{a} verdankt {b} sein Leben', farbe: '#9a8a4a', strich: 'doppelt', gerichtet: true }
 ];
 
 const FADEN_ART_IDS = FADEN_ARTEN.map((a) => a.id);
-const FADEN_STRICHE = ['voll', 'gestrichelt', 'gepunktet'];
+/* Wie ein Faden gezeichnet wird. Mehr Bilder heisst: mehr Arten lassen sich
+   auf einen Blick auseinanderhalten, ohne dass die Wand bunter wird. */
+const FADEN_STRICHE = ['voll', 'gestrichelt', 'gepunktet', 'doppelt', 'wellig', 'perlen'];
+const FADEN_STRICH_NAMEN = {
+  voll: 'durchgezogen', gestrichelt: 'gestrichelt', gepunktet: 'gepunktet',
+  doppelt: 'doppelt', wellig: 'wellig', perlen: 'Perlen'
+};
 /* Die Farben, aus denen eine eigene Fadenart wählen kann. */
-const FADEN_FARBEN = ['#c2564a', '#8f2f22', '#c8b273', '#7f9a86', '#6f8aa0', '#8a7fa0', '#9a8a4a', '#7a7a70', '#a44a30', '#5f4a6a'];
+const FADEN_FARBEN = [
+  '#c2564a', '#8f2f22', '#a44a30', '#96683a', '#c8b273', '#9a8a4a',
+  '#7f9a86', '#6f9a8a', '#6f8aa0', '#7f8aa0', '#8a7fa0', '#6a6ea8',
+  '#5f4a6a', '#5a6a72', '#7a7a70', '#5f6068'
+];
+function fadenFarbeSauber(wert, ersatz) {
+  const f = String(wert || '').trim();
+  return /^#[0-9a-f]{6}$/i.test(f) ? f.toLowerCase() : (ersatz || FADEN_FARBEN[0]);
+}
+
+/* ----- Eigene Fadenarten -----
+   Eine selbst erfundene Art kann zweierlei sein: etwas, das nur zu DIESEM
+   Teppich gehört („der Fluch der Wieks“), oder etwas, das man immer wieder
+   braucht („hat den Eid gebrochen“). Deshalb gibt es beides: die Art im
+   Teppich selbst — und die Bibliothek, die in allen Stammbäumen gilt.
+
+   Beim Anlegen wählt man, wohin sie gehört. Umhängen geht später. */
+function saubereFadenart(a) {
+  if (!a || typeof a !== 'object') return null;
+  const id = String(a.id || '').trim().slice(0, 40);
+  const name = String(a.name || '').trim().slice(0, 60);
+  if (!id || !name) return null;
+  return {
+    id, name,
+    gruppe: FADEN_GRUPPEN.some((g) => g[0] === a.gruppe) ? a.gruppe : 'band',
+    satz: String(a.satz || '').trim().slice(0, 120) || ('{a} — ' + name + ' — {b}'),
+    hilfe: String(a.hilfe || '').trim().slice(0, 200),
+    worthilfe: String(a.worthilfe || '').trim().slice(0, 200),
+    farbe: fadenFarbeSauber(a.farbe),
+    strich: FADEN_STRICHE.includes(a.strich) ? a.strich : 'gestrichelt',
+    gerichtet: a.gerichtet !== false,
+    schwer: a.schwer === true
+  };
+}
+
+const FADEN_BIBLIOTHEK_MAX = 120;
+function fadenBibliothek() {
+  const roh = (typeof D !== 'undefined' && D && D.einst && Array.isArray(D.einst.fadenBibliothek)) ? D.einst.fadenBibliothek : [];
+  const raus = [], gesehen = new Set(FADEN_ART_IDS);
+  for (const a of roh.slice(0, FADEN_BIBLIOTHEK_MAX)) {
+    const s = saubereFadenart(a);
+    if (!s || gesehen.has(s.id)) continue;
+    gesehen.add(s.id);
+    raus.push(s);
+  }
+  return raus;
+}
+function fadenBibliothekSetzen(liste) {
+  if (typeof D === 'undefined' || !D || !D.einst) return false;
+  D.einst.fadenBibliothek = (liste || []).map(saubereFadenart).filter(Boolean).slice(0, FADEN_BIBLIOTHEK_MAX);
+  if (typeof speichereEinst === 'function') speichereEinst();
+  return true;
+}
+function fadenBibliothekHinzu(art) {
+  const s = saubereFadenart(art);
+  if (!s) return false;
+  const jetzt = fadenBibliothek();
+  if (jetzt.some((a) => a.id === s.id)) return false;
+  return fadenBibliothekSetzen(jetzt.concat([s]));
+}
+/* Wo eine Art wohnt: im Teppich, in der Bibliothek, oder fest eingebaut. */
+function fadenHeimat(id, baum) {
+  if ((baum && Array.isArray(baum.eigeneArten) ? baum.eigeneArten : []).some((a) => a && a.id === id)) return 'teppich';
+  if (fadenBibliothek().some((a) => a.id === id)) return 'bibliothek';
+  return FADEN_ART_IDS.includes(id) ? 'fest' : 'unbekannt';
+}
+/* Alle Arten, die in diesem Teppich zur Auswahl stehen. */
+function fadenAlleArten(baum) {
+  const eigene = (baum && Array.isArray(baum.eigeneArten) ? baum.eigeneArten : []).map(saubereFadenart).filter(Boolean);
+  const bib = fadenBibliothek().filter((a) => !eigene.some((e) => e.id === a.id));
+  return FADEN_ARTEN.concat(bib.map((a) => Object.assign({}, a, { bibliothek: true })))
+    .concat(eigene.map((a) => Object.assign({}, a, { eigen: true })));
+}
 
 /* Eine Fadenart nachschlagen — auch eine eigene, die im Teppich selbst steht.
    Was es nicht gibt, wird nicht erfunden: es kommt eine graue Ersatzart
    zurück, damit ein Tippfehler in alten Daten nichts zerreißt. */
 function fadenArt(id, baum) {
+  /* Der Teppich schlägt die Bibliothek, die Bibliothek schlägt nichts — so
+     kann ein einzelner Teppich eine Art überschreiben, ohne dass es die
+     anderen betrifft. */
   const eigene = baum && Array.isArray(baum.eigeneArten) ? baum.eigeneArten : [];
-  const e = eigene.find((a) => a && a.id === id);
-  if (e) return { id: e.id, gruppe: e.gruppe || 'band', name: e.name || 'Eigener Faden', satz: e.satz || '{a} — {b}', farbe: e.farbe || '#7a7a70', strich: FADEN_STRICHE.includes(e.strich) ? e.strich : 'gestrichelt', gerichtet: e.gerichtet !== false, eigen: true };
+  const e = saubereFadenart(eigene.find((a) => a && a.id === id));
+  if (e) return Object.assign({}, e, { eigen: true });
+  const b = fadenBibliothek().find((a) => a.id === id);
+  if (b) return Object.assign({}, b, { bibliothek: true });
   return FADEN_ARTEN.find((a) => a.id === id) ||
     { id: String(id || 'kennt'), gruppe: 'band', name: 'Faden', satz: '{a} — {b}', farbe: '#7a7a70', strich: 'gepunktet', gerichtet: false, unbekannt: true };
 }
@@ -151,20 +279,15 @@ function saubererStammbaum(roh) {
   /* Eigene Fadenarten zuerst, damit die Fäden sie kennen dürfen. */
   const eigeneArten = [];
   const artenGesehen = new Set(FADEN_ART_IDS);
-  for (const a of Array.isArray(r.eigeneArten) ? r.eigeneArten.slice(0, 40) : []) {
-    if (!a || typeof a !== 'object') continue;
-    const id = String(a.id || '').trim().slice(0, 40);
-    const name = String(a.name || '').trim().slice(0, 60);
-    if (!id || !name || artenGesehen.has(id)) continue;
-    artenGesehen.add(id);
-    eigeneArten.push({
-      id, name,
-      gruppe: FADEN_GRUPPEN.some((g) => g[0] === a.gruppe) ? a.gruppe : 'band',
-      satz: String(a.satz || '').trim().slice(0, 120) || '{a} — ' + name + ' — {b}',
-      farbe: /^#[0-9a-f]{6}$/i.test(String(a.farbe || '')) ? a.farbe : FADEN_FARBEN[0],
-      strich: FADEN_STRICHE.includes(a.strich) ? a.strich : 'gestrichelt',
-      gerichtet: a.gerichtet !== false
-    });
+  /* Was in der Bibliothek steht, gilt hier auch — sonst fielen alle Fäden
+     heraus, die eine Art aus der Bibliothek benutzen. */
+  for (const a of fadenBibliothek()) artenGesehen.add(a.id);
+  for (const a of Array.isArray(r.eigeneArten) ? r.eigeneArten.slice(0, 60) : []) {
+    const sa = saubereFadenart(a);
+    if (!sa || eigeneArten.some((x) => x.id === sa.id)) continue;
+    if (FADEN_ART_IDS.includes(sa.id)) continue;   /* feste Arten nicht überschreiben */
+    artenGesehen.add(sa.id);
+    eigeneArten.push(sa);
   }
 
   const leute = [];

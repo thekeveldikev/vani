@@ -272,3 +272,101 @@ test('Das Kabinett kennt seine Fächer', async () => {
   }
   assert.ok(ids.includes('stammbaum'));
 });
+
+test('Die Fadenarten sind reichlich, in sechs Gruppen, jede mit eigenem Bild', async () => {
+  const k = await frisch();
+  assert.ok(k.FADEN_ARTEN.length >= 55, 'reichlich Arten: ' + k.FADEN_ARTEN.length);
+  assert.equal(k.FADEN_GRUPPEN.length, 6, 'Blut, Bund, Herz, Klinge, Band, Schicksal');
+  assert.equal(k.FADEN_STRICHE.length, 6, 'sechs Strichbilder');
+  for (const st of k.FADEN_STRICHE) assert.ok(k.FADEN_STRICH_NAMEN[st], st + ' hat einen Namen');
+  /* Jedes Strichbild wird auch wirklich benutzt — sonst wäre es totes Gewicht */
+  for (const st of k.FADEN_STRICHE) {
+    assert.ok(k.FADEN_ARTEN.some((a) => a.strich === st), 'niemand benutzt: ' + st);
+  }
+  /* Jede Gruppe hat Arten */
+  for (const [gid, gname] of k.FADEN_GRUPPEN) {
+    assert.ok(k.FADEN_ARTEN.some((a) => a.gruppe === gid), 'Gruppe ohne Arten: ' + gname);
+  }
+});
+
+test('Farben werden geprüft, nicht geglaubt', async () => {
+  const k = await frisch();
+  assert.equal(k.fadenFarbeSauber('#A8452F'), '#a8452f', 'klein geschrieben');
+  assert.equal(k.fadenFarbeSauber('rot'), k.FADEN_FARBEN[0], 'Unsinn fällt auf die erste zurück');
+  assert.equal(k.fadenFarbeSauber('', '#123456'), '#123456', 'mit eigenem Ersatz');
+  assert.equal(k.fadenFarbeSauber('#12345'), k.FADEN_FARBEN[0], 'zu kurz ist keine Farbe');
+});
+
+test('Die Bibliothek gilt in allen Stammbäumen, die eigene Art nur in ihrem', async () => {
+  const k = await frisch();
+  k.D.einst.fadenBibliothek = [
+    { id: 'bib-eid', name: 'Hat den Eid gebrochen', gruppe: 'klinge', satz: '{a} hat {b} gegenüber den Eid gebrochen', farbe: '#8f2f22', strich: 'wellig' },
+    { id: 'bib-eid', name: 'Doppelt', gruppe: 'band' },   /* dieselbe Kennung */
+    { id: 'kind', name: 'Blut überschreiben', gruppe: 'band' },
+    { id: '', name: 'ohne Kennung' },
+    null
+  ];
+  const bib = k.fadenBibliothek();
+  assert.equal(bib.length, 1, 'Doppelte, Übergriffe und Unsinn fallen heraus');
+  assert.equal(bib[0].name, 'Hat den Eid gebrochen');
+  assert.equal(bib[0].strich, 'wellig');
+
+  /* Ein Faden mit einer Bibliotheksart überlebt das Putzen */
+  const b = baum(k, [P('a', 'Alma'), P('b', 'Bo')], [F('bib-eid', 'a', 'b')]);
+  assert.equal(b.faeden.length, 1, 'der Faden bleibt');
+  assert.equal(k.fadenArt('bib-eid', b).name, 'Hat den Eid gebrochen');
+  assert.equal(k.fadenArt('bib-eid', b).bibliothek, true);
+  assert.equal(k.fadenHeimat('bib-eid', b), 'bibliothek');
+  assert.equal(k.fadenHeimat('kind', b), 'fest');
+  assert.equal(k.fadenHeimat('gibtsnicht', b), 'unbekannt');
+
+  /* Der Teppich schlägt die Bibliothek */
+  const c = baum(k, [P('a', 'Alma'), P('b', 'Bo')], [F('bib-eid', 'a', 'b')], {
+    eigeneArten: [{ id: 'bib-eid', name: 'Hier heisst es anders', gruppe: 'herz', farbe: '#123456' }]
+  });
+  assert.equal(k.fadenArt('bib-eid', c).name, 'Hier heisst es anders');
+  assert.equal(k.fadenArt('bib-eid', c).eigen, true);
+  assert.equal(k.fadenHeimat('bib-eid', c), 'teppich');
+});
+
+test('Die Auswahl kennt feste, Bibliotheks- und eigene Arten — jede einmal', async () => {
+  const k = await frisch();
+  k.D.einst.fadenBibliothek = [{ id: 'bib-1', name: 'Aus der Bibliothek', gruppe: 'band' }];
+  const b = baum(k, [P('a', 'A')], [], { eigeneArten: [{ id: 'eig-1', name: 'Nur hier', gruppe: 'herz' }] });
+  const alle = k.fadenAlleArten(b);
+  const ids = alle.map((a) => a.id);
+  assert.equal(new Set(ids).size, ids.length, 'keine Art doppelt in der Auswahl');
+  assert.ok(ids.includes('kind') && ids.includes('bib-1') && ids.includes('eig-1'));
+  assert.equal(alle.find((a) => a.id === 'bib-1').bibliothek, true);
+  assert.equal(alle.find((a) => a.id === 'eig-1').eigen, true);
+  /* Steht eine Art in beiden, zählt die des Teppichs — und nur einmal */
+  const c = baum(k, [P('a', 'A')], [], { eigeneArten: [{ id: 'bib-1', name: 'Hier anders', gruppe: 'herz' }] });
+  const ids2 = k.fadenAlleArten(c).map((a) => a.id);
+  assert.equal(ids2.filter((x) => x === 'bib-1').length, 1);
+});
+
+test('Eine Fadenart wird geputzt wie alles andere', async () => {
+  const k = await frisch();
+  const a = k.saubereFadenart({ id: '  x  ', name: '  Name  ', gruppe: 'unfug', strich: 'unfug', farbe: 'unfug' });
+  assert.equal(a.id, 'x');
+  assert.equal(a.name, 'Name');
+  assert.equal(a.gruppe, 'band', 'unbekannte Gruppe wird zu Band');
+  assert.equal(a.strich, 'gestrichelt');
+  assert.ok(/^#[0-9a-f]{6}$/.test(a.farbe));
+  assert.ok(a.satz.includes('{a}') && a.satz.includes('{b}'), 'ohne Satz baut VANI einen');
+  assert.equal(a.gerichtet, true, 'im Zweifel gerichtet');
+  assert.equal(k.saubereFadenart({ id: 'x' }), null, 'ohne Namen keine Art');
+  assert.equal(k.saubereFadenart(null), null);
+});
+
+test('Die Bibliothek nimmt nicht unbegrenzt viel', async () => {
+  const k = await frisch();
+  const viele = [];
+  for (let i = 0; i < k.FADEN_BIBLIOTHEK_MAX + 30; i++) viele.push({ id: 'a' + i, name: 'Nr ' + i });
+  k.fadenBibliothekSetzen(viele);
+  assert.equal(k.fadenBibliothek().length, k.FADEN_BIBLIOTHEK_MAX);
+  /* Und eine, die es schon gibt, kommt nicht zweimal hinein */
+  k.fadenBibliothekSetzen([{ id: 'eins', name: 'Eins' }]);
+  assert.equal(k.fadenBibliothekHinzu({ id: 'eins', name: 'Nochmal' }), false);
+  assert.equal(k.fadenBibliothek().length, 1);
+});
