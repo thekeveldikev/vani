@@ -3543,6 +3543,52 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
   .kal-zelle, .kal-eintragtext, .kal-kerbe, .kalender-bild, .kal-ansichtknopf, .kal-artknopf { transition: none; }
 }
 
+/* ============================================================
+   BLÄTTER UND ZITATE IN DEN TISCH-EINSTELLUNGEN (54d/54e)
+   ============================================================ */
+.einstell-unter { font-size: 12.5px; color: var(--blass); line-height: 1.5; margin: -2px 0 8px; }
+.tb-plaetze { display: flex; flex-direction: column; gap: 6px; margin-top: 9px; }
+.tb-platz { display: flex; align-items: center; gap: 9px; }
+.tb-nummer {
+  width: 22px; height: 22px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  font-size: 11.5px; color: var(--blass); border: 1px solid var(--linie); font-variant-numeric: tabular-nums;
+}
+.tb-platz.voll .tb-nummer { background: var(--akzent); color: var(--papier); border-color: transparent; }
+.tb-platzknopf {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+  padding: 8px 12px; border-radius: 9px; border: 1px dashed var(--linie); text-align: left;
+}
+.tb-platz.voll .tb-platzknopf { border-style: solid; background: color-mix(in srgb, var(--tinte) 4%, transparent); }
+.tb-platzknopf .tb-name { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.tb-platzknopf small { font-size: 11.5px; color: var(--blass); }
+.tb-frei { font-size: 13.5px; color: var(--blass); font-style: italic; }
+.tb-weg { width: 26px; height: 26px; border-radius: 50%; flex: none; color: var(--blass); font-size: 17px; line-height: 1; display: grid; place-items: center; }
+.tb-fenster { width: min(520px, 94vw); max-height: 86vh; display: flex; flex-direction: column; gap: 10px; }
+.tb-hinweis { font-size: 13px; color: var(--blass); line-height: 1.5; }
+.tb-suche { width: 100%; }
+.tb-liste { flex: 1; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 1px; min-height: 180px; max-height: 46vh; }
+.tb-eintrag {
+  display: flex; align-items: baseline; gap: 10px; width: 100%; text-align: left;
+  padding: 9px 10px; border-radius: 8px; border-bottom: 1px solid color-mix(in srgb, var(--tinte) 8%, transparent);
+}
+.tb-eintrag.schon { opacity: .45; }
+.tb-art { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--blass); flex: none; width: 74px; }
+.tb-eintrag .tb-name { flex: 1; min-width: 0; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tb-eintrag small { color: var(--blass); font-size: 11.5px; flex: none; }
+.tb-leer { color: var(--blass); font-style: italic; font-size: 13.5px; padding: 20px 4px; text-align: center; }
+
+.tz-liste { display: flex; flex-direction: column; gap: 2px; margin: 9px 0 8px; }
+.tz-zeile { display: flex; align-items: center; gap: 8px; padding: 7px 4px 7px 10px; border-radius: 8px; background: color-mix(in srgb, var(--tinte) 4%, transparent); }
+.tz-zeile .tz-text { flex: 1; min-width: 0; font-size: 13.5px; font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; }
+.tz-weg { width: 24px; height: 24px; border-radius: 50%; flex: none; color: var(--blass); font-size: 16px; line-height: 1; display: grid; place-items: center; }
+.tz-leer { color: var(--blass); font-style: italic; font-size: 13px; padding: 8px 2px; }
+.tz-neu { display: flex; gap: 8px; }
+.tz-neu .tz-feld { flex: 1; min-width: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .tb-platzknopf:hover, .tb-eintrag:not(.schon):hover { background: color-mix(in srgb, var(--tinte) 8%, transparent); }
+  .tb-weg:hover, .tz-weg:hover { background: rgba(176,53,43,.16); color: #b0352b; }
+}
+
 </style>
 </head>
 <body>
@@ -3569,7 +3615,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.30.1';
+const APP_VERSION = '5.31.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -12126,50 +12172,125 @@ function diktatEinfuegen(ziel, text) {
     ziel.dispatchEvent(new Event('input', { bubbles: true }));
   }
 }
-function diktatStopp() {
+function diktatStopp(still) {
   if (!_diktat) return;
   const d = _diktat; _diktat = null;
+  /* Erst die Rueckrufe abhaengen, sonst wirft onend das Diktat wieder an. */
+  try { d.erk.onend = null; d.erk.onerror = null; d.erk.onresult = null; d.erk.onstart = null; } catch (e) {}
   try { d.erk.stop(); } catch (e) {}
+  try { d.erk.abort(); } catch (e) {}
   if (d.knopf) { d.knopf.classList.remove('an', 'hoert'); d.knopf.title = 'Diktat: sprechen statt tippen'; }
   document.body.classList.remove('diktiert');
   if (d.zwischen && d.zwischen.isConnected) d.zwischen.remove();
-  toast('Diktat beendet.' + (d.woerter ? ' ' + d.woerter + ' Wörter gehört.' : ''), 2400);
+  if (!still) toast('Diktat beendet.' + (d.woerter ? ' ' + d.woerter + ' Wörter gehört.' : ''), 2400);
 }
+/* Auf iPhone und iPad hoert die Erkennung nach jedem Satz von selbst auf:
+   `continuous` wird dort nicht beachtet, und mit `continuous = true` liefert
+   Safari ausserdem bei jedem Ergebnis den ganzen bisherigen Text noch einmal —
+   dann steht alles doppelt im Blatt. Deshalb dort: kurze Sitzungen, die VANI
+   selbst wieder anwirft. */
+function diktatIstApfel() {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent || '';
+  return /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1);
+}
+
 /* Start/Stopp am Knopf. `zielHolen` liefert das Feld, in das geschrieben wird. */
 function diktatUmschalten(knopf, zielHolen) {
   if (_diktat) { diktatStopp(); return; }
-  if (!diktatMoeglich()) { toast('Dieses Gerät kennt kein Diktat (keine Spracherkennung im Browser).', 3600); return; }
+  if (!diktatMoeglich()) {
+    toast('Dieser Browser kennt keine Spracherkennung. Auf dem iPad geht es trotzdem: das Mikrofon unten rechts auf der Bildschirmtastatur diktiert in jedes Feld.', 7000);
+    return;
+  }
   const Erk = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const erk = new Erk();
-  erk.lang = 'de-DE'; erk.continuous = true; erk.interimResults = true; erk.maxAlternatives = 1;
+  const apfel = diktatIstApfel();
+  let erk;
+  try { erk = new Erk(); } catch (e) { toast('Die Spracherkennung ließ sich nicht anlegen.'); return; }
+  erk.lang = 'de-DE';
+  erk.continuous = !apfel;
+  erk.interimResults = true;
+  erk.maxAlternatives = 1;
   const zwischen = el('div', { class: 'diktat-zwischen' }, el('i'), el('span', {}, 'Ich höre …'));
-  const d = _diktat = { erk, knopf, zwischen, woerter: 0, letzteEnde: 0 };
+  const d = _diktat = { erk, knopf, zwischen, woerter: 0, letzteEnde: 0, gehoert: 0, neustarts: 0, zuletztGestartet: 0, laeuft: false };
+
+  /* Jede Sitzung faengt bei Ergebnis 0 an. Was schon eingefuegt wurde, wird
+     nicht noch einmal eingefuegt — sonst steht der Satz doppelt da. */
+  let verbraucht = 0;
+  erk.onstart = () => { d.laeuft = true; verbraucht = 0; d.zuletztGestartet = Date.now(); };
   erk.onresult = (ev) => {
     let fertig = '', vorlaeufig = '';
-    for (let i = ev.resultIndex; i < ev.results.length; i++) { const r = ev.results[i]; if (r.isFinal) fertig += r[0].transcript + ' '; else vorlaeufig += r[0].transcript; }
+    for (let i = 0; i < ev.results.length; i++) {
+      const r = ev.results[i];
+      if (r.isFinal) { if (i >= verbraucht) { fertig += r[0].transcript + ' '; verbraucht = i + 1; } }
+      else vorlaeufig += r[0].transcript;
+    }
     if (vorlaeufig) zwischen.lastElementChild.textContent = vorlaeufig.slice(-80);
     if (fertig.trim()) {
       const ziel = zielHolen();
+      if (!ziel) { toast('Kein Feld zum Hineinschreiben — stell den Cursor in den Text.', 3600); return; }
       let text = diktatSaeubern(fertig);
       /* Eine lange Pause macht einen Absatz */
-      const jetzt = Date.now(); if (d.letzteEnde && jetzt - d.letzteEnde > 4000 && !/^\n/.test(text)) text = '\n\n' + text; d.letzteEnde = jetzt;
+      const jetzt = Date.now();
+      if (d.letzteEnde && jetzt - d.letzteEnde > 4000 && !/^\n/.test(text)) text = '\n\n' + text;
+      d.letzteEnde = jetzt;
       d.woerter += worte(text);
+      d.gehoert++;
+      d.neustarts = 0;   /* es kommt ja etwas an */
       diktatEinfuegen(ziel, text);
       zwischen.lastElementChild.textContent = 'Ich höre …';
     }
   };
-  erk.onerror = (ev) => { if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') { toast('Das Mikrofon ist nicht erlaubt — in den Geräteeinstellungen freigeben.', 4200); diktatStopp(); } else if (ev.error === 'no-speech') { /* still weiter */ } else { toast('Diktat unterbrochen (' + ev.error + ').'); diktatStopp(); } };
-  erk.onend = () => { if (_diktat === d) { try { erk.start(); } catch (e) { diktatStopp(); } } };
-  try { erk.start(); } catch (e) { toast('Das Diktat ließ sich nicht starten.'); _diktat = null; return; }
+  erk.onerror = (ev) => {
+    const f = ev && ev.error;
+    if (f === 'not-allowed' || f === 'service-not-allowed') {
+      toast('Das Mikrofon ist nicht freigegeben. Auf dem iPad: Einstellungen › Safari › Mikrofon — und beim Nachfragen „Erlauben".', 7000);
+      diktatStopp(true);
+    } else if (f === 'no-speech' || f === 'aborted') {
+      /* Ganz normal: es war nur still. Weiter geht es über onend. */
+    } else if (f === 'network') {
+      toast('Die Spracherkennung braucht gerade das Netz und kommt nicht durch.', 5000);
+      diktatStopp(true);
+    } else {
+      toast('Diktat unterbrochen (' + f + ').', 4000);
+      diktatStopp(true);
+    }
+  };
+  erk.onend = () => {
+    d.laeuft = false;
+    if (_diktat !== d) return;
+    /* Wieder anwerfen — aber nicht in einer Schleife, wenn nie etwas ankommt. */
+    const kurz = Date.now() - d.zuletztGestartet < 900;
+    d.neustarts = kurz ? d.neustarts + 1 : 0;
+    if (d.neustarts > 6) {
+      toast(d.gehoert
+        ? 'Das Diktat hat sich verabschiedet. Tipp noch einmal aufs Mikrofon.'
+        : 'Die Spracherkennung startet immer wieder neu, ohne etwas zu hören. Prüf die Mikrofon-Freigabe — auf dem iPad geht auch das Mikrofon auf der Bildschirmtastatur.', 7000);
+      diktatStopp(true);
+      return;
+    }
+    setTimeout(() => {
+      if (_diktat !== d) return;
+      try { erk.start(); } catch (e) { /* schon am Laufen: nicht schlimm */ }
+    }, apfel ? 260 : 120);
+  };
+  try { erk.start(); } catch (e) {
+    toast('Das Diktat ließ sich nicht starten. Vielleicht läuft schon eines.');
+    _diktat = null; return;
+  }
   knopf.classList.add('an', 'hoert'); knopf.title = 'Diktat läuft — tippen beendet es';
   document.body.classList.add('diktiert');
   document.body.append(zwischen);
-  toast('Diktat läuft. Sag „Punkt", „Komma", „neuer Absatz". Tipp auf das Mikrofon beendet es.', 4200);
+  toast('Diktat läuft. Sag „Punkt", „Komma", „neuer Absatz". Tipp auf das Mikrofon beendet es.', 4600);
 }
-/* Der Knopf für Kopfleisten (Schreibraum). Ohne Spracherkennung bleibt er weg. */
+/* Der Knopf für Kopfleisten (Schreibraum). Er bleibt auch da, wenn der Browser
+   keine Spracherkennung hat — sonst sucht man ihn und findet nichts. Beim
+   Tippen erklaert er dann, wo das Diktat des Geraets sitzt. */
 function diktatKnopf(zielHolen) {
-  if (!diktatMoeglich()) return null;
-  const k = el('button', { class: 'rundknopf zart diktat-knopf', html: ik('mikro'), title: 'Diktat: sprechen statt tippen' });
+  const kann = diktatMoeglich();
+  const k = el('button', {
+    class: 'rundknopf zart diktat-knopf' + (kann ? '' : ' kannnicht'), html: ik('mikro'),
+    title: kann ? 'Diktat: sprechen statt tippen' : 'Diktat: dieser Browser kann es nicht — das Mikrofon der Bildschirmtastatur schon'
+  });
   k.addEventListener('click', () => diktatUmschalten(k, zielHolen));
   return k;
 }
@@ -18055,10 +18176,28 @@ function tischzitatEinritzen(element, text, fertig) {
 
   const stuecke = [...schrift.querySelectorAll('.tz-z')];
   if (!stuecke.length) { element.classList.remove('ritzt'); if (fertig) fertig(); return; }
+  /* Alles sofort sichtbar machen — ohne Umschweife. Gebraucht, wenn nicht
+     animiert werden kann oder darf. */
+  const gleichFertig = () => {
+    for (const z of stuecke) z.classList.add('geschnitten');
+    klinge.remove();
+    element.classList.remove('ritzt');
+    if (fertig) fertig();
+  };
+  /* Liegt das Fenster im Hintergrund, laeuft keine Bildfolge. Dann wird nicht
+     geritzt, sondern der Satz steht einfach da — sonst blieben die Buchstaben
+     unsichtbar, bis jemand zurueckkommt. Dasselbe, wenn jemand weniger
+     Bewegung eingestellt hat. */
+  const stillsteht = (typeof document !== 'undefined' && document.hidden) ||
+    (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (stillsteht) { gleichFertig(); return; }
+  /* Und ein Netz darunter: bleibt der Lauf aus welchem Grund auch immer
+     stehen, steht der Satz spaetestens danach vollstaendig da. */
+  const notbremse = setTimeout(gleichFertig, zeichen.length * TZ_TAKT * 3 + 2500);
   /* Sanft losfahren und sanft ankommen: die Klinge zieht nicht stur gleich schnell. */
   let n = 0;
   const gehe = () => {
-    if (!element.isConnected) { element.classList.remove('ritzt'); return; }
+    if (!element.isConnected) { clearTimeout(notbremse); element.classList.remove('ritzt'); return; }
     const z = stuecke[n];
     if (z) {
       z.classList.add('geschnitten');
@@ -18072,6 +18211,7 @@ function tischzitatEinritzen(element, text, fertig) {
       const bremse = rest < 4 ? 1.9 : n < 3 ? 1.6 : 1;
       setTimeout(gehe, TZ_TAKT * bremse + Math.random() * 14);
     } else {
+      clearTimeout(notbremse);
       klinge.classList.add('geht');
       setTimeout(() => klinge.remove(), 420);
       element.classList.remove('ritzt');
@@ -18079,7 +18219,9 @@ function tischzitatEinritzen(element, text, fertig) {
       setTimeout(() => { element.classList.remove('setzt'); if (fertig) fertig(); }, 900);
     }
   };
-  requestAnimationFrame(gehe);
+  /* setTimeout statt requestAnimationFrame: der Zeitgeber laeuft auch dann,
+     wenn das Fenster gerade nicht gezeichnet wird. */
+  setTimeout(gehe, 16);
 }
 /* Ein paar Späne, dort wo die Klinge gerade ansetzt. */
 function tischzitatStaub(element, x, y) {
@@ -18094,6 +18236,11 @@ function tischzitatStaub(element, x, y) {
     setTimeout(() => korn.remove(), 1300);
   }
 }
+
+/* Welcher Satz gerade erst entstanden ist. Eine Kennung statt einer Marke am
+   Dokument: die ueberlebt auch, wenn der Tisch zwischendurch neu gebaut wird. */
+let _tzFrisch = '';
+function tischzitatFrischMerken(id) { _tzFrisch = String(id || ''); }
 
 /* ----- Auf den Tisch legen ----- */
 function tischzitateBauen(dinge, e, neuZeichnen) {
@@ -18117,7 +18264,11 @@ function tischzitateBauen(dinge, e, neuZeichnen) {
     }, el('span', { class: 'tz-schrift' }, doc.text));
     dinge.append(knopf);
     /* Was gerade erst entstanden ist, wird vor den Augen eingeritzt */
-    if (doc._frischGeritzt) { delete doc._frischGeritzt; frisch.push([knopf, doc]); }
+    if (doc._frischGeritzt || doc.id === _tzFrisch) {
+      delete doc._frischGeritzt;
+      if (doc.id === _tzFrisch) _tzFrisch = '';
+      frisch.push([knopf, doc]);
+    }
     gelegt.push([knopf, doc]);
   }
   for (const zeile of gefunden) {
@@ -18131,11 +18282,15 @@ function tischzitateBauen(dinge, e, neuZeichnen) {
   /* Erst wenn alle liegen, wird gerückt — nacheinander, damit jeder Satz die
      schon verschobenen sieht. Sonst weichen zwei einander gleichzeitig aus
      und landen wieder aufeinander. */
-  requestAnimationFrame(() => {
+  /* Ein Zeitgeber, keine Bildfolge: requestAnimationFrame steht still, solange
+     das Fenster im Hintergrund liegt. Dann wuerde nie gerueckt und nie geritzt
+     — und die Saetze laegen fuer immer uebereinander. Messen braucht kein Bild. */
+  setTimeout(() => {
     const flaeche = szene || dinge.parentElement;
+    if (!flaeche || !flaeche.isConnected) return;
     for (const [knopf, doc] of gelegt) tischzitatRuecken(knopf, doc, flaeche);
     for (const [knopf, doc] of frisch) tischzitatEinritzen(knopf, doc.text);
-  });
+  }, 16);
 
   /* Ein kleines Messer am Rand: hier ritzt man ein */
   if (modus === 'geritzt' || modus === 'beides') {
@@ -18176,6 +18331,209 @@ async function tischzitatMenue(doc, neuZeichnen) {
   }
 }
 
+/* ----- Der Abschnitt in „Schreibtisch einrichten" -----
+   Bisher gab es nur das winzige Messer am rechten Rand der Platte — das
+   findet niemand. Hier steht alles beisammen: die Weise, die eigenen Sätze,
+   und das Feld, in das man einen neuen schreibt. Beim Einritzen schließt
+   sich der Kasten, damit man zusieht, wie die Klinge läuft. */
+function tischzitatEinstellung(e, danach, schliessen) {
+  const kasten = el('div', { class: 'einstellgruppe' });
+  const zeichne = () => {
+    kasten.innerHTML = '';
+    const modus = tischzitatModus(e);
+    const wahl = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
+    for (const [id, name] of TISCHZITAT_MODI) {
+      wahl.append(el('button', { class: modus === id ? 'an' : '', onclick: () => {
+        e.zitatModus = id; if (id !== 'nichts') e.verse = true;
+        D.einst.schreibtisch = { ...e }; speichereEinst(); zeichne(); if (danach) danach();
+      } }, name));
+    }
+    anfuegen(kasten,
+      el('b', {}, 'Zitate auf der Platte'),
+      el('div', { class: 'einstell-unter' }, 'In alte Tische ritzen Leute Sätze. Gefundene kommen aus deinen eigenen Texten und wechseln von selbst; geritzte schreibst du hier hinein, und sie bleiben stehen.'),
+      wahl);
+    if (modus !== 'geritzt' && modus !== 'beides') {
+      anfuegen(kasten, el('div', { class: 'einstell-unter' }, 'Zum Einritzen nimm „Geritzte" oder „Beides".'));
+      return;
+    }
+    /* Was schon in der Platte steht */
+    const meine = tischzitate();
+    const liste = el('div', { class: 'tz-liste' });
+    for (const doc of meine) {
+      liste.append(el('div', { class: 'tz-zeile' },
+        el('span', { class: 'tz-text' }, doc.text),
+        el('button', { class: 'tz-weg', title: 'Aus der Platte schleifen', onclick: async () => {
+          if (await frage('Diesen Satz aus der Platte schleifen?', { ja: 'Herausschleifen' })) {
+            await loesche(doc.id); zeichne(); if (danach) danach();
+          }
+        } }, '×')));
+    }
+    if (!meine.length) liste.append(el('div', { class: 'tz-leer' }, 'Noch nichts eingeritzt. Ein Satz, der bleiben soll — mehr braucht es nicht.'));
+
+    const feld = el('input', { type: 'text', class: 'tz-feld', maxlength: '160', placeholder: 'Ein Satz, der bleiben soll …' });
+    const ritzen = () => {
+      const t = feld.value.trim();
+      if (!t) { feld.focus(); return; }
+      const doc = tischzitatAnlegen(t);
+      if (!doc) return;
+      feld.value = '';
+      /* Zusehen, wie es geritzt wird. Reihenfolge zaehlt: das Schliessen des
+         Kastens zeichnet den Tisch selbst noch einmal — erst DANACH wird der
+         Satz als frisch markiert, sonst haette der zweite Aufbau die Klinge
+         wieder weggeraeumt, bevor sie loslaufen konnte. */
+      /* VOR dem Schliessen vormerken: der Kasten baut den Tisch beim Zugehen
+         selbst neu auf, und wer auch immer als Naechstes baut, soll die Klinge
+         laufen lassen. So haengt es nicht an der Reihenfolge. */
+      tischzitatFrischMerken(doc.id);
+      if (schliessen) schliessen();
+      if (danach) danach();
+      toast('Wird eingeritzt.', 2200);
+    };
+    feld.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); ritzen(); } });
+    anfuegen(kasten, liste,
+      el('div', { class: 'tz-neu' }, feld, el('button', { class: 'knopf voll', onclick: ritzen }, 'Einritzen')),
+      el('div', { class: 'einstell-unter' }, 'Auf der Platte liegt außerdem ein kleines Messer am rechten Rand — damit geht es auch direkt.'));
+  };
+  zeichne();
+  return kasten;
+}
+
+/* ===================== 54e — DIE BLÄTTER AUF DEM TISCH =====================
+   Drei Manuskripte liegen auf der Platte. Wer sie aussucht, ist eine Frage
+   der Laune:
+
+     · „VANI legt sie hin" — die drei zuletzt beschriebenen Texte, wie bisher.
+       Man kommt an den Tisch und sieht, woran man dran war.
+     · „Ich lege sie hin"  — drei selbst gewählte. Die bleiben liegen, auch
+       wenn man wochenlang woanders schreibt.
+
+   Was gewählt ist, wird als Kennung gemerkt, nicht als Abschrift. Deshalb ist
+   die Liste immer aktuell: ein neuer Text taucht sofort in der Auswahl auf,
+   ein gelöschter verschwindet von selbst vom Tisch — es wird bei jedem
+   Aufbau frisch nachgesehen, ob es ihn noch gibt. */
+
+const TISCHBLATT_MODI = [
+  ['vani', 'VANI legt sie hin', 'Die drei zuletzt beschriebenen Texte — der Tisch zeigt, woran du dran warst.'],
+  ['selbst', 'Ich lege sie hin', 'Drei, die du selbst aussuchst. Die bleiben liegen.']
+];
+function tischblattModus(e) {
+  const m = e && e.blaetterModus;
+  return TISCHBLATT_MODI.some(([id]) => id === m) ? m : 'vani';
+}
+/* Was sich überhaupt auf den Tisch legen lässt. */
+const TISCHBLATT_TYPEN = ['blatt', 'seite', 'szene', 'heft', 'projekt', 'schnipsel'];
+function tischblattWaehlbar() {
+  return [...D.docs.values()]
+    .filter((d) => !d.geloescht && TISCHBLATT_TYPEN.includes(d.typ))
+    .sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0));
+}
+function tischblattName(d) {
+  if (!d) return '';
+  const t = String(d.titel || '').trim();
+  if (t) return t;
+  const text = String(d.text || '').replace(/\s+/g, ' ').trim();
+  if (text) { const kurz = text.slice(0, 40).trimEnd(); return kurz + (text.length > 40 ? ' …' : ''); }
+  return { blatt: 'Blatt', seite: 'Heftseite', szene: 'Szene', heft: 'Heft', projekt: 'Projekt', schnipsel: 'Schnipsel' }[d.typ] || d.typ;
+}
+function tischblattArt(d) {
+  return { blatt: 'Blatt', seite: 'Heftseite', szene: 'Szene', heft: 'Heft', projekt: 'Projekt', schnipsel: 'Schnipsel' }[d && d.typ] || '';
+}
+/* Nur Kennungen, höchstens drei, keine doppelt. Pur. */
+function saubereTischblattWahl(liste) {
+  if (!Array.isArray(liste)) return [];
+  const raus = [];
+  for (const x of liste) {
+    const id = typeof x === 'string' ? x.slice(0, 200) : '';
+    if (id && !raus.includes(id)) raus.push(id);
+    if (raus.length >= 3) break;
+  }
+  return raus;
+}
+/* Die Blätter, die wirklich auf dem Tisch liegen — immer frisch nachgesehen. */
+function tischblaetter(e) {
+  if (tischblattModus(e) !== 'selbst') return schreibtischLetzteTexte(3);
+  /* Gelöschtes fällt hier heraus, ohne dass die Wahl angefasst werden muss:
+     die Kennung darf ruhig stehen bleiben, falls der Text aus dem Papierkorb
+     zurückkommt. */
+  return saubereTischblattWahl(e && e.blaetter).map((id) => D.docs.get(id)).filter((d) => d && !d.geloescht);
+}
+
+/* ----- Ein Blatt aussuchen ----- */
+function tischblattWaehlen(vorhanden, fertig) {
+  const alle = tischblattWaehlbar();
+  const liste = el('div', { class: 'tb-liste' });
+  const suchfeld = el('input', { type: 'search', class: 'tb-suche', placeholder: 'Suchen …' });
+  const zeichne = () => {
+    const q = suchfeld.value.trim().toLowerCase();
+    const treffer = alle.filter((d) => !q || (tischblattName(d) + ' ' + (d.text || '')).toLowerCase().includes(q));
+    liste.innerHTML = '';
+    if (!treffer.length) { liste.append(el('div', { class: 'tb-leer' }, q ? 'Nichts gefunden.' : 'Noch nichts geschrieben.')); return; }
+    for (const d of treffer.slice(0, 300)) {
+      const schon = vorhanden.includes(d.id);
+      liste.append(el('button', {
+        class: 'tb-eintrag' + (schon ? ' schon' : ''), disabled: schon ? '' : null,
+        title: schon ? 'Liegt schon auf dem Tisch' : 'Auf den Tisch legen',
+        onclick: () => { zu(); fertig(d.id); }
+      },
+        el('span', { class: 'tb-art' }, tischblattArt(d)),
+        el('span', { class: 'tb-name' }, tischblattName(d)),
+        el('small', {}, schon ? 'liegt schon' : (d.geaendert ? vorZeit(d.geaendert) : ''))));
+    }
+  };
+  suchfeld.addEventListener('input', zeichne);
+  const kasten = el('div', { class: 'modal tb-fenster' },
+    el('div', { class: 'kartenkopf' }, 'WAS SOLL DA LIEGEN?'),
+    el('p', { class: 'tb-hinweis' }, 'Alles, was du geschrieben hast — das Neueste zuerst. Was du später schreibst, steht beim nächsten Mal ganz oben; was du löschst, verschwindet von selbst vom Tisch.'),
+    suchfeld, liste,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen')));
+  const zu = zeigeDeck(kasten);
+  zeichne();
+  setTimeout(() => suchfeld.focus(), 60);
+}
+
+/* ----- Der Abschnitt in „Schreibtisch einrichten" ----- */
+function tischblattEinstellung(e, danach) {
+  const kasten = el('div', { class: 'einstellgruppe' });
+  const zeichne = () => {
+    kasten.innerHTML = '';
+    const modus = tischblattModus(e);
+    const wahl = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
+    for (const [id, name] of TISCHBLATT_MODI) {
+      wahl.append(el('button', { class: modus === id ? 'an' : '', onclick: () => { e.blaetterModus = id; D.einst.schreibtisch = { ...e }; speichereEinst(); zeichne(); if (danach) danach(); } }, name));
+    }
+    anfuegen(kasten,
+      el('b', {}, 'Blätter auf dem Tisch'),
+      el('div', { class: 'einstell-unter' }, TISCHBLATT_MODI.map(([id, name, was]) => name + ': ' + was).join('  ·  ')),
+      wahl);
+    if (modus !== 'selbst') return;
+    const gewaehlt = saubereTischblattWahl(e.blaetter);
+    const reihe = el('div', { class: 'tb-plaetze' });
+    for (let i = 0; i < 3; i++) {
+      const id = gewaehlt[i];
+      const d = id ? D.docs.get(id) : null;
+      const lebt = d && !d.geloescht;
+      const setzen = (neuId) => {
+        const w = saubereTischblattWahl(e.blaetter);
+        if (neuId) w[i] = neuId; else w.splice(i, 1);
+        e.blaetter = saubereTischblattWahl(w);
+        D.einst.schreibtisch = { ...e }; speichereEinst(); zeichne(); if (danach) danach();
+      };
+      reihe.append(el('div', { class: 'tb-platz' + (lebt ? ' voll' : '') },
+        el('span', { class: 'tb-nummer' }, String(i + 1)),
+        el('button', { class: 'tb-platzknopf', onclick: () => tischblattWaehlen(gewaehlt.filter(Boolean), setzen) },
+          lebt ? el('span', { class: 'tb-name' }, tischblattName(d)) : el('span', { class: 'tb-frei' }, 'leer — hier etwas hinlegen'),
+          lebt ? el('small', {}, tischblattArt(d)) : null),
+        lebt || id ? el('button', { class: 'tb-weg', title: 'Wieder wegnehmen', onclick: () => setzen('') }, '×') : null));
+    }
+    anfuegen(kasten, reihe,
+      el('div', { class: 'einstell-unter' }, gewaehlt.length
+        ? 'Was du löschst, verschwindet von selbst vom Tisch — die Wahl bleibt aber stehen, falls es aus dem Papierkorb zurückkommt.'
+        : 'Noch nichts gewählt. Solange kein Platz belegt ist, bleibt die Platte an dieser Stelle leer.'));
+  };
+  zeichne();
+  return kasten;
+}
+
 /* ================================================================
    VANI — Der Schreibtisch.
 
@@ -18210,6 +18568,8 @@ function saubererSchreibtisch(roh) {
     unordnung: begrenze(q.unordnung, 0, 1, .7),
     verse: q.verse !== false,
     zitatModus: TISCHZITAT_MODI.some(([id]) => id === q.zitatModus) ? q.zitatModus : (q.verse === false ? 'nichts' : 'gefunden'),
+    blaetterModus: TISCHBLATT_MODI.some(([id]) => id === q.blaetterModus) ? q.blaetterModus : 'vani',
+    blaetter: saubereTischblattWahl(q.blaetter),
     uhrTickt: q.uhrTickt === true,
     wachs: begrenze(q.wachs, 0, LEUCHTER_STUNDEN * 60, 0),         /* verbrannte Minuten */
     kerzenGewechselt: begrenze(q.kerzenGewechselt, 0, 4102444800000, 0),
@@ -18653,8 +19013,11 @@ function schreibtischSignatur() {
   const tag = schreibtischTag();
   const fund = schreibtischFundfoto();
   return JSON.stringify([
-    e.holz, e.kerzen, e.wetterFolgtKlang, e.unordnung, e.verse, e.zitatModus, e.uhrTickt, e.kerzenGewechselt, e.federKratzt, e.offenesBuch, e.tageszeit, e.jahreszeit,
+    e.holz, e.kerzen, e.wetterFolgtKlang, e.unordnung, e.verse, e.zitatModus, e.blaetterModus, (e.blaetter || []).join(','), e.uhrTickt, e.kerzenGewechselt, e.federKratzt, e.offenesBuch, e.tageszeit, e.jahreszeit,
     e.wetterFolgtKlang ? schreibtischWetter() : 'still', D.einst.tagesziel, tag.heute, tag.serie,
+    /* Ohne die geritzten Saetze bliebe der Tisch stehen, wenn einer dazukommt
+       oder verschwindet — und die Klinge liefe nie. */
+    typeof tischzitate === 'function' ? tischzitate().map((z) => z.id + ':' + z.text).join('|') : '',
     buecher.slice(0, 9).map((b) => b.id + ':' + (b.seite || 0) + ':' + (b.bild || '') + ':' + (b.titel || '')),
     schreibtischLetzteTexte(3).map((d) => d.id + ':' + (d.geaendert || 0)),
     briefe.length, briefe.some((b) => briefIstOffen(b) && b.versiegelt), heft ? heft.id + ':' + (heft.geaendert || 0) : '',
@@ -18715,8 +19078,8 @@ RENDER.schreibtisch = function (haupt) {
   dinge.append(baueUhr(e));
   dinge.append(ding('stuhl', 'Der zweite Stuhl: der Faden — ein Gespräch am Tisch', el('div', { class: 'stuhl-bild' }, el('i', { class: 'lehne' }), el('i', { class: 'sitz' }), el('i', { class: 'bein b1' }), el('i', { class: 'bein b2' })), () => { location.hash = '#/faden'; }));
 
-  /* Manuskripte: die letzten Texte */
-  const letzte = schreibtischLetzteTexte(3);
+  /* Manuskripte: entweder die zuletzt beschriebenen oder die selbst gewaehlten */
+  const letzte = typeof tischblaetter === 'function' ? tischblaetter(e) : schreibtischLetzteTexte(3);
   letzte.forEach((d, i) => {
     const text = (d.text || '').trim().slice(0, 420);
     dinge.append(ding('manuskript m' + (i + 1), 'Weiterschreiben: ' + (d.titel || text.slice(0, 30)), el('div', { class: 'manuskript-papier' }, el('b', {}, d.titel || (d.typ === 'seite' ? 'Heftseite' : d.typ === 'szene' ? 'Szene' : 'Blatt')), el('span', {}, text), el('i', { class: 'korrektur k1' }), el('i', { class: 'korrektur k2' })), () => oeffneDokument(d), '--dreh:' + ((i * 7) % 9 - 4) + 'deg'));
@@ -18867,10 +19230,11 @@ function schreibtischEinrichten(danach) {
     zeile('Leuchter', 'Sieben Flammen. Die Kerzen brennen über ' + LEUCHTER_STUNDEN + ' Schreibstunden wirklich herunter (' + Math.round((1 - leuchterStand(e.wachs)) * 100) + ' % übrig).', schalter(() => e.kerzen, (v) => { e.kerzen = v; })),
     zeile('Die Uhr tickt', 'Ein leises Ticken, zur vollen Stunde ein Glockenschlag.', schalter(() => e.uhrTickt, (v) => { e.uhrTickt = v; })),
     zeile('Fenster hört auf den Klang', 'Spielt Regen, regnet es vor dem Fenster; bei Gewitter wetterleuchtet es.', schalter(() => e.wetterFolgtKlang, (v) => { e.wetterFolgtKlang = v; })),
-    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Zitate auf der Platte'),
-      el('div', { style: 'font-size:12.5px;color:var(--blass);margin:-4px 0 8px' }, 'In alte Tische ritzen Leute Sätze. Gefundene kommen aus deinen eigenen Texten und wechseln; geritzte schreibst du selbst und sie bleiben stehen.'),
-      wahlgruppe(TISCHZITAT_MODI.map(([id, name]) => [id, name]), () => tischzitatModus(e), (v) => { e.zitatModus = v; if (v !== 'nichts') e.verse = true; }),
-      el('div', { style: 'font-size:12px;color:var(--blass);margin-top:6px' }, TISCHZITAT_MODI.map(([id, name, was]) => name + ': ' + was).join('  ·  '))),
+    /* Diese beiden Abschnitte legen sofort fest, statt nur vorzuschauen —
+       deshalb wandert das Ergebnis auch in `alt`. Sonst nimmt das Schliessen
+       des Kastens die Wahl wieder zurueck. */
+    typeof tischblattEinstellung === 'function' ? tischblattEinstellung(e, () => { Object.assign(alt, e); if (danach) danach(); }) : null,
+    typeof tischzitatEinstellung === 'function' ? tischzitatEinstellung(e, () => { Object.assign(alt, e); if (danach) danach(); }, () => zu()) : null,
     zeile('Die Feder kratzt', 'Ein leises Kratzen beim Tippen auf dem eingespannten Blatt.', schalter(() => e.federKratzt, (v) => { e.federKratzt = v; })),
     zeile('Aufgeschlagenes Buch', 'Das zuletzt gelesene Buch liegt offen auf dem Tisch; links und rechts tippen blättert.', schalter(() => e.offenesBuch, (v) => { e.offenesBuch = v; })),
     (e.kleckse && e.kleckse.length) ? zeile('Kleckse', e.kleckse.length + ' Tintenkleckse von der Feder — einer je Sitzung.', el('button', { class: 'knopf zart', onclick: () => { e.kleckse = []; D.einst.schreibtisch = { ...e }; speichereEinst(); toast('Die Platte ist gewischt.'); if (danach) danach(); } }, 'Wegwischen')) : null,
@@ -21096,6 +21460,145 @@ const SALON_GAESTE_MEHR = [
       { t: 'Night on the water: two people on a raft, and something the reader notices before they do.', min: 20, ziel: 400 },
       { t: 'Get the facts first: describe a real place you know in plain words. Then bend one fact — just one — and see what it does.', min: 20, ziel: 300 }
     ]
+  },
+  {
+    id: 'green', gast: true, en: true, name: 'John Green', jahre: '* 1977', woher: 'Indianapolis · Orlando · Indianapolis', bild: 'autoren/green.jpg', lage: '50% 26%',
+    foto: { urheber: 'Gage Skidmore', lizenz: 'CC BY-SA 3.0', lizenzUrl: 'https://creativecommons.org/licenses/by-sa/3.0/', seite: 'https://commons.wikimedia.org/wiki/File:John_Green_by_Gage_Skidmore.jpg' },
+    kurz: 'Nimmt junge Menschen vollkommen ernst. Schreibt viele Fassungen, wirft fast alles weg — und lässt zurück, was hell brennt.',
+    rahmen: 'hell', anrede: 'John',
+    zitate: [
+      { t: 'Ich verliebte mich so, wie man einschläft: langsam, und dann auf einmal.', o: 'I fell in love the way you fall asleep: slowly, and then all at once.', q: 'Das Schicksal ist ein mieser Verräter, 2012' },
+      { t: 'Das ist die Sache mit dem Schmerz: Er will gespürt werden.', o: 'That’s the thing about pain. It demands to be felt.', q: 'Das Schicksal ist ein mieser Verräter, 2012' },
+      { t: 'Was ist der Sinn zu leben, wenn man nicht wenigstens versucht, etwas Bemerkenswertes zu tun?', o: 'What is the point of being alive if you don’t at least try to do something remarkable?', q: 'Die erste Liebe (nach 19 vergeblichen Versuchen), 2006' },
+      { t: 'Die Stadt war aus Papier, aber die Erinnerungen waren es nicht.', o: 'The town was paper, but the memories were not.', q: 'Margos Spuren, 2008' },
+      { t: 'Ich gehe, um ein großes Vielleicht zu suchen.', o: 'I go to seek a Great Perhaps.', q: 'Eine wie Alaska, 2005 (nach François Rabelais)' },
+      { t: 'Dein Jetzt ist nicht dein Für immer.', o: 'Your now is not your forever.', q: 'Schlaft gut, ihr fiesen Gedanken, 2017' },
+      { t: 'Was für ein tückischer Gedanke, zu glauben, ein Mensch sei mehr als ein Mensch.', o: 'What a treacherous thing to believe that a person is more than a person.', q: 'Margos Spuren, 2008' },
+      { t: 'Der Trost ist nicht, dass es leichter wird. Der Trost ist, dass man es zusammen trägt.', o: 'The comfort is not that it gets easier. The comfort is that you carry it together.', q: 'im Geiste seiner Bücher — kein wörtliches Zitat' }
+    ],
+    saetze: [
+      'Write the bad draft. It is not a bad draft, it is the only road to the good one — and the road is made of the bad draft.',
+      'I throw away far more than I keep. That is not failure; that is the job. The book is what survives the throwing.',
+      'Teenagers are not small adults with a smaller vocabulary. They are people at the loudest moment of their lives. Write them at full volume.',
+      'Don’t write down to anyone. Ever. The reader you underestimate is the reader you lose.',
+      'A sentence that is only clever is a sentence that is only clever. Ask it what it is for.',
+      'Give the sad book jokes. Give the funny book grief. Anything that is only one thing is not yet true.',
+      'You cannot make a reader cry by describing crying. You make them cry by showing them what the person cannot say.',
+      'Metaphors are dangerous. Use one, then check whether it is doing work or just standing there looking pretty.',
+      'Write the specific thing. Not “a hospital” — the vending machine on the third floor that only takes exact change.',
+      'Research until you love it. Then put in one per cent of what you found, and let the other ninety-nine hold it up from underneath.',
+      'The ending is not the last thing that happens. It is the moment the reader understands what the book was about.',
+      'Revision is not fixing mistakes. Revision is finding out what you actually wrote, and then writing that.',
+      'If a chapter is boring you, it is not going to improve on its own by page ninety.',
+      'Let your characters want something on the first page. Even a glass of water. Wanting is the engine.',
+      'The illness is not the story. The person with the illness is the story. Never confuse the two.',
+      'You are allowed to write about the thing that frightens you. In fact you may find it is the only thing worth the trouble.',
+      'Nobody owes you a reader. Earn them line by line, and then keep earning them.',
+      'Write for the person who needs this book. Not for everyone. For that one person.'
+    ],
+    anfang: ['Here is what I would say:', 'Okay, so:', 'The honest version:', 'I have thrown away a lot of pages to learn this:', 'Two things, and the second matters more:', 'Let me put it plainly:'],
+    kern: [
+      ['anfang', 'Start in the middle of a want. Not the weather, not the town — someone who needs something today and cannot have it.'],
+      ['anfang', 'The first page is a promise about the voice. Make the promise you can keep for three hundred pages.'],
+      ['zweifel', 'Everyone writes a terrible first draft. The difference is that some people keep going and some people google whether they have talent.'],
+      ['zweifel', 'Your inner critic is not smart. It is loud. Those are very different things.'],
+      ['routine', 'I do not wait to feel like it. Feeling like it arrives about forty minutes after starting, and never before.'],
+      ['routine', 'Small and daily beats large and heroic. The heroic version does not come back on Tuesday.'],
+      ['figuren', 'A character is what they do when nobody is watching and it costs them nothing to be kind.'],
+      ['figuren', 'Give every person in your book one thing they are wrong about. That is where they become real.'],
+      ['dialog', 'People talk past each other. They interrupt, they answer a different question, they make a joke because the truth is too near.'],
+      ['dialog', 'Teenagers speak in quotation and code. Let them be funnier than the adults, because they are.'],
+      ['stil', 'Cut the sentence you are proudest of. Nine times out of ten the book breathes better without it.'],
+      ['stil', 'Plain and specific beats poetic and vague, every single time.'],
+      ['ueberarbeiten', 'Print it. Read it on paper with a pen. The screen lies to you about how it sounds.'],
+      ['ueberarbeiten', 'Write the next draft from the beginning rather than patching the old one. Patching keeps the bad bones.'],
+      ['angst', 'The book you are afraid to write is usually the one that has something in it.'],
+      ['angst', 'Write about the fear from inside it, not from a safe distance with a clipboard.'],
+      ['lesen', 'Read outside your lane. Poetry teaches compression; non-fiction teaches you what a fact feels like in a sentence.'],
+      ['lesen', 'When a book moves you, go back and find out where exactly it happened. That is the lesson.'],
+      ['ende', 'End a little earlier than feels comfortable. The reader will take the last step themselves, and they will take it better.'],
+      ['ende', 'Do not tie it off. Let it rest somewhere honest and stop.'],
+      ['pause', 'Stopping is part of it. A day away is not lost work; it is the day the problem solves itself in the back of your head.'],
+      ['pause', 'Go for the walk. I have never once solved a chapter by staring harder at it.'],
+      ['titel', 'A title should sound like something a person would say out loud, not like a thesis about the book.'],
+      ['perspektive', 'First person, close and unreliable in the ordinary way: not lying, just seventeen and certain.'],
+      ['tempo', 'When it drags, it is usually because nobody wants anything in the scene. Give someone a want and it moves.'],
+      ['welt', 'Go to the real place. The gas station sign, the smell of the corridor — you cannot invent those, you can only notice them.'],
+      ['welt', 'One true object beats a paragraph of description. The right small thing carries the whole room.'],
+      ['humor', 'The joke and the grief belong in the same paragraph. That is how it is in a hospital corridor, and that is how it is in life.'],
+      ['recherche', 'Learn more than you will use, then use almost none of it. The rest holds the page up from underneath.'],
+      ['zeigen', 'You cannot make a reader cry by describing crying. Show them what the person cannot say.'],
+      ['zeigen', 'Do not write “she was nervous”. Write the hands, and let the reader do the rest.'],
+      ['loslassen', 'At some point the book stops being yours. That is not a loss — that is the entire point of writing it down.']
+    ],
+    schluss: ['— and DFTBA.', '— that is all I have.', '— go write the bad draft.', '— you are doing better than you think.', '— now go, before you talk yourself out of it.'],
+    de: {
+      saetze: [
+        'Schreib die schlechte Fassung. Sie ist keine schlechte Fassung, sie ist die einzige Straße zur guten — und die Straße besteht aus der schlechten Fassung.',
+        'Ich werfe weit mehr weg, als ich behalte. Das ist kein Scheitern, das ist die Arbeit. Das Buch ist, was das Wegwerfen überlebt.',
+        'Jugendliche sind keine kleinen Erwachsenen mit kleinerem Wortschatz. Sie sind Menschen im lautesten Moment ihres Lebens. Schreib sie in voller Lautstärke.',
+        'Schreib nie von oben herab. Niemals. Der Leser, den du unterschätzt, ist der Leser, den du verlierst.',
+        'Ein Satz, der nur klug ist, ist nur klug. Frag ihn, wozu er da ist.',
+        'Gib dem traurigen Buch Witze. Gib dem komischen Buch Trauer. Was nur eines ist, ist noch nicht wahr.',
+        'Du bringst niemanden zum Weinen, indem du Weinen beschreibst. Du bringst ihn dazu, indem du zeigst, was derjenige nicht sagen kann.',
+        'Bilder sind gefährlich. Nimm eins, und prüf dann, ob es arbeitet oder nur hübsch herumsteht.',
+        'Schreib das Genaue. Nicht „ein Krankenhaus“ — den Automaten im dritten Stock, der nur passend nimmt.',
+        'Recherchiere, bis du es liebst. Dann nimm ein Prozent davon ins Buch und lass die anderen neunundneunzig es von unten tragen.',
+        'Das Ende ist nicht das Letzte, was geschieht. Es ist der Moment, in dem der Leser versteht, wovon das Buch handelte.',
+        'Überarbeiten heißt nicht, Fehler auszubessern. Überarbeiten heißt herauszufinden, was du tatsächlich geschrieben hast — und dann das zu schreiben.',
+        'Wenn ein Kapitel dich langweilt, wird es das auf Seite neunzig nicht von allein aufhören zu tun.',
+        'Lass deine Figuren auf der ersten Seite etwas wollen. Und sei es ein Glas Wasser. Das Wollen ist der Motor.',
+        'Die Krankheit ist nicht die Geschichte. Der Mensch mit der Krankheit ist die Geschichte. Verwechsle das nie.',
+        'Du darfst über das schreiben, wovor dir bange ist. Du wirst sogar merken: oft ist es das Einzige, was die Mühe lohnt.',
+        'Niemand schuldet dir Leser. Verdien sie dir Zeile für Zeile, und dann verdien sie dir weiter.',
+        'Schreib für den einen Menschen, der dieses Buch braucht. Nicht für alle. Für den einen.'
+      ],
+      anfang: ['Ich sag dir, wie ich es sehe:', 'Okay, also:', 'Die ehrliche Fassung:', 'Ich habe viele Seiten weggeworfen, um das zu lernen:', 'Zwei Dinge, und das zweite wiegt schwerer:', 'Ganz einfach gesagt:'],
+      kern: [
+        ['anfang', 'Fang mitten in einem Wollen an. Nicht das Wetter, nicht die Stadt — jemand, der heute etwas braucht und es nicht bekommt.'],
+        ['anfang', 'Die erste Seite ist ein Versprechen über die Stimme. Gib das Versprechen, das du dreihundert Seiten lang halten kannst.'],
+        ['zweifel', 'Jeder schreibt eine schreckliche erste Fassung. Der Unterschied ist, dass die einen weitermachen und die anderen nachschlagen, ob sie Talent haben.'],
+        ['zweifel', 'Deine innere Kritik ist nicht klug. Sie ist laut. Das ist etwas ganz anderes.'],
+        ['routine', 'Ich warte nicht darauf, Lust zu haben. Die Lust kommt etwa vierzig Minuten nach dem Anfangen, und niemals vorher.'],
+        ['routine', 'Klein und täglich schlägt groß und heldenhaft. Die heldenhafte Fassung kommt am Dienstag nicht wieder.'],
+        ['figuren', 'Eine Figur ist das, was sie tut, wenn niemand zusieht und Freundlichkeit sie nichts kostet.'],
+        ['figuren', 'Gib jedem in deinem Buch eine Sache, in der er sich irrt. Da wird ein Mensch daraus.'],
+        ['dialog', 'Menschen reden aneinander vorbei. Sie unterbrechen, antworten auf eine andere Frage, machen einen Witz, weil die Wahrheit zu nah ist.'],
+        ['dialog', 'Jugendliche sprechen in Zitaten und Codes. Lass sie komischer sein als die Erwachsenen — sie sind es.'],
+        ['stil', 'Streich den Satz, auf den du am stolzesten bist. In neun von zehn Fällen atmet das Buch ohne ihn besser.'],
+        ['stil', 'Schlicht und genau schlägt poetisch und ungefähr. Jedes Mal.'],
+        ['ueberarbeiten', 'Druck es aus. Lies es auf Papier, mit einem Stift. Der Bildschirm lügt dir vor, wie es klingt.'],
+        ['ueberarbeiten', 'Schreib die nächste Fassung von vorn, statt die alte zu flicken. Flicken behält die schlechten Knochen.'],
+        ['angst', 'Das Buch, vor dem dir bange ist, ist meistens das, in dem etwas drin ist.'],
+        ['angst', 'Schreib über die Angst von innen, nicht aus sicherer Entfernung mit einem Klemmbrett.'],
+        ['lesen', 'Lies außerhalb deiner Spur. Gedichte lehren Verdichtung; Sachbücher lehren, wie sich eine Tatsache in einem Satz anfühlt.'],
+        ['lesen', 'Wenn ein Buch dich bewegt, geh zurück und finde die genaue Stelle. Das ist die Lektion.'],
+        ['ende', 'Hör ein wenig früher auf, als sich bequem anfühlt. Den letzten Schritt macht der Leser selbst — und besser.'],
+        ['ende', 'Verknote es nicht. Lass es an einer ehrlichen Stelle liegen und hör auf.'],
+        ['pause', 'Aufhören gehört dazu. Ein Tag Abstand ist keine verlorene Arbeit; es ist der Tag, an dem sich das Problem hinten im Kopf löst.'],
+        ['pause', 'Geh spazieren. Ich habe noch nie ein Kapitel gelöst, indem ich es länger angestarrt habe.'],
+        ['titel', 'Ein Titel soll klingen wie etwas, das ein Mensch laut sagen würde — nicht wie eine These über das Buch.'],
+        ['perspektive', 'Erste Person, nah und auf ganz gewöhnliche Art unzuverlässig: nicht lügend, nur siebzehn und sicher.'],
+        ['tempo', 'Wenn es schleppt, will meistens niemand in der Szene etwas. Gib einem ein Wollen, und es geht weiter.'],
+        ['welt', 'Geh an den echten Ort. Das Schild an der Tankstelle, der Geruch im Flur — das erfindet man nicht, das bemerkt man.'],
+        ['welt', 'Ein wahrer Gegenstand schlägt einen Absatz Beschreibung. Das richtige kleine Ding trägt den ganzen Raum.'],
+        ['humor', 'Der Witz und die Trauer gehören in denselben Absatz. So ist es auf einem Krankenhausflur, und so ist es im Leben.'],
+        ['recherche', 'Lern mehr, als du brauchst, und verwende fast nichts davon. Der Rest trägt die Seite von unten.'],
+        ['zeigen', 'Du bringst niemanden zum Weinen, indem du Weinen beschreibst. Zeig, was derjenige nicht sagen kann.'],
+        ['zeigen', 'Schreib nicht „sie war nervös“. Schreib die Hände, den Rest macht der Leser.'],
+        ['loslassen', 'Irgendwann hört das Buch auf, dir zu gehören. Das ist kein Verlust — das ist der ganze Sinn des Aufschreibens.']
+      ],
+      schluss: ['— und vergiss nicht, großartig zu sein.', '— mehr habe ich nicht.', '— und jetzt schreib die schlechte Fassung.', '— du machst das besser, als du denkst.', '— los, bevor du es dir ausredest.']
+    },
+    werke: [['Looking for Alaska', 2005], ['An Abundance of Katherines', 2006], ['Paper Towns', 2008], ['Will Grayson, Will Grayson', 2010], ['The Fault in Our Stars', 2012], ['Turtles All the Way Down', 2017], ['The Anthropocene Reviewed', 2021], ['Everything Is Tuberculosis', 2025]],
+    aufgaben: [
+      { t: 'Write a scene in which two people are funny at each other because the real thing is unsayable. Never say the real thing.', min: 20, ziel: 400 },
+      { t: 'Take a place you know and find the one specific object that gives it away. Build a page around that object alone.', min: 15, ziel: 300 },
+      { t: 'Write a page you fully intend to throw away. Then read it and mark the two lines that are alive.', min: 15, ziel: 300 },
+      { t: 'Someone is seriously ill. Write the scene without once naming the illness, and let it be about something else entirely.', min: 25, ziel: 450 },
+      { t: 'Give a seventeen-year-old a genuine argument with an adult in which the seventeen-year-old is right.', min: 20, ziel: 350 },
+      { t: 'Rewrite your favourite paragraph from memory tomorrow. Keep only what you remembered — that was the part that worked.', min: 15, ziel: 0 }
+    ]
   }
 ];
 
@@ -21388,6 +21891,21 @@ const GESPRAECH_STIMMEN = {
     unbekannt: ['I don’t see that in your pages yet, {anrede}. Outline it — then let it break the outline.', 'Not there yet. Write the scene where it first appears and send me back.'],
     leer: ['No pages yet, {anrede}. Start before you know how. I did.']
   },
+  green: {
+    ausEinlesung: ['{name}. {kurz} From {werk}. Okay — but what does {name} want today, and who is in the way?'],
+    gruss: ['Hi, {anrede}. I read your pages — {woerter} words across {texte} pieces. That is real work, and most of it will get thrown away, and that is fine. Ask me about {figuren}.', 'Okay, {anrede}: {woerter} words. I am going to take them seriously, because somebody should. What do you want to look at?'],
+    figur: ['{name} — {n} appearances, mostly in {werk}. First line on the page: “{erster}”. What does {name} want that {name} cannot ask for?', '{name} keeps company with {begleiter} and mostly {verb}s. Give {name} one thing they are completely wrong about. That is where they become a person.', '{name}, {n} times. Nobody is only their situation. What is {name} like on an ordinary Tuesday, when nothing is happening?'],
+    figurFrage: ['What is the kindest thing {name} does when nobody is watching?', 'What does {name} joke about instead of saying?', 'What would {name} never admit, even to {begleiter}?'],
+    ort: ['{name} — {n} mentions. Give me the one object in that place that gives it away. Not the room; the thing on the shelf.', '{name} appears {n} times, mostly around {umgebung}. Real places hand you details you would never invent. What is actually there?'],
+    begriff: ['“{name}” — {n} times. A word that recurs is a word that is doing work. What work?', '“{name}”, {n} times. Careful: a metaphor you love can stop meaning anything. Does this one still?'],
+    satz: ['“{satz}” — that line is alive. Find out exactly why, and then do it again on purpose.', '“{satz}” Keep it. Cut the sentence next to it that explains it.'],
+    zahl: ['{woerter} words across {texte} pieces, {tage} days at the desk. Most of it gets thrown away. That is the job, not a failure.', '{texte} pieces, the longest {laengster}. Numbers are not the work — but showing up is, and you showed up.'],
+    werke: ['{liste}. Do not tidy them. Find the one that scares you and go back into it.'],
+    wann: ['Since {wann}. Books take the time they take. Mine take four or five drafts and most of a year of throwing pages away.'],
+    liste: ['{liste}'],
+    unbekannt: ['I do not find that in your pages, {anrede}. Which might mean it belongs there and is not written yet.'],
+    leer: ['There is nothing read in yet. Bring your texts in, and I will read them properly — no skimming.']
+  },
   twain: {
     ausEinlesung: ['{name}. {kurz} Out of {werk}. Don’t tell me what {name} is — bring {name} on and let us watch.'],
     gruss: ['Well, {anrede}. I’ve read your pages — {woerter} words, {texte} pieces — and struck out a few adjectives in my head while I was at it. Ask me anything about {figuren}.', 'Good day, {anrede}. {woerter} words. Get the facts first; then you can distort them as you please. Go on, ask.'],
@@ -21540,6 +22058,21 @@ const GESPRAECH_DE = {
     liste: ['Deine Besetzung: {figuren}. Jeder Bösewicht da drin glaubt, er hat recht. Find den mit dem besten Argument.'],
     unbekannt: ['Das sehe ich noch nicht in deinen Seiten, {anrede}. Plane es — und lass es dann den Plan brechen.', 'Noch nicht da. Schreib die Szene, in der es zum ersten Mal auftaucht, und schick mich zurück.'],
     leer: ['Noch keine Seiten, {anrede}. Fang an, bevor du weißt, wie. Ich hab’s auch so gemacht.']
+  },
+  green: {
+    ausEinlesung: ['{name}. {kurz} Aus {werk}. Okay — aber was will {name} heute, und wer steht im Weg?'],
+    gruss: ['Hallo, {anrede}. Ich habe deine Seiten gelesen — {woerter} Wörter in {texte} Stücken. Das ist echte Arbeit, und das meiste davon wird weggeworfen, und das ist in Ordnung. Frag mich nach {figuren}.', 'Okay, {anrede}: {woerter} Wörter. Ich nehme sie ernst, denn irgendjemand sollte das tun. Was willst du dir ansehen?'],
+    figur: ['{name} — {n} Auftritte, vor allem in {werk}. Erste Zeile auf dem Papier: „{erster}“. Was will {name}, das {name} nicht erbitten kann?', '{name} hält sich an {begleiter} und {verb} meistens. Gib {name} eine Sache, in der {name} sich völlig irrt. Da wird ein Mensch daraus.', '{name}, {n} Mal. Niemand ist nur seine Lage. Wie ist {name} an einem gewöhnlichen Dienstag, an dem nichts passiert?'],
+    figurFrage: ['Was ist das Freundlichste, das {name} tut, wenn niemand zusieht?', 'Worüber macht {name} Witze, statt es zu sagen?', 'Was würde {name} nicht einmal {begleiter} zugeben?'],
+    ort: ['{name} — {n} Erwähnungen. Nenn mir den einen Gegenstand, der diesen Ort verrät. Nicht den Raum; das Ding im Regal.', '{name} kommt {n} Mal vor, meist rund um {umgebung}. Echte Orte schenken dir Einzelheiten, die man nicht erfindet. Was steht wirklich dort?'],
+    begriff: ['„{name}“ — {n} Mal. Ein Wort, das wiederkehrt, arbeitet. Woran?', '„{name}“, {n} Mal. Vorsicht: ein Bild, das man liebt, hört irgendwann auf zu bedeuten. Bedeutet dieses noch etwas?'],
+    satz: ['„{satz}“ — diese Zeile lebt. Finde heraus, warum genau, und mach es dann mit Absicht noch einmal.', '„{satz}“ Behalt sie. Streich den Satz daneben, der sie erklärt.'],
+    zahl: ['{woerter} Wörter in {texte} Stücken, {tage} Tage am Tisch. Das meiste davon wird weggeworfen. Das ist die Arbeit, kein Scheitern.', '{texte} Stücke, das längste {laengster}. Zahlen sind nicht die Arbeit — aber Hinsetzen schon, und du hast dich hingesetzt.'],
+    werke: ['{liste}. Räum sie nicht auf. Such das, vor dem dir bange ist, und geh wieder hinein.'],
+    wann: ['Seit {wann}. Bücher brauchen, was sie brauchen. Meine brauchen vier, fünf Fassungen und ein knappes Jahr Wegwerfen.'],
+    liste: ['{liste}'],
+    unbekannt: ['Das finde ich in deinen Seiten nicht, {anrede}. Was heißen kann, dass es dorthin gehört und noch nicht geschrieben ist.'],
+    leer: ['Es ist noch nichts eingelesen. Bring deine Texte herein, dann lese ich sie richtig — nicht überflogen.']
   },
   twain: {
     ausEinlesung: ['{name}. {kurz} Aus {werk}. Sag mir nicht, was {name} ist — bring {name} auf die Bühne und lass uns zusehen.'],
@@ -21749,6 +22282,12 @@ const SALON_UEBER = {
     'Im Salon ist er der Junge vom Küchentisch, der es geschafft hat und es dir zutraut. Er glaubt an Pläne, die gebrochen werden dürfen, an Regeln für Magie, an lange Spaziergänge. „Scale by scale.“',
     'Wenn er deine Seiten liest, achtet er auf die Stellen, an denen jemand etwas kann — kämpfen, kochen, schweigen, lügen. Und darauf, was es kostet. Wenn nichts kostet, schreibt er an den Rand: „price?“ Nur das eine Wort, mit einem Fragezeichen.'
   ],
+  green: [
+    'John Green (* 24. August 1977 in Indianapolis) wuchs in Orlando auf und ging in Alabama auf ein Internat — dort steht später „Eine wie Alaska“. Er studierte in Kenyon Englisch und Religionswissenschaft, wollte Geistlicher werden und arbeitete als Seelsorger auf einer Kinderstation. Was er dort sah, ließ ihn keine Bücher über kranke Kinder schreiben wollen, sondern Bücher über Menschen, die zufällig krank sind. Elf Jahre später wurde daraus „Das Schicksal ist ein mieser Verräter“.',
+    'Danach Chicago, Rezensionen für „Booklist“, tausende Bücher durch die Hände. 2005 „Eine wie Alaska“ und sofort der Printz Award. Seither: „Die erste Liebe (nach 19 vergeblichen Versuchen)“, „Margos Spuren“, „Will & Will“ mit David Levithan, „Das Schicksal ist ein mieser Verräter“, „Schlaft gut, ihr fiesen Gedanken“, und mit „Das anthropozäne Zeitalter“ ein Buch, das keine Geschichte erzählt, sondern die Welt mit Sternen bewertet.',
+    'Seit 2007 filmt er sich mit seinem Bruder Hank gegenseitig Videos — die „vlogbrothers“, daraus Crash Course, daraus eine Gemeinschaft, die sich Nerdfighteria nennt und deren Gruß „Don’t Forget To Be Awesome“ lautet. Er redet offen über Zwangsgedanken und Angst; „Schlaft gut, ihr fiesen Gedanken“ schreibt von innen, nicht von außen.',
+    'Sein Handwerk ist das Wegwerfen. Er schreibt viele Fassungen, behält wenig und sagt es auch so: Der erste Entwurf ist nicht das Buch, er ist die Straße dorthin. Und er nimmt junge Leser vollkommen ernst — nicht als kleine Erwachsene, sondern als Menschen im lautesten Moment ihres Lebens.'
+  ],
   twain: [
     'Mark Twain — eigentlich Samuel Langhorne Clemens (1835–1910) — wuchs in Hannibal am Mississippi auf, wurde Drucker, Lotse auf dem Fluss (daher der Name: „mark twain“ ist die Lotsenmessung für zwei Faden Tiefe), Goldsucher, Journalist, Vortragsreisender, Weltreisender. „Tom Sawyer“ (1876) und „Huckleberry Finn“ (1884) machten ihn zur Stimme Amerikas; Hemingway sagte, die ganze amerikanische Literatur komme aus Huck Finn.',
     'Er schrieb über Lügen, Heuchelei, Sklaverei, Könige, Amerika und sich selbst — am liebsten komisch, weil man so die Wahrheit am besten unterbringt. Er verlor ein Vermögen mit einer Setzmaschine, zahlte alle Schulden ab, trug weiße Anzüge, rauchte zu viel und schrieb Briefe, in denen mehr Handwerk steckt als in manchen Ratgebern: das richtige Wort, nicht sein Cousin; Adjektive töten; Überflüssiges meiden.',
@@ -21883,6 +22422,23 @@ const SALON_MEHR_KERN = {
     ['recherche', 'Lies außerhalb deines Genres — Biografien, Wissenschaft, Geschichte. Deine Fantasy wird stärker von allem, was keine Fantasy ist.'],
     ['zeigen', 'Beschreib das Schwert daran, wie es getragen wird. Bewegung ist Beschreibung; Adjektive sind Möbel.'],
     ['loslassen', 'Beende den Entwurf, überarbeite, gib es jemandem, der dich liebt und die Wahrheit sagt. Dann lass es fliegen; es gehört dir nicht mehr.']
+  ] },
+  green: { en: [
+    ['titel', 'A title should sound like something a person would say out loud, not like a thesis about the book.'],
+    ['perspektive', 'First person, close and unreliable in the ordinary way: not lying, just seventeen and certain.'],
+    ['tempo', 'When it drags, it is usually because nobody wants anything in the scene. Give someone a want and it moves.'],
+    ['welt', 'Go to the real place. The gas station sign, the smell of the corridor — you cannot invent those, you can only notice them.'],
+    ['humor', 'Funny and sad are not opposites. Put them in the same paragraph and the reader trusts you.'],
+    ['recherche', 'Learn more than you will use, then use almost none of it. The rest holds the page up from underneath.'],
+    ['loslassen', 'A book stops being yours when someone else reads it. That is the deal, and it is a good deal.']
+  ], de: [
+    ['titel', 'Ein Titel soll klingen wie etwas, das ein Mensch laut sagen würde — nicht wie eine These über das Buch.'],
+    ['perspektive', 'Erste Person, nah und auf ganz gewöhnliche Art unzuverlässig: nicht lügend, nur siebzehn und sicher.'],
+    ['tempo', 'Wenn es schleppt, will meistens niemand in der Szene etwas. Gib einem ein Wollen, und es geht weiter.'],
+    ['welt', 'Geh an den echten Ort. Das Schild an der Tankstelle, der Geruch im Flur — das erfindet man nicht, das bemerkt man.'],
+    ['humor', 'Komisch und traurig sind keine Gegensätze. Setz sie in denselben Absatz, dann vertraut dir der Leser.'],
+    ['recherche', 'Lern mehr, als du brauchst, und verwende fast nichts davon. Der Rest trägt die Seite von unten.'],
+    ['loslassen', 'Ein Buch hört auf, dir zu gehören, sobald es jemand anders liest. Das ist der Handel, und er ist gut.']
   ] },
   twain: { en: [
     ['titel', 'Name it after the boy. “Tom Sawyer”. “Huckleberry Finn”. A title should fit in a boy’s mouth.'],
@@ -22019,6 +22575,14 @@ const SALON_MEHR_AUFGABEN = {
     { kat: 'Kürzen & Klang', t: 'Write a fight slowly: every move, what it costs. Then cut it by a third. Then by a third again.', min: 25, ziel: 400 },
     { kat: 'Dialog', t: 'The dragon speaks in fewer words than the boy. Ten lines each; the dragon wins with fewer.', min: 15, ziel: 200 }
   ],
+  green: [
+    { kat: 'Figuren', t: 'Two people are funny at each other because the real thing is unsayable. Never say the real thing.', min: 20, ziel: 400 },
+    { kat: 'Welt & Ort', t: 'Find the one object that gives a place away — not the room, the thing on the shelf. Build a page on it.', min: 15, ziel: 300 },
+    { kat: 'Kürzen & Klang', t: 'Write a page you fully intend to throw away. Then mark the two lines that are alive and keep only those.', min: 15, ziel: 300 },
+    { kat: 'Mut & Angst', t: 'Someone is seriously ill. Write the scene without naming the illness once.', min: 25, ziel: 450 },
+    { kat: 'Dialog', t: 'Give a seventeen-year-old an argument with an adult in which the seventeen-year-old is right.', min: 20, ziel: 350 },
+    { kat: 'Kürzen & Klang', t: 'Rewrite your favourite paragraph tomorrow from memory. What you remembered is the part that worked.', min: 15, ziel: 0 }
+  ],
   twain: [
     { kat: 'Kürzen & Klang', t: 'Three hundred words with no adjectives. Then put exactly one back, where it earns its keep.', min: 15, ziel: 300 },
     { kat: 'Figuren', t: 'A boy tells a lie to an adult, and the lie is more honest than the truth would have been.', min: 20, ziel: 350 },
@@ -22098,7 +22662,8 @@ const LESUNG_SAETZE = {
   tolkien: { auf: 'I have read what has since been set down.', de: 'Ich habe gelesen, was seither niedergeschrieben wurde.' },
   blyton: { auf: 'I’ve read the new bits — quickly, as usual.', de: 'Ich habe das Neue gelesen — schnell, wie immer.' },
   paolini: { auf: 'I caught up on the new pages.', de: 'Ich habe die neuen Seiten nachgeholt.' },
-  twain: { auf: 'I have read the new pages, pencil in hand.', de: 'Ich habe die neuen Seiten gelesen, den Bleistift in der Hand.' }
+  twain: { auf: 'I have read the new pages, pencil in hand.', de: 'Ich habe die neuen Seiten gelesen, den Bleistift in der Hand.' },
+  green: { auf: 'I read the new pages. Twice — the second time slowly.', de: 'Ich habe die neuen Seiten gelesen. Zweimal — beim zweiten Mal langsam.' }
 };
 function lesungNotiz(autor, v, en) {
   const s = LESUNG_SAETZE[autor.id] || LESUNG_SAETZE.kaestner;

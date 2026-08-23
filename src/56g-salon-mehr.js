@@ -59,6 +59,12 @@ const SALON_UEBER = {
     'Im Salon ist er der Junge vom Küchentisch, der es geschafft hat und es dir zutraut. Er glaubt an Pläne, die gebrochen werden dürfen, an Regeln für Magie, an lange Spaziergänge. „Scale by scale.“',
     'Wenn er deine Seiten liest, achtet er auf die Stellen, an denen jemand etwas kann — kämpfen, kochen, schweigen, lügen. Und darauf, was es kostet. Wenn nichts kostet, schreibt er an den Rand: „price?“ Nur das eine Wort, mit einem Fragezeichen.'
   ],
+  green: [
+    'John Green (* 24. August 1977 in Indianapolis) wuchs in Orlando auf und ging in Alabama auf ein Internat — dort steht später „Eine wie Alaska“. Er studierte in Kenyon Englisch und Religionswissenschaft, wollte Geistlicher werden und arbeitete als Seelsorger auf einer Kinderstation. Was er dort sah, ließ ihn keine Bücher über kranke Kinder schreiben wollen, sondern Bücher über Menschen, die zufällig krank sind. Elf Jahre später wurde daraus „Das Schicksal ist ein mieser Verräter“.',
+    'Danach Chicago, Rezensionen für „Booklist“, tausende Bücher durch die Hände. 2005 „Eine wie Alaska“ und sofort der Printz Award. Seither: „Die erste Liebe (nach 19 vergeblichen Versuchen)“, „Margos Spuren“, „Will & Will“ mit David Levithan, „Das Schicksal ist ein mieser Verräter“, „Schlaft gut, ihr fiesen Gedanken“, und mit „Das anthropozäne Zeitalter“ ein Buch, das keine Geschichte erzählt, sondern die Welt mit Sternen bewertet.',
+    'Seit 2007 filmt er sich mit seinem Bruder Hank gegenseitig Videos — die „vlogbrothers“, daraus Crash Course, daraus eine Gemeinschaft, die sich Nerdfighteria nennt und deren Gruß „Don’t Forget To Be Awesome“ lautet. Er redet offen über Zwangsgedanken und Angst; „Schlaft gut, ihr fiesen Gedanken“ schreibt von innen, nicht von außen.',
+    'Sein Handwerk ist das Wegwerfen. Er schreibt viele Fassungen, behält wenig und sagt es auch so: Der erste Entwurf ist nicht das Buch, er ist die Straße dorthin. Und er nimmt junge Leser vollkommen ernst — nicht als kleine Erwachsene, sondern als Menschen im lautesten Moment ihres Lebens.'
+  ],
   twain: [
     'Mark Twain — eigentlich Samuel Langhorne Clemens (1835–1910) — wuchs in Hannibal am Mississippi auf, wurde Drucker, Lotse auf dem Fluss (daher der Name: „mark twain“ ist die Lotsenmessung für zwei Faden Tiefe), Goldsucher, Journalist, Vortragsreisender, Weltreisender. „Tom Sawyer“ (1876) und „Huckleberry Finn“ (1884) machten ihn zur Stimme Amerikas; Hemingway sagte, die ganze amerikanische Literatur komme aus Huck Finn.',
     'Er schrieb über Lügen, Heuchelei, Sklaverei, Könige, Amerika und sich selbst — am liebsten komisch, weil man so die Wahrheit am besten unterbringt. Er verlor ein Vermögen mit einer Setzmaschine, zahlte alle Schulden ab, trug weiße Anzüge, rauchte zu viel und schrieb Briefe, in denen mehr Handwerk steckt als in manchen Ratgebern: das richtige Wort, nicht sein Cousin; Adjektive töten; Überflüssiges meiden.',
@@ -194,6 +200,23 @@ const SALON_MEHR_KERN = {
     ['zeigen', 'Beschreib das Schwert daran, wie es getragen wird. Bewegung ist Beschreibung; Adjektive sind Möbel.'],
     ['loslassen', 'Beende den Entwurf, überarbeite, gib es jemandem, der dich liebt und die Wahrheit sagt. Dann lass es fliegen; es gehört dir nicht mehr.']
   ] },
+  green: { en: [
+    ['titel', 'A title should sound like something a person would say out loud, not like a thesis about the book.'],
+    ['perspektive', 'First person, close and unreliable in the ordinary way: not lying, just seventeen and certain.'],
+    ['tempo', 'When it drags, it is usually because nobody wants anything in the scene. Give someone a want and it moves.'],
+    ['welt', 'Go to the real place. The gas station sign, the smell of the corridor — you cannot invent those, you can only notice them.'],
+    ['humor', 'Funny and sad are not opposites. Put them in the same paragraph and the reader trusts you.'],
+    ['recherche', 'Learn more than you will use, then use almost none of it. The rest holds the page up from underneath.'],
+    ['loslassen', 'A book stops being yours when someone else reads it. That is the deal, and it is a good deal.']
+  ], de: [
+    ['titel', 'Ein Titel soll klingen wie etwas, das ein Mensch laut sagen würde — nicht wie eine These über das Buch.'],
+    ['perspektive', 'Erste Person, nah und auf ganz gewöhnliche Art unzuverlässig: nicht lügend, nur siebzehn und sicher.'],
+    ['tempo', 'Wenn es schleppt, will meistens niemand in der Szene etwas. Gib einem ein Wollen, und es geht weiter.'],
+    ['welt', 'Geh an den echten Ort. Das Schild an der Tankstelle, der Geruch im Flur — das erfindet man nicht, das bemerkt man.'],
+    ['humor', 'Komisch und traurig sind keine Gegensätze. Setz sie in denselben Absatz, dann vertraut dir der Leser.'],
+    ['recherche', 'Lern mehr, als du brauchst, und verwende fast nichts davon. Der Rest trägt die Seite von unten.'],
+    ['loslassen', 'Ein Buch hört auf, dir zu gehören, sobald es jemand anders liest. Das ist der Handel, und er ist gut.']
+  ] },
   twain: { en: [
     ['titel', 'Name it after the boy. “Tom Sawyer”. “Huckleberry Finn”. A title should fit in a boy’s mouth.'],
     ['perspektive', 'Let the one who knows least tell it. Huck sees everything and understands half — the reader fills the rest and feels clever.'],
@@ -328,6 +351,14 @@ const SALON_MEHR_AUFGABEN = {
     { kat: 'Mut & Angst', t: 'Your hero is afraid on the page — really afraid — before being brave. Write the afraid part only.', min: 15, ziel: 250 },
     { kat: 'Kürzen & Klang', t: 'Write a fight slowly: every move, what it costs. Then cut it by a third. Then by a third again.', min: 25, ziel: 400 },
     { kat: 'Dialog', t: 'The dragon speaks in fewer words than the boy. Ten lines each; the dragon wins with fewer.', min: 15, ziel: 200 }
+  ],
+  green: [
+    { kat: 'Figuren', t: 'Two people are funny at each other because the real thing is unsayable. Never say the real thing.', min: 20, ziel: 400 },
+    { kat: 'Welt & Ort', t: 'Find the one object that gives a place away — not the room, the thing on the shelf. Build a page on it.', min: 15, ziel: 300 },
+    { kat: 'Kürzen & Klang', t: 'Write a page you fully intend to throw away. Then mark the two lines that are alive and keep only those.', min: 15, ziel: 300 },
+    { kat: 'Mut & Angst', t: 'Someone is seriously ill. Write the scene without naming the illness once.', min: 25, ziel: 450 },
+    { kat: 'Dialog', t: 'Give a seventeen-year-old an argument with an adult in which the seventeen-year-old is right.', min: 20, ziel: 350 },
+    { kat: 'Kürzen & Klang', t: 'Rewrite your favourite paragraph tomorrow from memory. What you remembered is the part that worked.', min: 15, ziel: 0 }
   ],
   twain: [
     { kat: 'Kürzen & Klang', t: 'Three hundred words with no adjectives. Then put exactly one back, where it earns its keep.', min: 15, ziel: 300 },

@@ -55,7 +55,8 @@ const LESUNG_SAETZE = {
   tolkien: { auf: 'I have read what has since been set down.', de: 'Ich habe gelesen, was seither niedergeschrieben wurde.' },
   blyton: { auf: 'I’ve read the new bits — quickly, as usual.', de: 'Ich habe das Neue gelesen — schnell, wie immer.' },
   paolini: { auf: 'I caught up on the new pages.', de: 'Ich habe die neuen Seiten nachgeholt.' },
-  twain: { auf: 'I have read the new pages, pencil in hand.', de: 'Ich habe die neuen Seiten gelesen, den Bleistift in der Hand.' }
+  twain: { auf: 'I have read the new pages, pencil in hand.', de: 'Ich habe die neuen Seiten gelesen, den Bleistift in der Hand.' },
+  green: { auf: 'I read the new pages. Twice — the second time slowly.', de: 'Ich habe die neuen Seiten gelesen. Zweimal — beim zweiten Mal langsam.' }
 };
 function lesungNotiz(autor, v, en) {
   const s = LESUNG_SAETZE[autor.id] || LESUNG_SAETZE.kaestner;

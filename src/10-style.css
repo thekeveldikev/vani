@@ -3523,3 +3523,49 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
   .desk-ding.kalender.hat-heute::after { animation: none; }
   .kal-zelle, .kal-eintragtext, .kal-kerbe, .kalender-bild, .kal-ansichtknopf, .kal-artknopf { transition: none; }
 }
+
+/* ============================================================
+   BLÄTTER UND ZITATE IN DEN TISCH-EINSTELLUNGEN (54d/54e)
+   ============================================================ */
+.einstell-unter { font-size: 12.5px; color: var(--blass); line-height: 1.5; margin: -2px 0 8px; }
+.tb-plaetze { display: flex; flex-direction: column; gap: 6px; margin-top: 9px; }
+.tb-platz { display: flex; align-items: center; gap: 9px; }
+.tb-nummer {
+  width: 22px; height: 22px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  font-size: 11.5px; color: var(--blass); border: 1px solid var(--linie); font-variant-numeric: tabular-nums;
+}
+.tb-platz.voll .tb-nummer { background: var(--akzent); color: var(--papier); border-color: transparent; }
+.tb-platzknopf {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+  padding: 8px 12px; border-radius: 9px; border: 1px dashed var(--linie); text-align: left;
+}
+.tb-platz.voll .tb-platzknopf { border-style: solid; background: color-mix(in srgb, var(--tinte) 4%, transparent); }
+.tb-platzknopf .tb-name { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.tb-platzknopf small { font-size: 11.5px; color: var(--blass); }
+.tb-frei { font-size: 13.5px; color: var(--blass); font-style: italic; }
+.tb-weg { width: 26px; height: 26px; border-radius: 50%; flex: none; color: var(--blass); font-size: 17px; line-height: 1; display: grid; place-items: center; }
+.tb-fenster { width: min(520px, 94vw); max-height: 86vh; display: flex; flex-direction: column; gap: 10px; }
+.tb-hinweis { font-size: 13px; color: var(--blass); line-height: 1.5; }
+.tb-suche { width: 100%; }
+.tb-liste { flex: 1; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 1px; min-height: 180px; max-height: 46vh; }
+.tb-eintrag {
+  display: flex; align-items: baseline; gap: 10px; width: 100%; text-align: left;
+  padding: 9px 10px; border-radius: 8px; border-bottom: 1px solid color-mix(in srgb, var(--tinte) 8%, transparent);
+}
+.tb-eintrag.schon { opacity: .45; }
+.tb-art { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--blass); flex: none; width: 74px; }
+.tb-eintrag .tb-name { flex: 1; min-width: 0; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tb-eintrag small { color: var(--blass); font-size: 11.5px; flex: none; }
+.tb-leer { color: var(--blass); font-style: italic; font-size: 13.5px; padding: 20px 4px; text-align: center; }
+
+.tz-liste { display: flex; flex-direction: column; gap: 2px; margin: 9px 0 8px; }
+.tz-zeile { display: flex; align-items: center; gap: 8px; padding: 7px 4px 7px 10px; border-radius: 8px; background: color-mix(in srgb, var(--tinte) 4%, transparent); }
+.tz-zeile .tz-text { flex: 1; min-width: 0; font-size: 13.5px; font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; }
+.tz-weg { width: 24px; height: 24px; border-radius: 50%; flex: none; color: var(--blass); font-size: 16px; line-height: 1; display: grid; place-items: center; }
+.tz-leer { color: var(--blass); font-style: italic; font-size: 13px; padding: 8px 2px; }
+.tz-neu { display: flex; gap: 8px; }
+.tz-neu .tz-feld { flex: 1; min-width: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .tb-platzknopf:hover, .tb-eintrag:not(.schon):hover { background: color-mix(in srgb, var(--tinte) 8%, transparent); }
+  .tb-weg:hover, .tz-weg:hover { background: rgba(176,53,43,.16); color: #b0352b; }
+}

@@ -110,6 +110,17 @@
    "lizenzUrl": "https://commons.wikimedia.org/wiki/Template:PD-old",
    "seite": "https://commons.wikimedia.org/wiki/File:Twain1909.jpg",
    "quelle": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Mark_Twain_1907.jpg/960px-Mark_Twain_1907.jpg"
+  },
+  {
+   "id": "green",
+   "name": "John Green",
+   "datei": "autoren/green.jpg",
+   "titel": "John Green by Gage Skidmore.jpg",
+   "urheber": "Gage Skidmore",
+   "lizenz": "CC BY-SA 3.0",
+   "lizenzUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+   "seite": "https://commons.wikimedia.org/wiki/File:John_Green_by_Gage_Skidmore.jpg",
+   "quelle": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/John_Green_by_Gage_Skidmore.jpg/960px-John_Green_by_Gage_Skidmore.jpg"
   }
  ]
 }

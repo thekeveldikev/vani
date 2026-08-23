@@ -15,9 +15,9 @@ async function frisch() {
 
 test('Salon: vier Gäste mehr, englische Stimmen raten englisch und tragen die deutsche Fassung parallel', async () => {
   const k = await frisch();
-  assert.equal(k.SALON_GAESTE_MEHR.length, 4);
-  deep(k.SALON_GAESTE_MEHR.map((a) => a.id), ['tolkien', 'blyton', 'paolini', 'twain']);
-  assert.equal(k.SALON_FEST.length, 10);
+  assert.equal(k.SALON_GAESTE_MEHR.length, 5);
+  deep(k.SALON_GAESTE_MEHR.map((a) => a.id), ['tolkien', 'blyton', 'paolini', 'twain', 'green']);
+  assert.equal(k.SALON_FEST.length, 11);
   for (const a of k.SALON_GAESTE_MEHR) {
     assert.ok(a.gast && a.en && a.foto && a.foto.lizenz && a.foto.seite, a.name + ': Gast mit Foto und Lizenz');
     assert.ok(a.zitate.length >= 5, a.name + ' hat Zitate');

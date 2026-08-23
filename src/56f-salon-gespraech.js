@@ -98,6 +98,21 @@ const GESPRAECH_STIMMEN = {
     unbekannt: ['I don’t see that in your pages yet, {anrede}. Outline it — then let it break the outline.', 'Not there yet. Write the scene where it first appears and send me back.'],
     leer: ['No pages yet, {anrede}. Start before you know how. I did.']
   },
+  green: {
+    ausEinlesung: ['{name}. {kurz} From {werk}. Okay — but what does {name} want today, and who is in the way?'],
+    gruss: ['Hi, {anrede}. I read your pages — {woerter} words across {texte} pieces. That is real work, and most of it will get thrown away, and that is fine. Ask me about {figuren}.', 'Okay, {anrede}: {woerter} words. I am going to take them seriously, because somebody should. What do you want to look at?'],
+    figur: ['{name} — {n} appearances, mostly in {werk}. First line on the page: “{erster}”. What does {name} want that {name} cannot ask for?', '{name} keeps company with {begleiter} and mostly {verb}s. Give {name} one thing they are completely wrong about. That is where they become a person.', '{name}, {n} times. Nobody is only their situation. What is {name} like on an ordinary Tuesday, when nothing is happening?'],
+    figurFrage: ['What is the kindest thing {name} does when nobody is watching?', 'What does {name} joke about instead of saying?', 'What would {name} never admit, even to {begleiter}?'],
+    ort: ['{name} — {n} mentions. Give me the one object in that place that gives it away. Not the room; the thing on the shelf.', '{name} appears {n} times, mostly around {umgebung}. Real places hand you details you would never invent. What is actually there?'],
+    begriff: ['“{name}” — {n} times. A word that recurs is a word that is doing work. What work?', '“{name}”, {n} times. Careful: a metaphor you love can stop meaning anything. Does this one still?'],
+    satz: ['“{satz}” — that line is alive. Find out exactly why, and then do it again on purpose.', '“{satz}” Keep it. Cut the sentence next to it that explains it.'],
+    zahl: ['{woerter} words across {texte} pieces, {tage} days at the desk. Most of it gets thrown away. That is the job, not a failure.', '{texte} pieces, the longest {laengster}. Numbers are not the work — but showing up is, and you showed up.'],
+    werke: ['{liste}. Do not tidy them. Find the one that scares you and go back into it.'],
+    wann: ['Since {wann}. Books take the time they take. Mine take four or five drafts and most of a year of throwing pages away.'],
+    liste: ['{liste}'],
+    unbekannt: ['I do not find that in your pages, {anrede}. Which might mean it belongs there and is not written yet.'],
+    leer: ['There is nothing read in yet. Bring your texts in, and I will read them properly — no skimming.']
+  },
   twain: {
     ausEinlesung: ['{name}. {kurz} Out of {werk}. Don’t tell me what {name} is — bring {name} on and let us watch.'],
     gruss: ['Well, {anrede}. I’ve read your pages — {woerter} words, {texte} pieces — and struck out a few adjectives in my head while I was at it. Ask me anything about {figuren}.', 'Good day, {anrede}. {woerter} words. Get the facts first; then you can distort them as you please. Go on, ask.'],
@@ -250,6 +265,21 @@ const GESPRAECH_DE = {
     liste: ['Deine Besetzung: {figuren}. Jeder Bösewicht da drin glaubt, er hat recht. Find den mit dem besten Argument.'],
     unbekannt: ['Das sehe ich noch nicht in deinen Seiten, {anrede}. Plane es — und lass es dann den Plan brechen.', 'Noch nicht da. Schreib die Szene, in der es zum ersten Mal auftaucht, und schick mich zurück.'],
     leer: ['Noch keine Seiten, {anrede}. Fang an, bevor du weißt, wie. Ich hab’s auch so gemacht.']
+  },
+  green: {
+    ausEinlesung: ['{name}. {kurz} Aus {werk}. Okay — aber was will {name} heute, und wer steht im Weg?'],
+    gruss: ['Hallo, {anrede}. Ich habe deine Seiten gelesen — {woerter} Wörter in {texte} Stücken. Das ist echte Arbeit, und das meiste davon wird weggeworfen, und das ist in Ordnung. Frag mich nach {figuren}.', 'Okay, {anrede}: {woerter} Wörter. Ich nehme sie ernst, denn irgendjemand sollte das tun. Was willst du dir ansehen?'],
+    figur: ['{name} — {n} Auftritte, vor allem in {werk}. Erste Zeile auf dem Papier: „{erster}“. Was will {name}, das {name} nicht erbitten kann?', '{name} hält sich an {begleiter} und {verb} meistens. Gib {name} eine Sache, in der {name} sich völlig irrt. Da wird ein Mensch daraus.', '{name}, {n} Mal. Niemand ist nur seine Lage. Wie ist {name} an einem gewöhnlichen Dienstag, an dem nichts passiert?'],
+    figurFrage: ['Was ist das Freundlichste, das {name} tut, wenn niemand zusieht?', 'Worüber macht {name} Witze, statt es zu sagen?', 'Was würde {name} nicht einmal {begleiter} zugeben?'],
+    ort: ['{name} — {n} Erwähnungen. Nenn mir den einen Gegenstand, der diesen Ort verrät. Nicht den Raum; das Ding im Regal.', '{name} kommt {n} Mal vor, meist rund um {umgebung}. Echte Orte schenken dir Einzelheiten, die man nicht erfindet. Was steht wirklich dort?'],
+    begriff: ['„{name}“ — {n} Mal. Ein Wort, das wiederkehrt, arbeitet. Woran?', '„{name}“, {n} Mal. Vorsicht: ein Bild, das man liebt, hört irgendwann auf zu bedeuten. Bedeutet dieses noch etwas?'],
+    satz: ['„{satz}“ — diese Zeile lebt. Finde heraus, warum genau, und mach es dann mit Absicht noch einmal.', '„{satz}“ Behalt sie. Streich den Satz daneben, der sie erklärt.'],
+    zahl: ['{woerter} Wörter in {texte} Stücken, {tage} Tage am Tisch. Das meiste davon wird weggeworfen. Das ist die Arbeit, kein Scheitern.', '{texte} Stücke, das längste {laengster}. Zahlen sind nicht die Arbeit — aber Hinsetzen schon, und du hast dich hingesetzt.'],
+    werke: ['{liste}. Räum sie nicht auf. Such das, vor dem dir bange ist, und geh wieder hinein.'],
+    wann: ['Seit {wann}. Bücher brauchen, was sie brauchen. Meine brauchen vier, fünf Fassungen und ein knappes Jahr Wegwerfen.'],
+    liste: ['{liste}'],
+    unbekannt: ['Das finde ich in deinen Seiten nicht, {anrede}. Was heißen kann, dass es dorthin gehört und noch nicht geschrieben ist.'],
+    leer: ['Es ist noch nichts eingelesen. Bring deine Texte herein, dann lese ich sie richtig — nicht überflogen.']
   },
   twain: {
     ausEinlesung: ['{name}. {kurz} Aus {werk}. Sag mir nicht, was {name} ist — bring {name} auf die Bühne und lass uns zusehen.'],

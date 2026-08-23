@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.30.1 (23. August 2026)
+# Übergabe an Codex — Stand VANI 5.31.0 (23. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -26,6 +26,7 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
 | Datei | Inhalt |
 |---|---|
 | `src/33-scrollleiste.js` | die Scrollleiste: `scrollleiste(bereich, {ziel, marken, fahne})`, Marken aus Ueberschriften, raeumt sich selbst weg |
+| `src/54e-tischblaetter.js` | die drei Blaetter auf dem Tisch: zwei Weisen (VANI waehlt / selbst gewaehlt), Waehler, Einstellung |
 | `src/54d-tischzitate.js` | Zitate auf der Tischplatte: vier Weisen, Einritz-Animation, gemessene Verteilung |
 | `src/61-kalender.js` | der Kalender, Rechenwerk: Daten 2000-2050, Wochentage, KW, Alter, Widersprueche (ohne DOM) |
 | `src/61b-kalender-ansicht.js` | der Kalender, sichtbar: Zeichen, Monat/Jahr/Leben, Eintragfenster, das Buch auf dem Tisch |

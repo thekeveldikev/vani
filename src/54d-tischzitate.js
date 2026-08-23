@@ -217,10 +217,28 @@ function tischzitatEinritzen(element, text, fertig) {
 
   const stuecke = [...schrift.querySelectorAll('.tz-z')];
   if (!stuecke.length) { element.classList.remove('ritzt'); if (fertig) fertig(); return; }
+  /* Alles sofort sichtbar machen — ohne Umschweife. Gebraucht, wenn nicht
+     animiert werden kann oder darf. */
+  const gleichFertig = () => {
+    for (const z of stuecke) z.classList.add('geschnitten');
+    klinge.remove();
+    element.classList.remove('ritzt');
+    if (fertig) fertig();
+  };
+  /* Liegt das Fenster im Hintergrund, laeuft keine Bildfolge. Dann wird nicht
+     geritzt, sondern der Satz steht einfach da — sonst blieben die Buchstaben
+     unsichtbar, bis jemand zurueckkommt. Dasselbe, wenn jemand weniger
+     Bewegung eingestellt hat. */
+  const stillsteht = (typeof document !== 'undefined' && document.hidden) ||
+    (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (stillsteht) { gleichFertig(); return; }
+  /* Und ein Netz darunter: bleibt der Lauf aus welchem Grund auch immer
+     stehen, steht der Satz spaetestens danach vollstaendig da. */
+  const notbremse = setTimeout(gleichFertig, zeichen.length * TZ_TAKT * 3 + 2500);
   /* Sanft losfahren und sanft ankommen: die Klinge zieht nicht stur gleich schnell. */
   let n = 0;
   const gehe = () => {
-    if (!element.isConnected) { element.classList.remove('ritzt'); return; }
+    if (!element.isConnected) { clearTimeout(notbremse); element.classList.remove('ritzt'); return; }
     const z = stuecke[n];
     if (z) {
       z.classList.add('geschnitten');
@@ -234,6 +252,7 @@ function tischzitatEinritzen(element, text, fertig) {
       const bremse = rest < 4 ? 1.9 : n < 3 ? 1.6 : 1;
       setTimeout(gehe, TZ_TAKT * bremse + Math.random() * 14);
     } else {
+      clearTimeout(notbremse);
       klinge.classList.add('geht');
       setTimeout(() => klinge.remove(), 420);
       element.classList.remove('ritzt');
@@ -241,7 +260,9 @@ function tischzitatEinritzen(element, text, fertig) {
       setTimeout(() => { element.classList.remove('setzt'); if (fertig) fertig(); }, 900);
     }
   };
-  requestAnimationFrame(gehe);
+  /* setTimeout statt requestAnimationFrame: der Zeitgeber laeuft auch dann,
+     wenn das Fenster gerade nicht gezeichnet wird. */
+  setTimeout(gehe, 16);
 }
 /* Ein paar Späne, dort wo die Klinge gerade ansetzt. */
 function tischzitatStaub(element, x, y) {
@@ -256,6 +277,11 @@ function tischzitatStaub(element, x, y) {
     setTimeout(() => korn.remove(), 1300);
   }
 }
+
+/* Welcher Satz gerade erst entstanden ist. Eine Kennung statt einer Marke am
+   Dokument: die ueberlebt auch, wenn der Tisch zwischendurch neu gebaut wird. */
+let _tzFrisch = '';
+function tischzitatFrischMerken(id) { _tzFrisch = String(id || ''); }
 
 /* ----- Auf den Tisch legen ----- */
 function tischzitateBauen(dinge, e, neuZeichnen) {
@@ -279,7 +305,11 @@ function tischzitateBauen(dinge, e, neuZeichnen) {
     }, el('span', { class: 'tz-schrift' }, doc.text));
     dinge.append(knopf);
     /* Was gerade erst entstanden ist, wird vor den Augen eingeritzt */
-    if (doc._frischGeritzt) { delete doc._frischGeritzt; frisch.push([knopf, doc]); }
+    if (doc._frischGeritzt || doc.id === _tzFrisch) {
+      delete doc._frischGeritzt;
+      if (doc.id === _tzFrisch) _tzFrisch = '';
+      frisch.push([knopf, doc]);
+    }
     gelegt.push([knopf, doc]);
   }
   for (const zeile of gefunden) {
@@ -293,11 +323,15 @@ function tischzitateBauen(dinge, e, neuZeichnen) {
   /* Erst wenn alle liegen, wird gerückt — nacheinander, damit jeder Satz die
      schon verschobenen sieht. Sonst weichen zwei einander gleichzeitig aus
      und landen wieder aufeinander. */
-  requestAnimationFrame(() => {
+  /* Ein Zeitgeber, keine Bildfolge: requestAnimationFrame steht still, solange
+     das Fenster im Hintergrund liegt. Dann wuerde nie gerueckt und nie geritzt
+     — und die Saetze laegen fuer immer uebereinander. Messen braucht kein Bild. */
+  setTimeout(() => {
     const flaeche = szene || dinge.parentElement;
+    if (!flaeche || !flaeche.isConnected) return;
     for (const [knopf, doc] of gelegt) tischzitatRuecken(knopf, doc, flaeche);
     for (const [knopf, doc] of frisch) tischzitatEinritzen(knopf, doc.text);
-  });
+  }, 16);
 
   /* Ein kleines Messer am Rand: hier ritzt man ein */
   if (modus === 'geritzt' || modus === 'beides') {
@@ -336,4 +370,71 @@ async function tischzitatMenue(doc, neuZeichnen) {
       if (neuZeichnen) neuZeichnen();
     }
   }
+}
+
+/* ----- Der Abschnitt in „Schreibtisch einrichten" -----
+   Bisher gab es nur das winzige Messer am rechten Rand der Platte — das
+   findet niemand. Hier steht alles beisammen: die Weise, die eigenen Sätze,
+   und das Feld, in das man einen neuen schreibt. Beim Einritzen schließt
+   sich der Kasten, damit man zusieht, wie die Klinge läuft. */
+function tischzitatEinstellung(e, danach, schliessen) {
+  const kasten = el('div', { class: 'einstellgruppe' });
+  const zeichne = () => {
+    kasten.innerHTML = '';
+    const modus = tischzitatModus(e);
+    const wahl = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
+    for (const [id, name] of TISCHZITAT_MODI) {
+      wahl.append(el('button', { class: modus === id ? 'an' : '', onclick: () => {
+        e.zitatModus = id; if (id !== 'nichts') e.verse = true;
+        D.einst.schreibtisch = { ...e }; speichereEinst(); zeichne(); if (danach) danach();
+      } }, name));
+    }
+    anfuegen(kasten,
+      el('b', {}, 'Zitate auf der Platte'),
+      el('div', { class: 'einstell-unter' }, 'In alte Tische ritzen Leute Sätze. Gefundene kommen aus deinen eigenen Texten und wechseln von selbst; geritzte schreibst du hier hinein, und sie bleiben stehen.'),
+      wahl);
+    if (modus !== 'geritzt' && modus !== 'beides') {
+      anfuegen(kasten, el('div', { class: 'einstell-unter' }, 'Zum Einritzen nimm „Geritzte" oder „Beides".'));
+      return;
+    }
+    /* Was schon in der Platte steht */
+    const meine = tischzitate();
+    const liste = el('div', { class: 'tz-liste' });
+    for (const doc of meine) {
+      liste.append(el('div', { class: 'tz-zeile' },
+        el('span', { class: 'tz-text' }, doc.text),
+        el('button', { class: 'tz-weg', title: 'Aus der Platte schleifen', onclick: async () => {
+          if (await frage('Diesen Satz aus der Platte schleifen?', { ja: 'Herausschleifen' })) {
+            await loesche(doc.id); zeichne(); if (danach) danach();
+          }
+        } }, '×')));
+    }
+    if (!meine.length) liste.append(el('div', { class: 'tz-leer' }, 'Noch nichts eingeritzt. Ein Satz, der bleiben soll — mehr braucht es nicht.'));
+
+    const feld = el('input', { type: 'text', class: 'tz-feld', maxlength: '160', placeholder: 'Ein Satz, der bleiben soll …' });
+    const ritzen = () => {
+      const t = feld.value.trim();
+      if (!t) { feld.focus(); return; }
+      const doc = tischzitatAnlegen(t);
+      if (!doc) return;
+      feld.value = '';
+      /* Zusehen, wie es geritzt wird. Reihenfolge zaehlt: das Schliessen des
+         Kastens zeichnet den Tisch selbst noch einmal — erst DANACH wird der
+         Satz als frisch markiert, sonst haette der zweite Aufbau die Klinge
+         wieder weggeraeumt, bevor sie loslaufen konnte. */
+      /* VOR dem Schliessen vormerken: der Kasten baut den Tisch beim Zugehen
+         selbst neu auf, und wer auch immer als Naechstes baut, soll die Klinge
+         laufen lassen. So haengt es nicht an der Reihenfolge. */
+      tischzitatFrischMerken(doc.id);
+      if (schliessen) schliessen();
+      if (danach) danach();
+      toast('Wird eingeritzt.', 2200);
+    };
+    feld.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); ritzen(); } });
+    anfuegen(kasten, liste,
+      el('div', { class: 'tz-neu' }, feld, el('button', { class: 'knopf voll', onclick: ritzen }, 'Einritzen')),
+      el('div', { class: 'einstell-unter' }, 'Auf der Platte liegt außerdem ein kleines Messer am rechten Rand — damit geht es auch direkt.'));
+  };
+  zeichne();
+  return kasten;
 }

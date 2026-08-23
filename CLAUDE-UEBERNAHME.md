@@ -2414,3 +2414,55 @@ selbst**: sie setzt den Cursor um, wenn sie ein Wort ersetzen will, und der
 gemeldete Screenshot zeigt eine Rechtschreib-Unterkringelung. Zum Pruefen:
 im Schreibraum unter dem Zahnrad **„Autokorrektur — Aus"**
 (`D.einst.autokorrektur`). Springt es dann nicht mehr, liegt es dort.
+
+## 5.31.0 — Tisch, Diktat, elfte Stimme
+
+**Die Blaetter auf dem Tisch sind waehlbar.** `src/54e-tischblaetter.js`.
+`D.einst.schreibtisch.blaetterModus` ist `'vani'` (die drei zuletzt
+beschriebenen Texte, wie bisher) oder `'selbst'`; im zweiten Fall stehen bis zu
+drei Kennungen in `blaetter`. **Gespeichert werden Kennungen, keine
+Abschriften** — deshalb ist die Liste immer aktuell: `tischblaetter(e)` sieht
+bei jedem Aufbau frisch nach, ob es das Dokument noch gibt. Geloeschtes faellt
+vom Tisch, die Wahl bleibt aber stehen (es kann aus dem Papierkorb
+zurueckkommen). `tischblattWaehlbar()` liest live aus `D.docs`.
+
+**Zitate einritzen hat endlich einen Ort.** `tischzitatEinstellung()` steht in
+"Schreibtisch einrichten" direkt unter den Blaettern: die vier Weisen, die
+Liste der eigenen Saetze mit Wegwerfen, und ein Feld zum Hineinschreiben. Das
+winzige Messer am rechten Rand der Platte bleibt, war aber allein nicht zu
+finden.
+
+Drei Fehler kamen dabei heraus, alle aus derselben Ecke:
+
+1. **Der Kasten nahm die Wahl beim Schliessen zurueck.**
+   `schreibtischEinrichten` setzt beim Zugehen `D.einst.schreibtisch = alt`,
+   solange nicht "So bleibt es" gedrueckt wurde. Die beiden neuen Abschnitte
+   legen aber sofort fest — sie schreiben ihr Ergebnis deshalb auch nach `alt`.
+2. **Ein neuer geritzter Satz baute den Tisch nicht neu.** Die Signatur
+   (`schreibtischSignatur`) kannte die Saetze nicht; jetzt schon.
+3. **Die Klinge lief nie, wenn das Fenster im Hintergrund lag.** Der
+   Nachbereitungslauf in `tischzitateBauen` hing an `requestAnimationFrame` —
+   und der steht bei verstecktem Fenster still. Dann wurde weder gerueckt noch
+   geritzt, und weil `.tz-z` mit `opacity: 0` startet, waere der Satz
+   **unsichtbar** geblieben. Jetzt: `setTimeout` statt Bildfolge, und
+   `tischzitatEinritzen` zeigt bei `document.hidden` oder
+   `prefers-reduced-motion` sofort alles an. Dazu eine Notbremse, die nach der
+   erwarteten Laufzeit alles sichtbar macht. **Merksatz: Messen und Aufraeumen
+   nie an requestAnimationFrame haengen.**
+
+**Das Diktat.** iOS beachtet `continuous` nicht und liefert mit
+`continuous = true` bei jedem Ergebnis den ganzen bisherigen Text noch einmal —
+dann stand alles doppelt im Blatt. Neu: `diktatIstApfel()` erkennt das Geraet,
+dort laufen kurze Sitzungen, die VANI selbst wieder anwirft; verbrauchte
+Ergebnisse werden je Sitzung mitgezaehlt (keine Dopplung); `onend` zaehlt
+Neustarts und gibt nach sechs erfolglosen in Folge ehrlich auf; `diktatStopp`
+haengt erst die Rueckrufe ab, sonst wirft `onend` das Diktat wieder an. Der
+Knopf bleibt jetzt auch dann sichtbar, wenn der Browser keine Spracherkennung
+kennt, und erklaert dann, dass das Mikrofon der Bildschirmtastatur es kann.
+
+**John Green** ist die elfte Stimme im Salon — vollstaendig: Eintrag in
+`56a` (Zitate zweisprachig, 18 Saetze, Kern zu allen 19 Themen, deutsche
+Fassung parallel, Werke, Aufgaben), Gespraechsstimme in `56f` (englisch und
+deutsch), langer Text, Kern und Aufgaben in `56g`, Lesungssatz in `56h`.
+Das Foto stammt von Gage Skidmore (CC BY-SA 3.0) und ist wie alle anderen in
+`autoren/quellen.json` belegt.

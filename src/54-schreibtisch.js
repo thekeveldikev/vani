@@ -32,6 +32,8 @@ function saubererSchreibtisch(roh) {
     unordnung: begrenze(q.unordnung, 0, 1, .7),
     verse: q.verse !== false,
     zitatModus: TISCHZITAT_MODI.some(([id]) => id === q.zitatModus) ? q.zitatModus : (q.verse === false ? 'nichts' : 'gefunden'),
+    blaetterModus: TISCHBLATT_MODI.some(([id]) => id === q.blaetterModus) ? q.blaetterModus : 'vani',
+    blaetter: saubereTischblattWahl(q.blaetter),
     uhrTickt: q.uhrTickt === true,
     wachs: begrenze(q.wachs, 0, LEUCHTER_STUNDEN * 60, 0),         /* verbrannte Minuten */
     kerzenGewechselt: begrenze(q.kerzenGewechselt, 0, 4102444800000, 0),
@@ -475,8 +477,11 @@ function schreibtischSignatur() {
   const tag = schreibtischTag();
   const fund = schreibtischFundfoto();
   return JSON.stringify([
-    e.holz, e.kerzen, e.wetterFolgtKlang, e.unordnung, e.verse, e.zitatModus, e.uhrTickt, e.kerzenGewechselt, e.federKratzt, e.offenesBuch, e.tageszeit, e.jahreszeit,
+    e.holz, e.kerzen, e.wetterFolgtKlang, e.unordnung, e.verse, e.zitatModus, e.blaetterModus, (e.blaetter || []).join(','), e.uhrTickt, e.kerzenGewechselt, e.federKratzt, e.offenesBuch, e.tageszeit, e.jahreszeit,
     e.wetterFolgtKlang ? schreibtischWetter() : 'still', D.einst.tagesziel, tag.heute, tag.serie,
+    /* Ohne die geritzten Saetze bliebe der Tisch stehen, wenn einer dazukommt
+       oder verschwindet — und die Klinge liefe nie. */
+    typeof tischzitate === 'function' ? tischzitate().map((z) => z.id + ':' + z.text).join('|') : '',
     buecher.slice(0, 9).map((b) => b.id + ':' + (b.seite || 0) + ':' + (b.bild || '') + ':' + (b.titel || '')),
     schreibtischLetzteTexte(3).map((d) => d.id + ':' + (d.geaendert || 0)),
     briefe.length, briefe.some((b) => briefIstOffen(b) && b.versiegelt), heft ? heft.id + ':' + (heft.geaendert || 0) : '',
@@ -537,8 +542,8 @@ RENDER.schreibtisch = function (haupt) {
   dinge.append(baueUhr(e));
   dinge.append(ding('stuhl', 'Der zweite Stuhl: der Faden — ein Gespräch am Tisch', el('div', { class: 'stuhl-bild' }, el('i', { class: 'lehne' }), el('i', { class: 'sitz' }), el('i', { class: 'bein b1' }), el('i', { class: 'bein b2' })), () => { location.hash = '#/faden'; }));
 
-  /* Manuskripte: die letzten Texte */
-  const letzte = schreibtischLetzteTexte(3);
+  /* Manuskripte: entweder die zuletzt beschriebenen oder die selbst gewaehlten */
+  const letzte = typeof tischblaetter === 'function' ? tischblaetter(e) : schreibtischLetzteTexte(3);
   letzte.forEach((d, i) => {
     const text = (d.text || '').trim().slice(0, 420);
     dinge.append(ding('manuskript m' + (i + 1), 'Weiterschreiben: ' + (d.titel || text.slice(0, 30)), el('div', { class: 'manuskript-papier' }, el('b', {}, d.titel || (d.typ === 'seite' ? 'Heftseite' : d.typ === 'szene' ? 'Szene' : 'Blatt')), el('span', {}, text), el('i', { class: 'korrektur k1' }), el('i', { class: 'korrektur k2' })), () => oeffneDokument(d), '--dreh:' + ((i * 7) % 9 - 4) + 'deg'));
@@ -689,10 +694,11 @@ function schreibtischEinrichten(danach) {
     zeile('Leuchter', 'Sieben Flammen. Die Kerzen brennen über ' + LEUCHTER_STUNDEN + ' Schreibstunden wirklich herunter (' + Math.round((1 - leuchterStand(e.wachs)) * 100) + ' % übrig).', schalter(() => e.kerzen, (v) => { e.kerzen = v; })),
     zeile('Die Uhr tickt', 'Ein leises Ticken, zur vollen Stunde ein Glockenschlag.', schalter(() => e.uhrTickt, (v) => { e.uhrTickt = v; })),
     zeile('Fenster hört auf den Klang', 'Spielt Regen, regnet es vor dem Fenster; bei Gewitter wetterleuchtet es.', schalter(() => e.wetterFolgtKlang, (v) => { e.wetterFolgtKlang = v; })),
-    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Zitate auf der Platte'),
-      el('div', { style: 'font-size:12.5px;color:var(--blass);margin:-4px 0 8px' }, 'In alte Tische ritzen Leute Sätze. Gefundene kommen aus deinen eigenen Texten und wechseln; geritzte schreibst du selbst und sie bleiben stehen.'),
-      wahlgruppe(TISCHZITAT_MODI.map(([id, name]) => [id, name]), () => tischzitatModus(e), (v) => { e.zitatModus = v; if (v !== 'nichts') e.verse = true; }),
-      el('div', { style: 'font-size:12px;color:var(--blass);margin-top:6px' }, TISCHZITAT_MODI.map(([id, name, was]) => name + ': ' + was).join('  ·  '))),
+    /* Diese beiden Abschnitte legen sofort fest, statt nur vorzuschauen —
+       deshalb wandert das Ergebnis auch in `alt`. Sonst nimmt das Schliessen
+       des Kastens die Wahl wieder zurueck. */
+    typeof tischblattEinstellung === 'function' ? tischblattEinstellung(e, () => { Object.assign(alt, e); if (danach) danach(); }) : null,
+    typeof tischzitatEinstellung === 'function' ? tischzitatEinstellung(e, () => { Object.assign(alt, e); if (danach) danach(); }, () => zu()) : null,
     zeile('Die Feder kratzt', 'Ein leises Kratzen beim Tippen auf dem eingespannten Blatt.', schalter(() => e.federKratzt, (v) => { e.federKratzt = v; })),
     zeile('Aufgeschlagenes Buch', 'Das zuletzt gelesene Buch liegt offen auf dem Tisch; links und rechts tippen blättert.', schalter(() => e.offenesBuch, (v) => { e.offenesBuch = v; })),
     (e.kleckse && e.kleckse.length) ? zeile('Kleckse', e.kleckse.length + ' Tintenkleckse von der Feder — einer je Sitzung.', el('button', { class: 'knopf zart', onclick: () => { e.kleckse = []; D.einst.schreibtisch = { ...e }; speichereEinst(); toast('Die Platte ist gewischt.'); if (danach) danach(); } }, 'Wegwischen')) : null,
