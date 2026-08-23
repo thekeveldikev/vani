@@ -2801,7 +2801,9 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
 .salon-tonknopf.an { box-shadow: inset 0 0 0 1.5px var(--gold, #c9a25a); color: var(--akzent); }
 
 /* ----- Deine Welten: die Wand spricht über die eigenen Texte ----- */
-.salon-welten { display: grid; gap: 14px; }
+/* Achtung: display darf hier nicht stehen — sonst schlägt es .salon-seite { display: none } und die Seite bleibt sichtbar. */
+.salon-welten { gap: 14px; }
+.salon-seite.salon-welten.an { display: grid; }
 .sw-stand { font-size: 12px; color: var(--blass); margin: -4px 0 8px; }
 .sw-einlesung { display: grid; gap: 8px; padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, var(--karte) 70%, transparent); box-shadow: inset 0 0 0 1px var(--linie); }
 .sw-einlesung .salon-rat { font-size: 15.5px; }
@@ -2866,6 +2868,45 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
 .sw-chronikzeile.offen { background: color-mix(in srgb, var(--akzent2) 12%, var(--karte)); }
 .sw-chronikzeile .knopf { justify-self: start; margin-top: 6px; }
 .salon-themen .suchchip.still { background: none; color: var(--blass); box-shadow: inset 0 0 0 1px var(--linie); }
+/* ----- Unauffälliger Aktualisieren-Knopf neben der Stimmung ----- */
+.abschnitt-kopfzeile { display: flex; align-items: center; gap: 10px; }
+.abschnitt-kopfzeile h2 { margin: 0; flex: none; }
+.abschnitt-fassung { margin-left: auto; font-size: 11.5px; color: var(--blass); font-variant-numeric: tabular-nums; }
+.still-aktualisieren { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; font-size: 12.5px; color: var(--blass); background: none; box-shadow: inset 0 0 0 1px var(--linie); border-radius: 100px; }
+.still-aktualisieren:hover { color: var(--tinte); box-shadow: inset 0 0 0 1px var(--blass); }
+.still-aktualisieren svg.ik { width: 14px; height: 14px; }
+.still-aktualisieren[data-laeuft] { opacity: .6; }
+/* ----- Personenblatt ----- */
+.personenblatt { width: min(600px, calc(100vw - 28px)); max-height: min(88dvh, calc(var(--vvh, 100dvh) - 28px)); overflow: auto; display: grid; gap: 12px; }
+.pb-kopf { display: flex; align-items: flex-start; gap: 10px; }
+.pb-kopf h2 { margin: 0; }
+.pb-kopf > button { margin-left: auto; flex: none; }
+.pb-satz { font: 14.5px/1.55 ui-serif, "New York", Georgia, serif; margin-top: 6px; }
+.pb-block { display: grid; gap: 6px; }
+.pb-werke { display: grid; gap: 4px; }
+.pb-werk { display: grid; grid-template-columns: minmax(60px, 1fr) 3fr auto; gap: 8px; align-items: center; font-size: 12.5px; }
+.pb-wname { color: var(--blass); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pb-balken { height: 8px; border-radius: 4px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); overflow: hidden; }
+.pb-balken i { display: block; height: 100%; background: var(--akzent2); opacity: .75; }
+.pb-wzahl { font-variant-numeric: tabular-nums; color: var(--blass); }
+.pb-zahlen { display: flex; flex-wrap: wrap; gap: 6px; }
+.pb-verb { display: inline-flex; align-items: baseline; gap: 5px; padding: 4px 10px; border-radius: 100px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 13px; }
+.pb-verb i { font-style: normal; font-size: 11.5px; color: var(--blass); font-variant-numeric: tabular-nums; }
+.pb-verb.still { background: none; }
+.pb-stimme { display: flex; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.pb-stimme > div { display: grid; gap: 3px; }
+.pb-stimme b { font-size: 13px; }
+.pb-stimme i { font: 13.5px/1.5 ui-serif, "New York", Georgia, serif; font-style: normal; }
+.pb-stimme i.en { font-style: italic; }
+.pb-stimme small { font: 12.5px/1.45 ui-serif, "New York", Georgia, serif; color: var(--blass); border-left: 2px solid var(--gold); padding-left: 8px; }
+/* ----- Ein eigener Satz an der Wand ----- */
+.salon-eigenerrahmen { position: relative; z-index: 1; display: grid; gap: 6px; justify-items: center; text-align: center; max-width: 420px; margin: 26px auto 0; padding: 18px 22px 14px; border-radius: 4px; background: linear-gradient(170deg, #fbf6e8, #efe4cc); color: #2c2218; box-shadow: 0 0 0 6px #8a6a2e, 0 0 0 8px rgba(255,236,190,.35), 0 14px 30px rgba(0,0,0,.45); }
+.salon-eigenerrahmen .se-satz { font: italic 15px/1.55 ui-serif, "New York", Georgia, serif; }
+.salon-eigenerrahmen .se-quelle { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #8a7a62; }
+.salon-eigenerrahmen .se-schild { position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%); padding: 2px 12px; border-radius: 3px; background: linear-gradient(#d9b463, #a8832f); color: #2f2412; font: 700 9.5px ui-rounded, system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,.4); }
+.salon-eigenerrahmen-ecke { position: absolute; left: 50%; top: -14px; width: 10px; height: 14px; margin-left: -5px; background: linear-gradient(#e8c27a, #8a6a2e); border-radius: 2px; }
+.salon-eigenerrahmen:hover { box-shadow: 0 0 0 6px #a8832f, 0 0 0 8px rgba(255,236,190,.5), 0 18px 36px rgba(0,0,0,.5); }
+@media (max-width: 600px) { .salon-eigenerrahmen { max-width: 90%; } }
 
 </style>
 </head>
@@ -2893,7 +2934,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.27.0';
+const APP_VERSION = '5.27.1';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -12487,7 +12528,19 @@ RENDER.feinheiten = function (haupt) {
       el('div', { class: 'tname' }, name)
     ));
   }
-  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Stimmung'), themen));
+  /* Neben der Stimmung, unauffällig: aktualisieren, ohne bis ganz nach unten zu scrollen. */
+  const aktKnopf = el('button', {
+    class: 'knopf zart still-aktualisieren', title: 'Nach einer neuen Fassung von VANI sehen',
+    onclick: async (ev) => {
+      const b = ev.currentTarget; if (b.dataset.laeuft) return; b.dataset.laeuft = '1';
+      const alt = b.textContent; b.textContent = 'sieht nach …';
+      try { await sucheAppUpdate(true); } catch (e) { toast('Gerade ging das nicht.'); }
+      setTimeout(() => { if (b.isConnected) { b.textContent = alt; delete b.dataset.laeuft; } }, 2500);
+    }
+  }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Aktualisieren');
+  inhalt.append(el('div', { class: 'abschnitt' },
+    el('div', { class: 'abschnitt-kopfzeile' }, el('h2', {}, 'Stimmung'), el('span', { class: 'abschnitt-fassung' }, 'v' + APP_VERSION), aktKnopf),
+    themen));
 
   /* Schreiben */
   const zielFeld = el('input', { type: 'text', inputmode: 'numeric', value: D.einst.tagesziel || '', placeholder: 'keins', style: 'width:90px;text-align:right;background:var(--karte);border-radius:10px;padding:7px 11px;box-shadow:inset 0 0 0 1px var(--linie)' });
@@ -15856,6 +15909,15 @@ const SPOTLIGHT_BEFEHLE = () => [
   ...((typeof ALLE_RAEUME !== 'undefined' ? ALLE_RAEUME : []).map((r) => ({ text: r.name, unter: 'Raum', icon: r.icon, tu: () => { location.hash = '#/' + r.id; } }))),
   { text: 'Sitzung beginnen', unter: 'Uhr, Klang, Kerze, ein Rat — und die Bilanz danach', icon: 'feuer', tu: () => { if (typeof sitzungBeginnen === 'function') sitzungBeginnen(); } },
   { text: 'Das Jahr in Ringen', unter: 'Schreibtage als Baumquerschnitt', icon: 'feinheiten', tu: () => { if (typeof zeigeJahresringe === 'function') zeigeJahresringe(); } },
+  { text: 'Personenblatt öffnen', unter: 'Eine Figur aus deinen Texten auf einer Seite', icon: 'rahmen', tu: async () => {
+    if (typeof salonKenntnis !== 'function') return;
+    const k = salonKenntnis();
+    if (!k || k.leer) { toast('Es liegen noch keine Texte da.'); return; }
+    const punkte = [...(k.figuren || []).slice(0, 12), ...(k.orte || []).slice(0, 4)].map((f) => ({ text: f.name, icon: 'rahmen', wert: f.name }));
+    if (!punkte.length) { toast('Die Wand hat noch niemanden gefunden.'); return; }
+    const wahl = await menue(punkte, 'Wen möchtest du sehen?');
+    if (wahl) zeigePersonenblatt(wahl);
+  } },
   { text: 'An die Schreibmaschine', unter: 'Tippen wie früher — mit Glocke und Wagenrücklauf', icon: 'stift', tu: () => { if (typeof schreibmaschineOeffnen === 'function') schreibmaschineOeffnen(); } },
   { text: 'Brief an die Wand', unter: 'an King, Kästner, Funke, Rothfuss … — Antwort in drei Tagen', icon: 'brief', tu: () => { if (typeof salonBriefSchreiben === 'function') salonBriefSchreiben(); } },
   { text: 'Neues Blatt', unter: 'im Schreibraum', icon: 'blatt', tu: () => { const b = blattAusText('', ''); oeffneSchreibraum(b.id); } },
@@ -20500,6 +20562,131 @@ function salonLesungNotiz(autorId) {
   return null;
 }
 
+/* ===================== 56i — DAS PERSONENBLATT =====================
+   Eine Figur auf einer Seite: wie oft sie vorkommt und wo, in welchen Werken,
+   mit wem sie im Satz steht, was sie am häufigsten tut, wie viel sie spricht,
+   ihre erste und ihre letzte Stelle — und darunter alle Stellen zum Antippen.
+   Dazu, wenn die Einlesung offen ist, was die Wand über sie weiß und was die
+   Stimmen zu ihr gesagt haben. Alles aus den eigenen Texten auf dem Gerät. */
+
+/* Alles über eine Figur, aus der Kenntnis. Pur. */
+function personenblattDaten(name, k) {
+  if (!k || k.leer) return null;
+  const n = String(name || '').trim(); if (!n) return null;
+  const figur = (k.figuren || []).find((f) => f.name === n) || null;
+  const ort = !figur ? (k.orte || []).find((o) => o.name === n) : null;
+  const begriff = !figur && !ort ? (k.begriffe || []).find((b) => b.name === n) : null;
+  const wesen = figur || ort || begriff;
+  if (!wesen) return null;
+  const art = figur ? 'figur' : ort ? 'ort' : 'begriff';
+  const werke = (wesen.werke || []).slice();
+  const summe = werke.reduce((s, w) => s + w.n, 0) || 1;
+  const stellen = [];
+  const gesehen = new Set();
+  for (const b of (wesen.beispiele || [])) { if (!gesehen.has(b.satz)) { gesehen.add(b.satz); stellen.push(b); } }
+  for (const s of (k.saetze || [])) {
+    if (stellen.length >= 40) break;
+    if (s.text.includes(n) && !gesehen.has(s.text)) { gesehen.add(s.text); stellen.push({ satz: s.text, werk: s.werk, id: s.id }); }
+  }
+  return {
+    name: n, art, n: wesen.n || 0,
+    werke: werke.map((w) => ({ name: w.name, n: w.n, anteil: Math.round(w.n / summe * 100) })),
+    begleiter: (wesen.begleiter || []).slice(0, 8),
+    verben: (wesen.verben || []).slice(0, 6),
+    dialog: wesen.dialog || 0,
+    dialogAnteil: wesen.n ? Math.round((wesen.dialog || 0) / wesen.n * 100) : 0,
+    erster: wesen.erster || null,
+    stellen: stellen.slice(0, 40),
+    ortScore: wesen.ortScore || 0
+  };
+}
+/* Ein Satz, der die Figur in einem Atemzug beschreibt. Pur. */
+function personenblattSatz(d) {
+  if (!d) return '';
+  const teile = [];
+  const wo = d.werke.length === 1 ? 'nur in ' + d.werke[0].name : d.werke.length > 1 ? 'in ' + d.werke.length + ' Texten, meist in ' + d.werke[0].name : '';
+  teile.push(d.name + ' kommt ' + d.n + '-mal vor' + (wo ? ', ' + wo : '') + '.');
+  if (d.art === 'figur') {
+    if (d.begleiter.length) teile.push('Am häufigsten steht ' + (d.begleiter[0].name) + ' im selben Satz.');
+    if (d.verben.length) teile.push('Das häufigste Verb: „' + d.verben[0].verb + '".');
+    if (d.n >= 6) teile.push(d.dialogAnteil > 70 ? 'Fast immer in der Nähe von Anführungszeichen — ' + d.name + ' redet viel.' : d.dialogAnteil < 15 ? d.name + ' wird eher beschrieben als gehört.' : 'Reden und Handeln halten sich ungefähr die Waage.');
+  }
+  return teile.join(' ');
+}
+
+/* ----- Das Fenster ----- */
+function zeigePersonenblatt(name, autor) {
+  const k = typeof salonKenntnis === 'function' ? salonKenntnis() : null;
+  const d = personenblattDaten(name, k);
+  const ein = typeof einlesungFigur === 'function' ? einlesungFigur(name) : null;
+  if (!d && !ein) { toast('Zu „' + name + '" findet die Wand gerade nichts.'); return; }
+  const art = d ? d.art : 'figur';
+  const kasten = el('div', { class: 'modal personenblatt' });
+  const kopf = el('div', { class: 'pb-kopf' },
+    el('div', {}, el('h2', {}, name), el('div', { class: 'salon-fenster-unter' }, art === 'figur' ? 'Figur' : art === 'ort' ? 'Schauplatz' : 'Begriff'), d ? el('div', { class: 'pb-satz' }, personenblattSatz(d)) : null),
+    el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Schließen', onclick: () => zu() }));
+  kasten.append(kopf);
+
+  /* Was die Wand aus der Einlesung weiß */
+  if (ein) kasten.append(el('div', { class: 'sw-einlesungkarte' },
+    el('span', { class: 'sw-belege-titel' }, 'Aus der Einlesung' + (ein.werk ? ' · ' + ein.werk : '')),
+    el('i', {}, ein.kurz), ein.mehr ? el('small', {}, ein.mehr) : null));
+
+  if (d) {
+    /* Werke als Balken */
+    if (d.werke.length) {
+      const balken = el('div', { class: 'pb-werke' });
+      for (const w of d.werke) balken.append(el('div', { class: 'pb-werk' },
+        el('span', { class: 'pb-wname' }, w.name), el('span', { class: 'pb-balken' }, el('i', { style: 'width:' + Math.max(4, w.anteil) + '%' })), el('span', { class: 'pb-wzahl' }, w.n + '×')));
+      kasten.append(el('div', { class: 'pb-block' }, el('span', { class: 'sw-belege-titel' }, 'Wo'), balken));
+    }
+    /* Begleiter */
+    if (d.begleiter.length) {
+      const chips = el('div', { class: 'sw-chips' });
+      for (const b of d.begleiter) chips.append(el('button', { class: 'suchchip figur', onclick: () => { zu(); zeigePersonenblatt(b.name, autor); } }, b.name + ' · ' + b.n + '×'));
+      kasten.append(el('div', { class: 'pb-block' }, el('span', { class: 'sw-belege-titel' }, 'Mit wem im selben Satz'), chips));
+    }
+    /* Verben und Redeanteil */
+    if (d.verben.length || d.n >= 4) {
+      const zeile = el('div', { class: 'pb-zahlen' });
+      for (const v of d.verben) zeile.append(el('span', { class: 'pb-verb' }, v.verb, el('i', {}, String(v.n))));
+      if (d.art === 'figur' && d.n >= 4) zeile.append(el('span', { class: 'pb-verb still' }, 'im Dialog', el('i', {}, d.dialogAnteil + ' %')));
+      kasten.append(el('div', { class: 'pb-block' }, el('span', { class: 'sw-belege-titel' }, 'Was ' + name + ' tut'), zeile));
+    }
+    /* Alle Stellen */
+    if (d.stellen.length) {
+      const liste = el('div', { class: 'sw-belege' });
+      for (const s of d.stellen) liste.append(el('button', { class: 'sw-beleg', onclick: () => { const doc = D.docs.get(s.id); zu(); if (doc) oeffneDoc(doc); } }, el('i', {}, '„' + (s.satz.length > 220 ? s.satz.slice(0, 217) + ' …' : s.satz) + '"'), el('small', {}, s.werk)));
+      kasten.append(el('div', { class: 'pb-block' }, el('span', { class: 'sw-belege-titel' }, d.stellen.length >= 40 ? 'Vierzig Stellen' : d.stellen.length + (d.stellen.length === 1 ? ' Stelle' : ' Stellen')), liste));
+    }
+  } else {
+    kasten.append(el('div', { class: 'sw-hinweis' }, 'In den Texten auf diesem Gerät kommt ' + name + ' gerade nicht vor — die Wand kennt sie oder ihn nur aus der Einlesung.'));
+  }
+
+  /* Was die Stimmen gesagt haben */
+  const stimmen = typeof einlesungStimmenZu === 'function' ? einlesungStimmenZu(name) : [];
+  if (stimmen.length) {
+    const block = el('div', { class: 'pb-block' }, el('span', { class: 'sw-belege-titel' }, 'Was die Wand dazu gesagt hat'));
+    for (const id of stimmen) {
+      const a = typeof salonFinde === 'function' ? salonFinde(id) : null; if (!a) continue;
+      const notiz = einlesungNotiz(id, name); if (!notiz) continue;
+      const karte = el('div', { class: 'pb-stimme' }, el('span', { class: 'st-mini' }, salonPortraet(a)), el('div', {}, el('b', {}, a.name), el('i', { class: a.en ? 'en' : '' }, notiz.text)));
+      if (notiz.de) { const u = el('small', { hidden: 'hidden' }, notiz.de); karte.lastChild.append(u, el('button', { class: 'sw-mini', onclick: (ev) => { u.hidden = !u.hidden; ev.currentTarget.textContent = u.hidden ? 'Übersetzung' : 'verbergen'; } }, 'Übersetzung')); }
+      block.append(karte);
+    }
+    kasten.append(block);
+  }
+  /* Und eine Frage dazu, von der Stimme, mit der man gerade spricht */
+  if (autor && typeof gespraechAntwort === 'function' && k && !k.leer) {
+    const ant = typeof salonFrageAntwort === 'function' ? salonFrageAntwort(autor, 'Wer ist ' + name + '?') : null;
+    if (ant) kasten.append(el('div', { class: 'pb-block' }, el('span', { class: 'sw-belege-titel' }, (autor.anrede || autor.name) + ' dazu'), el('div', { class: 'salon-rat' + (autor.en ? ' en' : '') }, ant.text)));
+  }
+  kasten.append(el('div', { class: 'reihe' },
+    el('button', { class: 'knopf', onclick: () => { const b = blattAusText('Über ' + name, 'Über ' + name + '\n\n' + (d ? personenblattSatz(d) : (ein ? ein.kurz : '')) + '\n\n'); zu(); oeffneSchreibraum(b.id); } }, 'Ein Blatt darüber anfangen'),
+    el('button', { class: 'knopf voll', onclick: () => zu() }, 'Zu')));
+  const zu = zeigeDeck(kasten);
+}
+
 /* ===================== 56 — DER SALON: DIE LIEBLINGSWAND =====================
    Vier Porträts in Rahmen an einer Wand. Jede Person hat echte Zitate (mit
    Quelle, bei Übersetzungen steht das Original dabei) — und eine Stimme, in
@@ -20868,12 +21055,12 @@ const SALON_ZUSATZ = {
     en: true,
     werke: [['Carrie', 1974], ['Brennen muss Salem', 1975], ['Shining', 1977], ['The Stand', 1978], ['Es', 1986], ['Misery', 1987], ['Der dunkle Turm (Reihe)', 1982], ['The Green Mile', 1996], ['Das Leben und das Schreiben', 2000], ['Der Anschlag (11/22/63)', 2011], ['Billy Summers', 2021]],
     aufgaben: [
-      { t: 'Schreib 300 Wörter über ein Geräusch im Keller. Kein einziges Adverb. Die Tür bleibt zu.', min: 15, ziel: 300 },
-      { t: 'Eine Figur betritt ein Zimmer, in dem jemand fehlt. Zeig mir, wer fehlt, ohne es zu sagen.', min: 20, ziel: 400 },
-      { t: 'Ein Dialog, in dem zwei Leute über das Wetter reden und einer davon Angst hat. Das Wort Angst kommt nicht vor.', min: 15, ziel: 250 },
-      { t: 'Nimm die Szene, die du gestern geschrieben hast, und streich zehn Prozent. Zähl nach.', min: 20, ziel: 0 },
-      { t: 'Der erste Satz eines Romans, den du nie schreiben wirst. Dann der zweite. Dann die erste Seite.', min: 25, ziel: 350 },
-      { t: 'Beschreib einen Menschen nur über das, was er in den Taschen trägt.', min: 10, ziel: 180 }
+      { t: 'Write 300 words about a sound in the basement. Not one adverb. The door stays shut.', min: 15, ziel: 300 },
+      { t: 'A character walks into a room where somebody is missing. Show me who, without saying it.', min: 20, ziel: 400 },
+      { t: 'A dialogue: two people talk about the weather and one of them is afraid. The word fear never appears.', min: 15, ziel: 250 },
+      { t: 'Take yesterday’s scene and cut ten percent. Count the words before and after.', min: 20, ziel: 0 },
+      { t: 'The first sentence of a novel you will never write. Then the second. Then the first page.', min: 25, ziel: 350 },
+      { t: 'Describe a person using nothing but what they carry in their pockets.', min: 10, ziel: 180 }
     ]
   },
   kaestner: {
@@ -20902,12 +21089,12 @@ const SALON_ZUSATZ = {
     en: true,
     werke: [['Der Name des Windes', 2007], ['Die Furcht des Weisen', 2011], ['Die Musik der Stille', 2014], ['The Narrow Road Between Desires', 2023]],
     aufgaben: [
-      { t: 'Ein Absatz, in dem niemand spricht und alles gesagt wird. Drei Teile Stille.', min: 15, ziel: 200 },
-      { t: 'Erzähl die Legende von deiner Figur — was die Leute sagen. Dann einen Absatz, wie es wirklich war.', min: 25, ziel: 400 },
-      { t: 'Schreib einen Satz zwanzigmal um, bis er klingt wie eine gespannte Saite. Behalte alle zwanzig.', min: 20, ziel: 0 },
-      { t: 'Jemand lernt ein Handwerk. Zeig drei Handgriffe so genau, dass man sie nachmachen könnte.', min: 20, ziel: 300 },
-      { t: 'Gib einem Ding einen Namen — und erzähl, was passiert, wenn man ihn ausspricht.', min: 15, ziel: 250 },
-      { t: 'Eine Frage, die die Geschichte nie beantwortet. Schreib die Szene, in der sie gestellt wird.', min: 15, ziel: 250 }
+      { t: 'A paragraph in which nobody speaks and everything is said. Three kinds of silence.', min: 15, ziel: 200 },
+      { t: 'Tell the legend of your character — what people say. Then one paragraph of how it really was.', min: 25, ziel: 400 },
+      { t: 'Rewrite one sentence twenty times, until it rings like a taut string. Keep all twenty.', min: 20, ziel: 0 },
+      { t: 'Someone learns a craft. Show three movements precisely enough that a reader could copy them.', min: 20, ziel: 300 },
+      { t: 'Give a thing its true name — then write what happens when somebody says it out loud.', min: 15, ziel: 250 },
+      { t: 'A question the story never answers. Write the scene in which it gets asked.', min: 15, ziel: 250 }
     ]
   }
 };
@@ -21158,6 +21345,9 @@ function salonAntwortElement(a, antwort, { tippen = false } = {}) {
       el('span', { class: 'sw-belege-titel' }, 'Aus der Einlesung' + (e.werk ? ' · ' + e.werk : '')),
       el('b', {}, e.name), el('i', {}, e.kurz), e.mehr ? el('small', {}, e.mehr) : null));
   }
+  if (antwort.einlesung && typeof zeigePersonenblatt === 'function' && ['figur', 'ort', 'begriff'].includes(antwort.einlesung.art)) {
+    box.append(el('button', { class: 'knopf zart', style: 'justify-self:start', onclick: () => zeigePersonenblatt(antwort.einlesung.name, a) }, 'Personenblatt: ' + antwort.einlesung.name));
+  }
   if (antwort.belege && antwort.belege.length) {
     const bel = el('div', { class: 'sw-belege' }, el('span', { class: 'sw-belege-titel' }, 'Aus deinen Seiten'));
     for (const b of antwort.belege) bel.append(el('button', { class: 'sw-beleg', title: 'Stelle öffnen', onclick: () => { const d = D.docs.get(b.id); if (d) { oeffneDoc(d); } } }, el('i', {}, '„' + b.satz + '“'), el('small', {}, b.werk)));
@@ -21193,7 +21383,20 @@ RENDER.salon = function (haupt) {
   const reihe2 = el('div', { class: 'salon-reihen-gaeste' }, ...reihen);
   const sessel = el('button', { class: 'salon-sessel', title: 'Setz dich: eine Sitzung beginnen', 'aria-label': 'Setz dich — Sitzung beginnen', onclick: () => { if (typeof sitzungBeginnen === 'function') sitzungBeginnen(); } });
   const kamin = el('button', { class: 'salon-kaminknopf', title: 'Das Feuer: Klang an oder aus', 'aria-label': 'Kaminfeuer und Klang', onclick: () => salonKlang() });
-  const galerie = el('div', { class: 'salon-galerie gemalt zimmer' }, reihe1, reihe2, sessel, kamin);
+  /* Ein eigener Satz hängt zwischen den Porträts — jeden Tag ein anderer, aus den eigenen Texten. */
+  let eigenerRahmen = null;
+  try {
+    const kk = salonKenntnis();
+    if (kk && !kk.leer && (kk.saetze || []).length) {
+      const s = kk.saetze[salonHash(tagKey() + ':eigener') % Math.min(20, kk.saetze.length)];
+      eigenerRahmen = el('button', { class: 'salon-eigenerrahmen', title: 'Aus „' + s.werk + '" — tippen öffnet die Stelle', onclick: () => { const d = D.docs.get(s.id); if (d) oeffneDoc(d); } },
+        el('i', { class: 'salon-eigenerrahmen-ecke' }),
+        el('span', { class: 'se-satz' }, '„' + (s.text.length > 150 ? s.text.slice(0, 147) + ' …' : s.text) + '“'),
+        el('span', { class: 'se-quelle' }, s.werk),
+        el('span', { class: 'se-schild' }, 'von dir'));
+    }
+  } catch (e) {}
+  const galerie = el('div', { class: 'salon-galerie gemalt zimmer' }, reihe1, reihe2, eigenerRahmen, sessel, kamin);
   let maler = null;
   if (typeof salonMaler === 'function') {
     const leinwand = el('canvas', { class: 'salon-malerei', 'aria-hidden': 'true' });
@@ -21337,6 +21540,7 @@ function salonWeltenSeite(a) {
         if (andere.length) box.append(el('div', { class: 'sw-hinweis' }, 'Dazu haben auch ' + andere.map((id) => (salonFinde(id) || { name: id }).name).join(', ') + ' etwas gesagt.'));
       };
       for (const name of namen) chips.append(el('button', { class: 'suchchip figur', onclick: (ev) => { $$('button', chips).forEach((c) => c.classList.remove('an')); ev.currentTarget.classList.add('an'); zeigeFigur(name); } }, name));
+      box.append(el('div', { class: 'reihe', style: 'justify-content:flex-start;margin-top:6px' }, el('button', { class: 'knopf zart', onclick: () => { const gewaehlt = ($$('button.an', chips)[0] || {}).textContent || namen[0]; if (typeof zeigePersonenblatt === 'function') zeigePersonenblatt(gewaehlt, a); } }, 'Personenblatt öffnen')));
       leute.append(chips, box);
       if (namen.length) zeigeFigur(namen[0]);
     }

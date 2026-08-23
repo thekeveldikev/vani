@@ -2112,3 +2112,26 @@ Jahre bis zum Selbstverlag, Hiaasen, Guinness-Rekord).
 
 Tests 177/177 (neu `test/lernen.mjs`: Stand/Vergleich/Fälligkeit, Notizen je Stimme, versiegelte
 Einlesung bleibt leer und bricht nichts, `anfuegen` überspringt null).
+
+### 5.27.1 — Reiter, Personenblatt, ein eigener Satz an der Wand
+
+- **Reiterfehler behoben:** `.salon-welten { display: grid }` stand später im Stylesheet als
+  `.salon-seite { display: none }` und hat es überschrieben — die Welten-Seite blieb sichtbar,
+  auch wenn man auf „Zitate" wechselte. Jetzt setzt nur noch `.salon-seite.salon-welten.an` das
+  `display`. Merke: in Umschalt-Systemen nie `display` an einer zweiten Klasse setzen.
+- **Aufgaben der englischen Stimmen** waren bei King und Rothfuss noch deutsch (die kamen aus
+  SALON_ZUSATZ) — alle zwölf übersetzt. Vertrag im Test: bei `a.en` dürfen weder Aufgaben noch
+  Sätze noch Kern-Zeilen deutsche Spuren tragen.
+- **Das Personenblatt** (`src/56i-salon-personenblatt.js`): `personenblattDaten(name, k)` sammelt
+  alles über eine Figur, einen Ort oder einen Begriff — Nennungen, Werke mit Anteil, Begleiter,
+  häufigste Verben, Redeanteil, bis zu vierzig Stellen; `personenblattSatz(d)` fasst es in einem
+  Atemzug zusammen. `zeigePersonenblatt(name, autor?)` baut daraus ein Fenster: Einlesungskarte,
+  Balken je Werk, Begleiter-Chips (führen zum nächsten Blatt), Verben, alle Stellen zum Antippen,
+  die Notizen aller Stimmen dazu, und was die Stimme, mit der man gerade spricht, dazu sagt.
+  Zugänge: „Deine Leute" → „Personenblatt öffnen", jede Antwort mit Wesen, Spotlight.
+- **Ein eigener Satz an der Wand:** zwischen den Porträts hängt ein gerahmter Satz aus den
+  eigenen Texten, mit Schild „von dir" — jeden Tag ein anderer, Tipp öffnet die Stelle.
+- **Unauffälliger Aktualisieren-Knopf** oben in den Feinheiten neben „Stimmung", mit Fassungs-
+  nummer daneben (`.still-aktualisieren`), damit man zum Aktualisieren nicht mehr scrollen muss.
+
+Tests 178/178.

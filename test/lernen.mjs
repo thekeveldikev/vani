@@ -90,3 +90,32 @@ test('Anfügen: null und false landen nie als Wort in der Seite', async () => {
   assert.equal(gesammelt.filter((x) => x === null || x === false).length, 0);
   assert.equal(gesammelt[0].name, 'b'); assert.equal(gesammelt[1].name, 'text'); assert.equal(gesammelt[2].name, 'i');
 });
+
+test('Personenblatt: alles über eine Figur auf einer Seite — pur', async () => {
+  const k = await frisch();
+  const docs = new Map();
+  docs.set('h', { id: 'h', typ: 'heft', titel: 'Roman' });
+  docs.set('s1', { id: 's1', typ: 'seite', parent: 'h', titel: 'Eins', angelegt: 1, geaendert: 2,
+    text: 'Mira ging zum Fenster. „Komm", sagte Mira. Jonas nickte. Mira lachte, als Jonas den Kopf schüttelte. Später schwieg Mira. Jonas sagte nichts.' });
+  docs.set('b1', { id: 'b1', typ: 'blatt', titel: 'Notiz', angelegt: 3, geaendert: 4,
+    text: 'Eine Notiz über Mira. Mira schreibt jeden Abend, und Mira wartet.' });
+  const kk = k.kenntnisSammeln(docs, {});
+  const d = k.personenblattDaten('Mira', kk);
+  assert.ok(d, 'Mira wird gefunden');
+  assert.equal(d.art, 'figur');
+  assert.ok(d.n >= 6, 'zählt alle Nennungen: ' + d.n);
+  assert.equal(d.werke.length, 2, 'in beiden Werken');
+  assert.equal(d.werke.reduce((s, w) => s + w.anteil, 0) >= 99, true, 'Anteile ergeben rund hundert');
+  assert.ok(d.begleiter.some((b) => b.name === 'Jonas'), 'Jonas steht daneben');
+  assert.ok(d.verben.length >= 1 && d.stellen.length >= 2, 'Verben und Stellen');
+  assert.ok(d.stellen.every((s) => s.satz && s.werk && s.id), 'jede Stelle ist antippbar');
+  assert.ok(d.stellen.length <= 40, 'höchstens vierzig Stellen');
+  /* Der Satz darüber nennt Zahl, Werk und Verb */
+  const satz = k.personenblattSatz(d);
+  assert.ok(satz.includes('Mira') && /\d/.test(satz) && satz.includes('Roman'), satz);
+  /* Unbekannte und leere Fälle */
+  assert.equal(k.personenblattDaten('Niemand', kk), null);
+  assert.equal(k.personenblattDaten('Mira', { leer: true }), null);
+  assert.equal(k.personenblattDaten('', kk), null);
+  assert.equal(k.personenblattSatz(null), '');
+});

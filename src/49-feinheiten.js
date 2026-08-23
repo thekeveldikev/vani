@@ -150,7 +150,19 @@ RENDER.feinheiten = function (haupt) {
       el('div', { class: 'tname' }, name)
     ));
   }
-  inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Stimmung'), themen));
+  /* Neben der Stimmung, unauffällig: aktualisieren, ohne bis ganz nach unten zu scrollen. */
+  const aktKnopf = el('button', {
+    class: 'knopf zart still-aktualisieren', title: 'Nach einer neuen Fassung von VANI sehen',
+    onclick: async (ev) => {
+      const b = ev.currentTarget; if (b.dataset.laeuft) return; b.dataset.laeuft = '1';
+      const alt = b.textContent; b.textContent = 'sieht nach …';
+      try { await sucheAppUpdate(true); } catch (e) { toast('Gerade ging das nicht.'); }
+      setTimeout(() => { if (b.isConnected) { b.textContent = alt; delete b.dataset.laeuft; } }, 2500);
+    }
+  }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Aktualisieren');
+  inhalt.append(el('div', { class: 'abschnitt' },
+    el('div', { class: 'abschnitt-kopfzeile' }, el('h2', {}, 'Stimmung'), el('span', { class: 'abschnitt-fassung' }, 'v' + APP_VERSION), aktKnopf),
+    themen));
 
   /* Schreiben */
   const zielFeld = el('input', { type: 'text', inputmode: 'numeric', value: D.einst.tagesziel || '', placeholder: 'keins', style: 'width:90px;text-align:right;background:var(--karte);border-radius:10px;padding:7px 11px;box-shadow:inset 0 0 0 1px var(--linie)' });

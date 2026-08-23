@@ -366,12 +366,12 @@ const SALON_ZUSATZ = {
     en: true,
     werke: [['Carrie', 1974], ['Brennen muss Salem', 1975], ['Shining', 1977], ['The Stand', 1978], ['Es', 1986], ['Misery', 1987], ['Der dunkle Turm (Reihe)', 1982], ['The Green Mile', 1996], ['Das Leben und das Schreiben', 2000], ['Der Anschlag (11/22/63)', 2011], ['Billy Summers', 2021]],
     aufgaben: [
-      { t: 'Schreib 300 Wörter über ein Geräusch im Keller. Kein einziges Adverb. Die Tür bleibt zu.', min: 15, ziel: 300 },
-      { t: 'Eine Figur betritt ein Zimmer, in dem jemand fehlt. Zeig mir, wer fehlt, ohne es zu sagen.', min: 20, ziel: 400 },
-      { t: 'Ein Dialog, in dem zwei Leute über das Wetter reden und einer davon Angst hat. Das Wort Angst kommt nicht vor.', min: 15, ziel: 250 },
-      { t: 'Nimm die Szene, die du gestern geschrieben hast, und streich zehn Prozent. Zähl nach.', min: 20, ziel: 0 },
-      { t: 'Der erste Satz eines Romans, den du nie schreiben wirst. Dann der zweite. Dann die erste Seite.', min: 25, ziel: 350 },
-      { t: 'Beschreib einen Menschen nur über das, was er in den Taschen trägt.', min: 10, ziel: 180 }
+      { t: 'Write 300 words about a sound in the basement. Not one adverb. The door stays shut.', min: 15, ziel: 300 },
+      { t: 'A character walks into a room where somebody is missing. Show me who, without saying it.', min: 20, ziel: 400 },
+      { t: 'A dialogue: two people talk about the weather and one of them is afraid. The word fear never appears.', min: 15, ziel: 250 },
+      { t: 'Take yesterday’s scene and cut ten percent. Count the words before and after.', min: 20, ziel: 0 },
+      { t: 'The first sentence of a novel you will never write. Then the second. Then the first page.', min: 25, ziel: 350 },
+      { t: 'Describe a person using nothing but what they carry in their pockets.', min: 10, ziel: 180 }
     ]
   },
   kaestner: {
@@ -400,12 +400,12 @@ const SALON_ZUSATZ = {
     en: true,
     werke: [['Der Name des Windes', 2007], ['Die Furcht des Weisen', 2011], ['Die Musik der Stille', 2014], ['The Narrow Road Between Desires', 2023]],
     aufgaben: [
-      { t: 'Ein Absatz, in dem niemand spricht und alles gesagt wird. Drei Teile Stille.', min: 15, ziel: 200 },
-      { t: 'Erzähl die Legende von deiner Figur — was die Leute sagen. Dann einen Absatz, wie es wirklich war.', min: 25, ziel: 400 },
-      { t: 'Schreib einen Satz zwanzigmal um, bis er klingt wie eine gespannte Saite. Behalte alle zwanzig.', min: 20, ziel: 0 },
-      { t: 'Jemand lernt ein Handwerk. Zeig drei Handgriffe so genau, dass man sie nachmachen könnte.', min: 20, ziel: 300 },
-      { t: 'Gib einem Ding einen Namen — und erzähl, was passiert, wenn man ihn ausspricht.', min: 15, ziel: 250 },
-      { t: 'Eine Frage, die die Geschichte nie beantwortet. Schreib die Szene, in der sie gestellt wird.', min: 15, ziel: 250 }
+      { t: 'A paragraph in which nobody speaks and everything is said. Three kinds of silence.', min: 15, ziel: 200 },
+      { t: 'Tell the legend of your character — what people say. Then one paragraph of how it really was.', min: 25, ziel: 400 },
+      { t: 'Rewrite one sentence twenty times, until it rings like a taut string. Keep all twenty.', min: 20, ziel: 0 },
+      { t: 'Someone learns a craft. Show three movements precisely enough that a reader could copy them.', min: 20, ziel: 300 },
+      { t: 'Give a thing its true name — then write what happens when somebody says it out loud.', min: 15, ziel: 250 },
+      { t: 'A question the story never answers. Write the scene in which it gets asked.', min: 15, ziel: 250 }
     ]
   }
 };
@@ -656,6 +656,9 @@ function salonAntwortElement(a, antwort, { tippen = false } = {}) {
       el('span', { class: 'sw-belege-titel' }, 'Aus der Einlesung' + (e.werk ? ' · ' + e.werk : '')),
       el('b', {}, e.name), el('i', {}, e.kurz), e.mehr ? el('small', {}, e.mehr) : null));
   }
+  if (antwort.einlesung && typeof zeigePersonenblatt === 'function' && ['figur', 'ort', 'begriff'].includes(antwort.einlesung.art)) {
+    box.append(el('button', { class: 'knopf zart', style: 'justify-self:start', onclick: () => zeigePersonenblatt(antwort.einlesung.name, a) }, 'Personenblatt: ' + antwort.einlesung.name));
+  }
   if (antwort.belege && antwort.belege.length) {
     const bel = el('div', { class: 'sw-belege' }, el('span', { class: 'sw-belege-titel' }, 'Aus deinen Seiten'));
     for (const b of antwort.belege) bel.append(el('button', { class: 'sw-beleg', title: 'Stelle öffnen', onclick: () => { const d = D.docs.get(b.id); if (d) { oeffneDoc(d); } } }, el('i', {}, '„' + b.satz + '“'), el('small', {}, b.werk)));
@@ -691,7 +694,20 @@ RENDER.salon = function (haupt) {
   const reihe2 = el('div', { class: 'salon-reihen-gaeste' }, ...reihen);
   const sessel = el('button', { class: 'salon-sessel', title: 'Setz dich: eine Sitzung beginnen', 'aria-label': 'Setz dich — Sitzung beginnen', onclick: () => { if (typeof sitzungBeginnen === 'function') sitzungBeginnen(); } });
   const kamin = el('button', { class: 'salon-kaminknopf', title: 'Das Feuer: Klang an oder aus', 'aria-label': 'Kaminfeuer und Klang', onclick: () => salonKlang() });
-  const galerie = el('div', { class: 'salon-galerie gemalt zimmer' }, reihe1, reihe2, sessel, kamin);
+  /* Ein eigener Satz hängt zwischen den Porträts — jeden Tag ein anderer, aus den eigenen Texten. */
+  let eigenerRahmen = null;
+  try {
+    const kk = salonKenntnis();
+    if (kk && !kk.leer && (kk.saetze || []).length) {
+      const s = kk.saetze[salonHash(tagKey() + ':eigener') % Math.min(20, kk.saetze.length)];
+      eigenerRahmen = el('button', { class: 'salon-eigenerrahmen', title: 'Aus „' + s.werk + '" — tippen öffnet die Stelle', onclick: () => { const d = D.docs.get(s.id); if (d) oeffneDoc(d); } },
+        el('i', { class: 'salon-eigenerrahmen-ecke' }),
+        el('span', { class: 'se-satz' }, '„' + (s.text.length > 150 ? s.text.slice(0, 147) + ' …' : s.text) + '“'),
+        el('span', { class: 'se-quelle' }, s.werk),
+        el('span', { class: 'se-schild' }, 'von dir'));
+    }
+  } catch (e) {}
+  const galerie = el('div', { class: 'salon-galerie gemalt zimmer' }, reihe1, reihe2, eigenerRahmen, sessel, kamin);
   let maler = null;
   if (typeof salonMaler === 'function') {
     const leinwand = el('canvas', { class: 'salon-malerei', 'aria-hidden': 'true' });
@@ -835,6 +851,7 @@ function salonWeltenSeite(a) {
         if (andere.length) box.append(el('div', { class: 'sw-hinweis' }, 'Dazu haben auch ' + andere.map((id) => (salonFinde(id) || { name: id }).name).join(', ') + ' etwas gesagt.'));
       };
       for (const name of namen) chips.append(el('button', { class: 'suchchip figur', onclick: (ev) => { $$('button', chips).forEach((c) => c.classList.remove('an')); ev.currentTarget.classList.add('an'); zeigeFigur(name); } }, name));
+      box.append(el('div', { class: 'reihe', style: 'justify-content:flex-start;margin-top:6px' }, el('button', { class: 'knopf zart', onclick: () => { const gewaehlt = ($$('button.an', chips)[0] || {}).textContent || namen[0]; if (typeof zeigePersonenblatt === 'function') zeigePersonenblatt(gewaehlt, a); } }, 'Personenblatt öffnen')));
       leute.append(chips, box);
       if (namen.length) zeigeFigur(namen[0]);
     }

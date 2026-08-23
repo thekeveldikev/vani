@@ -7,6 +7,15 @@ const SPOTLIGHT_BEFEHLE = () => [
   ...((typeof ALLE_RAEUME !== 'undefined' ? ALLE_RAEUME : []).map((r) => ({ text: r.name, unter: 'Raum', icon: r.icon, tu: () => { location.hash = '#/' + r.id; } }))),
   { text: 'Sitzung beginnen', unter: 'Uhr, Klang, Kerze, ein Rat — und die Bilanz danach', icon: 'feuer', tu: () => { if (typeof sitzungBeginnen === 'function') sitzungBeginnen(); } },
   { text: 'Das Jahr in Ringen', unter: 'Schreibtage als Baumquerschnitt', icon: 'feinheiten', tu: () => { if (typeof zeigeJahresringe === 'function') zeigeJahresringe(); } },
+  { text: 'Personenblatt öffnen', unter: 'Eine Figur aus deinen Texten auf einer Seite', icon: 'rahmen', tu: async () => {
+    if (typeof salonKenntnis !== 'function') return;
+    const k = salonKenntnis();
+    if (!k || k.leer) { toast('Es liegen noch keine Texte da.'); return; }
+    const punkte = [...(k.figuren || []).slice(0, 12), ...(k.orte || []).slice(0, 4)].map((f) => ({ text: f.name, icon: 'rahmen', wert: f.name }));
+    if (!punkte.length) { toast('Die Wand hat noch niemanden gefunden.'); return; }
+    const wahl = await menue(punkte, 'Wen möchtest du sehen?');
+    if (wahl) zeigePersonenblatt(wahl);
+  } },
   { text: 'An die Schreibmaschine', unter: 'Tippen wie früher — mit Glocke und Wagenrücklauf', icon: 'stift', tu: () => { if (typeof schreibmaschineOeffnen === 'function') schreibmaschineOeffnen(); } },
   { text: 'Brief an die Wand', unter: 'an King, Kästner, Funke, Rothfuss … — Antwort in drei Tagen', icon: 'brief', tu: () => { if (typeof salonBriefSchreiben === 'function') salonBriefSchreiben(); } },
   { text: 'Neues Blatt', unter: 'im Schreibraum', icon: 'blatt', tu: () => { const b = blattAusText('', ''); oeffneSchreibraum(b.id); } },

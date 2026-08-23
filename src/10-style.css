@@ -2782,7 +2782,9 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
 .salon-tonknopf.an { box-shadow: inset 0 0 0 1.5px var(--gold, #c9a25a); color: var(--akzent); }
 
 /* ----- Deine Welten: die Wand spricht über die eigenen Texte ----- */
-.salon-welten { display: grid; gap: 14px; }
+/* Achtung: display darf hier nicht stehen — sonst schlägt es .salon-seite { display: none } und die Seite bleibt sichtbar. */
+.salon-welten { gap: 14px; }
+.salon-seite.salon-welten.an { display: grid; }
 .sw-stand { font-size: 12px; color: var(--blass); margin: -4px 0 8px; }
 .sw-einlesung { display: grid; gap: 8px; padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, var(--karte) 70%, transparent); box-shadow: inset 0 0 0 1px var(--linie); }
 .sw-einlesung .salon-rat { font-size: 15.5px; }
@@ -2847,3 +2849,42 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
 .sw-chronikzeile.offen { background: color-mix(in srgb, var(--akzent2) 12%, var(--karte)); }
 .sw-chronikzeile .knopf { justify-self: start; margin-top: 6px; }
 .salon-themen .suchchip.still { background: none; color: var(--blass); box-shadow: inset 0 0 0 1px var(--linie); }
+/* ----- Unauffälliger Aktualisieren-Knopf neben der Stimmung ----- */
+.abschnitt-kopfzeile { display: flex; align-items: center; gap: 10px; }
+.abschnitt-kopfzeile h2 { margin: 0; flex: none; }
+.abschnitt-fassung { margin-left: auto; font-size: 11.5px; color: var(--blass); font-variant-numeric: tabular-nums; }
+.still-aktualisieren { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; font-size: 12.5px; color: var(--blass); background: none; box-shadow: inset 0 0 0 1px var(--linie); border-radius: 100px; }
+.still-aktualisieren:hover { color: var(--tinte); box-shadow: inset 0 0 0 1px var(--blass); }
+.still-aktualisieren svg.ik { width: 14px; height: 14px; }
+.still-aktualisieren[data-laeuft] { opacity: .6; }
+/* ----- Personenblatt ----- */
+.personenblatt { width: min(600px, calc(100vw - 28px)); max-height: min(88dvh, calc(var(--vvh, 100dvh) - 28px)); overflow: auto; display: grid; gap: 12px; }
+.pb-kopf { display: flex; align-items: flex-start; gap: 10px; }
+.pb-kopf h2 { margin: 0; }
+.pb-kopf > button { margin-left: auto; flex: none; }
+.pb-satz { font: 14.5px/1.55 ui-serif, "New York", Georgia, serif; margin-top: 6px; }
+.pb-block { display: grid; gap: 6px; }
+.pb-werke { display: grid; gap: 4px; }
+.pb-werk { display: grid; grid-template-columns: minmax(60px, 1fr) 3fr auto; gap: 8px; align-items: center; font-size: 12.5px; }
+.pb-wname { color: var(--blass); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pb-balken { height: 8px; border-radius: 4px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); overflow: hidden; }
+.pb-balken i { display: block; height: 100%; background: var(--akzent2); opacity: .75; }
+.pb-wzahl { font-variant-numeric: tabular-nums; color: var(--blass); }
+.pb-zahlen { display: flex; flex-wrap: wrap; gap: 6px; }
+.pb-verb { display: inline-flex; align-items: baseline; gap: 5px; padding: 4px 10px; border-radius: 100px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 13px; }
+.pb-verb i { font-style: normal; font-size: 11.5px; color: var(--blass); font-variant-numeric: tabular-nums; }
+.pb-verb.still { background: none; }
+.pb-stimme { display: flex; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.pb-stimme > div { display: grid; gap: 3px; }
+.pb-stimme b { font-size: 13px; }
+.pb-stimme i { font: 13.5px/1.5 ui-serif, "New York", Georgia, serif; font-style: normal; }
+.pb-stimme i.en { font-style: italic; }
+.pb-stimme small { font: 12.5px/1.45 ui-serif, "New York", Georgia, serif; color: var(--blass); border-left: 2px solid var(--gold); padding-left: 8px; }
+/* ----- Ein eigener Satz an der Wand ----- */
+.salon-eigenerrahmen { position: relative; z-index: 1; display: grid; gap: 6px; justify-items: center; text-align: center; max-width: 420px; margin: 26px auto 0; padding: 18px 22px 14px; border-radius: 4px; background: linear-gradient(170deg, #fbf6e8, #efe4cc); color: #2c2218; box-shadow: 0 0 0 6px #8a6a2e, 0 0 0 8px rgba(255,236,190,.35), 0 14px 30px rgba(0,0,0,.45); }
+.salon-eigenerrahmen .se-satz { font: italic 15px/1.55 ui-serif, "New York", Georgia, serif; }
+.salon-eigenerrahmen .se-quelle { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #8a7a62; }
+.salon-eigenerrahmen .se-schild { position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%); padding: 2px 12px; border-radius: 3px; background: linear-gradient(#d9b463, #a8832f); color: #2f2412; font: 700 9.5px ui-rounded, system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,.4); }
+.salon-eigenerrahmen-ecke { position: absolute; left: 50%; top: -14px; width: 10px; height: 14px; margin-left: -5px; background: linear-gradient(#e8c27a, #8a6a2e); border-radius: 2px; }
+.salon-eigenerrahmen:hover { box-shadow: 0 0 0 6px #a8832f, 0 0 0 8px rgba(255,236,190,.5), 0 18px 36px rgba(0,0,0,.5); }
+@media (max-width: 600px) { .salon-eigenerrahmen { max-width: 90%; } }

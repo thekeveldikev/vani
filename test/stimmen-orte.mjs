@@ -43,6 +43,13 @@ test('Salon: vier Gäste mehr, englische Stimmen raten englisch und tragen die d
     assert.ok(/[äöüß]|\b(und|nicht|der|die|das)\b/.test(a.de.saetze[0]), id + ' hat die deutsche Fassung');
     assert.equal(a.kern.map((x) => x[0]).join(), a.de.kern.map((x) => x[0]).join(), id + ': Kern-Themen parallel, auch mit den Themen aus 56g');
   }
+  /* Englische Stimmen stellen englische Aufgaben — keine deutschen Wörter darin */
+  const deutscheSpur = /[äöüßÄÖÜ]|(und|nicht|oder|aber|der|die|das|dem|den|ein|eine|einen|einem|einer|Schreib|Nimm|Lass|Zeig|dein|deine|Wörter|Minuten|Satz|Szene)/;
+  for (const a of k.SALON_FEST.filter((x) => x.en)) {
+    for (const au of a.aufgaben || []) assert.ok(!deutscheSpur.test(au.t), a.name + ': Aufgabe muss englisch sein — „' + au.t.slice(0, 70) + '“');
+    for (const s of a.saetze) assert.ok(!deutscheSpur.test(s), a.name + ': Satz muss englisch sein — „' + s.slice(0, 70) + '“');
+    for (const [, t] of a.kern) assert.ok(!deutscheSpur.test(t), a.name + ': Kern muss englisch sein — „' + t.slice(0, 70) + '“');
+  }
   /* Kästner, Funke, Lindgren bleiben deutsch */
   for (const id of ['kaestner', 'funke', 'lindgren']) { const a = k.SALON_FEST.find((x) => x.id === id); assert.ok(!a.en && !a.de, id + ' bleibt deutsch'); }
   /* Gleiche Saat, gleicher Rat in beiden Sprachen: die Übersetzung gehört zum englischen Satz */
