@@ -2456,6 +2456,11 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .inhalt, html[data-thema="ker
 .salon-galerie.gemalt { position: relative; overflow: hidden; }
 .salon-malerei { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; border-radius: 22px; }
 .salon-galerie.gemalt > *:not(.salon-malerei) { position: relative; z-index: 1; }
+/* Sessel und Kamin werden per Skript genau auf das gemalte Moebel gelegt. Dafuer
+   muessen sie absolut liegen - die Sammelregel darueber stellt sonst alles auf
+   relative, und die Flaechen landen weit unter dem Bild. */
+.salon-galerie.gemalt > .salon-sessel,
+.salon-galerie.gemalt > .salon-kaminknopf { position: absolute; z-index: 3; }
 .salon-galerie.gemalt .salon-kurz { color: rgba(255,240,215,.82); text-shadow: 0 1px 2px rgba(0,0,0,.4); }
 .salon-galerie.gemalt::before { display: none; }
 /* ----- Diktat ----- */
@@ -2515,7 +2520,7 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .inhalt, html[data-thema="ker
 .salon-sessel:hover::after { opacity: 1; }
 .salon-kaminknopf { position: absolute; z-index: 2; left: calc(50% - 90px); bottom: 8px; width: 180px; height: 110px; background: transparent; border-radius: 8px; cursor: pointer; }
 .salon-kaminknopf:hover { box-shadow: 0 0 0 2px rgba(255,200,120,.3); }
-@media (max-width: 760px) { .salon-sessel { display: none; } .salon-galerie.zimmer { padding-bottom: 130px; } }
+@media (max-width: 760px) { .salon-galerie.zimmer { padding-bottom: 130px; } }
 .salon-konsole { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-top: 14px; }
 .salon-konsole .salon-tageskarte { max-width: none; transform: none; background: var(--karte); color: var(--tinte); box-shadow: 0 1px 5px var(--schein), inset 0 0 0 1px var(--linie); }
 .salon-konsole .st-kopf { display: flex; align-items: center; gap: 8px; }
@@ -2932,3 +2937,358 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
 .sicher-karte-pfeil { margin-left: auto; color: var(--blass); display: flex; flex: none; }
 .sicher-karte.hakt .sicher-karte-icon { background: rgba(176,53,43,.14); color: #b0352b; }
 .sicher-karte.hakt .sicher-karte-text small { color: #b0352b; }
+
+/* ============================================================
+   DIE SCROLLLEISTE (33)
+   Schmal, zurückhaltend, rechts am Rand. Sichtbar, wenn etwas
+   geschieht — sonst fast nicht da.
+   ============================================================ */
+.scrollleiste {
+  position: absolute; right: 3px; top: 8px; bottom: 8px; width: 26px;
+  z-index: 24; display: flex; align-items: stretch; justify-content: center;
+  opacity: 0; transition: opacity .35s ease; pointer-events: none;
+}
+.scrollleiste.sichtbar { opacity: 1; pointer-events: auto; }
+.scrollleiste:hover { opacity: 1; pointer-events: auto; }
+.scrollleiste.unnoetig { display: none; }
+.sl-spur {
+  position: absolute; left: 50%; transform: translateX(-50%); top: 26px; bottom: 26px; width: 20px;
+  border-radius: 12px; cursor: grab; touch-action: none;
+  background: linear-gradient(90deg, transparent 0 6px, var(--linie) 6px 14px, transparent 14px);
+}
+.scrollleiste.zieht .sl-spur { cursor: grabbing; }
+.sl-griff {
+  position: absolute; left: 50%; margin-left: -5px; top: 0; width: 10px; border-radius: 6px;
+  background: color-mix(in srgb, var(--blass) 58%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+  transition: background .2s, width .18s, margin-left .18s;
+}
+.scrollleiste:hover .sl-griff, .scrollleiste.zieht .sl-griff {
+  background: var(--akzent); width: 14px; margin-left: -7px;
+}
+.sl-marken { position: absolute; left: 50%; transform: translateX(-50%); top: 26px; bottom: 26px; width: 20px; pointer-events: none; }
+.sl-marke { position: absolute; left: 3px; width: 6px; height: 2px; border-radius: 1px; background: var(--blass); opacity: .5; }
+.sl-marke.stark { left: 1px; width: 10px; height: 2.5px; opacity: .8; background: var(--akzent); }
+.sl-fahne {
+  position: absolute; right: 30px; transform: translateY(-50%);
+  background: var(--tinte); color: var(--papier); padding: 5px 10px; border-radius: 9px;
+  font-size: 12.5px; white-space: nowrap; max-width: 46vw; overflow: hidden; text-overflow: ellipsis;
+  opacity: 0; transition: opacity .16s; pointer-events: none; box-shadow: 0 6px 18px rgba(0,0,0,.28);
+}
+.scrollleiste.zieht .sl-fahne { opacity: 1; }
+.sl-sprung {
+  position: absolute; left: 50%; transform: translateX(-50%); width: 22px; height: 22px;
+  border-radius: 50%; display: grid; place-items: center; font-size: 13px; line-height: 1;
+  color: var(--blass); background: color-mix(in srgb, var(--papier) 80%, transparent);
+  opacity: 0; transition: opacity .25s, color .2s;
+}
+.sl-sprung.hoch { top: 0; } .sl-sprung.runter { bottom: 0; }
+.scrollleiste.sichtbar .sl-sprung, .scrollleiste:hover .sl-sprung { opacity: .85; }
+.sl-sprung:hover { color: var(--akzent); }
+@media (max-width: 700px) { .scrollleiste { width: 30px; right: 0; } .sl-fahne { right: 34px; } }
+@media (prefers-reduced-motion: reduce) { .scrollleiste, .sl-griff, .sl-fahne, .sl-sprung { transition: none; } }
+
+/* ============================================================
+   ZITATE AUF DER PLATTE (54d)
+   Geritzt heißt: hell an der Oberkante, dunkel darunter — so
+   sieht eine Kerbe im Holz aus.
+   ============================================================ */
+.desk-zitat {
+  /* Eingeritzt heisst: im Holz. Also unter allem, was auf dem Tisch liegt -
+     die Dinge haben z-index 2 und 3, die Leinwand darunter 0. */
+  position: absolute; z-index: 1; max-width: 172px;
+  left: calc(5% + var(--zx, .5) * 82%); top: calc(47% + var(--zy, .5) * 44%);
+  transform: translate(-50%, 0) rotate(var(--zd, -3deg));
+  font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive;
+  font-size: 13px; line-height: 1.35; text-align: left; background: none; padding: 2px 4px;
+}
+.desk-zitat.gefunden { color: rgba(235,220,190,.40); text-shadow: 0 1px 1px rgba(0,0,0,.4); pointer-events: none; }
+.desk-zitat.geritzt {
+  cursor: pointer; color: rgba(38,24,13,.5);
+  /* Die Kerbe: eine helle Kante oben, ein dunkler Schatten darunter. Die
+     Fuellung bleibt dunkel, damit es lesbar bleibt und nicht nur ahnbar. */
+  text-shadow: 0 -1px 0 rgba(255,238,208,.42), 0 1px 0 rgba(0,0,0,.5), 0 2px 4px rgba(0,0,0,.34);
+}
+html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(60,40,22,.5); }
+.desk-zitat.geritzt:hover { text-shadow: 0 -1px 0 rgba(255,240,215,.34), 0 1px 1px rgba(0,0,0,.7), 0 0 14px rgba(255,200,120,.25); }
+.desk-zitat.geritzt:focus-visible { outline: 2px solid var(--akzent); outline-offset: 3px; border-radius: 6px; }
+.desk-zitat .tz-schrift { white-space: pre-wrap; }
+/* Jedes Zeichen steht schon da — es ist nur noch nicht geschnitten. */
+.desk-zitat .tz-z { font-style: normal; display: inline-block; opacity: 0; transform: translateY(-.5px) scaleY(.72); filter: blur(.8px); }
+.desk-zitat .tz-z.geschnitten {
+  animation: tz-schnitt .34s cubic-bezier(.18,.9,.3,1) forwards;
+}
+@keyframes tz-schnitt {
+  0% { opacity: 0; transform: translateY(-.5px) scaleY(.72); filter: blur(.8px); text-shadow: 0 0 5px rgba(255,215,150,.9); }
+  45% { opacity: 1; transform: translateY(.3px) scaleY(1.06); filter: blur(0); text-shadow: 0 -1px 0 rgba(255,240,215,.75), 0 1px 2px rgba(0,0,0,.6), 0 0 8px rgba(255,200,130,.55); }
+  100% { opacity: 1; transform: none; filter: none; text-shadow: 0 -1px 0 rgba(255,238,208,.42), 0 1px 0 rgba(0,0,0,.5), 0 2px 4px rgba(0,0,0,.34); }
+}
+/* Die Klinge: eine schmale, warm glühende Spitze, die mitwandert. */
+.tz-klinge-spitze {
+  position: absolute; left: 0; top: 0; width: 2px; height: 1.05em; border-radius: 1px;
+  background: linear-gradient(180deg, rgba(255,246,224,.95), rgba(255,196,120,.25));
+  box-shadow: 0 0 8px rgba(255,208,150,.8), 0 0 18px rgba(255,170,90,.35);
+  transition: transform .07s linear; pointer-events: none;
+}
+.tz-klinge-spitze::after {
+  content: ""; position: absolute; left: -1px; top: -3px; width: 4px; height: 4px; border-radius: 50%;
+  background: rgba(255,240,210,.9); filter: blur(1.5px);
+}
+.tz-klinge-spitze.geht { animation: tz-klinge-weg .4s ease-out forwards; }
+@keyframes tz-klinge-weg { to { opacity: 0; transform: translate(var(--tx, 0), -9px) scale(.7); } }
+/* Wenn der letzte Buchstabe steht, setzt sich die Kerbe noch einmal. */
+.desk-zitat.setzt { animation: tz-setzen .9s ease-out; }
+@keyframes tz-setzen {
+  0% { filter: drop-shadow(0 0 7px rgba(255,200,120,.5)); }
+  100% { filter: none; }
+}
+/* Späne, dort wo die Klinge ansetzt. */
+.tz-staub {
+  position: absolute; width: 2px; height: 2px; border-radius: 50%;
+  background: rgba(232,212,178,.9); pointer-events: none;
+  animation: tz-span .85s cubic-bezier(.3,.6,.5,1) var(--sd, 0s) forwards;
+}
+@keyframes tz-span {
+  0% { opacity: .95; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--ss, 0), var(--sw, 12px)) scale(.5); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .desk-zitat .tz-z, .desk-zitat .tz-z.geschnitten { opacity: 1; transform: none; filter: none; animation: none; }
+  .tz-klinge-spitze, .tz-staub { display: none; }
+  .desk-zitat.setzt { animation: none; }
+}
+
+.desk-ritzen {
+  position: absolute; z-index: 3; right: 5%; top: calc(46% + 316px); width: 34px; height: 34px;
+  opacity: .34; transition: opacity .25s, transform .25s;
+}
+.desk-ritzen:hover { opacity: 1; transform: rotate(-12deg) scale(1.08); }
+.desk-ritzen .tz-klinge { position: absolute; left: 15px; top: 2px; width: 4px; height: 17px; background: linear-gradient(180deg, #e8e2d6, #9aa0a6); border-radius: 1px 1px 2px 2px; box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.desk-ritzen .tz-griff { position: absolute; left: 13px; top: 17px; width: 8px; height: 15px; background: linear-gradient(180deg, #6d4a2c, #3f2a17); border-radius: 2px 2px 3px 3px; }
+@media (max-width: 760px) { .desk-zitat { max-width: 124px; font-size: 11px; } .desk-ritzen { right: 3%; } }
+@media (prefers-reduced-motion: reduce) { .tz-spur, .desk-zitat.frisch, .tz-staub { animation: none; } }
+
+/* ============================================================
+   DER KALENDER AUF DEM TISCH (61b)
+   ============================================================ */
+.desk-ding.kalender { left: 23%; top: calc(46% + 190px); width: 132px; height: 92px; z-index: 3; }
+.kalender-bild { position: absolute; inset: 0; transform: rotate(-4deg); transition: transform .3s; }
+.kalender-bild .kal-ruecken {
+  position: absolute; inset: 0; border-radius: 5px;
+  background: linear-gradient(160deg, #5b4630, #34281b);
+  box-shadow: 0 7px 14px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,235,200,.14);
+}
+.kalender-bild .kal-blatt {
+  position: absolute; top: 5px; bottom: 5px; width: calc(50% - 8px);
+  background: linear-gradient(178deg, #f4ecd9, #e6dcc2);
+  box-shadow: inset 0 0 12px rgba(120,96,60,.2);
+  display: flex; flex-direction: column; padding: 5px 6px; overflow: hidden;
+}
+.kalender-bild .kal-blatt.links { left: 5px; border-radius: 3px 1px 1px 3px; align-items: center; justify-content: center; }
+.kalender-bild .kal-blatt.rechts { right: 5px; border-radius: 1px 3px 3px 1px; gap: 2px; justify-content: center; }
+.kal-blattmonat { font-size: 8.5px; letter-spacing: .18em; color: #a8552f; font-weight: 700; }
+.kal-blatttag { font-family: Georgia, "Iowan Old Style", serif; font-size: 30px; line-height: 1; color: #3a2c1e; font-weight: 600; }
+.kal-blattwt { font-size: 7.5px; letter-spacing: .1em; color: #7d6a50; }
+.kal-blattzeile { display: flex; align-items: center; gap: 3px; font-size: 7.5px; color: #4a3c2c; line-height: 1.15; }
+.kal-blattzeile i { display: flex; color: var(--artfarbe, #7d6a50); flex: none; }
+.kal-blattzeile em { font-style: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kal-blattleer { font-size: 7.5px; color: #a2917a; font-style: italic; text-align: center; }
+.kalender-bild .kal-spirale {
+  position: absolute; left: 50%; top: 2px; bottom: 2px; width: 8px; margin-left: -4px;
+  background: repeating-linear-gradient(180deg, rgba(200,190,175,.9) 0 3px, transparent 3px 9px);
+  border-radius: 3px;
+}
+.kalender-bild > .kal-band { position: absolute; left: 50%; bottom: -7px; width: 5px; height: 16px; margin-left: 14px; background: linear-gradient(180deg, #a8452f, #7d3020); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 74%, 0 100%); display: block; }
+.desk-ding.kalender:hover .kalender-bild { transform: rotate(-2deg) translateY(-3px) scale(1.03); }
+.desk-ding.kalender.hat-heute .kal-blatttag { color: #a8452f; }
+.desk-ding.kalender.hat-heute::after {
+  content: ""; position: absolute; right: -3px; top: -3px; width: 9px; height: 9px; border-radius: 50%;
+  background: #c4703a; box-shadow: 0 0 10px rgba(196,112,58,.8); animation: kal-pochen 3.4s ease-in-out infinite;
+}
+@keyframes kal-pochen { 0%, 100% { opacity: .55; transform: scale(1) } 50% { opacity: 1; transform: scale(1.25) } }
+@media (max-width: 760px) { .desk-ding.kalender { width: 106px; height: 74px; left: 20%; top: calc(46% + 158px); } .kal-blatttag { font-size: 23px; } }
+
+/* ============================================================
+   DER KALENDER, AUFGEKLAPPT (61b)
+   ============================================================ */
+.kal-buch {
+  width: min(1120px, 96vw); max-height: 92vh; display: flex; flex-direction: column;
+  background: linear-gradient(178deg, var(--papier), color-mix(in srgb, var(--papier) 88%, var(--hg2)));
+  border-radius: 16px; box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 1px var(--linie);
+  overflow: hidden;
+}
+.kal-buch.klappt-auf { animation: kal-aufklappen .52s cubic-bezier(.2,.9,.25,1); transform-origin: 50% 12%; }
+@keyframes kal-aufklappen {
+  0% { opacity: 0; transform: perspective(1400px) rotateX(-58deg) scale(.92); }
+  60% { opacity: 1; transform: perspective(1400px) rotateX(6deg) scale(1.01); }
+  100% { opacity: 1; transform: perspective(1400px) rotateX(0) scale(1); }
+}
+.kal-buehne { overflow-y: auto; overscroll-behavior: contain; padding: 0 0 18px; position: relative; }
+.kal-kopf {
+  position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 8px;
+  padding: 14px 16px 10px; background: color-mix(in srgb, var(--papier) 94%, transparent);
+  backdrop-filter: blur(8px); border-bottom: 1px solid var(--linie);
+}
+.kal-monatname { font-family: Georgia, "Iowan Old Style", serif; font-size: 24px; margin: 0; display: flex; align-items: baseline; gap: 9px; }
+.kal-monatname i { font-style: normal; font-size: 16px; color: var(--blass); font-variant-numeric: tabular-nums; }
+.kal-blaetter { width: 34px; height: 34px; border-radius: 50%; font-size: 21px; line-height: 1; color: var(--blass); display: grid; place-items: center; flex: none; }
+.kal-blaetter:hover { background: var(--hg2); color: var(--tinte); }
+.kal-kopfrechts { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.kal-ansichtknopf { padding: 6px 12px; border-radius: 999px; font-size: 13px; color: var(--blass); border: 1px solid var(--linie); }
+.kal-ansichtknopf.an { background: var(--akzent); color: var(--papier); border-color: transparent; }
+.kal-schliessen { width: 34px; height: 34px; border-radius: 50%; font-size: 22px; line-height: 1; color: var(--blass); display: grid; place-items: center; }
+.kal-schliessen:hover { background: rgba(176,53,43,.12); color: #b0352b; }
+
+.kal-jahrleiste { display: flex; gap: 3px; overflow-x: auto; overscroll-behavior-x: contain; padding: 8px 16px 10px; scroll-behavior: smooth; border-bottom: 1px solid var(--linie); }
+.kal-jahrknopf {
+  flex: none; padding: 4px 9px; border-radius: 8px; font-size: 12.5px; color: var(--blass);
+  font-variant-numeric: tabular-nums; position: relative; transition: background .18s, color .18s;
+}
+.kal-jahrknopf:hover { background: var(--hg2); color: var(--tinte); }
+.kal-jahrknopf.voll::after { content: ""; position: absolute; left: 50%; bottom: 1px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--akzent); opacity: .75; }
+.kal-jahrknopf.an { background: var(--tinte); color: var(--papier); font-weight: 600; }
+.kal-jahrknopf.an.voll::after { background: var(--papier); }
+
+.kal-raster { display: grid; grid-template-columns: 30px repeat(7, 1fr); gap: 4px; padding: 12px 16px 6px; }
+.kal-wochenkopf, .kal-kw-kopf { text-align: center; font-size: 11px; letter-spacing: .09em; color: var(--blass); text-transform: uppercase; padding-bottom: 4px; }
+.kal-kw-kopf, .kal-kw { font-size: 10.5px; color: color-mix(in srgb, var(--blass) 65%, transparent); display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+.kal-zelle {
+  position: relative; min-height: 68px; border-radius: 10px; border: 1px solid var(--linie);
+  background: color-mix(in srgb, var(--papier) 70%, transparent);
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 5px 6px;
+  transition: background .16s, border-color .16s, transform .12s;
+}
+.kal-zelle:hover { background: var(--hg2); transform: translateY(-1px); }
+.kal-zelle.fremd { opacity: .38; }
+.kal-zelle .kal-zahl { font-size: 13.5px; color: var(--tinte); font-variant-numeric: tabular-nums; }
+.kal-zelle.heute { border-color: var(--akzent); box-shadow: inset 0 0 0 1px var(--akzent); }
+.kal-zelle.heute .kal-zahl { color: var(--akzent); font-weight: 700; }
+.kal-zelle.gewaehlt { background: var(--tinte); border-color: var(--tinte); }
+.kal-zelle.gewaehlt .kal-zahl, .kal-zelle.gewaehlt .kal-mehr { color: var(--papier); }
+.kal-marken { display: flex; flex-wrap: wrap; gap: 2px; margin-top: auto; }
+.kal-marke { display: flex; color: var(--artfarbe, var(--blass)); }
+.kal-zelle.gewaehlt .kal-marke { color: color-mix(in srgb, var(--artfarbe, #ffffff) 70%, white); }
+.kal-mehr { font-size: 10px; color: var(--blass); }
+
+.kal-tagesblatt { margin: 10px 16px 0; padding: 14px 16px; border-radius: 14px; background: var(--hg2); border: 1px solid var(--linie); }
+.kal-tageskopf { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.kal-tageskopf h3 { font-family: Georgia, "Iowan Old Style", serif; font-size: 19px; margin: 0 0 2px; }
+.kal-tageskopf small { color: var(--blass); font-size: 12.5px; }
+.kal-tageskopf .knopf { margin-left: auto; }
+.kal-leertag { color: var(--blass); font-size: 13.5px; line-height: 1.55; font-style: italic; padding: 6px 0; }
+.kal-eintrag {
+  display: flex; gap: 11px; width: 100%; text-align: left; padding: 10px 12px; border-radius: 11px;
+  background: var(--papier); border: 1px solid var(--linie); border-left: 3px solid var(--artfarbe, var(--blass));
+  margin-bottom: 7px; transition: transform .12s, box-shadow .16s;
+}
+.kal-eintrag:hover { transform: translateX(2px); box-shadow: 0 4px 14px rgba(0,0,0,.1); }
+.kal-eintragzeichen { color: var(--artfarbe, var(--blass)); display: flex; flex: none; padding-top: 1px; }
+.kal-eintragtext { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.kal-eintragtext b { font-size: 14.5px; }
+.kal-eintragart { font-size: 12px; color: var(--blass); letter-spacing: .02em; }
+.kal-eintragleute { font-size: 12.5px; color: var(--artfarbe, var(--blass)); }
+.kal-eintragalter { font-size: 12.5px; color: var(--tinte); opacity: .78; font-variant-numeric: tabular-nums; }
+.kal-eintragnotiz { font-size: 12.5px; color: var(--blass); line-height: 1.5; margin-top: 2px; white-space: pre-wrap; }
+.kal-abschnitt { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--blass); display: block; margin: 12px 0 6px; }
+.kal-jahrestage { border-top: 1px dashed var(--linie); margin-top: 10px; }
+.kal-jahrestag { display: flex; gap: 9px; align-items: baseline; width: 100%; text-align: left; padding: 6px 8px; border-radius: 8px; font-size: 13px; }
+.kal-jahrestag:hover { background: var(--papier); }
+.kal-jahrestag b { color: var(--akzent); font-size: 12.5px; flex: none; }
+.kal-jahrestag span { color: var(--blass); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.kal-widersprueche { margin: 12px 16px 0; border: 1px solid rgba(176,53,43,.3); border-radius: 12px; background: rgba(176,53,43,.06); padding: 10px 14px; }
+.kal-widersprueche summary { cursor: pointer; font-size: 13.5px; color: #b0352b; }
+.kal-widerspruch { display: flex; gap: 9px; align-items: baseline; font-size: 13px; padding: 6px 0; border-top: 1px solid rgba(176,53,43,.14); }
+.kal-wsym { width: 18px; height: 18px; border-radius: 50%; background: rgba(176,53,43,.16); color: #b0352b; display: grid; place-items: center; font-size: 12px; font-weight: 700; flex: none; }
+.kal-wlink { color: var(--akzent); text-decoration: underline; font-size: 12.5px; flex: none; margin-left: auto; }
+
+.kal-jahresbild { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; padding: 14px 16px; }
+.kal-mini { border: 1px solid var(--linie); border-radius: 12px; padding: 9px 10px; background: color-mix(in srgb, var(--papier) 70%, transparent); }
+.kal-mini.voll { border-color: color-mix(in srgb, var(--akzent) 45%, var(--linie)); }
+.kal-mininame { display: flex; align-items: baseline; gap: 6px; width: 100%; font-family: Georgia, "Iowan Old Style", serif; font-size: 15px; margin-bottom: 6px; }
+.kal-mininame i { font-style: normal; font-size: 11px; color: var(--papier); background: var(--akzent); border-radius: 999px; padding: 1px 6px; margin-left: auto; }
+.kal-minigitter { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
+.kal-minikopf { text-align: center; font-size: 9px; color: var(--blass); padding-bottom: 2px; }
+.kal-minitag { aspect-ratio: 1; border-radius: 4px; font-size: 10px; color: var(--blass); display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+.kal-minitag:hover { background: var(--hg2); color: var(--tinte); }
+.kal-minitag.fremd { opacity: .22; }
+.kal-minitag.voll { background: color-mix(in srgb, var(--akzent) 24%, transparent); color: var(--tinte); font-weight: 600; }
+.kal-minitag.heute { box-shadow: inset 0 0 0 1.5px var(--akzent); color: var(--akzent); }
+
+.kal-leben { padding: 14px 16px; }
+.kal-massband { position: relative; height: 20px; margin: 0 0 10px 190px; border-bottom: 1px solid var(--linie); }
+.kal-massmarke { position: absolute; top: 0; font-size: 10.5px; color: var(--blass); transform: translateX(-50%); font-style: normal; font-variant-numeric: tabular-nums; }
+.kal-band { display: flex; align-items: center; gap: 12px; padding: 5px 0; border-bottom: 1px solid var(--linie); }
+.kal-bandname { width: 178px; flex: none; display: flex; flex-direction: column; }
+.kal-bandname b { font-size: 13.5px; }
+.kal-bandname small { font-size: 11px; color: var(--blass); font-variant-numeric: tabular-nums; }
+.kal-spur { position: relative; flex: 1; height: 30px; }
+.kal-lebenslinie { position: absolute; top: 13px; height: 4px; border-radius: 2px; background: linear-gradient(90deg, color-mix(in srgb, var(--akzent) 60%, transparent), color-mix(in srgb, var(--akzent) 20%, transparent)); }
+.kal-lebenslinie.zuende { background: linear-gradient(90deg, color-mix(in srgb, var(--akzent) 65%, transparent), color-mix(in srgb, var(--blass) 55%, transparent)); }
+.kal-kerbe { position: absolute; top: 4px; width: 18px; height: 22px; margin-left: -9px; display: grid; place-items: center; color: var(--artfarbe, var(--blass)); border-radius: 5px; transition: transform .14s, background .14s; }
+.kal-kerbe:hover { background: var(--hg2); transform: scale(1.25); z-index: 2; }
+.kal-kerbe i { display: flex; }
+
+/* ----- Das Fenster zum Eintragen ----- */
+.kal-fenster { width: min(560px, 94vw); max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.kal-feld { display: flex; flex-direction: column; gap: 5px; }
+.kal-feldname { font-size: 11.5px; letter-spacing: .11em; text-transform: uppercase; color: var(--blass); }
+.kal-feldunter { font-size: 12px; color: var(--blass); line-height: 1.45; }
+.kal-datumreihe { display: flex; gap: 7px; }
+.kal-datumreihe .kal-jahr { width: 92px; }
+.kal-datumreihe select { flex: 1; min-width: 0; }
+.kal-wochentag { font-size: 12.5px; color: var(--akzent); min-height: 17px; margin-top: -4px; }
+.kal-bisreihe { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--blass); }
+.kal-bisreihe input[type="date"] { flex: 1; min-width: 0; }
+.kal-artwahl { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 5px; }
+.kal-artknopf { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 4px; border-radius: 9px; border: 1px solid var(--linie); color: var(--blass); transition: background .15s, color .15s, border-color .15s; }
+.kal-artknopf small { font-size: 10.5px; }
+.kal-artknopf:hover { background: var(--hg2); }
+.kal-artknopf.an { background: color-mix(in srgb, var(--artfarbe) 16%, transparent); border-color: var(--artfarbe); color: var(--artfarbe); }
+.kal-artbild, .kal-iconbild { display: flex; }
+.kal-zeichenknopf { display: flex; align-items: center; gap: 9px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--linie); color: var(--tinte); align-self: flex-start; }
+.kal-zeichenknopf:hover { background: var(--hg2); }
+.kal-zeichenknopf small { color: var(--blass); font-size: 12.5px; }
+.kal-leute { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; min-height: 26px; align-items: center; }
+.kal-person { display: inline-flex; align-items: center; gap: 5px; padding: 3px 5px 3px 10px; border-radius: 999px; background: var(--hg2); font-size: 13px; }
+.kal-person button { width: 18px; height: 18px; border-radius: 50%; color: var(--blass); font-size: 14px; line-height: 1; display: grid; place-items: center; }
+.kal-person button:hover { background: rgba(176,53,43,.16); color: #b0352b; }
+.kal-leerhinweis { font-size: 12.5px; color: var(--blass); font-style: italic; }
+.kal-namenreihe { display: flex; gap: 6px; }
+.kal-namenreihe input { flex: 1; min-width: 0; }
+.kal-alterzeile { display: flex; flex-direction: column; gap: 3px; }
+.kal-alterhinweis { font-size: 12.5px; color: var(--blass); padding: 5px 9px; border-radius: 7px; background: var(--hg2); }
+.kal-alterhinweis.warn { background: rgba(176,53,43,.1); color: #b0352b; }
+.kal-notiz { width: 100%; resize: vertical; }
+.kal-hinweis { font-size: 13px; color: var(--blass); line-height: 1.5; }
+
+.kal-iconfenster { width: min(460px, 94vw); max-height: 88vh; overflow-y: auto; }
+.kal-icongitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 6px; margin: 8px 0; }
+.kal-iconwahl { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 9px 4px; border-radius: 10px; border: 1px solid var(--linie); color: var(--tinte); }
+.kal-iconwahl small { font-size: 10.5px; color: var(--blass); }
+.kal-iconwahl:hover { background: var(--hg2); }
+.kal-iconwahl.an { border-color: var(--akzent); background: color-mix(in srgb, var(--akzent) 12%, transparent); }
+.kal-eigenwahl { position: relative; }
+.kal-eigenwahl .kal-iconwahl { width: 100%; }
+.kal-iconweg { position: absolute; right: -3px; top: -3px; width: 20px; height: 20px; border-radius: 50%; background: var(--papier); border: 1px solid var(--linie); color: var(--blass); font-size: 13px; line-height: 1; display: grid; place-items: center; }
+.kal-iconweg:hover { background: rgba(176,53,43,.16); color: #b0352b; }
+.kal-malfenster { width: min(340px, 92vw); display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.kal-malpad { width: 100%; aspect-ratio: 1; border-radius: 12px; border: 1px solid var(--linie); background: var(--papier); touch-action: none; cursor: crosshair; }
+.kal-malfuss { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--blass); }
+.kal-malvorschau { display: flex; color: var(--tinte); }
+
+@media (max-width: 760px) {
+  .kal-raster { grid-template-columns: 22px repeat(7, 1fr); gap: 2px; padding: 10px 8px 4px; }
+  .kal-zelle { min-height: 52px; padding: 3px 4px; border-radius: 7px; }
+  .kal-zelle .kal-zahl { font-size: 12px; }
+  .kal-monatname { font-size: 19px; }
+  .kal-tagesblatt { margin: 8px 8px 0; padding: 11px 12px; }
+  .kal-bandname { width: 110px; }
+  .kal-massband { margin-left: 122px; }
+  .kal-kopfrechts .knopf { padding: 5px 9px; font-size: 12.5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kal-buch.klappt-auf { animation: none; }
+  .desk-ding.kalender.hat-heute::after { animation: none; }
+  .kal-zelle, .kal-eintrag, .kal-kerbe, .kalender-bild { transition: none; }
+}

@@ -14,7 +14,7 @@ const roh = (x) => JSON.parse(JSON.stringify(x));
 
 test('saubererSchreibtisch: Vorgaben, Grenzen, nur bekannte Hölzer', async () => {
   const k = await frisch();
-  assert.deepEqual(roh(k.saubererSchreibtisch(undefined)), { holz: 'nuss', lampe: .8, lampeAn: true, kerzen: true, wetterFolgtKlang: true, unordnung: .7, verse: true, uhrTickt: false, wachs: 0, kerzenGewechselt: 0, kleckse: [], federKratzt: false, offenesBuch: true, tageszeit: 'echt', jahreszeit: 'echt', blattId: null });
+  assert.deepEqual(roh(k.saubererSchreibtisch(undefined)), { holz: 'nuss', lampe: .8, lampeAn: true, kerzen: true, wetterFolgtKlang: true, unordnung: .7, verse: true, zitatModus: 'gefunden', uhrTickt: false, wachs: 0, kerzenGewechselt: 0, kleckse: [], federKratzt: false, offenesBuch: true, tageszeit: 'echt', jahreszeit: 'echt', blattId: null });
   const w = roh(k.saubererSchreibtisch({ holz: 'plastik', lampe: 9, kerzen: false, unordnung: -1, verse: 'ja', wachs: 99999, lampeAn: false, uhrTickt: true }));
   assert.equal(w.holz, 'nuss'); assert.equal(w.lampe, 1); assert.equal(w.kerzen, false); assert.equal(w.unordnung, 0); assert.equal(w.verse, true);
   assert.equal(w.wachs, 1200, 'Wachs endet bei zwanzig Stunden'); assert.equal(w.lampeAn, false); assert.equal(w.uhrTickt, true);

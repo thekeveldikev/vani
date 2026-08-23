@@ -136,6 +136,18 @@ async function sucheAppUpdate(neuLaden = false) {
   /* Das Sicherheitsnetz: Absturzfang, Rettungskopie, Wochensicherung */
   try { if (typeof sicherheitStarten === 'function') sicherheitStarten(); } catch (e) {}
 
+  /* Die Scrollleiste am Hauptbereich: lange Seiten in einem Zug */
+  try {
+    if (typeof scrollleiste === 'function') {
+      const raum = $('#raum');
+      if (raum) scrollleiste(raum, {
+        ziel: $('#app'),
+        marken: (b) => scrollMarkenAusUeberschriften(b, 'h1, h2, .kartenkopf, .abschnittstitel'),
+        fahne: scrollFahneText(raum)
+      });
+    }
+  } catch (e) {}
+
   /* Nichts verlieren, auch wenn iOS die App wegwirft */
   const notSicherung = () => { try { spueleAlles(); } catch (e) {} };
   window.addEventListener('pagehide', notSicherung);

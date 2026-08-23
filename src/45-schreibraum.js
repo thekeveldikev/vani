@@ -113,6 +113,11 @@ function oeffneSchreibraum(docId) {
 
   const raum = el('div', { class: 'schreibraum' }, kopf, mitte, leiste);
   document.body.append(raum);
+  /* Die Scrollleiste: in langen Texten die schnellste Art, an eine Stelle zu
+     kommen. Die Fahne zeigt beim Ziehen die Überschrift, nicht nur Prozent. */
+  if (typeof scrollleiste === 'function') {
+    try { scrollleiste(mitte, { ziel: raum, marken: (b) => scrollMarkenAusUeberschriften(b, 'h1, h2, h3'), fahne: scrollFahneText(mitte) }); } catch (x) {}
+  }
   _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, sprint: null, klangKnopf, istRich, richPaket, titelSichern };
 
   wendeSchriftAn();

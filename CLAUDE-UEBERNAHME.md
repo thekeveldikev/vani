@@ -2244,3 +2244,66 @@ fehlschlug - sie standen da und waren nach dem Neustart weg; jetzt zaehlen sie
 als uebersprungen. Und die Synchronisation (`src/31-sync.js`) schreibt Texte,
 Einstellungen und Zaehler ueber `sicherSpeichern`, statt beim ersten Fehler den
 ganzen Abgleich abzubrechen.
+
+## Der Kalender (5.29.0)
+
+`src/61-kalender.js` (Rechenwerk, kein DOM) und `src/61b-kalender-ansicht.js`
+(alles Sichtbare). Auf dem Schreibtisch liegt ein aufgeschlagenes Buch; ein
+Tippen klappt es auf.
+
+**Er rechnet wirklich.** 2000 bis 2050, echte Monatslaengen, echte Schaltjahre
+(`kalSchaltjahr`, auch 2100), Wochentage ueber UTC (nie ueber die lokale Zeit -
+sonst verschiebt die Sommerzeit ganze Tage), Kalenderwochen nach ISO 8601
+(`kalWoche`, geprueft an 2021-01-01 = KW 53). `test/kalender.mjs` prueft die
+Wochentage quer ueber fuenfzig Jahre gegen die eingebaute Datumsrechnung.
+
+**Das Herzstueck ist das Alter.** Wer ein Geburtsdatum hat, wird aelter:
+`kalAlter(geburt, stichtag)` gibt Jahre, Monate und Tage. Der Monatsuebertrag
+laeuft ueber die richtige Monatslaenge - vom 31. Januar aus ist ein Monat
+spaeter der 28./29. Februar, nicht der 3. Maerz. Im Eintragfenster steht
+waehrend des Tippens, wie alt jemand an dem Tag ist.
+
+**`kalWidersprueche()`** meldet, was nicht sein kann: jemand tritt vor der
+eigenen Geburt auf, nach dem eigenen Tod, hat zwei Geburtsdaten, stirbt vor der
+Geburt. Das ist der eigentliche Nutzen eines Kalenders fuer eine Geschichte.
+
+**Frei, nicht verknuepft.** Ein Termin haelt `leute: [{ id, name }]` - `name`
+ist freier Text, `id` bleibt leer, solange nichts verknuepft wurde. Wer einen
+Namen tippt, der zufaellig eine Figur ist, bekommt die Verknuepfung geschenkt;
+noetig ist sie nie. **Das ist Absicht und darf nicht "verbessert" werden:** der
+Kalender gehoert dem Kopf, nicht der Textsammlung.
+
+**Ungenaue Daten sind erlaubt.** `'2026'` heisst irgendwann in dem Jahr,
+`'2026-08'` irgendwann in dem Monat, `'2026-08-23'` an dem Tag. `kalTeile().genau`
+sagt, was gemeint ist; das Alter wird dann als "etwa" ausgegeben.
+
+**Ein Termin ist ein Dokument** (`typ: 'termin'`) und wandert dadurch von selbst
+in Sicherung, Papierkorb und Synchronisation. Selbstgezeichnete Zeichen sind
+Dokumente vom Typ `'kalicon'` mit `striche: [[[x, y], ...]]` in 0..1.
+
+**Geschwindigkeit:** `kalTeile` und `kalZeit` merken sich ihre Ergebnisse
+(Map, bei 6000 Eintraegen geleert), und Geburts-/Todesdaten liegen in einer
+WeakMap an der uebergebenen Liste. Ohne das kostete die Jahresansicht bei 400
+Terminen 104 ms, mit 20 ms. Wer hier etwas aendert, sollte das nachmessen.
+
+## Die Scrollleiste (5.29.0)
+
+`src/33-scrollleiste.js`. `scrollleiste(bereich, { ziel, marken, fahne })` haengt
+rechts einen Griff an einen scrollenden Bereich. Angehaengt ist sie am
+Hauptbereich (`#raum`, Ziel `#app`) und im Schreibraum (`.sr-mitte`, Ziel
+`.schreibraum`). Sie meldet sich selbst ab, sobald ihr Bereich aus dem Bild ist
+- ein zweiter Aufruf am selben Bereich gibt die vorhandene zurueck.
+
+## Zitate auf der Platte (5.29.0)
+
+`src/54d-tischzitate.js`. Vier Weisen ueber `D.einst.schreibtisch.zitatModus`:
+gefunden (aus den eigenen Texten, wie bisher), geritzt (selbst eingegeben,
+bleibt stehen), beides, nichts. Ein geritztes Zitat ist ein Dokument
+(`typ: 'tischzitat'`) mit Platz und Neigung.
+
+Die Verteilung ist zufaellig, aber gemessen: `tischzitatHindernisse(szene)`
+liest die Kaesten aller Dinge auf dem Tisch, `tischzitatPlatz` sucht daraus den
+Platz mit dem groessten Abstand. Und weil Rechnung und Wirklichkeit
+auseinandergehen koennen, prueft `tischzitatRuecken` am Ende **gemessen** nach
+(`tischzitatStoert`) und probiert bis zu vierzehn Plaetze durch. Nur diese
+Pruefung stimmt wirklich - die gerechnete war zweimal zu optimistisch.

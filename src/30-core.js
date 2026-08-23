@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.28.2';
+const APP_VERSION = '5.29.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */

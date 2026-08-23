@@ -741,13 +741,17 @@ RENDER.salon = function (haupt) {
       const setz = (elm, r) => {
         if (!elm) return;
         if (!r) { elm.style.display = 'none'; return; }
-        elm.style.display = ''; elm.style.left = r.x + 'px'; elm.style.top = r.y + 'px';
+        elm.style.display = 'block'; elm.style.left = r.x + 'px'; elm.style.top = r.y + 'px';
         elm.style.right = 'auto'; elm.style.bottom = 'auto'; elm.style.width = r.w + 'px'; elm.style.height = r.h + 'px';
       };
       setz(sessel, f.sessel); setz(kamin, f.kamin);
     };
     requestAnimationFrame(legeFlaechen);
+    /* Die Wand waechst noch, waehrend Schrift und Bilder laden. Ein paar
+       Nachmessungen kosten nichts und ersparen falsch liegende Flaechen. */
+    for (const ms of [120, 400, 1200]) setTimeout(() => { if (galerie.isConnected) legeFlaechen(); }, ms);
     if (typeof ResizeObserver !== 'undefined') { const ro = new ResizeObserver(() => { if (!galerie.isConnected) { ro.disconnect(); return; } legeFlaechen(); }); ro.observe(galerie); }
+    window.addEventListener('resize', legeFlaechen);
   }
   salonBriefeNachsehen();
 };

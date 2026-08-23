@@ -2475,6 +2475,11 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .inhalt, html[data-thema="ker
 .salon-galerie.gemalt { position: relative; overflow: hidden; }
 .salon-malerei { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; border-radius: 22px; }
 .salon-galerie.gemalt > *:not(.salon-malerei) { position: relative; z-index: 1; }
+/* Sessel und Kamin werden per Skript genau auf das gemalte Moebel gelegt. Dafuer
+   muessen sie absolut liegen - die Sammelregel darueber stellt sonst alles auf
+   relative, und die Flaechen landen weit unter dem Bild. */
+.salon-galerie.gemalt > .salon-sessel,
+.salon-galerie.gemalt > .salon-kaminknopf { position: absolute; z-index: 3; }
 .salon-galerie.gemalt .salon-kurz { color: rgba(255,240,215,.82); text-shadow: 0 1px 2px rgba(0,0,0,.4); }
 .salon-galerie.gemalt::before { display: none; }
 /* ----- Diktat ----- */
@@ -2534,7 +2539,7 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .inhalt, html[data-thema="ker
 .salon-sessel:hover::after { opacity: 1; }
 .salon-kaminknopf { position: absolute; z-index: 2; left: calc(50% - 90px); bottom: 8px; width: 180px; height: 110px; background: transparent; border-radius: 8px; cursor: pointer; }
 .salon-kaminknopf:hover { box-shadow: 0 0 0 2px rgba(255,200,120,.3); }
-@media (max-width: 760px) { .salon-sessel { display: none; } .salon-galerie.zimmer { padding-bottom: 130px; } }
+@media (max-width: 760px) { .salon-galerie.zimmer { padding-bottom: 130px; } }
 .salon-konsole { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-top: 14px; }
 .salon-konsole .salon-tageskarte { max-width: none; transform: none; background: var(--karte); color: var(--tinte); box-shadow: 0 1px 5px var(--schein), inset 0 0 0 1px var(--linie); }
 .salon-konsole .st-kopf { display: flex; align-items: center; gap: 8px; }
@@ -2952,6 +2957,361 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
 .sicher-karte.hakt .sicher-karte-icon { background: rgba(176,53,43,.14); color: #b0352b; }
 .sicher-karte.hakt .sicher-karte-text small { color: #b0352b; }
 
+/* ============================================================
+   DIE SCROLLLEISTE (33)
+   Schmal, zurückhaltend, rechts am Rand. Sichtbar, wenn etwas
+   geschieht — sonst fast nicht da.
+   ============================================================ */
+.scrollleiste {
+  position: absolute; right: 3px; top: 8px; bottom: 8px; width: 26px;
+  z-index: 24; display: flex; align-items: stretch; justify-content: center;
+  opacity: 0; transition: opacity .35s ease; pointer-events: none;
+}
+.scrollleiste.sichtbar { opacity: 1; pointer-events: auto; }
+.scrollleiste:hover { opacity: 1; pointer-events: auto; }
+.scrollleiste.unnoetig { display: none; }
+.sl-spur {
+  position: absolute; left: 50%; transform: translateX(-50%); top: 26px; bottom: 26px; width: 20px;
+  border-radius: 12px; cursor: grab; touch-action: none;
+  background: linear-gradient(90deg, transparent 0 6px, var(--linie) 6px 14px, transparent 14px);
+}
+.scrollleiste.zieht .sl-spur { cursor: grabbing; }
+.sl-griff {
+  position: absolute; left: 50%; margin-left: -5px; top: 0; width: 10px; border-radius: 6px;
+  background: color-mix(in srgb, var(--blass) 58%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+  transition: background .2s, width .18s, margin-left .18s;
+}
+.scrollleiste:hover .sl-griff, .scrollleiste.zieht .sl-griff {
+  background: var(--akzent); width: 14px; margin-left: -7px;
+}
+.sl-marken { position: absolute; left: 50%; transform: translateX(-50%); top: 26px; bottom: 26px; width: 20px; pointer-events: none; }
+.sl-marke { position: absolute; left: 3px; width: 6px; height: 2px; border-radius: 1px; background: var(--blass); opacity: .5; }
+.sl-marke.stark { left: 1px; width: 10px; height: 2.5px; opacity: .8; background: var(--akzent); }
+.sl-fahne {
+  position: absolute; right: 30px; transform: translateY(-50%);
+  background: var(--tinte); color: var(--papier); padding: 5px 10px; border-radius: 9px;
+  font-size: 12.5px; white-space: nowrap; max-width: 46vw; overflow: hidden; text-overflow: ellipsis;
+  opacity: 0; transition: opacity .16s; pointer-events: none; box-shadow: 0 6px 18px rgba(0,0,0,.28);
+}
+.scrollleiste.zieht .sl-fahne { opacity: 1; }
+.sl-sprung {
+  position: absolute; left: 50%; transform: translateX(-50%); width: 22px; height: 22px;
+  border-radius: 50%; display: grid; place-items: center; font-size: 13px; line-height: 1;
+  color: var(--blass); background: color-mix(in srgb, var(--papier) 80%, transparent);
+  opacity: 0; transition: opacity .25s, color .2s;
+}
+.sl-sprung.hoch { top: 0; } .sl-sprung.runter { bottom: 0; }
+.scrollleiste.sichtbar .sl-sprung, .scrollleiste:hover .sl-sprung { opacity: .85; }
+.sl-sprung:hover { color: var(--akzent); }
+@media (max-width: 700px) { .scrollleiste { width: 30px; right: 0; } .sl-fahne { right: 34px; } }
+@media (prefers-reduced-motion: reduce) { .scrollleiste, .sl-griff, .sl-fahne, .sl-sprung { transition: none; } }
+
+/* ============================================================
+   ZITATE AUF DER PLATTE (54d)
+   Geritzt heißt: hell an der Oberkante, dunkel darunter — so
+   sieht eine Kerbe im Holz aus.
+   ============================================================ */
+.desk-zitat {
+  /* Eingeritzt heisst: im Holz. Also unter allem, was auf dem Tisch liegt -
+     die Dinge haben z-index 2 und 3, die Leinwand darunter 0. */
+  position: absolute; z-index: 1; max-width: 172px;
+  left: calc(5% + var(--zx, .5) * 82%); top: calc(47% + var(--zy, .5) * 44%);
+  transform: translate(-50%, 0) rotate(var(--zd, -3deg));
+  font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive;
+  font-size: 13px; line-height: 1.35; text-align: left; background: none; padding: 2px 4px;
+}
+.desk-zitat.gefunden { color: rgba(235,220,190,.40); text-shadow: 0 1px 1px rgba(0,0,0,.4); pointer-events: none; }
+.desk-zitat.geritzt {
+  cursor: pointer; color: rgba(38,24,13,.5);
+  /* Die Kerbe: eine helle Kante oben, ein dunkler Schatten darunter. Die
+     Fuellung bleibt dunkel, damit es lesbar bleibt und nicht nur ahnbar. */
+  text-shadow: 0 -1px 0 rgba(255,238,208,.42), 0 1px 0 rgba(0,0,0,.5), 0 2px 4px rgba(0,0,0,.34);
+}
+html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(60,40,22,.5); }
+.desk-zitat.geritzt:hover { text-shadow: 0 -1px 0 rgba(255,240,215,.34), 0 1px 1px rgba(0,0,0,.7), 0 0 14px rgba(255,200,120,.25); }
+.desk-zitat.geritzt:focus-visible { outline: 2px solid var(--akzent); outline-offset: 3px; border-radius: 6px; }
+.desk-zitat .tz-schrift { white-space: pre-wrap; }
+/* Jedes Zeichen steht schon da — es ist nur noch nicht geschnitten. */
+.desk-zitat .tz-z { font-style: normal; display: inline-block; opacity: 0; transform: translateY(-.5px) scaleY(.72); filter: blur(.8px); }
+.desk-zitat .tz-z.geschnitten {
+  animation: tz-schnitt .34s cubic-bezier(.18,.9,.3,1) forwards;
+}
+@keyframes tz-schnitt {
+  0% { opacity: 0; transform: translateY(-.5px) scaleY(.72); filter: blur(.8px); text-shadow: 0 0 5px rgba(255,215,150,.9); }
+  45% { opacity: 1; transform: translateY(.3px) scaleY(1.06); filter: blur(0); text-shadow: 0 -1px 0 rgba(255,240,215,.75), 0 1px 2px rgba(0,0,0,.6), 0 0 8px rgba(255,200,130,.55); }
+  100% { opacity: 1; transform: none; filter: none; text-shadow: 0 -1px 0 rgba(255,238,208,.42), 0 1px 0 rgba(0,0,0,.5), 0 2px 4px rgba(0,0,0,.34); }
+}
+/* Die Klinge: eine schmale, warm glühende Spitze, die mitwandert. */
+.tz-klinge-spitze {
+  position: absolute; left: 0; top: 0; width: 2px; height: 1.05em; border-radius: 1px;
+  background: linear-gradient(180deg, rgba(255,246,224,.95), rgba(255,196,120,.25));
+  box-shadow: 0 0 8px rgba(255,208,150,.8), 0 0 18px rgba(255,170,90,.35);
+  transition: transform .07s linear; pointer-events: none;
+}
+.tz-klinge-spitze::after {
+  content: ""; position: absolute; left: -1px; top: -3px; width: 4px; height: 4px; border-radius: 50%;
+  background: rgba(255,240,210,.9); filter: blur(1.5px);
+}
+.tz-klinge-spitze.geht { animation: tz-klinge-weg .4s ease-out forwards; }
+@keyframes tz-klinge-weg { to { opacity: 0; transform: translate(var(--tx, 0), -9px) scale(.7); } }
+/* Wenn der letzte Buchstabe steht, setzt sich die Kerbe noch einmal. */
+.desk-zitat.setzt { animation: tz-setzen .9s ease-out; }
+@keyframes tz-setzen {
+  0% { filter: drop-shadow(0 0 7px rgba(255,200,120,.5)); }
+  100% { filter: none; }
+}
+/* Späne, dort wo die Klinge ansetzt. */
+.tz-staub {
+  position: absolute; width: 2px; height: 2px; border-radius: 50%;
+  background: rgba(232,212,178,.9); pointer-events: none;
+  animation: tz-span .85s cubic-bezier(.3,.6,.5,1) var(--sd, 0s) forwards;
+}
+@keyframes tz-span {
+  0% { opacity: .95; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--ss, 0), var(--sw, 12px)) scale(.5); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .desk-zitat .tz-z, .desk-zitat .tz-z.geschnitten { opacity: 1; transform: none; filter: none; animation: none; }
+  .tz-klinge-spitze, .tz-staub { display: none; }
+  .desk-zitat.setzt { animation: none; }
+}
+
+.desk-ritzen {
+  position: absolute; z-index: 3; right: 5%; top: calc(46% + 316px); width: 34px; height: 34px;
+  opacity: .34; transition: opacity .25s, transform .25s;
+}
+.desk-ritzen:hover { opacity: 1; transform: rotate(-12deg) scale(1.08); }
+.desk-ritzen .tz-klinge { position: absolute; left: 15px; top: 2px; width: 4px; height: 17px; background: linear-gradient(180deg, #e8e2d6, #9aa0a6); border-radius: 1px 1px 2px 2px; box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.desk-ritzen .tz-griff { position: absolute; left: 13px; top: 17px; width: 8px; height: 15px; background: linear-gradient(180deg, #6d4a2c, #3f2a17); border-radius: 2px 2px 3px 3px; }
+@media (max-width: 760px) { .desk-zitat { max-width: 124px; font-size: 11px; } .desk-ritzen { right: 3%; } }
+@media (prefers-reduced-motion: reduce) { .tz-spur, .desk-zitat.frisch, .tz-staub { animation: none; } }
+
+/* ============================================================
+   DER KALENDER AUF DEM TISCH (61b)
+   ============================================================ */
+.desk-ding.kalender { left: 23%; top: calc(46% + 190px); width: 132px; height: 92px; z-index: 3; }
+.kalender-bild { position: absolute; inset: 0; transform: rotate(-4deg); transition: transform .3s; }
+.kalender-bild .kal-ruecken {
+  position: absolute; inset: 0; border-radius: 5px;
+  background: linear-gradient(160deg, #5b4630, #34281b);
+  box-shadow: 0 7px 14px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,235,200,.14);
+}
+.kalender-bild .kal-blatt {
+  position: absolute; top: 5px; bottom: 5px; width: calc(50% - 8px);
+  background: linear-gradient(178deg, #f4ecd9, #e6dcc2);
+  box-shadow: inset 0 0 12px rgba(120,96,60,.2);
+  display: flex; flex-direction: column; padding: 5px 6px; overflow: hidden;
+}
+.kalender-bild .kal-blatt.links { left: 5px; border-radius: 3px 1px 1px 3px; align-items: center; justify-content: center; }
+.kalender-bild .kal-blatt.rechts { right: 5px; border-radius: 1px 3px 3px 1px; gap: 2px; justify-content: center; }
+.kal-blattmonat { font-size: 8.5px; letter-spacing: .18em; color: #a8552f; font-weight: 700; }
+.kal-blatttag { font-family: Georgia, "Iowan Old Style", serif; font-size: 30px; line-height: 1; color: #3a2c1e; font-weight: 600; }
+.kal-blattwt { font-size: 7.5px; letter-spacing: .1em; color: #7d6a50; }
+.kal-blattzeile { display: flex; align-items: center; gap: 3px; font-size: 7.5px; color: #4a3c2c; line-height: 1.15; }
+.kal-blattzeile i { display: flex; color: var(--artfarbe, #7d6a50); flex: none; }
+.kal-blattzeile em { font-style: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kal-blattleer { font-size: 7.5px; color: #a2917a; font-style: italic; text-align: center; }
+.kalender-bild .kal-spirale {
+  position: absolute; left: 50%; top: 2px; bottom: 2px; width: 8px; margin-left: -4px;
+  background: repeating-linear-gradient(180deg, rgba(200,190,175,.9) 0 3px, transparent 3px 9px);
+  border-radius: 3px;
+}
+.kalender-bild > .kal-band { position: absolute; left: 50%; bottom: -7px; width: 5px; height: 16px; margin-left: 14px; background: linear-gradient(180deg, #a8452f, #7d3020); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 74%, 0 100%); display: block; }
+.desk-ding.kalender:hover .kalender-bild { transform: rotate(-2deg) translateY(-3px) scale(1.03); }
+.desk-ding.kalender.hat-heute .kal-blatttag { color: #a8452f; }
+.desk-ding.kalender.hat-heute::after {
+  content: ""; position: absolute; right: -3px; top: -3px; width: 9px; height: 9px; border-radius: 50%;
+  background: #c4703a; box-shadow: 0 0 10px rgba(196,112,58,.8); animation: kal-pochen 3.4s ease-in-out infinite;
+}
+@keyframes kal-pochen { 0%, 100% { opacity: .55; transform: scale(1) } 50% { opacity: 1; transform: scale(1.25) } }
+@media (max-width: 760px) { .desk-ding.kalender { width: 106px; height: 74px; left: 20%; top: calc(46% + 158px); } .kal-blatttag { font-size: 23px; } }
+
+/* ============================================================
+   DER KALENDER, AUFGEKLAPPT (61b)
+   ============================================================ */
+.kal-buch {
+  width: min(1120px, 96vw); max-height: 92vh; display: flex; flex-direction: column;
+  background: linear-gradient(178deg, var(--papier), color-mix(in srgb, var(--papier) 88%, var(--hg2)));
+  border-radius: 16px; box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 1px var(--linie);
+  overflow: hidden;
+}
+.kal-buch.klappt-auf { animation: kal-aufklappen .52s cubic-bezier(.2,.9,.25,1); transform-origin: 50% 12%; }
+@keyframes kal-aufklappen {
+  0% { opacity: 0; transform: perspective(1400px) rotateX(-58deg) scale(.92); }
+  60% { opacity: 1; transform: perspective(1400px) rotateX(6deg) scale(1.01); }
+  100% { opacity: 1; transform: perspective(1400px) rotateX(0) scale(1); }
+}
+.kal-buehne { overflow-y: auto; overscroll-behavior: contain; padding: 0 0 18px; position: relative; }
+.kal-kopf {
+  position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 8px;
+  padding: 14px 16px 10px; background: color-mix(in srgb, var(--papier) 94%, transparent);
+  backdrop-filter: blur(8px); border-bottom: 1px solid var(--linie);
+}
+.kal-monatname { font-family: Georgia, "Iowan Old Style", serif; font-size: 24px; margin: 0; display: flex; align-items: baseline; gap: 9px; }
+.kal-monatname i { font-style: normal; font-size: 16px; color: var(--blass); font-variant-numeric: tabular-nums; }
+.kal-blaetter { width: 34px; height: 34px; border-radius: 50%; font-size: 21px; line-height: 1; color: var(--blass); display: grid; place-items: center; flex: none; }
+.kal-blaetter:hover { background: var(--hg2); color: var(--tinte); }
+.kal-kopfrechts { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.kal-ansichtknopf { padding: 6px 12px; border-radius: 999px; font-size: 13px; color: var(--blass); border: 1px solid var(--linie); }
+.kal-ansichtknopf.an { background: var(--akzent); color: var(--papier); border-color: transparent; }
+.kal-schliessen { width: 34px; height: 34px; border-radius: 50%; font-size: 22px; line-height: 1; color: var(--blass); display: grid; place-items: center; }
+.kal-schliessen:hover { background: rgba(176,53,43,.12); color: #b0352b; }
+
+.kal-jahrleiste { display: flex; gap: 3px; overflow-x: auto; overscroll-behavior-x: contain; padding: 8px 16px 10px; scroll-behavior: smooth; border-bottom: 1px solid var(--linie); }
+.kal-jahrknopf {
+  flex: none; padding: 4px 9px; border-radius: 8px; font-size: 12.5px; color: var(--blass);
+  font-variant-numeric: tabular-nums; position: relative; transition: background .18s, color .18s;
+}
+.kal-jahrknopf:hover { background: var(--hg2); color: var(--tinte); }
+.kal-jahrknopf.voll::after { content: ""; position: absolute; left: 50%; bottom: 1px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--akzent); opacity: .75; }
+.kal-jahrknopf.an { background: var(--tinte); color: var(--papier); font-weight: 600; }
+.kal-jahrknopf.an.voll::after { background: var(--papier); }
+
+.kal-raster { display: grid; grid-template-columns: 30px repeat(7, 1fr); gap: 4px; padding: 12px 16px 6px; }
+.kal-wochenkopf, .kal-kw-kopf { text-align: center; font-size: 11px; letter-spacing: .09em; color: var(--blass); text-transform: uppercase; padding-bottom: 4px; }
+.kal-kw-kopf, .kal-kw { font-size: 10.5px; color: color-mix(in srgb, var(--blass) 65%, transparent); display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+.kal-zelle {
+  position: relative; min-height: 68px; border-radius: 10px; border: 1px solid var(--linie);
+  background: color-mix(in srgb, var(--papier) 70%, transparent);
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 5px 6px;
+  transition: background .16s, border-color .16s, transform .12s;
+}
+.kal-zelle:hover { background: var(--hg2); transform: translateY(-1px); }
+.kal-zelle.fremd { opacity: .38; }
+.kal-zelle .kal-zahl { font-size: 13.5px; color: var(--tinte); font-variant-numeric: tabular-nums; }
+.kal-zelle.heute { border-color: var(--akzent); box-shadow: inset 0 0 0 1px var(--akzent); }
+.kal-zelle.heute .kal-zahl { color: var(--akzent); font-weight: 700; }
+.kal-zelle.gewaehlt { background: var(--tinte); border-color: var(--tinte); }
+.kal-zelle.gewaehlt .kal-zahl, .kal-zelle.gewaehlt .kal-mehr { color: var(--papier); }
+.kal-marken { display: flex; flex-wrap: wrap; gap: 2px; margin-top: auto; }
+.kal-marke { display: flex; color: var(--artfarbe, var(--blass)); }
+.kal-zelle.gewaehlt .kal-marke { color: color-mix(in srgb, var(--artfarbe, #ffffff) 70%, white); }
+.kal-mehr { font-size: 10px; color: var(--blass); }
+
+.kal-tagesblatt { margin: 10px 16px 0; padding: 14px 16px; border-radius: 14px; background: var(--hg2); border: 1px solid var(--linie); }
+.kal-tageskopf { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.kal-tageskopf h3 { font-family: Georgia, "Iowan Old Style", serif; font-size: 19px; margin: 0 0 2px; }
+.kal-tageskopf small { color: var(--blass); font-size: 12.5px; }
+.kal-tageskopf .knopf { margin-left: auto; }
+.kal-leertag { color: var(--blass); font-size: 13.5px; line-height: 1.55; font-style: italic; padding: 6px 0; }
+.kal-eintrag {
+  display: flex; gap: 11px; width: 100%; text-align: left; padding: 10px 12px; border-radius: 11px;
+  background: var(--papier); border: 1px solid var(--linie); border-left: 3px solid var(--artfarbe, var(--blass));
+  margin-bottom: 7px; transition: transform .12s, box-shadow .16s;
+}
+.kal-eintrag:hover { transform: translateX(2px); box-shadow: 0 4px 14px rgba(0,0,0,.1); }
+.kal-eintragzeichen { color: var(--artfarbe, var(--blass)); display: flex; flex: none; padding-top: 1px; }
+.kal-eintragtext { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.kal-eintragtext b { font-size: 14.5px; }
+.kal-eintragart { font-size: 12px; color: var(--blass); letter-spacing: .02em; }
+.kal-eintragleute { font-size: 12.5px; color: var(--artfarbe, var(--blass)); }
+.kal-eintragalter { font-size: 12.5px; color: var(--tinte); opacity: .78; font-variant-numeric: tabular-nums; }
+.kal-eintragnotiz { font-size: 12.5px; color: var(--blass); line-height: 1.5; margin-top: 2px; white-space: pre-wrap; }
+.kal-abschnitt { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--blass); display: block; margin: 12px 0 6px; }
+.kal-jahrestage { border-top: 1px dashed var(--linie); margin-top: 10px; }
+.kal-jahrestag { display: flex; gap: 9px; align-items: baseline; width: 100%; text-align: left; padding: 6px 8px; border-radius: 8px; font-size: 13px; }
+.kal-jahrestag:hover { background: var(--papier); }
+.kal-jahrestag b { color: var(--akzent); font-size: 12.5px; flex: none; }
+.kal-jahrestag span { color: var(--blass); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.kal-widersprueche { margin: 12px 16px 0; border: 1px solid rgba(176,53,43,.3); border-radius: 12px; background: rgba(176,53,43,.06); padding: 10px 14px; }
+.kal-widersprueche summary { cursor: pointer; font-size: 13.5px; color: #b0352b; }
+.kal-widerspruch { display: flex; gap: 9px; align-items: baseline; font-size: 13px; padding: 6px 0; border-top: 1px solid rgba(176,53,43,.14); }
+.kal-wsym { width: 18px; height: 18px; border-radius: 50%; background: rgba(176,53,43,.16); color: #b0352b; display: grid; place-items: center; font-size: 12px; font-weight: 700; flex: none; }
+.kal-wlink { color: var(--akzent); text-decoration: underline; font-size: 12.5px; flex: none; margin-left: auto; }
+
+.kal-jahresbild { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; padding: 14px 16px; }
+.kal-mini { border: 1px solid var(--linie); border-radius: 12px; padding: 9px 10px; background: color-mix(in srgb, var(--papier) 70%, transparent); }
+.kal-mini.voll { border-color: color-mix(in srgb, var(--akzent) 45%, var(--linie)); }
+.kal-mininame { display: flex; align-items: baseline; gap: 6px; width: 100%; font-family: Georgia, "Iowan Old Style", serif; font-size: 15px; margin-bottom: 6px; }
+.kal-mininame i { font-style: normal; font-size: 11px; color: var(--papier); background: var(--akzent); border-radius: 999px; padding: 1px 6px; margin-left: auto; }
+.kal-minigitter { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
+.kal-minikopf { text-align: center; font-size: 9px; color: var(--blass); padding-bottom: 2px; }
+.kal-minitag { aspect-ratio: 1; border-radius: 4px; font-size: 10px; color: var(--blass); display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+.kal-minitag:hover { background: var(--hg2); color: var(--tinte); }
+.kal-minitag.fremd { opacity: .22; }
+.kal-minitag.voll { background: color-mix(in srgb, var(--akzent) 24%, transparent); color: var(--tinte); font-weight: 600; }
+.kal-minitag.heute { box-shadow: inset 0 0 0 1.5px var(--akzent); color: var(--akzent); }
+
+.kal-leben { padding: 14px 16px; }
+.kal-massband { position: relative; height: 20px; margin: 0 0 10px 190px; border-bottom: 1px solid var(--linie); }
+.kal-massmarke { position: absolute; top: 0; font-size: 10.5px; color: var(--blass); transform: translateX(-50%); font-style: normal; font-variant-numeric: tabular-nums; }
+.kal-band { display: flex; align-items: center; gap: 12px; padding: 5px 0; border-bottom: 1px solid var(--linie); }
+.kal-bandname { width: 178px; flex: none; display: flex; flex-direction: column; }
+.kal-bandname b { font-size: 13.5px; }
+.kal-bandname small { font-size: 11px; color: var(--blass); font-variant-numeric: tabular-nums; }
+.kal-spur { position: relative; flex: 1; height: 30px; }
+.kal-lebenslinie { position: absolute; top: 13px; height: 4px; border-radius: 2px; background: linear-gradient(90deg, color-mix(in srgb, var(--akzent) 60%, transparent), color-mix(in srgb, var(--akzent) 20%, transparent)); }
+.kal-lebenslinie.zuende { background: linear-gradient(90deg, color-mix(in srgb, var(--akzent) 65%, transparent), color-mix(in srgb, var(--blass) 55%, transparent)); }
+.kal-kerbe { position: absolute; top: 4px; width: 18px; height: 22px; margin-left: -9px; display: grid; place-items: center; color: var(--artfarbe, var(--blass)); border-radius: 5px; transition: transform .14s, background .14s; }
+.kal-kerbe:hover { background: var(--hg2); transform: scale(1.25); z-index: 2; }
+.kal-kerbe i { display: flex; }
+
+/* ----- Das Fenster zum Eintragen ----- */
+.kal-fenster { width: min(560px, 94vw); max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.kal-feld { display: flex; flex-direction: column; gap: 5px; }
+.kal-feldname { font-size: 11.5px; letter-spacing: .11em; text-transform: uppercase; color: var(--blass); }
+.kal-feldunter { font-size: 12px; color: var(--blass); line-height: 1.45; }
+.kal-datumreihe { display: flex; gap: 7px; }
+.kal-datumreihe .kal-jahr { width: 92px; }
+.kal-datumreihe select { flex: 1; min-width: 0; }
+.kal-wochentag { font-size: 12.5px; color: var(--akzent); min-height: 17px; margin-top: -4px; }
+.kal-bisreihe { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--blass); }
+.kal-bisreihe input[type="date"] { flex: 1; min-width: 0; }
+.kal-artwahl { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 5px; }
+.kal-artknopf { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 4px; border-radius: 9px; border: 1px solid var(--linie); color: var(--blass); transition: background .15s, color .15s, border-color .15s; }
+.kal-artknopf small { font-size: 10.5px; }
+.kal-artknopf:hover { background: var(--hg2); }
+.kal-artknopf.an { background: color-mix(in srgb, var(--artfarbe) 16%, transparent); border-color: var(--artfarbe); color: var(--artfarbe); }
+.kal-artbild, .kal-iconbild { display: flex; }
+.kal-zeichenknopf { display: flex; align-items: center; gap: 9px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--linie); color: var(--tinte); align-self: flex-start; }
+.kal-zeichenknopf:hover { background: var(--hg2); }
+.kal-zeichenknopf small { color: var(--blass); font-size: 12.5px; }
+.kal-leute { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; min-height: 26px; align-items: center; }
+.kal-person { display: inline-flex; align-items: center; gap: 5px; padding: 3px 5px 3px 10px; border-radius: 999px; background: var(--hg2); font-size: 13px; }
+.kal-person button { width: 18px; height: 18px; border-radius: 50%; color: var(--blass); font-size: 14px; line-height: 1; display: grid; place-items: center; }
+.kal-person button:hover { background: rgba(176,53,43,.16); color: #b0352b; }
+.kal-leerhinweis { font-size: 12.5px; color: var(--blass); font-style: italic; }
+.kal-namenreihe { display: flex; gap: 6px; }
+.kal-namenreihe input { flex: 1; min-width: 0; }
+.kal-alterzeile { display: flex; flex-direction: column; gap: 3px; }
+.kal-alterhinweis { font-size: 12.5px; color: var(--blass); padding: 5px 9px; border-radius: 7px; background: var(--hg2); }
+.kal-alterhinweis.warn { background: rgba(176,53,43,.1); color: #b0352b; }
+.kal-notiz { width: 100%; resize: vertical; }
+.kal-hinweis { font-size: 13px; color: var(--blass); line-height: 1.5; }
+
+.kal-iconfenster { width: min(460px, 94vw); max-height: 88vh; overflow-y: auto; }
+.kal-icongitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 6px; margin: 8px 0; }
+.kal-iconwahl { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 9px 4px; border-radius: 10px; border: 1px solid var(--linie); color: var(--tinte); }
+.kal-iconwahl small { font-size: 10.5px; color: var(--blass); }
+.kal-iconwahl:hover { background: var(--hg2); }
+.kal-iconwahl.an { border-color: var(--akzent); background: color-mix(in srgb, var(--akzent) 12%, transparent); }
+.kal-eigenwahl { position: relative; }
+.kal-eigenwahl .kal-iconwahl { width: 100%; }
+.kal-iconweg { position: absolute; right: -3px; top: -3px; width: 20px; height: 20px; border-radius: 50%; background: var(--papier); border: 1px solid var(--linie); color: var(--blass); font-size: 13px; line-height: 1; display: grid; place-items: center; }
+.kal-iconweg:hover { background: rgba(176,53,43,.16); color: #b0352b; }
+.kal-malfenster { width: min(340px, 92vw); display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.kal-malpad { width: 100%; aspect-ratio: 1; border-radius: 12px; border: 1px solid var(--linie); background: var(--papier); touch-action: none; cursor: crosshair; }
+.kal-malfuss { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--blass); }
+.kal-malvorschau { display: flex; color: var(--tinte); }
+
+@media (max-width: 760px) {
+  .kal-raster { grid-template-columns: 22px repeat(7, 1fr); gap: 2px; padding: 10px 8px 4px; }
+  .kal-zelle { min-height: 52px; padding: 3px 4px; border-radius: 7px; }
+  .kal-zelle .kal-zahl { font-size: 12px; }
+  .kal-monatname { font-size: 19px; }
+  .kal-tagesblatt { margin: 8px 8px 0; padding: 11px 12px; }
+  .kal-bandname { width: 110px; }
+  .kal-massband { margin-left: 122px; }
+  .kal-kopfrechts .knopf { padding: 5px 9px; font-size: 12.5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kal-buch.klappt-auf { animation: none; }
+  .desk-ding.kalender.hat-heute::after { animation: none; }
+  .kal-zelle, .kal-eintrag, .kal-kerbe, .kalender-bild { transition: none; }
+}
+
 </style>
 </head>
 <body>
@@ -2978,7 +3338,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.28.2';
+const APP_VERSION = '5.29.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -4731,6 +5091,164 @@ async function zeigeSicherheit() {
       ...prot.slice(-8).reverse().map((p) => el('div', { class: 'sicher-protokollzeile' }, el('small', {}, fmtDatum(p.wann) + ' ' + fmtZeit(p.wann) + ' · ' + p.art), el('span', {}, p.text))),
       el('button', { class: 'knopf zart', style: 'margin-top:8px', onclick: (ev) => { protokollLoeschen(); ev.currentTarget.closest('details').remove(); toast('Protokoll geleert.'); } }, 'Protokoll leeren')) : null);
   const zu = zeigeDeck(kasten);
+}
+
+/* ===================== 33 — DIE SCROLLLEISTE =====================
+   Lange Seiten sind mit dem Finger eine Wanderung. Rechts am Rand liegt
+   deshalb ein schmaler Griff: anfassen, ziehen, loslassen — und man ist da.
+
+   Sie hält sich zurück. Solange man nichts tut, ist sie fast unsichtbar; wer
+   scrollt, sieht sie kurz; wer sie anfasst, bekommt eine kleine Fahne, die
+   sagt, wo man landet. Marken zeigen, wo etwas ist — Kapitel, Seiten,
+   Abschnitte —, damit das Ziehen nicht blind geschieht.
+
+   Angehängt wird sie an einen Bereich, der scrollt:
+     scrollleiste(bereich, { marken: () => [{ anteil, name }], fahne: (a) => '…' })
+   Sie räumt sich selbst weg, sobald der Bereich aus dem Bild ist. */
+
+function scrollleiste(bereich, optionen = {}) {
+  if (!bereich || typeof ResizeObserver === 'undefined') return null;
+  /* Zweimal an denselben Bereich wäre eine Leiste zu viel. */
+  if (bereich._leiste) return bereich._leiste;
+
+  const griff = el('i', { class: 'sl-griff' });
+  const fahne = el('span', { class: 'sl-fahne' });
+  const spur = el('div', { class: 'sl-spur' }, griff);
+  const markenLage = el('div', { class: 'sl-marken' });
+  const leiste = el('div', { class: 'scrollleiste', 'aria-hidden': 'true' }, markenLage, spur, fahne);
+  const hoch = el('button', { class: 'sl-sprung hoch', title: 'Ganz nach oben', tabindex: '-1' }, '⌃');
+  const runter = el('button', { class: 'sl-sprung runter', title: 'Ganz nach unten', tabindex: '-1' }, '⌄');
+  leiste.append(hoch, runter);
+
+  let zeigen = 0, zieht = false, aus = false;
+  const sichtbar = (dauer = 1300) => {
+    leiste.classList.add('sichtbar');
+    clearTimeout(zeigen);
+    if (!zieht) zeigen = setTimeout(() => leiste.classList.remove('sichtbar'), dauer);
+  };
+
+  const masse = () => {
+    const hoehe = bereich.clientHeight, ganz = bereich.scrollHeight;
+    return { hoehe, ganz, weg: Math.max(0, ganz - hoehe) };
+  };
+  const stellen = () => {
+    const m = masse();
+    /* Passt alles auf einen Blick, braucht es keine Leiste. */
+    const noetig = m.weg > 80;
+    leiste.classList.toggle('unnoetig', !noetig);
+    if (!noetig) return;
+    const spurHoehe = spur.clientHeight;
+    const griffHoehe = Math.max(38, Math.round(spurHoehe * (m.hoehe / m.ganz)));
+    const anteil = m.weg ? bereich.scrollTop / m.weg : 0;
+    griff.style.height = griffHoehe + 'px';
+    griff.style.transform = 'translateY(' + ((spurHoehe - griffHoehe) * anteil).toFixed(1) + 'px)';
+    if (zieht) {
+      fahne.style.top = Math.round((spurHoehe - griffHoehe) * anteil + griffHoehe / 2) + 'px';
+      fahne.textContent = typeof optionen.fahne === 'function' ? (optionen.fahne(anteil, bereich) || Math.round(anteil * 100) + ' %') : Math.round(anteil * 100) + ' %';
+    }
+  };
+
+  /* Marken: kleine Striche an der Spur, dort, wo etwas anfängt. */
+  const markenSetzen = () => {
+    markenLage.innerHTML = '';
+    if (typeof optionen.marken !== 'function') return;
+    let liste = [];
+    try { liste = optionen.marken(bereich) || []; } catch (e) { liste = []; }
+    for (const m of liste.slice(0, 120)) {
+      const a = begrenze(m.anteil, 0, 1, 0);
+      markenLage.append(el('i', { class: 'sl-marke' + (m.stark ? ' stark' : ''), style: 'top:' + (a * 100).toFixed(2) + '%', title: m.name || '' }));
+    }
+  };
+
+  /* Weiches Springen: kein harter Sprung, aber auch kein Gezappel. */
+  const springenZu = (ziel) => {
+    const m = masse();
+    const wohin = begrenze(ziel, 0, m.weg, 0);
+    try { bereich.scrollTo({ top: wohin, behavior: 'smooth' }); }
+    catch (e) { bereich.scrollTop = wohin; }
+  };
+  const ausPunkt = (klientY) => {
+    const r = spur.getBoundingClientRect();
+    const griffHoehe = griff.offsetHeight;
+    const anteil = begrenze((klientY - r.top - griffHoehe / 2) / Math.max(1, r.height - griffHoehe), 0, 1, 0);
+    return anteil * masse().weg;
+  };
+
+  let zeiger = 0;
+  const fassen = (ev) => {
+    if (leiste.classList.contains('unnoetig')) return;
+    ev.preventDefault();
+    zieht = true; zeiger = ev.pointerId;
+    leiste.classList.add('sichtbar', 'zieht');
+    try { spur.setPointerCapture(ev.pointerId); } catch (e) {}
+    bereich.scrollTop = ausPunkt(ev.clientY);
+    stellen();
+  };
+  spur.addEventListener('pointerdown', fassen);
+  spur.addEventListener('pointermove', (ev) => {
+    if (!zieht || ev.pointerId !== zeiger) return;
+    ev.preventDefault();
+    bereich.scrollTop = ausPunkt(ev.clientY);
+    stellen();
+  });
+  const loslassen = (ev) => {
+    if (!zieht || (ev && ev.pointerId !== zeiger)) return;
+    zieht = false;
+    leiste.classList.remove('zieht');
+    sichtbar(900);
+  };
+  spur.addEventListener('pointerup', loslassen);
+  spur.addEventListener('pointercancel', loslassen);
+
+  hoch.addEventListener('click', () => { springenZu(0); sichtbar(); });
+  runter.addEventListener('click', () => { springenZu(masse().weg); sichtbar(); });
+
+  const beiScroll = () => { stellen(); sichtbar(); };
+  bereich.addEventListener('scroll', beiScroll, { passive: true });
+  const ro = new ResizeObserver(() => { stellen(); markenSetzen(); });
+  ro.observe(bereich);
+  /* Wächst der Inhalt (Bilder laden, Listen kommen nach), stimmt die Größe wieder. */
+  const mo = new MutationObserver(() => { stellen(); markenSetzen(); });
+  mo.observe(bereich, { childList: true, subtree: true });
+
+  const abraeumen = () => {
+    if (aus) return;
+    aus = true;
+    bereich.removeEventListener('scroll', beiScroll);
+    ro.disconnect(); mo.disconnect();
+    clearTimeout(zeigen);
+    leiste.remove();
+    delete bereich._leiste;
+  };
+  /* Verschwindet der Bereich, verschwindet die Leiste mit. */
+  const wache = new MutationObserver(() => { if (!bereich.isConnected) { abraeumen(); wache.disconnect(); } });
+  if (bereich.parentNode) wache.observe(bereich.parentNode, { childList: true });
+
+  (optionen.ziel || bereich.parentNode || document.body).append(leiste);
+  bereich._leiste = { element: leiste, stellen, markenSetzen, ab: abraeumen };
+  requestAnimationFrame(() => { stellen(); markenSetzen(); sichtbar(2200); });
+  return bereich._leiste;
+}
+
+/* ----- Marken aus Überschriften: für Hefte und den Schreibraum ----- */
+function scrollMarkenAusUeberschriften(bereich, wahl = 'h1, h2, h3, .sr-seite, .heft-seite') {
+  const ganz = bereich.scrollHeight;
+  if (!ganz) return [];
+  const oben = bereich.getBoundingClientRect().top - bereich.scrollTop;
+  return [...bereich.querySelectorAll(wahl)].slice(0, 120).map((k) => ({
+    anteil: begrenze((k.getBoundingClientRect().top - oben) / ganz, 0, 1, 0),
+    name: (k.textContent || '').trim().slice(0, 60),
+    stark: k.tagName === 'H1' || k.tagName === 'H2'
+  }));
+}
+/* Die Fahne beim Ziehen: im Text lieber die Stelle als eine Zahl. */
+function scrollFahneText(bereich) {
+  return (anteil) => {
+    const marken = scrollMarkenAusUeberschriften(bereich);
+    let letzte = null;
+    for (const m of marken) if (m.anteil <= anteil + .001) letzte = m;
+    return letzte && letzte.name ? letzte.name : Math.round(anteil * 100) + ' %';
+  };
 }
 
 /* ================================================================
@@ -10558,6 +11076,11 @@ function oeffneSchreibraum(docId) {
 
   const raum = el('div', { class: 'schreibraum' }, kopf, mitte, leiste);
   document.body.append(raum);
+  /* Die Scrollleiste: in langen Texten die schnellste Art, an eine Stelle zu
+     kommen. Die Fahne zeigt beim Ziehen die Überschrift, nicht nur Prozent. */
+  if (typeof scrollleiste === 'function') {
+    try { scrollleiste(mitte, { ziel: raum, marken: (b) => scrollMarkenAusUeberschriften(b, 'h1, h2, h3'), fahne: scrollFahneText(mitte) }); } catch (x) {}
+  }
   _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, sprint: null, klangKnopf, istRich, richPaket, titelSichern };
 
   wendeSchriftAn();
@@ -17026,6 +17549,346 @@ function schreibtischMaler(canvas, optionen = {}) {
   };
 }
 
+/* ===================== 54d — ZITATE AUF DER PLATTE =====================
+   In alte Tische ritzen Leute Sätze. Hier auch.
+
+   Drei Weisen, wählbar in „Schreibtisch einrichten":
+     · gefunden — kurze Zeilen aus den eigenen Texten, jeden Tag andere
+     · geritzt  — was man selbst eingeritzt hat, bleibt stehen
+     · beides   — gefundene und geritzte nebeneinander
+     · nichts   — die Platte bleibt leer
+
+   Ein geritztes Zitat ist ein Dokument (typ 'tischzitat') und wandert damit
+   von selbst in Sicherung, Papierkorb und Synchronisation.
+
+   Die Verteilung ist zufällig, aber nicht dumm: aus mehreren Kandidaten wird
+   der genommen, der am weitesten von allen anderen entfernt liegt. So steht
+   nie etwas übereinander, und trotzdem sieht es nie nach Raster aus. */
+
+const TISCHZITAT_MODI = [
+  ['gefunden', 'Gefundene', 'Kurze Zeilen aus deinen eigenen Texten — jeden Tag andere.'],
+  ['geritzt', 'Geritzte', 'Nur, was du selbst eingeritzt hast. Das bleibt stehen.'],
+  ['beides', 'Beides', 'Gefundene und geritzte nebeneinander.'],
+  ['nichts', 'Nichts', 'Die Platte bleibt leer.']
+];
+function tischzitatModus(e) {
+  const m = e && e.zitatModus;
+  if (TISCHZITAT_MODI.some(([id]) => id === m)) return m;
+  /* Wer den alten Schalter „Eigene Zeilen" aus hatte, bleibt ohne. */
+  return e && e.verse === false ? 'nichts' : 'gefunden';
+}
+
+/* ----- Der Platz auf der Platte ----- */
+/* x und y laufen von 0 bis 1 innerhalb des Bereichs, in dem etwas stehen darf.
+   Wo schon etwas liegt, wird nicht geritzt — und was auf dem Tisch liegt,
+   wird gemessen, nicht geraten. */
+/* Ein Satz ist kein Punkt: er ist breit. Ohne Groesse wird der Anker geprueft,
+   mit Groesse die ganze Flaeche - der Anker sitzt mittig oben. */
+function tischzitatFrei(x, y, hindernisse, groesse) {
+  const w = (groesse && groesse.w) || 0, hoch = (groesse && groesse.h) || 0;
+  const x1 = x - w / 2, x2 = x + w / 2, y1 = y, y2 = y + hoch;
+  for (const h of hindernisse || []) {
+    if (x2 > h.x1 && x1 < h.x2 && y2 > h.y1 && y1 < h.y2) return false;
+  }
+  return true;
+}
+function saubererTischplatz(p) {
+  return { x: begrenze(p && p.x, 0, 1, .5), y: begrenze(p && p.y, 0, 1, .5), dreh: begrenze(p && p.dreh, -9, 9, 0) };
+}
+/* Sucht einen Platz, der möglichst weit von allen anderen weg ist und auf
+   nichts drauffällt. Findet sich gar nichts Freies, gilt der beste Kompromiss. */
+function tischzitatPlatz(vorhandene, zufall, hindernisse, groesse) {
+  const rnd = typeof zufall === 'function' ? zufall : Math.random;
+  const andere = (vorhandene || []).map(saubererTischplatz);
+  let bester = null, besteWeite = -1, notfall = null, notWeite = -1;
+  for (let i = 0; i < 200; i++) {
+    const x = rnd(), y = rnd();
+    let naechste = Infinity;
+    for (const a of andere) naechste = Math.min(naechste, Math.hypot(a.x - x, (a.y - y) * .7));
+    /* Auch der Rand zählt: nichts soll ganz außen kleben. */
+    naechste = Math.min(naechste, x + .06, 1 - x + .06, y + .08, 1 - y + .08);
+    if (naechste > notWeite) { notWeite = naechste; notfall = { x, y }; }
+    if (!tischzitatFrei(x, y, hindernisse, groesse)) continue;
+    if (naechste > besteWeite) { besteWeite = naechste; bester = { x, y }; }
+  }
+  if (!bester) bester = notfall || { x: .5, y: .8 };
+  return { x: bester.x, y: bester.y, dreh: Math.round((rnd() * 10 - 5) * 10) / 10 };
+}
+/* Liegt der Satz auf etwas drauf? Gemessen, nicht gerechnet - die einzige
+   Prüfung, die wirklich stimmt, weil sie das nimmt, was zu sehen ist. */
+function tischzitatStoert(element, szene) {
+  const zr = element.getBoundingClientRect();
+  if (!zr.width || !zr.height) return false;
+  const flaeche = zr.width * zr.height;
+  /* Auch die anderen Saetze zaehlen: zwei Kerben uebereinander sind
+     unleserlich - und im Holz gibt es kein Uebereinander. */
+  for (const d of szene.querySelectorAll('.desk-ding, .desk-ding-halter, .desk-korb, .desk-schublade, .desk-zitat, .desk-ritzen')) {
+    if (d === element) continue;
+    const dr = d.getBoundingClientRect();
+    if (!dr.width || !dr.height) continue;
+    const x = Math.max(0, Math.min(zr.right, dr.right) - Math.max(zr.left, dr.left));
+    const y = Math.max(0, Math.min(zr.bottom, dr.bottom) - Math.max(zr.top, dr.top));
+    if (x * y > flaeche * .06) return true;
+  }
+  /* Auch nicht über den Rand der Szene hinaus */
+  const sr = szene.getBoundingClientRect();
+  if (zr.left < sr.left + 4 || zr.right > sr.right - 4 || zr.bottom > sr.bottom - 4) return true;
+  return false;
+}
+/* Probiert Plätze durch, bis einer wirklich frei ist. Höchstens ein Dutzend —
+   danach bleibt der beste Versuch stehen, statt ewig zu suchen. */
+function tischzitatRuecken(element, doc, szene) {
+  if (!szene || !element.isConnected) return false;
+  if (!tischzitatStoert(element, szene)) return false;
+  const andere = tischzitate().filter((d) => d.id !== doc.id);
+  const h = tischzitatHindernisse(szene, element);
+  const g = tischzitatGroesse(element, szene);
+  const setz = (p) => {
+    element.style.setProperty('--zx', p.x.toFixed(3));
+    element.style.setProperty('--zy', p.y.toFixed(3));
+    element.style.setProperty('--zd', p.dreh + 'deg');
+  };
+  const start = saubererTischplatz(doc);
+  const kandidaten = tischzitatKandidaten(h, g, andere.map(saubererTischplatz));
+  /* Nur die besten werden wirklich nachgemessen — messen kostet Layout. */
+  for (const k of kandidaten.slice(0, 24)) {
+    const p = { x: k.x, y: k.y, dreh: start.dreh };
+    setz(p);
+    if (!tischzitatStoert(element, szene)) {
+      Object.assign(doc, p);
+      if (typeof speichereStill === 'function') speichereStill(doc);
+      return true;
+    }
+  }
+  /* Wirklich kein Platz mehr: der Satz bleibt, wo er war, statt zu wandern. */
+  setz(start);
+  return false;
+}
+
+/* Alle Plätze, die frei sind — der Reihe nach, der beste zuerst.
+   Ein Raster statt Würfeln: auf einem vollen Tisch findet Zufall die letzte
+   Lücke oft nicht, ein Raster schon. Rein rechnerisch, ohne DOM. */
+function tischzitatKandidaten(hindernisse, groesse, andere, schritte) {
+  const nx = (schritte && schritte.x) || 30, ny = (schritte && schritte.y) || 22;
+  /* Ist der Tisch wirklich voll, wird der Sicherheitsabstand nachgelassen —
+     lieber eng als übereinander. Erst wenn auch das nichts findet, gibt es
+     nichts zu finden. */
+  for (const nachlass of [0, .015, .03]) {
+    const eng = nachlass ? (hindernisse || []).map((h) => ({ x1: h.x1 + nachlass, x2: h.x2 - nachlass, y1: h.y1 + nachlass, y2: h.y2 - nachlass })) : hindernisse;
+    const gefunden = _tzRaster(eng, groesse, andere, nx, ny);
+    if (gefunden.length) return gefunden;
+  }
+  return [];
+}
+function _tzRaster(hindernisse, groesse, andere, nx, ny) {
+  const raus = [];
+  for (let ix = 0; ix < nx; ix++) {
+    for (let iy = 0; iy < ny; iy++) {
+      const x = (ix + .5) / nx, y = (iy + .5) / ny;
+      if (!tischzitatFrei(x, y, hindernisse, groesse)) continue;
+      let weite = Infinity;
+      for (const a of andere || []) weite = Math.min(weite, Math.hypot(a.x - x, (a.y - y) * .7));
+      weite = Math.min(weite, x + .06, 1 - x + .06, y + .08, 1 - y + .08);
+      raus.push({ x, y, weite });
+    }
+  }
+  /* Der freieste Fleck zuerst — und bei Gleichstand immer dieselbe Reihenfolge,
+     damit ein Tisch nicht bei jedem Betreten anders aussieht. */
+  raus.sort((a, b) => b.weite - a.weite || a.x - b.x || a.y - b.y);
+  return raus;
+}
+
+/* Wie breit und hoch ein Satz auf der Platte ist - in derselben Rechnung. */
+function tischzitatGroesse(element, szene) {
+  if (!element || !szene) return { w: .18, h: .12 };
+  const r = element.getBoundingClientRect(), sr = szene.getBoundingClientRect();
+  if (!r.width || !sr.width) return { w: .18, h: .12 };
+  return { w: (r.width / sr.width) / TZ_BREIT, h: (r.height / sr.height) / TZ_HOCH };
+}
+/* Was auf dem Tisch liegt, in dieselbe 0..1-Rechnung gebracht wie die Zitate.
+   Die Zahlen stammen aus dem CSS: left = 5% + x·82%, top = 47% + y·44%.
+   Beide Achsen sind Anteile der Szene — so gilt die Rechnung auf jedem Gerät. */
+const TZ_LINKS = .05, TZ_BREIT = .82, TZ_OBEN = .47, TZ_HOCH = .44;
+function tischzitatHindernisse(szene, ausser) {
+  if (!szene || !szene.getBoundingClientRect) return [];
+  const sr = szene.getBoundingClientRect();
+  if (!sr.width || !sr.height) return [];
+  const raus = [];
+  for (const d of szene.querySelectorAll('.desk-ding, .desk-ding-halter, .desk-korb, .desk-schublade, .desk-fensterknopf, .desk-zitat')) {
+    if (d === ausser) continue;
+    const r = d.getBoundingClientRect();
+    if (!r.width || !r.height) continue;
+    const x1 = (((r.left - sr.left) / sr.width) - TZ_LINKS) / TZ_BREIT;
+    const x2 = (((r.right - sr.left) / sr.width) - TZ_LINKS) / TZ_BREIT;
+    const y1 = (((r.top - sr.top) / sr.height) - TZ_OBEN) / TZ_HOCH;
+    const y2 = (((r.bottom - sr.top) / sr.height) - TZ_OBEN) / TZ_HOCH;
+    /* Ein schmaler Rand, damit nichts anstößt — aber nicht so viel, dass am
+       Ende gar kein Holz mehr frei ist. */
+    raus.push({ x1: x1 - .022, x2: x2 + .022, y1: y1 - .03, y2: y2 + .03 });
+  }
+  return raus;
+}
+
+function tischzitate() {
+  return [...D.docs.values()].filter((d) => d.typ === 'tischzitat' && !d.geloescht && String(d.text || '').trim())
+    .sort((a, b) => (a.angelegt || 0) - (b.angelegt || 0));
+}
+function tischzitatAnlegen(text, hindernisse) {
+  const sauber = String(text || '').trim().slice(0, 160);
+  if (!sauber) return null;
+  const andere = tischzitate().map(saubererTischplatz);
+  const h = hindernisse || (typeof document !== 'undefined' ? tischzitatHindernisse(document.querySelector('.desk-szene')) : []);
+  const frei = tischzitatKandidaten(h, { w: .2, h: .12 }, andere);
+  const platz = frei.length
+    ? { x: frei[0].x, y: frei[0].y, dreh: Math.round((Math.random() * 10 - 5) * 10) / 10 }
+    : tischzitatPlatz(tischzitate(), null, h, { w: .2, h: .12 });
+  return neuDoc('tischzitat', { text: sauber, x: platz.x, y: platz.y, dreh: platz.dreh });
+}
+
+/* ----- Das Einritzen ----- */
+/* Jedes Zeichen steht von Anfang an da, nur noch nicht geschnitten — so
+   springt nichts im Umbruch. Die Klinge wandert darüber und setzt sie frei,
+   Buchstabe für Buchstabe; wo sie ansetzt, staubt es. Am Schluss setzt sich
+   die Kerbe kurz, dann ist es einfach ein Satz im Holz. */
+const TZ_TAKT = 38;          /* Millisekunden je Zeichen */
+function tischzitatEinritzen(element, text, fertig) {
+  if (!element) return;
+  const zeichen = [...String(text)];
+  const schrift = el('span', { class: 'tz-schrift' });
+  for (let i = 0; i < zeichen.length; i++) {
+    /* Leerzeichen brauchen kein eigenes Zeichen, aber ihren Platz */
+    schrift.append(zeichen[i] === ' '
+      ? document.createTextNode(' ')
+      : el('i', { class: 'tz-z', style: '--i:' + i }, zeichen[i]));
+  }
+  const klinge = el('i', { class: 'tz-klinge-spitze' });
+  element.innerHTML = '';
+  element.append(schrift, klinge);
+  element.classList.add('ritzt');
+
+  const stuecke = [...schrift.querySelectorAll('.tz-z')];
+  if (!stuecke.length) { element.classList.remove('ritzt'); if (fertig) fertig(); return; }
+  /* Sanft losfahren und sanft ankommen: die Klinge zieht nicht stur gleich schnell. */
+  let n = 0;
+  const gehe = () => {
+    if (!element.isConnected) { element.classList.remove('ritzt'); return; }
+    const z = stuecke[n];
+    if (z) {
+      z.classList.add('geschnitten');
+      klinge.style.transform = 'translate(' + (z.offsetLeft + z.offsetWidth) + 'px,' + z.offsetTop + 'px)';
+      if (n % 2 === 0) tischzitatStaub(element, z.offsetLeft + z.offsetWidth, z.offsetTop + z.offsetHeight * .8);
+    }
+    n++;
+    if (n < stuecke.length) {
+      const rest = stuecke.length - n;
+      /* Am Anfang und am Ende ein wenig langsamer — das wirkt wie eine Hand. */
+      const bremse = rest < 4 ? 1.9 : n < 3 ? 1.6 : 1;
+      setTimeout(gehe, TZ_TAKT * bremse + Math.random() * 14);
+    } else {
+      klinge.classList.add('geht');
+      setTimeout(() => klinge.remove(), 420);
+      element.classList.remove('ritzt');
+      element.classList.add('setzt');
+      setTimeout(() => { element.classList.remove('setzt'); if (fertig) fertig(); }, 900);
+    }
+  };
+  requestAnimationFrame(gehe);
+}
+/* Ein paar Späne, dort wo die Klinge gerade ansetzt. */
+function tischzitatStaub(element, x, y) {
+  for (let i = 0; i < 2; i++) {
+    const korn = el('i', {
+      class: 'tz-staub',
+      style: 'left:' + x.toFixed(0) + 'px;top:' + y.toFixed(0) + 'px;' +
+        '--sw:' + (7 + Math.random() * 13).toFixed(0) + 'px;--ss:' + (Math.random() * 8 - 4).toFixed(1) + 'px;' +
+        '--sd:' + (Math.random() * .12).toFixed(2) + 's'
+    });
+    element.append(korn);
+    setTimeout(() => korn.remove(), 1300);
+  }
+}
+
+/* ----- Auf den Tisch legen ----- */
+function tischzitateBauen(dinge, e, neuZeichnen) {
+  const modus = tischzitatModus(e);
+  if (modus === 'nichts') return;
+  const eigene = modus === 'geritzt' || modus === 'beides' ? tischzitate() : [];
+  const gefunden = modus === 'gefunden' || modus === 'beides' ? schreibtischVerse(modus === 'beides' ? 2 : 3) : [];
+
+  /* Was schon auf dem Tisch liegt, wird beim Verteilen ausgespart. Gemessen
+     wird erst, wenn die Szene steht — deshalb hier so früh wie möglich. */
+  const szene = dinge.closest ? dinge.closest('.desk-szene') : null;
+  const hindernisse = tischzitatHindernisse(szene || dinge.parentElement);
+  const belegt = eigene.map(saubererTischplatz);
+  const gelegt = [], frisch = [];
+  for (const doc of eigene) {
+    const p = saubererTischplatz(doc);
+    const knopf = el('button', {
+      class: 'desk-zitat geritzt', style: '--zx:' + p.x.toFixed(3) + ';--zy:' + p.y.toFixed(3) + ';--zd:' + p.dreh + 'deg',
+      title: 'Eingeritzt: „' + doc.text + '“ — tippen für mehr',
+      onclick: () => tischzitatMenue(doc, neuZeichnen)
+    }, el('span', { class: 'tz-schrift' }, doc.text));
+    dinge.append(knopf);
+    /* Was gerade erst entstanden ist, wird vor den Augen eingeritzt */
+    if (doc._frischGeritzt) { delete doc._frischGeritzt; frisch.push([knopf, doc]); }
+    gelegt.push([knopf, doc]);
+  }
+  for (const zeile of gefunden) {
+    const p = tischzitatPlatz(belegt, null, hindernisse, { w: .2, h: .12 });
+    belegt.push(p);
+    dinge.append(el('div', {
+      class: 'desk-zitat gefunden', style: '--zx:' + p.x.toFixed(3) + ';--zy:' + p.y.toFixed(3) + ';--zd:' + p.dreh + 'deg',
+      title: 'Aus deinen Texten'
+    }, el('span', { class: 'tz-schrift' }, zeile)));
+  }
+  /* Erst wenn alle liegen, wird gerückt — nacheinander, damit jeder Satz die
+     schon verschobenen sieht. Sonst weichen zwei einander gleichzeitig aus
+     und landen wieder aufeinander. */
+  requestAnimationFrame(() => {
+    const flaeche = szene || dinge.parentElement;
+    for (const [knopf, doc] of gelegt) tischzitatRuecken(knopf, doc, flaeche);
+    for (const [knopf, doc] of frisch) tischzitatEinritzen(knopf, doc.text);
+  });
+
+  /* Ein kleines Messer am Rand: hier ritzt man ein */
+  if (modus === 'geritzt' || modus === 'beides') {
+    dinge.append(el('button', { class: 'desk-ritzen', title: 'Einen Satz in die Platte ritzen', onclick: () => tischzitatNeu(neuZeichnen) },
+      el('i', { class: 'tz-klinge' }), el('i', { class: 'tz-griff' })));
+  }
+}
+
+async function tischzitatNeu(neuZeichnen) {
+  const t = await eingabe({ titel: 'In die Platte ritzen', platzhalter: 'Ein Satz, der bleiben soll …', ok: 'Einritzen', mehrzeilig: false });
+  if (!t || !t.trim()) return;
+  const doc = tischzitatAnlegen(t);
+  if (!doc) return;
+  doc._frischGeritzt = true;
+  if (neuZeichnen) neuZeichnen();
+}
+
+async function tischzitatMenue(doc, neuZeichnen) {
+  const w = await menue([
+    { text: 'Anders schreiben', icon: 'stift', wert: 'aendern' },
+    { text: 'Woandershin legen', icon: 'wuerfel', wert: 'ruecken' },
+    { text: 'Herausschleifen', icon: 'papierkorb', wert: 'weg' }
+  ], '„' + (doc.text.length > 60 ? doc.text.slice(0, 57) + ' …' : doc.text) + '“');
+  if (w === 'aendern') {
+    const t = await eingabe({ titel: 'Anders schreiben', wert: doc.text, ok: 'Übernehmen' });
+    if (t && t.trim()) { doc.text = t.trim().slice(0, 160); speichere(doc); doc._frischGeritzt = true; if (neuZeichnen) neuZeichnen(); }
+  } else if (w === 'ruecken') {
+    const szene = document.querySelector('.desk-szene');
+    const p = tischzitatPlatz(tischzitate().filter((d) => d.id !== doc.id), null, tischzitatHindernisse(szene), { w: .2, h: .12 });
+    Object.assign(doc, p); speichere(doc);
+    if (neuZeichnen) neuZeichnen();
+    toast('Woandershin.');
+  } else if (w === 'weg') {
+    if (await frage('Diesen Satz aus der Platte schleifen?', { ja: 'Herausschleifen' })) {
+      await loesche(doc.id);
+      if (neuZeichnen) neuZeichnen();
+    }
+  }
+}
+
 /* ================================================================
    VANI — Der Schreibtisch.
 
@@ -17059,6 +17922,7 @@ function saubererSchreibtisch(roh) {
     wetterFolgtKlang: q.wetterFolgtKlang !== false,
     unordnung: begrenze(q.unordnung, 0, 1, .7),
     verse: q.verse !== false,
+    zitatModus: TISCHZITAT_MODI.some(([id]) => id === q.zitatModus) ? q.zitatModus : (q.verse === false ? 'nichts' : 'gefunden'),
     uhrTickt: q.uhrTickt === true,
     wachs: begrenze(q.wachs, 0, LEUCHTER_STUNDEN * 60, 0),         /* verbrannte Minuten */
     kerzenGewechselt: begrenze(q.kerzenGewechselt, 0, 4102444800000, 0),
@@ -17502,7 +18366,7 @@ function schreibtischSignatur() {
   const tag = schreibtischTag();
   const fund = schreibtischFundfoto();
   return JSON.stringify([
-    e.holz, e.kerzen, e.wetterFolgtKlang, e.unordnung, e.verse, e.uhrTickt, e.kerzenGewechselt, e.federKratzt, e.offenesBuch, e.tageszeit, e.jahreszeit,
+    e.holz, e.kerzen, e.wetterFolgtKlang, e.unordnung, e.verse, e.zitatModus, e.uhrTickt, e.kerzenGewechselt, e.federKratzt, e.offenesBuch, e.tageszeit, e.jahreszeit,
     e.wetterFolgtKlang ? schreibtischWetter() : 'still', D.einst.tagesziel, tag.heute, tag.serie,
     buecher.slice(0, 9).map((b) => b.id + ':' + (b.seite || 0) + ':' + (b.bild || '') + ':' + (b.titel || '')),
     schreibtischLetzteTexte(3).map((d) => d.id + ':' + (d.geaendert || 0)),
@@ -17653,8 +18517,11 @@ RENDER.schreibtisch = function (haupt) {
   const letztesHeft = vomTyp('heft').filter((h) => !h.archiv).sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0))[0];
   if (letztesHeft) dinge.append(ding('notizbuch', 'Das Notizbuch mit zu vielen Zetteln: ' + letztesHeft.titel, el('div', { class: 'notizbuch-bild', style: heftDeckelDaten(letztesHeft).style }, el('i', { class: 'zettelchen z1' }), el('i', { class: 'zettelchen z2' }), el('i', { class: 'zettelchen z3' }), el('i', { class: 'gummi' })), () => { location.hash = '#/heft/' + letztesHeft.id; }));
 
-  /* Verse auf der Platte */
-  if (e.verse && e.unordnung > .2) schreibtischVerse(3).forEach((v, i) => dinge.append(el('div', { class: 'desk-vers v' + (i + 1) }, v)));
+  /* Der Kalender: was in den Geschichten geschieht, mit Datum */
+  if (typeof baueTischkalender === 'function') { try { dinge.append(baueTischkalender()); } catch (x) {} }
+
+  /* Zitate auf der Platte: gefundene, geritzte oder beides */
+  if (typeof tischzitateBauen === 'function') { try { tischzitateBauen(dinge, e, () => zeichne()); } catch (x) {} }
 
   /* Papierkorb, Schublade, Einrichten */
   dinge.append(el('button', { class: 'desk-korb', title: 'Der Papierkorb unterm Tisch', onclick: () => papierkorbAmTisch() }, el('i', { class: 'knuell k1' }), el('i', { class: 'knuell k2' }), el('i', { class: 'knuell k3' }), el('i', { class: 'korbrand' })));
@@ -17713,7 +18580,10 @@ function schreibtischEinrichten(danach) {
     zeile('Leuchter', 'Sieben Flammen. Die Kerzen brennen über ' + LEUCHTER_STUNDEN + ' Schreibstunden wirklich herunter (' + Math.round((1 - leuchterStand(e.wachs)) * 100) + ' % übrig).', schalter(() => e.kerzen, (v) => { e.kerzen = v; })),
     zeile('Die Uhr tickt', 'Ein leises Ticken, zur vollen Stunde ein Glockenschlag.', schalter(() => e.uhrTickt, (v) => { e.uhrTickt = v; })),
     zeile('Fenster hört auf den Klang', 'Spielt Regen, regnet es vor dem Fenster; bei Gewitter wetterleuchtet es.', schalter(() => e.wetterFolgtKlang, (v) => { e.wetterFolgtKlang = v; })),
-    zeile('Eigene Zeilen auf der Platte', 'Kurze Sätze aus meinen Funden, wie hingekritzelt.', schalter(() => e.verse, (v) => { e.verse = v; })),
+    el('div', { class: 'einstellgruppe' }, el('b', {}, 'Zitate auf der Platte'),
+      el('div', { style: 'font-size:12.5px;color:var(--blass);margin:-4px 0 8px' }, 'In alte Tische ritzen Leute Sätze. Gefundene kommen aus deinen eigenen Texten und wechseln; geritzte schreibst du selbst und sie bleiben stehen.'),
+      wahlgruppe(TISCHZITAT_MODI.map(([id, name]) => [id, name]), () => tischzitatModus(e), (v) => { e.zitatModus = v; if (v !== 'nichts') e.verse = true; }),
+      el('div', { style: 'font-size:12px;color:var(--blass);margin-top:6px' }, TISCHZITAT_MODI.map(([id, name, was]) => name + ': ' + was).join('  ·  '))),
     zeile('Die Feder kratzt', 'Ein leises Kratzen beim Tippen auf dem eingespannten Blatt.', schalter(() => e.federKratzt, (v) => { e.federKratzt = v; })),
     zeile('Aufgeschlagenes Buch', 'Das zuletzt gelesene Buch liegt offen auf dem Tisch; links und rechts tippen blättert.', schalter(() => e.offenesBuch, (v) => { e.offenesBuch = v; })),
     (e.kleckse && e.kleckse.length) ? zeile('Kleckse', e.kleckse.length + ' Tintenkleckse von der Feder — einer je Sitzung.', el('button', { class: 'knopf zart', onclick: () => { e.kleckse = []; D.einst.schreibtisch = { ...e }; speichereEinst(); toast('Die Platte ist gewischt.'); if (danach) danach(); } }, 'Wegwischen')) : null,
@@ -21868,13 +22738,17 @@ RENDER.salon = function (haupt) {
       const setz = (elm, r) => {
         if (!elm) return;
         if (!r) { elm.style.display = 'none'; return; }
-        elm.style.display = ''; elm.style.left = r.x + 'px'; elm.style.top = r.y + 'px';
+        elm.style.display = 'block'; elm.style.left = r.x + 'px'; elm.style.top = r.y + 'px';
         elm.style.right = 'auto'; elm.style.bottom = 'auto'; elm.style.width = r.w + 'px'; elm.style.height = r.h + 'px';
       };
       setz(sessel, f.sessel); setz(kamin, f.kamin);
     };
     requestAnimationFrame(legeFlaechen);
+    /* Die Wand waechst noch, waehrend Schrift und Bilder laden. Ein paar
+       Nachmessungen kosten nichts und ersparen falsch liegende Flaechen. */
+    for (const ms of [120, 400, 1200]) setTimeout(() => { if (galerie.isConnected) legeFlaechen(); }, ms);
     if (typeof ResizeObserver !== 'undefined') { const ro = new ResizeObserver(() => { if (!galerie.isConnected) { ro.disconnect(); return; } legeFlaechen(); }); ro.observe(galerie); }
+    window.addEventListener('resize', legeFlaechen);
   }
   salonBriefeNachsehen();
 };
@@ -23649,6 +24523,975 @@ function zeigeJahresringe(jahr) {
   male();
 }
 
+/* ===================== 61 — DER KALENDER =====================
+   Auf dem Schreibtisch liegt ein Kalender. Darin steht, was in den
+   Geschichten geschieht — Geburten, Tode, Begegnungen, Verluste, Reisen,
+   Schwüre. Vieles davon steht in keinem Text; es steht im Kopf. Hier
+   bekommt es ein Datum.
+
+   Dieses Modul ist das Rechenwerk und kennt kein DOM. Es rechnet mit
+   echten Daten: richtige Monatslängen, richtige Schaltjahre, richtige
+   Wochentage, echte Kalenderwochen. Der Bereich reicht von 2000 bis 2050.
+
+   Ein Termin ist ein ganz normales Dokument (typ 'termin'). Damit wandert
+   er von selbst in die Sicherung, in den Papierkorb, in die
+   Synchronisation — ohne dass hier irgendetwas dafür getan werden muss.
+
+   Das Besondere: Wer ein Geburtsdatum hat, hat ein Alter. Der Kalender
+   rechnet es für jeden Tag aus, und er merkt, wenn etwas nicht sein kann —
+   wenn jemand vor seiner Geburt auftritt oder nach seinem Tod. */
+
+const KAL_JAHR_VON = 2000;
+const KAL_JAHR_BIS = 2050;
+const KAL_MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+const KAL_MONATE_KURZ = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+const KAL_TAGE = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
+const KAL_TAGE_KURZ = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+
+/* ----- Die Arten. Keine Torten, keine Herzchen: geritzte Zeichen. ----- */
+const KAL_ARTEN = [
+  { id: 'geburt', name: 'Geburt', kurz: 'geboren', icon: 'keim', farbe: '#7d9a6a', beugt: 'wurde geboren' },
+  { id: 'tod', name: 'Tod', kurz: 'gestorben', icon: 'kreuzweg', farbe: '#6b6f78', beugt: 'starb' },
+  { id: 'begegnung', name: 'Begegnung', kurz: 'trafen sich', icon: 'zweiwege', farbe: '#b0762f', beugt: 'begegneten sich' },
+  { id: 'abschied', name: 'Abschied', kurz: 'Abschied', icon: 'wegfort', farbe: '#8a6a86', beugt: 'nahm Abschied' },
+  { id: 'bund', name: 'Bund', kurz: 'Bund', icon: 'ring', farbe: '#a8843c', beugt: 'schloss einen Bund' },
+  { id: 'bruch', name: 'Bruch', kurz: 'Bruch', icon: 'riss', farbe: '#9c4a3c', beugt: 'zerbrach' },
+  { id: 'reise', name: 'Reise', kurz: 'Reise', icon: 'pfad', farbe: '#4f7d86', beugt: 'brach auf' },
+  { id: 'ankunft', name: 'Ankunft', kurz: 'Ankunft', icon: 'schwelle', farbe: '#5d8a6e', beugt: 'kam an' },
+  { id: 'wunde', name: 'Wunde', kurz: 'Wunde', icon: 'naht', farbe: '#8f4f4a', beugt: 'wurde verletzt' },
+  { id: 'fund', name: 'Fund', kurz: 'Fund', icon: 'stein', farbe: '#7a7d4a', beugt: 'fand' },
+  { id: 'verlust', name: 'Verlust', kurz: 'Verlust', icon: 'leer', farbe: '#6a6560', beugt: 'verlor' },
+  { id: 'schwur', name: 'Schwur', kurz: 'Schwur', icon: 'siegel', farbe: '#7b5ea7', beugt: 'schwor' },
+  { id: 'geheimnis', name: 'Geheimnis', kurz: 'Geheimnis', icon: 'schloss', farbe: '#4a5a7d', beugt: 'verschwieg' },
+  { id: 'wende', name: 'Wende', kurz: 'Wende', icon: 'scheide', farbe: '#b06a2f', beugt: 'wendete sich' },
+  { id: 'brief', name: 'Brief', kurz: 'Brief', icon: 'faltung', farbe: '#8a7a5e', beugt: 'schrieb' },
+  { id: 'ereignis', name: 'Ereignis', kurz: 'Ereignis', icon: 'punktkreis', farbe: '#8a7f70', beugt: 'geschah' }
+];
+const KAL_ART_IDS = KAL_ARTEN.map((a) => a.id);
+function kalArt(id) { return KAL_ARTEN.find((a) => a.id === id) || KAL_ARTEN[KAL_ARTEN.length - 1]; }
+
+/* ----- Datum: Zeichenkette 'JJJJ-MM-TT'. Kürzer heißt ungenauer. ----- */
+/* 'JJJJ' = irgendwann in dem Jahr, 'JJJJ-MM' = irgendwann in dem Monat.
+   Schreibende wissen oft das Jahr, aber nicht den Tag. Das darf kein Mangel sein. */
+/* Ein Datum wird oft hundertfach gelesen - im Jahresbild fuer 504 Tage gegen
+   jeden Termin. Deshalb wird jede Zeichenkette nur einmal zerlegt. Das
+   Ergebnis ist eingefroren: es wird ueberall nur gelesen, nie geaendert. */
+const _kalTeileKarte = new Map();
+function kalTeile(s) {
+  const t = String(s == null ? '' : s).trim();
+  if (_kalTeileKarte.has(t)) return _kalTeileKarte.get(t);
+  const fertig = _kalTeileRechnen(t);
+  if (_kalTeileKarte.size > 6000) _kalTeileKarte.clear();
+  _kalTeileKarte.set(t, fertig);
+  return fertig;
+}
+function _kalTeileRechnen(t) {
+  const m = /^(\d{4})(?:-(\d{1,2})(?:-(\d{1,2}))?)?$/.exec(t);
+  if (!m) return null;
+  const jahr = Number(m[1]);
+  const monat = m[2] === undefined ? null : Number(m[2]);
+  const tag = m[3] === undefined ? null : Number(m[3]);
+  if (jahr < KAL_JAHR_VON || jahr > KAL_JAHR_BIS) return null;
+  if (monat !== null && (monat < 1 || monat > 12)) return null;
+  if (tag !== null && (tag < 1 || tag > kalMonatstage(jahr, monat))) return null;
+  return Object.freeze({ jahr, monat, tag, genau: tag !== null ? 'tag' : monat !== null ? 'monat' : 'jahr' });
+}
+function kalGueltig(s) { return kalTeile(s) !== null; }
+/* Immer dieselbe Form, damit Vergleiche und Sortierung stimmen. */
+function kalDatum(jahr, monat, tag) {
+  const j = Math.round(Number(jahr));
+  if (!Number.isFinite(j) || j < KAL_JAHR_VON || j > KAL_JAHR_BIS) return '';
+  if (monat == null) return String(j);
+  const m = Math.round(Number(monat));
+  if (!Number.isFinite(m) || m < 1 || m > 12) return '';
+  if (tag == null) return j + '-' + String(m).padStart(2, '0');
+  const t = Math.round(Number(tag));
+  if (!Number.isFinite(t) || t < 1 || t > kalMonatstage(j, m)) return '';
+  return j + '-' + String(m).padStart(2, '0') + '-' + String(t).padStart(2, '0');
+}
+function kalSchaltjahr(jahr) { return (jahr % 4 === 0 && jahr % 100 !== 0) || jahr % 400 === 0; }
+function kalMonatstage(jahr, monat) {
+  if (monat == null) return 31;
+  return [31, kalSchaltjahr(jahr) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][monat - 1] || 31;
+}
+/* Immer über UTC rechnen — sonst verschiebt die Sommerzeit ganze Tage. */
+const _kalZeitKarte = new Map();
+function kalZeit(s) {
+  const k = String(s == null ? '' : s);
+  if (_kalZeitKarte.has(k)) return _kalZeitKarte.get(k);
+  const t = kalTeile(k);
+  const z = t ? Date.UTC(t.jahr, (t.monat || 1) - 1, t.tag || 1) : NaN;
+  if (_kalZeitKarte.size > 6000) _kalZeitKarte.clear();
+  _kalZeitKarte.set(k, z);
+  return z;
+}
+/* Montag = 0. So liest sich die Woche wie ein deutscher Kalender. */
+function kalWochentag(s) {
+  const z = kalZeit(s);
+  if (!Number.isFinite(z)) return -1;
+  return (new Date(z).getUTCDay() + 6) % 7;
+}
+/* Kalenderwoche nach ISO 8601: die Woche mit dem ersten Donnerstag zählt als erste. */
+function kalWoche(s) {
+  const t = kalTeile(s);
+  if (!t || t.genau !== 'tag') return 0;
+  const d = new Date(Date.UTC(t.jahr, t.monat - 1, t.tag));
+  d.setUTCDate(d.getUTCDate() + 3 - ((d.getUTCDay() + 6) % 7));
+  const ersterDo = new Date(Date.UTC(d.getUTCFullYear(), 0, 4));
+  ersterDo.setUTCDate(ersterDo.getUTCDate() + 3 - ((ersterDo.getUTCDay() + 6) % 7));
+  return 1 + Math.round((d - ersterDo) / 604800000);
+}
+function kalHeute(jetzt = Date.now()) {
+  const d = new Date(jetzt);
+  return kalDatum(Math.min(KAL_JAHR_BIS, Math.max(KAL_JAHR_VON, d.getFullYear())), d.getMonth() + 1, d.getDate());
+}
+function kalJahreszeit(s) {
+  const t = kalTeile(s); if (!t || t.monat == null) return '';
+  const m = t.monat, tag = t.tag || 15;
+  if ((m === 3 && tag >= 20) || m === 4 || m === 5 || (m === 6 && tag < 21)) return 'Frühling';
+  if ((m === 6 && tag >= 21) || m === 7 || m === 8 || (m === 9 && tag < 23)) return 'Sommer';
+  if ((m === 9 && tag >= 23) || m === 10 || m === 11 || (m === 12 && tag < 21)) return 'Herbst';
+  return 'Winter';
+}
+
+/* ----- Alter. Das Herzstück: wer geboren ist, wird älter. ----- */
+/* Gibt Jahre, Monate und Tage zurück — oder null, wenn eines der beiden
+   Daten fehlt oder der Stichtag vor der Geburt liegt. */
+function kalAlter(geburt, stichtag) {
+  const g = kalTeile(geburt), s = kalTeile(stichtag);
+  if (!g || !s) return null;
+  const gm = g.monat || 1, gt = g.tag || 1, sm = s.monat || 1, st = s.tag || 1;
+  if (kalZeit(kalDatum(s.jahr, sm, st)) < kalZeit(kalDatum(g.jahr, gm, gt))) return null;
+  let jahre = s.jahr - g.jahr, monate = sm - gm, tage = st - gt;
+  if (tage < 0) {
+    /* Ein Monat zurueck. Der Stichtag im Vormonat ist der Geburtstag, aber
+       hoechstens der letzte Tag dieses Monats: vom 31. Januar aus ist ein
+       Monat spaeter der 28. oder 29. Februar, nicht der 3. Maerz. */
+    monate -= 1;
+    const vm = sm === 1 ? 12 : sm - 1, vj = sm === 1 ? s.jahr - 1 : s.jahr;
+    const laenge = kalMonatstage(vj, vm);
+    tage = st + (laenge - Math.min(gt, laenge));
+  }
+  if (monate < 0) { jahre -= 1; monate += 12; }
+  /* Ist eines der Daten nur aufs Jahr genau, ist auch das Alter nur ungefähr. */
+  const genau = g.genau === 'tag' && s.genau === 'tag';
+  return { jahre, monate, tage, genau };
+}
+function kalAlterText(a) {
+  if (!a) return '';
+  const un = a.genau ? '' : 'etwa ';
+  if (a.jahre >= 2) return un + a.jahre + ' Jahre';
+  if (a.jahre === 1) return un + (a.monate ? 'ein Jahr und ' + a.monate + (a.monate === 1 ? ' Monat' : ' Monate') : 'ein Jahr');
+  if (a.monate >= 1) return un + a.monate + (a.monate === 1 ? ' Monat' : ' Monate');
+  return un + (a.tage === 1 ? 'einen Tag' : a.tage + ' Tage') + ' alt';
+}
+
+/* ----- Termine als Dokumente ----- */
+function saubererTermin(t) {
+  if (!t || typeof t !== 'object') return null;
+  const wann = kalDatum(...(() => { const p = kalTeile(t.wann); return p ? [p.jahr, p.monat, p.tag] : [null]; })());
+  if (!wann) return null;
+  const bisTeile = kalTeile(t.bis);
+  const bis = bisTeile && kalZeit(t.bis) >= kalZeit(wann) ? kalDatum(bisTeile.jahr, bisTeile.monat, bisTeile.tag) : '';
+  const art = KAL_ART_IDS.includes(t.art) ? t.art : 'ereignis';
+  const leute = Array.isArray(t.leute) ? t.leute.slice(0, 40).map((p) => {
+    if (typeof p === 'string') return { id: '', name: String(p).slice(0, 120) };
+    if (!p || typeof p !== 'object') return null;
+    const name = String(p.name || '').slice(0, 120);
+    if (!name) return null;
+    return { id: String(p.id || '').slice(0, 200), name };
+  }).filter(Boolean) : [];
+  return {
+    wann, bis, art,
+    titel: String(t.titel || '').slice(0, 200),
+    notiz: String(t.notiz || '').slice(0, 4000),
+    ort: String(t.ort || '').slice(0, 200),
+    leute,
+    icon: /^[a-z0-9_:-]{1,60}$/i.test(String(t.icon || '')) ? String(t.icon) : '',
+    farbe: /^#[0-9a-f]{6}$/i.test(String(t.farbe || '')) ? String(t.farbe) : '',
+    jaehrlich: t.jaehrlich === true,
+    projekt: String(t.projekt || '').slice(0, 200),
+    quelle: String(t.quelle || '').slice(0, 200)
+  };
+}
+function kalTermine() {
+  return [...D.docs.values()].filter((d) => d.typ === 'termin' && !d.geloescht && kalGueltig(d.wann));
+}
+/* Sortiert wie ein Kalender: nach Zeit, bei gleichem Tag die Geburt zuerst. */
+function kalSortiert(liste) {
+  const rang = (t) => (t.art === 'geburt' ? 0 : t.art === 'tod' ? 2 : 1);
+  return [...liste].sort((a, b) => kalZeit(a.wann) - kalZeit(b.wann) || rang(a) - rang(b) || String(a.titel || '').localeCompare(String(b.titel || ''), 'de'));
+}
+
+/* Welche Termine fallen auf einen Tag? Zählt Zeiträume und jährliche mit. */
+function kalAmTag(datum, liste) {
+  const t = kalTeile(datum);
+  if (!t || t.genau !== 'tag') return [];
+  const z = kalZeit(datum);
+  return kalSortiert((liste || kalTermine()).filter((e) => {
+    const a = kalTeile(e.wann); if (!a) return false;
+    /* Ungenaue Termine hängen an ihrem ersten Tag — sonst wären sie nirgends zu sehen. */
+    if (a.genau !== 'tag') return a.jahr === t.jahr && (a.monat == null ? t.monat === 1 && t.tag === 1 : a.monat === t.monat && t.tag === 1);
+    if (e.jaehrlich || e.art === 'geburt') {
+      /* Wiederkehr: gleicher Tag, gleicher Monat, ab dem Jahr des Termins.
+         Der 29. Februar fällt in Nicht-Schaltjahren auf den 28. */
+      if (t.jahr < a.jahr) return false;
+      if (a.monat === 2 && a.tag === 29 && !kalSchaltjahr(t.jahr)) return t.monat === 2 && t.tag === 28;
+      if (!(a.monat === t.monat && a.tag === t.tag)) return false;
+      /* Nach dem Tod wird kein Geburtstag mehr gefeiert — der Todestag zählt dann. */
+      if (e.art === 'geburt' && t.jahr > a.jahr) { const tod = kalTodVon(e.leute, liste); if (tod && kalZeit(datum) > kalZeit(tod)) return false; }
+      return true;
+    }
+    if (e.bis) return z >= kalZeit(e.wann) && z <= kalZeit(e.bis);
+    return kalZeit(e.wann) === z;
+  }));
+}
+/* Wie viele Termine je Tag eines Monats — für die Punkte im Raster. */
+function kalMonatsZaehlung(jahr, monat, liste) {
+  const alle = liste || kalTermine();
+  const raus = {};
+  for (let tag = 1; tag <= kalMonatstage(jahr, monat); tag++) {
+    const d = kalDatum(jahr, monat, tag);
+    const t = kalAmTag(d, alle);
+    if (t.length) raus[tag] = t;
+  }
+  return raus;
+}
+
+/* ----- Das Raster eines Monats: sechs Wochen, Montag bis Sonntag ----- */
+function kalRaster(jahr, monat) {
+  const ersterWt = kalWochentag(kalDatum(jahr, monat, 1));
+  const tage = kalMonatstage(jahr, monat);
+  const vorMonat = monat === 1 ? 12 : monat - 1, vorJahr = monat === 1 ? jahr - 1 : jahr;
+  const vorTage = kalMonatstage(vorJahr, vorMonat);
+  const zellen = [];
+  for (let i = 0; i < ersterWt; i++) {
+    const tag = vorTage - ersterWt + 1 + i;
+    zellen.push({ jahr: vorJahr, monat: vorMonat, tag, datum: kalDatum(vorJahr, vorMonat, tag), fremd: true });
+  }
+  for (let tag = 1; tag <= tage; tag++) zellen.push({ jahr, monat, tag, datum: kalDatum(jahr, monat, tag), fremd: false });
+  let n = 1;
+  while (zellen.length % 7 !== 0 || zellen.length < 42) {
+    const nMonat = monat === 12 ? 1 : monat + 1, nJahr = monat === 12 ? jahr + 1 : jahr;
+    zellen.push({ jahr: nJahr, monat: nMonat, tag: n, datum: kalDatum(nJahr, nMonat, n), fremd: true });
+    n++;
+    if (zellen.length >= 42) break;
+  }
+  const wochen = [];
+  for (let i = 0; i < zellen.length; i += 7) {
+    const reihe = zellen.slice(i, i + 7);
+    wochen.push({ kw: kalWoche(reihe[0].datum), tage: reihe });
+  }
+  return wochen;
+}
+
+/* ----- Leben: wer wann geboren wurde und wann gestorben ist ----- */
+/* Ein Mensch ist hier ein Name. Gibt es dazu ein Figurendokument, umso besser —
+   nötig ist es nicht. Wer nur einen Namen im Kopf hat, soll ihn eintragen dürfen. */
+function kalPersonSchluessel(p) {
+  if (!p) return '';
+  if (typeof p === 'string') return p.trim().toLowerCase();
+  return (p.id || String(p.name || '').trim().toLowerCase());
+}
+function kalGeburtVon(leute, liste) { return kalLebensdatum(leute, 'geburt', liste); }
+function kalTodVon(leute, liste) { return kalLebensdatum(leute, 'tod', liste); }
+/* Nachschlagen statt durchsuchen. Ohne diese Karte kostet die Jahresansicht
+   bei vielen Terminen quadratisch viel Zeit: für jeden der 504 Tage würde
+   für jede Geburt die ganze Liste nach dem Todestag durchgegangen. Die Karte
+   hängt an der übergebenen Liste — neue Liste, neue Karte. */
+const _kalLebenKarten = new WeakMap();
+function kalLebenKarte(liste, art) {
+  let paar = _kalLebenKarten.get(liste);
+  if (!paar) { paar = {}; _kalLebenKarten.set(liste, paar); }
+  if (paar[art]) return paar[art];
+  const karte = new Map();
+  for (const e of kalSortiert(liste.filter((x) => x.art === art))) {
+    for (const p of e.leute || []) {
+      const k = kalPersonSchluessel(p);
+      if (k && !karte.has(k)) karte.set(k, e.wann);
+    }
+  }
+  paar[art] = karte;
+  return karte;
+}
+function kalLebensdatum(leute, art, liste) {
+  const alle = liste || kalTermine();
+  const karte = kalLebenKarte(alle, art);
+  if (!karte.size) return '';
+  for (const p of (Array.isArray(leute) ? leute : [leute])) {
+    const k = kalPersonSchluessel(p);
+    if (k && karte.has(k)) return karte.get(k);
+  }
+  return '';
+}
+/* Alle Menschen, die im Kalender vorkommen — mit Leben, Alter und Terminen. */
+function kalLeute(liste) {
+  const alle = liste || kalTermine();
+  const karte = new Map();
+  for (const e of kalSortiert(alle)) {
+    for (const p of e.leute || []) {
+      const k = kalPersonSchluessel(p); if (!k) continue;
+      if (!karte.has(k)) karte.set(k, { schluessel: k, id: p.id || '', name: p.name, geburt: '', tod: '', termine: [] });
+      const m = karte.get(k);
+      if (p.id && !m.id) m.id = p.id;
+      m.termine.push(e);
+      if (e.art === 'geburt' && !m.geburt) m.geburt = e.wann;
+      if (e.art === 'tod' && !m.tod) m.tod = e.wann;
+    }
+  }
+  return [...karte.values()].sort((a, b) => a.name.localeCompare(b.name, 'de'));
+}
+/* Wie alt wurde jemand? Nur wenn beides bekannt ist. */
+function kalLebensalter(person) {
+  if (!person || !person.geburt || !person.tod) return null;
+  return kalAlter(person.geburt, person.tod);
+}
+
+/* ----- Widersprüche: der eigentliche Nutzen eines Kalenders ----- */
+/* Sagt, was nicht sein kann — jemand tritt vor seiner Geburt auf oder nach
+   seinem Tod. Findet außerdem doppelte Geburts- und Todesdaten. */
+function kalWidersprueche(liste) {
+  const alle = liste || kalTermine();
+  const leute = kalLeute(alle);
+  const raus = [];
+  for (const p of leute) {
+    if (p.geburt && p.tod && kalZeit(p.tod) < kalZeit(p.geburt)) {
+      raus.push({ art: 'reihenfolge', person: p.name, text: p.name + ' stirbt vor der eigenen Geburt.' });
+    }
+    const geburten = p.termine.filter((e) => e.art === 'geburt');
+    if (geburten.length > 1) raus.push({ art: 'doppelt', person: p.name, text: p.name + ' hat ' + geburten.length + ' Geburtsdaten.' });
+    const tode = p.termine.filter((e) => e.art === 'tod');
+    if (tode.length > 1) raus.push({ art: 'doppelt', person: p.name, text: p.name + ' hat ' + tode.length + ' Todesdaten.' });
+    for (const e of p.termine) {
+      if (e.art === 'geburt' || e.art === 'tod') continue;
+      if (p.geburt && kalZeit(e.wann) < kalZeit(p.geburt)) {
+        raus.push({ art: 'vorGeburt', person: p.name, termin: e, text: p.name + ' kommt am ' + kalLesbar(e.wann) + ' vor — geboren aber erst ' + kalLesbar(p.geburt) + '.' });
+      }
+      if (p.tod && kalZeit(e.wann) > kalZeit(p.tod)) {
+        raus.push({ art: 'nachTod', person: p.name, termin: e, text: p.name + ' kommt am ' + kalLesbar(e.wann) + ' vor — gestorben aber schon ' + kalLesbar(p.tod) + '.' });
+      }
+    }
+  }
+  return raus;
+}
+
+/* ----- Lesbares ----- */
+function kalLesbar(s, lang) {
+  const t = kalTeile(s);
+  if (!t) return '';
+  if (t.genau === 'jahr') return String(t.jahr);
+  if (t.genau === 'monat') return KAL_MONATE[t.monat - 1] + ' ' + t.jahr;
+  const wt = lang ? KAL_TAGE[kalWochentag(s)] + ', ' : '';
+  return wt + t.tag + '. ' + KAL_MONATE[t.monat - 1] + ' ' + t.jahr;
+}
+function kalKurz(s) {
+  const t = kalTeile(s);
+  if (!t) return '';
+  if (t.genau === 'jahr') return String(t.jahr);
+  if (t.genau === 'monat') return KAL_MONATE_KURZ[t.monat - 1] + ' ' + t.jahr;
+  return t.tag + '. ' + KAL_MONATE_KURZ[t.monat - 1] + ' ' + t.jahr;
+}
+/* Ein Satz über einen Termin, wie ihn ein Chronist schreiben würde. */
+function kalSatz(termin, liste) {
+  if (!termin) return '';
+  const art = kalArt(termin.art);
+  const namen = (termin.leute || []).map((p) => p.name);
+  const wer = namen.length === 0 ? '' : namen.length === 1 ? namen[0] : namen.slice(0, -1).join(', ') + ' und ' + namen[namen.length - 1];
+  const wann = kalLesbar(termin.wann, kalTeile(termin.wann) && kalTeile(termin.wann).genau === 'tag');
+  const kopf = termin.titel || (wer ? wer + ' — ' + art.name : art.name);
+  const teile = [kopf, wann];
+  if (termin.ort) teile.push('in ' + termin.ort);
+  /* Wer an diesem Tag wie alt war — das ist die Frage, die man später stellt. */
+  const alter = [];
+  for (const p of termin.leute || []) {
+    if (termin.art === 'geburt') continue;
+    const g = kalGeburtVon([p], liste);
+    if (!g) continue;
+    const a = kalAlter(g, termin.wann);
+    if (a) alter.push(p.name + ': ' + kalAlterText(a));
+  }
+  if (alter.length) teile.push(alter.join(', '));
+  return teile.join(' · ');
+}
+
+/* ----- Jahrestage: was heute vor Jahren geschah ----- */
+function kalJahrestage(datum, liste) {
+  const t = kalTeile(datum);
+  if (!t || t.genau !== 'tag') return [];
+  const raus = [];
+  for (const e of kalSortiert(liste || kalTermine())) {
+    const a = kalTeile(e.wann);
+    if (!a || a.genau !== 'tag') continue;
+    if (a.monat !== t.monat || a.tag !== t.tag) continue;
+    const her = t.jahr - a.jahr;
+    if (her <= 0) continue;
+    raus.push({ termin: e, jahre: her });
+  }
+  return raus;
+}
+
+/* ----- Was in einem Jahr geschieht: für die Jahresübersicht ----- */
+function kalJahresZaehlung(jahr, liste) {
+  const alle = liste || kalTermine();
+  const raus = Array.from({ length: 12 }, () => 0);
+  for (const e of alle) {
+    const a = kalTeile(e.wann);
+    if (!a) continue;
+    if (e.jaehrlich || e.art === 'geburt') { if (jahr >= a.jahr && a.monat) raus[a.monat - 1]++; continue; }
+    if (a.jahr === jahr && a.monat) raus[a.monat - 1]++;
+    else if (a.jahr === jahr && !a.monat) raus[0]++;
+    if (e.bis) { const b = kalTeile(e.bis); if (b && a.jahr !== b.jahr && jahr > a.jahr && jahr <= b.jahr) raus[0]++; }
+  }
+  return raus;
+}
+/* Die Jahre, in denen überhaupt etwas steht — damit die Leiste weiß, wo es lohnt. */
+function kalJahreMitInhalt(liste) {
+  const raus = new Set();
+  for (const e of liste || kalTermine()) {
+    const a = kalTeile(e.wann); if (!a) continue;
+    const b = e.bis ? kalTeile(e.bis) : null;
+    for (let j = a.jahr; j <= (b ? b.jahr : a.jahr); j++) raus.add(j);
+  }
+  return [...raus].sort((a, b) => a - b);
+}
+
+/* ===================== 61b — DER KALENDER, SICHTBAR =====================
+   Das Buch liegt aufgeschlagen auf dem Tisch. Ein Tippen, und es klappt auf:
+   ein Monat, ein Tag, ein Leben.
+
+   Zu den Zeichen: keine Torten, keine Herzchen. Für Geburt und Tod nimmt der
+   Kalender, was in deutschen Familienbüchern seit jeher steht — den Stern und
+   das Kreuzzeichen, * und †. Alles andere sind geritzte Linien: ein Weg, der
+   sich gabelt; eine Naht; ein Siegel. Zeichen, keine Bildchen.
+
+   Und wer ein eigenes will, zeichnet es selbst. */
+
+/* ----- Die geritzten Zeichen. 24×24, nur Linien. ----- */
+const KAL_ICONS = {
+  /* Geburt: der Stern der Familienbücher */
+  keim: '<path d="M12 4v16M5 7.5l14 9M19 7.5l-14 9"/>',
+  /* Tod: das Kreuzzeichen der Familienbücher — schmal, aufrecht */
+  kreuzweg: '<path d="M12 3v18M7.5 8h9"/>',
+  /* Begegnung: zwei Wege laufen zusammen */
+  zweiwege: '<path d="M4 4c3 5 5 7 8 8 3-1 5-3 8-8M12 12v8"/>',
+  /* Abschied: einer wird zu zweien */
+  wegfort: '<path d="M12 4v8M12 12c-3 1-5 3-8 8M12 12c3 1 5 3 8 8"/>',
+  /* Bund: zwei Ringe, ineinander */
+  ring: '<circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/>',
+  /* Bruch: eine Linie, die reißt */
+  riss: '<path d="M3 12h6l2-4 2 8 2-4h6"/>',
+  /* Reise: ein Pfad, gestrichelt */
+  pfad: '<path d="M3 18c4 0 4-6 8-6s4 6 8 6" stroke-dasharray="3 3"/><path d="M17 15l3 3-3 3"/>',
+  /* Ankunft: eine Schwelle, über die jemand tritt */
+  schwelle: '<path d="M4 20h16M8 20V8h8v12M3 12h5"/>',
+  /* Wunde: eine genähte Naht */
+  naht: '<path d="M3 12h18M7 9v6M11 9v6M15 9v6"/>',
+  /* Fund: ein Stein in der Hand */
+  stein: '<path d="M6 15c0-4 3-7 6-7s6 3 6 7-3 5-6 5-6-1-6-5z"/><path d="M9 13c1-1 2-1.5 3-1.5"/>',
+  /* Verlust: die Stelle, wo etwas war */
+  leer: '<circle cx="12" cy="12" r="7" stroke-dasharray="2.5 3.5"/>',
+  /* Schwur: ein Siegel */
+  siegel: '<circle cx="12" cy="12" r="7"/><path d="M9 12l2 2 4-4"/>',
+  /* Geheimnis: ein Schlüsselloch */
+  schloss: '<circle cx="12" cy="10" r="3"/><path d="M10.5 12.5L9.5 18h5l-1-5.5"/>',
+  /* Wende: der Weg knickt ab */
+  scheide: '<path d="M4 20V9a4 4 0 014-4h9"/><path d="M14 2l4 3-4 3"/>',
+  /* Brief: ein gefaltetes Blatt */
+  faltung: '<path d="M4 6h16v12H4z"/><path d="M4 6l8 6 8-6"/>',
+  /* Ereignis: ein Punkt, der zählt */
+  punktkreis: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>'
+};
+/* Ein Zeichen als SVG. Eigene Zeichen ('eigen:<id>') werden aus ihren Strichen gebaut. */
+function kalIcon(schluessel, groesse = 22) {
+  const s = String(schluessel || '');
+  if (s.startsWith('eigen:')) {
+    const d = D.docs.get(s.slice(6));
+    if (d && Array.isArray(d.striche)) return kalStricheSVG(d.striche, groesse);
+    return kalIcon('punktkreis', groesse);
+  }
+  const pfad = KAL_ICONS[s] || KAL_ICONS.punktkreis;
+  return '<svg viewBox="0 0 24 24" width="' + groesse + '" height="' + groesse + '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + pfad + '</svg>';
+}
+/* Selbstgezeichnete Zeichen: Striche in 0..1, hier auf 24 gerechnet. */
+function kalStricheSVG(striche, groesse = 22) {
+  const linien = striche.slice(0, 40).map((st) => {
+    const p = (st || []).slice(0, 400).map(([x, y]) => (x * 24).toFixed(1) + ',' + (y * 24).toFixed(1)).join(' ');
+    return p ? '<polyline points="' + p + '"/>' : '';
+  }).join('');
+  return '<svg viewBox="0 0 24 24" width="' + groesse + '" height="' + groesse + '" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + linien + '</svg>';
+}
+function kalEigeneIcons() { return [...D.docs.values()].filter((d) => d.typ === 'kalicon' && !d.geloescht && Array.isArray(d.striche) && d.striche.length); }
+function saubereStricheEinfach(striche) {
+  if (!Array.isArray(striche)) return [];
+  return striche.slice(0, 40).map((st) => Array.isArray(st)
+    ? st.slice(0, 400).map((p) => Array.isArray(p) ? [begrenze(p[0], 0, 1, .5), begrenze(p[1], 0, 1, .5)] : null).filter(Boolean)
+    : []).filter((st) => st.length > 1);
+}
+
+/* ----- Ein eigenes Zeichen malen ----- */
+function kalIconMalen(fertig) {
+  const groesse = 260;
+  const leinwand = el('canvas', { class: 'kal-malpad', width: String(groesse), height: String(groesse) });
+  const ctx = leinwand.getContext('2d');
+  let striche = [], aktuell = null;
+  const male = () => {
+    ctx.clearRect(0, 0, groesse, groesse);
+    /* Hilfsraster: ein Kreuz, damit das Zeichen mittig wird */
+    ctx.strokeStyle = 'rgba(160,140,110,.28)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(groesse / 2, 12); ctx.lineTo(groesse / 2, groesse - 12); ctx.moveTo(12, groesse / 2); ctx.lineTo(groesse - 12, groesse / 2); ctx.stroke();
+    ctx.strokeStyle = 'rgba(160,140,110,.16)';
+    ctx.strokeRect(groesse * .16, groesse * .16, groesse * .68, groesse * .68);
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--tinte') || '#3a2f26';
+    ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    for (const st of [...striche, aktuell].filter(Boolean)) {
+      if (st.length < 2) continue;
+      ctx.beginPath(); ctx.moveTo(st[0][0] * groesse, st[0][1] * groesse);
+      for (const [x, y] of st.slice(1)) ctx.lineTo(x * groesse, y * groesse);
+      ctx.stroke();
+    }
+  };
+  const punkt = (ev) => { const r = leinwand.getBoundingClientRect(); return [begrenze((ev.clientX - r.left) / r.width, 0, 1, .5), begrenze((ev.clientY - r.top) / r.height, 0, 1, .5)]; };
+  leinwand.addEventListener('pointerdown', (ev) => { ev.preventDefault(); leinwand.setPointerCapture(ev.pointerId); aktuell = [punkt(ev)]; male(); });
+  leinwand.addEventListener('pointermove', (ev) => { if (!aktuell) return; const p = punkt(ev); const l = aktuell[aktuell.length - 1]; if (Math.hypot(p[0] - l[0], p[1] - l[1]) > .012) { aktuell.push(p); male(); } });
+  const auf = () => { if (aktuell && aktuell.length > 1) striche.push(aktuell); aktuell = null; male(); vorschauen(); };
+  leinwand.addEventListener('pointerup', auf); leinwand.addEventListener('pointercancel', auf);
+  const vorschau = el('span', { class: 'kal-malvorschau' });
+  const vorschauen = () => { vorschau.innerHTML = striche.length ? kalStricheSVG(striche, 30) : ''; };
+  const kasten = el('div', { class: 'modal kal-malfenster' },
+    el('div', { class: 'kartenkopf' }, 'EIN EIGENES ZEICHEN'),
+    el('p', { class: 'kal-hinweis' }, 'Zeichne es in Ruhe. Es wird auf Strichstärke gebracht und überall dort klein dargestellt, wo der Termin steht — im Raster, im Tag, im Lebensband.'),
+    leinwand,
+    el('div', { class: 'kal-malfuss' }, el('span', {}, 'So klein wird es:'), vorschau),
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => { striche = []; aktuell = null; male(); vorschauen(); } }, 'Noch einmal'),
+      el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
+      el('button', { class: 'knopf voll', onclick: () => {
+        const sauber = saubereStricheEinfach(striche);
+        if (!sauber.length) { toast('Da ist noch nichts gezeichnet.'); return; }
+        const d = neuDoc('kalicon', { striche: sauber, titel: 'Eigenes Zeichen' });
+        zu(); toast('Das Zeichen ist da.');
+        if (fertig) fertig('eigen:' + d.id);
+      } }, 'Nehmen')));
+  const zu = zeigeDeck(kasten);
+  male();
+}
+
+/* ----- Das Zeichen wählen ----- */
+function kalIconWaehlen(aktuell, fertig) {
+  const eigene = kalEigeneIcons();
+  const knopf = (schluessel, name) => el('button', {
+    class: 'kal-iconwahl' + (schluessel === aktuell ? ' an' : ''), title: name,
+    onclick: () => { zu(); fertig(schluessel); }
+  }, el('span', { class: 'kal-iconbild', html: kalIcon(schluessel, 26) }), el('small', {}, name));
+  const kasten = el('div', { class: 'modal kal-iconfenster' },
+    el('div', { class: 'kartenkopf' }, 'DAS ZEICHEN'),
+    el('div', { class: 'kal-icongitter' }, ...KAL_ARTEN.map((a) => knopf(a.icon, a.name))),
+    eigene.length ? el('div', { class: 'kal-abschnitt' }, 'Deine eigenen') : null,
+    eigene.length ? el('div', { class: 'kal-icongitter' }, ...eigene.map((d) => el('div', { class: 'kal-eigenwahl' },
+      knopf('eigen:' + d.id, 'Eigenes'),
+      el('button', { class: 'kal-iconweg', title: 'Dieses Zeichen wegwerfen', onclick: async () => { if (await frage('Dieses Zeichen wegwerfen?', { ja: 'Wegwerfen' })) { await loesche(d.id, true); zu(); kalIconWaehlen(aktuell, fertig); } } }, '×'))) ) : null,
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => { zu(); kalIconMalen(fertig); } }, 'Selbst zeichnen'),
+      el('button', { class: 'knopf zart', onclick: () => { zu(); fertig(''); } }, 'Das der Art nehmen')));
+  const zu = zeigeDeck(kasten);
+}
+
+/* ----- Ein Termin: anlegen und ändern ----- */
+/* Namen sind freier Text. Wer will, hängt eine vorhandene Figur daran — wer
+   nicht will, tippt einfach einen Namen. Der Kalender gehört dem Kopf, nicht
+   der Textsammlung. */
+function kalTerminBearbeiten(doc, vorgabe, danach) {
+  const neu = !doc;
+  const stand = saubererTermin(doc || { wann: vorgabe || kalHeute(), art: 'ereignis' }) || saubererTermin({ wann: kalHeute() });
+  let art = stand.art, icon = stand.icon, leute = stand.leute.slice();
+
+  const titel = el('input', { type: 'text', value: stand.titel, placeholder: 'Was geschieht? (darf leer bleiben)', maxlength: '200' });
+  const wannTeile = kalTeile(stand.wann);
+  const jahr = el('input', { type: 'number', class: 'kal-jahr', min: String(KAL_JAHR_VON), max: String(KAL_JAHR_BIS), value: String(wannTeile.jahr) });
+  const monat = el('select', { class: 'kal-monat' }, el('option', { value: '' }, 'ganzes Jahr'), ...KAL_MONATE.map((m, i) => el('option', { value: String(i + 1) }, m)));
+  const tag = el('select', { class: 'kal-tag' });
+  const wochentag = el('span', { class: 'kal-wochentag' });
+  monat.value = wannTeile.monat == null ? '' : String(wannTeile.monat);
+  const fuelleTage = () => {
+    const j = Number(jahr.value) || KAL_JAHR_VON, m = Number(monat.value) || 0;
+    const alt = tag.value;
+    tag.innerHTML = '';
+    tag.append(el('option', { value: '' }, m ? 'ganzer Monat' : '—'));
+    if (m) for (let t = 1; t <= kalMonatstage(j, m); t++) tag.append(el('option', { value: String(t) }, t + '.'));
+    tag.value = alt && Number(alt) <= kalMonatstage(j, m || 1) ? alt : '';
+    tag.disabled = !m;
+    zeigeWochentag();
+  };
+  const gewaehltesDatum = () => kalDatum(Number(jahr.value), monat.value ? Number(monat.value) : null, tag.value ? Number(tag.value) : null);
+  const zeigeWochentag = () => {
+    const d = gewaehltesDatum();
+    const t = kalTeile(d);
+    if (t && t.genau === 'tag') {
+      const mond = typeof mondphase === 'function' ? mondphase(kalZeit(d)) : null;
+      const mondwort = mond == null ? '' : mond < .03 || mond > .97 ? ' · Neumond' : Math.abs(mond - .5) < .03 ? ' · Vollmond' : '';
+      wochentag.textContent = KAL_TAGE[kalWochentag(d)] + ' · KW ' + kalWoche(d) + ' · ' + kalJahreszeit(d) + mondwort;
+    } else if (t) wochentag.textContent = t.genau === 'monat' ? 'ungefähr — irgendwann in dem Monat' : 'ungefähr — irgendwann in dem Jahr';
+    else wochentag.textContent = '';
+    zeigeAlter();
+  };
+  jahr.addEventListener('input', fuelleTage); monat.addEventListener('change', fuelleTage); tag.addEventListener('change', zeigeWochentag);
+
+  /* Zeitraum: nur wenn gewünscht */
+  const bisAn = el('input', { type: 'checkbox' });
+  /* Ein Datumsfeld kann nur ganze Tage. Ein ungenaues Ende ('2026-08') waere
+     darin unsichtbar - dann lieber gar keins zeigen als ein leeres Feld. */
+  const bisTag = kalTeile(stand.bis) && kalTeile(stand.bis).genau === 'tag' ? stand.bis : '';
+  const bisFeld = el('input', { type: 'date', class: 'kal-bis', min: KAL_JAHR_VON + '-01-01', max: KAL_JAHR_BIS + '-12-31', value: bisTag });
+  bisAn.checked = !!bisTag;
+  const bisZeile = el('label', { class: 'kal-bisreihe' }, bisAn, el('span', {}, 'Es dauert länger — bis'), bisFeld);
+
+  /* Die Art */
+  const artWahl = el('div', { class: 'kal-artwahl' });
+  const zeichneArten = () => {
+    artWahl.innerHTML = '';
+    for (const a of KAL_ARTEN) {
+      artWahl.append(el('button', { type: 'button', class: 'kal-artknopf' + (a.id === art ? ' an' : ''), title: a.name, style: '--artfarbe:' + a.farbe, onclick: () => { art = a.id; zeichneArten(); zeigeZeichen(); zeigeAlter(); } },
+        el('span', { class: 'kal-artbild', html: kalIcon(a.icon, 20) }), el('small', {}, a.name)));
+    }
+  };
+  zeichneArten();
+
+  /* Das Zeichen */
+  const zeichenKnopf = el('button', { type: 'button', class: 'kal-zeichenknopf', onclick: () => kalIconWaehlen(icon || kalArt(art).icon, (neuIcon) => { icon = neuIcon; zeigeZeichen(); }) });
+  const zeigeZeichen = () => { zeichenKnopf.innerHTML = ''; anfuegen(zeichenKnopf, el('span', { class: 'kal-iconbild', html: kalIcon(icon || kalArt(art).icon, 24) }), el('small', {}, icon ? 'eigenes Zeichen' : 'Zeichen der Art')); };
+  zeigeZeichen();
+
+  /* Die Leute: frei getippt. Vorhandene Figuren werden vorgeschlagen, mehr nicht. */
+  const leuteReihe = el('div', { class: 'kal-leute' });
+  const namensfeld = el('input', { type: 'text', placeholder: 'Ein Name — einfach tippen', maxlength: '120', list: 'kal-namensliste' });
+  const alterZeile = el('div', { class: 'kal-alterzeile' });
+  const zeigeLeute = () => {
+    leuteReihe.innerHTML = '';
+    for (const p of leute) {
+      leuteReihe.append(el('span', { class: 'kal-person' }, p.name,
+        el('button', { type: 'button', title: 'Weg damit', onclick: () => { leute = leute.filter((x) => x !== p); zeigeLeute(); } }, '×')));
+    }
+    if (!leute.length) leuteReihe.append(el('span', { class: 'kal-leerhinweis' }, 'Noch niemand. Muss auch nicht sein.'));
+    zeigeAlter();
+  };
+  const nameDazu = () => {
+    const n = namensfeld.value.trim();
+    if (!n) return;
+    if (leute.some((p) => p.name.toLowerCase() === n.toLowerCase())) { namensfeld.value = ''; return; }
+    /* Gibt es zufällig eine Figur mit dem Namen, wird sie mitverknüpft — sonst nicht. */
+    const figur = [...D.docs.values()].find((d) => d.typ === 'figur' && !d.geloescht && String(d.titel || '').toLowerCase() === n.toLowerCase());
+    leute.push({ id: figur ? figur.id : '', name: n });
+    namensfeld.value = ''; zeigeLeute();
+  };
+  namensfeld.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); nameDazu(); } });
+  /* Vorschläge: bereits im Kalender genannte Namen und vorhandene Figuren */
+  const vorschlaege = new Set([...kalLeute().map((p) => p.name), ...[...D.docs.values()].filter((d) => d.typ === 'figur' && !d.geloescht && d.titel).map((d) => d.titel)]);
+  const liste = el('datalist', { id: 'kal-namensliste' }, ...[...vorschlaege].slice(0, 200).map((n) => el('option', { value: n })));
+
+  /* Wie alt jemand an diesem Tag ist — sofort, während man tippt */
+  const zeigeAlter = () => {
+    alterZeile.innerHTML = '';
+    const d = gewaehltesDatum();
+    if (!d || art === 'geburt') return;
+    const zeilen = [];
+    for (const p of leute) {
+      const g = kalGeburtVon([p]);
+      if (!g) continue;
+      const a = kalAlter(g, d);
+      if (a) zeilen.push(p.name + ' ist an diesem Tag ' + kalAlterText(a) + '.');
+      else zeilen.push(p.name + ' ist an diesem Tag noch nicht geboren.');
+      const tod = kalTodVon([p]);
+      if (tod && kalZeit(d) > kalZeit(tod)) zeilen.push(p.name + ' ist zu diesem Zeitpunkt bereits gestorben (' + kalLesbar(tod) + ').');
+    }
+    for (const z of zeilen) alterZeile.append(el('div', { class: 'kal-alterhinweis' + (z.includes('noch nicht geboren') || z.includes('bereits gestorben') ? ' warn' : '') }, z));
+  };
+
+  const notiz = el('textarea', { class: 'kal-notiz', rows: '4', placeholder: 'Was noch dazugehört. Was niemand sonst weiß.', maxlength: '4000' }, stand.notiz);
+  const ort = el('input', { type: 'text', value: stand.ort, placeholder: 'Wo? (darf leer bleiben)', maxlength: '200' });
+  const jaehrlich = el('input', { type: 'checkbox' }); jaehrlich.checked = stand.jaehrlich;
+
+  const feld = (name, inhalt, unter) => el('label', { class: 'kal-feld' }, el('span', { class: 'kal-feldname' }, name), inhalt, unter ? el('small', { class: 'kal-feldunter' }, unter) : null);
+  const kasten = el('div', { class: 'modal kal-fenster' },
+    el('div', { class: 'kartenkopf' }, neu ? 'EIN NEUER TAG' : 'DIESEN TAG ÄNDERN'),
+    feld('Was', titel),
+    feld('Wann', el('div', { class: 'kal-datumreihe' }, jahr, monat, tag), null),
+    wochentag,
+    bisZeile,
+    feld('Art', artWahl),
+    feld('Zeichen', zeichenKnopf),
+    feld('Wer', el('div', {}, leuteReihe, el('div', { class: 'kal-namenreihe' }, namensfeld, el('button', { type: 'button', class: 'knopf zart', onclick: nameDazu }, 'Dazu'), liste)),
+      'Tipp einfach einen Namen. Er muss zu keiner Figur und keinem Text gehören.'),
+    alterZeile,
+    feld('Wo', ort),
+    feld('Dazu', notiz),
+    el('label', { class: 'kal-bisreihe' }, jaehrlich, el('span', {}, 'Kehrt jedes Jahr wieder')),
+    el('div', { class: 'reihe' },
+      !neu ? el('button', { class: 'knopf zart gefahr', onclick: async () => {
+        if (await frage('Diesen Tag aus dem Kalender nehmen?', { ja: 'Herausnehmen' })) { await loesche(doc.id); zu(); if (danach) danach(); }
+      } }, 'Herausnehmen') : null,
+      el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
+      el('button', { class: 'knopf voll', onclick: () => {
+        const wann = gewaehltesDatum();
+        if (!wann) { toast('Das Datum stimmt so nicht.'); return; }
+        const felder = saubererTermin({
+          wann, bis: bisAn.checked ? bisFeld.value : '', art, titel: titel.value, notiz: notiz.value, ort: ort.value,
+          leute, icon, jaehrlich: jaehrlich.checked, farbe: stand.farbe, projekt: stand.projekt, quelle: stand.quelle
+        });
+        if (!felder) { toast('Das Datum stimmt so nicht.'); return; }
+        if (doc) { Object.assign(doc, felder); speichere(doc); }
+        else neuDoc('termin', felder);
+        zu();
+        toast(neu ? 'Steht im Kalender.' : 'Geändert.');
+        if (danach) danach(wann);
+      } }, neu ? 'Eintragen' : 'Übernehmen')));
+  const zu = zeigeDeck(kasten);
+  /* Erst jetzt fuellen: zeigeWochentag ruft zeigeAlter, und das braucht
+     alterZeile und leute - beides steht erst hier vollstaendig. */
+  fuelleTage();
+  if (wannTeile.tag != null) { tag.value = String(wannTeile.tag); zeigeWochentag(); }
+  zeigeLeute();
+  setTimeout(() => titel.focus(), 60);
+}
+
+/* ----- Der große Kalender ----- */
+let _kal = { jahr: 0, monat: 0, tag: '', ansicht: 'monat' };
+function kalenderOeffnen(startDatum) {
+  const heute = kalHeute();
+  const start = kalGueltig(startDatum) ? startDatum : (_kal.tag || heute);
+  const t = kalTeile(start);
+  _kal.jahr = t.jahr; _kal.monat = t.monat || 1; _kal.tag = t.genau === 'tag' ? start : kalDatum(t.jahr, t.monat || 1, 1);
+
+  const buehne = el('div', { class: 'kal-buehne' });
+  const kasten = el('div', { class: 'kal-buch' }, buehne);
+  const zu = zeigeDeck(kasten);
+  kasten.classList.add('klappt-auf');
+  const neuZeichnen = (datum) => { if (datum && kalGueltig(datum)) { const p = kalTeile(datum); _kal.jahr = p.jahr; _kal.monat = p.monat || 1; if (p.genau === 'tag') _kal.tag = datum; } zeichneKalender(buehne, neuZeichnen, zu); };
+  zeichneKalender(buehne, neuZeichnen, zu);
+}
+
+function zeichneKalender(buehne, neuZeichnen, schliessen) {
+  const heute = kalHeute();
+  const alle = kalTermine();
+  buehne.innerHTML = '';
+
+  /* --- Kopf: Jahr und Monat --- */
+  const jahrLeiste = el('div', { class: 'kal-jahrleiste' });
+  const mitInhalt = new Set(kalJahreMitInhalt(alle));
+  for (let j = KAL_JAHR_VON; j <= KAL_JAHR_BIS; j++) {
+    jahrLeiste.append(el('button', {
+      class: 'kal-jahrknopf' + (j === _kal.jahr ? ' an' : '') + (mitInhalt.has(j) ? ' voll' : ''),
+      'data-jahr': String(j),
+      onclick: () => neuZeichnen(kalDatum(j, _kal.monat, 1))
+    }, String(j)));
+  }
+  const monatName = el('h2', { class: 'kal-monatname' }, KAL_MONATE[_kal.monat - 1], el('i', {}, String(_kal.jahr)));
+  const blaettern = (schritt) => {
+    let m = _kal.monat + schritt, j = _kal.jahr;
+    if (m < 1) { m = 12; j--; } if (m > 12) { m = 1; j++; }
+    if (j < KAL_JAHR_VON || j > KAL_JAHR_BIS) return;
+    neuZeichnen(kalDatum(j, m, 1));
+  };
+  const kopf = el('div', { class: 'kal-kopf' },
+    el('button', { class: 'kal-blaetter', title: 'Ein Monat zurück', onclick: () => blaettern(-1) }, '‹'),
+    monatName,
+    el('button', { class: 'kal-blaetter', title: 'Ein Monat vor', onclick: () => blaettern(1) }, '›'),
+    el('div', { class: 'kal-kopfrechts' },
+      el('button', { class: 'knopf zart', onclick: () => neuZeichnen(heute) }, 'Heute'),
+      el('button', { class: 'kal-ansichtknopf' + (_kal.ansicht === 'jahr' ? ' an' : ''), title: 'Das ganze Jahr auf einen Blick', onclick: () => { _kal.ansicht = _kal.ansicht === 'jahr' ? 'monat' : 'jahr'; neuZeichnen(); } }, 'Jahr'),
+      el('button', { class: 'kal-ansichtknopf' + (_kal.ansicht === 'leben' ? ' an' : ''), title: 'Die Lebensbänder aller Leute', onclick: () => { _kal.ansicht = _kal.ansicht === 'leben' ? 'monat' : 'leben'; neuZeichnen(); } }, 'Leben'),
+      el('button', { class: 'kal-schliessen', title: 'Den Kalender zuklappen', onclick: () => schliessen() }, '×')));
+
+  buehne.append(kopf, jahrLeiste);
+  /* Das gewählte Jahr in den Blick rücken */
+  requestAnimationFrame(() => { const an = jahrLeiste.querySelector('.an'); if (an) an.scrollIntoView({ block: 'nearest', inline: 'center' }); });
+
+  if (_kal.ansicht === 'jahr') { buehne.append(kalJahresBild(alle, neuZeichnen)); return; }
+  if (_kal.ansicht === 'leben') { buehne.append(kalLebensbaender(alle, neuZeichnen)); return; }
+
+  /* --- Das Monatsraster --- */
+  const raster = el('div', { class: 'kal-raster' });
+  raster.append(el('div', { class: 'kal-kw-kopf' }, 'KW'));
+  for (const d of KAL_TAGE_KURZ) raster.append(el('div', { class: 'kal-wochenkopf' }, d));
+  const zaehlung = kalMonatsZaehlung(_kal.jahr, _kal.monat, alle);
+  for (const woche of kalRaster(_kal.jahr, _kal.monat)) {
+    raster.append(el('div', { class: 'kal-kw' }, woche.kw ? String(woche.kw) : ''));
+    for (const zelle of woche.tage) {
+      const termine = zelle.fremd ? kalAmTag(zelle.datum, alle) : (zaehlung[zelle.tag] || []);
+      const istHeute = zelle.datum === heute;
+      const gewaehlt = zelle.datum === _kal.tag;
+      const zellElement = el('button', {
+        class: 'kal-zelle' + (zelle.fremd ? ' fremd' : '') + (istHeute ? ' heute' : '') + (gewaehlt ? ' gewaehlt' : '') + (termine.length ? ' voll' : ''),
+        onclick: () => { _kal.tag = zelle.datum; if (zelle.fremd) neuZeichnen(zelle.datum); else { _kal.tag = zelle.datum; neuZeichnen(); } },
+        ondblclick: () => kalTerminBearbeiten(null, zelle.datum, (d) => neuZeichnen(d))
+      },
+        el('span', { class: 'kal-zahl' }, String(zelle.tag)),
+        termine.length ? el('span', { class: 'kal-marken' }, ...termine.slice(0, 4).map((e) => el('i', { class: 'kal-marke', style: '--artfarbe:' + kalArt(e.art).farbe, html: kalIcon(e.icon || kalArt(e.art).icon, 13) }))) : null,
+        termine.length > 4 ? el('span', { class: 'kal-mehr' }, '+' + (termine.length - 4)) : null);
+      raster.append(zellElement);
+    }
+  }
+  buehne.append(raster);
+
+  /* --- Der gewählte Tag --- */
+  buehne.append(kalTagesBlatt(_kal.tag, alle, neuZeichnen));
+
+  /* --- Was nicht sein kann --- */
+  const w = kalWidersprueche(alle);
+  if (w.length) {
+    buehne.append(el('details', { class: 'kal-widersprueche' },
+      el('summary', {}, w.length === 1 ? 'Eine Stelle passt nicht zusammen' : w.length + ' Stellen passen nicht zusammen'),
+      ...w.slice(0, 30).map((x) => el('div', { class: 'kal-widerspruch' },
+        el('span', { class: 'kal-wsym' }, '!'),
+        el('span', {}, x.text),
+        x.termin ? el('button', { class: 'kal-wlink', onclick: () => neuZeichnen(x.termin.wann) }, 'hinsehen') : null))));
+  }
+}
+
+/* ----- Das Tagesblatt ----- */
+function kalTagesBlatt(datum, alle, neuZeichnen) {
+  const t = kalTeile(datum);
+  const termine = kalAmTag(datum, alle);
+  const jahrestage = kalJahrestage(datum, alle);
+  const mond = typeof mondphase === 'function' ? mondphase(kalZeit(datum)) : null;
+  const mondwort = mond == null ? '' : mond < .04 || mond > .96 ? 'Neumond' : Math.abs(mond - .5) < .04 ? 'Vollmond' : mond < .5 ? 'zunehmend' : 'abnehmend';
+
+  const blatt = el('div', { class: 'kal-tagesblatt' },
+    el('div', { class: 'kal-tageskopf' },
+      el('div', {},
+        el('h3', {}, kalLesbar(datum, true)),
+        el('small', {}, 'KW ' + kalWoche(datum) + ' · ' + kalJahreszeit(datum) + (mondwort ? ' · Mond: ' + mondwort : ''))),
+      el('button', { class: 'knopf voll', onclick: () => kalTerminBearbeiten(null, datum, (d) => neuZeichnen(d)) }, 'Hier etwas eintragen')));
+
+  if (!termine.length) {
+    blatt.append(el('div', { class: 'kal-leertag' }, 'An diesem Tag steht noch nichts. Ein leerer Tag ist kein leerer Tag — er ist einer, an dem noch alles möglich ist.'));
+  }
+  for (const e of termine) {
+    const art = kalArt(e.art);
+    const wiederkehr = (e.jaehrlich || e.art === 'geburt') && kalTeile(e.wann).jahr !== t.jahr;
+    const alterHier = [];
+    for (const p of e.leute || []) {
+      if (e.art === 'geburt') {
+        const a = kalAlter(e.wann, datum);
+        if (a && a.jahre > 0) alterHier.push(p.name + ' wird ' + a.jahre + '.');
+        continue;
+      }
+      const g = kalGeburtVon([p], alle);
+      if (!g) continue;
+      const a = kalAlter(g, e.wann);
+      if (a) alterHier.push(p.name + ': ' + kalAlterText(a));
+    }
+    blatt.append(el('button', { class: 'kal-eintrag', style: '--artfarbe:' + art.farbe, onclick: () => kalTerminBearbeiten(e, null, (d) => neuZeichnen(d || datum)) },
+      el('span', { class: 'kal-eintragzeichen', html: kalIcon(e.icon || art.icon, 24) }),
+      el('span', { class: 'kal-eintragtext' },
+        el('b', {}, e.titel || art.name),
+        el('span', { class: 'kal-eintragart' }, art.name + (wiederkehr ? ' · seit ' + kalTeile(e.wann).jahr : '') + (e.bis ? ' · bis ' + kalKurz(e.bis) : '') + (e.ort ? ' · ' + e.ort : '')),
+        (e.leute || []).length ? el('span', { class: 'kal-eintragleute' }, e.leute.map((p) => p.name).join(', ')) : null,
+        alterHier.length ? el('span', { class: 'kal-eintragalter' }, alterHier.join(' · ')) : null,
+        e.notiz ? el('span', { class: 'kal-eintragnotiz' }, e.notiz.length > 220 ? e.notiz.slice(0, 217) + ' …' : e.notiz) : null)));
+  }
+  if (jahrestage.length) {
+    blatt.append(el('div', { class: 'kal-jahrestage' },
+      el('span', { class: 'kal-abschnitt' }, 'Heute vor Jahren'),
+      ...jahrestage.map((j) => el('button', { class: 'kal-jahrestag', onclick: () => neuZeichnen(j.termin.wann) },
+        el('b', {}, j.jahre === 1 ? 'vor einem Jahr' : 'vor ' + j.jahre + ' Jahren'),
+        el('span', {}, j.termin.titel || kalArt(j.termin.art).name)))));
+  }
+  return blatt;
+}
+
+/* ----- Das ganze Jahr ----- */
+function kalJahresBild(alle, neuZeichnen) {
+  const raus = el('div', { class: 'kal-jahresbild' });
+  const zaehlung = kalJahresZaehlung(_kal.jahr, alle);
+  const heute = kalHeute();
+  for (let m = 1; m <= 12; m++) {
+    const mini = el('div', { class: 'kal-mini' + (zaehlung[m - 1] ? ' voll' : '') });
+    mini.append(el('button', { class: 'kal-mininame', onclick: () => { _kal.monat = m; _kal.ansicht = 'monat'; neuZeichnen(kalDatum(_kal.jahr, m, 1)); } },
+      KAL_MONATE[m - 1], zaehlung[m - 1] ? el('i', {}, String(zaehlung[m - 1])) : null));
+    const gitter = el('div', { class: 'kal-minigitter' });
+    for (const d of KAL_TAGE_KURZ) gitter.append(el('span', { class: 'kal-minikopf' }, d[0]));
+    for (const woche of kalRaster(_kal.jahr, m)) {
+      for (const zelle of woche.tage) {
+        const hat = !zelle.fremd && kalAmTag(zelle.datum, alle).length;
+        gitter.append(el('button', {
+          class: 'kal-minitag' + (zelle.fremd ? ' fremd' : '') + (hat ? ' voll' : '') + (zelle.datum === heute ? ' heute' : ''),
+          title: hat ? kalLesbar(zelle.datum) + ' — ' + hat + (hat === 1 ? ' Eintrag' : ' Einträge') : kalLesbar(zelle.datum),
+          onclick: () => { _kal.ansicht = 'monat'; neuZeichnen(zelle.datum); }
+        }, String(zelle.tag)));
+      }
+    }
+    mini.append(gitter);
+    raus.append(mini);
+  }
+  return raus;
+}
+
+/* ----- Die Lebensbänder: fünfzig Jahre, ein Strich pro Mensch ----- */
+function kalLebensbaender(alle, neuZeichnen) {
+  const leute = kalLeute(alle);
+  const raus = el('div', { class: 'kal-leben' });
+  if (!leute.length) {
+    raus.append(el('div', { class: 'kal-leertag' }, 'Noch niemand im Kalender. Trag einen Tag ein und schreib einen Namen dazu — mehr braucht es nicht.'));
+    return raus;
+  }
+  const spanne = KAL_JAHR_BIS - KAL_JAHR_VON + 1;
+  const anteil = (datum) => { const t = kalTeile(datum); return t ? ((t.jahr - KAL_JAHR_VON) + ((t.monat || 1) - 1) / 12) / spanne : 0; };
+
+  const massband = el('div', { class: 'kal-massband' });
+  for (let j = KAL_JAHR_VON; j <= KAL_JAHR_BIS; j += 5) {
+    massband.append(el('i', { class: 'kal-massmarke', style: 'left:' + (anteil(kalDatum(j, 1, 1)) * 100).toFixed(2) + '%' }, String(j)));
+  }
+  raus.append(massband);
+
+  for (const p of leute) {
+    const band = el('div', { class: 'kal-band' });
+    const lebt = p.geburt && p.tod;
+    const von = p.geburt ? anteil(p.geburt) : null, bis = p.tod ? anteil(p.tod) : null;
+    const spur = el('div', { class: 'kal-spur' });
+    if (von != null) {
+      const breite = (bis != null ? bis : anteil(kalHeute())) - von;
+      spur.append(el('i', { class: 'kal-lebenslinie' + (lebt ? ' zuende' : ''), style: 'left:' + (von * 100).toFixed(2) + '%;width:' + Math.max(.4, breite * 100).toFixed(2) + '%' }));
+    }
+    for (const e of p.termine) {
+      const art = kalArt(e.art);
+      spur.append(el('button', {
+        class: 'kal-kerbe art-' + e.art, style: 'left:' + (anteil(e.wann) * 100).toFixed(2) + '%;--artfarbe:' + art.farbe,
+        title: (e.titel || art.name) + ' · ' + kalLesbar(e.wann),
+        onclick: () => { _kal.ansicht = 'monat'; neuZeichnen(e.wann); }
+      }, el('i', { html: kalIcon(e.icon || art.icon, 12) })));
+    }
+    const alterText = lebt ? 'wurde ' + kalLebensalter(p).jahre + ' Jahre' : p.geburt ? kalAlterText(kalAlter(p.geburt, kalHeute())) + ' alt' : p.termine.length + (p.termine.length === 1 ? ' Eintrag' : ' Einträge');
+    band.append(el('div', { class: 'kal-bandname' }, el('b', {}, p.name),
+      el('small', {}, (p.geburt ? '* ' + kalKurz(p.geburt) : '') + (p.tod ? '  † ' + kalKurz(p.tod) : '') + (p.geburt || p.tod ? ' · ' : '') + alterText)), spur);
+    raus.append(band);
+  }
+  return raus;
+}
+
+/* ----- Der Kalender auf dem Schreibtisch ----- */
+function baueTischkalender() {
+  const heute = kalHeute();
+  const t = kalTeile(heute);
+  const alle = kalTermine();
+  const heutige = kalAmTag(heute, alle);
+  const naechster = kalSortiert(alle.filter((e) => kalZeit(e.wann) > kalZeit(heute)))[0];
+  const titel = 'Der Kalender · ' + kalLesbar(heute, true) +
+    (heutige.length ? ' — heute: ' + heutige.map((e) => e.titel || kalArt(e.art).name).join(', ') : naechster ? ' — als Nächstes: ' + (naechster.titel || kalArt(naechster.art).name) + ' am ' + kalKurz(naechster.wann) : ' — noch nichts eingetragen');
+  return el('button', { class: 'desk-ding kalender' + (heutige.length ? ' hat-heute' : ''), title: titel, 'aria-label': titel, onclick: () => kalenderOeffnen(heute) },
+    el('div', { class: 'kalender-bild' },
+      el('i', { class: 'kal-ruecken' }),
+      el('div', { class: 'kal-blatt links' },
+        el('span', { class: 'kal-blattmonat' }, KAL_MONATE_KURZ[t.monat - 1].toUpperCase()),
+        el('span', { class: 'kal-blatttag' }, String(t.tag)),
+        el('span', { class: 'kal-blattwt' }, KAL_TAGE[kalWochentag(heute)])),
+      el('div', { class: 'kal-blatt rechts' },
+        ...(heutige.length ? heutige.slice(0, 3).map((e) => el('span', { class: 'kal-blattzeile' },
+          el('i', { style: '--artfarbe:' + kalArt(e.art).farbe, html: kalIcon(e.icon || kalArt(e.art).icon, 10) }),
+          el('em', {}, (e.titel || kalArt(e.art).name).slice(0, 22))))
+          : [el('span', { class: 'kal-blattleer' }, 'nichts notiert')])),
+      el('i', { class: 'kal-spirale' }), el('i', { class: 'kal-band' })));
+}
+
 /* ================================================================
    VANI — Aufwachen
    ================================================================ */
@@ -23786,6 +25629,18 @@ async function sucheAppUpdate(neuLaden = false) {
 
   /* Das Sicherheitsnetz: Absturzfang, Rettungskopie, Wochensicherung */
   try { if (typeof sicherheitStarten === 'function') sicherheitStarten(); } catch (e) {}
+
+  /* Die Scrollleiste am Hauptbereich: lange Seiten in einem Zug */
+  try {
+    if (typeof scrollleiste === 'function') {
+      const raum = $('#raum');
+      if (raum) scrollleiste(raum, {
+        ziel: $('#app'),
+        marken: (b) => scrollMarkenAusUeberschriften(b, 'h1, h2, .kartenkopf, .abschnittstitel'),
+        fahne: scrollFahneText(raum)
+      });
+    }
+  } catch (e) {}
 
   /* Nichts verlieren, auch wenn iOS die App wegwirft */
   const notSicherung = () => { try { spueleAlles(); } catch (e) {} };
