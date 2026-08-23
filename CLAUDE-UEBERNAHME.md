@@ -2162,3 +2162,48 @@ Tests 178/178.
 Tests 178/178.
 
 **5.27.3:** Der Schalter sitzt am ganzen Reiter „Deine Welten" (`D.einst.salonWelten`, Standard aus); „Deine Werke" und der Chip „Meine Werke" sind wieder immer da.
+
+## Das Sicherheitsnetz (5.28.0)
+
+`src/32-sicherheit.js`. Vier Netze, eines unter dem anderen. Wer hier etwas
+aendert, sollte alle vier im Kopf behalten — sie fangen sich gegenseitig auf.
+
+**1 · Hauptspeicher mit Anlaeufen.** `sicherSpeichern(store, wert, key)` ersetzt
+ueberall `dbPut(...).catch(() => {})`. Schlaegt das Schreiben fehl, wird es
+dreimal versucht (250 ms, 750 ms Pause). Erst danach wird gemeldet — einmal, per
+Toast, mit Ausweg, nicht bei jedem Anschlag (`_speicher.gemeldet`). Klappt es
+spaeter wieder, heilt der Zustand von selbst. `speichere`, `speichereStill`,
+`speichereEinst`, `speichereStats` laufen alle hierueber. **Neue Speicherwege
+bitte ebenfalls hier durchleiten, nicht direkt `dbPut`.**
+
+**2 · Rettungskopie.** `rettungSchreiben(docId, titel, text)` legt den gerade
+getippten Text zusaetzlich in `localStorage` (`vani-rettung`, max. 400 000
+Zeichen) — ein anderer Speicher, den der Browser anders behandelt als
+IndexedDB. Der Schreibraum ruft das entprellt alle 3 s beim Tippen auf
+(`_sr.rettung`), `sicherheitStarten()` zusaetzlich bei `pagehide` und wenn der
+Tab in den Hintergrund geht. Beim Start prueft `rettungPruefen()`, ob dort etwas
+liegt, das im Hauptspeicher fehlt; `rettungAnbieten()` zeigt dann das Fenster
+"Da war noch etwas." mit drei Wegen (verwerfen, als neues Blatt sichern,
+zurueckholen). Beim Zurueckholen wird der alte Stand vorher per
+`standEinfrieren` als Version weggelegt — nichts wird ohne Weg zurueck
+ueberschrieben.
+
+**3 · Absturzfang.** `absturzfangEinrichten()` haengt sich an `error` und
+`unhandledrejection`. Reihenfolge ist Absicht: erst `spueleAlles()` und die
+Rettungskopie, dann das Protokoll (`vani-protokoll`, max. 40 Eintraege), dann
+hoechstens einmal pro Minute ein ruhiger Toast. Die App laeuft weiter.
+
+**4 · Wochensicherung.** `sicherungAutoPruefen()` legt 6 s nach dem Start still
+ein vollstaendiges Paket (`baueSicherungsPaket({ mitMedien: false })`) unter
+`kv/sicherung-auto` ab, wenn die letzte laenger als `SICHERUNG_ABSTAND`
+(7 Tage) her ist.
+
+**Sichtbar wird das an drei Stellen:** die `speicheranzeige()` im Kopf des
+Schreibraums (Punkt + Wort, das nach 2,6 s verblasst), die Karte "Alles sicher"
+ganz oben in den Feinheiten und das Fenster `zeigeSicherheit()` mit Zahlen,
+Platz, Dauerspeicher-Knopf und dem Protokoll.
+
+Tests: `test/sicherheit.mjs`. Der Sandkasten kann den Hauptspeicher gezielt
+zicken lassen (Hilfsfunktion `speicherZicken` im Test: ersetzt die Map eines
+Ladens in der Fake-IndexedDB) — so wird ein echter Ausfall geprueft, nicht nur
+der schoene Fall.

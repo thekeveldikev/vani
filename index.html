@@ -2907,6 +2907,50 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
 .salon-eigenerrahmen-ecke { position: absolute; left: 50%; top: -14px; width: 10px; height: 14px; margin-left: -5px; background: linear-gradient(#e8c27a, #8a6a2e); border-radius: 2px; }
 .salon-eigenerrahmen:hover { box-shadow: 0 0 0 6px #a8832f, 0 0 0 8px rgba(255,236,190,.5), 0 18px 36px rgba(0,0,0,.5); }
 @media (max-width: 600px) { .salon-eigenerrahmen { max-width: 90%; } }
+/* ----- Die Speicheranzeige: ein ruhiger Punkt im Schreibraum ----- */
+.speicheranzeige { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 100px; background: none; color: var(--blass); font-size: 12px; line-height: 1; opacity: .55; transition: opacity .4s ease, background .3s ease; }
+.speicheranzeige.sichtbar { opacity: 1; }
+.speicheranzeige .sp-punkt { width: 7px; height: 7px; border-radius: 50%; background: #7ba05b; box-shadow: 0 0 0 0 rgba(123,160,91,.5); transition: background .3s ease; flex: none; }
+.speicheranzeige .sp-wort { max-width: 0; overflow: hidden; white-space: nowrap; transition: max-width .45s cubic-bezier(.2,.8,.2,1); }
+.speicheranzeige.sichtbar .sp-wort { max-width: 160px; }
+.speicheranzeige[data-art="schreibt"] .sp-punkt { background: #c9a25a; animation: sp-puls 1.1s ease-in-out infinite; }
+.speicheranzeige[data-art="fehler"] .sp-punkt { background: #b0352b; animation: sp-puls .9s ease-in-out infinite; }
+.speicheranzeige[data-art="fehler"] { color: #b0352b; opacity: 1; background: rgba(176,53,43,.1); }
+@keyframes sp-puls { 0%, 100% { box-shadow: 0 0 0 0 rgba(201,162,90,.5); } 50% { box-shadow: 0 0 0 5px rgba(201,162,90,0); } }
+@media (prefers-reduced-motion: reduce) { .speicheranzeige .sp-punkt { animation: none !important; } }
+
+/* ----- Gerettet ----- */
+.rettung-fenster { width: min(520px, calc(100vw - 28px)); display: grid; gap: 10px; }
+.rettung-fenster h2 { margin: 0; }
+.rettung-text { font: 14.5px/1.55 ui-serif, "New York", Georgia, serif; margin: 0; }
+.rettung-probe { max-height: 180px; overflow: auto; padding: 12px 14px; border-radius: 10px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font: 13px/1.6 ui-serif, "New York", Georgia, serif; white-space: pre-wrap; color: var(--blass); }
+
+/* ----- Alles sicher ----- */
+.sicher-fenster { width: min(560px, calc(100vw - 28px)); max-height: min(88dvh, calc(var(--vvh, 100dvh) - 28px)); overflow: auto; display: grid; gap: 12px; }
+.sicher-fenster h2 { margin: 0; font-size: 21px; }
+.sicher-erklaerung { font: 14px/1.55 ui-serif, "New York", Georgia, serif; margin: 0; color: var(--blass); }
+.sicher-liste { display: grid; gap: 2px; }
+.sicher-zeile { display: flex; align-items: baseline; gap: 10px; padding: 7px 12px; border-radius: 9px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 13.5px; }
+.sicher-zeile span { color: var(--blass); } .sicher-zeile b { margin-left: auto; font-variant-numeric: tabular-nums; }
+.sicher-zeile.gut b { color: #5f7752; } .sicher-zeile.warn b { color: #b0352b; }
+.sicher-netze { display: grid; gap: 6px; }
+.sicher-netz { display: grid; gap: 2px; padding: 9px 12px; border-radius: 10px; background: color-mix(in srgb, var(--karte) 65%, transparent); box-shadow: inset 0 0 0 1px var(--linie); }
+.sicher-netz b { font-size: 12.5px; letter-spacing: .04em; }
+.sicher-netz span { font-size: 12.5px; color: var(--blass); line-height: 1.45; }
+.sicher-protokoll summary { font-size: 12.5px; color: var(--blass); cursor: pointer; padding: 4px 0; }
+.sicher-protokollzeile { display: grid; gap: 1px; padding: 6px 10px; border-radius: 8px; background: var(--karte); margin-top: 4px; }
+.sicher-protokollzeile small { font-size: 11px; color: var(--blass); }
+.sicher-protokollzeile span { font-size: 12.5px; word-break: break-word; }
+/* ----- Die Karte „Alles sicher" in den Feinheiten ----- */
+.sicher-karte { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; margin-bottom: 12px; }
+.sicher-karte-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: rgba(123,160,91,.16); color: #5f7752; flex: none; }
+.sicher-karte-icon svg.ik { width: 19px; height: 19px; }
+.sicher-karte-text { display: grid; gap: 2px; min-width: 0; }
+.sicher-karte-text b { font-size: 15px; }
+.sicher-karte-text small { font-size: 12.5px; color: var(--blass); }
+.sicher-karte-pfeil { margin-left: auto; color: var(--blass); display: flex; flex: none; }
+.sicher-karte.hakt .sicher-karte-icon { background: rgba(176,53,43,.14); color: #b0352b; }
+.sicher-karte.hakt .sicher-karte-text small { color: #b0352b; }
 
 </style>
 </head>
@@ -2934,7 +2978,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.27.3';
+const APP_VERSION = '5.28.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -3172,6 +3216,7 @@ const IK = {
   kamera: '<path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.5" r="3.5"/>',
   senden: '<path d="M12 19V6"/><path d="m6 11.5 6-6 6 6"/>',
   kreuz: '<path d="M6 6l12 12M18 6 6 18"/>',
+  schild: '<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
   haken: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
   rechts: '<path d="m9.5 5 6.5 7-6.5 7"/>',
   feuer: '<path d="M12 3s-5 4.5-5 9.5a5 5 0 0 0 10 0c0-2-1-4-2.5-5.5 0 2-.7 3-1.8 3.7C12.5 9.5 12 6.5 12 3Z"/>',
@@ -3534,11 +3579,11 @@ async function ladeAlles() {
   };
 }
 const speichereEinst = entprellt(() => {
-  dbPut('kv', D.einst, 'einst').catch(() => {});
+  sicherSpeichern('kv', D.einst, 'einst');
   if (typeof syncMetadatenGeaendert === 'function') syncMetadatenGeaendert('einst');
 }, 300);
 const speichereStats = entprellt(() => {
-  dbPut('kv', D.stats, 'stats').catch(() => {});
+  sicherSpeichern('kv', D.stats, 'stats');
   if (typeof syncMetadatenGeaendert === 'function') syncMetadatenGeaendert('stats');
 }, 800);
 
@@ -3557,11 +3602,11 @@ function neuDoc(typ, felder) {
   const d = Object.assign({ id: uid(), typ, angelegt: Date.now(), geaendert: Date.now() }, felder);
   markiereAenderung(d, false);
   D.docs.set(d.id, d);
-  dbPut('docs', d).catch(() => toast('Das Speichern hat gerade nicht geklappt.'));
+  sicherSpeichern('docs', d);
   D.stats.letzte[d.id] = worte(d.text || '');
   return d;
 }
-function speichere(d) { d.geaendert = Date.now(); staendeAutomatisch(d); markiereAenderung(d, false); dbPut('docs', d).catch(() => {}); }
+function speichere(d) { d.geaendert = Date.now(); staendeAutomatisch(d); markiereAenderung(d, false); sicherSpeichern('docs', d); }
 /* Rückgängig-Verlauf: alle 15 Minuten friert das Speichern den Text still ein (höchstens 20 Stände,
    automatische weichen zuerst). Pur bis auf die Uhr. */
 const STAENDE_ABSTAND = 15 * 60000;
@@ -3575,7 +3620,7 @@ function staendeAutomatisch(d, jetzt = Date.now()) {
   while (st.length > 20) { const i = st.findIndex((s) => s.auto); st.splice(i >= 0 ? i : 0, 1); }
   return true;
 }
-function speichereStill(d) { markiereAenderung(d, false); dbPut('docs', d).catch(() => {}); }
+function speichereStill(d) { markiereAenderung(d, false); sicherSpeichern('docs', d); }
 
 /* Löschen ist bei VANI nie endgültig: alles wandert erst in den Papierkorb. */
 function _nachfahren(id, kinderDerWurzelBehalten = false) {
@@ -4327,6 +4372,319 @@ async function profilEntschluesseleObjekt(paket) {
     const klar = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: profilBytes(paket.iv) }, PROFIL_SCHLUESSEL, profilBytes(paket.daten));
     return JSON.parse(new TextDecoder().decode(klar));
   } catch (e) { return null; }
+}
+
+/* ===================== 32 — DAS SICHERHEITSNETZ =====================
+   Damit nie etwas verlorengeht — und damit man das auch sieht.
+
+   Vier Netze, eines unter dem anderen:
+
+   1. Der Hauptspeicher (IndexedDB). Jedes Speichern läuft ab jetzt über
+      `sicherSpeichern`: schlägt es fehl, wird es dreimal wiederholt, mit
+      wachsender Pause. Erst dann wird es sichtbar gemeldet — vorher nicht,
+      damit nichts unnötig beunruhigt.
+   2. Die Rettungskopie (localStorage). Während des Schreibens liegt der
+      aktuelle Text zusätzlich in einem winzigen zweiten Speicher, den der
+      Browser anders behandelt. Selbst wenn die Datenbank kaputtgeht oder das
+      Gerät mitten im Satz abstürzt, ist der Text beim nächsten Start da.
+   3. Der Absturzfang. Jeder unerwartete Fehler schreibt zuerst die
+      Rettungskopie, landet dann in einem Protokoll und wird ruhig gemeldet.
+      Die App läuft weiter.
+   4. Die Wochensicherung. Einmal pro Woche legt VANI still eine vollständige
+      Kopie aller Texte neben die Daten — und erinnert daran, sie als Datei
+      aus dem Haus zu tragen.
+
+   Dazu die Anzeige: `speicherZustand()` sagt jederzeit, ob alles drin ist. */
+
+const RETTUNG_SCHLUESSEL = 'vani-rettung';
+const PROTOKOLL_SCHLUESSEL = 'vani-protokoll';
+const SICHERUNG_SCHLUESSEL = 'sicherung-auto';
+const SICHERUNG_ABSTAND = 7 * 86400000;   /* eine Woche */
+
+/* ----- 1. Speichern, das nicht aufgibt ----- */
+let _speicher = { offen: 0, zuletzt: 0, fehler: 0, letzterFehler: '', gemeldet: false };
+const _speicherHorcher = new Set();
+function speicherZustand() {
+  return {
+    offen: _speicher.offen, zuletzt: _speicher.zuletzt, fehler: _speicher.fehler,
+    letzterFehler: _speicher.letzterFehler,
+    art: _speicher.fehler ? 'fehler' : _speicher.offen ? 'schreibt' : _speicher.zuletzt ? 'gesichert' : 'still'
+  };
+}
+function speicherHorchen(fn) { _speicherHorcher.add(fn); return () => _speicherHorcher.delete(fn); }
+function speicherMelden() { for (const fn of [..._speicherHorcher]) { try { fn(speicherZustand()); } catch (e) {} } }
+const warte = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/* Speichern mit drei Anläufen. Gibt true zurück, wenn es geklappt hat. */
+async function sicherSpeichern(store, wert, key, { versuche = 3 } = {}) {
+  _speicher.offen++; speicherMelden();
+  let letzter = null;
+  for (let i = 0; i < versuche; i++) {
+    try {
+      await dbPut(store, wert, key);
+      _speicher.offen = Math.max(0, _speicher.offen - 1);
+      _speicher.zuletzt = Date.now();
+      if (_speicher.fehler) { _speicher.fehler = 0; _speicher.letzterFehler = ''; _speicher.gemeldet = false; }
+      speicherMelden();
+      return true;
+    } catch (e) {
+      letzter = e;
+      if (i < versuche - 1) await warte(250 * Math.pow(3, i));   /* 250 ms, 750 ms */
+    }
+  }
+  _speicher.offen = Math.max(0, _speicher.offen - 1);
+  _speicher.fehler++;
+  _speicher.letzterFehler = (letzter && (letzter.name + ': ' + letzter.message)) || 'unbekannt';
+  protokollSchreiben('speichern', _speicher.letzterFehler, { store, key: key || (wert && wert.id) });
+  speicherMelden();
+  /* Nur einmal melden, nicht bei jedem Anschlag — und immer mit einem Ausweg. */
+  if (!_speicher.gemeldet) {
+    _speicher.gemeldet = true;
+    try {
+      toast('Der Hauptspeicher zickt gerade. Dein Text liegt in der Rettungskopie und geht nicht verloren — schau in den Feinheiten unter „Alles sicher“.', 9000);
+    } catch (e) {}
+  }
+  return false;
+}
+
+/* ----- 2. Die Rettungskopie ----- */
+function rettungSchreiben(docId, titel, text) {
+  try {
+    if (text == null) return false;
+    localStorage.setItem(RETTUNG_SCHLUESSEL, JSON.stringify({
+      docId: String(docId || ''), titel: String(titel || '').slice(0, 200),
+      text: String(text).slice(0, 400000), wann: Date.now()
+    }));
+    return true;
+  } catch (e) { return false; }
+}
+function rettungLesen() {
+  try {
+    const roh = localStorage.getItem(RETTUNG_SCHLUESSEL);
+    if (!roh) return null;
+    const r = JSON.parse(roh);
+    return r && typeof r.text === 'string' ? r : null;
+  } catch (e) { return null; }
+}
+function rettungLoeschen() { try { localStorage.removeItem(RETTUNG_SCHLUESSEL); } catch (e) {} }
+
+/* Beim Start nachsehen: liegt in der Rettungskopie etwas, das im Hauptspeicher fehlt? */
+function rettungPruefen() {
+  const r = rettungLesen();
+  if (!r || !r.text.trim()) return null;
+  const doc = r.docId ? D.docs.get(r.docId) : null;
+  /* Alles in Ordnung: der Text steht schon so im Hauptspeicher */
+  if (doc && String(doc.text || '').trim() === r.text.trim()) { rettungLoeschen(); return null; }
+  /* Auch in Ordnung: der Hauptspeicher ist neuer (woanders weitergeschrieben) */
+  if (doc && (doc.geaendert || 0) > r.wann + 2000 && String(doc.text || '').length >= r.text.length) { rettungLoeschen(); return null; }
+  return { rettung: r, doc };
+}
+/* Was gefunden wurde, ruhig anbieten. */
+function rettungAnbieten() {
+  const fund = rettungPruefen();
+  if (!fund) return false;
+  const { rettung, doc } = fund;
+  const wieVielMehr = doc ? rettung.text.length - String(doc.text || '').length : rettung.text.length;
+  const kasten = el('div', { class: 'modal rettung-fenster' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('schild') || ik('haken') }), 'GERETTET'),
+    el('h2', {}, 'Da war noch etwas.'),
+    el('p', { class: 'rettung-text' }, 'Beim letzten Mal wurde VANI mitten im Schreiben unterbrochen. Der Text lag in der Rettungskopie und ist noch da — ' +
+      (doc ? 'er gehört zu „' + (doc.titel || rettung.titel || 'einem Text') + '“' : 'ein neuer Text') + ', von ' + fmtZeit(rettung.wann) + ' Uhr' +
+      (wieVielMehr > 0 ? ', mit ' + wieVielMehr + ' Zeichen mehr als gespeichert' : '') + '.'),
+    el('div', { class: 'rettung-probe' }, rettung.text.trim().slice(-500)),
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => { rettungLoeschen(); zu(); toast('Gut — dann war schon alles drin.'); } }, 'Alles schon da'),
+      el('button', { class: 'knopf', onclick: async () => {
+        const b = blattAusText('Gerettet · ' + fmtDatum(rettung.wann), rettung.text);
+        rettungLoeschen(); zu(); toast('Liegt als eigenes Blatt bei den Blättern.', 4000);
+        if (typeof oeffneSchreibraum === 'function') setTimeout(() => oeffneSchreibraum(b.id), 120);
+      } }, 'Als neues Blatt sichern'),
+      doc ? el('button', { class: 'knopf voll', onclick: async () => {
+        /* Der alte Stand bleibt als Version erhalten — nichts wird überschrieben, ohne dass es einen Weg zurück gibt. */
+        try { if (typeof standEinfrieren === 'function') standEinfrieren(doc, 'vor der Rettung'); } catch (e) {}
+        doc.text = rettung.text; await sicherSpeichern('docs', doc); speichere(doc);
+        rettungLoeschen(); zu(); toast('Zurückgeholt. Der Stand von vorher liegt als Version daneben.', 5000);
+        if (typeof oeffneSchreibraum === 'function') setTimeout(() => oeffneSchreibraum(doc.id), 120);
+      } }, 'In den Text zurückholen') : null));
+  const zu = zeigeDeck(kasten);
+  return true;
+}
+
+/* ----- 3. Der Absturzfang ----- */
+function protokollSchreiben(art, text, mehr) {
+  try {
+    const liste = protokollLesen();
+    liste.push({ wann: Date.now(), art: String(art || '').slice(0, 40), text: String(text || '').slice(0, 400), mehr: mehr ? JSON.stringify(mehr).slice(0, 300) : '' });
+    localStorage.setItem(PROTOKOLL_SCHLUESSEL, JSON.stringify(liste.slice(-40)));
+  } catch (e) {}
+}
+function protokollLesen() {
+  try { const r = JSON.parse(localStorage.getItem(PROTOKOLL_SCHLUESSEL) || '[]'); return Array.isArray(r) ? r : []; } catch (e) { return []; }
+}
+function protokollLoeschen() { try { localStorage.removeItem(PROTOKOLL_SCHLUESSEL); } catch (e) {} }
+
+let _absturzGemeldet = 0;
+function absturzFangen(art, nachricht, quelle) {
+  /* Zuerst retten, dann reden. */
+  try { if (typeof spueleAlles === 'function') spueleAlles(); } catch (e) {}
+  try {
+    if (typeof _sr !== 'undefined' && _sr && _sr.doc) {
+      const feld = document.querySelector('.sr-text');
+      const text = feld ? (feld.value != null ? feld.value : feld.textContent) : _sr.doc.text;
+      rettungSchreiben(_sr.doc.id, _sr.doc.titel, text);
+    }
+  } catch (e) {}
+  protokollSchreiben(art, nachricht, quelle);
+  /* Höchstens einmal pro Minute etwas sagen — und nie dramatisch. */
+  if (Date.now() - _absturzGemeldet > 60000) {
+    _absturzGemeldet = Date.now();
+    try { toast('Da hat sich etwas verschluckt. Dein Text ist gesichert — du kannst weiterschreiben.', 6000); } catch (e) {}
+  }
+}
+function absturzfangEinrichten() {
+  window.addEventListener('error', (e) => {
+    if (e && e.target && e.target !== window && e.target.tagName) return;   /* Bild/Script konnte nicht laden: nicht der Rede wert */
+    absturzFangen('fehler', (e && e.message) || 'unbekannt', { datei: (e && e.filename || '').split('/').pop(), zeile: e && e.lineno });
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    const g = e && e.reason;
+    absturzFangen('versprechen', (g && (g.message || String(g))) || 'unbekannt', null);
+  });
+}
+
+/* ----- 4. Die Wochensicherung ----- */
+async function sicherungAutoStand() {
+  try { const s = await dbGet('kv', SICHERUNG_SCHLUESSEL); return s && s.wann ? s : null; } catch (e) { return null; }
+}
+async function sicherungAutoFaellig() {
+  const s = await sicherungAutoStand();
+  return !s || Date.now() - s.wann > SICHERUNG_ABSTAND;
+}
+/* Still eine vollständige Kopie neben die Daten legen (ohne Medien: klein und schnell). */
+async function sicherungAutoAnlegen() {
+  if (typeof baueSicherungsPaket !== 'function') return null;
+  try {
+    const paket = await baueSicherungsPaket({ mitMedien: false });
+    const eintrag = { wann: Date.now(), texte: (paket.docs || []).length, paket };
+    await sicherSpeichern('kv', eintrag, SICHERUNG_SCHLUESSEL);
+    return eintrag;
+  } catch (e) { protokollSchreiben('sicherung', (e && e.message) || 'unbekannt'); return null; }
+}
+/* Beim Start, in Ruhe, wenn nichts anderes zu tun ist. */
+function sicherungAutoPruefen() {
+  setTimeout(async () => {
+    try { if (await sicherungAutoFaellig()) await sicherungAutoAnlegen(); } catch (e) {}
+  }, 6000);
+}
+
+/* ----- Der Platz auf dem Gerät ----- */
+async function speicherPlatz() {
+  try {
+    if (!navigator.storage || !navigator.storage.estimate) return null;
+    const s = await navigator.storage.estimate();
+    const belegt = s.usage || 0, frei = s.quota || 0;
+    return { belegt, gesamt: frei, anteil: frei ? belegt / frei : 0, dauerhaft: navigator.storage.persisted ? await navigator.storage.persisted() : null };
+  } catch (e) { return null; }
+}
+function bytesLesbar(n) {
+  if (!Number.isFinite(n)) return '—';
+  if (n < 1024) return n + ' B';
+  if (n < 1048576) return (n / 1024).toFixed(0) + ' KB';
+  if (n < 1073741824) return (n / 1048576).toFixed(1) + ' MB';
+  return (n / 1073741824).toFixed(2) + ' GB';
+}
+
+/* ----- Alles einschalten ----- */
+function sicherheitStarten() {
+  absturzfangEinrichten();
+  sicherungAutoPruefen();
+  /* Die Rettungskopie erst zeigen, wenn die App steht */
+  setTimeout(() => { try { rettungAnbieten(); } catch (e) {} }, 1500);
+  /* Beim Verlassen: Rettungskopie auf den neuesten Stand bringen */
+  const merken = () => {
+    try {
+      if (typeof _sr !== 'undefined' && _sr && _sr.doc) {
+        const feld = document.querySelector('.sr-text');
+        const text = feld ? (feld.value != null ? feld.value : feld.textContent) : null;
+        if (text != null) rettungSchreiben(_sr.doc.id, _sr.doc.titel, text);
+      }
+    } catch (e) {}
+  };
+  window.addEventListener('pagehide', merken);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') merken(); });
+}
+
+/* ----- Die Anzeige: ein ruhiger Punkt, der sagt, dass alles drin ist ----- */
+function speicherAnzeige() {
+  const punkt = el('i', { class: 'sp-punkt' });
+  const wort = el('span', { class: 'sp-wort' }, 'gesichert');
+  const kasten = el('button', {
+    class: 'speicheranzeige', type: 'button',
+    title: 'Wie es um das Speichern steht',
+    onclick: () => { if (typeof zeigeSicherheit === 'function') zeigeSicherheit(); }
+  }, punkt, wort);
+  let ausblendTimer = 0;
+  const zeigen = (z) => {
+    if (!kasten.isConnected) return;
+    kasten.dataset.art = z.art;
+    clearTimeout(ausblendTimer);
+    if (z.art === 'schreibt') { wort.textContent = 'speichert …'; kasten.classList.add('sichtbar'); }
+    else if (z.art === 'fehler') { wort.textContent = 'in der Rettungskopie'; kasten.classList.add('sichtbar'); }
+    else if (z.art === 'gesichert') {
+      wort.textContent = 'gesichert';
+      kasten.classList.add('sichtbar');
+      /* Nach ein paar Sekunden verblasst der Text, der Punkt bleibt — beruhigend, nicht nervig. */
+      ausblendTimer = setTimeout(() => kasten.classList.remove('sichtbar'), 2600);
+    } else { wort.textContent = ''; kasten.classList.remove('sichtbar'); }
+  };
+  const loesen = speicherHorchen(zeigen);
+  zeigen(speicherZustand());
+  kasten._loesen = loesen;
+  return kasten;
+}
+
+/* ----- Das Fenster „Alles sicher“ ----- */
+async function zeigeSicherheit() {
+  const z = speicherZustand();
+  const platz = await speicherPlatz();
+  const sich = await sicherungAutoStand();
+  const prot = protokollLesen();
+  const texte = [...D.docs.values()].filter((d) => !d.geloescht).length;
+  const woerter = [...D.docs.values()].reduce((n, d) => n + worte(d.text || ''), 0);
+  const zeile = (name, wert, art) => el('div', { class: 'sicher-zeile' + (art ? ' ' + art : '') }, el('span', {}, name), el('b', {}, wert));
+  const kasten = el('div', { class: 'modal sicher-fenster' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('schild') || ik('haken') }), 'ALLES SICHER'),
+    el('h2', {}, z.art === 'fehler' ? 'Der Hauptspeicher hakt — dein Text ist trotzdem da.' : 'Alles ist gespeichert.'),
+    el('p', { class: 'sicher-erklaerung' }, z.art === 'fehler'
+      ? 'Das Speichern in der Datenbank ist gerade fehlgeschlagen. Deine Texte liegen in der Rettungskopie und beim nächsten Start hole ich sie zurück. Am besten legst du jetzt eine Sicherungsdatei an.'
+      : 'VANI speichert beim Tippen von selbst — spätestens eine halbe Sekunde nach dem letzten Anschlag, und immer beim Verlassen der App. Vier Netze liegen untereinander.'),
+    el('div', { class: 'sicher-liste' },
+      zeile('Texte', texte.toLocaleString('de-DE')),
+      zeile('Wörter insgesamt', woerter.toLocaleString('de-DE')),
+      zeile('Zuletzt gespeichert', z.zuletzt ? vorZeit(z.zuletzt) : 'noch nichts in dieser Sitzung'),
+      zeile('Speicher hakt', z.fehler ? z.fehler + '× — Rettungskopie greift' : 'nein', z.fehler ? 'warn' : 'gut'),
+      zeile('Wochensicherung', sich ? fmtDatum(sich.wann) + ', ' + sich.texte + ' Texte' : 'wird gleich angelegt'),
+      platz ? zeile('Platz belegt', bytesLesbar(platz.belegt) + (platz.gesamt ? ' von ' + bytesLesbar(platz.gesamt) : ''), platz.anteil > .9 ? 'warn' : 'gut') : null,
+      platz ? zeile('Dauerspeicher', platz.dauerhaft === true ? 'ja — nichts wird weggeräumt' : platz.dauerhaft === false ? 'nicht bestätigt' : 'unbekannt', platz.dauerhaft === true ? 'gut' : '') : null),
+    platz && platz.dauerhaft === false ? el('button', { class: 'knopf zart', style: 'justify-self:start', onclick: async () => {
+      try {
+        const ok = navigator.storage && navigator.storage.persist ? await navigator.storage.persist() : false;
+        toast(ok ? 'Der Browser hat den Dauerspeicher zugesagt: hier wird nichts mehr weggeräumt.' : 'Der Browser sagt: noch nicht. Auf dem iPad hilft es, VANI zum Home-Bildschirm hinzuzufügen — dann wird es zugesagt.', 7000);
+      } catch (e) { toast('Das ging gerade nicht.'); }
+    } }, 'Dauerspeicher anfordern') : null,
+    el('div', { class: 'sicher-netze' },
+      el('div', { class: 'sicher-netz' }, el('b', {}, '1 · Hauptspeicher'), el('span', {}, 'Jedes Speichern wird bei einem Fehler dreimal wiederholt.')),
+      el('div', { class: 'sicher-netz' }, el('b', {}, '2 · Rettungskopie'), el('span', {}, 'Beim Schreiben liegt der Text zusätzlich in einem zweiten Speicher.')),
+      el('div', { class: 'sicher-netz' }, el('b', {}, '3 · Absturzfang'), el('span', {}, 'Jeder unerwartete Fehler sichert zuerst den Text, dann wird er notiert.')),
+      el('div', { class: 'sicher-netz' }, el('b', {}, '4 · Wochensicherung'), el('span', {}, 'Einmal pro Woche legt VANI still eine vollständige Kopie an.'))),
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: async () => { const e = await sicherungAutoAnlegen(); toast(e ? 'Kopie angelegt: ' + e.texte + ' Texte.' : 'Das hat gerade nicht geklappt.'); } }, 'Jetzt still sichern'),
+      el('button', { class: 'knopf voll', onclick: () => { zu(); if (typeof sichereAlles === 'function') sichereAlles(); else location.hash = '#/feinheiten'; } }, 'Sicherungsdatei anlegen')),
+    prot.length ? el('details', { class: 'sicher-protokoll' },
+      el('summary', {}, 'Was zuletzt gehakt hat (' + prot.length + ')'),
+      ...prot.slice(-8).reverse().map((p) => el('div', { class: 'sicher-protokollzeile' }, el('small', {}, fmtDatum(p.wann) + ' ' + fmtZeit(p.wann) + ' · ' + p.art), el('span', {}, p.text))),
+      el('button', { class: 'knopf zart', style: 'margin-top:8px', onclick: (ev) => { protokollLoeschen(); ev.currentTarget.closest('details').remove(); toast('Protokoll geleert.'); } }, 'Protokoll leeren')) : null);
+  const zu = zeigeDeck(kasten);
 }
 
 /* ================================================================
@@ -10131,6 +10489,7 @@ function oeffneSchreibraum(docId) {
     titel,
     kerzenhalter,
     worteAnzeige,
+    typeof speicherAnzeige === 'function' ? speicherAnzeige() : null,
     vorleseKnopf,
     typeof diktatKnopf === 'function' ? diktatKnopf(() => (_sr ? _sr.ta : null)) : null,
     klangKnopf,
@@ -10174,11 +10533,17 @@ function oeffneSchreibraum(docId) {
     speichere(doc);
     zaehleWorte(doc.id, doc.text);
   }, 500, true);
+  /* Das zweite Netz: während des Schreibens liegt der Text auch in der Rettungskopie —
+     ein anderer Speicher, den der Browser anders behandelt. Kostet nichts und rettet alles. */
+  const rettung = typeof rettungSchreiben === 'function' ? entprellt(() => {
+    rettungSchreiben(doc.id, doc.titel, istRich ? (($('.sr-text') || {}).textContent || doc.text) : ta.value);
+  }, 3000, true) : null;
+  if (rettung) { _sr.rettung = rettung; }
   _sr.sichern = sichern;
   if (typeof klangkarteAnbieten === 'function') setTimeout(() => klangkarteAnbieten(doc), 900);
   if (typeof pauseErinnerungStart === 'function') pauseErinnerungStart();
   /* Jeder Anschlag ist ein kleiner Luftzug für die Kerze. */
-  ta.addEventListener('input', () => { if (_sr && _sr.sprint && _sr.sprint.kerze) _sr.sprint.kerze.puste(.22); });
+  ta.addEventListener('input', () => { if (_sr && _sr.sprint && _sr.sprint.kerze) _sr.sprint.kerze.puste(.22); if (_sr && _sr.rettung) _sr.rettung(); });
 
   /* Deutsche Feder: -- wird –, gerade Anführungszeichen werden „so" */
   function ersetzeKlug() {
@@ -12538,6 +12903,28 @@ RENDER.feinheiten = function (haupt) {
       setTimeout(() => { if (b.isConnected) { b.textContent = alt; delete b.dataset.laeuft; } }, 2500);
     }
   }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Aktualisieren');
+  /* Ganz oben: der Zustand, damit man ihn sieht, ohne zu suchen. */
+  if (typeof speicherZustand === 'function') {
+    const karte = el('button', { class: 'karte sicher-karte', onclick: () => zeigeSicherheit() },
+      el('span', { class: 'sicher-karte-icon', html: ik('schild') }),
+      el('span', { class: 'sicher-karte-text' }, el('b', {}, 'Alles sicher'), el('small', {}, 'Wird geprüft …')),
+      el('span', { class: 'sicher-karte-pfeil', html: ik('rechts') }));
+    const kleines = karte.querySelector('small');
+    const setz = async () => {
+      if (!kleines.isConnected) return;
+      const z = speicherZustand();
+      const texte = [...D.docs.values()].filter((d) => !d.geloescht).length;
+      const s = typeof sicherungAutoStand === 'function' ? await sicherungAutoStand() : null;
+      karte.classList.toggle('hakt', z.art === 'fehler');
+      kleines.textContent = z.art === 'fehler'
+        ? 'Der Hauptspeicher hakt — deine Texte liegen in der Rettungskopie. Hier ansehen.'
+        : texte.toLocaleString('de-DE') + ' Texte gespeichert' + (z.zuletzt ? ' · zuletzt ' + vorZeit(z.zuletzt) : '') + (s ? ' · Wochensicherung ' + fmtDatum(s.wann) : '');
+    };
+    inhalt.append(karte);
+    setz();
+    if (typeof speicherHorchen === 'function') { const loesen = speicherHorchen(() => setz()); setTimeout(() => { if (!karte.isConnected) loesen(); }, 60000); }
+  }
+
   inhalt.append(el('div', { class: 'abschnitt' },
     el('div', { class: 'abschnitt-kopfzeile' }, el('h2', {}, 'Stimmung'), el('span', { class: 'abschnitt-fassung' }, 'v' + APP_VERSION), aktKnopf),
     themen));
@@ -23346,6 +23733,9 @@ async function sucheAppUpdate(neuLaden = false) {
 
   /* Speicher festhalten */
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+
+  /* Das Sicherheitsnetz: Absturzfang, Rettungskopie, Wochensicherung */
+  try { if (typeof sicherheitStarten === 'function') sicherheitStarten(); } catch (e) {}
 
   /* Nichts verlieren, auch wenn iOS die App wegwirft */
   const notSicherung = () => { try { spueleAlles(); } catch (e) {} };

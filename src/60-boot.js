@@ -133,6 +133,9 @@ async function sucheAppUpdate(neuLaden = false) {
   /* Speicher festhalten */
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
 
+  /* Das Sicherheitsnetz: Absturzfang, Rettungskopie, Wochensicherung */
+  try { if (typeof sicherheitStarten === 'function') sicherheitStarten(); } catch (e) {}
+
   /* Nichts verlieren, auch wenn iOS die App wegwirft */
   const notSicherung = () => { try { spueleAlles(); } catch (e) {} };
   window.addEventListener('pagehide', notSicherung);

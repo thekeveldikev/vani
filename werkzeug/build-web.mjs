@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const wurzel = join(dirname(fileURLToPath(import.meta.url)), '..');
 const jsDateien = [
-  'src/30-core.js', 'src/29-profile.js', 'src/31-sync.js', 'src/35-richtext.js', 'src/36-caret.js', 'src/34-inhalt.js', 'src/38-media.js',
+  'src/30-core.js', 'src/29-profile.js', 'src/32-sicherheit.js', 'src/31-sync.js', 'src/35-richtext.js', 'src/36-caret.js', 'src/34-inhalt.js', 'src/38-media.js',
   'src/39-beziehungen.js', 'src/40-router.js', 'src/41-zuhause.js',
   'src/42-schnipsel.js', 'src/42b-blaetter.js', 'src/42c-faden.js',
   'src/42d-goodnotes.js', 'src/43-hefte.js', 'src/43b-sticker.js', 'src/43c-kritzel.js', 'src/43d-ton.js', 'src/43e-deckel.js', 'src/44-projekte.js',

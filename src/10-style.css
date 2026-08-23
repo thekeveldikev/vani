@@ -2888,3 +2888,47 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
 .salon-eigenerrahmen-ecke { position: absolute; left: 50%; top: -14px; width: 10px; height: 14px; margin-left: -5px; background: linear-gradient(#e8c27a, #8a6a2e); border-radius: 2px; }
 .salon-eigenerrahmen:hover { box-shadow: 0 0 0 6px #a8832f, 0 0 0 8px rgba(255,236,190,.5), 0 18px 36px rgba(0,0,0,.5); }
 @media (max-width: 600px) { .salon-eigenerrahmen { max-width: 90%; } }
+/* ----- Die Speicheranzeige: ein ruhiger Punkt im Schreibraum ----- */
+.speicheranzeige { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 100px; background: none; color: var(--blass); font-size: 12px; line-height: 1; opacity: .55; transition: opacity .4s ease, background .3s ease; }
+.speicheranzeige.sichtbar { opacity: 1; }
+.speicheranzeige .sp-punkt { width: 7px; height: 7px; border-radius: 50%; background: #7ba05b; box-shadow: 0 0 0 0 rgba(123,160,91,.5); transition: background .3s ease; flex: none; }
+.speicheranzeige .sp-wort { max-width: 0; overflow: hidden; white-space: nowrap; transition: max-width .45s cubic-bezier(.2,.8,.2,1); }
+.speicheranzeige.sichtbar .sp-wort { max-width: 160px; }
+.speicheranzeige[data-art="schreibt"] .sp-punkt { background: #c9a25a; animation: sp-puls 1.1s ease-in-out infinite; }
+.speicheranzeige[data-art="fehler"] .sp-punkt { background: #b0352b; animation: sp-puls .9s ease-in-out infinite; }
+.speicheranzeige[data-art="fehler"] { color: #b0352b; opacity: 1; background: rgba(176,53,43,.1); }
+@keyframes sp-puls { 0%, 100% { box-shadow: 0 0 0 0 rgba(201,162,90,.5); } 50% { box-shadow: 0 0 0 5px rgba(201,162,90,0); } }
+@media (prefers-reduced-motion: reduce) { .speicheranzeige .sp-punkt { animation: none !important; } }
+
+/* ----- Gerettet ----- */
+.rettung-fenster { width: min(520px, calc(100vw - 28px)); display: grid; gap: 10px; }
+.rettung-fenster h2 { margin: 0; }
+.rettung-text { font: 14.5px/1.55 ui-serif, "New York", Georgia, serif; margin: 0; }
+.rettung-probe { max-height: 180px; overflow: auto; padding: 12px 14px; border-radius: 10px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font: 13px/1.6 ui-serif, "New York", Georgia, serif; white-space: pre-wrap; color: var(--blass); }
+
+/* ----- Alles sicher ----- */
+.sicher-fenster { width: min(560px, calc(100vw - 28px)); max-height: min(88dvh, calc(var(--vvh, 100dvh) - 28px)); overflow: auto; display: grid; gap: 12px; }
+.sicher-fenster h2 { margin: 0; font-size: 21px; }
+.sicher-erklaerung { font: 14px/1.55 ui-serif, "New York", Georgia, serif; margin: 0; color: var(--blass); }
+.sicher-liste { display: grid; gap: 2px; }
+.sicher-zeile { display: flex; align-items: baseline; gap: 10px; padding: 7px 12px; border-radius: 9px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-size: 13.5px; }
+.sicher-zeile span { color: var(--blass); } .sicher-zeile b { margin-left: auto; font-variant-numeric: tabular-nums; }
+.sicher-zeile.gut b { color: #5f7752; } .sicher-zeile.warn b { color: #b0352b; }
+.sicher-netze { display: grid; gap: 6px; }
+.sicher-netz { display: grid; gap: 2px; padding: 9px 12px; border-radius: 10px; background: color-mix(in srgb, var(--karte) 65%, transparent); box-shadow: inset 0 0 0 1px var(--linie); }
+.sicher-netz b { font-size: 12.5px; letter-spacing: .04em; }
+.sicher-netz span { font-size: 12.5px; color: var(--blass); line-height: 1.45; }
+.sicher-protokoll summary { font-size: 12.5px; color: var(--blass); cursor: pointer; padding: 4px 0; }
+.sicher-protokollzeile { display: grid; gap: 1px; padding: 6px 10px; border-radius: 8px; background: var(--karte); margin-top: 4px; }
+.sicher-protokollzeile small { font-size: 11px; color: var(--blass); }
+.sicher-protokollzeile span { font-size: 12.5px; word-break: break-word; }
+/* ----- Die Karte „Alles sicher" in den Feinheiten ----- */
+.sicher-karte { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; margin-bottom: 12px; }
+.sicher-karte-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: rgba(123,160,91,.16); color: #5f7752; flex: none; }
+.sicher-karte-icon svg.ik { width: 19px; height: 19px; }
+.sicher-karte-text { display: grid; gap: 2px; min-width: 0; }
+.sicher-karte-text b { font-size: 15px; }
+.sicher-karte-text small { font-size: 12.5px; color: var(--blass); }
+.sicher-karte-pfeil { margin-left: auto; color: var(--blass); display: flex; flex: none; }
+.sicher-karte.hakt .sicher-karte-icon { background: rgba(176,53,43,.14); color: #b0352b; }
+.sicher-karte.hakt .sicher-karte-text small { color: #b0352b; }

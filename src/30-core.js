@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.27.3';
+const APP_VERSION = '5.28.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -241,6 +241,7 @@ const IK = {
   kamera: '<path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.5" r="3.5"/>',
   senden: '<path d="M12 19V6"/><path d="m6 11.5 6-6 6 6"/>',
   kreuz: '<path d="M6 6l12 12M18 6 6 18"/>',
+  schild: '<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
   haken: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
   rechts: '<path d="m9.5 5 6.5 7-6.5 7"/>',
   feuer: '<path d="M12 3s-5 4.5-5 9.5a5 5 0 0 0 10 0c0-2-1-4-2.5-5.5 0 2-.7 3-1.8 3.7C12.5 9.5 12 6.5 12 3Z"/>',
@@ -603,11 +604,11 @@ async function ladeAlles() {
   };
 }
 const speichereEinst = entprellt(() => {
-  dbPut('kv', D.einst, 'einst').catch(() => {});
+  sicherSpeichern('kv', D.einst, 'einst');
   if (typeof syncMetadatenGeaendert === 'function') syncMetadatenGeaendert('einst');
 }, 300);
 const speichereStats = entprellt(() => {
-  dbPut('kv', D.stats, 'stats').catch(() => {});
+  sicherSpeichern('kv', D.stats, 'stats');
   if (typeof syncMetadatenGeaendert === 'function') syncMetadatenGeaendert('stats');
 }, 800);
 
@@ -626,11 +627,11 @@ function neuDoc(typ, felder) {
   const d = Object.assign({ id: uid(), typ, angelegt: Date.now(), geaendert: Date.now() }, felder);
   markiereAenderung(d, false);
   D.docs.set(d.id, d);
-  dbPut('docs', d).catch(() => toast('Das Speichern hat gerade nicht geklappt.'));
+  sicherSpeichern('docs', d);
   D.stats.letzte[d.id] = worte(d.text || '');
   return d;
 }
-function speichere(d) { d.geaendert = Date.now(); staendeAutomatisch(d); markiereAenderung(d, false); dbPut('docs', d).catch(() => {}); }
+function speichere(d) { d.geaendert = Date.now(); staendeAutomatisch(d); markiereAenderung(d, false); sicherSpeichern('docs', d); }
 /* Rückgängig-Verlauf: alle 15 Minuten friert das Speichern den Text still ein (höchstens 20 Stände,
    automatische weichen zuerst). Pur bis auf die Uhr. */
 const STAENDE_ABSTAND = 15 * 60000;
@@ -644,7 +645,7 @@ function staendeAutomatisch(d, jetzt = Date.now()) {
   while (st.length > 20) { const i = st.findIndex((s) => s.auto); st.splice(i >= 0 ? i : 0, 1); }
   return true;
 }
-function speichereStill(d) { markiereAenderung(d, false); dbPut('docs', d).catch(() => {}); }
+function speichereStill(d) { markiereAenderung(d, false); sicherSpeichern('docs', d); }
 
 /* Löschen ist bei VANI nie endgültig: alles wandert erst in den Papierkorb. */
 function _nachfahren(id, kinderDerWurzelBehalten = false) {

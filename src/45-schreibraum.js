@@ -90,6 +90,7 @@ function oeffneSchreibraum(docId) {
     titel,
     kerzenhalter,
     worteAnzeige,
+    typeof speicherAnzeige === 'function' ? speicherAnzeige() : null,
     vorleseKnopf,
     typeof diktatKnopf === 'function' ? diktatKnopf(() => (_sr ? _sr.ta : null)) : null,
     klangKnopf,
@@ -133,11 +134,17 @@ function oeffneSchreibraum(docId) {
     speichere(doc);
     zaehleWorte(doc.id, doc.text);
   }, 500, true);
+  /* Das zweite Netz: während des Schreibens liegt der Text auch in der Rettungskopie —
+     ein anderer Speicher, den der Browser anders behandelt. Kostet nichts und rettet alles. */
+  const rettung = typeof rettungSchreiben === 'function' ? entprellt(() => {
+    rettungSchreiben(doc.id, doc.titel, istRich ? (($('.sr-text') || {}).textContent || doc.text) : ta.value);
+  }, 3000, true) : null;
+  if (rettung) { _sr.rettung = rettung; }
   _sr.sichern = sichern;
   if (typeof klangkarteAnbieten === 'function') setTimeout(() => klangkarteAnbieten(doc), 900);
   if (typeof pauseErinnerungStart === 'function') pauseErinnerungStart();
   /* Jeder Anschlag ist ein kleiner Luftzug für die Kerze. */
-  ta.addEventListener('input', () => { if (_sr && _sr.sprint && _sr.sprint.kerze) _sr.sprint.kerze.puste(.22); });
+  ta.addEventListener('input', () => { if (_sr && _sr.sprint && _sr.sprint.kerze) _sr.sprint.kerze.puste(.22); if (_sr && _sr.rettung) _sr.rettung(); });
 
   /* Deutsche Feder: -- wird –, gerade Anführungszeichen werden „so" */
   function ersetzeKlug() {

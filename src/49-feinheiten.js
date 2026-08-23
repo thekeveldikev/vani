@@ -160,6 +160,28 @@ RENDER.feinheiten = function (haupt) {
       setTimeout(() => { if (b.isConnected) { b.textContent = alt; delete b.dataset.laeuft; } }, 2500);
     }
   }, el('span', { html: ik('wieder'), style: 'display:flex' }), 'Aktualisieren');
+  /* Ganz oben: der Zustand, damit man ihn sieht, ohne zu suchen. */
+  if (typeof speicherZustand === 'function') {
+    const karte = el('button', { class: 'karte sicher-karte', onclick: () => zeigeSicherheit() },
+      el('span', { class: 'sicher-karte-icon', html: ik('schild') }),
+      el('span', { class: 'sicher-karte-text' }, el('b', {}, 'Alles sicher'), el('small', {}, 'Wird geprüft …')),
+      el('span', { class: 'sicher-karte-pfeil', html: ik('rechts') }));
+    const kleines = karte.querySelector('small');
+    const setz = async () => {
+      if (!kleines.isConnected) return;
+      const z = speicherZustand();
+      const texte = [...D.docs.values()].filter((d) => !d.geloescht).length;
+      const s = typeof sicherungAutoStand === 'function' ? await sicherungAutoStand() : null;
+      karte.classList.toggle('hakt', z.art === 'fehler');
+      kleines.textContent = z.art === 'fehler'
+        ? 'Der Hauptspeicher hakt — deine Texte liegen in der Rettungskopie. Hier ansehen.'
+        : texte.toLocaleString('de-DE') + ' Texte gespeichert' + (z.zuletzt ? ' · zuletzt ' + vorZeit(z.zuletzt) : '') + (s ? ' · Wochensicherung ' + fmtDatum(s.wann) : '');
+    };
+    inhalt.append(karte);
+    setz();
+    if (typeof speicherHorchen === 'function') { const loesen = speicherHorchen(() => setz()); setTimeout(() => { if (!karte.isConnected) loesen(); }, 60000); }
+  }
+
   inhalt.append(el('div', { class: 'abschnitt' },
     el('div', { class: 'abschnitt-kopfzeile' }, el('h2', {}, 'Stimmung'), el('span', { class: 'abschnitt-fassung' }, 'v' + APP_VERSION), aktKnopf),
     themen));
