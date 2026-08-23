@@ -74,6 +74,8 @@ const ALBUM_FELDER = [
   { id: 'bewundert', gruppe: 'wesen', name: 'Bewundert', form: 'liste', mehrfach: true, verweis: true, platz: 'Wen?' },
   { id: 'verachtet', gruppe: 'wesen', name: 'Verachtet', form: 'liste', mehrfach: true, verweis: true },
   { id: 'unbeobachtet', gruppe: 'wesen', name: 'Wenn niemand zusieht', form: 'karte', platz: 'Was {du} allein tut', hilfe: 'Der ehrlichste Ort einer Figur.' },
+  { id: 'schuldet', gruppe: 'wesen', name: 'Schuldet noch', form: 'liste', mehrfach: true, verweis: true, platz: 'Wem — und was?', hilfe: 'Gefallen, Geld, ein Versprechen. Schulden treiben Geschichten an.' },
+  { id: 'traeumt', gruppe: 'wesen', name: 'Träumt von', form: 'zeile', platz: 'Was {du} nachts sieht' },
   { id: 'streit', gruppe: 'wesen', name: 'Im Streit', form: 'zeile', platz: 'Laut, kalt, weinend, witzig?' },
   { id: 'kannnicht', gruppe: 'wesen', name: 'Kann nicht', form: 'zeile', platz: 'Etwas ganz Konkretes: schwimmen, lügen, danke sagen' },
   { id: 'aberglaube', gruppe: 'wesen', name: 'Aberglaube', form: 'zeile' },
@@ -84,6 +86,9 @@ const ALBUM_FELDER = [
   { id: 'spaet', gruppe: 'leben', name: 'Zu spät verstanden', form: 'karte', platz: 'Was {du} erst begriff, als es nichts mehr half' },
   { id: 'geweint', gruppe: 'leben', name: 'Zuletzt geweint, als', form: 'zeile' },
   { id: 'narbe', gruppe: 'leben', name: 'Die Wunde, über die nicht geredet wird', form: 'karte' },
+  { id: 'bogenAnfang', gruppe: 'leben', name: 'Am Anfang ist {du}', form: 'karte', platz: 'Wie steht {du} zu Beginn da?', hilfe: 'Die eine Hälfte des Bogens. Zusammen mit „Am Ende" steht die ganze Wandlung auf einer Zeile.' },
+  { id: 'bogenEnde', gruppe: 'leben', name: 'Am Ende ist {du}', form: 'karte', platz: 'Und wie am Schluss?' },
+  { id: 'status', gruppe: 'leben', name: 'Wie es jetzt um {du} steht', form: 'etikett', platz: 'lebt · verschollen · gestorben · niemand weiß es' },
   { id: 'familie', gruppe: 'leben', name: 'Familie', form: 'liste', mehrfach: true, verweis: true, platz: 'Wer gehört dazu?', hilfe: 'Schreib die Verwandtschaft dazu: „Mutter", „Bruder", „Ziehvater". Wer schon im Album steht, wird erkannt.' },
   { id: 'naehe', gruppe: 'leben', name: 'Steht nahe', form: 'liste', mehrfach: true, verweis: true, platz: 'Freunde, Feinde, alles dazwischen' },
 
@@ -102,8 +107,10 @@ const ALBUM_FELDER = [
   { id: 'jahreszeit', gruppe: 'welt', name: 'Jahreszeit', form: 'etikett', platz: 'Welche Jahreszeit ist {du}?' },
   { id: 'klang', gruppe: 'welt', name: 'Klingt nach', form: 'zeile', platz: 'Ein Geräusch, ein Instrument, ein Lied' },
   { id: 'bleibt', gruppe: 'welt', name: 'Was bleibt, wenn sie geht', form: 'karte', platz: 'Was im Raum zurückbleibt' },
+  { id: 'faden', gruppe: 'welt', name: 'Offene Fäden', form: 'faeden', mehrfach: true, platz: 'Was hier angelegt ist und noch eingelöst werden muss', hilfe: 'Der Schlüssel in der Schublade, der Cousin in Marseille, die Warnung vor dem Obstgarten. Alles, was du gelegt hast, ist ein Versprechen an den Leser. Setz einen Haken davor, sobald es eingelöst ist.' },
 
   /* ---------- Rand ---------- */
+  { id: 'motto', gruppe: 'rand', name: 'Leitsatz', form: 'motto', platz: 'Ein Satz, der über der ganzen Figur steht', hilfe: 'Steht groß über der Doppelseite — die kürzeste Fassung dieses Menschen.' },
   { id: 'notiz', gruppe: 'rand', name: 'Notizen', form: 'notizfeld', platz: 'Alles, was sonst nirgends hinpasst.' }
 ];
 const ALBUM_FELD_IDS = ALBUM_FELDER.map((f) => f.id);
@@ -142,6 +149,11 @@ function saubereAlbumFigur(f) {
   if (!f || typeof f !== 'object') return null;
   const raus = { name: String(f.name || f.titel || '').slice(0, 120).trim(), felder: {}, eigene: [], zettel: [], farbe: '' };
   if (/^#[0-9a-f]{6}$/i.test(String(f.farbe || ''))) raus.farbe = String(f.farbe);
+  if (f.bild) raus.bild = String(f.bild).slice(0, 500);
+  if (Array.isArray(f.striche) && typeof saubereStricheEinfach === 'function') {
+    const st = saubereStricheEinfach(f.striche);
+    if (st.length) raus.striche = st;
+  }
   const quelle = f.felder && typeof f.felder === 'object' ? f.felder : {};
   for (const feld of ALBUM_FELDER) {
     const w = quelle[feld.id];
@@ -337,4 +349,146 @@ function albumAlterText(f, stichtag) {
   }
   const a = kalAlter(g, stichtag || kalHeute());
   return a ? 'heute ' + kalAlterText(a) : '';
+}
+
+/* ----- Offene Fäden -----
+   Alles, was in einer Geschichte gelegt wird, ist ein Versprechen an den
+   Leser: der Schlüssel in der Schublade, der Cousin in Marseille, die
+   Warnung vor dem Obstgarten. Wer sie nicht einlöst, lässt den Leser stehen.
+   Ein Haken vorn heißt: eingelöst. */
+function albumFadenErledigt(eintrag) { return /^\s*[✓✔x]\s+/i.test(String(eintrag || '')); }
+function albumFadenText(eintrag) { return String(eintrag || '').replace(/^\s*[✓✔x]\s+/i, '').trim(); }
+function albumFadenSetzen(eintrag, erledigt) {
+  const t = albumFadenText(eintrag);
+  return erledigt ? '✓ ' + t : t;
+}
+function albumFaeden(f) {
+  return ((f.felder || {}).faden || []).map((e) => ({ roh: e, text: albumFadenText(e), erledigt: albumFadenErledigt(e) }));
+}
+/* Alle offenen Fäden im ganzen Album — für die Übersicht. */
+function albumOffeneFaeden(liste) {
+  const raus = [];
+  for (const f of liste || albumFiguren()) {
+    for (const x of albumFaeden(f)) if (!x.erledigt) raus.push({ figur: f, text: x.text });
+  }
+  return raus;
+}
+
+/* ----- Wo diese Figur in deinen eigenen Texten vorkommt -----
+   Der Name wird gesucht, wie er dasteht — als ganzes Wort, damit „Nore" nicht
+   in „Norwegen" anschlägt. Gezählt wird je Text, nicht je Fundstelle. */
+const ALBUM_TEXTTYPEN = ['blatt', 'seite', 'szene', 'schnipsel', 'heft', 'projekt', 'faden'];
+/* Ohne regulaeren Ausdruck: ein Name kann Punkte, Klammern oder Apostrophe
+   enthalten (O'Brien, St. Clair), und die muessten sonst alle entschaerft
+   werden. Ein Buchstabe erkennt man daran, dass er in Gross und Klein
+   verschieden aussieht. */
+function albumIstWortzeichen(c) {
+  if (!c) return false;
+  if (c >= '0' && c <= '9') return true;
+  return c.toLowerCase() !== c.toUpperCase();
+}
+/* Die Stelle, an der der Name als GANZES Wort steht — sonst schlaegt
+   „Nore" auch in „Norwegen" an. Gibt -1, wenn er nicht vorkommt. Pur. */
+function albumFundstelle(text, name) {
+  const t = String(text || '').toLowerCase();
+  const n = String(name || '').trim().toLowerCase();
+  if (!n) return -1;
+  let i = t.indexOf(n);
+  while (i >= 0) {
+    if (!albumIstWortzeichen(text[i - 1]) && !albumIstWortzeichen(text[i + n.length])) return i;
+    i = t.indexOf(n, i + 1);
+  }
+  return -1;
+}
+function albumErwaehnungen(f, grenze = 12) {
+  const name = String((f && f.name) || '').trim();
+  if (name.length < 3) return [];
+  const raus = [];
+  for (const d of D.docs.values()) {
+    if (d.geloescht || !ALBUM_TEXTTYPEN.includes(d.typ)) continue;
+    const text = String(d.titel || '') + ' — ' + String(d.text || '');
+    const i = albumFundstelle(text, name);
+    if (i < 0) continue;
+    /* Eine Fundstelle im Zusammenhang zeigen — das ist der eigentliche Wert. */
+    const von = Math.max(0, i - 40), bis = Math.min(text.length, i + name.length + 70);
+    raus.push({
+      doc: d,
+      stelle: (von > 0 ? '… ' : '') + text.slice(von, bis).replace(/\s+/g, ' ').trim() + (bis < text.length ? ' …' : '')
+    });
+    if (raus.length >= grenze) break;
+  }
+  return raus;
+}
+
+/* ----- Was der Kalender über diese Figur weiß ----- */
+function albumZeitleiste(f) {
+  if (typeof kalTermine !== 'function') return [];
+  const name = String((f && f.name) || '').trim().toLowerCase();
+  const id = f && f.id;
+  return kalSortiert(kalTermine().filter((t) => (t.leute || []).some((p) =>
+    (p.id && p.id === id) || String(p.name || '').trim().toLowerCase() === name)));
+}
+
+/* ----- Was nicht zusammenpasst -----
+   Dieselbe Idee wie im Kalender: nicht meckern, sondern zeigen, was auffällt. */
+function albumWidersprueche(f, liste) {
+  const raus = [];
+  const felder = f.felder || {};
+  const g = felder.geboren, t = felder.gestorben;
+  if (g && t && typeof kalZeit === 'function' && kalGueltig(g) && kalGueltig(t) && kalZeit(t) < kalZeit(g)) {
+    raus.push('Gestorben vor der Geburt.');
+  }
+  /* Ein Alter, das nicht zum Geburtsdatum passt */
+  if (g && felder.alter && typeof kalAlter === 'function' && kalGueltig(g)) {
+    const zahl = parseInt(String(felder.alter).replace(/\D+/g, ''), 10);
+    const a = kalAlter(g, t && kalGueltig(t) ? t : kalHeute());
+    if (Number.isFinite(zahl) && a && Math.abs(a.jahre - zahl) > 1) {
+      raus.push('Im Feld steht „' + felder.alter + '", aus dem Geburtsdatum wären es ' + a.jahre + '.');
+    }
+  }
+  /* Ein Status, der dem Todesdatum widerspricht */
+  const st = String(felder.status || '').toLowerCase();
+  if (t && kalGueltig(t) && /lebt|lebendig|am leben/.test(st)) raus.push('Steht als lebend da, hat aber ein Todesdatum.');
+  /* Verweise auf sich selbst */
+  for (const feldId of ['familie', 'naehe', 'bewundert', 'verachtet', 'schuldet']) {
+    for (const e of felder[feldId] || []) {
+      if (albumVerweisName(e).toLowerCase() === String(f.name || '').trim().toLowerCase() && f.name) {
+        raus.push('Verweist auf sich selbst: „' + e + '".');
+      }
+    }
+  }
+  return raus;
+}
+
+/* ----- Namen, die genannt werden, aber noch niemandem gehören ----- */
+function albumFehlendeFiguren(liste) {
+  const alle = liste || albumFiguren();
+  const da = new Set(alle.map((f) => String(f.name || '').trim().toLowerCase()).filter(Boolean));
+  const karte = new Map();
+  for (const b of albumBeziehungen(alle)) {
+    const k = b.name.trim().toLowerCase();
+    if (!k || da.has(k)) continue;
+    if (!karte.has(k)) karte.set(k, { name: b.name.trim(), wo: [] });
+    karte.get(k).wo.push(b.vonName || 'jemand');
+  }
+  return [...karte.values()].sort((a, b) => b.wo.length - a.wo.length || a.name.localeCompare(b.name, 'de'));
+}
+
+/* ----- Das Bildnis: standardmaessig aus -----
+   Ein Gesicht festzulegen nimmt einem etwas weg: solange keins dasteht, darf
+   die Figur aussehen, wie sie im Kopf gerade aussieht. Wer eins will, schaltet
+   es in den Feinheiten ein. */
+function albumBildnisAn() { return D.einst.albumBildnis === true; }
+
+/* ----- Das Bild ----- */
+/* Entweder ein Foto (Kennung in der Medienablage), ein selbst gezeichnetes
+   Bildnis (Striche in 0..1) — oder gar keins. Dann steht dort ein Monogramm,
+   das aussieht, als wäre es so gemeint. */
+function albumHatBild(f) { return !!(f && (f.bild || (Array.isArray(f.striche) && f.striche.length))); }
+function albumMonogramm(f) {
+  const n = String((f && f.name) || '').trim();
+  if (!n) return '?';
+  const teile = n.split(/\s+/).filter(Boolean);
+  if (teile.length >= 2) return (teile[0][0] + teile[teile.length - 1][0]).toUpperCase();
+  return n.slice(0, 2).toUpperCase();
 }

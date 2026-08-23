@@ -2520,3 +2520,70 @@ Figuren.
 
 Beschaedigte Daten duerfen die Seite nicht zerlegen: `albumStuecke` und
 `albumZettel` pruefen jeden Eintrag einzeln, statt blind zu iterieren.
+
+## Album, zweite Ausbaustufe (5.33.0)
+
+**Aussehen.** Halbfranzband: Leder auf Ruecken und Ecken, drei erhabene
+Buende, Goldpraegung, Messingecken, Schliesse, Lesebaendchen. Innen Buetten
+mit Kett- und Rippenlinien, ein doppelter Rahmen um den Satzspiegel, Fleurons
+in den vier Ecken, Laufkopf oben, Seitenzahl unten.
+
+**Beide Seiten sind immer gleich gross** (`min-height: 58vh`, gleiche Breite).
+Eine halb leere Seite in einem kostbaren Buch ist keine Luecke, sondern Raum —
+dafuer traegt jede Seite ihren Schmuck, auch die leere.
+
+**Der Seitenfuss braucht ein eigenes, deckendes Band.** Die Seite scrollt; ein
+absolut gesetzter Fuss bleibt am sichtbaren Rand stehen, und der Inhalt liefe
+sonst darunter durch (genau das passierte: die Seitenzahl stand mitten im
+Zitat). Nicht wieder entfernen.
+
+**Das Bildnis ist standardmaessig AUS** (`D.einst.albumBildnis`, Schalter in
+der Feinheiten-Karte „Album"). Kevins Begruendung, die zaehlt: ein Gesicht
+festzulegen nimmt einem etwas weg — solange keins dasteht, darf die Figur
+aussehen, wie sie im Kopf gerade aussieht. **Nicht ohne Anlass umstellen.**
+Ist es an, zeigt `albumBildplatte` ein Foto (`figur.bild`, Medienablage), eine
+Zeichnung (`figur.striche`, 0..1) oder ein Monogramm.
+
+**Statt eines Bildnisses fuellt eine Initiale die Seite** (`.alb-initiale`):
+gross, blass, hinter allem, ausserhalb des Flusses. Ein Buchstabe legt kein
+Gesicht fest — genau deshalb steht er dort.
+
+**Der Seitenfuss steht IM FLUSS**, nicht als aufgelegtes Band: `.alb-seite` ist
+eine Flex-Spalte aus `.alb-seiteninhalt` (waechst) und `.alb-seitenfuss`. Ein
+absolut gesetzter Fuss in einem scrollenden Bereich bleibt am sichtbaren Rand
+stehen, und der Text laeuft darunter durch — die Seitenzahl stand mitten im
+Zitat. Ein deckendes Band davor war die falsche Antwort und sah beim Scrollen
+aus wie ein Fehler.
+
+**Zitate:** ein Steg an der linken Seite, grosse haengende Anfuehrung, kein
+Feldname unter jedem Satz. Zier quer ueber die Gruppe war falsch — sie sieht
+beim Scrollen aus wie ein Riss im Papier.
+
+**Zitate stehen fuer sich.** Unter jedem Satz noch einmal „Sagt" zu schreiben,
+war Beiwerk; die Anfuehrungszeichen sagen es bereits. Nur wo der Feldname etwas
+hinzufuegt (die erste Zeile), steht er einmal ueber der Gruppe. Statt
+Beschriftungen: eine feine Zier ueber und unter der Gruppe.
+
+**Neue Felder** aus der Recherche zu Story Bibles: offene Faeden (Versprechen
+an den Leser, mit Haken zum Einloesen — `albumFadenErledigt` / `albumFadenSetzen`,
+ein Haken vorn heisst eingeloest), der Bogen (Am Anfang / Am Ende), Status,
+schuldet noch, traeumt von, Leitsatz.
+
+**Was das Buch selbst weiss:** `albumZeitleiste(f)` holt die Kalendertermine
+dieser Figur (links, mit dem Alter von damals); `albumErwaehnungen(f)` sucht
+den Namen in den eigenen Texten. **Diese Suche kommt ohne regulaeren Ausdruck
+aus** (`albumFundstelle` / `albumIstWortzeichen`): Namen koennen Punkte,
+Klammern oder Apostrophe enthalten, die sonst alle entschaerft werden muessten.
+Ein Buchstabe wird daran erkannt, dass er in Gross und Klein verschieden
+aussieht. `albumWidersprueche(f)` meldet Alter gegen Geburtsdatum, „lebt" trotz
+Todesdatum, Verweise auf sich selbst.
+
+**Die Uebersicht** (`albumRegal`): alle Figuren als Karten mit Bildnis und
+Fuellstand, dazu alle offenen Faeden des Albums und alle genannten Namen, die
+noch nicht darin wohnen (`albumFehlendeFiguren`).
+
+**Animationen:** Aufschlagen dreht den Deckel um den Ruecken; die Stuecke setzen
+sich gestaffelt wie Tinte (`.setzt-sich`, `--n`); beim Blaettern wandert ein
+Glanz ueber das Blatt. Alles haengt an `setTimeout`, nicht an
+`requestAnimationFrame` — sonst laege das Blatt bei verstecktem Fenster fuer
+immer quer im Buch.

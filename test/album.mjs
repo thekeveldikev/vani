@@ -187,3 +187,98 @@ test('Eine beschädigte Figur zerlegt die Seite nicht', async () => {
   assert.equal(k.albumStuecke(halb).length, 2, 'nur augen und die eine gute eigene Kategorie');
   assert.equal(k.albumZettel(halb).length, 1);
 });
+
+test('Offene Fäden: ein Haken davor heißt eingelöst', async () => {
+  const k = await frisch();
+  assert.equal(k.albumFadenErledigt('✓ Der Schlüssel'), true);
+  assert.equal(k.albumFadenErledigt('✔ Der Cousin'), true);
+  assert.equal(k.albumFadenErledigt('Der Obstgarten'), false);
+  assert.equal(k.albumFadenText('✓ Der Schlüssel'), 'Der Schlüssel');
+  assert.equal(k.albumFadenText('Der Obstgarten'), 'Der Obstgarten');
+  assert.equal(k.albumFadenSetzen('Der Schlüssel', true), '✓ Der Schlüssel');
+  assert.equal(k.albumFadenSetzen('✓ Der Schlüssel', false), 'Der Schlüssel', 'Haken wieder weg');
+  assert.equal(k.albumFadenSetzen('✓ Der Schlüssel', true), '✓ Der Schlüssel', 'nicht zweimal haken');
+  const f = figur(k, 'a', 'Nore', { faden: ['Der Schlüssel', '✓ Der Cousin', 'Der Obstgarten'] });
+  assert.equal(k.albumFaeden(f).filter((x) => !x.erledigt).length, 2);
+  assert.equal(k.albumOffeneFaeden().length, 2);
+  assert.equal(k.albumOffeneFaeden()[0].text, 'Der Schlüssel');
+});
+
+test('Der Name wird als ganzes Wort gefunden, nicht mittendrin', async () => {
+  const k = await frisch();
+  assert.equal(k.albumFundstelle('Nore ging fort', 'Nore'), 0);
+  assert.equal(k.albumFundstelle('Sie hieß Nore.', 'Nore'), 9);
+  assert.equal(k.albumFundstelle('Norwegen ist kalt', 'Nore'), -1, 'nicht innerhalb eines Wortes');
+  assert.equal(k.albumFundstelle('Er kannte Norebert', 'Nore'), -1);
+  assert.equal(k.albumFundstelle('„Nore!", rief er', 'Nore'), 1, 'Anführungszeichen zählen als Grenze');
+  assert.equal(k.albumFundstelle('nore klein geschrieben', 'Nore'), 0, 'Groß und klein egal');
+  assert.equal(k.albumFundstelle('Da war O Brien', 'O Brien'), 7, 'Namen mit Leerzeichen');
+  assert.equal(k.albumFundstelle('nichts davon', ''), -1);
+  assert.equal(k.albumIstWortzeichen('a'), true);
+  assert.equal(k.albumIstWortzeichen('7'), true);
+  assert.equal(k.albumIstWortzeichen(' '), false);
+  assert.equal(k.albumIstWortzeichen(undefined), false);
+});
+
+test('Erwähnungen findet die Figur in den eigenen Texten', async () => {
+  const k = await frisch();
+  const f = figur(k, 'a', 'Nore', {});
+  k.D.docs.set('t1', k.sauberesDokument({ id: 't1', typ: 'blatt', titel: 'Am Deich', text: 'Nore stand am Wasser.', angelegt: 1, geaendert: 1 }));
+  k.D.docs.set('t2', k.sauberesDokument({ id: 't2', typ: 'blatt', titel: 'Norwegen', text: 'Nur eine Reise.', angelegt: 1, geaendert: 1 }));
+  k.D.docs.set('t3', k.sauberesDokument({ id: 't3', typ: 'schnipsel', titel: '', text: 'Was Nore nie sagte.', angelegt: 1, geaendert: 1 }));
+  const funde = k.albumErwaehnungen(f);
+  assert.equal(funde.length, 2, 'zwei echte Treffer, Norwegen zählt nicht');
+  assert.ok(funde[0].stelle.includes('Nore'), funde[0].stelle);
+  /* Zu kurze Namen werden nicht gesucht — sonst trifft alles */
+  assert.equal(k.albumErwaehnungen(figur(k, 'b', 'Bo', {})).length, 0);
+  /* Gelöschte Texte zählen nicht */
+  k.D.docs.get('t1').geloescht = true;
+  assert.equal(k.albumErwaehnungen(f).length, 1);
+});
+
+test('Das Album merkt, was nicht zusammenpasst', async () => {
+  const k = await frisch();
+  assert.equal(k.albumWidersprueche(figur(k, 'a', 'A', { geboren: '2010-01-01', gestorben: '2000-01-01' }))[0], 'Gestorben vor der Geburt.');
+  const alt = k.albumWidersprueche(figur(k, 'b', 'B', { geboren: '2001-04-12', alter: '12' }));
+  assert.ok(alt.some((x) => x.includes('wären es')), JSON.stringify(alt));
+  assert.equal(k.albumWidersprueche(figur(k, 'c', 'C', { geboren: '2001-04-12', alter: '25' })).length, 0, 'ein Jahr Abweichung ist in Ordnung');
+  assert.ok(k.albumWidersprueche(figur(k, 'd', 'D', { gestorben: '2020-01-01', status: 'lebt' })).some((x) => x.includes('lebend')));
+  assert.ok(k.albumWidersprueche(figur(k, 'e', 'Ilva', { familie: ['Schwester — Ilva'] })).some((x) => x.includes('sich selbst')));
+  assert.equal(k.albumWidersprueche(figur(k, 'f', 'F', {})).length, 0, 'wer nichts einträgt, macht nichts falsch');
+});
+
+test('Genannte, die noch nicht im Album wohnen, werden vorgeschlagen', async () => {
+  const k = await frisch();
+  figur(k, 'a', 'Nore', { familie: ['Vater — Coster'], naehe: ['Halvar'] });
+  figur(k, 'b', 'Ilva', { bewundert: ['Coster'] });
+  const fehlt = k.albumFehlendeFiguren();
+  assert.equal(fehlt.length, 2);
+  assert.equal(fehlt[0].name, 'Coster', 'der am häufigsten genannte zuerst');
+  assert.equal(fehlt[0].wo.length, 2);
+  /* Sobald Coster angelegt ist, verschwindet der Vorschlag */
+  figur(k, 'c', 'Coster', {});
+  assert.equal(k.albumFehlendeFiguren().map((x) => x.name).join(','), 'Halvar');
+});
+
+test('Das Monogramm steht da, wenn kein Bildnis hängt', async () => {
+  const k = await frisch();
+  assert.equal(k.albumMonogramm({ name: 'Nore Kaltenbach' }), 'NK');
+  assert.equal(k.albumMonogramm({ name: 'Coster' }), 'CO');
+  assert.equal(k.albumMonogramm({ name: '' }), '?');
+  assert.equal(k.albumHatBild({ name: 'X' }), false);
+  assert.equal(k.albumHatBild({ bild: 'abc' }), true);
+  assert.equal(k.albumHatBild({ striche: [[[0, 0], [1, 1]]] }), true);
+  assert.equal(k.albumHatBild({ striche: [] }), false);
+});
+
+test('Die Zeitleiste holt die Termine dieser Figur', async () => {
+  const k = await frisch();
+  const f = figur(k, 'a', 'Nore', {});
+  const t = k.saubererTermin({ wann: '2001-04-12', art: 'geburt', titel: 'Nore kommt zur Welt', leute: [{ id: 'a', name: 'Nore' }] });
+  k.D.docs.set('t1', { id: 't1', typ: 'termin', angelegt: 1, geaendert: 1, ...t });
+  const t2 = k.saubererTermin({ wann: '2020-06-01', art: 'reise', titel: 'Fort', leute: [{ name: 'Halvar' }] });
+  k.D.docs.set('t2', { id: 't2', typ: 'termin', angelegt: 1, geaendert: 1, ...t2 });
+  const zl = k.albumZeitleiste(f);
+  assert.equal(zl.length, 1);
+  assert.equal(zl[0].titel, 'Nore kommt zur Welt');
+});

@@ -67,7 +67,7 @@ function kalEigeneIcons() { return [...D.docs.values()].filter((d) => d.typ === 
 function saubereStricheEinfach(striche) {
   if (!Array.isArray(striche)) return [];
   return striche.slice(0, 40).map((st) => Array.isArray(st)
-    ? st.slice(0, 400).map((p) => Array.isArray(p) ? [begrenze(p[0], 0, 1, .5), begrenze(p[1], 0, 1, .5)] : null).filter(Boolean)
+    ? st.slice(0, 600).map((p) => Array.isArray(p) ? [begrenze(p[0], 0, 1, .5), begrenze(p[1], 0, 1, .5)] : null).filter(Boolean)
     : []).filter((st) => st.length > 1);
 }
 

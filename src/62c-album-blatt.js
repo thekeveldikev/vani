@@ -187,6 +187,36 @@ function albumFeldEingabe(feld, stand, doc, merke) {
     return kasten;
   }
 
+  /* Offene Fäden: Liste mit Haken davor */
+  if (feld.form === 'faeden') {
+    const liste = el('div', { class: 'albb-mehrliste' });
+    const eintraege = () => stand.felder[feld.id] || [];
+    const zeichne = () => {
+      liste.innerHTML = '';
+      const w = eintraege();
+      w.forEach((eintrag, i) => {
+        const erledigt = albumFadenErledigt(eintrag);
+        const t = el('input', { type: 'text', value: albumFadenText(eintrag), maxlength: '600', placeholder: 'Was ist hier angelegt?' });
+        t.addEventListener('input', () => { const a2 = eintraege().slice(); a2[i] = albumFadenSetzen(t.value, erledigt); stand.felder[feld.id] = a2; merke(); });
+        liste.append(el('div', { class: 'albb-fadenzeile' + (erledigt ? ' erledigt' : '') },
+          el('button', { class: 'albb-fadenhaken' + (erledigt ? ' an' : ''), title: erledigt ? 'Wieder als offen führen' : 'Als eingelöst abhaken',
+            onclick: () => { const a2 = eintraege().slice(); a2[i] = albumFadenSetzen(a2[i], !erledigt); stand.felder[feld.id] = a2; zeichne(); merke(); } }, erledigt ? '✓' : ''),
+          t,
+          el('button', { class: 'albb-weg', title: 'Weg damit', onclick: () => { const a2 = eintraege().filter((_, j) => j !== i); if (a2.length) stand.felder[feld.id] = a2; else delete stand.felder[feld.id]; zeichne(); merke(); } }, '×')));
+      });
+      if (!w.length) liste.append(el('div', { class: 'albb-leer' }, 'Noch nichts angelegt.'));
+      const offen = w.filter((x) => !albumFadenErledigt(x)).length;
+      if (w.length) liste.append(el('div', { class: 'albb-fadenstand' }, offen ? offen + (offen === 1 ? ' Faden ist noch offen.' : ' Fäden sind noch offen.') : 'Alle eingelöst.'));
+    };
+    zeichne();
+    kasten.append(liste, el('button', { class: 'albb-dazu', onclick: () => {
+      stand.felder[feld.id] = [...eintraege(), ''];
+      zeichne(); merke();
+      const felder = liste.querySelectorAll('input'); const l = felder[felder.length - 1]; if (l) l.focus();
+    } }, '+ Faden'));
+    return kasten;
+  }
+
   /* Mehrfach: Liste mit Hinzufügen */
   if (feld.mehrfach) {
     const liste = el('div', { class: 'albb-mehrliste' });
@@ -389,4 +419,108 @@ function albumAlsBlatt(stand, doc) {
   const b = blattAusText(name + ' — aus dem Album', zeilen.join('\n').trim());
   toast('Liegt bei den Blättern. Jetzt kannst du daraus schreiben.', 4200);
   return b;
+}
+
+/* ----- Eine Figur mit vorgegebenem Namen anlegen -----
+   Aus der Übersicht heraus: „Halvar wird genannt, wohnt aber noch nicht hier." */
+function albumNeueFigurMitNamen(name, danach) {
+  const doc = neuDoc('albumfigur', { name: String(name || '').slice(0, 120), titel: String(name || '').slice(0, 120), felder: {}, eigene: [], zettel: [], farbe: '' });
+  albumBearbeiten(doc, () => { if (danach) danach(doc.id); }, true);
+}
+
+/* ----- Das Bildnis ----- */
+function albumBildWaehlen(figur, danach) {
+  const hat = albumHatBild(figur);
+  const kasten = el('div', { class: 'modal albbild-fenster' },
+    el('div', { class: 'kartenkopf' }, 'DAS BILDNIS'),
+    el('p', { class: 'albb-hilfe' }, 'Ein Foto vom Gerät, oder selbst gezeichnet. Beides darf auch wegbleiben — dann stehen dort die Anfangsbuchstaben, und das sieht aus, als wäre es so gemeint.'),
+    el('div', { class: 'albbild-wahl' },
+      el('button', { class: 'albbild-knopf', onclick: async () => {
+        zu();
+        const id = typeof waehleBild === 'function' ? await waehleBild() : null;
+        if (!id) return;
+        figur.bild = id;
+        delete figur.striche;
+        speichere(figur);
+        toast('Das Bildnis hängt.');
+        if (danach) danach();
+      } }, el('b', {}, 'Ein Foto'), el('small', {}, 'vom Gerät — bleibt hier, geht nirgendwohin')),
+      el('button', { class: 'albbild-knopf', onclick: () => { zu(); albumBildnisMalen(figur, danach); } },
+        el('b', {}, 'Selbst zeichnen'), el('small', {}, 'ein paar Striche genügen'))),
+    hat ? el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart gefahr', onclick: () => { delete figur.bild; delete figur.striche; speichere(figur); zu(); toast('Wieder die Anfangsbuchstaben.'); if (danach) danach(); } }, 'Bildnis abnehmen'),
+      el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'))
+      : el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen')));
+  const zu = zeigeDeck(kasten);
+}
+
+/* Ein Bildnis zeichnen — größer und ruhiger als das kleine Kalenderzeichen. */
+function albumBildnisMalen(figur, danach) {
+  const groesse = 320;
+  const leinwand = el('canvas', { class: 'albbild-pad', width: String(groesse), height: String(groesse) });
+  const ctx = leinwand.getContext('2d');
+  let striche = Array.isArray(figur.striche) ? figur.striche.map((s) => s.slice()) : [];
+  let aktuell = null;
+  const male = () => {
+    ctx.clearRect(0, 0, groesse, groesse);
+    /* Ein zarter Hilfsrahmen: Kopf sitzt meist im oberen Drittel */
+    ctx.strokeStyle = 'rgba(160,140,110,.2)'; ctx.lineWidth = 1;
+    ctx.strokeRect(groesse * .14, groesse * .1, groesse * .72, groesse * .8);
+    ctx.beginPath(); ctx.ellipse(groesse / 2, groesse * .38, groesse * .2, groesse * .25, 0, 0, 6.29); ctx.stroke();
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--tinte') || '#3a2f26';
+    ctx.lineWidth = 3.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    for (const st of [...striche, aktuell].filter(Boolean)) {
+      if (st.length < 2) continue;
+      ctx.beginPath(); ctx.moveTo(st[0][0] * groesse, st[0][1] * groesse);
+      for (const [x, y] of st.slice(1)) ctx.lineTo(x * groesse, y * groesse);
+      ctx.stroke();
+    }
+  };
+  const punkt = (ev) => { const r = leinwand.getBoundingClientRect(); return [begrenze((ev.clientX - r.left) / r.width, 0, 1, .5), begrenze((ev.clientY - r.top) / r.height, 0, 1, .5)]; };
+  leinwand.addEventListener('pointerdown', (ev) => { ev.preventDefault(); leinwand.setPointerCapture(ev.pointerId); aktuell = [punkt(ev)]; male(); });
+  leinwand.addEventListener('pointermove', (ev) => { if (!aktuell) return; const p = punkt(ev); const l = aktuell[aktuell.length - 1]; if (Math.hypot(p[0] - l[0], p[1] - l[1]) > .008) { aktuell.push(p); male(); } });
+  const auf = () => { if (aktuell && aktuell.length > 1) striche.push(aktuell); aktuell = null; male(); };
+  leinwand.addEventListener('pointerup', auf); leinwand.addEventListener('pointercancel', auf);
+
+  const kasten = el('div', { class: 'modal albbild-malen' },
+    el('div', { class: 'kartenkopf' }, 'EIN BILDNIS ZEICHNEN'),
+    el('p', { class: 'albb-hilfe' }, 'Ein paar Striche genügen. Es muss niemanden treffen — es muss dich nur erinnern.'),
+    leinwand,
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => { striche = []; aktuell = null; male(); } }, 'Noch einmal'),
+      el('button', { class: 'knopf zart', onclick: () => { if (striche.length) { striche.pop(); male(); } } }, 'Letzter Strich weg'),
+      el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
+      el('button', { class: 'knopf voll', onclick: () => {
+        const sauber = saubereStricheEinfach(striche);
+        if (!sauber.length) { toast('Da ist noch nichts gezeichnet.'); return; }
+        figur.striche = sauber;
+        delete figur.bild;
+        speichere(figur);
+        zu(); toast('Das Bildnis hängt.');
+        if (danach) danach();
+      } }, 'So bleibt es')));
+  const zu = zeigeDeck(kasten);
+  male();
+}
+
+/* ----- Die Karte in den Feinheiten ----- */
+function albumKarte() {
+  const zeile = (name, unter, s) => el('div', { class: 'einstellzeile' },
+    el('span', { class: 'ename' }, name, unter ? el('div', { style: 'font-size:12.5px;color:var(--blass)' }, unter) : null), s);
+  const schalter = (lies, setze) => el('button', { class: 'schalter' + (lies() ? ' an' : ''), onclick: (e) => { setze(!lies()); e.currentTarget.classList.toggle('an', lies()); speichereEinst(); } }, el('i'));
+  const worte = albumEigeneWorte();
+  return el('div', { class: 'karte' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('album') }), 'DAS ALBUM'),
+    zeile('Bildnisse zeigen',
+      'Auf der linken Seite jeder Figur ein gerahmtes Bildnis — Foto oder selbst gezeichnet. Standardmäßig aus: solange keins dasteht, darf die Figur aussehen, wie sie in deinem Kopf gerade aussieht.',
+      schalter(() => albumBildnisAn(), (v) => { D.einst.albumBildnis = v; })),
+    worte.length ? zeile('Deine eigenen Wesenswörter', worte.length + (worte.length === 1 ? ' Wort' : ' Wörter') + ', die du selbst geschrieben hast: ' + worte.slice(-8).join(', ') + (worte.length > 8 ? ' …' : ''),
+      el('button', { class: 'knopf zart', onclick: async () => {
+        if (await frage('Alle selbst geschriebenen Wesenswörter vergessen? Die Wörter bleiben bei den Figuren stehen, sie werden nur nicht mehr vorgeschlagen.', { ja: 'Vergessen' })) {
+          D.einst.albumWorte = []; speichereEinst(); toast('Vergessen.'); zeichne();
+        }
+      } }, 'Vergessen')) : null,
+    el('div', { class: 'einstellzeile' },
+      el('span', { class: 'ename' }, 'Alle Figuren', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Die Übersicht mit offenen Fäden und Namen, die noch nicht im Album wohnen.')),
+      el('button', { class: 'knopf zart', onclick: () => albumRegal() }, 'Übersicht')));
 }

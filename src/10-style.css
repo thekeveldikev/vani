@@ -3728,13 +3728,26 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
 .alb-band .alb-feldname { margin: 0; flex: none; }
 .alb-band b { font-family: ui-serif, "New York", Georgia, serif; font-size: 15.5px; font-weight: 600; }
 
-.alb-sprueche { flex: 1 1 100%; display: flex; flex-direction: column; gap: 10px; }
+.alb-sprueche { flex: 1 1 100%; display: flex; flex-direction: column; gap: 12px; margin: 14px 0 16px; }
+.alb-sprueche.benannt .alb-feldname { margin-bottom: 2px; }
+/* Ein Steg an der Seite statt Linien quer darueber: quer laufende Zier sieht
+   beim Scrollen aus wie ein Fehler im Papier. */
 .alb-spruch {
-  position: relative; margin: 0; padding: 4px 6px 4px 30px;
-  font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; line-height: 1.45; font-style: italic; color: var(--tinte);
+  position: relative; margin: 0; padding: 2px 4px 3px 40px;
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 19px; line-height: 1.5;
+  font-style: italic; color: var(--tinte);
 }
-.alb-anfuehrung { position: absolute; left: 0; top: -6px; font-size: 40px; line-height: 1; color: var(--figurfarbe, var(--akzent)); opacity: .5; font-style: normal; }
-.alb-spruch i { display: block; font-style: normal; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--blass); margin-top: 4px; }
+.alb-spruch::before {
+  content: ""; position: absolute; left: 22px; top: 5px; bottom: 5px; width: 2px; border-radius: 1px;
+  background: linear-gradient(180deg, var(--figurfarbe, var(--akzent)), transparent);
+  opacity: .5;
+}
+.alb-anfuehrung {
+  position: absolute; left: -2px; top: -8px; font-size: 46px; line-height: 1;
+  color: var(--figurfarbe, var(--akzent)); opacity: .34; font-style: normal;
+  font-family: ui-serif, "New York", Georgia, serif;
+}
+.alb-spruchtext::after { content: "“"; font-style: normal; color: var(--figurfarbe, var(--akzent)); opacity: .4; margin-left: 3px; }
 
 .alb-notiz { flex: 1 1 100%; padding: 11px 14px; border-radius: 2px; background: color-mix(in srgb, var(--tinte) 4%, transparent); border-left: 2px solid color-mix(in srgb, var(--tinte) 20%, transparent); }
 .alb-notiztext { font-size: 14px; line-height: 1.6; white-space: pre-wrap; font-family: ui-serif, "New York", Georgia, serif; }
@@ -3923,4 +3936,339 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
 @media (prefers-reduced-motion: reduce) {
   .alb-buch.schlaegt-auf, .alb-blatt.laeuft { animation: none; transition: none; }
   .alb-regalbuch, .albb-farbe, .alb-nameunter { transition: none; }
+}
+
+/* ============================================================
+   DAS ALBUM — ZWEITE AUSBAUSTUFE
+   Halbfranzband: Leder auf Ruecken und Ecken, erhabene Buende,
+   Goldpraegung, Messingecken, Schliesse. Innen Buetten mit
+   Wasserzeichen, doppelter Rahmen, Fleurons, Seitenzahl.
+   ============================================================ */
+
+/* ----- Das Buch im Raum ----- */
+.alb-raum { padding-top: 42px; }
+.alb-regalbuch {
+  position: relative; width: min(400px, 76vw); aspect-ratio: 5 / 7; perspective: 1600px;
+  transform-style: preserve-3d;
+  transition: transform .55s cubic-bezier(.2,.9,.28,1), filter .4s;
+  filter: drop-shadow(0 30px 40px rgba(0,0,0,.45));
+}
+.alb-rb-schnitt {
+  position: absolute; right: calc(var(--dicke, 22px) * -1 + 4px); top: 10px; bottom: 10px; width: var(--dicke, 22px);
+  border-radius: 0 3px 3px 0; transform: translateZ(-2px);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.5) 0 1px, transparent 1px 2.6px),
+    linear-gradient(90deg, #e9dcc0, #cbb994 60%, #a8946f);
+  box-shadow: inset -3px 0 6px rgba(0,0,0,.3);
+}
+.alb-rb-ruecken {
+  position: absolute; left: -4px; top: 0; bottom: 0; width: 30px; border-radius: 6px 2px 2px 6px;
+  background: linear-gradient(90deg, #2a1a10, #5e402a 40%, #4a3220 70%, #34220f);
+  box-shadow: inset -4px 0 10px rgba(0,0,0,.5), inset 2px 0 0 rgba(255,220,170,.14);
+}
+.alb-bund {
+  position: absolute; left: -2px; right: -2px; height: 12px; border-radius: 3px;
+  background: linear-gradient(180deg, rgba(255,225,180,.22), rgba(0,0,0,.35));
+  box-shadow: 0 1px 0 rgba(255,225,180,.14), 0 -1px 2px rgba(0,0,0,.4);
+}
+.alb-bund.b1 { top: 20%; } .alb-bund.b2 { top: 47%; } .alb-bund.b3 { top: 74%; }
+.alb-rb-deckel {
+  position: absolute; inset: 0; left: 18px; border-radius: 3px 9px 9px 3px; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  background:
+    repeating-linear-gradient(112deg, rgba(255,255,255,.03) 0 1.5px, transparent 1.5px 5px),
+    radial-gradient(90% 60% at 28% 12%, rgba(255,228,182,.17), transparent 62%),
+    radial-gradient(70% 50% at 78% 88%, rgba(0,0,0,.28), transparent 60%),
+    linear-gradient(152deg, #6f4c31, #40291a 66%, #2b1a0f);
+  box-shadow: inset 0 1px 0 rgba(255,228,190,.18), inset -10px 0 22px rgba(0,0,0,.4);
+}
+.alb-rb-praegung { position: absolute; inset: 16px; border-radius: 2px; border: 1.5px solid rgba(226,190,132,.42); }
+.alb-rb-praegung.innen { inset: 22px; border-width: .8px; border-color: rgba(226,190,132,.26); }
+.alb-rb-titel {
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 27px; letter-spacing: .4em; text-indent: .4em;
+  color: #e8ce97; z-index: 1;
+  text-shadow: 0 1px 0 rgba(0,0,0,.7), 0 -1px 0 rgba(255,240,200,.3), 0 0 24px rgba(232,206,151,.3);
+}
+.alb-rb-fleuron {
+  width: 62px; height: 16px; z-index: 1; opacity: .72;
+  background:
+    radial-gradient(circle at 50% 50%, #e8ce97 0 2px, transparent 2px),
+    linear-gradient(90deg, transparent 0 10%, #e8ce97 10% 11%, transparent 11% 89%, #e8ce97 89% 90%, transparent 90%),
+    linear-gradient(90deg, transparent 0 22%, rgba(232,206,151,.6) 22% 78%, transparent 78%);
+  background-size: 100% 100%, 100% 1.2px, 100% .8px;
+  background-position: center, center, center;
+  background-repeat: no-repeat;
+}
+.alb-rb-unter { font-size: 11px; letter-spacing: .24em; color: rgba(232,206,151,.55); text-transform: uppercase; z-index: 1; }
+.alb-rb-ecke {
+  position: absolute; width: 34px; height: 34px; z-index: 2;
+  background: linear-gradient(135deg, rgba(214,178,112,.9), rgba(150,116,60,.75));
+  box-shadow: inset 0 1px 0 rgba(255,240,200,.5), 0 1px 2px rgba(0,0,0,.4);
+}
+.alb-rb-ecke.e1 { left: 0; top: 0; clip-path: polygon(0 0, 100% 0, 0 100%); border-radius: 3px 0 0 0; }
+.alb-rb-ecke.e2 { right: 0; top: 0; clip-path: polygon(100% 0, 100% 100%, 0 0); border-radius: 0 9px 0 0; }
+.alb-rb-ecke.e3 { left: 0; bottom: 0; clip-path: polygon(0 0, 0 100%, 100% 100%); border-radius: 0 0 0 3px; }
+.alb-rb-ecke.e4 { right: 0; bottom: 0; clip-path: polygon(100% 0, 100% 100%, 0 100%); border-radius: 0 0 9px 0; }
+.alb-rb-schliesse {
+  position: absolute; right: -10px; top: 50%; width: 26px; height: 46px; margin-top: -23px; z-index: 3;
+  border-radius: 4px; background: linear-gradient(180deg, #dcbc82, #9c7940 60%, #6f5528);
+  box-shadow: inset 0 1px 0 rgba(255,245,210,.6), 0 2px 5px rgba(0,0,0,.45);
+}
+.alb-rb-schliesse::after { content: ""; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: rgba(60,40,16,.55); box-shadow: inset 0 1px 1px rgba(0,0,0,.5); }
+.alb-rb-band { position: absolute; right: 54px; top: -8px; width: 16px; height: 96px; z-index: 4; background: linear-gradient(180deg, #b04c33, #7d3020); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 74%, 0 100%); box-shadow: 0 3px 8px rgba(0,0,0,.45); transform-origin: 50% 0; }
+
+/* ----- Das aufgeschlagene Buch ----- */
+.alb-huelle { width: min(1300px, 97vw); max-height: 95vh; display: flex; }
+.alb-buch {
+  flex: 1; min-width: 0; max-height: 95vh; display: flex; position: relative; color: var(--tinte);
+  border-radius: 5px; overflow: visible; padding: 12px 12px 12px 34px;
+  background:
+    repeating-linear-gradient(112deg, rgba(255,255,255,.025) 0 1.5px, transparent 1.5px 5px),
+    radial-gradient(80% 60% at 20% 8%, rgba(255,228,182,.12), transparent 60%),
+    linear-gradient(160deg, #5b3f28, #33210f);
+  box-shadow: 0 40px 100px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,228,190,.16);
+}
+.alb-buchruecken {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 34px; border-radius: 5px 0 0 5px;
+  background: linear-gradient(90deg, #2a1a10, #5e402a 45%, #3d2818);
+  box-shadow: inset -5px 0 12px rgba(0,0,0,.5);
+}
+.alb-buch.schlaegt-auf { animation: alb-aufschlagen .92s cubic-bezier(.18,.86,.24,1); transform-origin: 6% 55%; }
+@keyframes alb-aufschlagen {
+  0% { opacity: 0; transform: perspective(2200px) rotateY(-72deg) rotateX(-8deg) scale(.9); }
+  50% { opacity: 1; }
+  72% { transform: perspective(2200px) rotateY(5deg) rotateX(2deg) scale(1.012); }
+  100% { opacity: 1; transform: none; }
+}
+.alb-buehne { flex: 1; min-width: 0; display: flex; flex-direction: column; border-radius: 2px; overflow: hidden; background: #f3ead6; }
+
+/* ----- Bütten ----- */
+.alb-seite {
+  flex: 1 1 50%; min-width: 0; min-height: 58vh; overflow-y: auto; overscroll-behavior: contain; position: relative;
+  display: flex; flex-direction: column;
+  padding: 30px 30px 22px;
+  background:
+    /* Wasserzeichen: Kettlinien und Rippen */
+    repeating-linear-gradient(90deg, rgba(120,96,60,.05) 0 1px, transparent 1px 26px),
+    repeating-linear-gradient(0deg, rgba(120,96,60,.028) 0 1px, transparent 1px 4px),
+    radial-gradient(60% 40% at 84% 12%, rgba(150,120,70,.07), transparent 60%),
+    radial-gradient(40% 30% at 16% 82%, rgba(150,120,70,.06), transparent 60%),
+    linear-gradient(178deg, #f7f0dd, #ebe0c6);
+}
+.alb-seite.links { box-shadow: inset -30px 0 40px -30px rgba(60,40,20,.6); border-radius: 1px 0 0 1px; }
+.alb-seite.rechts { box-shadow: inset 30px 0 40px -30px rgba(60,40,20,.6); border-radius: 0 1px 1px 0; }
+.alb-falz { flex: none; width: 3px; background: linear-gradient(180deg, rgba(70,46,22,.05), rgba(70,46,22,.35) 30%, rgba(70,46,22,.35) 70%, rgba(70,46,22,.05)); }
+
+/* Der doppelte Rahmen um den Satzspiegel */
+.alb-rahmen {
+  position: absolute; left: 16px; right: 16px; top: 16px; bottom: 16px; pointer-events: none;
+  border: 1px solid rgba(120,90,50,.26); border-radius: 1px;
+}
+.alb-rahmen::after { content: ""; position: absolute; inset: 5px; border: .6px solid rgba(120,90,50,.16); }
+/* Fleurons in den Ecken */
+.alb-fleuron {
+  position: absolute; width: 16px; height: 16px; pointer-events: none; opacity: .5;
+  background:
+    radial-gradient(circle at 100% 100%, transparent 0 7px, rgba(120,90,50,.55) 7px 7.8px, transparent 7.8px),
+    radial-gradient(circle at 50% 50%, rgba(120,90,50,.6) 0 1.4px, transparent 1.4px);
+}
+.alb-fleuron.e1 { left: 21px; top: 21px; }
+.alb-fleuron.e2 { right: 21px; top: 21px; transform: scaleX(-1); }
+.alb-fleuron.e3 { left: 21px; bottom: 21px; transform: scaleY(-1); }
+.alb-fleuron.e4 { right: 21px; bottom: 21px; transform: scale(-1); }
+.alb-laufkopf {
+  font-size: 9.5px; letter-spacing: .28em; text-transform: uppercase; color: rgba(120,90,50,.55);
+  text-align: center; margin: -8px 0 16px; min-height: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* Der Fuss liegt in einem scrollenden Bereich — ohne eigenes, deckendes Band
+   liefe der Inhalt darunter durch und die Seitenzahl staende mitten im Text.
+   Das Band liest sich zugleich als unterer Rand der Seite. */
+/* Der Inhalt fliesst, der Fuss steht danach — nie darueber. Ein aufgelegtes
+   Band war eine Verlegenheitsloesung und sah beim Scrollen aus wie ein Fehler. */
+.alb-seiteninhalt { flex: 1 0 auto; min-height: 0; }
+.alb-seiteninhalt::after { content: ""; display: block; clear: both; }
+.alb-seitenfuss {
+  flex: none; margin-top: 26px; padding-top: 12px; text-align: center;
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 12px; color: rgba(120,90,50,.5);
+  font-variant-numeric: tabular-nums; pointer-events: none;
+  border-top: 1px solid rgba(120,90,50,.16);
+}
+/* Die Initiale im Papier: gross, blass, hinter allem. Sie fuellt die Seite,
+   ohne etwas zu behaupten — ein Buchstabe legt kein Gesicht fest. Und sie
+   rueckt nichts, weil sie nicht im Fluss steht. */
+.alb-initiale {
+  position: absolute; right: 8%; top: 50%; transform: translateY(-50%);
+  font-family: ui-serif, "New York", Georgia, serif; font-style: normal; font-weight: 600;
+  font-size: clamp(140px, 22vh, 240px); line-height: .8;
+  color: var(--figurfarbe, #8a6a3f); opacity: .06; pointer-events: none; z-index: 0;
+  text-shadow: 0 2px 0 rgba(255,255,255,.5);
+}
+.alb-seite.rechts .alb-initiale { right: auto; left: 6%; opacity: .042; }
+.alb-seiteninhalt { position: relative; z-index: 1; }
+.alb-seitenband { position: absolute; right: 0; top: 40px; width: 7px; height: 104px; border-radius: 4px 0 0 4px; opacity: .85; box-shadow: -1px 0 3px rgba(0,0,0,.2); }
+
+/* ----- Das Bildnis ----- */
+.alb-bildplatte {
+  position: relative; float: right; width: 148px; height: 176px; margin: 0 0 14px 16px;
+  display: grid; place-items: center; border-radius: 2px; overflow: hidden;
+  background: linear-gradient(168deg, #efe4c9, #ddceac);
+  box-shadow: 0 3px 10px rgba(70,50,25,.28), inset 0 0 0 1px rgba(120,90,50,.3), inset 0 0 22px rgba(140,110,60,.16);
+  transition: transform .3s cubic-bezier(.2,.9,.3,1), box-shadow .3s;
+}
+.alb-bp-rahmen { position: absolute; inset: 7px; border: 1px solid rgba(120,90,50,.34); pointer-events: none; }
+.alb-bp-rahmen::after { content: ""; position: absolute; inset: 3px; border: .6px solid rgba(120,90,50,.2); }
+.alb-bp-foto { width: 100%; height: 100%; object-fit: cover; filter: sepia(.22) contrast(1.03); }
+.alb-bp-zeichnung { display: grid; place-items: center; color: var(--tinte); }
+.alb-bp-monogramm {
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 54px; letter-spacing: .06em;
+  color: var(--figurfarbe, #8a6a3f); opacity: .5; text-shadow: 0 1px 0 rgba(255,255,255,.6);
+}
+.alb-bp-ecke { position: absolute; width: 22px; height: 22px; background: linear-gradient(135deg, rgba(120,90,50,.28), transparent 70%); pointer-events: none; }
+.alb-bp-ecke.e1 { left: 0; top: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
+.alb-bp-ecke.e2 { right: 0; top: 0; clip-path: polygon(100% 0, 100% 100%, 0 0); }
+.alb-bp-ecke.e3 { left: 0; bottom: 0; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+.alb-bp-ecke.e4 { right: 0; bottom: 0; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+
+/* ----- Der Leitsatz ----- */
+.alb-motto {
+  clear: none; margin: 0 0 14px; padding: 8px 0 10px;
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 19px; line-height: 1.4; font-style: italic;
+  color: var(--tinte); text-align: left;
+  border-bottom: 1px solid rgba(120,90,50,.22);
+}
+.alb-motto span::before { content: "❧ "; color: var(--figurfarbe, var(--akzent)); font-style: normal; }
+
+/* ----- Die leere Seite ist auch eine Seite ----- */
+.alb-leereseite { display: flex; flex-direction: column; gap: 18px; padding-top: 8px; }
+.alb-leerornament { display: flex; align-items: center; gap: 12px; margin: 30px 0; opacity: .42; }
+.alb-leerornament.zart { opacity: .28; margin: 22px 0 0; }
+.alb-leerornament i { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(120,90,50,.6), transparent); }
+.alb-leerornament span { font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: rgba(120,90,50,.8); }
+
+/* ----- Was das Buch selbst weiß ----- */
+.alb-zeitleiste { flex: 1 1 100%; margin-top: 6px; }
+.alb-zl-spur { display: flex; flex-direction: column; gap: 2px; border-left: 1.5px solid rgba(120,90,50,.28); padding-left: 12px; margin-left: 5px; }
+.alb-zl-punkt { position: relative; display: flex; align-items: baseline; gap: 9px; width: 100%; text-align: left; padding: 4px 6px; border-radius: 6px; }
+.alb-zl-punkt::before { content: ""; position: absolute; left: -17px; top: 11px; width: 8px; height: 8px; border-radius: 50%; background: var(--artfarbe, var(--blass)); box-shadow: 0 0 0 3px #f3ead6; }
+.alb-zl-punkt i { display: flex; color: var(--artfarbe, var(--blass)); flex: none; }
+.alb-zl-punkt span { display: flex; flex-direction: column; min-width: 0; }
+.alb-zl-punkt b { font-size: 13.5px; font-weight: 600; }
+.alb-zl-punkt small { font-size: 11px; color: var(--blass); font-variant-numeric: tabular-nums; }
+
+.alb-erwaehnungen { flex: 1 1 100%; margin-top: 10px; padding-top: 9px; border-top: 1px dashed rgba(120,90,50,.26); }
+.alb-erwaehnungen summary { cursor: pointer; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--blass); }
+.alb-erwaehnung { display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: left; padding: 7px 9px; border-radius: 6px; margin-top: 4px; }
+.alb-erwaehnung b { font-size: 13px; font-weight: 600; }
+.alb-erwaehnung span { font-size: 12.5px; color: var(--blass); font-family: ui-serif, "New York", Georgia, serif; line-height: 1.45; }
+
+.alb-widerspruch { flex: 1 1 100%; display: flex; gap: 9px; align-items: flex-start; margin-top: 10px; padding: 9px 11px; border-radius: 3px; background: rgba(176,53,43,.07); border-left: 2px solid rgba(176,53,43,.5); font-size: 12.5px; color: #93382d; }
+.alb-widerspruch .alb-wsym { width: 17px; height: 17px; border-radius: 50%; background: rgba(176,53,43,.18); display: grid; place-items: center; font-size: 11px; font-weight: 700; flex: none; }
+
+/* ----- Offene Fäden ----- */
+.alb-faeden { flex: 1 1 100%; }
+.alb-faden { display: flex; align-items: baseline; gap: 8px; width: 100%; text-align: left; padding: 4px 7px; border-radius: 6px; font-size: 13.5px; }
+.alb-fadenhaken {
+  flex: none; width: 15px; height: 15px; border-radius: 3px; border: 1.4px solid var(--figurfarbe, var(--blass));
+  font-style: normal; font-size: 11px; line-height: 13px; text-align: center; color: var(--figurfarbe, var(--blass));
+  transition: background .18s, transform .18s;
+}
+.alb-faden.erledigt { color: var(--blass); }
+.alb-faden.erledigt span { text-decoration: line-through; text-decoration-color: rgba(120,90,50,.5); }
+.alb-faden.erledigt .alb-fadenhaken { background: var(--figurfarbe, var(--blass)); color: #fff; }
+
+/* ----- Wie sich eine Seite setzt ----- */
+.alb-block.setzt-sich .alb-stueck { animation: alb-setzen .5s cubic-bezier(.2,.9,.3,1) backwards; animation-delay: calc(var(--n, 0) * 34ms); }
+@keyframes alb-setzen {
+  from { opacity: 0; transform: translateY(6px) rotate(var(--dreh0, 0deg)); filter: blur(1.5px); }
+  to { opacity: 1; filter: none; }
+}
+.alb-block.setzt-sich .alb-bildplatte { animation: alb-platte .6s cubic-bezier(.2,.9,.3,1) backwards; }
+@keyframes alb-platte { from { opacity: 0; transform: scale(.94) rotate(-1deg); } to { opacity: 1; } }
+.alb-name b { position: relative; }
+.alb-block.setzt-sich .alb-namenlinie { animation: alb-strich .7s cubic-bezier(.3,.9,.3,1) 120ms backwards; transform-origin: left center; }
+@keyframes alb-strich { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* ----- Das Blatt beim Umschlagen ----- */
+.alb-blatt { box-shadow: 0 0 40px rgba(0,0,0,.25); }
+.alb-blatt.laeuft { transition: transform .62s cubic-bezier(.42,.02,.28,1); }
+.alb-blattglanz {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, rgba(255,250,235,.55), rgba(120,90,50,.16) 45%, rgba(60,40,20,.3));
+  transition: opacity .6s;
+}
+.alb-blatt.laeuft .alb-blattglanz { opacity: 1; }
+.alb-block.blaettert .alb-seite { filter: brightness(.985); }
+
+/* ----- Die Übersicht ----- */
+.albr-fenster { width: min(860px, 96vw); max-height: 92vh; display: flex; flex-direction: column; gap: 10px; }
+.albr-suche { width: 100%; }
+.albr-gitter { flex: 1; min-height: 200px; overflow-y: auto; overscroll-behavior: contain; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; align-content: start; }
+.albr-karte {
+  position: relative; display: flex; align-items: center; gap: 11px; text-align: left; padding: 10px 12px 13px;
+  border-radius: 3px; border: 1px solid var(--linie); background: color-mix(in srgb, var(--papier) 70%, transparent);
+  border-left: 3px solid var(--figurfarbe, var(--akzent)); overflow: hidden;
+  transition: transform .16s, box-shadow .16s;
+}
+.albr-bild { flex: none; width: 46px; height: 54px; border-radius: 2px; display: grid; place-items: center; overflow: hidden; background: color-mix(in srgb, var(--tinte) 6%, transparent); box-shadow: inset 0 0 0 1px var(--linie); }
+.albr-bild img { width: 100%; height: 100%; object-fit: cover; }
+.albr-monogramm { font-family: ui-serif, "New York", Georgia, serif; font-size: 20px; color: var(--figurfarbe, var(--blass)); opacity: .8; }
+.albr-zeichnung { display: grid; place-items: center; color: var(--tinte); }
+.albr-text { display: flex; flex-direction: column; min-width: 0; }
+.albr-text b { font-family: ui-serif, "New York", Georgia, serif; font-size: 16px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.albr-text small { font-size: 11.5px; color: var(--blass); }
+.albr-fuelle { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--figurfarbe, var(--akzent)); opacity: .55; }
+.albr-faeden, .albr-fehlend { border-top: 1px solid var(--linie); padding-top: 8px; }
+.albr-faeden summary, .albr-fehlend summary { cursor: pointer; font-size: 13px; color: var(--blass); }
+.albr-fadenzeile { display: flex; gap: 10px; align-items: baseline; width: 100%; text-align: left; padding: 5px 8px; border-radius: 6px; font-size: 13px; }
+.albr-fadenzeile i { font-style: normal; font-weight: 600; color: var(--akzent); flex: none; }
+.albr-fadenzeile span { color: var(--blass); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.albr-fehlendzeile { display: flex; gap: 10px; align-items: baseline; padding: 5px 8px; font-size: 13px; }
+.albr-fehlendzeile b { flex: none; }
+.albr-fehlendzeile span { color: var(--blass); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.albr-anlegen { flex: none; font-size: 12.5px; color: var(--akzent); border-bottom: 1px dotted currentColor; }
+
+/* ----- Das Bildnis geben ----- */
+.albbild-fenster { width: min(460px, 94vw); display: flex; flex-direction: column; gap: 12px; }
+.albbild-wahl { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.albbild-knopf { display: flex; flex-direction: column; gap: 3px; padding: 15px 13px; border-radius: 10px; border: 1px dashed color-mix(in srgb, var(--akzent) 42%, transparent); text-align: left; }
+.albbild-knopf b { font-size: 15px; font-family: ui-serif, "New York", Georgia, serif; }
+.albbild-knopf small { font-size: 12px; color: var(--blass); line-height: 1.4; }
+.albbild-malen { width: min(400px, 94vw); display: flex; flex-direction: column; gap: 11px; }
+.albbild-pad { width: 100%; aspect-ratio: 1; border-radius: 3px; border: 1px solid var(--linie); background: linear-gradient(178deg, #f7f0dd, #ebe0c6); touch-action: none; cursor: crosshair; }
+
+/* ----- Fäden im Blatt ----- */
+.albb-fadenzeile { display: flex; gap: 7px; align-items: center; }
+.albb-fadenzeile input { flex: 1; min-width: 0; }
+.albb-fadenzeile.erledigt input { color: var(--blass); text-decoration: line-through; }
+.albb-fadenhaken { flex: none; width: 22px; height: 22px; border-radius: 5px; border: 1.5px solid var(--linie); color: var(--akzent); font-size: 13px; display: grid; place-items: center; }
+.albb-fadenhaken.an { background: var(--akzent); border-color: transparent; color: var(--papier); }
+.albb-fadenstand { font-size: 12px; color: var(--blass); font-style: italic; margin-top: 3px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .alb-regalbuch:hover { transform: translateY(-10px) rotateY(-7deg) rotateX(2deg); filter: drop-shadow(0 40px 50px rgba(0,0,0,.5)); }
+  .alb-bildplatte:hover { transform: scale(1.03) rotate(-.8deg); box-shadow: 0 8px 20px rgba(70,50,25,.34), inset 0 0 0 1px rgba(120,90,50,.4); }
+  .alb-faden:hover, .alb-zl-punkt:hover, .alb-erwaehnung:hover { background: rgba(120,90,50,.08); }
+  .alb-fadenhaken:hover { transform: scale(1.15); }
+  .albr-karte:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.14); }
+  .albr-fadenzeile:hover { background: color-mix(in srgb, var(--tinte) 7%, transparent); }
+  .alb-werkzeug:hover { background: color-mix(in srgb, var(--tinte) 8%, transparent); color: var(--tinte); }
+  .albbild-knopf:hover { background: color-mix(in srgb, var(--akzent) 8%, transparent); }
+}
+.alb-werkzeug { padding: 6px 12px; border-radius: 999px; font-size: 12.5px; color: var(--blass); border: 1px solid var(--linie); white-space: nowrap; }
+
+@media (max-width: 900px) {
+  .alb-buch { padding: 6px 6px 6px 20px; }
+  .alb-buchruecken { width: 20px; }
+  .alb-seite { min-height: 40vh; padding: 22px 18px 34px; }
+  .alb-bildplatte { width: 108px; height: 128px; margin-left: 12px; }
+  .alb-bp-monogramm { font-size: 38px; }
+  .alb-motto { font-size: 16px; }
+  .alb-rahmen { left: 8px; right: 8px; top: 8px; bottom: 8px; }
+  .alb-fleuron.e1, .alb-fleuron.e3 { left: 13px; } .alb-fleuron.e2, .alb-fleuron.e4 { right: 13px; }
+  .alb-fleuron.e1, .alb-fleuron.e2 { top: 13px; } .alb-fleuron.e3, .alb-fleuron.e4 { bottom: 13px; }
+  .albbild-wahl { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .alb-block.setzt-sich .alb-stueck, .alb-block.setzt-sich .alb-bildplatte, .alb-block.setzt-sich .alb-namenlinie { animation: none; }
+  .alb-regalbuch, .alb-bildplatte, .alb-fadenhaken, .albr-karte { transition: none; }
 }

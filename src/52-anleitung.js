@@ -238,7 +238,13 @@ const ANLEITUNG = [
       { t: 'Wer wen kennt', p: ['Bei Familie, „Steht nahe", „Bewundert" und „Verachtet" schreibst du die Rolle davor: „Mutter — Ilva". Wer schon im Album steht, wird erkannt und verlinkt: ein Tipp, und du bist auf ihrer Seite.'] },
       { t: 'Klebezettel', p: ['Bis zu fünfzehn pro Figur, in fünf Farben. Sie kleben unten rechts auf der Doppelseite, ordentlich nebeneinander.'] },
       { t: 'Suchen und finden', p: ['Oben liegt die Suchleiste — sie sucht zuerst im Namen, dann in allem anderen. Daneben das Register: ein Buchstabe, ein Sprung. Die Figuren stehen immer alphabetisch, egal wann du sie angelegt hast.'] },
-      { t: 'Als Blatt ablegen', p: ['Im Blatt zur Figur legt der Knopf alles, was du eingetragen hast, als Text bei den Blättern ab — zum Weiterschreiben.'] }
+      { t: 'Das Bildnis', p: ['Auf der linken Seite hängt ein gerahmtes Bildnis. Tipp darauf: ein Foto vom Gerät, oder selbst gezeichnet. Lässt du es leer, stehen dort die Anfangsbuchstaben — und das sieht aus, als wäre es so gemeint.'] },
+      { t: 'Offene Fäden', p: ['Alles, was du in einer Geschichte legst, ist ein Versprechen an den Leser: der Schlüssel in der Schublade, der Cousin in Marseille, die Warnung vor dem Obstgarten. Trag sie unter „Offene Fäden" ein und setz einen Haken, sobald sie eingelöst sind. Unten im Buch steht, wie viele bei dieser Figur noch offen sind; in der Übersicht siehst du alle offenen Fäden des ganzen Albums.'] },
+      { t: 'Der Bogen', p: ['„Am Anfang ist X" und „Am Ende ist X" — zwei Karten nebeneinander, und dazwischen steht die ganze Wandlung. Dazu der Leitsatz, der groß über der Doppelseite steht.'] },
+      { t: 'Was das Buch selbst weiß', p: ['Links unter dem Steckbrief läuft die Zeitleiste: alle Kalendertermine dieser Figur, mit dem Alter, das sie damals hatte. Rechts steht, in welchen deiner Texte der Name vorkommt — mit der Stelle im Zusammenhang. Und wenn etwas nicht zusammenpasst (ein Alter, das nicht zum Geburtsdatum passt; „lebt" trotz Todesdatum), sagt es das ruhig dazu.'] },
+      { t: 'Die Übersicht', p: ['Der Knopf „Übersicht" zeigt alle Figuren als Karten mit Bildnis und Füllstand. Darunter: alle offenen Fäden — und alle Namen, die in deinen Figuren genannt werden, aber selbst noch nicht im Album wohnen. Ein Tipp, und sie sind angelegt.'] },
+      { t: 'Als Blatt ablegen', p: ['Im Blatt zur Figur legt der Knopf alles, was du eingetragen hast, als Text bei den Blättern ab — zum Weiterschreiben.'] },
+      { t: 'Tasten', p: ['Pfeile links und rechts blättern, Bild auf und ab ebenso, Pos1 und Ende springen an den Anfang und ans Ende. „n" legt eine neue Figur an, „z" schlägt irgendeine auf.'] }
     ]
   },
   {
