@@ -199,7 +199,9 @@ async function sicherungEinspielen(paket, modus) {
     if (!d) continue;
     if (modus === 'dazu' && D.docs.has(d.id)) { uebersprungen++; continue; }
     D.docs.set(d.id, d);
-    await dbPut('docs', d);
+    /* Nur was wirklich in der Datenbank liegt, gilt als angekommen — sonst
+       stuende es hier und waere nach dem naechsten Start spurlos weg. */
+    if (!(await sicherSpeichern('docs', d))) { D.docs.delete(d.id); uebersprungen++; continue; }
     neu.push(d);
     if (d.bild) benoetigteMedien.add(d.bild);
     if (d.skizze) benoetigteMedien.add(d.skizze);

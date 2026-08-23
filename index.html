@@ -2978,7 +2978,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.28.1';
+const APP_VERSION = '5.28.2';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -5014,9 +5014,9 @@ async function syncUebernehmeAusY() {
         for (const k of Object.keys(alt)) if (!(k in d) && !SYNC_INTERNE_FELDER.has(k)) delete alt[k];
         for (const f of SYNC_INTERNE_FELDER) delete d[f];
         Object.assign(alt, d);
-        await dbPut('docs', alt);
+        await sicherSpeichern('docs', alt);
       } else {
-        D.docs.set(id, d); await dbPut('docs', d);
+        D.docs.set(id, d); await sicherSpeichern('docs', d);
       }
       veraendert++;
     }
@@ -5027,12 +5027,12 @@ async function syncUebernehmeAusY() {
     }
     if (veraendert) _sync.fremdZuletzt = Date.now();
     const einst = _sync.ystate.get('einst');
-    if (typeof einst === 'string') try { uebernehmeEinstellungen(JSON.parse(einst)); await dbPut('kv', D.einst, 'einst'); setzeThema(D.einst.thema); } catch (e) {}
+    if (typeof einst === 'string') try { uebernehmeEinstellungen(JSON.parse(einst)); await sicherSpeichern('kv', D.einst, 'einst'); setzeThema(D.einst.thema); } catch (e) {}
     const stats = _sync.ystate.get('stats');
     if (typeof stats === 'string') try {
       const s = JSON.parse(stats);
       D.stats = { tage: saubereZaehler(s.tage), letzte: saubereZaehler(s.letzte), letzteSicherung: begrenze(s.letzteSicherung, 0, Date.now() + 86400000, 0) };
-      await dbPut('kv', D.stats, 'stats');
+      await sicherSpeichern('kv', D.stats, 'stats');
     } catch (e) {}
   } finally {
     _sync.uebernimmt = false;
@@ -13636,7 +13636,9 @@ async function sicherungEinspielen(paket, modus) {
     if (!d) continue;
     if (modus === 'dazu' && D.docs.has(d.id)) { uebersprungen++; continue; }
     D.docs.set(d.id, d);
-    await dbPut('docs', d);
+    /* Nur was wirklich in der Datenbank liegt, gilt als angekommen — sonst
+       stuende es hier und waere nach dem naechsten Start spurlos weg. */
+    if (!(await sicherSpeichern('docs', d))) { D.docs.delete(d.id); uebersprungen++; continue; }
     neu.push(d);
     if (d.bild) benoetigteMedien.add(d.bild);
     if (d.skizze) benoetigteMedien.add(d.skizze);

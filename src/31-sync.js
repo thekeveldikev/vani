@@ -279,9 +279,9 @@ async function syncUebernehmeAusY() {
         for (const k of Object.keys(alt)) if (!(k in d) && !SYNC_INTERNE_FELDER.has(k)) delete alt[k];
         for (const f of SYNC_INTERNE_FELDER) delete d[f];
         Object.assign(alt, d);
-        await dbPut('docs', alt);
+        await sicherSpeichern('docs', alt);
       } else {
-        D.docs.set(id, d); await dbPut('docs', d);
+        D.docs.set(id, d); await sicherSpeichern('docs', d);
       }
       veraendert++;
     }
@@ -292,12 +292,12 @@ async function syncUebernehmeAusY() {
     }
     if (veraendert) _sync.fremdZuletzt = Date.now();
     const einst = _sync.ystate.get('einst');
-    if (typeof einst === 'string') try { uebernehmeEinstellungen(JSON.parse(einst)); await dbPut('kv', D.einst, 'einst'); setzeThema(D.einst.thema); } catch (e) {}
+    if (typeof einst === 'string') try { uebernehmeEinstellungen(JSON.parse(einst)); await sicherSpeichern('kv', D.einst, 'einst'); setzeThema(D.einst.thema); } catch (e) {}
     const stats = _sync.ystate.get('stats');
     if (typeof stats === 'string') try {
       const s = JSON.parse(stats);
       D.stats = { tage: saubereZaehler(s.tage), letzte: saubereZaehler(s.letzte), letzteSicherung: begrenze(s.letzteSicherung, 0, Date.now() + 86400000, 0) };
-      await dbPut('kv', D.stats, 'stats');
+      await sicherSpeichern('kv', D.stats, 'stats');
     } catch (e) {}
   } finally {
     _sync.uebernimmt = false;

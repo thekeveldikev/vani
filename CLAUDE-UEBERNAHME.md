@@ -2237,3 +2237,10 @@ derselben Familie: es wurde etwas weggeraeumt, bevor der Ersatz sicher stand.
 
 Tests 191/191, `test/sicherheit.mjs` deckt die Papierkorb-Reihenfolge, den
 Rueckweg und den formatierten Fall mit ab.
+
+**5.28.2:** Zwei letzte Speicherwege nachgezogen. Der Umzugshelfer
+(`src/49b-ankommen.js`) legte Dokumente in den Bestand, deren `dbPut`
+fehlschlug - sie standen da und waren nach dem Neustart weg; jetzt zaehlen sie
+als uebersprungen. Und die Synchronisation (`src/31-sync.js`) schreibt Texte,
+Einstellungen und Zaehler ueber `sicherSpeichern`, statt beim ersten Fehler den
+ganzen Abgleich abzubrechen.
