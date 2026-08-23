@@ -2146,11 +2146,13 @@ Tests 178/178.
   Knopfreihen (zwei versetzte Knöpfe), hochgestellter Kragen mit asymmetrischen Hälften, Revers,
   loser Gürtel mit versetzter Schnalle und zwei verschieden langen Enden, Sturmpatte, zwei
   schräge Taschenpatten, vier dunkle Falten und zwei Lichtkanten, geschwungener Saum mit Schlitz.
-- **„Werke" ist abschaltbar und standardmäßig aus** (`D.einst.salonWerke`, in STANDARD_EINST):
-  betrifft den Reiter „Deine Werke" in „Deine Welten" und den Chip „Meine Werke" im Feld
-  „Jetzt gerade". Alles andere bleibt unberührt.
+- **Der Reiter „Deine Welten" ist abschaltbar und standardmäßig aus** (`D.einst.salonWelten`,
+  in STANDARD_EINST): ohne ihn zeigt jede Stimme nur Rat, Zitate, Aufgaben, Werke und Über —
+  wie vor 5.27. Mit ihm kommen die sechs Unterreiter dazu (Was mir auffiel, Deine Leute, Deine
+  Werke, Fragen an dich, Jetzt gerade, Chronik). Die Einlesung selbst bleibt davon unberührt:
+  die Runde und die Fragen an eine Stimme antworten weiter aus dem Material.
 - **Neue Karte „Salon" in den Feinheiten** (`salonKarte()` in 56-salon.js, eingehängt in
-  49-feinheiten.js hinter „Orte"): Werke zeigen, Salonklang, und der Zustand der Einlesung —
+  49-feinheiten.js hinter „Orte"): „Deine Welten" zeigen, Salonklang, und der Zustand der Einlesung —
   versiegelt mit „Umschlag öffnen" oder offen mit „Wegräumen" (`einlesungVergessen`). Der
   Umschlag wird beim Aufbau nachgeladen (`einlesungBereit`), damit die Zeile stimmt, auch wenn
   man den Salon noch nicht betreten hat.
@@ -2158,3 +2160,5 @@ Tests 178/178.
   neuen Karte).
 
 Tests 178/178.
+
+**5.27.3:** Der Schalter sitzt am ganzen Reiter „Deine Welten" (`D.einst.salonWelten`, Standard aus); „Deine Werke" und der Chip „Meine Werke" sind wieder immer da.

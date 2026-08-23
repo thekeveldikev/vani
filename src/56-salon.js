@@ -757,8 +757,8 @@ function salonKarte() {
   const zeile = (name, unter, s) => el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, name, unter ? el('div', { style: 'font-size:12.5px;color:var(--blass)' }, unter) : null), s);
   const schalter = (lies, setze) => el('button', { class: 'schalter' + (lies() ? ' an' : ''), onclick: (e) => { setze(!lies()); e.currentTarget.classList.toggle('an', lies()); speichereEinst(); } }, el('i'));
   const karte = el('div', { class: 'karte' },
-    zeile('Werke im Salon zeigen', 'Der Reiter „Deine Werke" in „Deine Welten" und der Chip „Meine Werke". Standardmäßig aus — der Rest bleibt davon unberührt.',
-      schalter(() => D.einst.salonWerke === true, (v) => { D.einst.salonWerke = v; })),
+    zeile('„Deine Welten" im Salon', 'Der Reiter bei jeder Stimme: was sie beim Lesen deiner Sammlung aufgeschrieben hat, deine Leute, deine Werke, Fragen an dich, was gerade in deinen Texten steht, und die Chronik. Standardmäßig aus — Rat, Zitate, Aufgaben und Werke der Stimme bleiben immer da.',
+      schalter(() => D.einst.salonWelten === true, (v) => { D.einst.salonWelten = v; })),
     zeile('Salonklang', 'Kaminknistern und die Uhr, wenn du den Salon betrittst. Der Knopf oben im Salon schaltet dasselbe.',
       schalter(() => D.einst.salonTon === true, (v) => { D.einst.salonTon = v; })));
   /* Der Umschlag: Zustand und Knöpfe */
@@ -862,7 +862,7 @@ function salonWeltenSeite(a) {
     if (ein) for (const w of ein.werke) werke.append(el('div', { class: 'sw-werk' },
       el('b', {}, w.titel), el('small', {}, w.form + ' · ' + w.woerter.toLocaleString('de-DE') + ' Wörter · ' + w.ton),
       el('i', {}, w.kurz)));
-    if (ein && D.einst.salonWerke === true) felder.werke = werke;
+    if (ein) felder.werke = werke;
 
     /* 3. Deine Leute — Figuren aus der Einlesung, die diese Stimme kommentiert hat */
     const leute = el('div', { class: 'sw-feld' });
@@ -913,7 +913,7 @@ function salonWeltenSeite(a) {
       for (const f of k.figuren.slice(0, 14)) chip(f.name, 'figur', () => zeige(gespraechAntwort(a, frageMit('wer', Object.assign({ art: 'figur' }, f)), k, { anrede, saat: salonHash(f.name + ':' + a.id) })));
       for (const o of k.orte.slice(0, 6)) chip(o.name, 'ort', () => zeige(gespraechAntwort(a, frageMit('wo', Object.assign({ art: 'ort' }, o)), k, { anrede, saat: salonHash(o.name + ':' + a.id) })));
       for (const b of k.begriffe.slice(0, 8)) chip(b.name, 'begriff', () => zeige(gespraechAntwort(a, frageMit('wer', Object.assign({ art: 'begriff' }, b)), k, { anrede, saat: salonHash(b.name + ':' + a.id) })));
-      if (D.einst.salonWerke === true) chip('Meine Werke', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'werke' }, k, { anrede })));
+      chip('Meine Werke', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'werke' }, k, { anrede })));
       chip('Zahlen', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'zahl' }, k, { anrede })));
       chip('Ein Satz von mir', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'stelle' }, k, { anrede, saat: Math.floor(Math.random() * 1e9) })));
       chip('Wo war ich zuletzt?', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'wann' }, k, { anrede })));
@@ -1112,7 +1112,7 @@ function salonSprechen(a, { thema = null, saat = null, reiterStart = 'rat' } = {
       a.eigen ? el('div', { class: 'reihe', style: 'justify-content:flex-start' }, el('button', { class: 'knopf', onclick: () => { zu(); salonEigenenBearbeiten(a.doc); } }, 'Bearbeiten'), el('button', { class: 'knopf zart', onclick: async () => { if (await frage(a.name + ' von der Wand nehmen?', { ja: 'Abnehmen', gefahr: true })) { await loesche(a.doc.id); zu(); zeichne(); } } }, 'Abnehmen')) : null))
   };
   /* Deine Welten: die Stimme spricht über die eigenen Texte — Einlesung (56d) und lebendige Kenntnis (56e/56f) */
-  if (!a.eigen && typeof gespraechAntwort === 'function') seiten.welten = salonWeltenSeite(a);
+  if (!a.eigen && D.einst.salonWelten === true && typeof gespraechAntwort === 'function') seiten.welten = salonWeltenSeite(a);
   const reiterKnopf = (id, name) => el('button', { class: 'salon-reiterknopf' + (id === reiterStart ? ' an' : ''), onclick: (ev) => { for (const k of Object.keys(seiten)) seiten[k].classList.toggle('an', k === id); $$('.salon-reiterknopf', reiter).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); if (id === 'welten' && seiten.welten && seiten.welten._starten) { seiten.welten._starten(); } } }, name);
   seiten[reiterStart].classList.add('an');
   anfuegen(reiter, reiterKnopf('rat', 'Rat'), seiten.welten ? reiterKnopf('welten', 'Deine Welten') : null, reiterKnopf('zitate', 'Zitate (' + (a.zitate || []).length + ')'), reiterKnopf('aufgaben', 'Aufgaben'), reiterKnopf('werke', 'Werke'), reiterKnopf('ueber', 'Über'));
