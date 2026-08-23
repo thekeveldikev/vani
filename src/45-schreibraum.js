@@ -147,6 +147,9 @@ function oeffneSchreibraum(docId) {
       istRich ? ta.innerHTML : null);
   }, 3000, true) : null;
   if (rettung) { _sr.rettung = rettung; }
+  /* Eine einzige, entprellte Nachfuehrung — nie mehrere gleichzeitig. */
+  const zentriereSpaeter = entprellt(() => zentriereZeile(), 130);
+  _sr.zentriereSpaeter = zentriereSpaeter;
   _sr.sichern = sichern;
   if (typeof klangkarteAnbieten === 'function') setTimeout(() => klangkarteAnbieten(doc), 900);
   if (typeof pauseErinnerungStart === 'function') pauseErinnerungStart();
@@ -175,7 +178,11 @@ function oeffneSchreibraum(docId) {
       + ' Zeichen · etwa ' + Math.max(1, Math.round(n / 200)) + ' Min. Lesezeit';
     kopf.classList.add('versunken');
     aktualisiereSpiegel();
-    if (D.einst.typewriter || istRich) zentriereZeile();
+    /* Nachfuehren erst, wenn ein Moment Ruhe ist. Auf dem iPad laeuft nach
+       jedem Anschlag noch die Autokorrektur und haelt eigene Bereiche im
+       Text; wer da den Textbereich scrollt, verschiebt den Cursor — er
+       sprang mitten in ein Wort weiter oben. Ein Zehntel Sekunde genuegt. */
+    if (D.einst.typewriter || istRich) zentriereSpaeter();
     if (D.einst.tagesziel > 0 && !zielKlangGespielt) {
       const heute = (D.stats.tage[tagKey()] || 0);
       if (heute >= D.einst.tagesziel) { zielKlangGespielt = true; glocke(); toast('Tagesziel. Der Rest ist Geschenk.'); }
@@ -198,6 +205,10 @@ function oeffneSchreibraum(docId) {
       ta.dispatchEvent(new Event('input', { bubbles: true }));
     }
   });
+  /* Waehrend die Autokorrektur oder eine andere Eingabehilfe am Wort
+     arbeitet, wird gar nichts nachgefuehrt. */
+  ta.addEventListener('compositionstart', () => { if (_sr) _sr.komponiert = true; });
+  ta.addEventListener('compositionend', () => { if (_sr) { _sr.komponiert = false; zentriereSpaeter(); } });
   document.addEventListener('selectionchange', spiegelBeiAuswahl);
   raum.addEventListener('pointerdown', (e) => { if (!e.target.closest('.zeichenleiste')) kopf.classList.remove('versunken'); });
 
@@ -225,7 +236,11 @@ function oeffneSchreibraum(docId) {
   _sr.spiegelBeiAuswahl = spiegelBeiAuswahl;
 }
 
-function srFensterZurueck() { if (_sr && window.scrollY) window.scrollTo(0, 0); }
+/* Safari schiebt bei formatiertem Text das Fenster, um den Cursor zu zeigen.
+   Das Geruest steht aber fest — also zurueck. Nur nicht, waehrend eine
+   Eingabehilfe am Wort arbeitet: dann wuerde das Zurueckschieben den Cursor
+   mitnehmen. */
+function srFensterZurueck() { if (_sr && !_sr.komponiert && window.scrollY) window.scrollTo(0, 0); }
 function srAktuellerText() {
   if (!_sr) return '';
   return _sr.istRich ? richReinerText(_sr.ta.innerHTML) : _sr.ta.value;
@@ -301,6 +316,8 @@ let _messer = null;
    unter die Tastaturkante gerät. */
 function zentriereZeileRich(sanft) {
   if (!_sr || !_sr.istRich) return;
+  /* Solange eine Eingabehilfe am Wort arbeitet: Finger weg. */
+  if (_sr.komponiert) return;
   const { ta, mitte } = _sr;
   const sel = window.getSelection && window.getSelection();
   if (!sel || !sel.rangeCount || !ta.contains(sel.anchorNode)) return;
@@ -311,11 +328,18 @@ function zentriereZeileRich(sanft) {
   if (!box || !box.height) return;
   const m = mitte.getBoundingClientRect();
   const oben = box.top - m.top, unten = box.bottom - m.top;
+  /* Hart setzen, nicht sanft rollen: eine laufende Rollbewegung waehrend des
+     Schreibens ist genau das, was den Cursor verrutschen laesst. Und eine
+     Totzone, damit nicht wegen zwei Pixeln gezappelt wird. */
+  const setzeScroll = (ziel) => {
+    const z = Math.max(0, Math.round(ziel));
+    if (Math.abs(mitte.scrollTop - z) < 10) return;
+    if (sanft) mitte.scrollTo({ top: z, behavior: 'smooth' }); else mitte.scrollTop = z;
+  };
   if (D.einst.typewriter) {
-    const ziel = mitte.scrollTop + oben - m.height * .42;
-    mitte.scrollTo({ top: Math.max(0, ziel), behavior: sanft ? 'smooth' : 'auto' });
+    setzeScroll(mitte.scrollTop + oben - m.height * .42);
   } else if (unten > m.height - 120 || oben < 64) {
-    mitte.scrollTo({ top: Math.max(0, mitte.scrollTop + unten - m.height * .55), behavior: sanft ? 'smooth' : 'auto' });
+    setzeScroll(mitte.scrollTop + unten - m.height * .55);
   }
   /* Und das Fenster bleibt, wo es hingehört. */
   if (window.scrollY) window.scrollTo(0, 0);

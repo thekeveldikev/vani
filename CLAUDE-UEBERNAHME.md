@@ -2366,3 +2366,51 @@ diesem Tag lebte", Abstand in Tagen zu heute, **Abschreiben** eines Tages,
 sechs zusaetzliche Zeichen ohne Art (Anker, Feder, Welle, Fenster, Faden,
 Glocke) und Tastatur: Pfeile = Tag/Woche, Bild auf/ab = vier Wochen, `n` = neuer
 Tag.
+
+## 5.30.1 — zwei Nachtraege
+
+**Der Kalender waehlte immer „Geburt".** Die Ursache war die Markierung: das
+Feld wurde mit `el('label', ...)` gebaut, und darin lag das ganze Gitter aus
+sechzehn Knoepfen. iOS-Safari leitet einen Tipp innerhalb eines Labels
+zusaetzlich an dessen erstes Bedienelement weiter — also an „Geburt". Am
+Schreibtisch mit der Maus faellt das nicht auf, auf dem iPad immer.
+`feld()` in 61b baut jetzt ein `<div>`, sobald der Inhalt einen Knopf
+enthaelt. **Regel: ein `<label>` gehoert um genau ein Eingabefeld, nie um
+Knoepfe.**
+
+**Der springende Cursor, zweiter Anlauf.** Nach 5.30.0 sprang er weiter. Was
+in dieser Runde gepruef und ausgeschlossen wurde — mit einem MutationObserver
+am lebenden Editor gemessen, nicht vermutet:
+
+- Beim Tippen aendert VANI den Text nicht (nur die drei getippten Zeichen als
+  `characterData`).
+- Die Auswahl wird nirgends geschrieben ausser in `kurzschriftLive`, und das
+  laeuft nur bei `_ * ~`.
+- `ersetzeKlug` und `aktualisiereSpiegel` steigen fuer formatierten Text
+  sofort aus.
+- `.sr-kopf.versunken` aendert nur die Deckkraft, kein Umbruch.
+- `.sr-text.rich-editor` hat bereits `overflow: visible`, ist also kein
+  eigener Scrollbereich.
+
+Geaendert wurde daraufhin:
+
+- **Nachgefuehrt wird entprellt (130 ms), nicht bei jedem Anschlag**
+  (`zentriereSpaeter`). Auf dem iPad laeuft nach jedem Anschlag noch die
+  Autokorrektur; ein Scroll mittendrin verschiebt den Cursor.
+- **Waehrend einer Eingabehilfe wird gar nicht nachgefuehrt**
+  (`compositionstart`/`compositionend`, `_sr.komponiert`) — auch
+  `srFensterZurueck` haelt sich dann zurueck.
+- **Hart scrollen statt sanft**, mit Totzone von 10 px: eine laufende
+  Rollbewegung waehrend des Schreibens ist selbst eine Fehlerquelle.
+- **`-webkit-overflow-scrolling: touch` ist ueberall raus** (7 Stellen). Das
+  legt in iOS-Safari eine eigene Scroll-Ebene an; ein contenteditable darin
+  ist eine bekannte Quelle fuer verrutschende Cursor. Seit iOS 13 ist
+  Schwungscrollen ohnehin die Vorgabe, die Eigenschaft also wirkungslos.
+
+**Was noch offen ist:** In Chromium liess sich der Sprung nie nachstellen —
+weder am Textende, noch bei scrollendem Bereich, noch ueber fuenf Anschlaege.
+Bleibt es bestehen, ist der naechste Verdaechtige die **iOS-Autokorrektur
+selbst**: sie setzt den Cursor um, wenn sie ein Wort ersetzen will, und der
+gemeldete Screenshot zeigt eine Rechtschreib-Unterkringelung. Zum Pruefen:
+im Schreibraum unter dem Zahnrad **„Autokorrektur — Aus"**
+(`D.einst.autokorrektur`). Springt es dann nicht mehr, liegt es dort.

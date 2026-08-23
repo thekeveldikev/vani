@@ -571,8 +571,17 @@ test('Ruhe-Vertrag: Sync zeichnet nicht mitten ins Schreiben, volle Seiten reich
   const r = lies('src/45-schreibraum.js');
   assert.match(r, /function zentriereZeileRich/);
   assert.match(r, /if \(_sr\.istRich\) \{ zentriereZeileRich\(false\); return; \}/);
-  assert.match(r, /if \(D\.einst\.typewriter \|\| istRich\) zentriereZeile\(\);/);
+  /* Nachgefuehrt wird ENTPRELLT, nicht bei jedem Anschlag: auf dem iPad
+     laeuft danach noch die Autokorrektur, und ein Scroll mittendrin
+     verschiebt den Cursor. Und waehrend einer Eingabehilfe gar nicht. */
+  assert.match(r, /if \(D\.einst\.typewriter \|\| istRich\) zentriereSpaeter\(\);/);
+  assert.match(r, /const zentriereSpaeter = entprellt\(/);
+  assert.match(r, /if \(_sr\.komponiert\) return;/);
+  assert.match(r, /compositionstart/);
   assert.match(r, /window\.addEventListener\('scroll', srFensterZurueck/);
+  /* Und niemals messen, indem etwas in den Text gesetzt wird. */
+  assert.doesNotMatch(r, /normalize\(\);/, 'kein normalize() im Schreibraum - das zerstoert die Auswahl');
+  assert.doesNotMatch(lies('src/36-caret.js'), /r\.insertNode\(mess\)/, 'nicht in den Text schreiben, um zu messen');
   /* Hefte: Cursor mittendrin auf voller Seite → Überhang wandert still, die Seite bleibt. */
   const h = lies('src/43-hefte.js');
   assert.match(h, /format: 'rich', still: true \}\);/);

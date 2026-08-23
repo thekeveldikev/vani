@@ -269,7 +269,17 @@ function kalTerminBearbeiten(doc, vorgabe, danach) {
   const ort = el('input', { type: 'text', value: stand.ort, placeholder: 'Wo? (darf leer bleiben)', maxlength: '200' });
   const jaehrlich = el('input', { type: 'checkbox' }); jaehrlich.checked = stand.jaehrlich;
 
-  const feld = (name, inhalt, unter) => el('label', { class: 'kal-feld' }, el('span', { class: 'kal-feldname' }, name), inhalt, unter ? el('small', { class: 'kal-feldunter' }, unter) : null);
+  /* Ein Feld. Enthaelt es Knoepfe, darf es KEIN <label> sein: iOS Safari
+     leitet einen Tipp innerhalb eines Labels zusaetzlich an dessen erstes
+     Bedienelement weiter. Beim Tippen auf "Reise" wurde so zusaetzlich der
+     erste Knopf des Gitters ausgeloest — "Geburt". Ein Label gehoert nur um
+     ein einzelnes Eingabefeld. */
+  const feld = (name, inhalt, unter) => {
+    const hatKnopf = inhalt && ((inhalt.tagName === 'BUTTON') || (inhalt.querySelector && inhalt.querySelector('button')));
+    return el(hatKnopf ? 'div' : 'label', { class: 'kal-feld' },
+      el('span', { class: 'kal-feldname' }, name), inhalt,
+      unter ? el('small', { class: 'kal-feldunter' }, unter) : null);
+  };
   const kasten = el('div', { class: 'modal kal-fenster' },
     el('div', { class: 'kartenkopf' }, neu ? 'EIN NEUER TAG' : 'DIESEN TAG ÄNDERN'),
     feld('Was', titel),
