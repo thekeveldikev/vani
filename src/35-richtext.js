@@ -88,7 +88,7 @@ function sauberesRichHTML(html) {
 }
 
 /* ----- Drei kleine Reparaturen für fremden Text -----
-   Goodnotes (und andere) schreiben Leerzeichen am Zeilenende als „&#x20;" in
+   Goodnotes (und andere) schreiben Leerzeichen am Zeilenende als „&#x20;“ in
    den Text — nicht als HTML, sondern als Buchstaben. Beim Einfügen standen
    sie dann wörtlich auf der Seite. Hier werden solche Reste zurückverwandelt.
    Nur das Eindeutige: Zahlen-Entitäten und die paar benannten, die in Text
@@ -148,7 +148,7 @@ function verbindeWeicheUmbrueche(bloecke) {
    (12pt wird sonst zu winzigen 12px), fremde Textfarben (schwarz auf dunklem
    Papier ist unlesbar), fremde Hintergründe und Ausrichtungen.
    Was gerettet wird: Tabellenzellen und Abschnitte werden getrennt, statt zu
-   „Zelle AZelle B" zu verschmelzen. */
+   „Zelle AZelle B“ zu verschmelzen. */
 function einfuegeHTML(html, maxBloecke = 20000) {
   if (typeof document === 'undefined' || !document.createElement) return richAusText(richReinerText(html));
   const vorlage = document.createElement('template');
@@ -345,7 +345,7 @@ function baueRichEditor(doc, optionen = {}) {
     sichern(); if (optionen.beiInput) optionen.beiInput(doc, editor, startWorte);
   });
   /* Sofort sichern, sobald der Blick den Text verlässt — nicht erst nach der
-     Schonfrist. Wer „Fertig" tippt oder die Seite wechselt, verliert nichts. */
+     Schonfrist. Wer „Fertig“ tippt oder die Seite wechselt, verliert nichts. */
   editor.addEventListener('blur', () => { if (sichern.haengt && sichern.haengt()) sichern.sofort(); });
   editor.addEventListener('paste', (e) => {
     if (!e.clipboardData) return;

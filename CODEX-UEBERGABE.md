@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.34.0 (23. August 2026)
+# Übergabe an Codex — Stand VANI 5.35.0 (23. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -52,6 +52,8 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
 | `src/54d-tischzitate.js`, `src/54e-tischblaetter.js` | Eigene Zitate ins Holz geritzt (gemessene Platzsuche, Schnitzanimation); die drei Blätter auf dem Tisch in zwei Modi (VANI wählt / selbst gewählt) |
 | `src/61-kalender.js`, `src/61b-kalender-ansicht.js` | Der Kalender auf dem Schreibtisch: 1600–2050 (gezeigt ab 2000), vier Ansichten, sechzehn gravierte Zeichen, freie Namen ohne Kopplung an Figuren |
 | `src/62-album.js`, `src/62b-album-buch.js`, `src/62c-album-blatt.js`, `src/62d-album-mehr.js` | Das Album: Figurendatenbank als Lederbuch. 62 = Kern (63 Felder, 400 Wesenswörter), 62b = das aufgeschlagene Buch, 62c = das Blatt zum Eintragen, 62d = Ordnungen, Geschichten-Filter, Netz, Gegenüberstellung, Fragen |
+| `src/63-stammbaum.js`, `63b-stammbaum-teppich.js`, `63c-stammbaum-blatt.js` | Der Wandteppich: ein Stammbaum, in dem Blut nur EINE Fadenart neben vielen ist („hat getötet“, „ist verliebt in“, „weiß nichts von“). Die Blutfäden bauen das Gerüst, alles andere wird als Ranke darüber gespannt und lässt sich einzeln stumm schalten. 63 = Kern (ohne DOM), 63b = der Teppich, 63c = das Blatt zum Eintragen |
+| `src/64-kabinett.js` | Das Kabinett: ein Schrank mit Fächern für Werkzeuge, die zu groß sind, um nebenher zu wohnen, und zu selten gebraucht für einen eigenen Platz in der Leiste. Ein neues Werkzeug einzuhängen ist ein Eintrag in `KABINETT_FAECHER` — Kachel, Öffnen, Rücken und Zählen macht der Schrank |
 | `vendor/pdf.min.js`, `vendor/pdf.worker.min.js`, `vendor/wasm/*` | pdf.js 6.2.108 + Decoder (Lizenzen liegen daneben) |
 | `autoren/*.jpg`, `autoren/quellen.json` | Porträts King/Kästner/Funke/Rothfuss (Wikimedia Commons, CC BY-SA 4.0 / CC0 / CC BY-SA 3.0 / CC BY-SA 3.0) |
 | `werkzeug/buecherkoffer.mjs`, `buecher/` | Bücherkoffer (AES-256-GCM, PBKDF2); nimmt PDF und EPUB |
@@ -100,6 +102,16 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
 - **5.32** Das Album als eigener Raum: ein Lederbuch, eine Doppelseite je Figur, 63 Felder, 400 Wesenswörter, fünfzehn Klebezettel, alles darf leer bleiben und steht dann nicht auf der Seite.
 - **5.33** Album, zweite Ausbaustufe: Zitate ohne Beiwerk, der Seitenfuß liegt im Fluss statt aufgelegt, Bildnisse standardmäßig AUS (`D.einst.albumBildnis`, Feinheiten → Album) — ein Gesicht festzulegen nimmt einem etwas weg.
 - **5.34** Album, dritte Ausbaustufe: Titelblatt mit Verzeichnis, Blattstapel an den Außenkanten, Lesebändchen, Klebezettel fest auf der linken Seite, sechs Ordnungen, Geschichten-Filter, das Netz, zwei Figuren nebeneinander, Abschreiben, siebzig Fragen an die Figur. Der Kalender reicht jetzt bis **1600** zurück (gezeigt ab 2000), damit eine Figur von 1783 ein richtiges Alter bekommt.
+- **5.35** Deutsch. Ohne Namen stand im Album „Wo kam ihr zur Welt?“ — kein deutscher Satz. `albumBeschriftung`
+  setzt jetzt „die Figur“ ein, und wo das nicht passt (Dativ, Genitiv), steht der ganze Satz hinter einem
+  senkrechten Strich noch einmal: `'Was {du} wirklich fehlt | Was der Figur wirklich fehlt'`. Dazu zwei neue
+  Helfer im Kern: `zaehl(n, einzahl, mehrzahl, eins)` gegen „1 Wörter“ und `genitiv(name)` gegen „Hanss Stimme“.
+  `klugeZeichen` schließt endlich mit „ statt mit einem geraden Strich; 526 Anführungszeichen in den Quelltexten
+  nachgezogen (Zeilen mit regulären Ausdrücken bleiben ausdrücklich unberührt).
+- **5.35** Datumsangaben auf Deutsch: `kalAusText('9. April 1783')` → `'1783-04-09'`. Verstanden werden
+  9.4.1783, 9. April 1783, April 1783, 1783, zweistellige Jahre und „Maerz“ ohne Umlaut. Gespeichert wird
+  weiterhin die eine Form, mit der sich rechnen lässt.
+- **5.35** Zwei neue Räume aus einer parallelen Sitzung: **Der Wandteppich** (Stammbaum, in dem auch die Fäden zählen, die keine Familie sind) und **Das Kabinett** (ein Schrank, in dessen Fächern große, selten gebrauchte Werkzeuge wohnen — der Wandteppich liegt im ersten Fach). In der Leiste steht nur das Kabinett.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

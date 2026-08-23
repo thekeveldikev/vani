@@ -267,7 +267,7 @@ async function verwandleSchnipsel(s, neuZeichnen) {
       titel: (s.text || '').split('\n')[0].slice(0, 40), text: s.text || '', rich: richAusText(s.text || ''), format: 'rich', status: 'funke', farbe: ''
     });
     await loesche(s.id);
-    toast('Jetzt eine Szene in „' + wo.projekt.titel + '".');
+    toast('Jetzt eine Szene in „' + wo.projekt.titel + '“.');
     if (neuZeichnen) neuZeichnen();
     return;
   }
@@ -276,7 +276,7 @@ async function verwandleSchnipsel(s, neuZeichnen) {
     if (!brett) return;
     neuDoc('blase', { parent: brett.id, text: s.text || '', farbe: '', pos: { x: 80 + Math.random() * 300, y: 80 + Math.random() * 300 } });
     await loesche(s.id);
-    toast('Schwebt jetzt auf „' + brett.titel + '".');
+    toast('Schwebt jetzt auf „' + brett.titel + '“.');
     if (neuZeichnen) neuZeichnen();
   }
 }

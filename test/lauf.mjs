@@ -130,7 +130,7 @@ test('klugeZeichen: Gedankenstrich und deutsche Anführungszeichen', async () =>
   assert.deepEqual(roh(k.klugeZeichen('Wort--', 6)), { text: 'Wort–', caret: 5 });
   assert.deepEqual(roh(k.klugeZeichen('"', 1)), { text: '„', caret: 1 });
   assert.deepEqual(roh(k.klugeZeichen('Wort "', 6)), { text: 'Wort „', caret: 6 });
-  assert.deepEqual(roh(k.klugeZeichen('Wort"', 5)), { text: 'Wort"', caret: 5 });
+  assert.deepEqual(roh(k.klugeZeichen('Wort"', 5)), { text: 'Wort“', caret: 5 }, 'am Wortende wird geschlossen — mit “, nicht mit einem geraden Strich');
   assert.deepEqual(roh(k.klugeZeichen("sagt'", 5)), { text: 'sagt’', caret: 5 });
   assert.deepEqual(roh(k.klugeZeichen("('", 2)), { text: '(‚', caret: 2 });
   assert.equal(k.klugeZeichen('nichts zu tun', 5), null);

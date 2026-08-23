@@ -2,7 +2,7 @@
    Sprechen statt tippen. Safari auf dem iPad (seit 14.5) und Chrome bringen die
    Spracherkennung mit (`webkitSpeechRecognition`); der Text fließt an die
    Schreibstelle — in Textfelder wie in formatierte Seiten. Satzzeichen per
-   Stimme („Punkt", „Komma", „neue Zeile"), Pausen werden Absätze. Nichts
+   Stimme („Punkt“, „Komma“, „neue Zeile“), Pausen werden Absätze. Nichts
    davon verlässt das Gerät anders als durch die Erkennung des Systems. */
 
 function diktatMoeglich() { return typeof window !== 'undefined' && !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
@@ -56,7 +56,7 @@ function diktatStopp(still) {
   if (d.knopf) { d.knopf.classList.remove('an', 'hoert'); d.knopf.title = 'Diktat: sprechen statt tippen'; }
   document.body.classList.remove('diktiert');
   if (d.zwischen && d.zwischen.isConnected) d.zwischen.remove();
-  if (!still) toast('Diktat beendet.' + (d.woerter ? ' ' + d.woerter + ' Wörter gehört.' : ''), 2400);
+  if (!still) toast('Diktat beendet.' + (d.woerter ? ' ' + zaehl(d.woerter, 'Wort', 'Wörter') + ' gehört.' : ''), 2400);
 }
 /* Auf iPhone und iPad hoert die Erkennung nach jedem Satz von selbst auf:
    `continuous` wird dort nicht beachtet, und mit `continuous = true` liefert
@@ -117,7 +117,7 @@ function diktatUmschalten(knopf, zielHolen) {
   erk.onerror = (ev) => {
     const f = ev && ev.error;
     if (f === 'not-allowed' || f === 'service-not-allowed') {
-      toast('Das Mikrofon ist nicht freigegeben. Auf dem iPad: Einstellungen › Safari › Mikrofon — und beim Nachfragen „Erlauben".', 7000);
+      toast('Das Mikrofon ist nicht freigegeben. Auf dem iPad: Einstellungen › Safari › Mikrofon — und beim Nachfragen „Erlauben“.', 7000);
       diktatStopp(true);
     } else if (f === 'no-speech' || f === 'aborted') {
       /* Ganz normal: es war nur still. Weiter geht es über onend. */
@@ -154,7 +154,7 @@ function diktatUmschalten(knopf, zielHolen) {
   knopf.classList.add('an', 'hoert'); knopf.title = 'Diktat läuft — tippen beendet es';
   document.body.classList.add('diktiert');
   document.body.append(zwischen);
-  toast('Diktat läuft. Sag „Punkt", „Komma", „neuer Absatz". Tipp auf das Mikrofon beendet es.', 4600);
+  toast('Diktat läuft. Sag „Punkt“, „Komma“, „neuer Absatz“. Tipp auf das Mikrofon beendet es.', 4600);
 }
 /* Der Knopf für Kopfleisten (Schreibraum). Er bleibt auch da, wenn der Browser
    keine Spracherkennung hat — sonst sucht man ihn und findet nichts. Beim

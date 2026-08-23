@@ -313,7 +313,7 @@ async function zeigeSicherheit() {
       zeile('Wörter insgesamt', woerter.toLocaleString('de-DE')),
       zeile('Zuletzt gespeichert', z.zuletzt ? vorZeit(z.zuletzt) : 'noch nichts in dieser Sitzung'),
       zeile('Speicher hakt', z.fehler ? z.fehler + '× — Rettungskopie greift' : 'nein', z.fehler ? 'warn' : 'gut'),
-      zeile('Wochensicherung', sich ? fmtDatum(sich.wann) + ', ' + sich.texte + ' Texte' : 'wird gleich angelegt'),
+      zeile('Wochensicherung', sich ? fmtDatum(sich.wann) + ', ' + zaehl(sich.texte, 'Text', 'Texte') : 'wird gleich angelegt'),
       platz ? zeile('Platz belegt', bytesLesbar(platz.belegt) + (platz.gesamt ? ' von ' + bytesLesbar(platz.gesamt) : ''), platz.anteil > .9 ? 'warn' : 'gut') : null,
       platz ? zeile('Dauerspeicher', platz.dauerhaft === true ? 'ja — nichts wird weggeräumt' : platz.dauerhaft === false ? 'nicht bestätigt' : 'unbekannt', platz.dauerhaft === true ? 'gut' : '') : null),
     platz && platz.dauerhaft === false ? el('button', { class: 'knopf zart', style: 'justify-self:start', onclick: async () => {
@@ -328,7 +328,7 @@ async function zeigeSicherheit() {
       el('div', { class: 'sicher-netz' }, el('b', {}, '3 · Absturzfang'), el('span', {}, 'Jeder unerwartete Fehler sichert zuerst den Text, dann wird er notiert.')),
       el('div', { class: 'sicher-netz' }, el('b', {}, '4 · Wochensicherung'), el('span', {}, 'Einmal pro Woche legt VANI still eine vollständige Kopie an.'))),
     el('div', { class: 'reihe' },
-      el('button', { class: 'knopf zart', onclick: async () => { const e = await sicherungAutoAnlegen(); toast(e ? 'Kopie angelegt: ' + e.texte + ' Texte.' : 'Das hat gerade nicht geklappt.'); } }, 'Jetzt still sichern'),
+      el('button', { class: 'knopf zart', onclick: async () => { const e = await sicherungAutoAnlegen(); toast(e ? 'Kopie angelegt: ' + zaehl(e.texte, 'Text', 'Texte') + '.' : 'Das hat gerade nicht geklappt.'); } }, 'Jetzt still sichern'),
       el('button', { class: 'knopf voll', onclick: () => { zu(); if (typeof sichereAlles === 'function') sichereAlles(); else location.hash = '#/feinheiten'; } }, 'Sicherungsdatei anlegen')),
     prot.length ? el('details', { class: 'sicher-protokoll' },
       el('summary', {}, 'Was zuletzt gehakt hat (' + prot.length + ')'),

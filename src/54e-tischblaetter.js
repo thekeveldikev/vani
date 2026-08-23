@@ -2,9 +2,9 @@
    Drei Manuskripte liegen auf der Platte. Wer sie aussucht, ist eine Frage
    der Laune:
 
-     · „VANI legt sie hin" — die drei zuletzt beschriebenen Texte, wie bisher.
+     · „VANI legt sie hin“ — die drei zuletzt beschriebenen Texte, wie bisher.
        Man kommt an den Tisch und sieht, woran man dran war.
-     · „Ich lege sie hin"  — drei selbst gewählte. Die bleiben liegen, auch
+     · „Ich lege sie hin“  — drei selbst gewählte. Die bleiben liegen, auch
        wenn man wochenlang woanders schreibt.
 
    Was gewählt ist, wird als Kennung gemerkt, nicht als Abschrift. Deshalb ist
@@ -91,7 +91,7 @@ function tischblattWaehlen(vorhanden, fertig) {
   setTimeout(() => suchfeld.focus(), 60);
 }
 
-/* ----- Der Abschnitt in „Schreibtisch einrichten" ----- */
+/* ----- Der Abschnitt in „Schreibtisch einrichten“ ----- */
 function tischblattEinstellung(e, danach) {
   const kasten = el('div', { class: 'einstellgruppe' });
   const zeichne = () => {

@@ -44,7 +44,7 @@ function personenblattSatz(d) {
   teile.push(d.name + ' kommt ' + d.n + '-mal vor' + (wo ? ', ' + wo : '') + '.');
   if (d.art === 'figur') {
     if (d.begleiter.length) teile.push('Am häufigsten steht ' + (d.begleiter[0].name) + ' im selben Satz.');
-    if (d.verben.length) teile.push('Das häufigste Verb: „' + d.verben[0].verb + '".');
+    if (d.verben.length) teile.push('Das häufigste Verb: „' + d.verben[0].verb + '“.');
     if (d.n >= 6) teile.push(d.dialogAnteil > 70 ? 'Fast immer in der Nähe von Anführungszeichen — ' + d.name + ' redet viel.' : d.dialogAnteil < 15 ? d.name + ' wird eher beschrieben als gehört.' : 'Reden und Handeln halten sich ungefähr die Waage.');
   }
   return teile.join(' ');
@@ -55,7 +55,7 @@ function zeigePersonenblatt(name, autor) {
   const k = typeof salonKenntnis === 'function' ? salonKenntnis() : null;
   const d = personenblattDaten(name, k);
   const ein = typeof einlesungFigur === 'function' ? einlesungFigur(name) : null;
-  if (!d && !ein) { toast('Zu „' + name + '" findet die Wand gerade nichts.'); return; }
+  if (!d && !ein) { toast('Zu „' + name + '“ findet die Wand gerade nichts.'); return; }
   const art = d ? d.art : 'figur';
   const kasten = el('div', { class: 'modal personenblatt' });
   const kopf = el('div', { class: 'pb-kopf' },
@@ -92,7 +92,7 @@ function zeigePersonenblatt(name, autor) {
     /* Alle Stellen */
     if (d.stellen.length) {
       const liste = el('div', { class: 'sw-belege' });
-      for (const s of d.stellen) liste.append(el('button', { class: 'sw-beleg', onclick: () => { const doc = D.docs.get(s.id); zu(); if (doc) oeffneDoc(doc); } }, el('i', {}, '„' + (s.satz.length > 220 ? s.satz.slice(0, 217) + ' …' : s.satz) + '"'), el('small', {}, s.werk)));
+      for (const s of d.stellen) liste.append(el('button', { class: 'sw-beleg', onclick: () => { const doc = D.docs.get(s.id); zu(); if (doc) oeffneDoc(doc); } }, el('i', {}, '„' + (s.satz.length > 220 ? s.satz.slice(0, 217) + ' …' : s.satz) + '“'), el('small', {}, s.werk)));
       kasten.append(el('div', { class: 'pb-block' }, el('span', { class: 'sw-belege-titel' }, d.stellen.length >= 40 ? 'Vierzig Stellen' : d.stellen.length + (d.stellen.length === 1 ? ' Stelle' : ' Stellen')), liste));
     }
   } else {

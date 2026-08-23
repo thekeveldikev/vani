@@ -100,6 +100,97 @@ function kalDatum(jahr, monat, tag) {
   if (!Number.isFinite(t) || t < 1 || t > kalMonatstage(j, m)) return '';
   return j + '-' + String(m).padStart(2, '0') + '-' + String(t).padStart(2, '0');
 }
+/* ----- Ein Datum so lesen, wie man es hinschreibt -----
+   Gespeichert wird immer 1783-04-09 — damit lässt sich rechnen und
+   sortieren. Tippen soll man das aber nicht müssen. Verstanden wird:
+
+     9.4.1783   09.04.1783   9. 4. 1783   9.4.83
+     9. April 1783   9. Apr 1783   9 April 1783
+     April 1783   Apr. 1783
+     1783
+     1783-04-09  (die gespeicherte Form selbst)
+
+   Zweistellige Jahre: 51 bis 99 werden 1951 bis 1999, alles darunter 2000
+   bis 2050. Was nicht aufgeht, gibt einen leeren String — dann sagt das
+   Feld, dass es das nicht lesen kann, statt still etwas Falsches zu setzen.
+
+   Von Hand zerlegt statt mit einem Ausdruck: so steht schwarz auf weiß da,
+   was erlaubt ist. */
+function kalZahl(stueck) {
+  const t = String(stueck == null ? '' : stueck).trim();
+  if (!t || t.length > 4) return null;
+  for (const c of t) if (c < '0' || c > '9') return null;
+  return Number(t);
+}
+function kalJahrAus(stueck) {
+  const t = String(stueck == null ? '' : stueck).trim();
+  const z = kalZahl(t);
+  if (z == null) return null;
+  if (t.length === 4) return z;
+  if (t.length <= 2) return z > 50 ? 1900 + z : 2000 + z;
+  return null;
+}
+function kalMonatAus(wort) {
+  const w = String(wort == null ? '' : wort).trim().toLowerCase().replace('.', '');
+  if (!w) return null;
+  const zahl = kalZahl(w);
+  if (zahl != null) return zahl >= 1 && zahl <= 12 ? zahl : null;
+  /* Wer keine Umlaute tippen mag, schreibt „Maerz“ — das ist derselbe Monat. */
+  const gerade = (s) => s.split('ä').join('a').split('ö').join('o').split('ü').join('u').split('ß').join('ss')
+    .split('ae').join('a').split('oe').join('o').split('ue').join('u');
+  const gesucht = gerade(w);
+  for (let i = 0; i < KAL_MONATE.length; i++) {
+    const lang = gerade(KAL_MONATE[i].toLowerCase());
+    const kurz = gerade(KAL_MONATE_KURZ[i].toLowerCase());
+    if (gesucht === lang || gesucht === kurz) return i + 1;
+    /* „Sept“, „Febr“ und andere Abkürzungen dazwischen */
+    if (gesucht.length >= 3 && lang.indexOf(gesucht) === 0) return i + 1;
+  }
+  return null;
+}
+function kalAusText(eingabe) {
+  const roh = String(eingabe == null ? '' : eingabe).trim().replace(',', ' ');
+  if (!roh) return '';
+
+  /* Die gespeicherte Form (und ihre knappen Varianten wie 1783-4-9) */
+  if (roh.indexOf('-') > 0) {
+    const t = roh.split('-').map((x) => x.trim());
+    if (t.length <= 3 && t.every((x) => kalZahl(x) != null)) {
+      return kalDatum(kalJahrAus(t[0]), t.length > 1 ? kalZahl(t[1]) : null, t.length > 2 ? kalZahl(t[2]) : null);
+    }
+  }
+
+  /* 9.4.1783 und Verwandte */
+  if (roh.indexOf('.') >= 0 && roh.split(' ').filter(Boolean).length <= 3) {
+    const t = roh.split('.').map((x) => x.trim()).filter((x) => x !== '');
+    if (t.length === 3 && t.every((x) => kalZahl(x) != null)) {
+      return kalDatum(kalJahrAus(t[2]), kalZahl(t[1]), kalZahl(t[0]));
+    }
+    if (t.length === 2 && t.every((x) => kalZahl(x) != null) && t[1].length === 4) {
+      return kalDatum(kalJahrAus(t[1]), kalZahl(t[0]), null);
+    }
+  }
+
+  /* 9. April 1783 · April 1783 · 1783 */
+  const worte = roh.split(' ').map((x) => x.trim()).filter(Boolean);
+  if (worte.length === 3) {
+    const tag = kalZahl(worte[0].replace('.', ''));
+    const monat = kalMonatAus(worte[1]);
+    const jahr = kalJahrAus(worte[2]);
+    if (tag != null && monat != null && jahr != null) return kalDatum(jahr, monat, tag);
+  }
+  if (worte.length === 2) {
+    const monat = kalMonatAus(worte[0]);
+    const jahr = kalJahrAus(worte[1]);
+    if (monat != null && jahr != null) return kalDatum(jahr, monat, null);
+  }
+  if (worte.length === 1) {
+    const jahr = worte[0].length === 4 ? kalJahrAus(worte[0]) : null;
+    if (jahr != null) return kalDatum(jahr, null, null);
+  }
+  return '';
+}
+
 function kalSchaltjahr(jahr) { return (jahr % 4 === 0 && jahr % 100 !== 0) || jahr % 400 === 0; }
 function kalMonatstage(jahr, monat) {
   if (monat == null) return 31;

@@ -104,7 +104,7 @@ async function sucheAppUpdate(neuLaden = false) {
   baueLeiste();
   zeichne();
 
-  /* Geteilter Text (Android „Teilen → VANI") oder ein Schnellstart vom Icon */
+  /* Geteilter Text (Android „Teilen → VANI“) oder ein Schnellstart vom Icon */
   const auftrag = startAuftrag(location.search);
   if (auftrag) {
     try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}

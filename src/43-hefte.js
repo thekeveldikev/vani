@@ -27,7 +27,7 @@ RENDER.hefte = function (haupt) { return renderHefteRegal(haupt); };
 async function textHereinholen(heft, danach) {
   const feld = el('div', {
     class: 'rich-editor text einfuegefeld', contenteditable: 'true', role: 'textbox',
-    'aria-multiline': 'true', 'data-placeholder': 'Hier hinein einfügen — ⌘V oder lange tippen und „Einsetzen".'
+    'aria-multiline': 'true', 'data-placeholder': 'Hier hinein einfügen — ⌘V oder lange tippen und „Einsetzen“.'
   });
   const zaehler = el('div', { class: 'einfuege-zaehler' }, 'Noch nichts eingesetzt.');
   const messen = () => {
@@ -48,7 +48,7 @@ async function textHereinholen(heft, danach) {
   return new Promise((res) => {
     const kasten = el('div', { class: 'modal einfuege-modal' },
       el('div', { class: 'kartenkopf' }, el('span', { html: ik('runter') }), 'TEXT HEREINHOLEN'),
-      el('h2', {}, 'Aus einer anderen App in „' + heft.titel + '"'),
+      el('h2', {}, 'Aus einer anderen App in „' + heft.titel + '“'),
       el('p', { class: 'einfuege-hinweis' }, 'In Goodnotes alles markieren und kopieren, dann hier einsetzen. VANI nimmt die fremden Schriftgrößen, Farben und Hintergründe heraus und behält Absätze, Überschriften, Listen und Hervorhebungen.'),
       feld, zaehler,
       el('div', { class: 'reihe' },
@@ -72,7 +72,7 @@ async function textHereinholen(heft, danach) {
           heft.geaendert = Date.now(); speichereStill(heft);
           res(seite);
           zu();
-          toast(worte(text).toLocaleString('de-DE') + ' Wörter sind angekommen. In der Ansicht „Am Stück" liegt alles auf einer langen Seite.', 5200);
+          toast(worte(text).toLocaleString('de-DE') + ' Wörter sind angekommen. In der Ansicht „Am Stück“ liegt alles auf einer langen Seite.', 5200);
           if (danach) danach();
         } }, 'Hereinholen')));
     const zu = zeigeDeck(kasten, () => res(null));
@@ -116,7 +116,7 @@ async function heftMenue(h, danach) {
     delete h.archiv; speichereStill(h);
   } else if (wahl === 'weg') {
     const seiten = kinder(h.id, 'seite').length;
-    if (await frage('„' + h.titel + '" mit ' + (seiten === 1 ? 'einer Seite' : seiten + ' Seiten') + ' in den Papierkorb legen?', { ja: 'In den Papierkorb', gefahr: true })) {
+    if (await frage('„' + h.titel + '“ mit ' + (seiten === 1 ? 'einer Seite' : seiten + ' Seiten') + ' in den Papierkorb legen?', { ja: 'In den Papierkorb', gefahr: true })) {
       await loesche(h.id);
       if (location.hash.includes(h.id)) location.hash = '#/hefte';
     }
@@ -136,7 +136,7 @@ RENDER.heft = function (haupt, heftId) {
   }
 
   let idx = Math.min(seiten.length - 1, parseInt(sessionStorage.getItem('heftSeite:' + heftId) || '0', 10) || 0);
-  /* Das Lesezeichen öffnet das Heft dort, wo ich zuletzt „hierher" gesagt habe —
+  /* Das Lesezeichen öffnet das Heft dort, wo ich zuletzt „hierher“ gesagt habe —
      nur beim ersten Öffnen in dieser Sitzung, danach zählt die letzte Seite. */
   if (!sessionStorage.getItem('heftSeite:' + heftId) && heft.lesezeichen) {
     const li = seiten.findIndex((s) => s.id === heft.lesezeichen);
@@ -480,10 +480,10 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
   const blatt = el('div', { class: papierKlassen(heft, optionen.fluss ? ' fluss' : ''), 'data-seite': seite.id });
 
   /* Werkzeuge: auf einer einzelnen Seite oben rechts auf dem Papier. In der
-     Ansicht „Am Stück" gibt es sie nur einmal ganz oben — dort ist alles eine
+     Ansicht „Am Stück“ gibt es sie nur einmal ganz oben — dort ist alles eine
      einzige lange Seite, und eine Werkzeugreihe je Stück wäre bloß Lärm. */
   /* Eine Werkzeugreihe je Seite gibt es nur in der Einzelansicht. Rolle und
-     „Am Stück" sind ein einziger Text — dort steht sie einmal oben rechts. */
+     „Am Stück“ sind ein einziger Text — dort steht sie einmal oben rechts. */
   const werkzeuge = (optionen.fluss || optionen.rolle) ? null : seitenWerkzeuge(
     () => ({ seite, blatt, heft }), { neuZeichnen, frisch: () => baueAnlagen() });
 
@@ -594,7 +594,7 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
   }
 
   /* Ohne Filter macht die native append-Methode aus einem fehlenden Element
-     den sichtbaren Text „null" — auf jeder schlichten Heftseite. */
+     den sichtbaren Text „null“ — auf jeder schlichten Heftseite. */
   blatt.append(...[skizzenbild, titel, formatleiste, text, werkzeuge].filter(Boolean));
   /* Aus der Gliederung kommend: zur n-ten Überschrift dieser Seite scrollen. */
   const zielUe = sessionStorage.getItem('zielUeberschrift');
@@ -1051,7 +1051,7 @@ async function starteKritzeln(blatt, seite) {
       /* Ein altes Bild ohne Striche bleibt als Grundlage erhalten — unter
          eigener Kennung, damit das fertige Bild darüber nicht die Grundlage
          überschreibt und beim nächsten Öffnen alles doppelt dasteht. */
-      /* „Alles löschen" gilt auch für die Grundlage: sonst taucht das alte Bild beim nächsten Strich wieder auf */
+      /* „Alles löschen“ gilt auch für die Grundlage: sonst taucht das alte Bild beim nächsten Strich wieder auf */
       const geleert = striche.some((s) => s && s.leeren);
       if (geleert) { basis = null; if (seite.skizzeBasis) { dbDel('media', seite.skizzeBasis).catch(() => {}); delete seite.skizzeBasis; } }
       if (basis && seite.skizze && !seite.skizzeBasis) {
@@ -1150,7 +1150,7 @@ function heftGliederung(heft) {
       } }, u.text));
     });
   });
-  if (!gesamt) { toast('Noch keine Überschriften — mit „Ü" in der Formatleiste entstehen sie.'); return; }
+  if (!gesamt) { toast('Noch keine Überschriften — mit „Ü“ in der Formatleiste entstehen sie.'); return; }
   const kasten = el('div', { class: 'modal gliederung-kasten' }, el('h2', {}, 'Gliederung'), liste,
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Schließen')));
   const zu = zeigeDeck(kasten);

@@ -1,6 +1,6 @@
 /* ===================== 48b — SPOTLIGHT UND TASTATURKÜRZEL =====================
    ⌘/Strg+K: eine Zeile tippen, Treffer mit Vorschau daneben, Pfeile, Enter.
-   „>" davor zeigt Befehle (Räume, Neues, Kerze …). „?" außerhalb eines
+   „>“ davor zeigt Befehle (Räume, Neues, Kerze …). „?“ außerhalb eines
    Feldes zeigt die Kürzel. */
 
 const SPOTLIGHT_BEFEHLE = () => [

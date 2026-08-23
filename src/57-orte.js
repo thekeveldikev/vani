@@ -4,7 +4,7 @@
    die Hefte ein Lesetisch mit Schreibmaschine, die Projekte eine Korkwand,
    das Cluster ein Küchentisch, die Wörter ein Setzkasten, der Klang ein
    Musikzimmer, der Faden eine Telefonbank, die Feinheiten ein Werkzeugkasten.
-   Alles ist zuschaltbar (Feinheiten → „Räume als Orte"), standardmäßig aus,
+   Alles ist zuschaltbar (Feinheiten → „Räume als Orte“), standardmäßig aus,
    je Raum einzeln. In den Kulissen lebt es: kleine Bewegungen (abschaltbar)
    und Dinge, die reagieren, wenn man sie antippt. */
 
@@ -186,7 +186,7 @@ function orteKulisse(raum, haupt) {
       /* Eine Karte ragt heraus: der letzte Zettel */
       (letzter ? '<g ' + T('karte', 'Der letzte Zettel: „' + (letzter.text || '').trim().slice(0, 60).replace(/\s+/g, ' ') + '“', 'letzter') + ' style="transform-origin:700px 70px"><g transform="rotate(-4 700 70)"><rect x="660" y="22" width="80" height="50" fill="#fbf6e8" stroke="#c9bda0"/><g stroke="rgba(90,110,170,.25)">' + [34, 42, 50, 58, 66].map((y) => '<line x1="666" y1="' + y + '" x2="734" y2="' + y + '"/>').join('') + '</g><line x1="660" y1="28" x2="740" y2="28" stroke="rgba(200,80,80,.5)"/>' + orteUmbruch(letzter.text, 16, 4).map((z, i) => '<text x="667" y="' + (40 + i * 8) + '" font-family="ui-serif, Georgia, serif" font-size="6.6" fill="#3a2a18">' + orteText(z) + '</text>').join('') + '</g></g>' : '') +
       /* Stempel, Büroklammern, Füller */
-      '<g ' + T('stempel', 'Tock. „Notiert."') + ' style="transform-origin:120px 40px"><rect x="100" y="18" width="40" height="10" rx="3" fill="#2c2218"/><rect x="114" y="6" width="12" height="14" rx="3" fill="#8a6a3e"/><rect x="104" y="28" width="32" height="6" fill="#8a1c12" opacity=".8"/></g>' +
+      '<g ' + T('stempel', 'Tock. „Notiert.“') + ' style="transform-origin:120px 40px"><rect x="100" y="18" width="40" height="10" rx="3" fill="#2c2218"/><rect x="114" y="6" width="12" height="14" rx="3" fill="#8a6a3e"/><rect x="104" y="28" width="32" height="6" fill="#8a1c12" opacity=".8"/></g>' +
       '<g ' + T('fueller', 'Die Feder ist voll. Sie will einen Zettel.') + ' style="transform-origin:560px 130px"><g transform="rotate(-18 560 130)"><rect x="520" y="126" width="80" height="7" rx="3.5" fill="#1a1a1a"/><rect x="596" y="126" width="14" height="7" rx="3" fill="#c9a25a"/><path d="M520 129.5l-10 2 10 2z" fill="#c9a25a"/><rect x="560" y="124" width="14" height="2" fill="#c9a25a"/></g></g>' +
       '<g fill="none" stroke="#8a8f96" stroke-width="1.4"><path d="M300 130c0-3 3-5 6-5h10c3 0 5 2 5 5v8"/><path d="M303 132c0-2 2-3 4-3h8c2 0 3 1 3 3v5"/></g>'
     ));

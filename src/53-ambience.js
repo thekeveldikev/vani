@@ -16,7 +16,7 @@ const AMBIENCE_VERSION = 1;
 const AMBIENCE_MAX = 40 * 1024 * 1024;   /* je Datei: großzügig, aber begrenzt */
 
 /* Der mitgelieferte Fundus. `datei` liegt neben der App, `quelle` nennt die
-   Herkunft ehrlich. Eigene Aufnahmen kommen als Dokumente vom Typ „klang"
+   Herkunft ehrlich. Eigene Aufnahmen kommen als Dokumente vom Typ „klang“
    dazu und stehen gleichberechtigt daneben. */
 let AMBIENCE_KATALOG = [];
 function ambienceKatalogSetzen(liste) {
@@ -32,7 +32,7 @@ function ambienceKatalogSetzen(liste) {
   return AMBIENCE_KATALOG;
 }
 
-/* Eigene Klänge: Dokumente vom Typ „klang" mit der Aufnahme in `datei` (Medien). */
+/* Eigene Klänge: Dokumente vom Typ „klang“ mit der Aufnahme in `datei` (Medien). */
 function eigeneAmbiences() { return vomTyp('klang'); }
 function alleAmbiences() {
   return [...AMBIENCE_KATALOG.map((k) => ({ ...k, eigen: false })),
@@ -355,7 +355,7 @@ async function klangbildFolgen(doc) {
   if (!bild || _klangbildZuletzt === bild.id) return false;
   _klangbildZuletzt = bild.id;
   await klangbildAnwenden(bild);
-  toast('Klangbild „' + (bild.titel || 'Ohne Namen') + '" — passend zu diesem Ort.', 3200);
+  toast('Klangbild „' + (bild.titel || 'Ohne Namen') + '“ — passend zu diesem Ort.', 3200);
   return true;
 }
 
@@ -414,7 +414,7 @@ async function ambienceEigeneHinzufuegen() {
       try {
         const id = await speichereDateiBlob(datei);
         const doc = neuDoc('klang', { titel: name, datei: id, art: 'Meine', groesse: datei.size, dateiname: datei.name.slice(0, 200) });
-        toast('„' + name + '" liegt jetzt bei deinen Klängen.');
+        toast('„' + name + '“ liegt jetzt bei deinen Klängen.');
         res(doc);
       } catch (e) { toast('Die Aufnahme wollte nicht.'); res(null); }
     });

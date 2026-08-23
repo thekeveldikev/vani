@@ -2,8 +2,8 @@
    VANI — Karteikarten: Wortkisten abfragen.
 
    Eine Wortkiste ist fast schon ein Karteikasten: vorn das Wort, hinten die
-   Notiz. „Abfragen" zeigt die Vorderseite, ein Tipp dreht die Karte, dann
-   „Gewusst" oder „Nochmal". Was man verfehlt, kommt öfter; was man sicher
+   Notiz. „Abfragen“ zeigt die Vorderseite, ein Tipp dreht die Karte, dann
+   „Gewusst“ oder „Nochmal“. Was man verfehlt, kommt öfter; was man sicher
    weiß, seltener — eine leichte Form des Karteikasten-Prinzips, ohne Zwang und
    ohne Kalender. Wer mag, fragt rückwärts (Notiz → Wort). Stand und Zähler
    liegen am Wort selbst und reisen über Sicherung und Sync mit.

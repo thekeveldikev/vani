@@ -175,7 +175,7 @@ RENDER.feinheiten = function (haupt) {
       karte.classList.toggle('hakt', z.art === 'fehler');
       kleines.textContent = z.art === 'fehler'
         ? 'Der Hauptspeicher hakt — deine Texte liegen in der Rettungskopie. Hier ansehen.'
-        : texte.toLocaleString('de-DE') + ' Texte gespeichert' + (z.zuletzt ? ' · zuletzt ' + vorZeit(z.zuletzt) : '') + (s ? ' · Wochensicherung ' + fmtDatum(s.wann) : '');
+        : zaehl(texte, 'Text', 'Texte') + ' gespeichert' + (z.zuletzt ? ' · zuletzt ' + vorZeit(z.zuletzt) : '') + (s ? ' · Wochensicherung ' + fmtDatum(s.wann) : '');
     };
     inhalt.append(karte);
     setz();
@@ -349,7 +349,7 @@ RENDER.feinheiten = function (haupt) {
         el('button', { class: 'knopf voll', onclick: () => importiereGoodnotes() }, el('span', { html: ik('buchzu'), style: 'display:flex' }), 'PDF, Goodnotes oder ZIP wählen'),
         vomTyp('goodnote').length ? el('button', { class: 'knopf', onclick: () => { location.hash = '#/goodnotes'; } }, 'Zum Archiv (' + vomTyp('goodnote').length + ')') : null),
       el('div', { class: 'goodnotes-exporttipp' },
-        'Für die beste, im PDF später durchsuchbare Kopie: In Goodnotes „Exportieren → PDF → Reduziert" wählen und „Handschrifterkennung" einschalten. Exportierte Ordner-ZIPs bleiben als ein ruhiges Archivpaket zusammen.'))));
+        'Für die beste, im PDF später durchsuchbare Kopie: In Goodnotes „Exportieren → PDF → Reduziert“ wählen und „Handschrifterkennung“ einschalten. Exportierte Ordner-ZIPs bleiben als ein ruhiges Archivpaket zusammen.'))));
 
   /* Eine Installation bleibt dieselbe App. Updates brauchen nie ein neues Icon. */
   inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'App auf dem Home-Bildschirm'),
@@ -357,10 +357,10 @@ RENDER.feinheiten = function (haupt) {
       el('div', { class: 'apppflege-kern' },
         el('span', { class: 'apppflege-icon' }, 'V'),
         el('span', {}, el('b', {}, 'Ein Icon genügt für immer.'),
-          el('small', {}, 'Solange die Web-Adresse gleich bleibt, ersetzen neue Fassungen die App hinter demselben Icon. Nicht nach jedem Update erneut „Zum Home-Bildschirm" wählen.'))),
+          el('small', {}, 'Solange die Web-Adresse gleich bleibt, ersetzen neue Fassungen die App hinter demselben Icon. Nicht nach jedem Update erneut „Zum Home-Bildschirm“ wählen.'))),
       el('div', { class: 'apppflege-schritte' },
         el('b', {}, 'Wenn das alte Icon kein Minus/X zeigt:'),
-        el('span', {}, '1. Icon lange halten → „App entfernen".'),
+        el('span', {}, '1. Icon lange halten → „App entfernen“.'),
         el('span', {}, '2. Fehlt das: Einstellungen → Bildschirmzeit → Beschränkungen → iTunes & App Store-Käufe → Apps löschen → Erlauben.'),
         el('span', {}, '3. Bei einem verwalteten iPad: Einstellungen → Allgemein → VPN & Geräteverwaltung prüfen. Dann kann nur die Verwaltung das Icon freigeben.')),
       el('div', { class: 'fussreihe' },
@@ -560,7 +560,7 @@ async function teileDatei(name, inhalt, typ = 'text/plain') {
     document.body.append(a);
     a.click();
     setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 4000);
-    toast('Gespeichert — schau in „Dateien" nach.');
+    toast('Gespeichert — schau in „Dateien“ nach.');
     return true;
   } catch (e) {}
   try {

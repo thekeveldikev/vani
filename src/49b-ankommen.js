@@ -11,9 +11,9 @@
 
 /* ----- Erkennen ----- */
 
-/* WhatsApp-Verlauf: „12.03.23, 14:05 - Name: Text" (Android) oder
-   „[12.03.23, 14:05:33] Name: Text" (iPhone). Zeilen ohne Datum gehören zur
-   Nachricht davor. Systemzeilen ohne „Name:" zählen als Sonstiges. */
+/* WhatsApp-Verlauf: „12.03.23, 14:05 - Name: Text“ (Android) oder
+   „[12.03.23, 14:05:33] Name: Text“ (iPhone). Zeilen ohne Datum gehören zur
+   Nachricht davor. Systemzeilen ohne „Name:“ zählen als Sonstiges. */
 function whatsappZerlegen(roh) {
   const kopf = /^‎?\[?(\d{1,2})\.(\d{1,2})\.(\d{2,4}),?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\]?\s*(?:-\s*)?([^:\n]{1,80}?):\s?(.*)$/;
   const nachrichten = [];
@@ -34,7 +34,7 @@ function whatsappZerlegen(roh) {
   return { nachrichten: nachrichten.filter((n) => n.text), sonst };
 }
 
-/* Text mit Überschriften: „# Titel", „## Titel" oder unterstrichen mit ===/---.
+/* Text mit Überschriften: „# Titel“, „## Titel“ oder unterstrichen mit ===/---.
    Was vor der ersten Überschrift steht, ist der Vorspann. */
 function markdownZerlegen(roh) {
   const zeilen = String(roh || '').split(/\r?\n/);
@@ -60,7 +60,7 @@ function markdownZerlegen(roh) {
   };
 }
 
-/* Der Text-Export eines VANI — „Nur Texte kopieren" gibt es seit der allerersten
+/* Der Text-Export eines VANI — „Nur Texte kopieren“ gibt es seit der allerersten
    Fassung. Daraus lassen sich Projekte, Hefte und Schnipsel zurückbauen. Seiten
    und Szenen ohne Titel standen im Export ohne Trennung hintereinander; sie
    kommen deshalb als ein Stück zurück — mehr gab der Export nie her. */
@@ -70,7 +70,7 @@ function vaniTextZerlegen(roh) {
   let block = null, kapitel = null, stueck = null, heft = null;
   const jetzt = new Date();
   const schnipselDatum = (t) => {
-    /* „Mo, 20. Aug" — ohne Jahr. Liegt der Tag in der Zukunft, war es voriges Jahr. */
+    /* „Mo, 20. Aug“ — ohne Jahr. Liegt der Tag in der Zukunft, war es voriges Jahr. */
     const m = t.match(/^(?:So|Mo|Di|Mi|Do|Fr|Sa),\s*(\d{1,2})\.\s*([A-Za-zäöü]+)$/);
     if (!m) return 0;
     const monat = ['jan', 'feb', 'mär', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dez'].indexOf(m[2].toLowerCase().slice(0, 3));
@@ -134,7 +134,7 @@ function erkenneEinfuegeInhalt(roh) {
   return { art: 'text', text: t };
 }
 
-/* Zusammenfassung einer Menge Dokumente — fürs „Das ist angekommen". */
+/* Zusammenfassung einer Menge Dokumente — fürs „Das ist angekommen“. */
 const ANKUNFT_NAMEN = {
   projekt: ['Projekt', 'Projekte'], kapitel: ['Kapitel', 'Kapitel'], szene: ['Szene', 'Szenen'],
   heft: ['Heft', 'Hefte'], seite: ['Seite', 'Seiten'], zettel: ['Zettel', 'Zettel'], foto: ['Foto', 'Fotos'],
@@ -182,7 +182,7 @@ async function baueSicherungsPaket({ mitMedien = true } = {}) {
   };
 }
 
-/* Spielt ein geprüftes Paket ein. „dazu" lässt Vorhandenes in Ruhe, „ersetzen"
+/* Spielt ein geprüftes Paket ein. „dazu“ lässt Vorhandenes in Ruhe, „ersetzen“
    räumt vorher alles weg. Gibt zurück, was wirklich neu angekommen ist. */
 async function sicherungEinspielen(paket, modus) {
   if (modus === 'ersetzen') {
@@ -290,9 +290,9 @@ async function inZwischenablageSichern() {
   toast('Packe ein …');
   const versprechen = baueSicherungsPaket({ mitMedien: wahl === 'alles' }).then((p) => JSON.stringify(p));
   const ok = await textInZwischenablage(versprechen);
-  if (!ok) { toast('Die Zwischenablage wollte nicht. Dann den Weg über „Alles sichern" als Datei.', 4600); return false; }
+  if (!ok) { toast('Die Zwischenablage wollte nicht. Dann den Weg über „Alles sichern“ als Datei.', 4600); return false; }
   const groesse = (await versprechen).length;
-  toast('Liegt in der Zwischenablage (' + formatBytes(groesse) + '). Drüben: „Aus der Zwischenablage einlesen".', 5600);
+  toast('Liegt in der Zwischenablage (' + formatBytes(groesse) + '). Drüben: „Aus der Zwischenablage einlesen“.', 5600);
   return true;
 }
 
@@ -303,10 +303,10 @@ function ausZwischenablageEinlesen() {
     let fertig = false;
     const feld = el('textarea', {
       rows: 6, class: 'ankommen-feld', spellcheck: 'false', autocapitalize: 'off', autocorrect: 'off',
-      placeholder: 'Hier einfügen — lange drücken und „Einfügen", oder Strg+V …'
+      placeholder: 'Hier einfügen — lange drücken und „Einfügen“, oder Strg+V …'
     });
     const hinweis = el('div', { class: 'ankommen-hinweis' },
-      'Es darf alles sein: eine VANI-Sicherung, ein Kopplungscode, „Nur Texte" aus einem älteren VANI, ein WhatsApp-Verlauf, ein Text mit Überschriften — oder einfach Text. VANI erkennt, was es ist.');
+      'Es darf alles sein: eine VANI-Sicherung, ein Kopplungscode, „Nur Texte“ aus einem älteren VANI, ein WhatsApp-Verlauf, ein Text mit Überschriften — oder einfach Text. VANI erkennt, was es ist.');
     const verarbeite = async (text) => {
       if (fertig) return;
       fertig = true; zu();
@@ -349,7 +349,7 @@ async function einfuegeInhaltVerarbeiten(text) {
       [e.grund === 'unvollstaendig'
         ? 'Das sieht aus wie eine Sicherung, ist aber abgeschnitten — vermutlich wurde nicht alles kopiert.'
         : 'Das ist eine Datei, aber keine VANI-Sicherung.'],
-      e.grund === 'unvollstaendig' ? 'Drüben noch einmal „In die Zwischenablage sichern", dann hier gleich einlesen. Bei sehr großen Sicherungen hilft „Nur Texte".' : '');
+      e.grund === 'unvollstaendig' ? 'Drüben noch einmal „In die Zwischenablage sichern“, dann hier gleich einlesen. Bei sehr großen Sicherungen hilft „Nur Texte“.' : '');
     return null;
   }
   if (e.art === 'kopplungscode') return vorhandenenSyncBereichKoppeln(e.code);
@@ -554,41 +554,41 @@ function umzugsHelfer() {
         : 'Jedes VANI-Symbol auf einem Gerät hat seinen eigenen Bestand — auch zwei Symbole derselben Adresse teilen nichts miteinander. Darum muss der alte Bestand einmal herüber. Drei Wege; die ersten beiden brauchen keine Datei und funktionieren auch auf verwalteten Schul-iPads.'));
 
   /* Weg 1: Kopplungscode */
-  kasten.append(weg('1 · Über den Kopplungscode', 'Wenn das alte VANI „iPad ↔ Laptop" schon kennt. Nichts tippen, nichts kopieren außer dem Code.',
+  kasten.append(weg('1 · Über den Kopplungscode', 'Wenn das alte VANI „iPad ↔ Laptop“ schon kennt. Nichts tippen, nichts kopieren außer dem Code.',
     imAlten
-      ? schritt(1, 'Im neuen VANI: Feinheiten → iPad ↔ Laptop → „Weiteres Gerät koppeln" — der Code ist dann in der Zwischenablage. Hierher bringen (Nachricht an dich selbst).')
+      ? schritt(1, 'Im neuen VANI: Feinheiten → iPad ↔ Laptop → „Weiteres Gerät koppeln“ — der Code ist dann in der Zwischenablage. Hierher bringen (Nachricht an dich selbst).')
       : schritt(1, verbunden
         ? el('span', {}, 'Hier den Kopplungscode holen: ', el('button', { class: 'knopf klein', onclick: () => kopiereSyncKopplungscode() }, 'Code kopieren'))
-        : el('span', {}, 'Zuerst hier einen privaten Bereich anlegen: ', el('button', { class: 'knopf klein', onclick: tu(() => neuerSyncBereich()) }, 'Bereich anlegen'), ' — danach „Weiteres Gerät koppeln".')),
+        : el('span', {}, 'Zuerst hier einen privaten Bereich anlegen: ', el('button', { class: 'knopf klein', onclick: tu(() => neuerSyncBereich()) }, 'Bereich anlegen'), ' — danach „Weiteres Gerät koppeln“.')),
     imAlten
-      ? schritt(2, el('span', {}, 'Hier: ', el('button', { class: 'knopf klein voll', onclick: tu(() => vorhandenenSyncBereichKoppeln()) }, 'Mit Bereich verbinden'), ' → Code einfügen → „Beides zusammenlegen".'))
-      : schritt(2, 'Im alten VANI: Feinheiten → iPad ↔ Laptop → „Mit Bereich verbinden" → Code einfügen → „Beides zusammenlegen".'),
+      ? schritt(2, el('span', {}, 'Hier: ', el('button', { class: 'knopf klein voll', onclick: tu(() => vorhandenenSyncBereichKoppeln()) }, 'Mit Bereich verbinden'), ' → Code einfügen → „Beides zusammenlegen“.'))
+      : schritt(2, 'Im alten VANI: Feinheiten → iPad ↔ Laptop → „Mit Bereich verbinden“ → Code einfügen → „Beides zusammenlegen“.'),
     schritt(3, 'Kurz warten. Alles wandert verschlüsselt herüber — Texte, Hefte, Bilder, Einstellungen.')));
 
   /* Weg 2: Zwischenablage */
   kasten.append(weg('2 · Über die Zwischenablage', 'Ohne Datei, ohne Netz. Funktioniert mit jeder VANI-Fassung seit der ersten.',
     imAlten
       ? schritt(1, el('span', {}, 'Hier: ', el('button', { class: 'knopf klein voll', onclick: tu(() => inZwischenablageSichern()) }, 'In die Zwischenablage sichern')))
-      : schritt(1, 'Im alten VANI: Feinheiten → „In die Zwischenablage sichern". Bei einer ganz alten Fassung, die das noch nicht hat: „Nur Texte kopieren" — VANI versteht auch das und baut Projekte, Hefte und Schnipsel daraus wieder auf.'),
+      : schritt(1, 'Im alten VANI: Feinheiten → „In die Zwischenablage sichern“. Bei einer ganz alten Fassung, die das noch nicht hat: „Nur Texte kopieren“ — VANI versteht auch das und baut Projekte, Hefte und Schnipsel daraus wieder auf.'),
     imAlten
-      ? schritt(2, 'Im neuen VANI: Feinheiten → „Aus der Zwischenablage einlesen" → ins Feld einfügen.')
+      ? schritt(2, 'Im neuen VANI: Feinheiten → „Aus der Zwischenablage einlesen“ → ins Feld einfügen.')
       : schritt(2, el('span', {}, 'Hier: ', el('button', { class: 'knopf klein voll', onclick: tu(() => ausZwischenablageEinlesen()) }, 'Aus der Zwischenablage einlesen'), ' → ins Feld einfügen. Fertig.')),
-    schritt(3, 'Wird es sehr viel (viele Bilder), lieber zweimal gehen: erst „Nur Texte", die Bilder später über den Kopplungscode.')));
+    schritt(3, 'Wird es sehr viel (viele Bilder), lieber zweimal gehen: erst „Nur Texte“, die Bilder später über den Kopplungscode.')));
 
   /* Weg 3: Datei */
   if (!imAlten) {
     kasten.append(weg('3 · Über eine Datei', 'Der klassische Weg — wenn das Gerät Dateien öffnen darf.',
-      schritt(1, 'Im alten VANI: Feinheiten → „Alles sichern" → Datei aufheben.'),
-      schritt(2, el('span', {}, 'Hier: ', el('button', { class: 'knopf klein', onclick: tu(() => leseSicherung()) }, 'Sicherung einlesen'), ' → Datei wählen → „Dazulegen".')),
+      schritt(1, 'Im alten VANI: Feinheiten → „Alles sichern“ → Datei aufheben.'),
+      schritt(2, el('span', {}, 'Hier: ', el('button', { class: 'knopf klein', onclick: tu(() => leseSicherung()) }, 'Sicherung einlesen'), ' → Datei wählen → „Dazulegen“.')),
       el('div', { class: 'umzug-unter', style: 'margin-top:10px' }, 'Manche Schul-iPads erlauben keine Dateiauswahl. Dann Weg 1 oder 2.')));
     kasten.append(el('div', { class: 'umzug-fuss' },
       el('b', {}, 'Lief dein altes VANI unter der früheren zweiten Adresse? '),
-      'Beim Öffnen erscheint „VANI ist umgezogen". Dort „Alten Bestand retten" antippen — das öffnet das alte VANI mit seinem ganzen Bestand, und von dort gehen Weg 1 und 2. Das alte Symbol erst löschen, wenn hier alles da ist.'));
+      'Beim Öffnen erscheint „VANI ist umgezogen“. Dort „Alten Bestand retten“ antippen — das öffnet das alte VANI mit seinem ganzen Bestand, und von dort gehen Weg 1 und 2. Das alte Symbol erst löschen, wenn hier alles da ist.'));
   }
   kasten.append(el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Alles klar')));
 }
 
-/* Die Karte „Sicher ist sicher" in den Feinheiten — mit und ohne Datei. */
+/* Die Karte „Sicher ist sicher“ in den Feinheiten — mit und ohne Datei. */
 function ankommenKarte() {
   const wann = D.stats.letzteSicherung;
   const imAlten = typeof vaniAdresseArt === 'function' && vaniAdresseArt() === 'rettung';

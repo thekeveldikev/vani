@@ -41,7 +41,7 @@ test('Der Wortschatz ist wirklich groß und ohne Doppelte', async () => {
 test('Der Name wird in die Beschriftungen eingesetzt', async () => {
   const k = await frisch();
   assert.equal(k.albumBeschriftung('Wichtig in {du}s Vergangenheit', 'Nore'), 'Wichtig in Nores Vergangenheit');
-  assert.equal(k.albumBeschriftung('Was {du} tut', ''), 'Was ihr tut', 'ohne Namen ein neutrales Wort');
+  assert.equal(k.albumBeschriftung('Was {du} tut', ''), 'Was die Figur tut', 'ohne Namen ein Hauptwort — „Was ihr tut“ ist kein deutscher Satz');
   assert.equal(k.albumBeschriftung('Ohne Platzhalter', 'Nore'), 'Ohne Platzhalter');
 });
 

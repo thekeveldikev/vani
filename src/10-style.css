@@ -4310,19 +4310,19 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
 .alb-stapel.rechts { --kanten: var(--stapel-rechts); right: 6px; box-shadow: 1px 0 5px rgba(0,0,0,.35); }
 
 /* ----- Das Lesebändchen ----- */
-.alb-band {
+.alb-leseband {
   position: absolute; top: -14px; left: calc(50% - 9px); width: 18px; height: 118px; z-index: 9;
   border: 0; padding: 0; cursor: pointer; background: none;
   transform-origin: 50% 0; animation: alb-bandfaellt .7s cubic-bezier(.25,1.3,.4,1);
 }
-.alb-band i {
+.alb-leseband i {
   display: block; width: 100%; height: 100%; border-radius: 1px;
   background: linear-gradient(180deg, color-mix(in srgb, var(--bandfarbe, #a8452f) 82%, #fff 18%), var(--bandfarbe, #a8452f));
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
   box-shadow: 1px 2px 7px rgba(0,0,0,.4);
   transition: height .35s cubic-bezier(.3,.9,.3,1), filter .25s;
 }
-.alb-band.hier i { height: 132%; filter: saturate(1.15); }
+.alb-leseband.hier i { height: 132%; filter: saturate(1.15); }
 @keyframes alb-bandfaellt { 0% { transform: translateY(-40px) rotate(-6deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
 .alb-merken { flex: none; border: 0; background: none; padding: 4px 8px; cursor: pointer; border-radius: 8px; opacity: .5; transition: opacity .2s, transform .2s; }
 .alb-merken.an { opacity: 1; }
@@ -4586,12 +4586,12 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
 
 /* ----- Wer keine Bewegung will, bekommt keine ----- */
 @media (prefers-reduced-motion: reduce) {
-  .alb-band, .alb-tb-titel, .alb-tb-unter, .alb-tb-zahlen span, .albn-kante, .albn-knoten,
+  .alb-leseband, .alb-tb-titel, .alb-tb-unter, .alb-tb-zahlen span, .albn-kante, .albn-knoten,
   .albg-zeile, .albr-karte, .alb-zettel, .alb-blattglanz,
   .alb-block.setzt-sich .alb-name.schreibt b, .alb-block.setzt-sich .alb-namenlinie {
     animation: none !important;
   }
-  .alb-stapel, .alb-band i, .albb-fuelle i { transition: none !important; }
+  .alb-stapel, .alb-leseband i, .albb-fuelle i { transition: none !important; }
   .albn-kante { stroke-dashoffset: 0; }
 }
 
@@ -4663,3 +4663,544 @@ html[data-thema="tinte"] .knopf.gefahr, html[data-thema="kerze"] .knopf.gefahr {
   padding: 18px 14px; font-size: 14px;
   font-family: ui-rounded, -apple-system, system-ui, sans-serif; font-style: normal;
 }
+
+/* ----- Das Buch im schmalen Fenster (iPad hochkant) -----
+   Untereinander statt nebeneinander. Vorher hatte jede der beiden Seiten
+   ihren eigenen kleinen Scrollbereich: bei einer vollen Figur schob man
+   oben ein paar Zeilen und musste dann unten weiterschieben. Jetzt läuft
+   der ganze Buchblock als eine Spalte durch — man liest von oben nach unten
+   und ist am Ende der linken Seite auf der rechten. */
+@media (max-width: 900px) {
+  .alb-block { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: rgba(120,90,50,.32) transparent; }
+  .alb-block::-webkit-scrollbar { width: 7px; }
+  .alb-block::-webkit-scrollbar-thumb { background: rgba(120,90,50,.3); border-radius: 4px; }
+  .alb-seite { flex: none; min-height: 0; overflow: visible; }
+  .alb-seiteninhalt { overflow: visible; }
+  /* Die Initiale liegt sonst mitten im Text einer langen Seite */
+  .alb-initiale { top: 84px; transform: none; font-size: clamp(110px, 26vw, 190px); }
+  /* Der Falz wird zur Trennlinie zwischen den beiden Seiten */
+  .alb-falz { margin: 6px 0; }
+  /* Das Lesebändchen hängt am Buch, nicht am scrollenden Block */
+  .alb-leseband { top: -10px; height: 84px; }
+}
+
+/* ============================================================
+   DAS KABINETT (64) — ein Schrank mit Fächern
+   ============================================================ */
+.kab-raum { display: flex; flex-direction: column; align-items: center; }
+.kab-schrank {
+  width: min(920px, 100%); margin: 8px auto 0; position: relative;
+  border-radius: 8px; padding: 22px 20px 26px;
+  background:
+    repeating-linear-gradient(94deg, rgba(255,255,255,.02) 0 2px, transparent 2px 7px),
+    radial-gradient(120% 70% at 30% 0%, rgba(255,225,180,.09), transparent 60%),
+    linear-gradient(165deg, #4b3524, #2d1f14);
+  box-shadow: 0 24px 60px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,228,190,.14), inset 0 -2px 6px rgba(0,0,0,.4);
+}
+.kab-krone, .kab-sockel {
+  display: block; height: 12px; border-radius: 4px; margin-bottom: 18px;
+  background: linear-gradient(180deg, #6b4c33, #33241704);
+  box-shadow: 0 3px 8px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,228,190,.2);
+}
+.kab-sockel { margin: 18px 0 0; background: linear-gradient(0deg, #6b4c33, #33241704); }
+.kab-faecher { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+
+.kab-fach {
+  position: relative; overflow: hidden; text-align: left; cursor: pointer;
+  border: 0; border-radius: 5px; padding: 20px 22px 22px; color: #f2e6cd;
+  display: flex; flex-direction: column; gap: 8px; min-height: 210px;
+  background:
+    repeating-linear-gradient(88deg, rgba(0,0,0,.05) 0 3px, transparent 3px 9px),
+    linear-gradient(160deg, #6a4c33, #422e1e);
+  box-shadow: inset 0 1px 0 rgba(255,228,190,.22), inset 0 -3px 10px rgba(0,0,0,.45), 0 6px 16px rgba(0,0,0,.3);
+  animation: kab-rein .5s cubic-bezier(.2,.9,.3,1) both; animation-delay: calc(var(--n, 0) * 70ms);
+  transition: transform .3s cubic-bezier(.2,.9,.3,1), box-shadow .3s;
+}
+@keyframes kab-rein { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.kab-fach:active { transform: translateX(4px); }
+.kab-holzmaser {
+  position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background:
+    radial-gradient(60% 30% at 20% 30%, rgba(255,220,170,.07), transparent 70%),
+    radial-gradient(50% 26% at 80% 70%, rgba(0,0,0,.16), transparent 70%);
+}
+.kab-emblem { color: #e0b26a; opacity: .9; }
+.kab-emblem svg { display: block; }
+.kab-schild {
+  display: block; padding: 7px 12px; border-radius: 3px; align-self: flex-start;
+  background: linear-gradient(180deg, #d8b271, #b48c4c);
+  color: #2a1c0f; box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 2px 5px rgba(0,0,0,.35);
+}
+.kab-schild b { display: block; font-family: ui-serif, "New York", Georgia, serif; font-size: 16px; letter-spacing: .02em; }
+.kab-schild small { display: block; font-size: 10.5px; opacity: .82; margin-top: 1px; }
+.kab-text { font-size: 13px; line-height: 1.55; color: rgba(242,230,205,.82); }
+.kab-zahl { margin-top: auto; font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: #e0b26a; }
+.kab-zahl.blass { color: rgba(242,230,205,.42); }
+.kab-griff {
+  position: absolute; right: 16px; top: 50%; width: 8px; height: 34px; margin-top: -17px; border-radius: 4px;
+  background: linear-gradient(90deg, #e2c489, #9d7738); box-shadow: -1px 0 3px rgba(0,0,0,.5);
+}
+.kab-fach.verschlossen { opacity: .62; }
+.kab-fach.verschlossen .kab-schild { background: linear-gradient(180deg, #a49b8a, #837a6c); }
+.kab-fusstext { max-width: 680px; margin: 22px auto 0; text-align: center; font-size: 13px; line-height: 1.6; color: var(--blass); }
+
+/* Ein Fach aufgezogen: das Werkzeug bekommt die ganze Fläche. */
+.kab-vollbild {
+  width: min(1500px, 99vw); height: 94vh; display: flex; flex-direction: column;
+  background: var(--hg); border-radius: 12px; overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0,0,0,.6);
+}
+.kab-vollbild.zieht-auf { animation: kab-auf .55s cubic-bezier(.2,.9,.25,1); }
+@keyframes kab-auf {
+  from { opacity: 0; transform: perspective(1600px) rotateX(4deg) translateY(26px) scale(.97); }
+  to { opacity: 1; transform: none; }
+}
+.kab-vollbild > * { min-height: 0; }
+
+/* ============================================================
+   DER WANDTEPPICH (63) — das Werkzeug
+   ============================================================ */
+.stb-werkzeug { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow-y: auto; }
+.stb-wkopf {
+  flex: none; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 14px 18px; border-bottom: 1px solid var(--rand); background: var(--karte);
+}
+.stb-zurueck {
+  border: 1px solid var(--rand); background: none; color: var(--blass); cursor: pointer;
+  border-radius: 999px; padding: 5px 13px; font-size: 12.5px; flex: none;
+}
+.stb-wtitel { flex: 1; min-width: 160px; }
+.stb-wtitel b { display: block; font-family: ui-serif, "New York", Georgia, serif; font-size: 19px; }
+.stb-wtitel small { display: block; font-size: 12px; color: var(--blass); margin-top: 1px; }
+
+.stb-regal { padding: 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; align-content: start; }
+.stb-kachel {
+  position: relative; border: 0; cursor: pointer; padding: 0; border-radius: 4px; overflow: hidden;
+  min-height: 170px; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px;
+  background: linear-gradient(160deg, var(--tuch, #1e3524), var(--tuch2, #16281a));
+  box-shadow: 0 10px 26px rgba(0,0,0,.35);
+  animation: kab-rein .45s cubic-bezier(.2,.9,.3,1) both; animation-delay: calc(var(--n, 0) * 50ms);
+  transition: transform .28s cubic-bezier(.2,.9,.3,1), box-shadow .28s;
+}
+.stb-k-tuch { position: absolute; inset: 0; overflow: hidden; }
+.stb-k-ast {
+  position: absolute; left: -10%; bottom: 12%; width: 90%; height: 60%;
+  border-top: 2px solid rgba(222,214,190,.5); border-right: 2px solid rgba(222,214,190,.34);
+  border-radius: 0 60% 0 0; transform: rotate(-6deg);
+}
+.stb-k-ast.zwei { left: 18%; bottom: 34%; width: 62%; height: 40%; opacity: .6; transform: rotate(-12deg); }
+.stb-k-band {
+  position: relative; z-index: 1; margin: 0 14px; padding: 6px 10px; border-radius: 2px;
+  background: linear-gradient(180deg, #b9bda6, #9aa08c); color: #22261c;
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 14px; letter-spacing: .06em; text-transform: uppercase;
+  text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,.35);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.stb-k-zahlen { position: relative; z-index: 1; margin: 0 14px 14px; font-size: 11px; color: rgba(232,226,205,.72); text-align: center; }
+.stb-k-rahmen { position: absolute; inset: 0; border: 5px solid transparent; border-radius: 4px; box-shadow: inset 0 0 0 5px rgba(74,52,32,.9), inset 0 0 24px rgba(0,0,0,.5); pointer-events: none; }
+
+.stb-leer { margin: auto; text-align: center; padding: 40px 24px; max-width: 520px; color: var(--blass); }
+.stb-leerbild { color: var(--blass); opacity: .5; margin-bottom: 10px; }
+.stb-leer b { display: block; font-family: ui-serif, "New York", Georgia, serif; font-size: 19px; color: var(--tinte); }
+.stb-leer p { font-size: 13.5px; line-height: 1.65; margin: 10px 0 18px; }
+
+/* ============================================================
+   DAS TUCH SELBST
+   ============================================================ */
+.tep-fenster {
+  width: min(1500px, 99vw); height: 95vh; display: flex; flex-direction: column;
+  background: var(--hg); border-radius: 10px; overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0,0,0,.6);
+}
+.tep-leiste { flex: none; background: var(--karte); border-bottom: 1px solid var(--rand); }
+.tep-lzeile { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 14px; }
+.tep-ltitel { flex: 1; min-width: 140px; }
+.tep-ltitel b { display: block; font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; }
+.tep-ltitel small { display: block; font-size: 11.5px; color: var(--blass); }
+.tep-lwerkzeug { display: flex; align-items: center; gap: 6px; border: 1px solid var(--rand); border-radius: 999px; padding: 3px 12px; background: var(--hg2); }
+.tep-lupe { display: inline-flex; color: var(--blass); }
+.tep-lupe svg { width: 15px; height: 15px; }
+.tep-suchfeld { border: 0; background: none; outline: none; color: var(--tinte); font-size: 13px; width: 170px; padding: 4px 0; }
+.tep-lknoepfe { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.tep-wk {
+  width: 30px; height: 28px; border: 1px solid var(--rand); background: var(--hg2); color: var(--tinte);
+  border-radius: 8px; cursor: pointer; font-size: 15px; line-height: 1; display: grid; place-items: center;
+}
+.tep-wk.zahl { width: auto; padding: 0 9px; font-size: 11.5px; font-variant-numeric: tabular-nums; color: var(--blass); }
+.tep-ltrenner { width: 1px; height: 20px; background: var(--rand); }
+.tep-zuknopf { width: 30px; height: 28px; border: 0; background: none; color: var(--blass); cursor: pointer; font-size: 20px; line-height: 1; }
+.knopf.klein { padding: 6px 12px; font-size: 12.5px; border-radius: 10px; }
+
+/* Die Legende: jede benutzte Fadenart, stummschaltbar */
+.tep-legende { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px; align-items: center; }
+.tep-lg {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  border: 1px solid var(--rand); background: var(--hg2); color: var(--tinte);
+  border-radius: 999px; padding: 3px 10px 3px 8px; font-size: 11.5px;
+  transition: opacity .2s, border-color .2s;
+}
+.tep-lg i { width: 18px; height: 0; border-top: 2px solid var(--fadenfarbe, #999); border-radius: 2px; }
+.tep-lg i.strich-gestrichelt { border-top-style: dashed; }
+.tep-lg i.strich-gepunktet { border-top-style: dotted; border-top-width: 2.5px; }
+.tep-lg small { color: var(--blass); font-variant-numeric: tabular-nums; }
+.tep-lg.stumm { opacity: .38; text-decoration: line-through; }
+.tep-lgalle { border: 0; background: none; color: var(--akzent); cursor: pointer; font-size: 11px; text-decoration: underline; text-underline-offset: 2px; }
+
+/* Der Rahmen um das Tuch: schweres Holz, oben und unten ein Schriftband */
+.tep-rahmen {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 12px; border-radius: 4px; overflow: hidden;
+  background: linear-gradient(160deg, #43301f, #241a10);
+  box-shadow: inset 0 0 0 9px #2e2114, inset 0 0 0 10px rgba(255,228,190,.12), 0 18px 44px rgba(0,0,0,.5);
+  padding: 10px;
+}
+.tep-randband {
+  flex: none; height: 30px; overflow: hidden; position: relative;
+  background: linear-gradient(180deg, #ddd6bb, #c6bd9d);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -1px 0 rgba(0,0,0,.2);
+  border-top: 2px solid #2e2114; border-bottom: 2px solid #2e2114;
+  display: flex; align-items: center;
+}
+.tep-randband span {
+  white-space: nowrap; font-family: ui-serif, "New York", Georgia, serif;
+  font-size: 15px; letter-spacing: .16em; color: #1c1710; padding-left: 8px;
+}
+.tep-flaeche { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; position: relative; background: #12180f; }
+.tep-flaeche { scrollbar-width: thin; scrollbar-color: rgba(220,210,180,.28) transparent; }
+.tep-flaeche::-webkit-scrollbar { width: 9px; height: 9px; }
+.tep-flaeche::-webkit-scrollbar-track { background: transparent; }
+.tep-flaeche::-webkit-scrollbar-thumb { background: rgba(220,210,180,.26); border-radius: 5px; }
+
+.tep-tuch { display: block; }
+.tep-grund { fill: var(--tuch, #1e3524); }
+.tep-webung { opacity: .8; }
+.tep-schatten { pointer-events: none; }
+
+/* Äste: helle, sich verjüngende Kurven */
+.tep-ast, .tep-stamm, .tep-wurzel {
+  fill: none; stroke: #ded6bd; stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.45));
+}
+.tep-stamm { stroke-width: 13; }
+.tep-wurzel { stroke-width: 6; opacity: .75; }
+.tep-bund { fill: none; stroke: #c8b273; stroke-width: 2.4; stroke-dasharray: 5 4; opacity: .8; }
+
+/* Laub */
+.tep-blattform { fill: #cfd6be; stroke: #a8b193; stroke-width: .5; opacity: .82; }
+.tep-blatt { transform-box: fill-box; transform-origin: bottom center; }
+.tep-tuch:not(.ohne-wind) .tep-blatt { animation: tep-wiegen var(--wiege, 3.4s) ease-in-out infinite alternate; animation-delay: var(--versatz, 0s); }
+@keyframes tep-wiegen { from { rotate: -3deg; } to { rotate: 3deg; } }
+
+/* Namensbänder */
+.tep-bandgrund { fill: #a7ad96; stroke: #7d8470; stroke-width: .8; filter: drop-shadow(0 2px 3px rgba(0,0,0,.5)); }
+.tep-bandzipfel { fill: #868d74; stroke: #6b7260; stroke-width: .7; }
+.tep-name {
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 12.5px; font-weight: 600;
+  letter-spacing: .09em; fill: #1f2418;
+}
+.tep-jahre { font-family: ui-serif, "New York", Georgia, serif; font-size: 8.5px; letter-spacing: .06em; fill: #3d422f; }
+.tep-person { cursor: pointer; transition: opacity .25s; }
+.tep-person.blass { opacity: .26; }
+.tep-person.hervor .tep-bandgrund { fill: #cfd4bb; stroke: #e0b26a; stroke-width: 1.6; }
+.tep-person:focus-visible { outline: none; }
+.tep-person:focus-visible .tep-bandgrund { stroke: #e0b26a; stroke-width: 2; }
+.tep-tuch:not(.ohne-wind) .tep-person { animation: tep-bandkommt .5s cubic-bezier(.2,.9,.3,1) backwards; animation-delay: calc(var(--n, 0) * 26ms); }
+@keyframes tep-bandkommt { from { opacity: 0; } to { opacity: 1; } }
+
+/* Zeichen und Brandlöcher */
+.tep-zkreis { fill: rgba(20,26,18,.5); stroke: #ded6bd; stroke-width: 1.2; }
+.tep-zform { fill: none; stroke: #ded6bd; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.tep-loch { fill: #0b0907; }
+.tep-glut { opacity: .95; }
+.tep-person.gebrannt .tep-bandgrund { fill: #8e9480; }
+.tep-tuch:not(.ohne-wind) .tep-person.gebrannt .tep-glut { animation: tep-glimmt 4.5s ease-in-out infinite alternate; }
+@keyframes tep-glimmt { from { opacity: .85; } to { opacity: 1; } }
+
+/* Ranken: alles, was kein Gerüst ist */
+.tep-ranke { cursor: pointer; }
+.tep-rankeschatten { fill: none; stroke: rgba(0,0,0,.45); stroke-width: 4; opacity: .5; }
+.tep-rankelinie { fill: none; stroke: var(--fadenfarbe, #999); stroke-width: 2; stroke-linecap: round; opacity: .9; }
+.tep-rankelinie.strich-gestrichelt { stroke-dasharray: 8 6; }
+.tep-rankelinie.strich-gepunktet { stroke-dasharray: 1.5 6; }
+.tep-ranke.schwer .tep-rankelinie { stroke-width: 2.6; }
+.tep-spitze { fill: var(--fadenfarbe, #999); }
+.tep-rbgrund { fill: rgba(18,22,16,.86); stroke: var(--fadenfarbe, #999); stroke-width: .8; }
+.tep-rbtext { font-family: ui-rounded, -apple-system, system-ui, sans-serif; font-size: 9px; fill: #e6e2d2; }
+.tep-tuch:not(.ohne-wind) .tep-ranke { animation: tep-rankeauf .7s ease both; animation-delay: calc(var(--n, 0) * 18ms + 250ms); }
+@keyframes tep-rankeauf { from { opacity: 0; } to { opacity: 1; } }
+
+/* Das Wappen am Stamm */
+.tep-wschild { fill: rgba(20,26,18,.55); }
+.tep-wrand { fill: none; stroke: #c8b273; stroke-width: 2; }
+.tep-wteilung { stroke: #c8b273; stroke-width: .8; opacity: .5; }
+.tep-wspruch { font-family: ui-serif, "New York", Georgia, serif; font-size: 9px; letter-spacing: .18em; fill: rgba(222,214,189,.55); }
+
+/* Das Getier */
+.tep-tierform { fill: #c9a06a; stroke: #8a6a3f; stroke-width: .6; opacity: 0; }
+.tep-tier.laeuft .tep-tierform { opacity: .92; }
+.tep-tier.laeuft {
+  offset-distance: 0%; offset-rotate: auto;
+  animation: tep-huscht 5s cubic-bezier(.4,0,.6,1);
+}
+@keyframes tep-huscht {
+  0% { offset-distance: 0%; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+
+/* Fallendes Laub — liegt über dem Tuch, nicht darin */
+.tep-fallblatt {
+  position: absolute; top: -24px; width: 11px; height: 15px; pointer-events: none; z-index: 3;
+  background: #cfd6be; opacity: .0;
+  clip-path: polygon(50% 0%, 78% 22%, 100% 55%, 62% 78%, 50% 100%, 38% 78%, 0% 55%, 22% 22%);
+  animation: tep-faellt var(--dauer, 9s) linear forwards;
+}
+@keyframes tep-faellt {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  8% { opacity: .8; }
+  100% { transform: translate(var(--drift, 0px), 115vh) rotate(var(--dreh, 360deg)); opacity: 0; }
+}
+
+/* ============================================================
+   DIE KARTUSCHE UND DIE FENSTER
+   ============================================================ */
+.stb-kartusche { width: min(640px, 95vw); max-height: 92vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+.stb-kkopf { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.stb-name { flex: 1; min-width: 180px; font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; }
+.stb-jahre { display: flex; align-items: center; gap: 6px; }
+.stb-jahre i { color: var(--blass); font-style: normal; }
+.stb-jahr { width: 92px; text-align: center; font-variant-numeric: tabular-nums; }
+.stb-albumhinweis { color: var(--blass); font-size: 11.5px; }
+.stb-khall { font-size: 12px; color: var(--tinte); min-height: 17px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.stb-khall .blass { color: var(--blass); }
+.stb-albumlink { border: 0; background: none; color: var(--akzent); cursor: pointer; font-size: 12px; text-decoration: underline; text-underline-offset: 2px; padding: 0 4px; }
+.stb-abschnitt {
+  font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--blass);
+  margin: 10px 0 2px; padding-top: 8px; border-top: 1px solid var(--rand);
+}
+.stb-notiz { width: 100%; resize: vertical; }
+.stb-vor { font-size: 12.5px; color: var(--blass); line-height: 1.55; margin: 0 0 10px; }
+.stb-hilfe { display: block; color: var(--blass); font-size: 11.5px; margin-top: 4px; line-height: 1.5; }
+
+.stb-zeichen { display: flex; flex-wrap: wrap; gap: 5px; }
+.stb-z {
+  width: 36px; height: 36px; border: 1px solid var(--rand); background: var(--karte); color: var(--tinte);
+  border-radius: 9px; cursor: pointer; display: grid; place-items: center; transition: border-color .18s, background .18s;
+}
+.stb-z.an { border-color: var(--akzent); background: color-mix(in srgb, var(--akzent) 14%, var(--karte)); }
+.stb-zleer { color: var(--blass); font-size: 14px; }
+
+.stb-faeden { display: flex; flex-direction: column; gap: 3px; }
+.stb-fgruppe {
+  display: flex; align-items: center; gap: 7px; margin-top: 8px;
+  font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--blass);
+}
+.stb-fgruppe small { color: var(--rand); font-variant-numeric: tabular-nums; }
+.stb-fstrich { display: block; width: 20px; height: 0; border-top: 2px solid var(--fadenfarbe, #999); border-radius: 2px; flex: none; }
+.stb-fstrich.strich-gestrichelt { border-top-style: dashed; }
+.stb-fstrich.strich-gepunktet { border-top-style: dotted; border-top-width: 2.5px; }
+.stb-fzeile { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.stb-ftext {
+  flex: 1; min-width: 0; text-align: left; border: 0; background: none; cursor: pointer; color: var(--tinte);
+  padding: 5px 8px; border-radius: 8px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap;
+  transition: background .18s;
+}
+.stb-ftext b { font-weight: 600; font-size: 12px; color: var(--fadenfarbe, var(--tinte)); }
+.stb-ftext span { font-size: 13.5px; }
+.stb-ftext small { font-size: 11.5px; color: var(--blass); font-style: italic; }
+.stb-fweg { flex: none; width: 26px; height: 26px; border: 0; background: none; color: var(--blass); cursor: pointer; border-radius: 7px; font-size: 15px; }
+.stb-fweg[disabled] { opacity: .3; pointer-events: none; }
+.stb-fneu {
+  margin-top: 10px; border: 1px dashed var(--rand); background: none; color: var(--akzent); cursor: pointer;
+  border-radius: 10px; padding: 8px 14px; font-size: 13px; align-self: flex-start;
+}
+.stb-kfuss { margin-top: 14px; flex-wrap: wrap; }
+
+/* Das Fadenfenster */
+.stb-fadenfenster { width: min(640px, 95vw); max-height: 92vh; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+.stb-fvon { display: flex; align-items: baseline; gap: 8px; }
+.stb-fvon small { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--blass); }
+.stb-fvon b { font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; }
+.stb-freiter, .stb-fgruppenwahl { display: flex; flex-wrap: wrap; gap: 5px; }
+.stb-fr {
+  border: 1px solid var(--rand); background: var(--karte); color: var(--blass); border-radius: 999px;
+  padding: 5px 13px; font-size: 12.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+  transition: background .18s, color .18s, border-color .18s;
+}
+.stb-fr.an { background: var(--akzent); border-color: transparent; color: #fff; }
+.stb-fr i { font-style: normal; font-size: 10px; opacity: .75; }
+.stb-farten { display: flex; flex-wrap: wrap; gap: 6px; }
+.stb-fart {
+  display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+  border: 1px solid var(--rand); background: var(--karte); color: var(--tinte);
+  border-radius: 9px; padding: 7px 12px; font-size: 13px;
+  transition: border-color .18s, background .18s;
+}
+.stb-fart.an { border-color: var(--fadenfarbe, var(--akzent)); background: color-mix(in srgb, var(--fadenfarbe, var(--akzent)) 12%, var(--karte)); }
+.stb-fsuche { width: 100%; }
+.stb-fziele { display: flex; flex-wrap: wrap; gap: 5px; max-height: 190px; overflow-y: auto; padding: 2px; }
+.stb-fziel {
+  border: 1px solid var(--rand); background: var(--karte); color: var(--tinte); border-radius: 9px;
+  padding: 6px 11px; font-size: 13px; cursor: pointer; display: inline-flex; align-items: baseline; gap: 6px;
+  transition: border-color .18s;
+}
+.stb-fziel small { font-size: 10.5px; color: var(--blass); font-variant-numeric: tabular-nums; }
+.stb-fziel.an { border-color: var(--akzent); background: color-mix(in srgb, var(--akzent) 12%, var(--karte)); }
+.stb-fziel.neu { border-style: dashed; color: var(--akzent); }
+.stb-fwort { width: 100%; }
+.stb-fvorschau {
+  margin-top: 10px; padding: 11px 13px; border-radius: 10px; background: var(--hg2);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-height: 44px;
+}
+.stb-fvorschau b { font-family: ui-serif, "New York", Georgia, serif; font-size: 14.5px; font-weight: 500; }
+.stb-fvorschau small { flex-basis: 100%; font-size: 11.5px; color: var(--blass); line-height: 1.5; }
+.stb-fvorschau .blass { color: var(--blass); font-size: 13px; }
+
+/* Eigene Fadenart */
+.stb-artfenster { width: min(520px, 94vw); max-height: 92vh; overflow-y: auto; }
+.stb-artfenster input { width: 100%; }
+.stb-farben, .stb-striche { display: flex; flex-wrap: wrap; gap: 6px; }
+.stb-farbe { width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+.stb-farbe.an { border-color: var(--tinte); box-shadow: 0 0 0 2px var(--karte) inset; }
+.stb-strichwahl {
+  width: 52px; height: 30px; border: 1px solid var(--rand); background: var(--karte); border-radius: 8px;
+  cursor: pointer; display: grid; place-items: center;
+}
+.stb-strichwahl.an { border-color: var(--akzent); }
+
+/* Das Verzeichnis */
+.stb-verzeichnis { width: min(700px, 95vw); max-height: 92vh; display: flex; flex-direction: column; gap: 9px; }
+.stb-vreiter { display: flex; gap: 5px; flex-wrap: wrap; }
+.stb-vr {
+  border: 1px solid var(--rand); background: var(--karte); color: var(--blass); border-radius: 999px;
+  padding: 5px 13px; font-size: 12.5px; cursor: pointer; display: inline-flex; gap: 5px; align-items: center;
+}
+.stb-vr.an { background: var(--akzent); border-color: transparent; color: #fff; }
+.stb-vr i { font-style: normal; font-size: 10px; opacity: .8; }
+.stb-vsuche { width: 100%; }
+.stb-vinhalt { flex: 1; min-height: 180px; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 2px; }
+.stb-vzeile {
+  display: flex; align-items: baseline; gap: 10px; text-align: left; width: 100%;
+  border: 0; background: none; cursor: pointer; color: var(--tinte); padding: 8px 10px; border-radius: 9px;
+  border-bottom: 1px solid var(--rand); transition: background .18s;
+}
+.stb-vzeile b { font-size: 14px; font-weight: 600; }
+.stb-vzeile span { font-size: 11.5px; color: var(--blass); }
+.stb-vzeile.gebrannt b { text-decoration: line-through; opacity: .7; }
+.stb-vzeile.faden { border-left: 3px solid var(--fadenfarbe, var(--rand)); border-bottom: 0; padding-left: 10px; }
+.stb-vzeile.faden b { font-weight: 400; font-size: 13.5px; }
+.stb-vzeile.auff b { font-weight: 400; font-size: 13px; }
+.stb-vsym {
+  flex: none; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(168,57,43,.16); color: #a8392b; font-style: normal; font-size: 12px; font-weight: 700;
+}
+.stb-vim { margin-left: auto; flex: none; font-style: normal; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--blass); }
+
+/* Der Rahmen */
+.stb-rahmenfenster { width: min(560px, 94vw); max-height: 92vh; overflow-y: auto; }
+.stb-rahmenfenster input { width: 100%; }
+.stb-vorschlaege { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.stb-vs {
+  border: 1px dashed var(--rand); background: none; color: var(--blass); border-radius: 999px;
+  padding: 3px 10px; font-size: 10.5px; cursor: pointer; letter-spacing: .06em;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.stb-stoffe { display: flex; flex-wrap: wrap; gap: 7px; }
+.stb-stoff {
+  width: 82px; height: 56px; border-radius: 5px; cursor: pointer; border: 2px solid transparent; position: relative;
+  background: linear-gradient(160deg, var(--tuch), var(--tuch2));
+  box-shadow: inset 0 0 0 3px rgba(74,52,32,.9);
+  display: grid; place-items: end center; padding-bottom: 5px;
+}
+.stb-stoff span { font-size: 9.5px; color: rgba(238,232,214,.8); letter-spacing: .04em; }
+.stb-stoff.an { border-color: var(--akzent); }
+.stb-eigenarten { display: flex; flex-direction: column; gap: 3px; }
+.stb-eazeile { display: flex; align-items: center; gap: 9px; padding: 6px 4px; border-bottom: 1px solid var(--rand); }
+.stb-eazeile b { flex: 1; font-size: 13.5px; font-weight: 500; }
+.stb-eazeile small { font-size: 11px; color: var(--blass); }
+
+/* Aus dem Album holen */
+.stb-albumfenster { width: min(600px, 94vw); max-height: 92vh; overflow-y: auto; }
+.stb-albumgitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 7px; max-height: 45vh; overflow-y: auto; padding: 2px; }
+.stb-albumkarte {
+  display: flex; align-items: center; gap: 8px; border: 1px solid var(--rand); background: var(--karte);
+  border-radius: 10px; padding: 7px 10px; cursor: pointer; color: var(--tinte); font-size: 13px; text-align: left;
+  transition: border-color .18s;
+}
+.stb-albumkarte span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stb-am {
+  flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--figurfarbe, var(--akzent)); color: #fff; font-size: 11px; font-weight: 600;
+}
+.stb-albumkarte.an { border-color: var(--akzent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--akzent) 24%, transparent); }
+.stb-albumstand { font-size: 12.5px; color: var(--blass); margin: 8px 0; text-align: center; }
+
+/* ----- Nur wo es eine echte Maus gibt ----- */
+@media (hover: hover) and (pointer: fine) {
+  .kab-fach:hover { transform: translateX(6px); box-shadow: inset 0 1px 0 rgba(255,228,190,.3), inset 0 -3px 10px rgba(0,0,0,.45), 0 12px 26px rgba(0,0,0,.42); }
+  .kab-fach.verschlossen:hover { transform: translateX(2px); }
+  .stb-kachel:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(0,0,0,.45); }
+  .stb-zurueck:hover { border-color: var(--akzent); color: var(--tinte); }
+  .tep-wk:hover, .tep-zuknopf:hover { border-color: var(--akzent); color: var(--tinte); }
+  .tep-lg:hover { border-color: var(--fadenfarbe, var(--akzent)); }
+  .tep-person:hover .tep-bandgrund { fill: #c3c9b0; }
+  .tep-ranke:hover .tep-rankelinie { stroke-width: 3.4; opacity: 1; }
+  .stb-ftext:hover { background: var(--hg2); }
+  .stb-fweg:hover { color: #a8392b; background: rgba(168,57,43,.1); }
+  .stb-fart:hover, .stb-fziel:hover, .stb-albumkarte:hover { border-color: var(--akzent); }
+  .stb-vzeile:hover { background: var(--hg2); }
+  .stb-fneu:hover { border-color: var(--akzent); }
+  .stb-vs:hover { border-color: var(--akzent); color: var(--tinte); }
+  .stb-lgalle:hover, .tep-lgalle:hover, .stb-albumlink:hover { color: var(--tinte); }
+}
+
+/* ----- Kleine Fenster ----- */
+@media (max-width: 760px) {
+  .kab-faecher { grid-template-columns: 1fr; }
+  .kab-fach { min-height: 0; }
+  .tep-fenster, .kab-vollbild { width: 100vw; height: 100vh; border-radius: 0; }
+  .tep-rahmen { margin: 6px; padding: 5px; }
+  .tep-randband { height: 22px; }
+  .tep-randband span { font-size: 12px; letter-spacing: .12em; }
+  .tep-suchfeld { width: 110px; }
+  .stb-regal { grid-template-columns: 1fr 1fr; }
+  .stb-jahre { width: 100%; }
+  .stb-jahr { flex: 1; width: auto; }
+}
+
+/* ----- Wer keine Bewegung will, bekommt keine ----- */
+@media (prefers-reduced-motion: reduce) {
+  .kab-fach, .stb-kachel, .kab-vollbild.zieht-auf,
+  .tep-blatt, .tep-person, .tep-ranke, .tep-tier, .tep-fallblatt, .tep-person.gebrannt .tep-glut {
+    animation: none !important;
+  }
+  .kab-fach, .tep-person, .tep-ranke { transition: none !important; }
+  .tep-fallblatt { display: none; }
+}
+
+/* Das fallende Laub liegt über dem Tuch, nicht darin: eine eigene Scheibe,
+   die nichts scrollt und nichts anfasst. Vorher machte jedes Blatt die
+   Scrollfläche größer, und der Teppich bekam Rollraum, den es nicht gab. */
+.tep-buehne { flex: 1; min-height: 0; position: relative; display: flex; }
+.tep-laubfall { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 4; }
+/* Das Tuch darf so groß werden, wie der Zoom es sagt — keine Deckelung. */
+.tep-tuch { max-width: none; max-height: none; }
+
+/* Ist der Baum kleiner als der Rahmen, geht das Tuch trotzdem bis an den
+   Rand — eine Wand hört ja nicht dort auf, wo der Baum aufhört. Die Fläche
+   trägt deshalb dieselbe Webung wie das Tuch selbst. */
+.tep-flaeche {
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.06) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 90% at 50% 46%, transparent 55%, rgba(0,0,0,.42) 100%),
+    linear-gradient(150deg, var(--tuch, #1e3524), var(--tuch2, #16281a));
+  display: flex; align-items: center; justify-content: center;
+}
+.tep-tuch { flex: none; margin: auto; }
+
+/* Der Stamm ist eine Fläche, kein Strich: unten breit, oben schmal, mit
+   zwei Rindenrissen. Vorher war er eine gleichmäßige Linie und sah aus wie
+   ein Mast. */
+.tep-stammkoerper { fill: #ded6bd; stroke: #b9b096; stroke-width: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,.5)); }
+.tep-rinde { fill: none; stroke: #b3aa90; stroke-width: 1.4; stroke-linecap: round; opacity: .7; }

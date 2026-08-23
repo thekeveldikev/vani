@@ -177,7 +177,7 @@ function baueOffenesBuch(b, szene) {
   return halter;
 }
 
-/* „Blatt einspannen": ein Blatt liegt wirklich auf dem Tisch und wird dort
+/* „Blatt einspannen“: ein Blatt liegt wirklich auf dem Tisch und wird dort
    getippt. Gespeichert wird wie überall (entprellt, beim Weglegen sofort);
    die Wörter zählen fürs Feuer; am Ende tropft die Feder. */
 function blattEinspannen(szene, e, blattId, fokus = true) {

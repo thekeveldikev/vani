@@ -2,7 +2,7 @@
    VANI — Sticker: Handgezeichnetes, das man auf Seiten klebt.
 
    Ein Sticker ist eine kleine Zeichnung mit durchsichtigem Grund — ein rotes
-   „SCHMU!", ein Pfeil, ein Herz, ein Kringel. Man zeichnet ihn einmal im
+   „SCHMU!“, ein Pfeil, ein Herz, ein Kringel. Man zeichnet ihn einmal im
    Stickerblock, dann liegt er als Anlage auf der Seite: verschiebbar, drehbar
    am Griff, größer und kleiner, abmachbar. Und weil man dieselben Dinge immer
    wieder in Hefte schreibt, wandert jeder Sticker auf Wunsch in die

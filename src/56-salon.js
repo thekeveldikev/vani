@@ -40,7 +40,7 @@ const SALON_AUTOREN = [
     saetze: [
       'Die Tür zu. Handy weg. Zweitausend Wörter, dann darfst du raus. Das ist kein Zauber, das ist Schichtarbeit — und sie funktioniert.',
       'Schreib den ersten Entwurf mit geschlossener Tür. Für dich. Den zweiten mit offener Tür — für alle anderen. Verwechsle die Reihenfolge nicht.',
-      'Das Adverb ist nicht dein Freund. „Sie sagte leise" — wenn der Satz nicht schon leise ist, rettet ihn kein Wort dahinter.',
+      'Das Adverb ist nicht dein Freund. „Sie sagte leise“ — wenn der Satz nicht schon leise ist, rettet ihn kein Wort dahinter.',
       'Die Geschichte ist ein Fossil im Boden. Du erfindest sie nicht, du gräbst sie aus. Also grab — und hör auf, am Pinsel herumzudenken.',
       'Wenn du nicht weiterweißt: Was will die Figur gerade? Was steht ihr im Weg? Schreib das. Der Rest kommt von selbst.',
       'Kein Mensch wartet auf deinen Text. Das ist die schlechte Nachricht. Die gute: Niemand sieht, wie schlecht der erste Entwurf ist.',
@@ -65,7 +65,7 @@ const SALON_AUTOREN = [
       'Pausen sind erlaubt. Verschwinden ist keine Pause. Wenn du zwei Tage nicht schreibst, merke ich das. Du auch.',
       'Der Leser ist klug. Erklär ihm nichts zweimal. Erklär ihm am besten gar nichts — zeig es ihm, und geh zur Seite.',
       'Das Geheimnis für lange Bücher: ein kurzes Stück am Tag. Das Geheimnis für kurze Bücher: dasselbe.',
-      'Nimm die Stimme ernst, die sagt: „So würde sie das nie sagen." Das ist nicht Zweifel. Das ist Handwerk, das spricht.',
+      'Nimm die Stimme ernst, die sagt: „So würde sie das nie sagen.“ Das ist nicht Zweifel. Das ist Handwerk, das spricht.',
       'Die schlimmste Zeile ist die, die du nicht schreibst, weil sie dumm klingen könnte. Schreib sie. Streichen kannst du später.',
       'Wenn du jemanden nicht erschrecken kannst, ekle ihn. Wenn du ihn nicht ekeln kannst, brich ihm das Herz. Eins davon geht immer.',
       'Ein Satz, den du geklaut hast, klingt wie geklaut. Ein Satz, den du dir abgerungen hast, klingt nach dir. Man hört den Unterschied.',
@@ -86,7 +86,7 @@ const SALON_AUTOREN = [
       ['figuren', 'Die Bösen halten sich für die Guten. Sonst sind sie keine Bösen, sonst sind sie Pappe.'],
       ['figuren', 'Was jemand in der Tasche hat, sagt mehr als seine Biografie. Schreib die Tasche.'],
       ['dialog', 'Leute reden aneinander vorbei. Lass sie. Der Leser versteht mehr als die Figuren — das ist der ganze Spaß.'],
-      ['dialog', '„Sagte" reicht. Immer. Jedes Verb daneben ist ein Regieanweisung, die keiner bestellt hat.'],
+      ['dialog', '„Sagte“ reicht. Immer. Jedes Verb daneben ist ein Regieanweisung, die keiner bestellt hat.'],
       ['dialog', 'Streich die Begrüßungen. Fang mitten im Streit an, das kann jede Szene vertragen.'],
       ['stil', 'Schreib das erste Wort, das dir einfällt, nicht das dritte. Das dritte ist geborgt.'],
       ['stil', 'Ein kurzer Satz nach drei langen ist ein Hammer. Heb ihn dir auf.'],
@@ -112,16 +112,16 @@ const SALON_AUTOREN = [
     kurz: 'Der Moralist mit dem Schalk. Schreibt für Kinder, ohne sich herabzubeugen, und für Erwachsene, ohne sie zu schonen.',
     rahmen: 'gold', anrede: 'Herr Kästner',
     zitate: [
-      { t: 'Es gibt nichts Gutes, außer: Man tut es.', q: '„Moral", in: Kurz und bündig, 1950' },
-      { t: 'Wird’s besser? Wird’s schlimmer? fragt man alljährlich. Seien wir ehrlich: Leben ist immer lebensgefährlich.', q: '„Zum neuen Jahr"' },
-      { t: 'Man soll das Jahr nicht mit Programmen beladen wie ein krankes Pferd. Wenn man es allzu sehr beschwert, bricht es zu guter Letzt zusammen.', q: '„Zum neuen Jahr"' },
+      { t: 'Es gibt nichts Gutes, außer: Man tut es.', q: '„Moral“, in: Kurz und bündig, 1950' },
+      { t: 'Wird’s besser? Wird’s schlimmer? fragt man alljährlich. Seien wir ehrlich: Leben ist immer lebensgefährlich.', q: '„Zum neuen Jahr“' },
+      { t: 'Man soll das Jahr nicht mit Programmen beladen wie ein krankes Pferd. Wenn man es allzu sehr beschwert, bricht es zu guter Letzt zusammen.', q: '„Zum neuen Jahr“' },
       { t: 'Nur wer erwachsen wird und ein Kind bleibt, ist ein Mensch!', q: 'Ansprache zum Schulbeginn, 1950' },
       { t: 'Lasst euch die Kindheit nicht austreiben! Schaut, die meisten Menschen legen ihre Kindheit ab wie einen alten Hut. Sie vergessen sie wie eine Telefonnummer, die nicht mehr gilt.', q: 'Ansprache zum Schulbeginn, 1950' },
-      { t: 'Die Zeit fährt Auto. Doch kein Mensch kann lenken. Das Leben fliegt wie ein Gehöft vorbei.', q: '„Die Zeit fährt Auto", 1931' },
-      { t: 'Als sie einander acht Jahre kannten (und man darf sagen: sie kannten sich gut), kam ihre Liebe plötzlich abhanden. Wie andern Leuten ein Stock oder Hut.', q: '„Sachliche Romanze", 1929' },
-      { t: 'Kennst du das Land, wo die Kanonen blühn?', q: '„Kennst du das Land, wo die Kanonen blühn?", 1928' },
-      { t: 'Einst haben die Kerls auf den Bäumen gehockt, behaart und mit böser Visage. Dann hat man sie aus dem Urwald gelockt und die Welt asphaltiert und aufgestockt, bis zur dreißigsten Etage.', q: '„Die Entwicklung der Menschheit", 1932' },
-      { t: 'Doch davon mal abgesehen und bei Lichte betrachtet sind sie im Grund noch immer die alten Affen.', q: '„Die Entwicklung der Menschheit", 1932' },
+      { t: 'Die Zeit fährt Auto. Doch kein Mensch kann lenken. Das Leben fliegt wie ein Gehöft vorbei.', q: '„Die Zeit fährt Auto“, 1931' },
+      { t: 'Als sie einander acht Jahre kannten (und man darf sagen: sie kannten sich gut), kam ihre Liebe plötzlich abhanden. Wie andern Leuten ein Stock oder Hut.', q: '„Sachliche Romanze“, 1929' },
+      { t: 'Kennst du das Land, wo die Kanonen blühn?', q: '„Kennst du das Land, wo die Kanonen blühn?“, 1928' },
+      { t: 'Einst haben die Kerls auf den Bäumen gehockt, behaart und mit böser Visage. Dann hat man sie aus dem Urwald gelockt und die Welt asphaltiert und aufgestockt, bis zur dreißigsten Etage.', q: '„Die Entwicklung der Menschheit“, 1932' },
+      { t: 'Doch davon mal abgesehen und bei Lichte betrachtet sind sie im Grund noch immer die alten Affen.', q: '„Die Entwicklung der Menschheit“, 1932' },
       { t: 'Was auch immer geschieht: Nie dürft ihr so tief sinken, von dem Kakao, durch den man euch zieht, auch noch zu trinken!', q: 'Gedicht, 1930er' },
       { t: 'An allem Unfug, der passiert, sind nicht etwa nur die schuld, die ihn tun, sondern auch die, die ihn nicht verhindern.', q: 'zugeschrieben' },
       { t: 'Humor ist der Regenschirm der Weisen.', q: 'zugeschrieben' },
@@ -136,7 +136,7 @@ const SALON_AUTOREN = [
       'Pathos ist Sahne auf Sahne. Ein bisschen Salz, und die Leute schmecken wieder etwas.',
       'Wenn Sie traurig sind, schreiben Sie kurz. Die langen Klagen gehören ins Tagebuch, die kurzen in die Welt.',
       'Ein Kinderbuch, das Kinder nicht ernst nimmt, ist ein Erwachsenenbuch, das sich verlaufen hat.',
-      'Seien Sie genau. „Er war arm" sagt nichts. „Er zählte am Monatsende die Streichhölzer" sagt alles.',
+      'Seien Sie genau. „Er war arm“ sagt nichts. „Er zählte am Monatsende die Streichhölzer“ sagt alles.',
       'Lachen ist kein Ausweichen. Wer lacht, hat genau hingeschaut — und sich entschieden, trotzdem nicht zu verzweifeln.',
       'Jeder gute Satz hat ein bisschen Berlin in sich: nicht viel Zeit, aber Augen im Kopf.',
       'Das Wichtigste am Schreiben ist das Streichen. Das Zweitwichtigste ist, sich dafür nicht zu bemitleiden.',
@@ -156,12 +156,12 @@ const SALON_AUTOREN = [
       'Die Pointe gehört ans Ende. Wer sie vorher verrät, hat den Witz zwar gemacht — aber der andere nicht gelacht.',
       'Traurige Bücher dürfen lustig sein. Lustige müssen ein bisschen traurig sein. Sonst sind sie nur Lärm.',
       'Üben Sie den zweiten Blick. Der erste sieht den Bettler. Der zweite sieht, dass er die Schuhe geputzt hat.',
-      'Schreiben Sie Briefe. Nicht zum Schicken — zum Üben. Wer einem Menschen schreibt, schreibt klarer als einer, der „an die Leser" schreibt.',
+      'Schreiben Sie Briefe. Nicht zum Schicken — zum Üben. Wer einem Menschen schreibt, schreibt klarer als einer, der „an die Leser“ schreibt.',
       'Das Glück ist kein Dauerzustand, und ein Satz ist kein Denkmal. Beides soll man pflegen und wieder loslassen.'
     ],
     anfang: ['Sehen Sie,', 'Ich sage Ihnen etwas:', 'Mit Verlaub:', 'Eine Kleinigkeit, die keine ist:', 'Nehmen Sie es mir nicht übel:', 'Kurz und bündig:', 'Das Leben hat es mir beigebracht:', 'Lassen Sie mich deutlich werden:', 'Bei Lichte betrachtet:', 'Ich meine das freundlich:', 'Ein Rat, der nichts kostet:', 'Merken Sie sich das:'],
     kern: [
-      ['anfang', 'Fangen Sie mit einer Tatsache an, nicht mit einer Stimmung. „Es regnete" ist eine Tatsache. „Es war traurig" ist eine Bitte um Mitleid.'],
+      ['anfang', 'Fangen Sie mit einer Tatsache an, nicht mit einer Stimmung. „Es regnete“ ist eine Tatsache. „Es war traurig“ ist eine Bitte um Mitleid.'],
       ['anfang', 'Der erste Satz darf klein sein. Ein Junge, ein Koffer, ein Bahnhof — und schon sind wir unterwegs.'],
       ['anfang', 'Beginnen Sie nicht mit dem Wetter, sondern mit einem Menschen, der das Wetter ignoriert.'],
       ['zweifel', 'Der Zweifel ist kein Urteil, er ist eine Uhr: Er zeigt an, dass Sie arbeiten.'],
@@ -175,7 +175,7 @@ const SALON_AUTOREN = [
       ['figuren', 'Niemand ist nur gut. Lassen Sie den Guten einmal schummeln — dann glauben wir ihm den Rest.'],
       ['dialog', 'Menschen reden kurz, wenn es ernst wird. Lange Reden hält man nur, wenn man nichts zu sagen hat.'],
       ['dialog', 'Lassen Sie die Leute lügen. Im Gespräch lügt jeder ein wenig; daran erkennt man, dass sie leben.'],
-      ['dialog', 'Ein Kind sagt: „Ich hab keinen Hunger", und meint: „Ich hab Angst." Schreiben Sie den ersten Satz, der Leser hört den zweiten.'],
+      ['dialog', 'Ein Kind sagt: „Ich hab keinen Hunger“, und meint: „Ich hab Angst.“ Schreiben Sie den ersten Satz, der Leser hört den zweiten.'],
       ['stil', 'Schreiben Sie, wie Sie einem klugen Kind etwas erklären: genau, freundlich, ohne Zierrat.'],
       ['stil', 'Ein Adjektiv ist wie ein Gast: Eins ist nett, drei sind eine Gesellschaft, fünf sind eine Belästigung.'],
       ['stil', 'Humor ist keine Zutat, sondern ein Blick. Wer genau hinsieht, findet ihn überall — auch im Traurigen.'],
@@ -203,7 +203,7 @@ const SALON_AUTOREN = [
       { t: 'Bücher müssen schwer sein, weil die ganze Welt in ihnen steckt.', q: 'Tintenherz, 2003' },
       { t: 'Geschichten enden nie, auch wenn die Bücher uns das gern weismachen wollen. Die Geschichten gehen immer weiter.', q: 'Tintenblut, 2005 (Fenoglio)' },
       { t: 'Lesen ist Abenteuer im Kopf.', q: 'in Interviews oft zitiert' },
-      { t: 'Manche Bücher muss man kosten, manche verschlingt man, und nur wenige kaut man und verdaut sie ganz.', o: 'Francis Bacon — steht als Motto in „Tintenherz"', q: 'Motto in Tintenherz (Zitat nach Francis Bacon)' }
+      { t: 'Manche Bücher muss man kosten, manche verschlingt man, und nur wenige kaut man und verdaut sie ganz.', o: 'Francis Bacon — steht als Motto in „Tintenherz“', q: 'Motto in Tintenherz (Zitat nach Francis Bacon)' }
     ],
     saetze: [
       'Zeichne deine Figur, bevor du sie schreibst. Ein Strich sagt dir, ob sie die Schultern hängen lässt — und dann weißt du, wie sie spricht.',
@@ -222,7 +222,7 @@ const SALON_AUTOREN = [
       'Wenn die Geschichte dich überrascht, bist du auf dem richtigen Weg. Wenn du alles vorher weißt, weiß es auch der Leser.',
       'Der erste Entwurf darf hässlich sein. Es ist der Ton, aus dem man später formt — und Ton ist nie schön, nur nützlich.',
       'Lies deine Dialoge laut, am besten mit verstellter Stimme. Wenn du lachen musst, ist es gut. Wenn dir peinlich wird, streich.',
-      'Schreib nicht für „die Kinder". Schreib für ein Kind — eines, das du kennst, oder das du warst.',
+      'Schreib nicht für „die Kinder“. Schreib für ein Kind — eines, das du kennst, oder das du warst.',
       'Vertrau dem Stillen. Nicht jede Szene braucht ein Feuer. Manchmal reicht ein Junge, der eine Feder aufhebt.',
       'Wenn du müde bist, zeichne. Wenn du nicht zeichnen kannst, kritzle. Die Hand findet Wege, die der Kopf nicht kennt.',
       'Schreib die Szene, auf die du Angst hast, zuerst. Dann ist sie geschrieben, und der Rest des Tages gehört dir.',
@@ -571,11 +571,11 @@ for (const a of SALON_AUTOREN) { const z = SALON_ZUSATZ[a.id]; if (z) Object.ass
 /* Englische Stimmen raten auf Englisch (56a): der deutsche Rat wandert nach `de` und bleibt als Übersetzung da */
 if (typeof SALON_RAT_EN !== 'undefined') for (const a of [...SALON_AUTOREN, ...SALON_GAESTE]) { const e = SALON_RAT_EN[a.id]; if (e && a.en) { a.de = { saetze: a.saetze, anfang: a.anfang, kern: a.kern, schluss: a.schluss }; Object.assign(a, e); } }
 const SALON_FEST = [...SALON_AUTOREN, ...SALON_GAESTE, ...(typeof SALON_GAESTE_MEHR !== 'undefined' ? SALON_GAESTE_MEHR : [])];
-/* Mehr (56g): Themen, Kern je Stimme (parallel in beiden Sprachen), Aufgaben mit Kategorie, lange Texte „Über" */
+/* Mehr (56g): Themen, Kern je Stimme (parallel in beiden Sprachen), Aufgaben mit Kategorie, lange Texte „Über“ */
 if (typeof SALON_MEHR_THEMEN !== 'undefined') {
   for (const t of SALON_MEHR_THEMEN) if (!SALON_THEMEN.some((x) => x[0] === t[0])) SALON_THEMEN.push(t);
-  /* Die enger gefassten neuen Stichworte fragen zuerst (sonst schluckt „Figuren" jede „Person"),
-     die weiteren („Weltenbau", „Zeigen") kommen ans Ende. */
+  /* Die enger gefassten neuen Stichworte fragen zuerst (sonst schluckt „Figuren“ jede „Person“),
+     die weiteren („Weltenbau“, „Zeigen“) kommen ans Ende. */
   if (typeof SALON_MEHR_STICHWORTE !== 'undefined') {
     const frueh = ['titel', 'perspektive', 'tempo', 'humor', 'recherche', 'loslassen'];
     for (const st of SALON_MEHR_STICHWORTE) { if (frueh.includes(st[0])) SALON_STICHWORTE.unshift(st); else SALON_STICHWORTE.push(st); }
@@ -640,7 +640,7 @@ function salonFrageAntwort(a, frageText, saat) {
   if (!ant) return null;
   if (ant.absicht === 'werk' && ant.werk) {
     const w = ant.werk, en = !!a.en;
-    return { art: 'werk', text: (en ? '„' + w.titel + '". ' : '„' + w.titel + '". ') + w.kurz, de: '', belege: [], einlesung: { art: 'werk', name: w.titel, werk: w.form + ' · ' + w.woerter.toLocaleString('de-DE') + ' Wörter', kurz: w.ton, mehr: w.kurz } };
+    return { art: 'werk', text: (en ? '„' + w.titel + '“. ' : '„' + w.titel + '“. ') + w.kurz, de: '', belege: [], einlesung: { art: 'werk', name: w.titel, werk: w.form + ' · ' + w.woerter.toLocaleString('de-DE') + ' Wörter', kurz: w.ton, mehr: w.kurz } };
   }
   return gespraechAntwort(a, ant, k, { anrede: salonAnrede(), saat: saat != null ? saat : salonHash(frageText + ':' + a.id) });
 }
@@ -675,7 +675,7 @@ RENDER.salon = function (haupt) {
   const heute = tagKey();
   const info = typeof schreibtischTageszeitInfo === 'function' ? schreibtischTageszeitInfo() : { licht: 1 };
   const wand = el('div', { class: 'salon', 'data-licht': info.licht > .5 ? 'tag' : info.licht > .15 ? 'abend' : 'nacht' });
-  const frageFeld = el('input', { type: 'text', placeholder: 'Frag die Wand — „Wer ist …?", „Mein Anfang ist langweilig", „Wie bleibe ich dran?" …', 'aria-label': 'Frage an die Wand' });
+  const frageFeld = el('input', { type: 'text', placeholder: 'Frag die Wand — „Wer ist …?“, „Mein Anfang ist langweilig“, „Wie bleibe ich dran?“ …', 'aria-label': 'Frage an die Wand' });
   const fragen = () => { const f = frageFeld.value.trim(); if (!f) { frageFeld.focus(); return; } salonRunde(f); };
   frageFeld.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); fragen(); } });
   const kopf = el('div', { class: 'kopf' },
@@ -700,7 +700,7 @@ RENDER.salon = function (haupt) {
     const kk = salonKenntnis();
     if (kk && !kk.leer && (kk.saetze || []).length) {
       const s = kk.saetze[salonHash(tagKey() + ':eigener') % Math.min(20, kk.saetze.length)];
-      eigenerRahmen = el('button', { class: 'salon-eigenerrahmen', title: 'Aus „' + s.werk + '" — tippen öffnet die Stelle', onclick: () => { const d = D.docs.get(s.id); if (d) oeffneDoc(d); } },
+      eigenerRahmen = el('button', { class: 'salon-eigenerrahmen', title: 'Aus „' + s.werk + '“ — tippen öffnet die Stelle', onclick: () => { const d = D.docs.get(s.id); if (d) oeffneDoc(d); } },
         el('i', { class: 'salon-eigenerrahmen-ecke' }),
         el('span', { class: 'se-satz' }, '„' + (s.text.length > 150 ? s.text.slice(0, 147) + ' …' : s.text) + '“'),
         el('span', { class: 'se-quelle' }, s.werk),
@@ -761,7 +761,7 @@ function salonKarte() {
   const zeile = (name, unter, s) => el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, name, unter ? el('div', { style: 'font-size:12.5px;color:var(--blass)' }, unter) : null), s);
   const schalter = (lies, setze) => el('button', { class: 'schalter' + (lies() ? ' an' : ''), onclick: (e) => { setze(!lies()); e.currentTarget.classList.toggle('an', lies()); speichereEinst(); } }, el('i'));
   const karte = el('div', { class: 'karte' },
-    zeile('„Deine Welten" im Salon', 'Der Reiter bei jeder Stimme: was sie beim Lesen deiner Sammlung aufgeschrieben hat, deine Leute, deine Werke, Fragen an dich, was gerade in deinen Texten steht, und die Chronik. Standardmäßig aus — Rat, Zitate, Aufgaben und Werke der Stimme bleiben immer da.',
+    zeile('„Deine Welten“ im Salon', 'Der Reiter bei jeder Stimme: was sie beim Lesen deiner Sammlung aufgeschrieben hat, deine Leute, deine Werke, Fragen an dich, was gerade in deinen Texten steht, und die Chronik. Standardmäßig aus — Rat, Zitate, Aufgaben und Werke der Stimme bleiben immer da.',
       schalter(() => D.einst.salonWelten === true, (v) => { D.einst.salonWelten = v; })),
     zeile('Salonklang', 'Kaminknistern und die Uhr, wenn du den Salon betrittst. Der Knopf oben im Salon schaltet dasselbe.',
       schalter(() => D.einst.salonTon === true, (v) => { D.einst.salonTon = v; })));
@@ -834,7 +834,7 @@ function salonWeltenSeite(a) {
       const datum = new Date(ein.stand + 'T12:00:00');
       const dazu = k && !k.leer && k.woerter > ein.woerter ? k.woerter - ein.woerter : 0;
       seite.append(el('div', { class: 'sw-stand' },
-        (a.anrede || a.name) + ' hat „' + ein.titel + '" am ' + datum.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' }) + ' gelesen — damals ' + ein.woerter.toLocaleString('de-DE') + ' Wörter in ' + ein.werke.length + ' Werken.' + (dazu ? ' Seitdem sind ' + dazu.toLocaleString('de-DE') + ' Wörter dazugekommen; die kennt ' + (a.anrede || a.name) + ' aus dem, was gerade auf dem Gerät liegt.' : '')));
+        (a.anrede || a.name) + ' hat „' + ein.titel + '“ am ' + datum.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' }) + ' gelesen — damals ' + ein.woerter.toLocaleString('de-DE') + ' Wörter in ' + ein.werke.length + ' Werken.' + (dazu ? ' Seitdem sind ' + dazu.toLocaleString('de-DE') + ' Wörter dazugekommen; die kennt ' + (a.anrede || a.name) + ' aus dem, was gerade auf dem Gerät liegt.' : '')));
       const gruss = el('div', { class: 'salon-rat' + (a.en ? ' en' : '') }, fuell(stimme.gruss));
       seite.append(gruss);
       if (a.en && stimme.grussDe) { const ueb = el('div', { class: 'salon-rat-de', hidden: 'hidden' }, fuell(stimme.grussDe)); seite.append(ueb, el('button', { class: 'knopf zart salon-rat-knopf', onclick: (ev) => { ueb.hidden = !ueb.hidden; ev.currentTarget.textContent = ueb.hidden ? 'Übersetzung' : 'Übersetzung verbergen'; } }, 'Übersetzung')); }
@@ -856,7 +856,7 @@ function salonWeltenSeite(a) {
       }
       if (stimme.stelle) auf.append(el('div', { class: 'sw-lieblingsstelle' },
         el('span', { class: 'sw-belege-titel' }, 'Der Satz, den ' + (a.anrede || a.name) + ' behalten hat'),
-        el('i', {}, '„' + stimme.stelle.s + '"'), el('small', {}, stimme.stelle.w),
+        el('i', {}, '„' + stimme.stelle.s + '“'), el('small', {}, stimme.stelle.w),
         el('em', {}, a.en && stimme.stelle.warumDe ? stimme.stelle.warum + ' — ' + stimme.stelle.warumDe : stimme.stelle.warum)));
     }
     if (stimme) felder.auf = auf;
@@ -921,7 +921,7 @@ function salonWeltenSeite(a) {
       chip('Zahlen', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'zahl' }, k, { anrede })));
       chip('Ein Satz von mir', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'stelle' }, k, { anrede, saat: Math.floor(Math.random() * 1e9) })));
       chip('Wo war ich zuletzt?', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'wann' }, k, { anrede })));
-      const feld = el('input', { type: 'text', class: 'sw-feldfrage', placeholder: 'Frag ' + (a.anrede || a.name) + ' — „Wer ist …?", „Zeig mir eine Stelle mit …", „Wo spielt das?"', 'aria-label': 'Frage zu deinen Texten' });
+      const feld = el('input', { type: 'text', class: 'sw-feldfrage', placeholder: 'Frag ' + (a.anrede || a.name) + ' — „Wer ist …?“, „Zeig mir eine Stelle mit …“, „Wo spielt das?“', 'aria-label': 'Frage zu deinen Texten' });
       const fragenJetzt = () => {
         const f = feld.value.trim(); if (!f) return;
         let ant = salonFrageAntwort(a, f);
@@ -1079,7 +1079,7 @@ function salonSprechen(a, { thema = null, saat = null, reiterStart = 'rat' } = {
   baueChips();
   const zitate = el('div', { class: 'salon-zitate' });
   if (!(a.zitate || []).length) zitate.append(el('div', { class: 'salon-leer' }, 'Noch keine Zitate.'));
-  else { if (a.en) zitate.append(el('div', { class: 'salon-hinweis' }, 'Im Original. „Übersetzung" zeigt die deutsche Fassung.')); for (const z of a.zitate) zitate.append(salonZitatElement(a, z, true)); }
+  else { if (a.en) zitate.append(el('div', { class: 'salon-hinweis' }, 'Im Original. „Übersetzung“ zeigt die deutsche Fassung.')); for (const z of a.zitate) zitate.append(salonZitatElement(a, z, true)); }
   const aufgaben = el('div', { class: 'salon-aufgaben' });
   if (!(a.aufgaben || []).length) aufgaben.append(el('div', { class: 'salon-leer' }, a.eigen ? 'Eigene Leute stellen (noch) keine Aufgaben.' : 'Keine Aufgaben.'));
   else {
@@ -1193,7 +1193,7 @@ function salonEigenenBearbeiten(doc) {
   const woher = el('input', { type: 'text', value: doc ? (doc.woher || '') : '', placeholder: 'Woher' });
   const kurz = el('textarea', { rows: 2, placeholder: 'Ein Satz über diesen Menschen' }); kurz.value = doc ? (doc.notiz || '') : '';
   const zitate = el('textarea', { rows: 5, placeholder: 'Zitate — eines je Zeile' }); zitate.value = doc ? (doc.zitate || []).join('\n') : '';
-  const rat = el('textarea', { rows: 4, placeholder: 'Ratschläge in dieser Stimme — einer je Zeile (die Person „spricht" dann damit)' }); rat.value = doc ? (doc.rat || []).join('\n') : '';
+  const rat = el('textarea', { rows: 4, placeholder: 'Ratschläge in dieser Stimme — einer je Zeile (die Person „spricht“ dann damit)' }); rat.value = doc ? (doc.rat || []).join('\n') : '';
   let bildId = doc ? doc.bild || null : null;
   const vorschau = el('div', { class: 'salon-foto-vorschau' });
   const zeigeVorschau = () => { vorschau.innerHTML = ''; if (bildId) { const img = el('img', { alt: '' }); setzeBild(img, bildId); vorschau.append(img); } else vorschau.append(el('span', {}, 'Kein Foto')); };

@@ -3,7 +3,7 @@
    das ist die Bauart: was leer bleibt, steht später nicht auf der Doppelseite.
 
    Gespeichert wird sofort, bei jedem Anschlag (entprellt). Es gibt kein
-   „Übernehmen", das man vergessen könnte.
+   „Übernehmen“, das man vergessen könnte.
 
    Geburts- und Todesdatum wandern von hier in den Kalender und bleiben mit der
    Figur verbunden (`ausAlbum`): wird das Datum geändert, ändert sich der
@@ -125,7 +125,7 @@ function albumBearbeiten(doc, danach, frisch) {
         (() => { const t = el('input', { type: 'text', value: e.wert, maxlength: '1200' }); t.addEventListener('input', () => { e.wert = t.value; merke(); }); return t; })()));
     }
     inhalt.append(el('button', { class: 'albb-eigenneu', onclick: async () => {
-      const name = await eingabe({ titel: 'Eine eigene Kategorie', platzhalter: 'z. B. „Lieblingswort", „Wie sie flucht", „Was im Rucksack ist"', ok: 'Anlegen' });
+      const name = await eingabe({ titel: 'Eine eigene Kategorie', platzhalter: 'z. B. „Lieblingswort“, „Wie sie flucht“, „Was im Rucksack ist“', ok: 'Anlegen' });
       if (!name || !name.trim()) return;
       stand.eigene.push({ name: name.trim().slice(0, 80), wert: '', gruppe });
       inhaltZeichnen(); reiterZeichnen(); merke();
@@ -258,33 +258,47 @@ function albumFeldEingabe(feld, stand, doc, merke) {
       const dl = el('datalist', { id: 'albb-verweise' }, ...vorschlaege.slice(0, 300).map((n) => el('option', { value: n })));
       kasten.append(dl);
       liste.querySelectorAll('input').forEach((i) => i.setAttribute('list', 'albb-verweise'));
-      kasten.append(el('small', { class: 'albb-hilfe' }, 'Wer schon im Album steht, wird erkannt und verlinkt. Schreib die Rolle davor: „Mutter — Ilva".'));
+      kasten.append(el('small', { class: 'albb-hilfe' }, 'Wer schon im Album steht, wird erkannt und verlinkt. Schreib die Rolle davor: „Mutter — Ilva“.'));
     }
     kasten.append(el('button', { class: 'albb-dazu', onclick: dazu }, '+ ' + (platz || 'Dazu')));
     return kasten;
   }
 
-  /* Datum */
+  /* Datum — hineingeschrieben, wie man es sagt.
+     „9.4.1783“, „9. April 1783“, „April 1783“ oder nur „1783“. Gespeichert
+     wird immer dieselbe Form (1783-04-09), damit sich damit rechnen und
+     sortieren lässt — aber tippen soll man das nicht müssen. Was VANI
+     verstanden hat, steht sofort darunter. */
   if (feld.art === 'datum') {
-    const t = el('input', { type: 'text', class: 'albb-datum', value: stand.felder[feld.id] || '', placeholder: 'JJJJ-MM-TT — oder nur JJJJ', maxlength: '10' });
+    const zeigeWert = (w) => (w && typeof kalLesbar === 'function' && kalGueltig(w)) ? kalLesbar(w) : (w || '');
+    const t = el('input', {
+      type: 'text', class: 'albb-datum', value: zeigeWert(stand.felder[feld.id]),
+      placeholder: '9.4.1783 · 9. April 1783 · April 1783 · 1783', maxlength: '40',
+      autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false'
+    });
     const hinweis = el('small', { class: 'albb-datumhinweis' });
-    const pruefe = () => {
+    const pruefe = (beimTippen) => {
       const v = t.value.trim();
       hinweis.innerHTML = '';
       if (!v) { delete stand.felder[feld.id]; t.classList.remove('falsch'); merke(); return; }
-      if (typeof kalGueltig === 'function' && kalGueltig(v)) {
+      const gelesen = typeof kalAusText === 'function' ? kalAusText(v) : '';
+      if (gelesen) {
         t.classList.remove('falsch');
-        stand.felder[feld.id] = v;
-        anfuegen(hinweis, el('span', {}, kalLesbar(v, true) + ' — steht damit auch im Kalender.'));
+        stand.felder[feld.id] = gelesen;
+        anfuegen(hinweis, el('span', {}, kalLesbar(gelesen, true) + ' — steht damit auch im Kalender.'));
         merke();
       } else {
         t.classList.add('falsch');
-        anfuegen(hinweis, el('span', { class: 'warn' }, 'So kann VANI das Datum nicht lesen. Erwartet wird JJJJ, JJJJ-MM oder JJJJ-MM-TT, zwischen ' + KAL_JAHR_VON + ' und ' + KAL_JAHR_BIS + ' — z. B. 1783-04-09.'));
+        anfuegen(hinweis, el('span', { class: 'warn' },
+          'Das kann VANI noch nicht lesen. Schreib es, wie du es sagst: 9.4.1783, 9. April 1783, April 1783 — oder nur das Jahr. Der Kalender reicht von ' + KAL_JAHR_VON + ' bis ' + KAL_JAHR_BIS + '.'));
       }
     };
-    t.addEventListener('input', pruefe);
+    t.addEventListener('input', () => pruefe(true));
+    /* Beim Verlassen wird das Feld auf die gelesene Form gebracht, damit man
+       sieht, was wirklich gespeichert ist. */
+    t.addEventListener('blur', () => { const w = stand.felder[feld.id]; if (w) { t.value = zeigeWert(w); pruefe(false); } });
     kasten.append(t, hinweis);
-    if (stand.felder[feld.id]) pruefe();
+    if (stand.felder[feld.id]) pruefe(false);
     return kasten;
   }
 
@@ -453,7 +467,7 @@ async function albumAbschreiben(doc, stand, sichern, zu, danach) {
 }
 
 /* ----- Eine Figur mit vorgegebenem Namen anlegen -----
-   Aus der Übersicht heraus: „Halvar wird genannt, wohnt aber noch nicht hier." */
+   Aus der Übersicht heraus: „Halvar wird genannt, wohnt aber noch nicht hier.“ */
 function albumNeueFigurMitNamen(name, danach) {
   const doc = neuDoc('albumfigur', { name: String(name || '').slice(0, 120), titel: String(name || '').slice(0, 120), felder: {}, eigene: [], zettel: [], farbe: '' });
   albumBearbeiten(doc, () => { if (danach) danach(doc.id); }, true);

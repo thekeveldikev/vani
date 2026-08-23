@@ -4,7 +4,7 @@
    damaligen Stand mit dem, was jetzt auf dem Gerät liegt, hält den Unterschied
    als eigene Lesung fest (Dokument vom Typ `lesung`, reist also mit der
    Sicherung und der Kopplung) und lässt jede Stimme zwei Sätze dazu sagen.
-   Aus Grundeinlesung + allen Lesungen entsteht die Chronik: „gelesen am …".
+   Aus Grundeinlesung + allen Lesungen entsteht die Chronik: „gelesen am …“.
    Alles bleibt auf dem Gerät. */
 
 /* Ein kompakter Stand: was zählbar ist, ohne den Text selbst. Pur. */

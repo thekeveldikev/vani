@@ -103,7 +103,7 @@ function oeffneSchreibraum(docId) {
   );
 
   /* Sonderzeichen, immer griffbereit über der Tastatur */
-  const zeichen = ['–', '„', '"', '…', '‚', '’', '»', '«'];
+  const zeichen = ['–', '„', '“', '…', '‚', '’', '»', '«'];
   const leiste = el('div', { class: 'zeichenleiste' },
     zeichen.map((z) => el('button', {
       onpointerdown: (e) => e.preventDefault(),
@@ -156,7 +156,7 @@ function oeffneSchreibraum(docId) {
   /* Jeder Anschlag ist ein kleiner Luftzug für die Kerze. */
   ta.addEventListener('input', () => { if (_sr && _sr.sprint && _sr.sprint.kerze) _sr.sprint.kerze.puste(.22); if (_sr && _sr.rettung) _sr.rettung(); });
 
-  /* Deutsche Feder: -- wird –, gerade Anführungszeichen werden „so" */
+  /* Deutsche Feder: -- wird –, gerade Anführungszeichen werden „so“ */
   function ersetzeKlug() {
     if (istRich || !D.einst.ersetzungen) return;
     const erg = klugeZeichen(ta.value, ta.selectionStart);
@@ -393,7 +393,7 @@ function srEinstellungen() {
     zeileFuer('Schreibmaschine', wahl([[true, 'An'], [false, 'Aus']], s.typewriter, (v) => { s.typewriter = v; })),
     zeileFuer('Zeilen-Fokus', wahl([[true, 'An'], [false, 'Aus']], s.fokus, (v) => { s.fokus = v; })),
     zeileFuer('Tastenklang', wahl([[true, 'An'], [false, 'Aus']], s.tastenklang, (v) => { s.tastenklang = v; })),
-    zeileFuer('„Kluge Zeichen"', wahl([[true, 'An'], [false, 'Aus']], s.ersetzungen, (v) => { s.ersetzungen = v; })),
+    zeileFuer('„Kluge Zeichen“', wahl([[true, 'An'], [false, 'Aus']], s.ersetzungen, (v) => { s.ersetzungen = v; })),
     zeileFuer('Autokorrektur', wahl([[true, 'An'], [false, 'Aus']], s.autokorrektur, (v) => { s.autokorrektur = v; })),
     zeileFuer('Vorlesetempo', wahl([[.8, 'Ruhig'], [.95, 'Normal'], [1.15, 'Zügig']], begrenze(s.vorleseTempo, .6, 1.4, .95), (v) => { s.vorleseTempo = v; })),
     zeileFuer('Pause nach 40 Minuten', wahl([[true, 'Erinnern'], [false, 'Aus']], s.pausenErinnerung !== false, (v) => { s.pausenErinnerung = v; })),

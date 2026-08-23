@@ -96,7 +96,7 @@ RENDER.goodnotes = function (haupt) {
     const q = normalisiere(feld.value.trim()).slice(0, 120);
     const funde = alle.filter((d) => !q || normalisiere([d.titel, d.dateiname, d.schlagworte, d.notiz].join(' ')).includes(q));
     if (!funde.length) gitter.append(el('div', { class: 'leer' }, alle.length ? 'Nichts Passendes im Archiv.' : 'Noch kein Goodnotes-Notizbuch hier.',
-      el('div', { class: 'klein' }, alle.length ? 'Die Suche bleibt nur in diesem Raum.' : 'Am sichersten: in Goodnotes als „reduzierte PDF" mit Handschrifterkennung exportieren.')));
+      el('div', { class: 'klein' }, alle.length ? 'Die Suche bleibt nur in diesem Raum.' : 'Am sichersten: in Goodnotes als „reduzierte PDF“ mit Handschrifterkennung exportieren.')));
     for (const d of funde) {
       const karte = el('button', { class: 'goodnotes-karte', onclick: () => oeffneGoodnote(d) },
         el('div', { class: 'goodnotes-deckel ' + d.art }, el('span', { html: ik(d.art === 'bild' ? 'kamera' : 'buchzu') })),
@@ -143,7 +143,7 @@ async function goodnoteMenue(d) {
     d.titel = neu; d.schlagworte = tags; d.notiz = notiz; speichere(d); zeichne();
   } else if (wahl === 'bezug') { await hinzufuegenMenue(d); }
   else if (wahl === 'raus') { await teileGespeicherteDatei(d); }
-  else if (wahl === 'weg' && await frage('„' + docName(d) + '" in den Papierkorb legen? Die Originaldatei bleibt dort 30 Tage erhalten.', { ja: 'In den Papierkorb', gefahr: true })) {
+  else if (wahl === 'weg' && await frage('„' + docName(d) + '“ in den Papierkorb legen? Die Originaldatei bleibt dort 30 Tage erhalten.', { ja: 'In den Papierkorb', gefahr: true })) {
     await loesche(d.id); zeichne();
   }
 }
@@ -179,5 +179,5 @@ async function oeffneGoodnote(d) {
   else if (d.art === 'pdf') bogen.append(el('iframe', { class: 'goodnote-pdf', src: url, title: d.titel || 'Goodnotes PDF', sandbox: '' }));
   else bogen.append(el('div', { class: 'goodnote-original' },
     el('div', { html: ik('buchzu') }), el('h2', {}, 'Sicher verwahrt.'),
-    el('p', {}, d.art === 'paket' ? 'Das ganze exportierte Ordnerpaket bleibt als eine Datei zusammen. Du kannst es jederzeit über „Original" wieder herausgeben und in Goodnotes öffnen.' : 'Das Goodnotes-Original bleibt unverändert. Anzeigen kann es nur Goodnotes; du kannst es jederzeit über „Original" wieder herausgeben.')));
+    el('p', {}, d.art === 'paket' ? 'Das ganze exportierte Ordnerpaket bleibt als eine Datei zusammen. Du kannst es jederzeit über „Original“ wieder herausgeben und in Goodnotes öffnen.' : 'Das Goodnotes-Original bleibt unverändert. Anzeigen kann es nur Goodnotes; du kannst es jederzeit über „Original“ wieder herausgeben.')));
 }

@@ -174,18 +174,18 @@ async function schoeneCoverHolen() {
   toast('Suche Cover für ' + offen.length + (offen.length === 1 ? ' Buch …' : ' Bücher …'), 3000);
   let n = 0;
   for (const b of offen) { try { if (await buchCoverAusDemNetz(b, { still: true })) n++; } catch (e) {} }
-  toast(n ? n + (n === 1 ? ' Cover gefunden.' : ' Cover gefunden.') : 'Im Netz war kein passendes Cover — über „Cover" am Buch geht es mit ISBN.', 4200);
+  toast(n ? n + (n === 1 ? ' Cover gefunden.' : ' Cover gefunden.') : 'Im Netz war kein passendes Cover — über „Cover“ am Buch geht es mit ISBN.', 4200);
   zeichne();
 }
 
 /* Ein PDF (Datei/Blob) als Buch auflegen: Datei ablegen, zählen, Cover malen. */
-/* Autorenangaben aus PDF-Metadaten sind oft Katalogzeilen: „Nachname, Vorname Verfasser", eckige
+/* Autorenangaben aus PDF-Metadaten sind oft Katalogzeilen: „Nachname, Vorname Verfasser“, eckige
    Klammern, doppelte Namen. Hier wird daraus ein Name. Pur. */
 function saubererAutor(roh) {
   let a = String(roh || '').replace(/\[[^\]]*\]/g, ' ').replace(/\b(Verfasser(?:in)?|Autor(?:in)?|author|Hrsg\.?|Übersetzer(?:in)?)\b\.?/gi, ' ').replace(/[;|/]+/g, ',').replace(/\s+/g, ' ').trim().replace(/^[,\s]+|[,\s]+$/g, '');
   const m = a.match(/^([^,]+),\s*([^,]+)$/);
   if (m && !/\s(?:und|and|&)\s/i.test(a) && !(m[1].trim().includes(' ') && m[2].trim().includes(' '))) a = (m[2] + ' ' + m[1]).replace(/\s+/g, ' ').trim();
-  /* „Silvana de Mari Silvana de Mari" -> einmal reicht */
+  /* „Silvana de Mari Silvana de Mari“ -> einmal reicht */
   const h = a.length >> 1;
   if (a.length > 8 && a.slice(0, h).trim().toLowerCase() === a.slice(h).trim().toLowerCase()) a = a.slice(0, h).trim();
   return a.slice(0, 120);
@@ -275,7 +275,7 @@ async function buecherAusOrdner() {
   if (!desk || !desk.buecherListe) { toast('Den Bücherordner gibt es nur in der Desktop-App.'); return; }
   let liste = [];
   try { liste = await desk.buecherListe(); } catch (e) { liste = []; }
-  if (!liste.length) { await zeigeAnkunft('Kein Buch im Ordner', ['Lege PDF-Dateien in den Ordner „VANI-Bücher" in deinen Dokumenten — oder in einen Ordner „buecher" neben der App.'], ''); return; }
+  if (!liste.length) { await zeigeAnkunft('Kein Buch im Ordner', ['Lege PDF-Dateien in den Ordner „VANI-Bücher“ in deinen Dokumenten — oder in einen Ordner „buecher“ neben der App.'], ''); return; }
   const da = new Set(lesestapelBuecher().map((b) => b.titel));
   const wahl = await menue([...liste.map((b) => ({ text: (da.has(b.name.replace(/\.(pdf|epub)$/i, '')) ? '✓ ' : '') + b.name + ' · ' + formatBytes(b.size), icon: 'buchzu', wert: b.pfad })), { text: 'Alle auflegen', icon: 'plus', wert: '_alle' }], liste.length + ' Bücher im Ordner');
   if (!wahl) return;
@@ -332,7 +332,7 @@ async function buecherkofferHolen() {
   let n = 0, fehl = 0;
   for (const b of koffer.buecher) {
     if (da.has(String(b.name || '').toLowerCase()) || (b.isbn && da.has(b.isbn))) continue;
-    toast('Hole „' + (b.name || b.datei) + '" …', 2400);
+    toast('Hole „' + (b.name || b.datei) + '“ …', 2400);
     try {
       const a = await fetch('buecher/' + b.datei, { cache: 'no-store' });
       if (!a.ok) throw new Error('HTTP ' + a.status);
@@ -367,7 +367,7 @@ function buchStatistikWorte(b) {
   const heute = Number(st[tagKey()]) || 0, gestern = Number(st[tagKey(Date.now() - 86400000)]) || 0;
   const woche = Object.entries(st).filter(([k]) => Date.now() - new Date(k).getTime() < 7 * 86400000).reduce((n, [, v]) => n + (Number(v) || 0), 0);
   if (!heute && !gestern && !woche) return '';
-  return (heute ? heute + ' Seiten heute' : gestern ? gestern + ' Seiten gestern' : '') + (woche ? (heute || gestern ? ' · ' : '') + woche + ' diese Woche' : '');
+  return (heute ? zaehl(heute, 'Seite heute', 'Seiten heute', 'Eine') : gestern ? zaehl(gestern, 'Seite gestern', 'Seiten gestern', 'Eine') : '') + (woche ? (heute || gestern ? ' · ' : '') + woche + ' diese Woche' : '');
 }
 
 /* Der Lesestapel als Fenster: Cover, Fortschritt, Auflegen. */
@@ -395,7 +395,7 @@ function lesestapelZeigen() {
       else if (wahl === 'netz') { zu(); toast('Suche das Cover …', 2500); const ok = await buchCoverAusDemNetz(b); if (ok) toast('Das Cover ist da.'); zeichne(); }
       else if (wahl === 'cover') { const s = await eingabe({ titel: 'Welche Seite als Cover?', wert: '1', platzhalter: 'Seitenzahl' }); const n = parseInt(s, 10); if (n > 0) { await buchCoverAusSeite(b, n); zu(); lesestapelZeigen(); } }
       else if (wahl === 'anfang') { b.seite = 1; speichere(b); zu(); lesestapelZeigen(); }
-      else if (wahl === 'weg' && await frage('„' + (b.titel || 'Buch') + '" vom Tisch nehmen? Die Datei geht in den Papierkorb.', { ja: 'Vom Tisch nehmen', gefahr: true })) { await loesche(b.id); zu(); zeichne(); }
+      else if (wahl === 'weg' && await frage('„' + (b.titel || 'Buch') + '“ vom Tisch nehmen? Die Datei geht in den Papierkorb.', { ja: 'Vom Tisch nehmen', gefahr: true })) { await loesche(b.id); zu(); zeichne(); }
     });
     raster.append(k);
   }
@@ -474,7 +474,7 @@ async function buchOeffnen(b) {
     leser.dok = await pdfjsDokument(pdfjs, await blob.arrayBuffer()).promise;
     if (leser.dok.numPages !== b.seiten) { b.seiten = leser.dok.numPages; speichereStill(b); balken.max = String(b.seiten); }
   } catch (x) { if (_leser === leser) { toast('Das Buch ließ sich nicht aufschlagen.' + (x && x.message ? ' (' + x.message + ')' : ''), 4200); buchSchliessen(); } return; }
-  if (_leser !== leser) { try { leser.dok.destroy(); } catch (e) {} return; }   /* „Zurück" kam schneller als das Buch */
+  if (_leser !== leser) { try { leser.dok.destroy(); } catch (e) {} return; }   /* „Zurück“ kam schneller als das Buch */
 
   const doppel = () => leser.e.doppel === 'an' || (leser.e.doppel === 'auto' && raum.clientWidth >= 900 && raum.clientWidth > raum.clientHeight);
   const seitenJetzt = () => { const d = doppel(); if (!d) return [leser.seite]; const links = leser.seite % 2 === 0 ? leser.seite : leser.seite - 1; return [links, links + 1].filter((n) => n >= 1 && n <= b.seiten); };
@@ -724,10 +724,10 @@ async function leserSuche() {
     const i = t.toLowerCase().indexOf(q);
     if (i >= 0) treffer.push({ seite: n, vor: t.slice(Math.max(0, i - 60), i), mitte: t.slice(i, i + q.length), nach: t.slice(i + q.length, i + q.length + 70) });
   }
-  if (!treffer.length) { toast('„' + frage_ + '" steht nicht in diesem Buch (oder es hat keine Textebene).', 4200); return; }
+  if (!treffer.length) { toast('„' + frage_ + '“ steht nicht in diesem Buch (oder es hat keine Textebene).', 4200); return; }
   const liste = el('div', { class: 'buchsuche-treffer' }, treffer.map((t) => el('button', { onclick: () => { zu(); l.seite = t.seite; l.zeige(0); } },
     el('small', {}, 'Seite ' + t.seite), '…' + t.vor, el('b', {}, t.mitte), t.nach + '…')));
-  const kasten = el('div', { class: 'modal gliederung-kasten' }, el('h2', {}, treffer.length + (treffer.length === 1 ? ' Treffer' : ' Treffer') + ' für „' + frage_ + '"'), liste,
+  const kasten = el('div', { class: 'modal gliederung-kasten' }, el('h2', {}, treffer.length + (treffer.length === 1 ? ' Treffer' : ' Treffer') + ' für „' + frage_ + '“'), liste,
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Schließen')));
   if (_leser) _leser.raum.classList.add('deck-offen');
   const zu = zeigeDeck(kasten, () => { if (_leser) _leser.raum.classList.remove('deck-offen'); });

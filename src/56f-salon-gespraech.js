@@ -317,7 +317,7 @@ const GESPRAECH_HINWEISE = {
   }
 };
 
-/* Zahlen hübsch; Listen mit „und". Pur. */
+/* Zahlen hübsch; Listen mit „und“. Pur. */
 function gespraechZahl(n) { try { return Number(n || 0).toLocaleString('de-DE'); } catch (e) { return String(n); } }
 function gespraechListe(arr, en, max = 5) {
   const a = (arr || []).slice(0, max); if (!a.length) return en ? 'nobody yet' : 'noch niemand';
@@ -338,7 +338,31 @@ function ohneWerk(muster) {
   return '{name}. {kurz}' + (rest ? ' ' + rest : '');
 }
 /* Platzhalter füllen. Pur. */
-function gespraechFuellen(muster, w) { return String(muster || '').replace(/\{(\w+)\}/g, (m, k) => (w[k] != null && w[k] !== '' ? String(w[k]) : m)).replace(/\{\w+\}/g, '…'); }
+/* Platzhalter füllen. Was leer ist, wird nicht durch ein Fürwort ersetzt,
+   sondern samt Beistrich herausgenommen: aus „Sehen Sie, {anrede}: Ich habe
+   gelesen …“ wird ohne Namen „Sehen Sie: Ich habe gelesen …“ und nicht
+   „Sehen Sie, du: …“ — die Stimmen im Salon siezen, und ein „du“ mitten
+   darin ist kein deutscher Satz. Was gar nicht vorgesehen war, bleibt als
+   Auslassung stehen. */
+function gespraechLeerRaus(text, schluessel) {
+  const marke = '{' + schluessel + '}';
+  let t = String(text || '');
+  for (const form of [', ' + marke, ' ' + marke + ',', ' ' + marke, marke + ', ', marke]) {
+    if (t.indexOf(form) >= 0) { t = t.split(form).join(form === ' ' + marke + ',' ? ',' : ''); break; }
+  }
+  t = t.split('  ').join(' ').split(' .').join('.').split(' ,').join(',').split(' :').join(':').trim();
+  /* Stand der Platzhalter am Satzanfang, fängt der Satz jetzt klein an. */
+  if (String(text || '').trim().indexOf(marke) === 0 && t) t = t[0].toUpperCase() + t.slice(1);
+  return t;
+}
+function gespraechFuellen(muster, w) {
+  let t = String(muster || '');
+  const daten = w || {};
+  for (const k of Object.keys(daten)) {
+    if (daten[k] == null || daten[k] === '') t = gespraechLeerRaus(t, k);
+  }
+  return t.replace(/\{(\w+)\}/g, (m, k) => (daten[k] != null && daten[k] !== '' ? String(daten[k]) : m)).replace(/\{\w+\}/g, '…');
+}
 
 /* Die Antwort einer Stimme auf eine gelesene Frage: { text, de, belege, art }. Pur bis auf Datum. */
 function gespraechAntwort(autor, antwort, k, { anrede = '', saat = 1 } = {}) {
@@ -350,7 +374,10 @@ function gespraechAntwort(autor, antwort, k, { anrede = '', saat = 1 } = {}) {
   let pickI = 0;
   const pick = (liste) => { const l = liste || []; if (!l.length) return ''; pickI = Math.floor(z() * l.length) % l.length; return l[pickI]; };
   const pickDe = (liste) => { const l = liste || []; return l.length ? l[pickI % l.length] : ''; };
-  const du = anrede || (en ? 'friend' : 'du');
+  /* Im Englischen ist „friend“ eine echte Anrede. Im Deutschen siezen die
+     Stimmen — dort bleibt die Anrede lieber weg, als dass ein „du“
+     mitten in einem Sie-Satz steht. */
+  const du = anrede || (en ? 'friend' : '');
   if (!k || k.leer) { const i = 0; return { art: 'leer', text: gespraechFuellen(st.leer[i], { anrede: du }), de: stDe ? gespraechFuellen(stDe.leer[i], { anrede: du }) : '', belege: [] }; }
   const fig = (k.figuren || []).map((f) => f.name);
   const basisFuer = (e) => ({ anrede: du, woerter: gespraechZahl(k.woerter), texte: gespraechZahl(k.texte), figuren: gespraechListe(fig, e, 5), orte: gespraechListe((k.orte || []).map((o) => o.name), e, 4), begriffe: gespraechListe((k.begriffe || []).map((b) => b.name), e, 4), tage: gespraechZahl(k.zeit && k.zeit.schreibtage || 0), laengster: k.zeit && k.zeit.laengster ? '„' + (k.zeit.laengster.titel || k.zeit.laengster.werk) + '“ (' + gespraechZahl(k.zeit.laengster.woerter) + (e ? ' words)' : ' Wörter)') : '—', zuletzt: k.zeit && k.zeit.letzter ? '„' + (k.zeit.letzter.titel || k.zeit.letzter.werk) + '“' : '—', werk: (k.werke[0] || {}).name || '—', werke: gespraechListe((k.werke || []).map((w) => w.name + ' (' + gespraechZahl(w.woerter) + ')'), e, 6), vierhundert: gespraechZahl(Math.ceil((k.woerter || 0) / 400)) });

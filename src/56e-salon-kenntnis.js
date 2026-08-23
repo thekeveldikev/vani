@@ -85,12 +85,12 @@ function kenntnisSammeln(docs, { statsTage = null, jetzt = Date.now() } = {}) {
         else if (/^[a-zäöüß]{3,}te(n|st)?$/.test(nach) && !KENNTNIS_ARTIKEL.has(nach)) { c.score += 1; c.verben.set(nach, (c.verben.get(nach) || 0) + 1); }
         if (KENNTNIS_VERBEN.has(vor)) c.score += 2;
         if (i === 0 && KENNTNIS_VERBEN.has(nach)) c.score += .5;
-        /* Nennung: „Val, …" / „…, Val." */
+        /* Nennung: „Val, …“ / „…, Val.“ */
         const idx = satz.indexOf(w);
         if (idx >= 0) { const danach = satz.slice(idx + w.length, idx + w.length + 2); const davor = satz.slice(Math.max(0, idx - 2), idx); if (/^[,!?]/.test(danach)) c.score += .5; if (/[,„"“]\s?$/.test(davor)) c.score += .5; }
         if (/["„“”]/.test(satz)) c.dialog++;
         /* Orte: nach Ortswörtern */
-        if (KENNTNIS_ORTSWORTE.has(vor) || (KENNTNIS_ARTIKEL.has(vor) && KENNTNIS_ORTSWORTE.has((woerter[i - 2] || '').toLowerCase()))) { if (!KENNTNIS_KEIN_ORT.has(w) && !KENNTNIS_GEWOEHNLICH.has(w)) { const ohneArtikel = ['nach', 'in', 'aus', 'durch', 'bei'].includes(vor);   /* „von/über Val" heißt nicht, dass Val ein Ort ist */ c.ortScore += ohneArtikel ? 4 : 1; if (ohneArtikel) c.ortEigen = (c.ortEigen || 0) + 1; if (!c.ortBeispiel) c.ortBeispiel = { werk: t.werk, satz, id: t.id }; } }
+        if (KENNTNIS_ORTSWORTE.has(vor) || (KENNTNIS_ARTIKEL.has(vor) && KENNTNIS_ORTSWORTE.has((woerter[i - 2] || '').toLowerCase()))) { if (!KENNTNIS_KEIN_ORT.has(w) && !KENNTNIS_GEWOEHNLICH.has(w)) { const ohneArtikel = ['nach', 'in', 'aus', 'durch', 'bei'].includes(vor);   /* „von/über Val“ heißt nicht, dass Val ein Ort ist */ c.ortScore += ohneArtikel ? 4 : 1; if (ohneArtikel) c.ortEigen = (c.ortEigen || 0) + 1; if (!c.ortBeispiel) c.ortBeispiel = { werk: t.werk, satz, id: t.id }; } }
         /* Zweiwortnamen: Nicky Wilholm */
         if (/^[A-ZÄÖÜ][a-zäöüß]+$/.test(nachRoh) && !KENNTNIS_STOPP.has(nachRoh) && !KENNTNIS_GEWOEHNLICH.has(nachRoh) && i + 1 < woerter.length && !KENNTNIS_ARTIKEL.has(vor)) { c.score += 1.5; const c2 = hole(nachRoh); c2.score += 1.5; }
         grossImSatz.push(w);
@@ -99,13 +99,13 @@ function kenntnisSammeln(docs, { statsTage = null, jetzt = Date.now() } = {}) {
       for (const a of grossImSatz) for (const b of grossImSatz) if (a !== b) { const c = kand.get(a); if (c) c.begleiter.set(b, (c.begleiter.get(b) || 0) + 1); }
     }
   }
-  /* Genitiv-Formen: „Vals" zählt für „Val" */
+  /* Genitiv-Formen: „Vals“ zählt für „Val“ */
   for (const [w, c] of kand) {
     if (alleTokens.has(w + 's') && !/s$/.test(w)) c.score += 2;
-    if (alleTokens.has(w.toLowerCase())) c.score -= 8;   /* „hast/Hast", „ist/Ist": Namen stehen nie klein */
+    if (alleTokens.has(w.toLowerCase())) c.score -= 8;   /* „hast/Hast“, „ist/Ist“: Namen stehen nie klein */
     if (/(isch|lich|ig|sam|bar|los|haft|end|ung|heit|keit|schaft)$/.test(w)) c.score -= 6;
   }
-  /* Genitive („Miras" gehört zu „Mira") zählen zur Figur */
+  /* Genitive („Miras“ gehört zu „Mira“) zählen zur Figur */
   for (const [w, c] of kand) { if (/[^s]s$/.test(w) && kand.has(w.slice(0, -1)) && kand.get(w.slice(0, -1)).n >= c.n) { const b = kand.get(w.slice(0, -1)); b.n += c.n; b.score += c.score > 0 ? 1 : 0; for (const [wk, n] of c.werke) b.werke.set(wk, (b.werke.get(wk) || 0) + n); c.score = -99; c.ortScore = 0; c.n = 0; } }
   /* Figuren: gute Punktzahl, mehrfach da */
   const istOrt = (c) => (c.ortEigen || 0) >= 2 && (c.ortEigen || 0) * 6 >= c.score;

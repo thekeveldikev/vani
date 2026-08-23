@@ -42,7 +42,7 @@ async function neueBeziehung(doc) {
   const art = await menue(BEZUG_ARTEN.map((a) => ({ text: a, wert: a })), 'Was verbindet die beiden?');
   if (!art) return null;
   const b = verbindeDocs(doc.id, ziel.id, art);
-  if (b) toast('Verbunden mit „' + docName(ziel) + '".');
+  if (b) toast('Verbunden mit „' + docName(ziel) + '“.');
   return b;
 }
 
@@ -58,7 +58,7 @@ function strukturelleBeziehungen(doc) {
 }
 
 function zeigeBeziehungen(doc) {
-  const kasten = el('div', { class: 'modal beziehungsmodal' }, el('h2', {}, 'Was zu „' + docName(doc) + '" gehört'));
+  const kasten = el('div', { class: 'modal beziehungsmodal' }, el('h2', {}, 'Was zu „' + docName(doc) + '“ gehört'));
   const liste = el('div', { class: 'beziehungsliste' });
   const baue = () => {
     liste.innerHTML = '';
@@ -92,7 +92,7 @@ async function waehleSeite({ heft = null, neueErlaubt = true } = {}) {
   const wahl = await menue([
     ...seiten.map((s, i) => ({ text: 'Seite ' + (i + 1) + (s.titel ? ' · ' + s.titel : ''), wert: s.id })),
     neueErlaubt ? { text: 'Neue Seite am Ende', icon: 'plus', wert: '_neu' } : null
-  ], 'Wohin in „' + heft.titel + '"?');
+  ], 'Wohin in „' + heft.titel + '“?');
   if (!wahl) return null;
   if (wahl === '_neu') return neuDoc('seite', { parent: heft.id, ord: seiten.length, titel: '', text: '' });
   return D.docs.get(wahl);
@@ -111,7 +111,7 @@ async function legeBlattInHeft(blatt) {
   const pos = await waehlePositionImHeft(heft);
   if (pos === null) return false;
   if (!blattInHeft(blatt, heft, pos)) return false;
-  toast('Liegt jetzt als Seite ' + (Number(pos) + 1) + ' in „' + heft.titel + '".');
+  toast('Liegt jetzt als Seite ' + (Number(pos) + 1) + ' in „' + heft.titel + '“.');
   return true;
 }
 
@@ -128,7 +128,7 @@ async function klebeDokumentEin(doc, befestigung = 'tesa') {
   });
   verbindeDocs(doc.id, seite.id, 'gehört dazu');
   if (doc.bild) neuDoc('foto', { parent: seite.id, quelle: doc.id, bild: doc.bild, befestigung, pos: { x: 48, y: 12, rot: 2, w: 38 } });
-  toast('Mit Tesa an eine Seite in „' + docName(D.docs.get(seite.parent)) + '" geklebt. Das Original bleibt an seinem Platz.');
+  toast('Mit Tesa an eine Seite in „' + docName(D.docs.get(seite.parent)) + '“ geklebt. Das Original bleibt an seinem Platz.');
   return z;
 }
 
@@ -145,7 +145,7 @@ async function kopiereHeftInProjekt(heft) {
     verbindeDocs(s.id, szene.id, 'spiegelt');
   }
   heft.projektRef = projekt.id; speichere(heft); verbindeDocs(heft.id, projekt.id, 'gehört dazu');
-  toast('Als Kapitel mit ' + seiten.length + (seiten.length === 1 ? ' Szene' : ' Szenen') + ' in „' + projekt.titel + '" kopiert. Das Heft bleibt erhalten.');
+  toast('Als Kapitel mit ' + seiten.length + (seiten.length === 1 ? ' Szene' : ' Szenen') + ' in „' + projekt.titel + '“ kopiert. Das Heft bleibt erhalten.');
   return projekt;
 }
 
@@ -157,7 +157,7 @@ async function legeAufBrett(doc) {
     farbe: '', pos: { x: 80 + Math.random() * 320, y: 80 + Math.random() * 260 }
   });
   verbindeDocs(doc.id, b.id, 'spiegelt');
-  toast('Liegt jetzt auch auf „' + brett.titel + '".');
+  toast('Liegt jetzt auch auf „' + brett.titel + '“.');
   return b;
 }
 
@@ -166,7 +166,7 @@ async function ordneHeftProjektZu(heft) {
   const wahl = await menue([
     ...projekte.map((p) => ({ text: p.titel, icon: 'projekte', wert: p.id })),
     heft.projektRef ? { text: 'Aus dem Projekt lösen', icon: 'kreuz', wert: '_los' } : null
-  ], 'Zu welchem Projekt gehört „' + heft.titel + '"?');
+  ], 'Zu welchem Projekt gehört „' + heft.titel + '“?');
   if (!wahl) return false;
   if (wahl === '_los') delete heft.projektRef; else heft.projektRef = wahl;
   speichere(heft);

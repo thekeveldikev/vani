@@ -280,3 +280,54 @@ test('Die Ansicht fängt bei 2000 an — und weiter unten nur, wenn dort etwas s
   assert.equal(k.kalZeigeVon([], 1200), 1600, 'weiter als der Kalender geht es nicht');
   assert.equal(k.kalZeigeVon([], 2030), 2000, 'nach oben verschiebt es die Ansicht nicht');
 });
+
+test('Ein Datum darf so hineingeschrieben werden, wie man es sagt', async () => {
+  const k = await frisch();
+  /* Gespeichert wird immer 1783-04-09. Tippen soll man das nicht müssen. */
+  assert.equal(k.kalAusText('9.4.1783'), '1783-04-09');
+  assert.equal(k.kalAusText('09.04.1783'), '1783-04-09');
+  assert.equal(k.kalAusText('9. 4. 1783'), '1783-04-09');
+  assert.equal(k.kalAusText('9. April 1783'), '1783-04-09');
+  assert.equal(k.kalAusText('9. Apr 1783'), '1783-04-09');
+  assert.equal(k.kalAusText('9 April 1783'), '1783-04-09');
+  assert.equal(k.kalAusText('31. März 2020'), '2020-03-31');
+  assert.equal(k.kalAusText('1. Dezember 2011'), '2011-12-01');
+  /* Nur Monat und Jahr, nur Jahr */
+  assert.equal(k.kalAusText('April 1783'), '1783-04');
+  assert.equal(k.kalAusText('Apr. 1783'), '1783-04');
+  assert.equal(k.kalAusText('Sept 2011'), '2011-09');
+  assert.equal(k.kalAusText('4.1783'), '1783-04');
+  assert.equal(k.kalAusText('1783'), '1783');
+  /* Die gespeicherte Form selbst bleibt gültig und wird auf Form gebracht */
+  assert.equal(k.kalAusText('1783-04-09'), '1783-04-09');
+  assert.equal(k.kalAusText('1783-4-9'), '1783-04-09');
+  /* Zweistellige Jahre: 51–99 ins vorige Jahrhundert, alles darunter in dieses */
+  assert.equal(k.kalAusText('9.4.83'), '1983-04-09');
+  assert.equal(k.kalAusText('1. Mai 26'), '2026-05-01');
+  /* Was nicht aufgeht, wird nicht erfunden */
+  assert.equal(k.kalAusText('30.2.1783'), '', 'den 30. Februar gibt es nicht');
+  assert.equal(k.kalAusText('13.13.1783'), '', 'den dreizehnten Monat auch nicht');
+  assert.equal(k.kalAusText('9.4.1500'), '', 'vor 1600 reicht der Kalender nicht');
+  assert.equal(k.kalAusText('9.4'), '', 'ohne Jahr kein Datum');
+  assert.equal(k.kalAusText('irgendwann'), '');
+  assert.equal(k.kalAusText(''), '');
+  assert.equal(k.kalAusText(null), '');
+  /* Umlaute im Monatsnamen sind egal */
+  assert.equal(k.kalMonatAus('März'), 3);
+  assert.equal(k.kalMonatAus('Maerz'), 3);
+  assert.equal(k.kalMonatAus('marz'), 3);
+  assert.equal(k.kalMonatAus('Dez'), 12);
+  assert.equal(k.kalMonatAus('gibtsnicht'), null);
+  assert.equal(k.kalMonatAus('13'), null);
+});
+
+test('Was hineingeschrieben wurde, lässt sich auch wieder lesen', async () => {
+  const k = await frisch();
+  /* Hin und zurück: was VANI anzeigt, versteht VANI auch wieder. */
+  for (const roh of ['9.4.1783', '31. März 2020', 'April 1783', '1783', '1. Dezember 2011']) {
+    const gespeichert = k.kalAusText(roh);
+    assert.ok(gespeichert, 'gelesen: ' + roh);
+    const angezeigt = k.kalLesbar(gespeichert);
+    assert.equal(k.kalAusText(angezeigt), gespeichert, 'hin und zurück: ' + roh + ' → ' + angezeigt);
+  }
+});

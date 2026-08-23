@@ -1,5 +1,5 @@
 /* ===================== 58 — DIE SITZUNG ALS RITUAL, UND DER WORT-VERGLEICH =====================
-   „Sitzung beginnen": ein Griff, der alles zusammen tut — Dauer und Wortziel
+   „Sitzung beginnen“: ein Griff, der alles zusammen tut — Dauer und Wortziel
    wählen, Klangbild an, ein Rat von der Wand, dann die Kerze im Schreibraum.
    Am Ende die Bilanz: Wörter, Minuten, ein Satz als Fundstück, ein Lob in der
    Stimme der Wand. Dazu: zwei Stände vergleichen, Wort für Wort (eigener Diff,
@@ -64,7 +64,7 @@ function staendeVergleichen(doc, stand, jetztText) {
   const b = wortDiffBilanz(diff);
   const bogen = el('div', { class: 'lesebogen' }, el('div', { class: 'innen' },
     el('h1', {}, 'Was sich verändert hat'),
-    el('div', { class: 'lmeta' }, 'Stand vom ' + fmtDatum(stand.wann) + ', ' + fmtZeit(stand.wann) + (stand.auto ? ' (automatisch)' : '') + ' → jetzt · ' + b.neu + ' Wörter dazu, ' + b.weg + ' weg'),
+    el('div', { class: 'lmeta' }, 'Stand vom ' + fmtDatum(stand.wann) + ', ' + fmtZeit(stand.wann) + (stand.auto ? ' (automatisch)' : '') + ' → jetzt · ' + zaehl(b.neu, 'Wort', 'Wörter') + ' dazu, ' + b.weg + ' weg'),
     el('div', { class: 'lesetext' }, wortDiffElement(diff))));
   const leiste = el('div', { class: 'schwebeleiste' }, el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Vergleich schließen', onclick: () => { bogen.remove(); leiste.remove(); } }));
   document.body.append(bogen, leiste);

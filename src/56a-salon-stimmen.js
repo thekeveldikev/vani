@@ -137,7 +137,7 @@ const SALON_GAESTE_MEHR = [
     rahmen: 'hell', anrede: 'Enid',
     zitate: [
       { t: 'Ich schließe ein paar Minuten lang die Augen, die Reiseschreibmaschine auf dem Knie — ich mache meinen Kopf leer und warte — und dann, so deutlich, wie ich echte Kinder sehen würde, stehen meine Figuren vor meinem inneren Auge.', o: 'I shut my eyes for a few minutes, with my portable typewriter on my knee — I make my mind a blank and wait — and then, as clearly as I would see real children, my characters stand before me in my mind’s eye.', q: 'Brief an Peter McKellar, 1953' },
-      { t: '„Mutter, hast du schon etwas über unsere Sommerferien gehört?", fragte Julian am Frühstückstisch.', o: '‘Mother, have you heard about our summer holidays yet?’ said Julian, at the breakfast-table.', q: 'Five on a Treasure Island, 1942 (erster Satz)' },
+      { t: '„Mutter, hast du schon etwas über unsere Sommerferien gehört?“, fragte Julian am Frühstückstisch.', o: '‘Mother, have you heard about our summer holidays yet?’ said Julian, at the breakfast-table.', q: 'Five on a Treasure Island, 1942 (erster Satz)' },
       { t: 'Darrell Rivers betrachtete sich im Spiegel. Es war fast Zeit, zum Zug aufzubrechen, aber eine Minute blieb noch, um zu sehen, wie sie in ihrer neuen Schuluniform aussah.', o: 'Darrell Rivers looked at herself in the glass. It was almost time to start for the train, but there was just a minute to see how she looked in her new school uniform.', q: 'First Term at Malory Towers, 1946 (erster Satz)' },
       { t: 'Die beste Art, mit Hindernissen umzugehen, ist, sie als Trittsteine zu benutzen.', o: 'The best way to treat obstacles is to use them as stepping-stones.', q: 'zugeschrieben' },
       { t: 'Die Ansichten von Kritikern über zwölf interessieren mich nicht.', o: 'I am not interested in the views of critics over the age of twelve.', q: 'zugeschrieben (sinngemäß in Interviews)' },
@@ -362,9 +362,9 @@ const SALON_GAESTE_MEHR = [
       { t: 'Wann immer du dich auf der Seite der Mehrheit findest, ist es Zeit, innezuhalten und nachzudenken.', o: 'Whenever you find yourself on the side of the majority, it is time to pause and reflect.', q: 'Notizbuch, 1904' },
       { t: 'Beschaff dir zuerst die Fakten, dann kannst du sie verdrehen, wie du willst.', o: 'Get your facts first, then you can distort them as you please.', q: 'überliefert von Rudyard Kipling, From Sea to Sea, 1889' },
       { t: 'Die Nachricht von meinem Tod war eine Übertreibung.', o: 'The report of my death was an exaggeration.', q: 'New York Journal, 1897' },
-      { t: 'Du kennst mich nicht, es sei denn, du hast ein Buch gelesen mit dem Titel „Die Abenteuer des Tom Sawyer"; aber das macht nichts.', o: 'You don’t know about me without you have read a book by the name of The Adventures of Tom Sawyer; but that ain’t no matter.', q: 'Adventures of Huckleberry Finn, 1884 (erster Satz)' },
+      { t: 'Du kennst mich nicht, es sei denn, du hast ein Buch gelesen mit dem Titel „Die Abenteuer des Tom Sawyer“; aber das macht nichts.', o: 'You don’t know about me without you have read a book by the name of The Adventures of Tom Sawyer; but that ain’t no matter.', q: 'Adventures of Huckleberry Finn, 1884 (erster Satz)' },
       { t: 'Sag nicht: Die alte Dame schrie. Bring sie auf die Bühne und lass sie schreien.', o: 'Don’t say the old lady screamed. Bring her on and let her scream.', q: 'zugeschrieben' },
-      { t: 'Ersetze „verdammt" jedes Mal, wenn du „sehr" schreiben willst; dein Lektor streicht es, und der Text wird genau so, wie er sein soll.', o: 'Substitute ‘damn’ every time you’re inclined to write ‘very’; your editor will delete it and the writing will be just as it should be.', q: 'zugeschrieben' }
+      { t: 'Ersetze „verdammt“ jedes Mal, wenn du „sehr“ schreiben willst; dein Lektor streicht es, und der Text wird genau so, wie er sein soll.', o: 'Substitute ‘damn’ every time you’re inclined to write ‘very’; your editor will delete it and the writing will be just as it should be.', q: 'zugeschrieben' }
     ],
     saetze: [
       'Kill the adjectives. Not all of them — leave one standing so the others know what happened.',
@@ -421,7 +421,7 @@ const SALON_GAESTE_MEHR = [
         'Lass den Jungen erzählen. Ein Kind als Erzähler kann die wahrsten Dinge sagen, weil ihm noch niemand beigebracht hat, was man nicht bemerkt.',
         'Zuerst die Fakten. Bring sie in Ordnung. Dann darfst du sie biegen, so weit die Geschichte es braucht — aber nicht vorher.',
         'Wenn du es nicht schlicht schreiben kannst, weißt du es noch nicht. Geh zurück an den Fluss und find es heraus.',
-        'Schreib nie „sehr". Wenn das Wort davor nicht allein stehen kann, verdient es zu fallen.',
+        'Schreib nie „sehr“. Wenn das Wort davor nicht allein stehen kann, verdient es zu fallen.',
         'Ein gutes Ende ist wie ein guter Abgang aus einem Zimmer: schnell, und ohne zu erklären, warum man da war.',
         'Man hat mich mehr als einmal für tot erklärt. Deinen Entwurf auch. Geh weiter; das verstört die Trauergäste.',
         'Nimm das Wetter nur hinein, wenn jemand nass wird.',
@@ -430,7 +430,7 @@ const SALON_GAESTE_MEHR = [
       anfang: ['Nun, Sir:', 'Ein Wort vom Fluss:', 'Hier ist ein Faktum, das du später verdrehen darfst:', 'Ich sag es dir schlicht:', 'Zitier mich nicht — doch, tu es:', 'Nach meiner Erfahrung:'],
       kern: [
         ['anfang', 'Fang mit einem Jungen an, der etwas getan hat, das er nicht sollte. Der Leser verzeiht ihm auf Seite eins und folgt ihm überallhin.'],
-        ['anfang', 'Beginn schlicht. „Du kennst mich nicht." Kein Donner, kein Wetter — eine Stimme, und eine kleine Lüge darin.'],
+        ['anfang', 'Beginn schlicht. „Du kennst mich nicht.“ Kein Donner, kein Wetter — eine Stimme, und eine kleine Lüge darin.'],
         ['zweifel', 'Zweifel ist die Mehrheit, die in deinem Kopf abstimmt. Halt inne, denk nach — dann überstimm sie.'],
         ['zweifel', 'Du bist nicht so schlecht, wie du um neun Uhr abends denkst, und nicht so gut, wie du um neun Uhr morgens denkst. Schreib zu beiden Stunden.'],
         ['routine', 'Schreib jeden Tag, bis dich jemand bezahlt; tut das in drei Jahren niemand, hast du viel übers Holzsägen gelernt. So oder so gewinnst du.'],
@@ -442,7 +442,7 @@ const SALON_GAESTE_MEHR = [
         ['stil', 'Benutze das richtige Wort, nicht seinen Cousin zweiten Grades. Und wenn du ein Adjektiv erwischst, töte es.'],
         ['stil', 'Meide Überflüssiges. Da — ich habe es gerade geübt.'],
         ['ueberarbeiten', 'Lies es einem Hund vor. Geht der Hund, ging auch der Leser; bleibt er, kürz trotzdem.'],
-        ['ueberarbeiten', 'Streich „sehr", wo immer es steht. Der Satz richtet sich auf wie ein Junge, dessen Mutter hereinkam.'],
+        ['ueberarbeiten', 'Streich „sehr“, wo immer es steht. Der Satz richtet sich auf wie ein Junge, dessen Mutter hereinkam.'],
         ['angst', 'Mut ist Beherrschung der Furcht, nicht ihre Abwesenheit. Lass den Helden erst zittern, dann hineingehen.'],
         ['angst', 'Die Dunkelheit auf einem Fluss bei Nacht ist besser als jedes Gespenst. Setz deinen Leser aufs Floß und blas die Laterne aus.'],
         ['lesen', 'Lies die Zeitungen. Die Wahrheit ist seltsamer als die Fiktion, weil sie nicht möglich sein muss — stiehl von ihr.'],

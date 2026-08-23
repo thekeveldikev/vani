@@ -158,7 +158,7 @@ function albumZeichne(buehne, neu, schliessen) {
   if (marke) {
     const wo = albumBlattVon(marke.id, liste);
     if (wo) block.append(el('button', {
-      class: 'alb-band' + (wo === _alb.i ? ' hier' : ''),
+      class: 'alb-leseband' + (wo === _alb.i ? ' hier' : ''),
       style: '--bandfarbe:' + albumFarbe(marke),
       title: wo === _alb.i ? 'Das Bändchen liegt hier — noch einmal tippen, und es kommt heraus' : 'Zum Bändchen: ' + (marke.name || 'ohne Namen'),
       onclick: () => { if (wo === _alb.i) { albumMarkeSetzen(marke); neu(); } else albumSpringen(wo, neu); }
@@ -372,7 +372,7 @@ function albumSeite(stelle, liste, welche, neu, flach) {
     anhaengen(albumSeitenkopf(figur, neu, flach));
     /* Geburts- und Todestag stehen bereits im Seitenkopf, mit Stern und
        Kreuz und in Sprache statt in Ziffern. Noch einmal als Etikett mit
-       „1783-04-09" darunter waere Doppelung — und die haesslichere. */
+       „1783-04-09“ darunter waere Doppelung — und die haesslichere. */
     const stuecke = albumStuecke(figur).filter((s) => ALB_LINKS.includes(s.feld.gruppe) && !ALB_IM_KOPF.includes(s.feld.id));
     anhaengen(albumStueckFeld(figur, stuecke, flach));
     /* Die Zeitleiste steht links: sie gehört zur Biografie, nicht zum Wesen. */
@@ -478,7 +478,7 @@ function albumOrdnungWaehlen(neu) {
 function albumGeschichteWaehlen(geschichten, neu) {
   const kasten = el('div', { class: 'modal albo-fenster' },
     el('div', { class: 'kartenkopf' }, 'WELCHE GESCHICHTE'),
-    el('p', { class: 'albo-vor' }, 'Was du bei „Kommt vor in" eingetragen hast, steht hier. Es wird nur gezählt, nicht verwaltet — schreib hinein, was du willst.'),
+    el('p', { class: 'albo-vor' }, 'Was du bei „Kommt vor in“ eingetragen hast, steht hier. Es wird nur gezählt, nicht verwaltet — schreib hinein, was du willst.'),
     el('button', { class: 'albo-wahl' + (!_alb.geschichte ? ' an' : ''), onclick: () => { _alb.geschichte = ''; _alb.i = 0; zu(); if (neu) neu(); } },
       el('b', {}, 'Alle Geschichten'), el('small', {}, 'Das ganze Album')),
     ...geschichten.map((g) => el('button', {
@@ -578,7 +578,7 @@ function albumStueck(figur, s, flach) {
       }, el('i', { class: 'alb-fadenhaken' }, x.erledigt ? '✓' : ''), el('span', {}, x.text))));
   }
   if (feld.form === 'spruch') {
-    /* Zitate stehen für sich. Unter jedem noch einmal „Sagt" zu schreiben,
+    /* Zitate stehen für sich. Unter jedem noch einmal „Sagt“ zu schreiben,
        wäre Beiwerk — die Anführungszeichen sagen es bereits. Nur wo der
        Feldname etwas HINZUFÜGT (die erste Zeile), steht er einmal darüber. */
     const eigenerName = feld.id !== 'zitat';
@@ -603,7 +603,7 @@ function albumStueck(figur, s, flach) {
         el('span', { class: 'alb-feldname' }, name),
         el('span', { class: 'alb-bandreihe' }, ...liste.map((z) => el('button', {
           class: 'alb-geschichte' + (_alb.geschichte === z ? ' an' : ''),
-          title: _alb.geschichte === z ? 'Wieder alle Figuren zeigen' : 'Nur die Figuren aus „' + z + '" zeigen',
+          title: _alb.geschichte === z ? 'Wieder alle Figuren zeigen' : 'Nur die Figuren aus „' + z + '“ zeigen',
           onclick: () => {
             _alb.geschichte = _alb.geschichte === z ? '' : z; _alb.suche = '';
             _alb.i = albumBlattVon(figur.id, albumSichtbare()) || 0;

@@ -257,3 +257,80 @@ test('Ein Widerspruch fällt auch bei alten Jahreszahlen auf', async () => {
   const h = figur(k, 'c', 'Caspar', { geboren: '1783-04-09', gestorben: '1845-04-09', alter: '62' });
   assert.equal(k.albumWidersprueche(h).length, 0, 'was stimmt, wird nicht angemeckert');
 });
+
+test('Ohne Namen steht ein deutscher Satz da, kein Fürwort', async () => {
+  const k = await frisch();
+  /* „Wo kam ihr zur Welt?" war kein deutscher Satz. Ohne Namen heißt es
+     „die Figur" — und wo das nicht passt (Dativ, Genitiv), steht der ganze
+     Satz hinter einem senkrechten Strich noch einmal. */
+  assert.equal(k.albumBeschriftung('Wo kam {du} zur Welt?', ''), 'Wo kam die Figur zur Welt?');
+  assert.equal(k.albumBeschriftung('Wo kam {du} zur Welt?', 'Nore'), 'Wo kam Nore zur Welt?');
+  assert.equal(k.albumBeschriftung('Was {du} wirklich fehlt | Was der Figur wirklich fehlt', ''), 'Was der Figur wirklich fehlt');
+  assert.equal(k.albumBeschriftung('Was {du} wirklich fehlt | Was der Figur wirklich fehlt', 'Nore'), 'Was Nore wirklich fehlt');
+  assert.equal(k.albumBeschriftung('Ohne Platzhalter', 'Nore'), 'Ohne Platzhalter');
+  assert.equal(k.albumBeschriftung('', 'Nore'), '');
+
+  /* Der Genitiv: Nores Vergangenheit — aber Hans' Vergangenheit */
+  assert.equal(k.albumBeschriftung('Wichtig in {du}s Vergangenheit | Wichtig in der Vergangenheit', 'Nore'), 'Wichtig in Nores Vergangenheit');
+  assert.equal(k.albumBeschriftung('Wichtig in {du}s Vergangenheit | Wichtig in der Vergangenheit', ''), 'Wichtig in der Vergangenheit');
+  assert.equal(k.albumGenitiv('Nore'), 'Nores');
+  assert.equal(k.albumGenitiv('Hans'), 'Hans’');
+  assert.equal(k.albumGenitiv('Max'), 'Max’');
+  assert.equal(k.albumGenitiv('Franz'), 'Franz’');
+  assert.equal(k.albumGenitiv('Fuß'), 'Fuß’');
+  assert.equal(k.albumGenitiv(''), '');
+  /* Ohne eigenen Satz dahinter fällt der Genitiv auf „der Figur" zurück */
+  assert.equal(k.albumBeschriftung('Bei {du}s Leuten', ''), 'Bei der Figur Leuten'.replace('Bei der Figur Leuten', 'Bei der Figur Leuten'));
+});
+
+test('Kein einziger Platzhalter und kein Fürwort bleibt stehen', async () => {
+  const k = await frisch();
+  const alles = [];
+  for (const f of k.ALBUM_FELDER) { alles.push(f.name); if (f.platz) alles.push(f.platz); if (f.hilfe) alles.push(f.hilfe); }
+  for (const q of k.ALBUM_FRAGEN) alles.push(q);
+
+  for (const roh of alles) {
+    for (const name of ['', 'Nore', 'Hans']) {
+      const fertig = k.albumBeschriftung(roh, name);
+      assert.ok(fertig.indexOf('{du}') < 0, 'Platzhalter blieb stehen: ' + fertig);
+      assert.ok(fertig.indexOf('|') < 0, 'der zweite Satz stand mit da: ' + fertig);
+      assert.ok(fertig.trim().length > 0 || !roh, 'leer geworden: ' + roh);
+    }
+    /* Ohne Namen darf nirgends „ihr" oder „sie" als Ersatz für den Namen
+       auftauchen, wo eigentlich ein Hauptwort stehen muss. */
+    const ohne = k.albumBeschriftung(roh, '');
+    assert.ok(!/\b(ihr|sie) (zur Welt|jetzt|trägt|tut|brennt)\b/.test(ohne), 'Fürwort statt Hauptwort: ' + ohne);
+  }
+});
+
+test('Beschriftungen setzen keine Figur männlich oder weiblich fest', async () => {
+  const k = await frisch();
+  /* Eine Figur kann alles sein. Beschriftungen, die „ihr" oder „ein anderer"
+     behaupten, lesen sich bei der Hälfte der Figuren falsch. */
+  const verdaechtig = /\b(Ihr|Ihre|ihres|ein anderer wurde|eine andere wurde)\b/;
+  for (const f of k.ALBUM_FELDER) {
+    assert.ok(!verdaechtig.test(f.name), 'Feldname legt ein Geschlecht fest: ' + f.name);
+    if (f.platz) assert.ok(!verdaechtig.test(f.platz), 'Platzhalter legt ein Geschlecht fest: ' + f.platz);
+  }
+  for (const q of k.ALBUM_FRAGEN) assert.ok(!verdaechtig.test(q), 'Frage legt ein Geschlecht fest: ' + q);
+});
+
+test('Kein unsinniges Alter für eine Figur, die vor Jahrhunderten geboren wurde', async () => {
+  const k = await frisch();
+  /* „Im Feld steht 48, aus dem Geburtsdatum wären es 243" — gerechnet gegen
+     HEUTE. Bei einer Figur von 1783, die noch lebt, ist heute aber der
+     falsche Bezugspunkt: die Geschichte spielt nicht jetzt. */
+  const lebt = figur(k, 'a', 'Halvar', { geboren: '1783-04-09', alter: '48' });
+  assert.equal(k.albumWidersprueche(lebt).length, 0, 'kein Wort über 243 Jahre');
+
+  /* Steht ein Todestag da, ist der Bezugspunkt richtig — dann darf gemeckert werden */
+  const tot = figur(k, 'b', 'Jens', { geboren: '1783-04-09', gestorben: '1831-06-02', alter: '20' });
+  assert.ok(k.albumWidersprueche(tot).some((t) => t.indexOf('48') >= 0), 'mit Todestag stimmt die Rechnung');
+  const passt = figur(k, 'c', 'Ilva', { geboren: '1783-04-09', gestorben: '1831-06-02', alter: '48' });
+  assert.equal(k.albumWidersprueche(passt).length, 0, 'was stimmt, wird nicht angemeckert');
+
+  /* Bei einer heutigen Figur greift die Prüfung wie vorher */
+  const heute = k.kalHeute().slice(0, 4);
+  const jung = figur(k, 'd', 'Bo', { geboren: (Number(heute) - 20) + '-04-09', alter: '40' });
+  assert.ok(k.albumWidersprueche(jung).some((t) => t.indexOf('20') >= 0), 'hier ist heute der richtige Bezugspunkt');
+});

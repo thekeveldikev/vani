@@ -28,7 +28,7 @@ const ALBUM_GRUPPEN = [
   ['kopf', 'Der Kopf der Seite'],
   ['aussehen', 'Wie sie aussieht'],
   ['wesen', 'Was für ein Mensch das ist'],
-  ['leben', 'Was ihr geschehen ist'],
+  ['leben', 'Was geschehen ist'],
   ['stimme', 'Wie sie klingt'],
   ['welt', 'Wo sie hingehört'],
   ['rand', 'An den Rand geschrieben']
@@ -55,7 +55,7 @@ const ALBUM_FELDER = [
   { id: 'muttermale', gruppe: 'aussehen', name: 'Muttermale, Sommersprossen', form: 'zeile' },
   { id: 'zeichnung', gruppe: 'aussehen', name: 'Tätowierungen, Zeichen', form: 'liste', mehrfach: true },
   { id: 'zaehne', gruppe: 'aussehen', name: 'Zähne, Lächeln', form: 'zeile' },
-  { id: 'gang', gruppe: 'aussehen', name: 'Gang, Haltung', form: 'zeile', platz: 'Wie {du} sich bewegt' },
+  { id: 'gang', gruppe: 'aussehen', name: 'Gang, Haltung', form: 'zeile', platz: 'Wie sich {du} bewegt' },
   { id: 'kleidung', gruppe: 'aussehen', name: 'Kleidung', form: 'zeile', platz: 'Was {du} trägt — und was nie' },
   { id: 'getragen', gruppe: 'aussehen', name: 'Trägt immer bei sich', form: 'liste', mehrfach: true, platz: 'Was in den Taschen ist', hilfe: 'Drei Gegenstände sagen mehr über einen Menschen als drei Absätze.' },
   { id: 'schmuck', gruppe: 'aussehen', name: 'Schmuck', form: 'zeile' },
@@ -68,9 +68,9 @@ const ALBUM_FELDER = [
   { id: 'leidenschaft', gruppe: 'wesen', name: 'Leidenschaften', form: 'wolke', mehrfach: true, platz: 'Wofür {du} brennt' },
   { id: 'angst', gruppe: 'wesen', name: 'Hat Angst vor', form: 'karte', mehrfach: true, platz: 'Wovor?' },
   { id: 'fehler', gruppe: 'wesen', name: 'Größter Fehler', form: 'karte', platz: 'Was {du} immer wieder falsch macht' },
-  { id: 'luege', gruppe: 'wesen', name: 'Die Lüge, die sie glaubt', form: 'karte', platz: 'Was {du} über sich für wahr hält — und was nicht stimmt', hilfe: 'Der stärkste Motor einer Figur: eine Überzeugung über sich selbst, die falsch ist.' },
+  { id: 'luege', gruppe: 'wesen', name: 'Die Lüge über sich selbst', form: 'karte', platz: 'Was {du} über sich für wahr hält — und was nicht stimmt', hilfe: 'Der stärkste Motor einer Figur: eine Überzeugung über sich selbst, die falsch ist.' },
   { id: 'will', gruppe: 'wesen', name: 'Will', form: 'karte', platz: 'Was {du} zu bekommen versucht' },
-  { id: 'braucht', gruppe: 'wesen', name: 'Braucht in Wahrheit', form: 'karte', platz: 'Was {du} wirklich fehlt', hilfe: 'Zwischen „will" und „braucht" liegt die ganze Geschichte.' },
+  { id: 'braucht', gruppe: 'wesen', name: 'Braucht in Wahrheit', form: 'karte', platz: 'Was {du} wirklich fehlt | Was der Figur wirklich fehlt', hilfe: 'Zwischen „will“ und „braucht“ liegt die ganze Geschichte.' },
   { id: 'bewundert', gruppe: 'wesen', name: 'Bewundert', form: 'liste', mehrfach: true, verweis: true, platz: 'Wen?' },
   { id: 'verachtet', gruppe: 'wesen', name: 'Verachtet', form: 'liste', mehrfach: true, verweis: true },
   { id: 'unbeobachtet', gruppe: 'wesen', name: 'Wenn niemand zusieht', form: 'karte', platz: 'Was {du} allein tut', hilfe: 'Der ehrlichste Ort einer Figur.' },
@@ -81,32 +81,32 @@ const ALBUM_FELDER = [
   { id: 'aberglaube', gruppe: 'wesen', name: 'Aberglaube', form: 'zeile' },
 
   /* ---------- Leben ---------- */
-  { id: 'ereignis', gruppe: 'leben', name: 'Wichtig in {du}s Vergangenheit', form: 'liste', mehrfach: true, platz: 'Was ist geschehen?', hilfe: 'Was vor der Geschichte lag und bis heute nachwirkt.' },
-  { id: 'wendepunkt', gruppe: 'leben', name: 'Der Wendepunkt', form: 'karte', platz: 'Der Tag, an dem {du} ein anderer wurde' },
+  { id: 'ereignis', gruppe: 'leben', name: 'Wichtig in {du}s Vergangenheit | Wichtig in der Vergangenheit', form: 'liste', mehrfach: true, platz: 'Was ist geschehen?', hilfe: 'Was vor der Geschichte lag und bis heute nachwirkt.' },
+  { id: 'wendepunkt', gruppe: 'leben', name: 'Der Wendepunkt', form: 'karte', platz: 'Der Tag, an dem {du} ein anderer Mensch wurde' },
   { id: 'spaet', gruppe: 'leben', name: 'Zu spät verstanden', form: 'karte', platz: 'Was {du} erst begriff, als es nichts mehr half' },
   { id: 'geweint', gruppe: 'leben', name: 'Zuletzt geweint, als', form: 'zeile' },
   { id: 'narbe', gruppe: 'leben', name: 'Die Wunde, über die nicht geredet wird', form: 'karte' },
-  { id: 'bogenAnfang', gruppe: 'leben', name: 'Am Anfang ist {du}', form: 'karte', platz: 'Wie steht {du} zu Beginn da?', hilfe: 'Die eine Hälfte des Bogens. Zusammen mit „Am Ende" steht die ganze Wandlung auf einer Zeile.' },
+  { id: 'bogenAnfang', gruppe: 'leben', name: 'Am Anfang ist {du}', form: 'karte', platz: 'Wie steht {du} zu Beginn da?', hilfe: 'Die eine Hälfte des Bogens. Zusammen mit „Am Ende“ steht die ganze Wandlung auf einer Zeile.' },
   { id: 'bogenEnde', gruppe: 'leben', name: 'Am Ende ist {du}', form: 'karte', platz: 'Und wie am Schluss?' },
   { id: 'status', gruppe: 'leben', name: 'Wie es jetzt um {du} steht', form: 'etikett', platz: 'lebt · verschollen · gestorben · niemand weiß es' },
-  { id: 'familie', gruppe: 'leben', name: 'Familie', form: 'liste', mehrfach: true, verweis: true, platz: 'Wer gehört dazu?', hilfe: 'Schreib die Verwandtschaft dazu: „Mutter", „Bruder", „Ziehvater". Wer schon im Album steht, wird erkannt.' },
+  { id: 'familie', gruppe: 'leben', name: 'Familie', form: 'liste', mehrfach: true, verweis: true, platz: 'Wer gehört dazu?', hilfe: 'Schreib die Verwandtschaft dazu: „Mutter“, „Bruder“, „Ziehvater“. Wer schon im Album steht, wird erkannt.' },
   { id: 'naehe', gruppe: 'leben', name: 'Steht nahe', form: 'liste', mehrfach: true, verweis: true, platz: 'Freunde, Feinde, alles dazwischen' },
 
   /* ---------- Stimme ---------- */
   { id: 'zitat', gruppe: 'stimme', name: 'Sagt', form: 'spruch', mehrfach: true, platz: 'Ein Satz, wie nur {du} ihn sagt', hilfe: 'So viele du willst. Sie stehen groß und schön auf der Seite.' },
   { id: 'ersteZeile', gruppe: 'stimme', name: 'Die erste Zeile', form: 'spruch', platz: 'Das Erste, was man {du} sagen hört', hilfe: 'Der erste Satz einer Figur ist ihr Versprechen an den Leser.' },
-  { id: 'sagtNie', gruppe: 'stimme', name: 'Sagt nie', form: 'karte', platz: 'Ein Wort, ein Satz — der nie über {du}s Lippen kommt' },
+  { id: 'sagtNie', gruppe: 'stimme', name: 'Sagt nie', form: 'karte', platz: 'Ein Wort, ein Satz — der nie über {du}s Lippen kommt | Ein Wort, ein Satz — der nie über die Lippen kommt' },
   { id: 'stimme', gruppe: 'stimme', name: 'Stimme', form: 'zeile', platz: 'Hoch, rau, leise, zu schnell?' },
   { id: 'redensart', gruppe: 'stimme', name: 'Redensarten', form: 'wolke', mehrfach: true, platz: 'Was {du} ständig sagt' },
 
   /* ---------- Welt ---------- */
-  { id: 'geschichte', gruppe: 'welt', name: 'Kommt vor in', form: 'band', mehrfach: true, platz: 'In welcher Geschichte?', hilfe: 'Frei hineinschreiben — Titel, Arbeitstitel, „das mit dem Deich".' },
+  { id: 'geschichte', gruppe: 'welt', name: 'Kommt vor in', form: 'band', mehrfach: true, platz: 'In welcher Geschichte?', hilfe: 'Frei hineinschreiben — Titel, Arbeitstitel, „das mit dem Deich“.' },
   { id: 'rolle', gruppe: 'welt', name: 'Rolle in der Geschichte', form: 'etikett', platz: 'Hauptfigur, Widersacher, die Stimme der Vernunft …' },
-  { id: 'ort', gruppe: 'welt', name: 'Ihr Ort', form: 'zeile', platz: 'Wo man {du} suchen würde' },
+  { id: 'ort', gruppe: 'welt', name: 'Der eigene Ort', form: 'zeile', platz: 'Wo man {du} suchen würde' },
   { id: 'beruf', gruppe: 'welt', name: 'Tut den ganzen Tag', form: 'zeile', platz: 'Beruf, Handwerk, Beschäftigung' },
   { id: 'jahreszeit', gruppe: 'welt', name: 'Jahreszeit', form: 'etikett', platz: 'Welche Jahreszeit ist {du}?' },
   { id: 'klang', gruppe: 'welt', name: 'Klingt nach', form: 'zeile', platz: 'Ein Geräusch, ein Instrument, ein Lied' },
-  { id: 'bleibt', gruppe: 'welt', name: 'Was bleibt, wenn sie geht', form: 'karte', platz: 'Was im Raum zurückbleibt' },
+  { id: 'bleibt', gruppe: 'welt', name: 'Was bleibt, wenn {du} geht | Was bleibt, wenn die Figur geht', form: 'karte', platz: 'Was im Raum zurückbleibt' },
   { id: 'faden', gruppe: 'welt', name: 'Offene Fäden', form: 'faeden', mehrfach: true, platz: 'Was hier angelegt ist und noch eingelöst werden muss', hilfe: 'Der Schlüssel in der Schublade, der Cousin in Marseille, die Warnung vor dem Obstgarten. Alles, was du gelegt hast, ist ein Versprechen an den Leser. Setz einen Haken davor, sobald es eingelöst ist.' },
 
   /* ---------- Rand ---------- */
@@ -116,10 +116,30 @@ const ALBUM_FELDER = [
 const ALBUM_FELD_IDS = ALBUM_FELDER.map((f) => f.id);
 function albumFeld(id) { return ALBUM_FELDER.find((f) => f.id === id) || null; }
 /* Der Name der Figur steht im Feldnamen, sobald es einen gibt. */
+/* Steht ein Name da, wird er eingesetzt: aus „Wo kam {du} zur Welt?“ wird
+   „Wo kam Nore zur Welt?“. Steht keiner da, kann man nicht einfach ein
+   Fürwort einsetzen — „Wo kam ihr zur Welt?“ ist kein deutscher Satz.
+   Ersatz ist deshalb „die Figur“, und wo das nicht passt (Dativ, Genitiv),
+   steht hinter einem senkrechten Strich der ganze Satz noch einmal, so wie
+   er ohne Namen heißen muss:
+
+     'Was {du} wirklich fehlt | Was der Figur wirklich fehlt'
+
+   Kein Grammatikapparat, sondern der zweite Satz gleich neben dem ersten. */
 function albumBeschriftung(text, name) {
+  const roh = String(text == null ? '' : text);
+  const strich = roh.indexOf('|');
+  const mit = (strich < 0 ? roh : roh.slice(0, strich)).trim();
+  const ohne = strich < 0 ? '' : roh.slice(strich + 1).trim();
   const n = String(name || '').trim();
-  return String(text || '').replace(/\{du\}/g, n || 'ihr');
+  if (!n) {
+    if (ohne) return ohne;
+    return mit.split('{du}s').join('der Figur').split('{du}').join('die Figur');
+  }
+  return mit.split('{du}s').join(albumGenitiv(n)).split('{du}').join(n);
 }
+/* Nores Vergangenheit — aber Hans' Vergangenheit, nicht Hanss. */
+function albumGenitiv(name) { return genitiv(name); }
 
 /* ----- Der Wortschatz für Wesenszüge -----
    Von den geläufigen bis zu den seltenen. Alles wählbar, eigene jederzeit
@@ -271,7 +291,7 @@ function albumFehlt(f, zufall) {
 }
 
 /* ----- Verweise: wer im Album schon steht ----- */
-/* Ein Eintrag darf „Mutter — Ilva" heißen. Erkannt wird, was hinter dem
+/* Ein Eintrag darf „Mutter — Ilva“ heißen. Erkannt wird, was hinter dem
    Gedankenstrich steht oder der ganze Eintrag. */
 function albumVerweisName(eintrag) {
   const s = String(eintrag || '').trim();
@@ -375,8 +395,8 @@ function albumOffeneFaeden(liste) {
 }
 
 /* ----- Wo diese Figur in deinen eigenen Texten vorkommt -----
-   Der Name wird gesucht, wie er dasteht — als ganzes Wort, damit „Nore" nicht
-   in „Norwegen" anschlägt. Gezählt wird je Text, nicht je Fundstelle. */
+   Der Name wird gesucht, wie er dasteht — als ganzes Wort, damit „Nore“ nicht
+   in „Norwegen“ anschlägt. Gezählt wird je Text, nicht je Fundstelle. */
 const ALBUM_TEXTTYPEN = ['blatt', 'seite', 'szene', 'schnipsel', 'heft', 'projekt', 'faden'];
 /* Ohne regulaeren Ausdruck: ein Name kann Punkte, Klammern oder Apostrophe
    enthalten (O'Brien, St. Clair), und die muessten sonst alle entschaerft
@@ -388,7 +408,7 @@ function albumIstWortzeichen(c) {
   return c.toLowerCase() !== c.toUpperCase();
 }
 /* Die Stelle, an der der Name als GANZES Wort steht — sonst schlaegt
-   „Nore" auch in „Norwegen" an. Gibt -1, wenn er nicht vorkommt. Pur. */
+   „Nore“ auch in „Norwegen“ an. Gibt -1, wenn er nicht vorkommt. Pur. */
 function albumFundstelle(text, name) {
   const t = String(text || '').toLowerCase();
   const n = String(name || '').trim().toLowerCase();
@@ -438,12 +458,20 @@ function albumWidersprueche(f, liste) {
   if (g && t && typeof kalZeit === 'function' && kalGueltig(g) && kalGueltig(t) && kalZeit(t) < kalZeit(g)) {
     raus.push('Gestorben vor der Geburt.');
   }
-  /* Ein Alter, das nicht zum Geburtsdatum passt */
+  /* Ein Alter, das nicht zum Geburtsdatum passt.
+
+     Gerechnet wird gegen den Todestag — und nur wenn keiner dasteht, gegen
+     heute. Bei einer Figur, die 1783 geboren wurde und noch lebt, ist
+     „heute“ aber der falsche Bezugspunkt: die Geschichte spielt ja nicht
+     jetzt. Deshalb schweigt VANI, sobald dabei ein unmögliches Alter
+     herauskommt — dann stimmt nicht das Feld nicht, sondern die Annahme. */
   if (g && felder.alter && typeof kalAlter === 'function' && kalGueltig(g)) {
     const zahl = parseInt(String(felder.alter).replace(/\D+/g, ''), 10);
-    const a = kalAlter(g, t && kalGueltig(t) ? t : kalHeute());
-    if (Number.isFinite(zahl) && a && Math.abs(a.jahre - zahl) > 1) {
-      raus.push('Im Feld steht „' + felder.alter + '", aus dem Geburtsdatum wären es ' + a.jahre + '.');
+    const tot = t && kalGueltig(t);
+    const a = kalAlter(g, tot ? t : kalHeute());
+    const glaubhaft = a && (tot || a.jahre <= 120);
+    if (Number.isFinite(zahl) && glaubhaft && Math.abs(a.jahre - zahl) > 1) {
+      raus.push('Im Feld steht „' + felder.alter + '“, aus dem Geburtsdatum wären es ' + a.jahre + '.');
     }
   }
   /* Ein Status, der dem Todesdatum widerspricht */
@@ -453,7 +481,7 @@ function albumWidersprueche(f, liste) {
   for (const feldId of ['familie', 'naehe', 'bewundert', 'verachtet', 'schuldet']) {
     for (const e of felder[feldId] || []) {
       if (albumVerweisName(e).toLowerCase() === String(f.name || '').trim().toLowerCase() && f.name) {
-        raus.push('Verweist auf sich selbst: „' + e + '".');
+        raus.push('Verweist auf sich selbst: „' + e + '“.');
       }
     }
   }

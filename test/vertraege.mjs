@@ -769,3 +769,42 @@ test('Hover-Vertrag: was nicht am Zeiger hängt, bleibt draußen', () => {
     assert.ok(!zeile.includes('hover: hover'), noetig + ' steckt in der Hover-Wache und wäre auf dem iPad weg');
   }
 });
+
+test('Stück-Vertrag: was auf der Doppelseite steht, liegt im Fluss', () => {
+  /* `.alb-band` gab es zweimal: als Zeile „Kommt vor in" und als
+     Lesebändchen. Die Bändchen-Regel machte die Zeile absolut positioniert,
+     und die Geschichten schwebten quer über den anderen Einträgen.
+
+     Deshalb hier schwarz auf weiß: keines der Stücke, die auf der Seite
+     stehen, darf jemals absolut positioniert werden. Das Bändchen heißt
+     jetzt `.alb-leseband` und hängt am Block, nicht am Text. */
+  const css = lies('src/10-style.css');
+  const zeilen = css.split('\n');
+  const stuecke = ['alb-band', 'alb-zeile', 'alb-liste', 'alb-karte', 'alb-notiz', 'alb-wolke',
+    'alb-sprueche', 'alb-faeden', 'alb-zeitleiste', 'alb-frage', 'alb-zettelbrett', 'alb-motto',
+    'alb-etikettreihe', 'alb-stuecke', 'alb-seiteninhalt', 'alb-seitenfuss'];
+  const fehler = [];
+  zeilen.forEach((z, i) => {
+    const sel = z.split('{')[0];
+    if (!z.includes('{')) return;
+    for (const k of stuecke) {
+      /* Nur wenn die Klasse das ZIEL der Regel ist, nicht als Vorfahre */
+      const endet = sel.trim().endsWith('.' + k) || sel.includes('.' + k + ',') || sel.includes('.' + k + ' {');
+      if (!endet) continue;
+      let t = 0, txt = '';
+      for (let j = i; j < zeilen.length; j++) { txt += zeilen[j]; t += (zeilen[j].split('{').length - 1) - (zeilen[j].split('}').length - 1); if (t <= 0) break; }
+      if (txt.replace(/\s/g, '').includes('position:absolute') || txt.replace(/\s/g, '').includes('position:fixed')) {
+        fehler.push((i + 1) + ': ' + sel.trim());
+      }
+    }
+  });
+  assert.equal(fehler.length, 0, 'Stück schwebt über der Seite statt im Fluss zu liegen:\n' + fehler.join('\n'));
+});
+
+test('Stück-Vertrag: das Lesebändchen heißt nicht wie ein Feld', () => {
+  const css = lies('src/10-style.css');
+  const buch = lies('src/62b-album-buch.js');
+  assert.ok(css.includes('.alb-leseband'), 'das Bändchen hat einen eigenen Namen');
+  assert.ok(buch.includes("'alb-leseband'"), 'und das Buch vergibt ihn auch');
+  assert.ok(!buch.includes("class: 'alb-band'"), 'das Bändchen trägt nicht mehr den Namen der Feldzeile');
+});

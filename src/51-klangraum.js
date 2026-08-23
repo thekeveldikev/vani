@@ -83,7 +83,7 @@ function baueAmbiencePult(kompakt, statusNeu) {
         if (wahl === 'name') {
           const n = await eingabe({ titel: 'Der Klang heißt jetzt …', wert: a.name });
           if (n) { a.doc.titel = n; speichere(a.doc); zeichne(); }
-        } else if (wahl === 'weg' && await frage('„' + a.name + '" entfernen? Die Aufnahme wird gelöscht.', { ja: 'Entfernen', gefahr: true })) {
+        } else if (wahl === 'weg' && await frage('„' + a.name + '“ entfernen? Die Aufnahme wird gelöscht.', { ja: 'Entfernen', gefahr: true })) {
           ambienceAus(a.id);
           const m = { ...(D.einst.ambience || {}) }; delete m[a.id];
           await ambienceMischungAnwenden(m);
@@ -110,13 +110,13 @@ function baueAmbiencePult(kompakt, statusNeu) {
     const alle = alleAmbiences();
     zaehler.textContent = alle.length ? alle.length + ' Aufnahmen' : '';
     if (!alle.length) {
-      liste.append(el('div', { class: 'leer klein' }, 'Noch keine Aufnahmen da. Über „Eigenen Klang" holst du dir welche herein.'));
+      liste.append(el('div', { class: 'leer klein' }, 'Noch keine Aufnahmen da. Über „Eigenen Klang“ holst du dir welche herein.'));
       return;
     }
     const treffer = !filter ? alle : alle.filter((a) =>
       (a.name || '').toLowerCase().includes(filter) || (a.kat || '').toLowerCase().includes(filter));
     if (!treffer.length) {
-      liste.append(el('div', { class: 'leer klein' }, 'Nichts gefunden zu „' + suche.value.trim() + '".'));
+      liste.append(el('div', { class: 'leer klein' }, 'Nichts gefunden zu „' + suche.value.trim() + '“.'));
       return;
     }
     if (filter) zaehler.textContent = treffer.length + ' von ' + alle.length;
@@ -196,13 +196,13 @@ function baueKlangbilder(statusNeu, neuZeichnen) {
         b.gewebt = { ...(D.einst.mischung || {}) };
         b.fein = JSON.parse(JSON.stringify(D.einst.ambienceFein || {}));
         b.lautstaerke = begrenze(D.einst.lautstaerke, 0, 1, .5);
-        speichere(b); toast('„' + b.titel + '" merkt sich jetzt diese Mischung.');
+        speichere(b); toast('„' + b.titel + '“ merkt sich jetzt diese Mischung.');
       } else if (wahl === 'los') {
         b.orte = []; speichereStill(b); toast('Bindungen gelöst.'); if (neuZeichnen) neuZeichnen();
       } else if (wahl === 'binden') {
-        const ziel = await waehleDokument(null, 'Woran soll „' + b.titel + '" hängen?');
-        if (ziel) { klangbildBinden(b, ziel.id); toast('Hängt jetzt an „' + docName(ziel) + '".'); if (neuZeichnen) neuZeichnen(); }
-      } else if (wahl === 'weg' && await frage('„' + b.titel + '" löschen?', { ja: 'Löschen', gefahr: true })) {
+        const ziel = await waehleDokument(null, 'Woran soll „' + b.titel + '“ hängen?');
+        if (ziel) { klangbildBinden(b, ziel.id); toast('Hängt jetzt an „' + docName(ziel) + '“.'); if (neuZeichnen) neuZeichnen(); }
+      } else if (wahl === 'weg' && await frage('„' + b.titel + '“ löschen?', { ja: 'Löschen', gefahr: true })) {
         await loesche(b.id, true); if (neuZeichnen) neuZeichnen();
       }
     });
@@ -326,7 +326,7 @@ function baueKlangFuss(statusNeu, neuZeichnen) {
       el('button', { class: 'knopf zart', onclick: async () => {
         if ((D.einst.lautstaerke || 0) <= 0) { setzeLautstaerke(.5); laut.value = '50'; }
         const ok = await audioFreigeben({ probe: true });
-        toast(ok ? 'Du solltest jetzt einen hellen Prüfton hören.' : 'Der Klang ist noch gesperrt. Tippe auf „Klang neu wecken".');
+        toast(ok ? 'Du solltest jetzt einen hellen Prüfton hören.' : 'Der Klang ist noch gesperrt. Tippe auf „Klang neu wecken“.');
         setTimeout(statusNeu, 120);
       } }, 'Ton prüfen'),
       el('button', { class: 'knopf zart', onclick: async () => {
@@ -347,22 +347,22 @@ async function zeigeKlangVorrat(neuZeichnen) {
     el('div', { class: 'kartenkopf' }, el('span', { html: ik('klang') }), 'KLANGVORRAT'),
     el('h2', {}, 'Was schon im Gerät liegt'),
     el('p', { style: 'font-size:14px;color:var(--blass);line-height:1.6' },
-      stand.da.length + (stand.da.length === 1 ? ' Aufnahme liegt' : ' Aufnahmen liegen') + ' hier und brauchen kein Internet mehr (' + mb + ' MB). '
-      + (stand.fehlt.length ? stand.fehlt.length + ' warten noch im Netz.' : 'Es fehlt nichts.')),
+      zaehl(stand.da.length, 'Aufnahme liegt', 'Aufnahmen liegen', 'Eine') + ' hier und braucht' + (stand.da.length === 1 ? '' : 'en') + ' kein Internet mehr (' + mb + ' MB). '
+      + (stand.fehlt.length ? zaehl(stand.fehlt.length, 'wartet', 'warten', 'Eine') + ' noch im Netz.' : 'Es fehlt nichts.')),
     el('div', { class: 'reihe', style: 'flex-wrap:wrap;justify-content:flex-start' },
       stand.fehlt.length ? el('button', { class: 'knopf voll', onclick: async () => {
         zu();
-        toast('Hole ' + stand.fehlt.length + ' Aufnahmen …', 4000);
+        toast('Hole ' + zaehl(stand.fehlt.length, 'Aufnahme', 'Aufnahmen', 'eine') + ' …', 4000);
         let ok = 0;
         for (const id of stand.fehlt) { try { await ambienceBlob(id); ok++; } catch (e) {} }
-        toast(ok + ' Aufnahmen liegen jetzt im Gerät. Ab jetzt auch offline.', 5000);
+        toast(zaehl(ok, 'Aufnahme liegt', 'Aufnahmen liegen', 'Eine') + ' jetzt im Gerät. Ab jetzt auch offline.', 5000);
         if (neuZeichnen) neuZeichnen();
       } }, 'Alle holen (' + stand.fehlt.length + ')') : null,
       stand.bytes ? el('button', { class: 'knopf zart', onclick: async () => {
         if (!await frage('Alle geholten Aufnahmen aus dem Gerät nehmen? Sie lassen sich jederzeit wieder holen.', { ja: 'Platz schaffen', gefahr: true })) return;
         await ambienceAllesAus();
         const weg = await ambienceVorratLeeren();
-        zu(); toast(weg + ' Aufnahmen entfernt.');
+        zu(); toast(zaehl(weg, 'Aufnahme entfernt.', 'Aufnahmen entfernt.', 'Eine'));
         if (neuZeichnen) neuZeichnen();
       } }, 'Platz schaffen') : null,
       el('button', { class: 'knopf', onclick: () => zu() }, 'Fertig')));

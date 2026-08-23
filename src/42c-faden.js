@@ -69,7 +69,7 @@ RENDER.faden = function (haupt) {
     const liste = alle();
     if (!liste.length) {
       innen.append(el('div', { class: 'leer' }, 'Der Faden liegt noch woanders.',
-        el('div', { class: 'klein' }, 'Er kommt als private Datei zu dir — Feinheiten → „Sicher ist sicher" → einlesen. Danach läuft er hier weiter.')));
+        el('div', { class: 'klein' }, 'Er kommt als private Datei zu dir — Feinheiten → „Sicher ist sicher“ → einlesen. Danach läuft er hier weiter.')));
       return;
     }
     if (zeigeAb > 0) {

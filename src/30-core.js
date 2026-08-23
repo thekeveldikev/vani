@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.34.0';
+const APP_VERSION = '5.35.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -30,7 +30,7 @@ const uid = () => (globalThis.crypto && typeof globalThis.crypto.randomUUID === 
   : Date.now().toString(36) + Math.random().toString(36).slice(2, 11);
 
 /* Kinder anhängen wie el(): null und false werden übersprungen. `.append(null)` würde sonst
-   das Wort „null" in die Seite schreiben — genau das ist im Salon passiert. */
+   das Wort „null“ in die Seite schreiben — genau das ist im Salon passiert. */
 function anfuegen(ziel, ...kinder) {
   for (const kind of kinder.flat(9)) { if (kind == null || kind === false) continue; ziel.append(kind.nodeType ? kind : document.createTextNode(kind)); }
   return ziel;
@@ -83,6 +83,29 @@ const TAGE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
 function tagKey(ts) { const d = new Date(ts || Date.now()); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 function fmtDatum(ts) { const d = new Date(ts); return TAGE[d.getDay()] + ', ' + d.getDate() + '. ' + MONATE[d.getMonth()]; }
 function fmtZeit(ts) { const d = new Date(ts); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+/* ----- Zaehlen auf Deutsch -----
+   „1 Wörter“ ist kein Deutsch, und „1 Aufnahme liegt hier und brauchen kein
+   Internet“ auch nicht. Wer eine Zahl in einen Satz stellt, muss die
+   Einzahl mitdenken — deshalb steht sie hier an einer Stelle.
+
+   `zaehl(3, 'Wort', 'Wörter')` → „3 Wörter“
+   `zaehl(1, 'Wort', 'Wörter')` → „1 Wort“
+   `zaehl(1, 'Seite', 'Seiten', 'Eine')` → „Eine Seite“ */
+function zaehl(n, einzahl, mehrzahl, eins) {
+  const z = Number(n);
+  const zahl = Number.isFinite(z) ? z : 0;
+  if (zahl === 1) return (eins == null ? '1' : eins) + ' ' + einzahl;
+  return zahl.toLocaleString('de-DE') + ' ' + mehrzahl;
+}
+
+/* ----- Der Genitiv eines Namens -----
+   Nores Stimme — aber Hans’ Stimme, nicht Hanss. */
+function genitiv(name) {
+  const n = String(name == null ? '' : name).trim();
+  if (!n) return '';
+  return 'sxzß'.indexOf(n[n.length - 1].toLowerCase()) >= 0 ? n + '’' : n + 's';
+}
+
 function vorZeit(ts) {
   const m = Math.max(0, Math.round((Date.now() - ts) / 60000));
   if (m < 2) return 'gerade eben';
@@ -125,7 +148,10 @@ function klugeZeichen(t, s) {
   if (letztes === '"' || letztes === "'") {
     const vorher = s >= 2 ? t[s - 2] : '';
     const oeffnend = !vorher || /[\s(\[{\n>»–-]/.test(vorher);
-    const ersatz = letztes === '"' ? (oeffnend ? '„' : '"') : (oeffnend ? '‚' : '’');
+    /* Beim Öffnen „, beim Schließen “ — nicht das gerade Zeichen. Vorher
+       stand am Satzende ein Schreibmaschinen-Strich neben einer gesetzten
+       Anführung, und das sieht in jedem Text falsch aus. */
+    const ersatz = letztes === '"' ? (oeffnend ? '„' : '“') : (oeffnend ? '‚' : '’');
     return { text: t.slice(0, s - 1) + ersatz + t.slice(s), caret: s };
   }
   return null;
@@ -227,6 +253,8 @@ const IK = {
   lasso: '<path d="M12 4c4.4 0 8 2 8 4.8S16.4 13.6 12 13.6 4 11.6 4 8.8 7.6 4 12 4Z" stroke-dasharray="3 2.2"/><path d="M8.5 13.2c-.6 2.2-.2 4.3 1.4 6.3"/><circle cx="10.4" cy="20" r="1.2"/>',
   gliederung: '<path d="M5 6h3M10 6h9"/><path d="M7 11h3M12 11h7"/><path d="M7 16h3M12 16h7"/><path d="M5 20h3M10 20h9"/>',
   album: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15"/><path d="M9 7.5h5M9 11h6"/><path d="M16.5 3v6l-1.7-1.4L13 9V3"/>',
+  /* Das Kabinett: ein Schrank mit drei Faechern und Griffen. */
+  kabinett: '<rect x="3.5" y="3.5" width="17" height="17" rx="1.6"/><path d="M3.5 9h17M3.5 14.5h17"/><path d="M10.5 6.2h3M10.5 11.7h3M10.5 17.2h3"/>',
   mikro: '<rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M6 11.5a6 6 0 0 0 12 0"/><path d="M12 17.5V21M9 21h6"/>',
   schnipsel: '<path d="M21 12a8 8 0 0 1-8 8c-1.6 0-3-.4-4.3-1L4 20l1.2-4A8 8 0 1 1 21 12Z"/>',
   hefte: '<path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4Z"/><path d="M5 4v14"/><path d="M9 8h6M9 11.5h6"/>',
@@ -1111,7 +1139,7 @@ document.addEventListener('click', (e) => {
   e.preventDefault(); e.stopPropagation();
   const ziel = findeNachTitel(v.dataset.ziel);
   if (ziel) oeffneDoc(ziel);
-  else toast('„' + v.dataset.ziel + '" gibt es noch nicht. Vielleicht bald.');
+  else toast('„' + v.dataset.ziel + '“ gibt es noch nicht. Vielleicht bald.');
 });
 
 /* ----- Schlagworte: #wort im Text, über alles gezählt ----- */
@@ -1134,7 +1162,7 @@ function schlagwortIndex(docs, max = 40) {
 }
 
 /* ----- Startauftrag aus der Adresse: geteilter Text oder Schnellstart -----
-   Android kann Text nach VANI teilen; das Home-Icon kann mit „Neuer Schnipsel"
+   Android kann Text nach VANI teilen; das Home-Icon kann mit „Neuer Schnipsel“
    aufgehen. Beides kommt als Suchteil der Adresse an und wird sofort wieder
    entfernt — die Adresse bleibt die eine Hauptadresse. */
 function startAuftrag(search) {

@@ -62,7 +62,7 @@ RENDER.blaetter = function (haupt) {
       b.gepinnt ? el('span', { class: 'blatt-nadel', html: ik('pin') }) : null,
       el('div', { class: 'btitel serif' }, b.titel || erste.slice(0, 60) || 'Ohne Titel'),
       el('div', { class: 'bprobe' }, (b.text || '').trim().replace(/\s+/g, ' ').slice(0, 140) || 'Noch leer.'),
-      el('div', { class: 'bfuss' }, (worteZahl ? worteZahl.toLocaleString('de-DE') + ' Wörter · ' : '') + vorZeit(b.geaendert)
+      el('div', { class: 'bfuss' }, (worteZahl ? zaehl(worteZahl, 'Wort', 'Wörter') + ' · ' : '') + vorZeit(b.geaendert)
         + (worteZahl > 60 ? ' · ' + Math.max(1, Math.round(worteZahl / 200)) + ' Min.' : ''))
     );
     langdruck(karte, async () => {

@@ -122,7 +122,7 @@ function formErkennen(punkte) {
     if (nx > 1 - rand || ny > 1 - rand) anKante++;
   }
   const kantenAnteil = anKante / p.length;
-  /* Erst das Eckige prüfen: ein Rechteck liegt auch „rund" um seine Mitte
+  /* Erst das Eckige prüfen: ein Rechteck liegt auch „rund“ um seine Mitte
      (Abstand 1 bis √2), aber ein Kreis klebt nur zu gut 60 % an den Kanten. */
   if (kantenAnteil > .82) {
     return { art: 'rechteck', punkte: [

@@ -1,7 +1,7 @@
 /* ===================== 54d — ZITATE AUF DER PLATTE =====================
    In alte Tische ritzen Leute Sätze. Hier auch.
 
-   Drei Weisen, wählbar in „Schreibtisch einrichten":
+   Drei Weisen, wählbar in „Schreibtisch einrichten“:
      · gefunden — kurze Zeilen aus den eigenen Texten, jeden Tag andere
      · geritzt  — was man selbst eingeritzt hat, bleibt stehen
      · beides   — gefundene und geritzte nebeneinander
@@ -23,7 +23,7 @@ const TISCHZITAT_MODI = [
 function tischzitatModus(e) {
   const m = e && e.zitatModus;
   if (TISCHZITAT_MODI.some(([id]) => id === m)) return m;
-  /* Wer den alten Schalter „Eigene Zeilen" aus hatte, bleibt ohne. */
+  /* Wer den alten Schalter „Eigene Zeilen“ aus hatte, bleibt ohne. */
   return e && e.verse === false ? 'nichts' : 'gefunden';
 }
 
@@ -372,7 +372,7 @@ async function tischzitatMenue(doc, neuZeichnen) {
   }
 }
 
-/* ----- Der Abschnitt in „Schreibtisch einrichten" -----
+/* ----- Der Abschnitt in „Schreibtisch einrichten“ -----
    Bisher gab es nur das winzige Messer am rechten Rand der Platte — das
    findet niemand. Hier steht alles beisammen: die Weise, die eigenen Sätze,
    und das Feld, in das man einen neuen schreibt. Beim Einritzen schließt
@@ -394,7 +394,7 @@ function tischzitatEinstellung(e, danach, schliessen) {
       el('div', { class: 'einstell-unter' }, 'In alte Tische ritzen Leute Sätze. Gefundene kommen aus deinen eigenen Texten und wechseln von selbst; geritzte schreibst du hier hinein, und sie bleiben stehen.'),
       wahl);
     if (modus !== 'geritzt' && modus !== 'beides') {
-      anfuegen(kasten, el('div', { class: 'einstell-unter' }, 'Zum Einritzen nimm „Geritzte" oder „Beides".'));
+      anfuegen(kasten, el('div', { class: 'einstell-unter' }, 'Zum Einritzen nimm „Geritzte“ oder „Beides“.'));
       return;
     }
     /* Was schon in der Platte steht */

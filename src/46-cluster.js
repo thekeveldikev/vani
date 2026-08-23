@@ -36,7 +36,7 @@ RENDER.cluster = function (haupt) {
         const neu = await eingabe({ titel: 'Das Brett heißt jetzt …', wert: b.titel });
         if (neu) { b.titel = neu; speichere(b); zeichne(); }
       } else if (wahl === 'weg') {
-        if (await frage('„' + b.titel + '" mit allen Blasen löschen?', { ja: 'Löschen', gefahr: true })) { await loesche(b.id); zeichne(); }
+        if (await frage('„' + b.titel + '“ mit allen Blasen löschen?', { ja: 'Löschen', gefahr: true })) { await loesche(b.id); zeichne(); }
       }
     });
     liste.append(karte);
@@ -647,6 +647,6 @@ async function brettAlsBild(brett) {
     const a = el('a', { href: url, download: name + '.png', style: 'display:none' });
     document.body.append(a); a.click();
     setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 4000);
-    toast('Das Brett liegt als Bild bereit — schau in „Dateien".', 4200);
+    toast('Das Brett liegt als Bild bereit — schau in „Dateien“.', 4200);
   }, 'image/png');
 }

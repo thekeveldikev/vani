@@ -2,7 +2,7 @@
    Eine alte Reiseschreibmaschine, die wirklich schreibt: Der Bogen steckt in
    der Walze, die Typen schlagen, das Band färbt (schwarz, rot, blau), bei
    Zeile sechzig klingelt die Glocke, der Wagen fährt zurück. Was man tippt,
-   landet als Blatt bei den Blättern. Wer will, schreibt „wie früher": dann
+   landet als Blatt bei den Blättern. Wer will, schreibt „wie früher“: dann
    gibt es keine Rücktaste — nur Übertippen mit x. Geräusche aus dem
    Lautsprecher, leise, abschaltbar. Steht oben auf dem Lesetisch der Hefte
    (Räume als Orte) und im Spotlight. */
@@ -181,7 +181,7 @@ function schreibmaschineOeffnen(startText) {
   const wagenRuecklauf = () => { const w = maschine.querySelector('.sm-wagen'); if (w) { w.classList.remove('faehrt'); void w.getBoundingClientRect(); w.classList.add('faehrt'); setTimeout(() => w.classList.remove('faehrt'), 400); } papier.classList.add('ruecklauf'); setTimeout(() => papier.classList.remove('ruecklauf'), 380); schreibmaschineKlang('wagen', einst); };
   const glocke = () => { const g = maschine.querySelector('.sm-glocke'); if (g) { g.classList.remove('klingelt'); void g.getBoundingClientRect(); g.classList.add('klingelt'); setTimeout(() => g.classList.remove('klingelt'), 600); } schreibmaschineKlang('glocke', einst); };
   /* Eingabe: wir lesen, was dazukam — die Maschine kennt nur Anhängen (und, wenn erlaubt, eine Rücktaste) */
-  /* Eingabe: eine Warteschlange — jedes neue Zeichen wird der Reihe nach „getippt"; `vorher` folgt sofort,
+  /* Eingabe: eine Warteschlange — jedes neue Zeichen wird der Reihe nach „getippt“; `vorher` folgt sofort,
      damit schnelles Tippen, Einfügen oder Autokorrektur nie doppelt anhängen. */
   let vorher = text;
   const tick = () => {

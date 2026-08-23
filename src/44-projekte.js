@@ -100,7 +100,7 @@ async function projektMenue(p, danach) {
     zeigeBeziehungen(p);
     return;
   } else if (wahl === 'weg') {
-    if (await frage('„' + p.titel + '" mit allem darin in den Papierkorb legen?', { ja: 'In den Papierkorb', gefahr: true })) {
+    if (await frage('„' + p.titel + '“ mit allem darin in den Papierkorb legen?', { ja: 'In den Papierkorb', gefahr: true })) {
       await loesche(p.id);
       if (location.hash === '#/projekte') zeichne(); else location.hash = '#/projekte';
       return;
@@ -170,7 +170,7 @@ RENDER.projekt = function (haupt, pid) {
 };
 
 /* ----- Figuren & Orte: die Welt eines Projekts -----
-   Jeder Eintrag ist ein Dokument vom Typ „figur" mit Name, Art und Notiz.
+   Jeder Eintrag ist ein Dokument vom Typ „figur“ mit Name, Art und Notiz.
    [[Name]] im Text springt direkt hierher, weil der Name der Titel ist. */
 const FIGUR_ARTEN = [['figur', 'Figur'], ['ort', 'Ort'], ['ding', 'Ding'], ['sonst', 'Anderes']];
 function figurenVon(p) { return kinder(p.id, 'figur'); }
@@ -207,7 +207,7 @@ function baueFigurenUndOrte(p) {
       const wahl = await menue([
         f.notiz ? { text: (f.notiz.length > 60 ? f.notiz.slice(0, 60) + '…' : f.notiz), wert: '_lesen' } : null,
         { text: 'Ändern', icon: 'stift', wert: 'aendern' },
-        vorkommen ? { text: 'Wo kommt „' + f.titel + '" vor? (' + vorkommen + ')', icon: 'suche', wert: 'suche' } : null,
+        vorkommen ? { text: 'Wo kommt „' + f.titel + '“ vor? (' + vorkommen + ')', icon: 'suche', wert: 'suche' } : null,
         { text: 'Verbindungen ansehen', icon: 'verbinden', wert: 'bezug' },
         { text: 'Entfernen', icon: 'muell', wert: 'weg', rot: true }
       ], f.titel);
@@ -215,7 +215,7 @@ function baueFigurenUndOrte(p) {
       else if (wahl === 'aendern') { if (await figurAnlegenOderAendern(p, f)) zeichne(); }
       else if (wahl === 'suche') { oeffneSuche(); setTimeout(() => { const feld = $('.suchbogen input'); if (feld) { feld.value = f.titel; feld.dispatchEvent(new Event('input', { bubbles: true })); } }, 120); }
       else if (wahl === 'bezug') zeigeBeziehungen(f);
-      else if (wahl === 'weg' && await frage('„' + f.titel + '" aus Figuren & Orten nehmen?', { ja: 'Entfernen', gefahr: true })) { await loesche(f.id); zeichne(); }
+      else if (wahl === 'weg' && await frage('„' + f.titel + '“ aus Figuren & Orten nehmen?', { ja: 'Entfernen', gefahr: true })) { await loesche(f.id); zeichne(); }
     });
     band.append(chip);
   }
@@ -254,7 +254,7 @@ function baueKapitel(k, p) {
           geschwister.forEach((x) => speichereStill(x));
           zeichne();
         } else if (wahl === 'weg') {
-          if (await frage('„' + k.titel + '" mit ' + szenen.length + ' Szenen löschen?', { ja: 'Löschen', gefahr: true })) {
+          if (await frage('„' + (k.titel || 'Ohne Titel') + '“' + (szenen.length ? ' mit ' + zaehl(szenen.length, 'Szene', 'Szenen', 'einer') : '') + ' löschen?', { ja: 'Löschen', gefahr: true })) {
             await loesche(k.id); zeichne();
           }
         }
@@ -435,7 +435,7 @@ function szenenGesten(karte, s, p) {
       s.projekt = wo.projekt.id;
       s.ord = kinder(wo.kapitel.id, 'szene').length;
       speichereStill(s);
-      toast('Umgezogen nach „' + wo.projekt.titel + '".');
+      toast('Umgezogen nach „' + wo.projekt.titel + '“.');
       zeichne();
     } else if (wahl === 'teilen') {
       teileText((s.titel ? s.titel + '\n\n' : '') + (s.text || ''));
@@ -515,7 +515,7 @@ async function projektHinausgeben(p) {
   vorschauNeu();
   const kasten = el('div', { class: 'modal manuskript-modal' },
     el('div', { class: 'kartenkopf' }, el('span', { html: ik('teilen') }), 'ALS MANUSKRIPT'),
-    el('h2', {}, '„' + (p.titel || 'Ohne Titel') + '" hinausgeben'),
+    el('h2', {}, '„' + (p.titel || 'Ohne Titel') + '“ hinausgeben'),
     el('div', { class: 'karte', style: 'margin-bottom:12px' },
       schalter('Kopfzeile', 'kopf', 'Art, Wörter, Datum'),
       schalter('Szenentitel', 'szenentitel'),

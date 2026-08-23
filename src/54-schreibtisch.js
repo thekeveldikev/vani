@@ -89,7 +89,7 @@ function schreibtischWachsVerbrennen(minuten) {
   D.einst.schreibtisch = e; speichereEinst();
 }
 
-/* Kurze eigene Zeilen für die „spontanen Verse" auf der Platte — aus den
+/* Kurze eigene Zeilen für die „spontanen Verse“ auf der Platte — aus den
    kuratierten Funden, nie aus allem. */
 function schreibtischVerse(max = 3) {
   if (typeof wiederFunde !== 'function') return [];
@@ -182,7 +182,7 @@ async function schubladeOeffnen() {
   const alte = vomTyp('schnipsel').filter((s) => Date.now() - s.angelegt > 14 * 86400000 && (s.text || '').trim());
   const metall = alte.length ? alte[Math.floor(Math.random() * alte.length)] : null;
   const wahl = await menue([
-    ...funde.map((f) => ({ text: '„' + (f.auszug.split('\n')[0] || '').slice(0, 60) + (f.auszug.length > 60 ? '…' : '') + '" — ' + f.art.toLowerCase(), icon: 'fund', wert: 'fund:' + f.doc.id })),
+    ...funde.map((f) => ({ text: '„' + (f.auszug.split('\n')[0] || '').slice(0, 60) + (f.auszug.length > 60 ? '…' : '') + '“ — ' + f.art.toLowerCase(), icon: 'fund', wert: 'fund:' + f.doc.id })),
     { text: 'Eine winzige Lupe — suchen', icon: 'suche', wert: 'lupe' },
     { text: 'Bindfaden — wo alles zusammenhängt (Cluster)', icon: 'cluster', wert: 'faden' },
     { text: 'Getrocknete Blätter — die losen Blätter', icon: 'blatt', wert: 'blaetter' },
@@ -197,7 +197,7 @@ async function schubladeOeffnen() {
   if (wahl === 'blaetter') { location.hash = '#/blaetter'; return; }
   if (wahl === 'marken' || wahl === 'schluessel') { location.hash = '#/feinheiten'; return; }
   if (wahl === 'metall' && metall) {
-    await zeigeAnkunft('Ein Stück Metall unbekannter Herkunft', ['„' + (metall.text || '').slice(0, 300) + '"'], 'Schnipsel vom ' + fmtDatum(metall.angelegt) + ' — vielleicht bedeutungslos, vielleicht der Schlüssel zu einem ganzen Roman.', () => { location.hash = '#/schnipsel'; });
+    await zeigeAnkunft('Ein Stück Metall unbekannter Herkunft', ['„' + (metall.text || '').slice(0, 300) + '“'], 'Schnipsel vom ' + fmtDatum(metall.angelegt) + ' — vielleicht bedeutungslos, vielleicht der Schlüssel zu einem ganzen Roman.', () => { location.hash = '#/schnipsel'; });
   }
 }
 
@@ -491,7 +491,7 @@ function schreibtischSignatur() {
     (() => { const f = typeof heuteVorEinemJahr === 'function' ? heuteVorEinemJahr([...D.docs.values()]) : null; return f ? f.doc.id : ''; })()
   ]);
 }
-/* Der Würfel für „Überraschung": einmal je Einstellung, dann gemerkt.
+/* Der Würfel für „Überraschung“: einmal je Einstellung, dann gemerkt.
    Stellt man wieder auf etwas Festes und später zurück auf Zufall, fällt er
    neu — das ist gewollt. */
 const _deskWurf = new Map();
@@ -508,7 +508,7 @@ RENDER.schreibtisch = function (haupt) {
   const erstesMal = !sessionStorage.getItem('vani-desk-gesehen');
   const szene = el('div', { class: 'desk-szene holz-' + e.holz + ' wetter-' + wetter + (e.kerzen ? ' kerzen-an' : '') + (e.lampeAn ? '' : ' lampe-aus'), style: '--lampe:' + e.lampe + ';--unordnung:' + e.unordnung });
   const leinwand = el('canvas', { class: 'desk-malerei' });
-  /* „Überraschung" wird einmal gewürfelt — und bleibt dann liegen, solange
+  /* „Überraschung“ wird einmal gewürfelt — und bleibt dann liegen, solange
      die App offen ist. Vorher fiel der Würfel bei JEDEM Neuzeichnen: kam man
      aus einem anderen Raum zurück, sprang der Tisch von Abend auf Mittag.
      Das war keine Überraschung mehr, sondern Unruhe. */

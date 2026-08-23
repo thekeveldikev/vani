@@ -1,6 +1,6 @@
 /* ================================================================
    VANI — Klangwelten: alles aus dem Nichts gerechnet, keine Dateien.
-   Rezepte nach Andy Farnell („Designing Sound") und eigenen Ohren.
+   Rezepte nach Andy Farnell („Designing Sound“) und eigenen Ohren.
    ================================================================ */
 
 let _audio = null;

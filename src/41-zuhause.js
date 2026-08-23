@@ -301,9 +301,9 @@ RENDER.zuhause = function (haupt) {
       const echo = echoes.length ? echoes[Math.floor(ab / 3) % echoes.length] : null;
       if (echo) regal.append(el('div', { class: 'wieder-fund echo' },
         el('span', { class: 'wieder-art' }, 'ECHO · ' + echo.wort.toUpperCase()),
-        el('button', { onclick: () => oeffneDoc(echo.a.doc) }, '„' + echo.a.auszug.slice(0, 150) + '…"'),
+        el('button', { onclick: () => oeffneDoc(echo.a.doc) }, '„' + echo.a.auszug.slice(0, 150) + '…“'),
         el('span', { class: 'echo-faden' }, '↕'),
-        el('button', { onclick: () => oeffneDoc(echo.b.doc) }, '„' + echo.b.auszug.slice(0, 150) + '…"')));
+        el('button', { onclick: () => oeffneDoc(echo.b.doc) }, '„' + echo.b.auszug.slice(0, 150) + '…“')));
     };
     const karte = el('div', { class: 'karte breit wieder-karte' },
       el('div', { class: 'kartenkopf' }, el('span', { html: ik('fund') }), 'WIEDER AUFGETAUCHT',

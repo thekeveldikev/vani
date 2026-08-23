@@ -59,7 +59,7 @@ function zeigeJahresringe(jahr) {
     const daten = jahresringeDaten(D.stats.tage, aktuell);
     titel.textContent = 'Das Jahr ' + aktuell + ' in Ringen';
     bild.innerHTML = jahresringeSVG(daten, { groesse: Math.min(360, Math.max(240, (window.innerWidth || 400) - 80)), hell: !['tinte', 'kerze'].includes(D.einst.thema) });
-    unter.textContent = daten.gesamt ? daten.gesamt.toLocaleString('de-DE') + ' Wörter an ' + daten.tage + ' Tagen — der dickste Ring: ' + daten.monate.reduce((a, b) => (b.worte > a.worte ? b : a)).name : 'In diesem Jahr noch kein Wort — der Baum wartet.';
+    unter.textContent = daten.gesamt ? daten.gesamt.toLocaleString('de-DE') + ' Wörter an ' + zaehl(daten.tage, 'Tag', 'Tagen', 'einem') + ' — der dickste Ring: ' + daten.monate.reduce((a, b) => (b.worte > a.worte ? b : a)).name : 'In diesem Jahr noch kein Wort — der Baum wartet.';
     liste.innerHTML = '';
     bild.querySelectorAll('.ring').forEach((p) => p.addEventListener('click', () => zeigeMonat(Number(p.dataset.monat))));
   };
