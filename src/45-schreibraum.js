@@ -213,7 +213,12 @@ function oeffneSchreibraum(docId) {
   function spiegelBeiAuswahl() {
     if (!_sr || document.activeElement !== ta) return;
     aktualisiereSpiegel();
-    if (D.einst.typewriter || istRich) zentriereZeile();
+    /* Beim Setzen des Cursors wird NICHT gescrollt: wer hintippt, hat sich die
+       Stelle gerade ausgesucht. Nur die Schreibmaschine zieht die Zeile nach —
+       das ist ihr ganzer Zweck. Frueher scrollte auch formatierter Text bei
+       jeder Auswahlaenderung; auf dem iPad geschieht das mitten in der noch
+       nicht abgeschlossenen Tippgeste und verschiebt den Cursor. */
+    if (D.einst.typewriter) zentriereZeile();
   }
   /* Safari schiebt bei formatiertem Text gern das Fenster — zurück damit. */
   if (istRich) window.addEventListener('scroll', srFensterZurueck, { passive: true });
@@ -299,13 +304,10 @@ function zentriereZeileRich(sanft) {
   const { ta, mitte } = _sr;
   const sel = window.getSelection && window.getSelection();
   if (!sel || !sel.rangeCount || !ta.contains(sel.anchorNode)) return;
-  let r = sel.getRangeAt(0).cloneRange();
-  let box = r.getBoundingClientRect();
-  if (!box || (!box.height && !box.width)) {
-    /* Leere Zeile: ein unsichtbarer Messpunkt liefert die Lage. */
-    const mess = document.createElement('span'); mess.textContent = '\u200b';
-    try { r.insertNode(mess); box = mess.getBoundingClientRect(); mess.remove(); ta.normalize(); } catch (e) { return; }
-  }
+  /* Gemessen, nicht geschrieben: frueher wurde hier ein Messpunkt in den Text
+     gesetzt und danach normalize() gerufen — das hat den Cursor beim Tippen
+     mitten in ein Wort weiter oben springen lassen. Siehe caretRechteck. */
+  const box = typeof caretRechteck === 'function' ? caretRechteck(sel, ta) : sel.getRangeAt(0).getBoundingClientRect();
   if (!box || !box.height) return;
   const m = mitte.getBoundingClientRect();
   const oben = box.top - m.top, unten = box.bottom - m.top;

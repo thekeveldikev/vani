@@ -3129,187 +3129,415 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
 
 /* ============================================================
    DER KALENDER, AUFGEKLAPPT (61b)
+   Kein Formular, sondern ein Buch: Papierfaser, Serifen, Tinte,
+   und ein Falz in der Mitte. Alle Zeigerzustaende sind hinter
+   (hover: hover) versteckt — auf dem iPad bleibt ein Tipp sonst
+   kleben und sieht aus wie eine Auswahl.
    ============================================================ */
 .kal-buch {
-  width: min(1120px, 96vw); max-height: 92vh; display: flex; flex-direction: column;
-  background: linear-gradient(178deg, var(--papier), color-mix(in srgb, var(--papier) 88%, var(--hg2)));
-  border-radius: 16px; box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 1px var(--linie);
+  width: min(1140px, 96vw); max-height: 92vh; display: flex; flex-direction: column; position: relative;
+  color: var(--tinte);
+  background:
+    repeating-linear-gradient(94deg, rgba(120,96,60,.028) 0 2px, transparent 2px 5px),
+    radial-gradient(120% 90% at 50% 0%, rgba(255,246,225,.5), transparent 60%),
+    linear-gradient(178deg, var(--papier), color-mix(in srgb, var(--papier) 86%, var(--hg2)));
+  border-radius: 6px 6px 8px 8px;
+  box-shadow: 0 34px 90px rgba(0,0,0,.5), 0 0 0 1px color-mix(in srgb, var(--tinte) 18%, transparent),
+    inset 0 1px 0 rgba(255,255,255,.5);
   overflow: hidden;
 }
-.kal-buch.klappt-auf { animation: kal-aufklappen .52s cubic-bezier(.2,.9,.25,1); transform-origin: 50% 12%; }
+/* Der Falz: das Buch hat eine Mitte. */
+.kal-falz {
+  position: absolute; left: 50%; top: 0; bottom: 0; width: 26px; margin-left: -13px; pointer-events: none; z-index: 1;
+  background: linear-gradient(90deg, transparent, rgba(90,66,36,.05) 35%, rgba(90,66,36,.09) 50%, rgba(90,66,36,.05) 65%, transparent);
+}
+@media (max-width: 900px) { .kal-falz { display: none; } }
+.kal-buch.klappt-auf { animation: kal-aufklappen .55s cubic-bezier(.2,.9,.25,1); transform-origin: 50% 8%; }
 @keyframes kal-aufklappen {
-  0% { opacity: 0; transform: perspective(1400px) rotateX(-58deg) scale(.92); }
-  60% { opacity: 1; transform: perspective(1400px) rotateX(6deg) scale(1.01); }
-  100% { opacity: 1; transform: perspective(1400px) rotateX(0) scale(1); }
+  0% { opacity: 0; transform: perspective(1500px) rotateX(-62deg) scale(.9); }
+  62% { opacity: 1; transform: perspective(1500px) rotateX(5deg) scale(1.008); }
+  100% { opacity: 1; transform: perspective(1500px) rotateX(0) scale(1); }
 }
-.kal-buehne { overflow-y: auto; overscroll-behavior: contain; padding: 0 0 18px; position: relative; }
-.kal-kopf {
-  position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 8px;
-  padding: 14px 16px 10px; background: color-mix(in srgb, var(--papier) 94%, transparent);
-  backdrop-filter: blur(8px); border-bottom: 1px solid var(--linie);
-}
-.kal-monatname { font-family: Georgia, "Iowan Old Style", serif; font-size: 24px; margin: 0; display: flex; align-items: baseline; gap: 9px; }
-.kal-monatname i { font-style: normal; font-size: 16px; color: var(--blass); font-variant-numeric: tabular-nums; }
-.kal-blaetter { width: 34px; height: 34px; border-radius: 50%; font-size: 21px; line-height: 1; color: var(--blass); display: grid; place-items: center; flex: none; }
-.kal-blaetter:hover { background: var(--hg2); color: var(--tinte); }
-.kal-kopfrechts { margin-left: auto; display: flex; align-items: center; gap: 6px; }
-.kal-ansichtknopf { padding: 6px 12px; border-radius: 999px; font-size: 13px; color: var(--blass); border: 1px solid var(--linie); }
-.kal-ansichtknopf.an { background: var(--akzent); color: var(--papier); border-color: transparent; }
-.kal-schliessen { width: 34px; height: 34px; border-radius: 50%; font-size: 22px; line-height: 1; color: var(--blass); display: grid; place-items: center; }
-.kal-schliessen:hover { background: rgba(176,53,43,.12); color: #b0352b; }
+.kal-buehne { overflow-y: auto; overscroll-behavior: contain; padding: 0 0 20px; position: relative; z-index: 2; }
 
-.kal-jahrleiste { display: flex; gap: 3px; overflow-x: auto; overscroll-behavior-x: contain; padding: 8px 16px 10px; scroll-behavior: smooth; border-bottom: 1px solid var(--linie); }
-.kal-jahrknopf {
-  flex: none; padding: 4px 9px; border-radius: 8px; font-size: 12.5px; color: var(--blass);
-  font-variant-numeric: tabular-nums; position: relative; transition: background .18s, color .18s;
+/* ----- Kopf ----- */
+.kal-kopf {
+  position: sticky; top: 0; z-index: 6;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--papier) 97%, transparent) 70%, color-mix(in srgb, var(--papier) 82%, transparent));
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid color-mix(in srgb, var(--tinte) 16%, transparent);
+  padding: 13px 18px 9px;
 }
-.kal-jahrknopf:hover { background: var(--hg2); color: var(--tinte); }
-.kal-jahrknopf.voll::after { content: ""; position: absolute; left: 50%; bottom: 1px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--akzent); opacity: .75; }
+.kal-kopfzeile { display: flex; align-items: center; gap: 8px; }
+.kal-kopfzeile.zwei { margin-top: 9px; gap: 10px; flex-wrap: wrap; }
+.kal-monatname {
+  font-family: ui-serif, "New York", "Iowan Old Style", Georgia, serif;
+  font-size: 26px; font-weight: 600; margin: 0; display: flex; align-items: baseline; gap: 10px; letter-spacing: -.01em;
+}
+.kal-monatname i { font-style: normal; font-size: 16px; color: var(--blass); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.kal-blaetter {
+  width: 36px; height: 36px; border-radius: 50%; font-size: 24px; line-height: 1; color: var(--blass);
+  display: grid; place-items: center; flex: none; transition: background .16s, color .16s;
+}
+.kal-kopfrechts { margin-left: auto; display: flex; align-items: center; gap: 7px; }
+.kal-heuteknopf {
+  padding: 6px 14px; border-radius: 999px; font-size: 13px; color: var(--akzent);
+  border: 1px solid color-mix(in srgb, var(--akzent) 42%, transparent); letter-spacing: .02em;
+}
+.kal-schliessen { width: 36px; height: 36px; border-radius: 50%; font-size: 24px; line-height: 1; color: var(--blass); display: grid; place-items: center; }
+.kal-ansichten { display: flex; gap: 2px; padding: 2px; border-radius: 999px; background: color-mix(in srgb, var(--tinte) 7%, transparent); }
+.kal-ansichtknopf {
+  padding: 6px 14px; border-radius: 999px; font-size: 13px; color: var(--blass); letter-spacing: .02em;
+  transition: background .18s, color .18s;
+}
+.kal-ansichtknopf.an { background: var(--papier); color: var(--tinte); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.14); }
+.kal-suche { margin-left: auto; display: flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--tinte) 15%, transparent); background: color-mix(in srgb, var(--papier) 60%, transparent); min-width: 190px; }
+.kal-lupe { display: flex; color: var(--blass); flex: none; }
+.kal-suchfeld { border: none; background: none; outline: none; font-size: 13.5px; width: 100%; color: var(--tinte); }
+.kal-suchfeld::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+.kal-filterzeile { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; padding: 9px 18px 0; font-size: 12.5px; color: var(--blass); font-style: italic; }
+.kal-filterchip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px 3px 11px; border-radius: 999px; font-style: normal;
+  background: color-mix(in srgb, var(--akzent) 13%, transparent); color: var(--akzent); font-size: 12.5px;
+}
+.kal-filterchip i { font-style: normal; font-size: 14px; opacity: .7; }
+
+/* ----- Die Jahresleiste: ein Lineal ----- */
+.kal-jahrleiste {
+  display: flex; gap: 1px; overflow-x: auto; overscroll-behavior-x: contain; padding: 9px 18px 11px; scroll-behavior: smooth;
+  border-bottom: 1px solid color-mix(in srgb, var(--tinte) 12%, transparent);
+  scrollbar-width: none;
+}
+.kal-jahrleiste::-webkit-scrollbar { display: none; }
+.kal-jahrknopf {
+  flex: none; padding: 3px 9px 7px; border-radius: 5px; font-size: 12.5px; color: var(--blass);
+  font-variant-numeric: tabular-nums; position: relative; transition: background .16s, color .16s;
+  font-family: ui-serif, "New York", Georgia, serif;
+}
+.kal-jahrknopf::before { content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 4px; background: color-mix(in srgb, var(--tinte) 22%, transparent); }
+.kal-jahrknopf.voll::after { content: ""; position: absolute; left: 50%; bottom: 1px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--akzent); }
 .kal-jahrknopf.an { background: var(--tinte); color: var(--papier); font-weight: 600; }
+.kal-jahrknopf.an::before { background: transparent; }
 .kal-jahrknopf.an.voll::after { background: var(--papier); }
 
-.kal-raster { display: grid; grid-template-columns: 30px repeat(7, 1fr); gap: 4px; padding: 12px 16px 6px; }
-.kal-wochenkopf, .kal-kw-kopf { text-align: center; font-size: 11px; letter-spacing: .09em; color: var(--blass); text-transform: uppercase; padding-bottom: 4px; }
-.kal-kw-kopf, .kal-kw { font-size: 10.5px; color: color-mix(in srgb, var(--blass) 65%, transparent); display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+/* ----- Das Monatsraster: ein Kassenbuch, keine Kacheln ----- */
+.kal-raster {
+  display: grid; grid-template-columns: 34px repeat(7, 1fr); gap: 0; padding: 6px 18px 4px;
+  border-collapse: collapse;
+}
+.kal-wochenkopf, .kal-kw-kopf {
+  text-align: center; font-size: 10.5px; letter-spacing: .16em; color: var(--blass); text-transform: uppercase;
+  padding: 6px 0 7px; border-bottom: 1.5px solid color-mix(in srgb, var(--tinte) 30%, transparent);
+}
+.kal-kw-kopf, .kal-kw {
+  font-size: 10px; color: color-mix(in srgb, var(--blass) 70%, transparent); display: grid; place-items: center;
+  font-variant-numeric: tabular-nums; border-right: 1px solid color-mix(in srgb, var(--tinte) 14%, transparent);
+}
 .kal-zelle {
-  position: relative; min-height: 68px; border-radius: 10px; border: 1px solid var(--linie);
-  background: color-mix(in srgb, var(--papier) 70%, transparent);
-  display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 5px 6px;
-  transition: background .16s, border-color .16s, transform .12s;
+  position: relative; min-height: 74px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  padding: 5px 7px; text-align: left;
+  border-right: 1px solid color-mix(in srgb, var(--tinte) 9%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--tinte) 9%, transparent);
+  transition: background .16s;
 }
-.kal-zelle:hover { background: var(--hg2); transform: translateY(-1px); }
-.kal-zelle.fremd { opacity: .38; }
-.kal-zelle .kal-zahl { font-size: 13.5px; color: var(--tinte); font-variant-numeric: tabular-nums; }
-.kal-zelle.heute { border-color: var(--akzent); box-shadow: inset 0 0 0 1px var(--akzent); }
+.kal-zelle.wochenende { background: color-mix(in srgb, var(--tinte) 3.5%, transparent); }
+.kal-zelle.fremd { opacity: .3; }
+.kal-zelle .kal-zahl {
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 15px; color: var(--tinte);
+  font-variant-numeric: tabular-nums; line-height: 1;
+}
 .kal-zelle.heute .kal-zahl { color: var(--akzent); font-weight: 700; }
-.kal-zelle.gewaehlt { background: var(--tinte); border-color: var(--tinte); }
-.kal-zelle.gewaehlt .kal-zahl, .kal-zelle.gewaehlt .kal-mehr { color: var(--papier); }
-.kal-marken { display: flex; flex-wrap: wrap; gap: 2px; margin-top: auto; }
-.kal-marke { display: flex; color: var(--artfarbe, var(--blass)); }
-.kal-zelle.gewaehlt .kal-marke { color: color-mix(in srgb, var(--artfarbe, #ffffff) 70%, white); }
-.kal-mehr { font-size: 10px; color: var(--blass); }
-
-.kal-tagesblatt { margin: 10px 16px 0; padding: 14px 16px; border-radius: 14px; background: var(--hg2); border: 1px solid var(--linie); }
-.kal-tageskopf { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
-.kal-tageskopf h3 { font-family: Georgia, "Iowan Old Style", serif; font-size: 19px; margin: 0 0 2px; }
-.kal-tageskopf small { color: var(--blass); font-size: 12.5px; }
-.kal-tageskopf .knopf { margin-left: auto; }
-.kal-leertag { color: var(--blass); font-size: 13.5px; line-height: 1.55; font-style: italic; padding: 6px 0; }
-.kal-eintrag {
-  display: flex; gap: 11px; width: 100%; text-align: left; padding: 10px 12px; border-radius: 11px;
-  background: var(--papier); border: 1px solid var(--linie); border-left: 3px solid var(--artfarbe, var(--blass));
-  margin-bottom: 7px; transition: transform .12s, box-shadow .16s;
+.kal-zelle.heute::before {
+  content: ""; position: absolute; left: 4px; right: 4px; top: 3px; height: 2px; border-radius: 1px;
+  background: var(--akzent); opacity: .75;
 }
-.kal-eintrag:hover { transform: translateX(2px); box-shadow: 0 4px 14px rgba(0,0,0,.1); }
-.kal-eintragzeichen { color: var(--artfarbe, var(--blass)); display: flex; flex: none; padding-top: 1px; }
-.kal-eintragtext { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.kal-eintragtext b { font-size: 14.5px; }
-.kal-eintragart { font-size: 12px; color: var(--blass); letter-spacing: .02em; }
-.kal-eintragleute { font-size: 12.5px; color: var(--artfarbe, var(--blass)); }
-.kal-eintragalter { font-size: 12.5px; color: var(--tinte); opacity: .78; font-variant-numeric: tabular-nums; }
-.kal-eintragnotiz { font-size: 12.5px; color: var(--blass); line-height: 1.5; margin-top: 2px; white-space: pre-wrap; }
-.kal-abschnitt { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--blass); display: block; margin: 12px 0 6px; }
-.kal-jahrestage { border-top: 1px dashed var(--linie); margin-top: 10px; }
-.kal-jahrestag { display: flex; gap: 9px; align-items: baseline; width: 100%; text-align: left; padding: 6px 8px; border-radius: 8px; font-size: 13px; }
-.kal-jahrestag:hover { background: var(--papier); }
-.kal-jahrestag b { color: var(--akzent); font-size: 12.5px; flex: none; }
-.kal-jahrestag span { color: var(--blass); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Der gewaehlte Tag ist eingekreist — mit Tinte, nicht mit einem Kasten. */
+.kal-zelle.gewaehlt::after {
+  content: ""; position: absolute; left: 2px; top: 1px; width: 30px; height: 26px;
+  border: 1.8px solid var(--akzent); border-radius: 48% 52% 50% 50% / 55% 45% 55% 45%;
+  transform: rotate(-3deg); pointer-events: none;
+}
+.kal-zelle.gewaehlt { background: color-mix(in srgb, var(--akzent) 7%, transparent); }
+.kal-marken { display: flex; flex-wrap: wrap; gap: 3px; margin-top: auto; }
+.kal-marke { display: flex; color: var(--artfarbe, var(--blass)); }
+.kal-mehr { font-size: 10px; color: var(--blass); font-variant-numeric: tabular-nums; }
 
-.kal-widersprueche { margin: 12px 16px 0; border: 1px solid rgba(176,53,43,.3); border-radius: 12px; background: rgba(176,53,43,.06); padding: 10px 14px; }
-.kal-widersprueche summary { cursor: pointer; font-size: 13.5px; color: #b0352b; }
-.kal-widerspruch { display: flex; gap: 9px; align-items: baseline; font-size: 13px; padding: 6px 0; border-top: 1px solid rgba(176,53,43,.14); }
-.kal-wsym { width: 18px; height: 18px; border-radius: 50%; background: rgba(176,53,43,.16); color: #b0352b; display: grid; place-items: center; font-size: 12px; font-weight: 700; flex: none; }
+/* ----- Das Tagesblatt ----- */
+.kal-tagesblatt {
+  margin: 14px 18px 0; padding: 15px 17px; border-radius: 3px;
+  background: linear-gradient(178deg, color-mix(in srgb, var(--papier) 92%, #fff), color-mix(in srgb, var(--papier) 70%, var(--hg2)));
+  box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 6px 20px rgba(0,0,0,.08);
+  border-left: 2px solid color-mix(in srgb, var(--akzent) 55%, transparent);
+}
+.kal-tageskopf { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.kal-tagestitel { min-width: 0; }
+.kal-tageskopf h3 { font-family: ui-serif, "New York", Georgia, serif; font-size: 20px; font-weight: 600; margin: 0 0 3px; }
+.kal-tageskopf small { color: var(--blass); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.kal-tageskopf .knopf { margin-left: auto; }
+.kal-leertag { color: var(--blass); font-size: 13.5px; line-height: 1.6; font-style: italic; padding: 8px 0; font-family: ui-serif, "New York", Georgia, serif; }
+.kal-leertag.mitte { text-align: center; padding: 34px 24px; }
+
+.kal-eintrag {
+  display: flex; gap: 11px; align-items: flex-start; width: 100%; padding: 10px 4px 11px;
+  border-bottom: 1px solid color-mix(in srgb, var(--tinte) 10%, transparent);
+}
+.kal-eintrag:last-child { border-bottom: none; }
+.kal-eintragzeichen {
+  color: var(--artfarbe, var(--blass)); display: flex; flex: none; padding: 3px; margin-top: -1px; border-radius: 7px;
+  transition: background .16s;
+}
+.kal-eintragtext { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; text-align: left; border-radius: 6px; padding: 1px 3px; }
+.kal-eintragtext b { font-family: ui-serif, "New York", Georgia, serif; font-size: 16px; font-weight: 600; }
+.kal-eintragart { font-size: 12px; color: var(--blass); letter-spacing: .03em; }
+.kal-eintragalter { font-size: 12.5px; color: color-mix(in srgb, var(--tinte) 72%, transparent); font-variant-numeric: tabular-nums; }
+.kal-eintragnotiz { font-size: 13px; color: var(--blass); line-height: 1.55; margin-top: 3px; white-space: pre-wrap; font-family: ui-serif, "New York", Georgia, serif; }
+.kal-eintragleute { display: flex; flex-wrap: wrap; gap: 4px; align-items: flex-start; flex: none; max-width: 40%; justify-content: flex-end; }
+.kal-personknopf {
+  font-size: 12.5px; padding: 2px 9px; border-radius: 999px; color: var(--artfarbe, var(--blass));
+  border: 1px solid color-mix(in srgb, var(--artfarbe, #888) 34%, transparent);
+}
+.kal-abschnitt { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--blass); display: block; margin: 14px 0 7px; }
+.kal-alterliste { margin-top: 12px; border-top: 1px dashed color-mix(in srgb, var(--tinte) 18%, transparent); padding-top: 8px; }
+.kal-alterliste summary { cursor: pointer; font-size: 12.5px; color: var(--blass); letter-spacing: .02em; }
+.kal-alterzeile-eintrag { display: flex; gap: 10px; width: 100%; text-align: left; padding: 5px 7px; border-radius: 6px; font-size: 13px; }
+.kal-alterzeile-eintrag b { font-weight: 600; }
+.kal-alterzeile-eintrag span { color: var(--blass); margin-left: auto; font-variant-numeric: tabular-nums; }
+.kal-jahrestage { border-top: 1px dashed color-mix(in srgb, var(--tinte) 18%, transparent); margin-top: 12px; }
+.kal-jahrestag { display: flex; gap: 10px; align-items: baseline; width: 100%; text-align: left; padding: 6px 8px; border-radius: 6px; font-size: 13px; }
+.kal-jahrestag b { color: var(--akzent); font-size: 12.5px; flex: none; font-variant-numeric: tabular-nums; }
+.kal-jahrestag span { color: var(--blass); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: ui-serif, "New York", Georgia, serif; }
+
+/* ----- Die Chronik ----- */
+.kal-chronik { padding: 6px 18px 0; }
+.kal-chronikjahr {
+  display: flex; align-items: baseline; gap: 11px; width: 100%; text-align: left; margin: 18px 0 3px; padding: 4px 2px;
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 22px; font-weight: 600; color: var(--tinte);
+  border-bottom: 1.5px solid color-mix(in srgb, var(--tinte) 24%, transparent); font-variant-numeric: tabular-nums;
+}
+.kal-chronikjahr:first-child { margin-top: 4px; }
+.kal-chronikjahr.an { color: var(--akzent); border-bottom-color: color-mix(in srgb, var(--akzent) 50%, transparent); }
+.kal-chronikjahr i { font-style: normal; font-size: 12px; color: var(--blass); margin-left: auto; font-family: ui-rounded, -apple-system, system-ui, sans-serif; }
+
+/* ----- Was nicht sein kann ----- */
+.kal-widersprueche { margin: 14px 18px 0; border: 1px solid rgba(176,53,43,.28); border-radius: 4px; background: rgba(176,53,43,.05); padding: 10px 14px; }
+.kal-widersprueche summary { cursor: pointer; font-size: 13.5px; color: #b0352b; font-family: ui-serif, "New York", Georgia, serif; }
+.kal-widerspruch { display: flex; gap: 9px; align-items: baseline; font-size: 13px; padding: 7px 0; border-top: 1px solid rgba(176,53,43,.12); }
+.kal-wsym { width: 18px; height: 18px; border-radius: 50%; background: rgba(176,53,43,.15); color: #b0352b; display: grid; place-items: center; font-size: 12px; font-weight: 700; flex: none; }
 .kal-wlink { color: var(--akzent); text-decoration: underline; font-size: 12.5px; flex: none; margin-left: auto; }
 
-.kal-jahresbild { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; padding: 14px 16px; }
-.kal-mini { border: 1px solid var(--linie); border-radius: 12px; padding: 9px 10px; background: color-mix(in srgb, var(--papier) 70%, transparent); }
-.kal-mini.voll { border-color: color-mix(in srgb, var(--akzent) 45%, var(--linie)); }
-.kal-mininame { display: flex; align-items: baseline; gap: 6px; width: 100%; font-family: Georgia, "Iowan Old Style", serif; font-size: 15px; margin-bottom: 6px; }
-.kal-mininame i { font-style: normal; font-size: 11px; color: var(--papier); background: var(--akzent); border-radius: 999px; padding: 1px 6px; margin-left: auto; }
+/* ----- Das ganze Jahr ----- */
+.kal-jahresbild { display: grid; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); gap: 16px; padding: 16px 18px; }
+.kal-mini { border-bottom: 1px solid color-mix(in srgb, var(--tinte) 12%, transparent); padding: 0 4px 12px; }
+.kal-mininame {
+  display: flex; align-items: baseline; gap: 6px; width: 100%; margin-bottom: 8px; padding-bottom: 4px;
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 16px; font-weight: 600;
+  border-bottom: 1px solid color-mix(in srgb, var(--tinte) 18%, transparent);
+}
+.kal-mini.voll .kal-mininame { color: var(--akzent); }
+.kal-mininame i { font-style: normal; font-size: 10.5px; color: var(--papier); background: var(--akzent); border-radius: 999px; padding: 1px 7px; margin-left: auto; font-family: ui-rounded, -apple-system, system-ui, sans-serif; }
 .kal-minigitter { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
-.kal-minikopf { text-align: center; font-size: 9px; color: var(--blass); padding-bottom: 2px; }
-.kal-minitag { aspect-ratio: 1; border-radius: 4px; font-size: 10px; color: var(--blass); display: grid; place-items: center; font-variant-numeric: tabular-nums; }
-.kal-minitag:hover { background: var(--hg2); color: var(--tinte); }
-.kal-minitag.fremd { opacity: .22; }
-.kal-minitag.voll { background: color-mix(in srgb, var(--akzent) 24%, transparent); color: var(--tinte); font-weight: 600; }
+.kal-minikopf { text-align: center; font-size: 9px; color: var(--blass); padding-bottom: 3px; letter-spacing: .06em; }
+.kal-minitag { aspect-ratio: 1; border-radius: 3px; font-size: 10px; color: var(--blass); display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+.kal-minitag.fremd { opacity: .18; }
+.kal-minitag.voll { background: color-mix(in srgb, var(--akzent) 26%, transparent); color: var(--tinte); font-weight: 700; }
 .kal-minitag.heute { box-shadow: inset 0 0 0 1.5px var(--akzent); color: var(--akzent); }
 
-.kal-leben { padding: 14px 16px; }
-.kal-massband { position: relative; height: 20px; margin: 0 0 10px 190px; border-bottom: 1px solid var(--linie); }
-.kal-massmarke { position: absolute; top: 0; font-size: 10.5px; color: var(--blass); transform: translateX(-50%); font-style: normal; font-variant-numeric: tabular-nums; }
-.kal-band { display: flex; align-items: center; gap: 12px; padding: 5px 0; border-bottom: 1px solid var(--linie); }
-.kal-bandname { width: 178px; flex: none; display: flex; flex-direction: column; }
-.kal-bandname b { font-size: 13.5px; }
+/* ----- Die Lebensbänder ----- */
+.kal-leben { padding: 16px 18px; }
+.kal-massband { position: relative; height: 22px; margin: 0 0 12px 190px; border-bottom: 1.5px solid color-mix(in srgb, var(--tinte) 26%, transparent); }
+.kal-massmarke { position: absolute; top: 2px; font-size: 10.5px; color: var(--blass); transform: translateX(-50%); font-style: normal; font-variant-numeric: tabular-nums; }
+.kal-massmarke::after { content: ""; position: absolute; left: 50%; bottom: -7px; width: 1px; height: 5px; background: color-mix(in srgb, var(--tinte) 30%, transparent); }
+.kal-massheute { position: absolute; top: 0; bottom: -8px; width: 1.5px; background: var(--akzent); opacity: .7; }
+.kal-band { display: flex; align-items: center; gap: 12px; padding: 6px 0; border-bottom: 1px solid color-mix(in srgb, var(--tinte) 10%, transparent); }
+.kal-bandname { width: 178px; flex: none; display: flex; flex-direction: column; text-align: left; padding: 3px 6px; border-radius: 6px; }
+.kal-bandname b { font-family: ui-serif, "New York", Georgia, serif; font-size: 14.5px; font-weight: 600; }
 .kal-bandname small { font-size: 11px; color: var(--blass); font-variant-numeric: tabular-nums; }
 .kal-spur { position: relative; flex: 1; height: 30px; }
-.kal-lebenslinie { position: absolute; top: 13px; height: 4px; border-radius: 2px; background: linear-gradient(90deg, color-mix(in srgb, var(--akzent) 60%, transparent), color-mix(in srgb, var(--akzent) 20%, transparent)); }
-.kal-lebenslinie.zuende { background: linear-gradient(90deg, color-mix(in srgb, var(--akzent) 65%, transparent), color-mix(in srgb, var(--blass) 55%, transparent)); }
+.kal-spur::before { content: ""; position: absolute; left: 0; right: 0; top: 14.5px; height: 1px; background: color-mix(in srgb, var(--tinte) 8%, transparent); }
+.kal-lebenslinie { position: absolute; top: 13px; height: 4px; border-radius: 2px; background: linear-gradient(90deg, color-mix(in srgb, var(--akzent) 62%, transparent), color-mix(in srgb, var(--akzent) 22%, transparent)); }
+.kal-lebenslinie.zuende { background: linear-gradient(90deg, color-mix(in srgb, var(--akzent) 66%, transparent), color-mix(in srgb, var(--blass) 55%, transparent)); }
 .kal-kerbe { position: absolute; top: 4px; width: 18px; height: 22px; margin-left: -9px; display: grid; place-items: center; color: var(--artfarbe, var(--blass)); border-radius: 5px; transition: transform .14s, background .14s; }
-.kal-kerbe:hover { background: var(--hg2); transform: scale(1.25); z-index: 2; }
 .kal-kerbe i { display: flex; }
 
 /* ----- Das Fenster zum Eintragen ----- */
-.kal-fenster { width: min(560px, 94vw); max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-.kal-feld { display: flex; flex-direction: column; gap: 5px; }
-.kal-feldname { font-size: 11.5px; letter-spacing: .11em; text-transform: uppercase; color: var(--blass); }
-.kal-feldunter { font-size: 12px; color: var(--blass); line-height: 1.45; }
-.kal-datumreihe { display: flex; gap: 7px; }
-.kal-datumreihe .kal-jahr { width: 92px; }
-.kal-datumreihe select { flex: 1; min-width: 0; }
-.kal-wochentag { font-size: 12.5px; color: var(--akzent); min-height: 17px; margin-top: -4px; }
-.kal-bisreihe { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--blass); }
-.kal-bisreihe input[type="date"] { flex: 1; min-width: 0; }
-.kal-artwahl { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 5px; }
-.kal-artknopf { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 4px; border-radius: 9px; border: 1px solid var(--linie); color: var(--blass); transition: background .15s, color .15s, border-color .15s; }
-.kal-artknopf small { font-size: 10.5px; }
-.kal-artknopf:hover { background: var(--hg2); }
-.kal-artknopf.an { background: color-mix(in srgb, var(--artfarbe) 16%, transparent); border-color: var(--artfarbe); color: var(--artfarbe); }
-.kal-artbild, .kal-iconbild { display: flex; }
-.kal-zeichenknopf { display: flex; align-items: center; gap: 9px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--linie); color: var(--tinte); align-self: flex-start; }
-.kal-zeichenknopf:hover { background: var(--hg2); }
-.kal-zeichenknopf small { color: var(--blass); font-size: 12.5px; }
-.kal-leute { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; min-height: 26px; align-items: center; }
-.kal-person { display: inline-flex; align-items: center; gap: 5px; padding: 3px 5px 3px 10px; border-radius: 999px; background: var(--hg2); font-size: 13px; }
-.kal-person button { width: 18px; height: 18px; border-radius: 50%; color: var(--blass); font-size: 14px; line-height: 1; display: grid; place-items: center; }
-.kal-person button:hover { background: rgba(176,53,43,.16); color: #b0352b; }
-.kal-leerhinweis { font-size: 12.5px; color: var(--blass); font-style: italic; }
-.kal-namenreihe { display: flex; gap: 6px; }
-.kal-namenreihe input { flex: 1; min-width: 0; }
-.kal-alterzeile { display: flex; flex-direction: column; gap: 3px; }
-.kal-alterhinweis { font-size: 12.5px; color: var(--blass); padding: 5px 9px; border-radius: 7px; background: var(--hg2); }
-.kal-alterhinweis.warn { background: rgba(176,53,43,.1); color: #b0352b; }
-.kal-notiz { width: 100%; resize: vertical; }
-.kal-hinweis { font-size: 13px; color: var(--blass); line-height: 1.5; }
+.kal-fenster { width: min(580px, 94vw); max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 13px; }
+.kal-feld { display: flex; flex-direction: column; gap: 6px; }
+.kal-feldname { font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--blass); }
+.kal-feldunter { font-size: 12px; color: var(--blass); line-height: 1.5; }
+.kal-titelfeld { font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; }
 
-.kal-iconfenster { width: min(460px, 94vw); max-height: 88vh; overflow-y: auto; }
-.kal-icongitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 6px; margin: 8px 0; }
-.kal-iconwahl { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 9px 4px; border-radius: 10px; border: 1px solid var(--linie); color: var(--tinte); }
-.kal-iconwahl small { font-size: 10.5px; color: var(--blass); }
-.kal-iconwahl:hover { background: var(--hg2); }
-.kal-iconwahl.an { border-color: var(--akzent); background: color-mix(in srgb, var(--akzent) 12%, transparent); }
+/* Wann: drei Felder, die zusammengehoeren und wie eine Zeile aussehen */
+.kal-datumreihe {
+  display: flex; align-items: stretch; border-radius: 9px; overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--tinte) 20%, transparent);
+  background: color-mix(in srgb, var(--papier) 70%, transparent);
+}
+.kal-wahlfeld { position: relative; display: flex; align-items: center; }
+.kal-wahlfeld + .kal-wahlfeld { border-left: 1px solid color-mix(in srgb, var(--tinte) 14%, transparent); }
+.kal-wahlfeld.jahr { flex: 0 0 5.4em; }
+.kal-wahlfeld.monat { flex: 1 1 auto; min-width: 0; }
+.kal-wahlfeld.tag { flex: 0 0 7.4em; }
+.kal-wahlfeld input, .kal-wahlfeld select {
+  width: 100%; border: none; background: none; outline: none; color: var(--tinte);
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 16px; font-variant-numeric: tabular-nums;
+  padding: 11px 12px; -webkit-appearance: none; appearance: none; text-align: left;
+}
+.kal-wahlfeld.jahr input { text-align: center; letter-spacing: .02em; }
+.kal-wahlfeld.tag select { text-align: right; padding-right: 26px; }
+.kal-wahlfeld select { padding-right: 26px; cursor: pointer; }
+.kal-wahlfeld select:disabled { color: var(--blass); }
+/* Der eigene Pfeil — der vom System passt nicht zum Papier. */
+.kal-wahlfeld.monat::after, .kal-wahlfeld.tag::after {
+  content: ""; position: absolute; right: 11px; top: 50%; width: 7px; height: 7px; margin-top: -5px;
+  border-right: 1.6px solid var(--blass); border-bottom: 1.6px solid var(--blass);
+  transform: rotate(45deg); pointer-events: none;
+}
+.kal-wahlfeld input[type="number"]::-webkit-outer-spin-button,
+.kal-wahlfeld input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.kal-wochentag {
+  display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; min-height: 18px;
+  font-size: 12.5px; color: var(--akzent); font-family: ui-serif, "New York", Georgia, serif;
+}
+.kal-wochentag b { font-weight: 600; }
+.kal-wochentag span { color: var(--blass); font-variant-numeric: tabular-nums; }
+.kal-wochentag em { color: var(--blass); font-style: italic; }
+
+.kal-spanne { display: flex; flex-direction: column; gap: 7px; margin-top: 3px; }
+.kal-kaestchen { display: flex; align-items: center; gap: 9px; font-size: 13.5px; color: var(--tinte); cursor: pointer; }
+.kal-kaestchen input { flex: none; width: 17px; height: 17px; accent-color: var(--akzent); }
+.kal-bisfeld { display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: var(--blass); padding-left: 26px; }
+.kal-bisfeld input { flex: 1; min-width: 0; }
+
+.kal-artwahl { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; }
+.kal-artknopf {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 9px 4px; border-radius: 9px;
+  border: 1px solid color-mix(in srgb, var(--tinte) 15%, transparent); color: var(--blass);
+  transition: background .15s, color .15s, border-color .15s, box-shadow .15s;
+}
+.kal-artknopf small { font-size: 10.5px; letter-spacing: .01em; }
+/* Der gewaehlte Zustand muss auf den ersten Blick zu sehen sein — sonst
+   sieht ein klebengebliebener Tipp genauso aus wie eine Auswahl. */
+.kal-artknopf.an {
+  background: color-mix(in srgb, var(--artfarbe) 20%, transparent);
+  border-color: var(--artfarbe); color: var(--artfarbe);
+  box-shadow: inset 0 0 0 1px var(--artfarbe);
+}
+.kal-artknopf.an small { font-weight: 700; }
+.kal-artbild, .kal-iconbild { display: flex; }
+.kal-zeichenknopf {
+  display: flex; align-items: center; gap: 11px; padding: 10px 14px; border-radius: 9px;
+  border: 1px solid color-mix(in srgb, var(--tinte) 15%, transparent); color: var(--tinte); align-self: flex-start; text-align: left;
+}
+.kal-zeichentext { display: flex; flex-direction: column; }
+.kal-zeichentext b { font-size: 14px; font-weight: 600; }
+.kal-zeichentext small { color: var(--blass); font-size: 12px; }
+
+.kal-leute { display: flex; flex-wrap: wrap; gap: 6px; min-height: 26px; align-items: center; }
+.kal-person {
+  display: inline-flex; align-items: center; gap: 5px; padding: 4px 5px 4px 11px; border-radius: 999px;
+  background: color-mix(in srgb, var(--akzent) 12%, transparent); color: var(--tinte); font-size: 13px;
+}
+.kal-person button { width: 19px; height: 19px; border-radius: 50%; color: var(--blass); font-size: 15px; line-height: 1; display: grid; place-items: center; }
+.kal-leerhinweis { font-size: 12.5px; color: var(--blass); font-style: italic; }
+.kal-namenreihe { display: flex; gap: 7px; }
+.kal-namensfeld { flex: 1; min-width: 0; }
+.kal-namedazu {
+  flex: none; padding: 0 15px; border-radius: 9px; font-size: 13.5px; color: var(--akzent);
+  border: 1px dashed color-mix(in srgb, var(--akzent) 45%, transparent); white-space: nowrap;
+}
+.kal-alterzeile { display: flex; flex-direction: column; gap: 4px; }
+.kal-alterhinweis {
+  font-size: 12.5px; color: var(--blass); padding: 6px 10px; border-radius: 7px;
+  background: color-mix(in srgb, var(--tinte) 5%, transparent); border-left: 2px solid color-mix(in srgb, var(--tinte) 20%, transparent);
+}
+.kal-alterhinweis b { color: var(--tinte); font-weight: 600; }
+.kal-alterhinweis.warn { background: rgba(176,53,43,.09); color: #b0352b; border-left-color: #b0352b; }
+.kal-alterhinweis.warn b { color: #b0352b; }
+.kal-notiz { width: 100%; resize: vertical; font-family: ui-serif, "New York", Georgia, serif; }
+.kal-hinweis { font-size: 13px; color: var(--blass); line-height: 1.55; }
+
+/* ----- Das Zeichenfenster ----- */
+.kal-iconfenster { width: min(480px, 94vw); max-height: 88vh; overflow-y: auto; }
+.kal-icongitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 7px; margin: 10px 0; }
+.kal-iconwahl {
+  display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px 4px; border-radius: 9px;
+  border: 1px solid color-mix(in srgb, var(--tinte) 13%, transparent); color: var(--tinte);
+}
+.kal-iconwahl small { font-size: 10px; color: var(--blass); text-align: center; line-height: 1.2; }
+.kal-iconwahl.an { border-color: var(--akzent); box-shadow: inset 0 0 0 1px var(--akzent); background: color-mix(in srgb, var(--akzent) 12%, transparent); color: var(--akzent); }
+.kal-iconwahl.an small { color: var(--akzent); font-weight: 700; }
 .kal-eigenwahl { position: relative; }
 .kal-eigenwahl .kal-iconwahl { width: 100%; }
-.kal-iconweg { position: absolute; right: -3px; top: -3px; width: 20px; height: 20px; border-radius: 50%; background: var(--papier); border: 1px solid var(--linie); color: var(--blass); font-size: 13px; line-height: 1; display: grid; place-items: center; }
-.kal-iconweg:hover { background: rgba(176,53,43,.16); color: #b0352b; }
-.kal-malfenster { width: min(340px, 92vw); display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
-.kal-malpad { width: 100%; aspect-ratio: 1; border-radius: 12px; border: 1px solid var(--linie); background: var(--papier); touch-action: none; cursor: crosshair; }
+.kal-iconweg { position: absolute; right: -4px; top: -4px; width: 21px; height: 21px; border-radius: 50%; background: var(--papier); border: 1px solid var(--linie); color: var(--blass); font-size: 14px; line-height: 1; display: grid; place-items: center; }
+.kal-malfenster { width: min(340px, 92vw); display: flex; flex-direction: column; gap: 11px; align-items: stretch; }
+.kal-malpad { width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--tinte) 16%, transparent); background: var(--papier); touch-action: none; cursor: crosshair; }
 .kal-malfuss { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--blass); }
 .kal-malvorschau { display: flex; color: var(--tinte); }
 
+/* ----- Das Blatt über einen Menschen ----- */
+.kal-personfenster { width: min(520px, 94vw); max-height: 88vh; overflow-y: auto; }
+.kal-personfenster h2 { font-family: ui-serif, "New York", Georgia, serif; font-size: 24px; margin: 4px 0 12px; }
+.kal-personzeilen { display: flex; flex-direction: column; gap: 1px; }
+.kal-personzeile { display: flex; align-items: baseline; gap: 12px; padding: 7px 2px; border-bottom: 1px solid color-mix(in srgb, var(--tinte) 10%, transparent); font-size: 13.5px; }
+.kal-personzeile span { color: var(--blass); }
+.kal-personzeile b { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 600; }
+.kal-personliste { display: flex; flex-direction: column; gap: 2px; }
+.kal-personeintrag { display: flex; align-items: flex-start; gap: 10px; width: 100%; text-align: left; padding: 8px 9px; border-radius: 7px; border-left: 2px solid var(--artfarbe, var(--blass)); }
+.kal-personeintrag i { display: flex; color: var(--artfarbe, var(--blass)); flex: none; padding-top: 1px; }
+.kal-personeintrag span { display: flex; flex-direction: column; min-width: 0; }
+.kal-personeintrag b { font-size: 14px; font-weight: 600; font-family: ui-serif, "New York", Georgia, serif; }
+.kal-personeintrag small { font-size: 12px; color: var(--blass); font-variant-numeric: tabular-nums; }
+
+/* ----- Zeigerzustände: nur mit echtem Zeiger. Auf dem iPad bliebe ein
+   Tipp sonst kleben und sähe aus wie eine Auswahl. ----- */
+@media (hover: hover) and (pointer: fine) {
+  .kal-blaetter:hover { background: color-mix(in srgb, var(--tinte) 8%, transparent); color: var(--tinte); }
+  .kal-heuteknopf:hover { background: color-mix(in srgb, var(--akzent) 12%, transparent); }
+  .kal-schliessen:hover { background: rgba(176,53,43,.12); color: #b0352b; }
+  .kal-ansichtknopf:hover:not(.an) { color: var(--tinte); }
+  .kal-jahrknopf:hover:not(.an) { background: color-mix(in srgb, var(--tinte) 8%, transparent); color: var(--tinte); }
+  .kal-zelle:hover:not(.gewaehlt) { background: color-mix(in srgb, var(--tinte) 6%, transparent); }
+  .kal-eintragtext:hover { background: color-mix(in srgb, var(--tinte) 5%, transparent); }
+  .kal-eintragzeichen:hover { background: color-mix(in srgb, var(--artfarbe, #888) 16%, transparent); }
+  .kal-personknopf:hover { background: color-mix(in srgb, var(--artfarbe, #888) 15%, transparent); }
+  .kal-jahrestag:hover, .kal-alterzeile-eintrag:hover, .kal-personeintrag:hover { background: color-mix(in srgb, var(--tinte) 6%, transparent); }
+  .kal-minitag:hover { background: color-mix(in srgb, var(--tinte) 12%, transparent); color: var(--tinte); }
+  .kal-kerbe:hover { background: color-mix(in srgb, var(--tinte) 10%, transparent); transform: scale(1.3); z-index: 2; }
+  .kal-bandname:hover { background: color-mix(in srgb, var(--tinte) 6%, transparent); }
+  .kal-artknopf:hover:not(.an) { background: color-mix(in srgb, var(--tinte) 6%, transparent); color: var(--tinte); }
+  .kal-iconwahl:hover:not(.an) { background: color-mix(in srgb, var(--tinte) 6%, transparent); }
+  .kal-zeichenknopf:hover { background: color-mix(in srgb, var(--tinte) 6%, transparent); }
+  .kal-namedazu:hover { background: color-mix(in srgb, var(--akzent) 10%, transparent); }
+  .kal-person button:hover { background: rgba(176,53,43,.16); color: #b0352b; }
+  .kal-iconweg:hover { background: rgba(176,53,43,.16); color: #b0352b; }
+  .kal-chronikjahr:hover { color: var(--akzent); }
+  .kal-filterchip:hover { background: color-mix(in srgb, var(--akzent) 22%, transparent); }
+}
+/* Beim Tippen kurz ein Echo — das ersetzt den Zeigerzustand auf dem iPad. */
+.kal-zelle:active, .kal-artknopf:active, .kal-iconwahl:active, .kal-jahrknopf:active,
+.kal-eintragtext:active, .kal-personeintrag:active, .kal-minitag:active { filter: brightness(.94); }
+
 @media (max-width: 760px) {
-  .kal-raster { grid-template-columns: 22px repeat(7, 1fr); gap: 2px; padding: 10px 8px 4px; }
-  .kal-zelle { min-height: 52px; padding: 3px 4px; border-radius: 7px; }
-  .kal-zelle .kal-zahl { font-size: 12px; }
-  .kal-monatname { font-size: 19px; }
-  .kal-tagesblatt { margin: 8px 8px 0; padding: 11px 12px; }
-  .kal-bandname { width: 110px; }
-  .kal-massband { margin-left: 122px; }
-  .kal-kopfrechts .knopf { padding: 5px 9px; font-size: 12.5px; }
+  .kal-raster { grid-template-columns: 24px repeat(7, 1fr); padding: 6px 8px 4px; }
+  .kal-zelle { min-height: 56px; padding: 3px 4px; }
+  .kal-zelle .kal-zahl { font-size: 13px; }
+  .kal-zelle.gewaehlt::after { width: 24px; height: 22px; }
+  .kal-monatname { font-size: 20px; }
+  .kal-kopf { padding: 11px 12px 8px; }
+  .kal-tagesblatt { margin: 10px 10px 0; padding: 12px 13px; }
+  .kal-chronik, .kal-jahrleiste, .kal-filterzeile { padding-inline: 12px; }
+  .kal-bandname { width: 118px; }
+  .kal-massband { margin-left: 130px; }
+  .kal-suche { min-width: 0; flex: 1; }
+  .kal-eintragleute { max-width: 100%; justify-content: flex-start; }
+  .kal-eintrag { flex-wrap: wrap; }
 }
 @media (prefers-reduced-motion: reduce) {
   .kal-buch.klappt-auf { animation: none; }
   .desk-ding.kalender.hat-heute::after { animation: none; }
-  .kal-zelle, .kal-eintrag, .kal-kerbe, .kalender-bild { transition: none; }
+  .kal-zelle, .kal-eintragtext, .kal-kerbe, .kalender-bild, .kal-ansichtknopf, .kal-artknopf { transition: none; }
 }
 
 </style>
@@ -3338,7 +3566,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.29.0';
+const APP_VERSION = '5.30.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -6200,22 +6428,52 @@ function caretKastenTextfeld(feld) {
   return kasten;
 }
 
+/* Wo der Cursor steht — gemessen, ohne den Text anzufassen.
+
+   Ein zusammengefallener Bereich hat in Safari oft kein Rechteck: am
+   Zeilenende, in leeren Zeilen, an Elementgrenzen. Frueher wurde dafuer ein
+   unsichtbarer Messpunkt in den Text gesetzt und danach normalize() gerufen.
+   Das ist ein Schreiben ins Dokument: normalize() verschmilzt Textknoten, und
+   die Auswahl haengt an (Knoten, Position) — sie zeigt danach woandershin.
+   Der Cursor sprang mitten im Tippen in ein Wort weiter oben.
+
+   Deshalb wird jetzt nur noch gemessen. Der Bereich wird auf einer KOPIE um
+   ein Zeichen geweitet; eine Kopie beruehrt das Dokument nicht. */
+function caretRechteck(sel, feld) {
+  if (!sel || !sel.rangeCount) return null;
+  let r;
+  try { r = sel.getRangeAt(0).cloneRange(); } catch (e) { return null; }
+  let box = r.getBoundingClientRect();
+  if (box && box.height) return box;
+  const knoten = r.startContainer, pos = r.startOffset;
+  const messe = (setz) => {
+    try { const k = r.cloneRange(); setz(k); const b = k.getBoundingClientRect(); return b && b.height ? b : null; }
+    catch (e) { return null; }
+  };
+  if (knoten && knoten.nodeType === 3) {
+    const laenge = knoten.nodeValue ? knoten.nodeValue.length : 0;
+    /* Erst das Zeichen davor (am Zeilenende das richtige), sonst das danach. */
+    box = (pos > 0 ? messe((k) => { k.setStart(knoten, pos - 1); k.setEnd(knoten, pos); }) : null)
+      || (pos < laenge ? messe((k) => { k.setStart(knoten, pos); k.setEnd(knoten, pos + 1); }) : null);
+    if (box) return box;
+  }
+  /* Immer noch nichts: das Element nehmen, in dem der Cursor steht. */
+  let elm = knoten && (knoten.nodeType === 1 ? knoten : knoten.parentElement);
+  if (knoten && knoten.nodeType === 1 && knoten.childNodes && knoten.childNodes[pos] && knoten.childNodes[pos].nodeType === 1) {
+    elm = knoten.childNodes[pos];
+  }
+  if (elm && feld && feld.contains && !feld.contains(elm)) elm = feld;
+  const rr = elm && elm.getBoundingClientRect ? elm.getBoundingClientRect() : null;
+  return rr && rr.height ? rr : null;
+}
+
 /* Rechteck des Cursors im Fenster — für Rich-Text über die Auswahl. */
 function caretKasten(feld) {
   if (!feld) return null;
   if (feld.isContentEditable) {
     const sel = window.getSelection && window.getSelection();
     if (!sel || !sel.rangeCount || !feld.contains(sel.anchorNode)) return null;
-    const r = sel.getRangeAt(0).cloneRange();
-    let box = r.getBoundingClientRect();
-    if (!box || (!box.height && !box.width)) {
-      /* Leere Zeile: ein unsichtbarer Messpunkt verrät die Lage. */
-      const mess = document.createElement('span'); mess.textContent = '​';
-      try {
-        r.insertNode(mess); box = mess.getBoundingClientRect();
-        const eltern = mess.parentNode; mess.remove(); if (eltern) eltern.normalize();
-      } catch (e) { return null; }
-    }
+    const box = caretRechteck(sel, feld);
     return box && box.height ? { top: box.top, bottom: box.bottom, height: box.height } : null;
   }
   if (feld.tagName === 'TEXTAREA') return caretKastenTextfeld(feld);
@@ -11176,7 +11434,12 @@ function oeffneSchreibraum(docId) {
   function spiegelBeiAuswahl() {
     if (!_sr || document.activeElement !== ta) return;
     aktualisiereSpiegel();
-    if (D.einst.typewriter || istRich) zentriereZeile();
+    /* Beim Setzen des Cursors wird NICHT gescrollt: wer hintippt, hat sich die
+       Stelle gerade ausgesucht. Nur die Schreibmaschine zieht die Zeile nach —
+       das ist ihr ganzer Zweck. Frueher scrollte auch formatierter Text bei
+       jeder Auswahlaenderung; auf dem iPad geschieht das mitten in der noch
+       nicht abgeschlossenen Tippgeste und verschiebt den Cursor. */
+    if (D.einst.typewriter) zentriereZeile();
   }
   /* Safari schiebt bei formatiertem Text gern das Fenster — zurück damit. */
   if (istRich) window.addEventListener('scroll', srFensterZurueck, { passive: true });
@@ -11262,13 +11525,10 @@ function zentriereZeileRich(sanft) {
   const { ta, mitte } = _sr;
   const sel = window.getSelection && window.getSelection();
   if (!sel || !sel.rangeCount || !ta.contains(sel.anchorNode)) return;
-  let r = sel.getRangeAt(0).cloneRange();
-  let box = r.getBoundingClientRect();
-  if (!box || (!box.height && !box.width)) {
-    /* Leere Zeile: ein unsichtbarer Messpunkt liefert die Lage. */
-    const mess = document.createElement('span'); mess.textContent = '\u200b';
-    try { r.insertNode(mess); box = mess.getBoundingClientRect(); mess.remove(); ta.normalize(); } catch (e) { return; }
-  }
+  /* Gemessen, nicht geschrieben: frueher wurde hier ein Messpunkt in den Text
+     gesetzt und danach normalize() gerufen — das hat den Cursor beim Tippen
+     mitten in ein Wort weiter oben springen lassen. Siehe caretRechteck. */
+  const box = typeof caretRechteck === 'function' ? caretRechteck(sel, ta) : sel.getRangeAt(0).getBoundingClientRect();
   if (!box || !box.height) return;
   const m = mitte.getBoundingClientRect();
   const oben = box.top - m.top, unten = box.bottom - m.top;
@@ -24956,51 +25216,46 @@ function kalJahreMitInhalt(liste) {
 }
 
 /* ===================== 61b — DER KALENDER, SICHTBAR =====================
-   Das Buch liegt aufgeschlagen auf dem Tisch. Ein Tippen, und es klappt auf:
-   ein Monat, ein Tag, ein Leben.
+   Ein Buch liegt auf dem Tisch. Ein Tippen, und es klappt auf: ein Monat,
+   ein Tag, ein Leben.
 
    Zu den Zeichen: keine Torten, keine Herzchen. Für Geburt und Tod nimmt der
    Kalender, was in deutschen Familienbüchern seit jeher steht — den Stern und
-   das Kreuzzeichen, * und †. Alles andere sind geritzte Linien: ein Weg, der
-   sich gabelt; eine Naht; ein Siegel. Zeichen, keine Bildchen.
+   das Kreuzzeichen. Alles andere sind geritzte Linien: ein Weg, der sich
+   gabelt; eine Naht; ein Siegel. Zeichen, keine Bildchen.
 
    Und wer ein eigenes will, zeichnet es selbst. */
 
 /* ----- Die geritzten Zeichen. 24×24, nur Linien. ----- */
+/* Jedes Zeichen hat einen eigenen Namen — es ist ein Zeichen, keine Art.
+   Wer ein Siegel für eine Reise nehmen will, soll das dürfen. */
 const KAL_ICONS = {
-  /* Geburt: der Stern der Familienbücher */
-  keim: '<path d="M12 4v16M5 7.5l14 9M19 7.5l-14 9"/>',
-  /* Tod: das Kreuzzeichen der Familienbücher — schmal, aufrecht */
-  kreuzweg: '<path d="M12 3v18M7.5 8h9"/>',
-  /* Begegnung: zwei Wege laufen zusammen */
-  zweiwege: '<path d="M4 4c3 5 5 7 8 8 3-1 5-3 8-8M12 12v8"/>',
-  /* Abschied: einer wird zu zweien */
-  wegfort: '<path d="M12 4v8M12 12c-3 1-5 3-8 8M12 12c3 1 5 3 8 8"/>',
-  /* Bund: zwei Ringe, ineinander */
-  ring: '<circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/>',
-  /* Bruch: eine Linie, die reißt */
-  riss: '<path d="M3 12h6l2-4 2 8 2-4h6"/>',
-  /* Reise: ein Pfad, gestrichelt */
-  pfad: '<path d="M3 18c4 0 4-6 8-6s4 6 8 6" stroke-dasharray="3 3"/><path d="M17 15l3 3-3 3"/>',
-  /* Ankunft: eine Schwelle, über die jemand tritt */
-  schwelle: '<path d="M4 20h16M8 20V8h8v12M3 12h5"/>',
-  /* Wunde: eine genähte Naht */
-  naht: '<path d="M3 12h18M7 9v6M11 9v6M15 9v6"/>',
-  /* Fund: ein Stein in der Hand */
-  stein: '<path d="M6 15c0-4 3-7 6-7s6 3 6 7-3 5-6 5-6-1-6-5z"/><path d="M9 13c1-1 2-1.5 3-1.5"/>',
-  /* Verlust: die Stelle, wo etwas war */
-  leer: '<circle cx="12" cy="12" r="7" stroke-dasharray="2.5 3.5"/>',
-  /* Schwur: ein Siegel */
-  siegel: '<circle cx="12" cy="12" r="7"/><path d="M9 12l2 2 4-4"/>',
-  /* Geheimnis: ein Schlüsselloch */
-  schloss: '<circle cx="12" cy="10" r="3"/><path d="M10.5 12.5L9.5 18h5l-1-5.5"/>',
-  /* Wende: der Weg knickt ab */
-  scheide: '<path d="M4 20V9a4 4 0 014-4h9"/><path d="M14 2l4 3-4 3"/>',
-  /* Brief: ein gefaltetes Blatt */
-  faltung: '<path d="M4 6h16v12H4z"/><path d="M4 6l8 6 8-6"/>',
-  /* Ereignis: ein Punkt, der zählt */
-  punktkreis: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>'
+  keim: { name: 'Stern', d: '<path d="M12 4v16M5 7.5l14 9M19 7.5l-14 9"/>' },
+  kreuzweg: { name: 'Kreuz', d: '<path d="M12 3v18M7.5 8h9"/>' },
+  zweiwege: { name: 'Gabelung', d: '<path d="M4 4c3 5 5 7 8 8 3-1 5-3 8-8M12 12v8"/>' },
+  wegfort: { name: 'Trennung', d: '<path d="M12 4v8M12 12c-3 1-5 3-8 8M12 12c3 1 5 3 8 8"/>' },
+  ring: { name: 'Ringe', d: '<circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/>' },
+  riss: { name: 'Riss', d: '<path d="M3 12h6l2-4 2 8 2-4h6"/>' },
+  pfad: { name: 'Pfad', d: '<path d="M3 18c4 0 4-6 8-6s4 6 8 6" stroke-dasharray="3 3"/><path d="M17 15l3 3-3 3"/>' },
+  schwelle: { name: 'Schwelle', d: '<path d="M4 20h16M8 20V8h8v12M3 12h5"/>' },
+  naht: { name: 'Naht', d: '<path d="M3 12h18M7 9v6M11 9v6M15 9v6"/>' },
+  stein: { name: 'Stein', d: '<path d="M6 15c0-4 3-7 6-7s6 3 6 7-3 5-6 5-6-1-6-5z"/><path d="M9 13c1-1 2-1.5 3-1.5"/>' },
+  leer: { name: 'Leerstelle', d: '<circle cx="12" cy="12" r="7" stroke-dasharray="2.5 3.5"/>' },
+  siegel: { name: 'Siegel', d: '<circle cx="12" cy="12" r="7"/><path d="M9 12l2 2 4-4"/>' },
+  schloss: { name: 'Schlüsselloch', d: '<circle cx="12" cy="10" r="3"/><path d="M10.5 12.5L9.5 18h5l-1-5.5"/>' },
+  scheide: { name: 'Knick', d: '<path d="M4 20V9a4 4 0 014-4h9"/><path d="M14 2l4 3-4 3"/>' },
+  faltung: { name: 'Brief', d: '<path d="M4 6h16v12H4z"/><path d="M4 6l8 6 8-6"/>' },
+  punktkreis: { name: 'Punkt', d: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>' },
+  /* Ein paar Zeichen, die zu keiner Art gehören — nur zum Nehmen */
+  anker: { name: 'Anker', d: '<circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21M6 12h12M4 15a8 8 0 0016 0"/>' },
+  feder: { name: 'Feder', d: '<path d="M4 20c6-1 11-5 14-12M18 3c-6 1-10 4-12 9l-1 5 5-1"/>' },
+  welle: { name: 'Welle', d: '<path d="M3 10c3-3 5 3 8 0s5 3 8 0M3 16c3-3 5 3 8 0s5 3 8 0"/>' },
+  fenster: { name: 'Fenster', d: '<path d="M5 4h14v16H5z"/><path d="M12 4v16M5 12h14"/>' },
+  faden: { name: 'Faden', d: '<path d="M4 6c5 0 5 12 10 12s6-8 6-8"/><circle cx="4" cy="6" r="1.4"/>' },
+  glocke: { name: 'Glocke', d: '<path d="M7 17V11a5 5 0 0110 0v6M4 17h16M10.5 20h3"/>' }
 };
+const KAL_ICON_IDS = Object.keys(KAL_ICONS);
+
 /* Ein Zeichen als SVG. Eigene Zeichen ('eigen:<id>') werden aus ihren Strichen gebaut. */
 function kalIcon(schluessel, groesse = 22) {
   const s = String(schluessel || '');
@@ -25009,8 +25264,13 @@ function kalIcon(schluessel, groesse = 22) {
     if (d && Array.isArray(d.striche)) return kalStricheSVG(d.striche, groesse);
     return kalIcon('punktkreis', groesse);
   }
-  const pfad = KAL_ICONS[s] || KAL_ICONS.punktkreis;
-  return '<svg viewBox="0 0 24 24" width="' + groesse + '" height="' + groesse + '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + pfad + '</svg>';
+  const eintrag = KAL_ICONS[s] || KAL_ICONS.punktkreis;
+  return '<svg viewBox="0 0 24 24" width="' + groesse + '" height="' + groesse + '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + eintrag.d + '</svg>';
+}
+function kalIconName(schluessel) {
+  const s = String(schluessel || '');
+  if (s.startsWith('eigen:')) return 'Eigenes';
+  return (KAL_ICONS[s] || KAL_ICONS.punktkreis).name;
 }
 /* Selbstgezeichnete Zeichen: Striche in 0..1, hier auf 24 gerechnet. */
 function kalStricheSVG(striche, groesse = 22) {
@@ -25036,7 +25296,6 @@ function kalIconMalen(fertig) {
   let striche = [], aktuell = null;
   const male = () => {
     ctx.clearRect(0, 0, groesse, groesse);
-    /* Hilfsraster: ein Kreuz, damit das Zeichen mittig wird */
     ctx.strokeStyle = 'rgba(160,140,110,.28)'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(groesse / 2, 12); ctx.lineTo(groesse / 2, groesse - 12); ctx.moveTo(12, groesse / 2); ctx.lineTo(groesse - 12, groesse / 2); ctx.stroke();
     ctx.strokeStyle = 'rgba(160,140,110,.16)';
@@ -25059,7 +25318,7 @@ function kalIconMalen(fertig) {
   const vorschauen = () => { vorschau.innerHTML = striche.length ? kalStricheSVG(striche, 30) : ''; };
   const kasten = el('div', { class: 'modal kal-malfenster' },
     el('div', { class: 'kartenkopf' }, 'EIN EIGENES ZEICHEN'),
-    el('p', { class: 'kal-hinweis' }, 'Zeichne es in Ruhe. Es wird auf Strichstärke gebracht und überall dort klein dargestellt, wo der Termin steht — im Raster, im Tag, im Lebensband.'),
+    el('p', { class: 'kal-hinweis' }, 'Zeichne es in Ruhe. Überall, wo der Tag steht, wird es klein dargestellt — im Raster, im Tagesblatt, im Lebensband.'),
     leinwand,
     el('div', { class: 'kal-malfuss' }, el('span', {}, 'So klein wird es:'), vorschau),
     el('div', { class: 'reihe' },
@@ -25079,16 +25338,17 @@ function kalIconMalen(fertig) {
 /* ----- Das Zeichen wählen ----- */
 function kalIconWaehlen(aktuell, fertig) {
   const eigene = kalEigeneIcons();
-  const knopf = (schluessel, name) => el('button', {
-    class: 'kal-iconwahl' + (schluessel === aktuell ? ' an' : ''), title: name,
+  const knopf = (schluessel) => el('button', {
+    class: 'kal-iconwahl' + (schluessel === aktuell ? ' an' : ''), title: kalIconName(schluessel),
     onclick: () => { zu(); fertig(schluessel); }
-  }, el('span', { class: 'kal-iconbild', html: kalIcon(schluessel, 26) }), el('small', {}, name));
+  }, el('span', { class: 'kal-iconbild', html: kalIcon(schluessel, 26) }), el('small', {}, kalIconName(schluessel)));
   const kasten = el('div', { class: 'modal kal-iconfenster' },
     el('div', { class: 'kartenkopf' }, 'DAS ZEICHEN'),
-    el('div', { class: 'kal-icongitter' }, ...KAL_ARTEN.map((a) => knopf(a.icon, a.name))),
-    eigene.length ? el('div', { class: 'kal-abschnitt' }, 'Deine eigenen') : null,
+    el('p', { class: 'kal-hinweis' }, 'Ein Zeichen für diesen Tag. Es muss nicht zur Art passen — wenn ein Anker besser trifft als ein Stern, nimm den Anker.'),
+    el('div', { class: 'kal-icongitter' }, ...KAL_ICON_IDS.map((id) => knopf(id))),
+    eigene.length ? el('span', { class: 'kal-abschnitt' }, 'Selbst gezeichnet') : null,
     eigene.length ? el('div', { class: 'kal-icongitter' }, ...eigene.map((d) => el('div', { class: 'kal-eigenwahl' },
-      knopf('eigen:' + d.id, 'Eigenes'),
+      knopf('eigen:' + d.id),
       el('button', { class: 'kal-iconweg', title: 'Dieses Zeichen wegwerfen', onclick: async () => { if (await frage('Dieses Zeichen wegwerfen?', { ja: 'Wegwerfen' })) { await loesche(d.id, true); zu(); kalIconWaehlen(aktuell, fertig); } } }, '×'))) ) : null,
     el('div', { class: 'reihe' },
       el('button', { class: 'knopf zart', onclick: () => { zu(); kalIconMalen(fertig); } }, 'Selbst zeichnen'),
@@ -25096,7 +25356,7 @@ function kalIconWaehlen(aktuell, fertig) {
   const zu = zeigeDeck(kasten);
 }
 
-/* ----- Ein Termin: anlegen und ändern ----- */
+/* ----- Ein Tag: eintragen und ändern ----- */
 /* Namen sind freier Text. Wer will, hängt eine vorhandene Figur daran — wer
    nicht will, tippt einfach einen Namen. Der Kalender gehört dem Kopf, nicht
    der Textsammlung. */
@@ -25105,14 +25365,15 @@ function kalTerminBearbeiten(doc, vorgabe, danach) {
   const stand = saubererTermin(doc || { wann: vorgabe || kalHeute(), art: 'ereignis' }) || saubererTermin({ wann: kalHeute() });
   let art = stand.art, icon = stand.icon, leute = stand.leute.slice();
 
-  const titel = el('input', { type: 'text', value: stand.titel, placeholder: 'Was geschieht? (darf leer bleiben)', maxlength: '200' });
+  const titel = el('input', { type: 'text', class: 'kal-titelfeld', value: stand.titel, placeholder: 'Was geschieht? (darf leer bleiben)', maxlength: '200' });
   const wannTeile = kalTeile(stand.wann);
-  const jahr = el('input', { type: 'number', class: 'kal-jahr', min: String(KAL_JAHR_VON), max: String(KAL_JAHR_BIS), value: String(wannTeile.jahr) });
+  const jahr = el('input', { type: 'number', class: 'kal-jahr', min: String(KAL_JAHR_VON), max: String(KAL_JAHR_BIS), step: '1', inputmode: 'numeric', value: String(wannTeile.jahr) });
   const monat = el('select', { class: 'kal-monat' }, el('option', { value: '' }, 'ganzes Jahr'), ...KAL_MONATE.map((m, i) => el('option', { value: String(i + 1) }, m)));
   const tag = el('select', { class: 'kal-tag' });
-  const wochentag = el('span', { class: 'kal-wochentag' });
+  const wochentag = el('div', { class: 'kal-wochentag' });
   monat.value = wannTeile.monat == null ? '' : String(wannTeile.monat);
-  const fuelleTage = () => {
+
+  function fuelleTage() {
     const j = Number(jahr.value) || KAL_JAHR_VON, m = Number(monat.value) || 0;
     const alt = tag.value;
     tag.innerHTML = '';
@@ -25121,90 +25382,105 @@ function kalTerminBearbeiten(doc, vorgabe, danach) {
     tag.value = alt && Number(alt) <= kalMonatstage(j, m || 1) ? alt : '';
     tag.disabled = !m;
     zeigeWochentag();
-  };
+  }
   const gewaehltesDatum = () => kalDatum(Number(jahr.value), monat.value ? Number(monat.value) : null, tag.value ? Number(tag.value) : null);
-  const zeigeWochentag = () => {
+  function zeigeWochentag() {
     const d = gewaehltesDatum();
     const t = kalTeile(d);
+    wochentag.innerHTML = '';
     if (t && t.genau === 'tag') {
       const mond = typeof mondphase === 'function' ? mondphase(kalZeit(d)) : null;
-      const mondwort = mond == null ? '' : mond < .03 || mond > .97 ? ' · Neumond' : Math.abs(mond - .5) < .03 ? ' · Vollmond' : '';
-      wochentag.textContent = KAL_TAGE[kalWochentag(d)] + ' · KW ' + kalWoche(d) + ' · ' + kalJahreszeit(d) + mondwort;
-    } else if (t) wochentag.textContent = t.genau === 'monat' ? 'ungefähr — irgendwann in dem Monat' : 'ungefähr — irgendwann in dem Jahr';
-    else wochentag.textContent = '';
+      const mondwort = mond == null ? '' : mond < .04 || mond > .96 ? 'Neumond' : Math.abs(mond - .5) < .04 ? 'Vollmond' : '';
+      anfuegen(wochentag,
+        el('b', {}, KAL_TAGE[kalWochentag(d)]),
+        el('span', {}, 'KW ' + kalWoche(d)), el('span', {}, kalJahreszeit(d)),
+        mondwort ? el('span', {}, mondwort) : null);
+    } else if (t) {
+      anfuegen(wochentag, el('em', {}, t.genau === 'monat' ? 'ungefähr — irgendwann in dem Monat' : 'ungefähr — irgendwann in dem Jahr'));
+    }
     zeigeAlter();
-  };
+  }
   jahr.addEventListener('input', fuelleTage); monat.addEventListener('change', fuelleTage); tag.addEventListener('change', zeigeWochentag);
 
-  /* Zeitraum: nur wenn gewünscht */
+  /* Ein Zeitraum — nur wenn es einer ist */
   const bisAn = el('input', { type: 'checkbox' });
-  /* Ein Datumsfeld kann nur ganze Tage. Ein ungenaues Ende ('2026-08') waere
-     darin unsichtbar - dann lieber gar keins zeigen als ein leeres Feld. */
   const bisTag = kalTeile(stand.bis) && kalTeile(stand.bis).genau === 'tag' ? stand.bis : '';
   const bisFeld = el('input', { type: 'date', class: 'kal-bis', min: KAL_JAHR_VON + '-01-01', max: KAL_JAHR_BIS + '-12-31', value: bisTag });
   bisAn.checked = !!bisTag;
-  const bisZeile = el('label', { class: 'kal-bisreihe' }, bisAn, el('span', {}, 'Es dauert länger — bis'), bisFeld);
+  const bisFeldZeile = el('div', { class: 'kal-bisfeld' }, el('span', {}, 'letzter Tag'), bisFeld);
+  const bisZeile = el('div', { class: 'kal-spanne' },
+    el('label', { class: 'kal-kaestchen' }, bisAn, el('span', {}, 'Zieht sich über mehrere Tage')),
+    bisFeldZeile);
+  const bisZeigen = () => { bisFeldZeile.style.display = bisAn.checked ? '' : 'none'; };
+  bisAn.addEventListener('change', bisZeigen);
 
   /* Die Art */
   const artWahl = el('div', { class: 'kal-artwahl' });
-  const zeichneArten = () => {
+  function zeichneArten() {
     artWahl.innerHTML = '';
     for (const a of KAL_ARTEN) {
-      artWahl.append(el('button', { type: 'button', class: 'kal-artknopf' + (a.id === art ? ' an' : ''), title: a.name, style: '--artfarbe:' + a.farbe, onclick: () => { art = a.id; zeichneArten(); zeigeZeichen(); zeigeAlter(); } },
+      artWahl.append(el('button', { type: 'button', class: 'kal-artknopf' + (a.id === art ? ' an' : ''), title: a.name, style: '--artfarbe:' + a.farbe, 'aria-pressed': a.id === art ? 'true' : 'false', onclick: () => { art = a.id; zeichneArten(); zeigeZeichen(); zeigeAlter(); } },
         el('span', { class: 'kal-artbild', html: kalIcon(a.icon, 20) }), el('small', {}, a.name)));
     }
-  };
+  }
   zeichneArten();
 
   /* Das Zeichen */
   const zeichenKnopf = el('button', { type: 'button', class: 'kal-zeichenknopf', onclick: () => kalIconWaehlen(icon || kalArt(art).icon, (neuIcon) => { icon = neuIcon; zeigeZeichen(); }) });
-  const zeigeZeichen = () => { zeichenKnopf.innerHTML = ''; anfuegen(zeichenKnopf, el('span', { class: 'kal-iconbild', html: kalIcon(icon || kalArt(art).icon, 24) }), el('small', {}, icon ? 'eigenes Zeichen' : 'Zeichen der Art')); };
+  function zeigeZeichen() {
+    zeichenKnopf.innerHTML = '';
+    anfuegen(zeichenKnopf,
+      el('span', { class: 'kal-iconbild', html: kalIcon(icon || kalArt(art).icon, 24) }),
+      el('span', { class: 'kal-zeichentext' },
+        el('b', {}, kalIconName(icon || kalArt(art).icon)),
+        el('small', {}, icon ? 'selbst gewählt · tippen zum Ändern' : 'das Zeichen der Art · tippen zum Ändern')));
+  }
   zeigeZeichen();
 
-  /* Die Leute: frei getippt. Vorhandene Figuren werden vorgeschlagen, mehr nicht. */
+  /* Die Leute: frei getippt. */
   const leuteReihe = el('div', { class: 'kal-leute' });
-  const namensfeld = el('input', { type: 'text', placeholder: 'Ein Name — einfach tippen', maxlength: '120', list: 'kal-namensliste' });
+  const namensfeld = el('input', { type: 'text', class: 'kal-namensfeld', placeholder: 'Ein Name — einfach tippen', maxlength: '120', list: 'kal-namensliste' });
   const alterZeile = el('div', { class: 'kal-alterzeile' });
-  const zeigeLeute = () => {
+  function zeigeLeute() {
     leuteReihe.innerHTML = '';
     for (const p of leute) {
       leuteReihe.append(el('span', { class: 'kal-person' }, p.name,
-        el('button', { type: 'button', title: 'Weg damit', onclick: () => { leute = leute.filter((x) => x !== p); zeigeLeute(); } }, '×')));
+        el('button', { type: 'button', title: 'Diesen Namen wieder wegnehmen', onclick: () => { leute = leute.filter((x) => x !== p); zeigeLeute(); } }, '×')));
     }
     if (!leute.length) leuteReihe.append(el('span', { class: 'kal-leerhinweis' }, 'Noch niemand. Muss auch nicht sein.'));
     zeigeAlter();
-  };
+  }
   const nameDazu = () => {
     const n = namensfeld.value.trim();
-    if (!n) return;
+    if (!n) { namensfeld.focus(); return; }
     if (leute.some((p) => p.name.toLowerCase() === n.toLowerCase())) { namensfeld.value = ''; return; }
-    /* Gibt es zufällig eine Figur mit dem Namen, wird sie mitverknüpft — sonst nicht. */
     const figur = [...D.docs.values()].find((d) => d.typ === 'figur' && !d.geloescht && String(d.titel || '').toLowerCase() === n.toLowerCase());
     leute.push({ id: figur ? figur.id : '', name: n });
-    namensfeld.value = ''; zeigeLeute();
+    namensfeld.value = ''; zeigeLeute(); namensfeld.focus();
   };
   namensfeld.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); nameDazu(); } });
-  /* Vorschläge: bereits im Kalender genannte Namen und vorhandene Figuren */
   const vorschlaege = new Set([...kalLeute().map((p) => p.name), ...[...D.docs.values()].filter((d) => d.typ === 'figur' && !d.geloescht && d.titel).map((d) => d.titel)]);
   const liste = el('datalist', { id: 'kal-namensliste' }, ...[...vorschlaege].slice(0, 200).map((n) => el('option', { value: n })));
 
   /* Wie alt jemand an diesem Tag ist — sofort, während man tippt */
-  const zeigeAlter = () => {
+  function zeigeAlter() {
     alterZeile.innerHTML = '';
     const d = gewaehltesDatum();
     if (!d || art === 'geburt') return;
-    const zeilen = [];
     for (const p of leute) {
       const g = kalGeburtVon([p]);
-      if (!g) continue;
-      const a = kalAlter(g, d);
-      if (a) zeilen.push(p.name + ' ist an diesem Tag ' + kalAlterText(a) + '.');
-      else zeilen.push(p.name + ' ist an diesem Tag noch nicht geboren.');
       const tod = kalTodVon([p]);
-      if (tod && kalZeit(d) > kalZeit(tod)) zeilen.push(p.name + ' ist zu diesem Zeitpunkt bereits gestorben (' + kalLesbar(tod) + ').');
+      if (!g && !tod) continue;
+      if (g) {
+        const a = kalAlter(g, d);
+        alterZeile.append(el('div', { class: 'kal-alterhinweis' + (a ? '' : ' warn') },
+          el('b', {}, p.name), a ? ' ist an diesem Tag ' + kalAlterText(a) + '.' : ' ist an diesem Tag noch nicht geboren (Geburt: ' + kalLesbar(g) + ').'));
+      }
+      if (tod && kalZeit(d) > kalZeit(tod)) {
+        alterZeile.append(el('div', { class: 'kal-alterhinweis warn' }, el('b', {}, p.name), ' ist zu diesem Zeitpunkt bereits gestorben (' + kalLesbar(tod) + ').'));
+      }
     }
-    for (const z of zeilen) alterZeile.append(el('div', { class: 'kal-alterhinweis' + (z.includes('noch nicht geboren') || z.includes('bereits gestorben') ? ' warn' : '') }, z));
-  };
+  }
 
   const notiz = el('textarea', { class: 'kal-notiz', rows: '4', placeholder: 'Was noch dazugehört. Was niemand sonst weiß.', maxlength: '4000' }, stand.notiz);
   const ort = el('input', { type: 'text', value: stand.ort, placeholder: 'Wo? (darf leer bleiben)', maxlength: '200' });
@@ -25214,21 +25490,32 @@ function kalTerminBearbeiten(doc, vorgabe, danach) {
   const kasten = el('div', { class: 'modal kal-fenster' },
     el('div', { class: 'kartenkopf' }, neu ? 'EIN NEUER TAG' : 'DIESEN TAG ÄNDERN'),
     feld('Was', titel),
-    feld('Wann', el('div', { class: 'kal-datumreihe' }, jahr, monat, tag), null),
-    wochentag,
-    bisZeile,
+    el('div', { class: 'kal-feld' }, el('span', { class: 'kal-feldname' }, 'Wann'),
+      el('div', { class: 'kal-datumreihe' },
+        el('span', { class: 'kal-wahlfeld jahr' }, jahr),
+        el('span', { class: 'kal-wahlfeld monat' }, monat),
+        el('span', { class: 'kal-wahlfeld tag' }, tag)),
+      wochentag,
+      el('small', { class: 'kal-feldunter' }, 'Nur das Jahr oder nur den Monat zu wissen, genügt auch — dann steht der Tag als „ungefähr“ im Kalender.'),
+      bisZeile),
     feld('Art', artWahl),
     feld('Zeichen', zeichenKnopf),
-    feld('Wer', el('div', {}, leuteReihe, el('div', { class: 'kal-namenreihe' }, namensfeld, el('button', { type: 'button', class: 'knopf zart', onclick: nameDazu }, 'Dazu'), liste)),
-      'Tipp einfach einen Namen. Er muss zu keiner Figur und keinem Text gehören.'),
-    alterZeile,
+    el('div', { class: 'kal-feld' }, el('span', { class: 'kal-feldname' }, 'Wer'),
+      leuteReihe,
+      el('div', { class: 'kal-namenreihe' }, namensfeld, el('button', { type: 'button', class: 'kal-namedazu', title: 'Diesen Namen zum Tag legen', onclick: nameDazu }, '+ Name'), liste),
+      el('small', { class: 'kal-feldunter' }, 'Einfach tippen. Der Name muss zu keiner Figur und keinem Text gehören.'),
+      alterZeile),
     feld('Wo', ort),
-    feld('Dazu', notiz),
-    el('label', { class: 'kal-bisreihe' }, jaehrlich, el('span', {}, 'Kehrt jedes Jahr wieder')),
+    feld('Notiz', notiz),
+    el('label', { class: 'kal-kaestchen' }, jaehrlich, el('span', {}, 'Kehrt jedes Jahr wieder')),
     el('div', { class: 'reihe' },
       !neu ? el('button', { class: 'knopf zart gefahr', onclick: async () => {
         if (await frage('Diesen Tag aus dem Kalender nehmen?', { ja: 'Herausnehmen' })) { await loesche(doc.id); zu(); if (danach) danach(); }
       } }, 'Herausnehmen') : null,
+      !neu ? el('button', { class: 'knopf zart', title: 'Denselben Tag noch einmal, zum Abwandeln', onclick: () => {
+        const kopie = neuDoc('termin', Object.assign(saubererTermin(doc), { titel: (doc.titel || kalArt(doc.art).name) + ' (noch einmal)' }));
+        zu(); toast('Abgeschrieben.'); kalTerminBearbeiten(kopie, null, danach);
+      } }, 'Abschreiben') : null,
       el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
       el('button', { class: 'knopf voll', onclick: () => {
         const wann = gewaehltesDatum();
@@ -25245,16 +25532,17 @@ function kalTerminBearbeiten(doc, vorgabe, danach) {
         if (danach) danach(wann);
       } }, neu ? 'Eintragen' : 'Übernehmen')));
   const zu = zeigeDeck(kasten);
-  /* Erst jetzt fuellen: zeigeWochentag ruft zeigeAlter, und das braucht
-     alterZeile und leute - beides steht erst hier vollstaendig. */
+  /* Erst jetzt füllen: zeigeWochentag ruft zeigeAlter, und das braucht
+     alterZeile und leute — beides steht erst hier vollständig. */
   fuelleTage();
   if (wannTeile.tag != null) { tag.value = String(wannTeile.tag); zeigeWochentag(); }
+  bisZeigen();
   zeigeLeute();
   setTimeout(() => titel.focus(), 60);
 }
 
 /* ----- Der große Kalender ----- */
-let _kal = { jahr: 0, monat: 0, tag: '', ansicht: 'monat' };
+let _kal = { jahr: 0, monat: 0, tag: '', ansicht: 'monat', suche: '', filterArt: '', filterPerson: '' };
 function kalenderOeffnen(startDatum) {
   const heute = kalHeute();
   const start = kalGueltig(startDatum) ? startDatum : (_kal.tag || heute);
@@ -25262,28 +25550,59 @@ function kalenderOeffnen(startDatum) {
   _kal.jahr = t.jahr; _kal.monat = t.monat || 1; _kal.tag = t.genau === 'tag' ? start : kalDatum(t.jahr, t.monat || 1, 1);
 
   const buehne = el('div', { class: 'kal-buehne' });
-  const kasten = el('div', { class: 'kal-buch' }, buehne);
-  const zu = zeigeDeck(kasten);
+  const kasten = el('div', { class: 'kal-buch' }, el('i', { class: 'kal-falz', 'aria-hidden': 'true' }), buehne);
+  const zu = zeigeDeck(kasten, () => document.removeEventListener('keydown', taste));
   kasten.classList.add('klappt-auf');
-  const neuZeichnen = (datum) => { if (datum && kalGueltig(datum)) { const p = kalTeile(datum); _kal.jahr = p.jahr; _kal.monat = p.monat || 1; if (p.genau === 'tag') _kal.tag = datum; } zeichneKalender(buehne, neuZeichnen, zu); };
+  const neuZeichnen = (datum) => {
+    if (datum && kalGueltig(datum)) { const p = kalTeile(datum); _kal.jahr = p.jahr; _kal.monat = p.monat || 1; if (p.genau === 'tag') _kal.tag = datum; }
+    zeichneKalender(buehne, neuZeichnen, zu);
+  };
+  /* Mit den Pfeiltasten durch die Tage — schneller als jedes Tippen. */
+  const taste = (ev) => {
+    if (!kasten.isConnected) { document.removeEventListener('keydown', taste); return; }
+    const ziel = ev.target;
+    if (ziel && (ziel.tagName === 'INPUT' || ziel.tagName === 'TEXTAREA' || ziel.tagName === 'SELECT')) return;
+    if (document.querySelectorAll('.schleier').length > 1) return;   /* ein Fenster liegt darüber */
+    if (_kal.ansicht !== 'monat') return;
+    const springe = (tage) => {
+      const d = new Date(kalZeit(_kal.tag) + tage * 86400000);
+      const ziel2 = kalDatum(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());
+      if (!ziel2) return;
+      ev.preventDefault(); neuZeichnen(ziel2);
+    };
+    if (ev.key === 'ArrowLeft') springe(-1);
+    else if (ev.key === 'ArrowRight') springe(1);
+    else if (ev.key === 'ArrowUp') springe(-7);
+    else if (ev.key === 'ArrowDown') springe(7);
+    else if (ev.key === 'PageUp') springe(-28);
+    else if (ev.key === 'PageDown') springe(28);
+    else if (ev.key === 'n' || ev.key === 'N') { ev.preventDefault(); kalTerminBearbeiten(null, _kal.tag, (d) => neuZeichnen(d)); }
+  };
+  document.addEventListener('keydown', taste);
   zeichneKalender(buehne, neuZeichnen, zu);
+}
+
+/* Was gerade gezeigt wird — Suche und Filter greifen überall gleich. */
+function kalGefiltert(alle) {
+  let liste = alle;
+  if (_kal.filterArt) liste = liste.filter((e) => e.art === _kal.filterArt);
+  if (_kal.filterPerson) liste = liste.filter((e) => (e.leute || []).some((p) => kalPersonSchluessel(p) === _kal.filterPerson));
+  const q = _kal.suche.trim().toLowerCase();
+  if (q) {
+    liste = liste.filter((e) => [e.titel, e.notiz, e.ort, kalArt(e.art).name, (e.leute || []).map((p) => p.name).join(' '), kalLesbar(e.wann)]
+      .join(' ').toLowerCase().includes(q));
+  }
+  return liste;
 }
 
 function zeichneKalender(buehne, neuZeichnen, schliessen) {
   const heute = kalHeute();
-  const alle = kalTermine();
+  const roh = kalTermine();
+  const alle = kalGefiltert(roh);
+  const gefiltert = alle.length !== roh.length;
   buehne.innerHTML = '';
 
-  /* --- Kopf: Jahr und Monat --- */
-  const jahrLeiste = el('div', { class: 'kal-jahrleiste' });
-  const mitInhalt = new Set(kalJahreMitInhalt(alle));
-  for (let j = KAL_JAHR_VON; j <= KAL_JAHR_BIS; j++) {
-    jahrLeiste.append(el('button', {
-      class: 'kal-jahrknopf' + (j === _kal.jahr ? ' an' : '') + (mitInhalt.has(j) ? ' voll' : ''),
-      'data-jahr': String(j),
-      onclick: () => neuZeichnen(kalDatum(j, _kal.monat, 1))
-    }, String(j)));
-  }
+  /* --- Kopf --- */
   const monatName = el('h2', { class: 'kal-monatname' }, KAL_MONATE[_kal.monat - 1], el('i', {}, String(_kal.jahr)));
   const blaettern = (schritt) => {
     let m = _kal.monat + schritt, j = _kal.jahr;
@@ -25291,52 +25610,81 @@ function zeichneKalender(buehne, neuZeichnen, schliessen) {
     if (j < KAL_JAHR_VON || j > KAL_JAHR_BIS) return;
     neuZeichnen(kalDatum(j, m, 1));
   };
-  const kopf = el('div', { class: 'kal-kopf' },
-    el('button', { class: 'kal-blaetter', title: 'Ein Monat zurück', onclick: () => blaettern(-1) }, '‹'),
-    monatName,
-    el('button', { class: 'kal-blaetter', title: 'Ein Monat vor', onclick: () => blaettern(1) }, '›'),
-    el('div', { class: 'kal-kopfrechts' },
-      el('button', { class: 'knopf zart', onclick: () => neuZeichnen(heute) }, 'Heute'),
-      el('button', { class: 'kal-ansichtknopf' + (_kal.ansicht === 'jahr' ? ' an' : ''), title: 'Das ganze Jahr auf einen Blick', onclick: () => { _kal.ansicht = _kal.ansicht === 'jahr' ? 'monat' : 'jahr'; neuZeichnen(); } }, 'Jahr'),
-      el('button', { class: 'kal-ansichtknopf' + (_kal.ansicht === 'leben' ? ' an' : ''), title: 'Die Lebensbänder aller Leute', onclick: () => { _kal.ansicht = _kal.ansicht === 'leben' ? 'monat' : 'leben'; neuZeichnen(); } }, 'Leben'),
-      el('button', { class: 'kal-schliessen', title: 'Den Kalender zuklappen', onclick: () => schliessen() }, '×')));
+  const suchfeld = el('input', { type: 'search', class: 'kal-suchfeld', placeholder: 'Suchen …', value: _kal.suche });
+  suchfeld.addEventListener('input', entprellt(() => { _kal.suche = suchfeld.value; neuZeichnen(); }, 280, true));
+  const ansicht = (id, name, titelText) => el('button', {
+    class: 'kal-ansichtknopf' + (_kal.ansicht === id ? ' an' : ''), title: titelText,
+    onclick: () => { _kal.ansicht = id; neuZeichnen(); }
+  }, name);
+  buehne.append(el('div', { class: 'kal-kopf' },
+    el('div', { class: 'kal-kopfzeile' },
+      el('button', { class: 'kal-blaetter', title: 'Ein Monat zurück', onclick: () => blaettern(-1) }, '‹'),
+      monatName,
+      el('button', { class: 'kal-blaetter', title: 'Ein Monat vor', onclick: () => blaettern(1) }, '›'),
+      el('div', { class: 'kal-kopfrechts' },
+        el('button', { class: 'kal-heuteknopf', title: 'Zum heutigen Tag', onclick: () => neuZeichnen(heute) }, 'Heute'),
+        el('button', { class: 'kal-schliessen', title: 'Den Kalender zuklappen', onclick: () => schliessen() }, '×'))),
+    el('div', { class: 'kal-kopfzeile zwei' },
+      el('div', { class: 'kal-ansichten' },
+        ansicht('monat', 'Monat', 'Ein Monat, Tag für Tag'),
+        ansicht('jahr', 'Jahr', 'Das ganze Jahr auf einen Blick'),
+        ansicht('leben', 'Leben', 'Die Lebensbänder aller Leute'),
+        ansicht('chronik', 'Chronik', 'Alles der Reihe nach')),
+      el('div', { class: 'kal-suche' }, el('span', { class: 'kal-lupe', html: ik('suche') }), suchfeld))));
 
-  buehne.append(kopf, jahrLeiste);
-  /* Das gewählte Jahr in den Blick rücken */
+  /* --- Filter: nur sichtbar, wenn einer gesetzt ist --- */
+  if (_kal.filterArt || _kal.filterPerson || _kal.suche.trim()) {
+    const chip = (text, weg) => el('button', { class: 'kal-filterchip', onclick: () => { weg(); neuZeichnen(); } }, text, el('i', {}, '×'));
+    buehne.append(el('div', { class: 'kal-filterzeile' },
+      el('span', {}, alle.length === 1 ? 'ein Tag passt' : alle.length + ' Tage passen'),
+      _kal.suche.trim() ? chip('„' + _kal.suche.trim() + '“', () => { _kal.suche = ''; }) : null,
+      _kal.filterArt ? chip(kalArt(_kal.filterArt).name, () => { _kal.filterArt = ''; }) : null,
+      _kal.filterPerson ? chip((kalLeute(roh).find((p) => p.schluessel === _kal.filterPerson) || { name: 'jemand' }).name, () => { _kal.filterPerson = ''; }) : null));
+  }
+
+  /* --- Jahresleiste --- */
+  const jahrLeiste = el('div', { class: 'kal-jahrleiste' });
+  const mitInhalt = new Set(kalJahreMitInhalt(alle));
+  for (let j = KAL_JAHR_VON; j <= KAL_JAHR_BIS; j++) {
+    jahrLeiste.append(el('button', {
+      class: 'kal-jahrknopf' + (j === _kal.jahr ? ' an' : '') + (mitInhalt.has(j) ? ' voll' : ''),
+      onclick: () => neuZeichnen(kalDatum(j, _kal.monat, 1))
+    }, String(j)));
+  }
+  buehne.append(jahrLeiste);
   requestAnimationFrame(() => { const an = jahrLeiste.querySelector('.an'); if (an) an.scrollIntoView({ block: 'nearest', inline: 'center' }); });
 
-  if (_kal.ansicht === 'jahr') { buehne.append(kalJahresBild(alle, neuZeichnen)); return; }
-  if (_kal.ansicht === 'leben') { buehne.append(kalLebensbaender(alle, neuZeichnen)); return; }
-
-  /* --- Das Monatsraster --- */
-  const raster = el('div', { class: 'kal-raster' });
-  raster.append(el('div', { class: 'kal-kw-kopf' }, 'KW'));
-  for (const d of KAL_TAGE_KURZ) raster.append(el('div', { class: 'kal-wochenkopf' }, d));
-  const zaehlung = kalMonatsZaehlung(_kal.jahr, _kal.monat, alle);
-  for (const woche of kalRaster(_kal.jahr, _kal.monat)) {
-    raster.append(el('div', { class: 'kal-kw' }, woche.kw ? String(woche.kw) : ''));
-    for (const zelle of woche.tage) {
-      const termine = zelle.fremd ? kalAmTag(zelle.datum, alle) : (zaehlung[zelle.tag] || []);
-      const istHeute = zelle.datum === heute;
-      const gewaehlt = zelle.datum === _kal.tag;
-      const zellElement = el('button', {
-        class: 'kal-zelle' + (zelle.fremd ? ' fremd' : '') + (istHeute ? ' heute' : '') + (gewaehlt ? ' gewaehlt' : '') + (termine.length ? ' voll' : ''),
-        onclick: () => { _kal.tag = zelle.datum; if (zelle.fremd) neuZeichnen(zelle.datum); else { _kal.tag = zelle.datum; neuZeichnen(); } },
-        ondblclick: () => kalTerminBearbeiten(null, zelle.datum, (d) => neuZeichnen(d))
-      },
-        el('span', { class: 'kal-zahl' }, String(zelle.tag)),
-        termine.length ? el('span', { class: 'kal-marken' }, ...termine.slice(0, 4).map((e) => el('i', { class: 'kal-marke', style: '--artfarbe:' + kalArt(e.art).farbe, html: kalIcon(e.icon || kalArt(e.art).icon, 13) }))) : null,
-        termine.length > 4 ? el('span', { class: 'kal-mehr' }, '+' + (termine.length - 4)) : null);
-      raster.append(zellElement);
+  if (_kal.ansicht === 'jahr') buehne.append(kalJahresBild(alle, neuZeichnen));
+  else if (_kal.ansicht === 'leben') buehne.append(kalLebensbaender(alle, neuZeichnen));
+  else if (_kal.ansicht === 'chronik') buehne.append(kalChronik(alle, neuZeichnen));
+  else {
+    /* --- Das Monatsraster --- */
+    const raster = el('div', { class: 'kal-raster' });
+    raster.append(el('div', { class: 'kal-kw-kopf' }, 'KW'));
+    for (const d of KAL_TAGE_KURZ) raster.append(el('div', { class: 'kal-wochenkopf' }, d));
+    const zaehlung = kalMonatsZaehlung(_kal.jahr, _kal.monat, alle);
+    for (const woche of kalRaster(_kal.jahr, _kal.monat)) {
+      raster.append(el('div', { class: 'kal-kw' }, woche.kw ? String(woche.kw) : ''));
+      for (const zelle of woche.tage) {
+        const termine = zelle.fremd ? kalAmTag(zelle.datum, alle) : (zaehlung[zelle.tag] || []);
+        const wt = kalWochentag(zelle.datum);
+        raster.append(el('button', {
+          class: 'kal-zelle' + (zelle.fremd ? ' fremd' : '') + (zelle.datum === heute ? ' heute' : '') +
+            (zelle.datum === _kal.tag ? ' gewaehlt' : '') + (termine.length ? ' voll' : '') + (wt >= 5 ? ' wochenende' : ''),
+          onclick: () => { _kal.tag = zelle.datum; neuZeichnen(zelle.fremd ? zelle.datum : undefined); },
+          ondblclick: () => kalTerminBearbeiten(null, zelle.datum, (d) => neuZeichnen(d))
+        },
+          el('span', { class: 'kal-zahl' }, String(zelle.tag)),
+          termine.length ? el('span', { class: 'kal-marken' }, ...termine.slice(0, 4).map((e) => el('i', { class: 'kal-marke', style: '--artfarbe:' + kalArt(e.art).farbe, html: kalIcon(e.icon || kalArt(e.art).icon, 13) }))) : null,
+          termine.length > 4 ? el('span', { class: 'kal-mehr' }, '+' + (termine.length - 4)) : null));
+      }
     }
+    buehne.append(raster);
+    buehne.append(kalTagesBlatt(_kal.tag, alle, neuZeichnen));
   }
-  buehne.append(raster);
-
-  /* --- Der gewählte Tag --- */
-  buehne.append(kalTagesBlatt(_kal.tag, alle, neuZeichnen));
 
   /* --- Was nicht sein kann --- */
-  const w = kalWidersprueche(alle);
+  const w = kalWidersprueche(roh);
   if (w.length) {
     buehne.append(el('details', { class: 'kal-widersprueche' },
       el('summary', {}, w.length === 1 ? 'Eine Stelle passt nicht zusammen' : w.length + ' Stellen passen nicht zusammen'),
@@ -25345,49 +25693,79 @@ function zeichneKalender(buehne, neuZeichnen, schliessen) {
         el('span', {}, x.text),
         x.termin ? el('button', { class: 'kal-wlink', onclick: () => neuZeichnen(x.termin.wann) }, 'hinsehen') : null))));
   }
+  if (gefiltert && !alle.length) buehne.append(el('div', { class: 'kal-leertag mitte' }, 'Dazu steht nichts im Kalender.'));
+}
+
+/* ----- Ein Eintrag, wie er überall aussieht ----- */
+function kalEintragElement(e, bezug, alle, neuZeichnen, mitDatum) {
+  const art = kalArt(e.art);
+  const t = kalTeile(bezug);
+  const wiederkehr = (e.jaehrlich || e.art === 'geburt') && t && kalTeile(e.wann).jahr !== t.jahr;
+  const alterHier = [];
+  for (const p of e.leute || []) {
+    if (e.art === 'geburt') {
+      const a = bezug ? kalAlter(e.wann, bezug) : null;
+      if (a && a.jahre > 0) alterHier.push(p.name + ' wird ' + a.jahre);
+      continue;
+    }
+    const g = kalGeburtVon([p], alle);
+    if (!g) continue;
+    const a = kalAlter(g, e.wann);
+    if (a) alterHier.push(p.name + ': ' + kalAlterText(a));
+  }
+  return el('div', { class: 'kal-eintrag', style: '--artfarbe:' + art.farbe },
+    el('button', { class: 'kal-eintragzeichen', title: 'Nur „' + art.name + '“ zeigen', onclick: () => { _kal.filterArt = _kal.filterArt === e.art ? '' : e.art; neuZeichnen(); }, html: kalIcon(e.icon || art.icon, 24) }),
+    el('button', { class: 'kal-eintragtext', onclick: () => kalTerminBearbeiten(e, null, (d) => neuZeichnen(d || bezug)) },
+      el('b', {}, e.titel || art.name),
+      el('span', { class: 'kal-eintragart' },
+        (mitDatum ? kalKurz(e.wann) + ' · ' : '') + art.name +
+        (wiederkehr ? ' · seit ' + kalTeile(e.wann).jahr : '') + (e.bis ? ' · bis ' + kalKurz(e.bis) : '') + (e.ort ? ' · ' + e.ort : '')),
+      alterHier.length ? el('span', { class: 'kal-eintragalter' }, alterHier.join('  ·  ')) : null,
+      e.notiz ? el('span', { class: 'kal-eintragnotiz' }, e.notiz.length > 220 ? e.notiz.slice(0, 217) + ' …' : e.notiz) : null),
+    (e.leute || []).length ? el('span', { class: 'kal-eintragleute' }, ...e.leute.map((p) => el('button', {
+      class: 'kal-personknopf', title: 'Alles über ' + p.name,
+      onclick: () => kalPersonBlatt(p, neuZeichnen)
+    }, p.name))) : null);
 }
 
 /* ----- Das Tagesblatt ----- */
 function kalTagesBlatt(datum, alle, neuZeichnen) {
-  const t = kalTeile(datum);
+  const heute = kalHeute();
   const termine = kalAmTag(datum, alle);
   const jahrestage = kalJahrestage(datum, alle);
   const mond = typeof mondphase === 'function' ? mondphase(kalZeit(datum)) : null;
-  const mondwort = mond == null ? '' : mond < .04 || mond > .96 ? 'Neumond' : Math.abs(mond - .5) < .04 ? 'Vollmond' : mond < .5 ? 'zunehmend' : 'abnehmend';
+  const mondwort = mond == null ? '' : mond < .04 || mond > .96 ? 'Neumond' : Math.abs(mond - .5) < .04 ? 'Vollmond' : mond < .5 ? 'zunehmender Mond' : 'abnehmender Mond';
+  const tageWeg = Math.round((kalZeit(datum) - kalZeit(heute)) / 86400000);
+  const abstand = tageWeg === 0 ? 'heute' : tageWeg > 0
+    ? (tageWeg === 1 ? 'morgen' : 'in ' + tageWeg.toLocaleString('de-DE') + ' Tagen')
+    : (tageWeg === -1 ? 'gestern' : 'vor ' + Math.abs(tageWeg).toLocaleString('de-DE') + ' Tagen');
 
   const blatt = el('div', { class: 'kal-tagesblatt' },
     el('div', { class: 'kal-tageskopf' },
-      el('div', {},
+      el('div', { class: 'kal-tagestitel' },
         el('h3', {}, kalLesbar(datum, true)),
-        el('small', {}, 'KW ' + kalWoche(datum) + ' · ' + kalJahreszeit(datum) + (mondwort ? ' · Mond: ' + mondwort : ''))),
+        el('small', {}, 'KW ' + kalWoche(datum) + ' · ' + kalJahreszeit(datum) + (mondwort ? ' · ' + mondwort : '') + ' · ' + abstand)),
       el('button', { class: 'knopf voll', onclick: () => kalTerminBearbeiten(null, datum, (d) => neuZeichnen(d)) }, 'Hier etwas eintragen')));
 
   if (!termine.length) {
     blatt.append(el('div', { class: 'kal-leertag' }, 'An diesem Tag steht noch nichts. Ein leerer Tag ist kein leerer Tag — er ist einer, an dem noch alles möglich ist.'));
   }
-  for (const e of termine) {
-    const art = kalArt(e.art);
-    const wiederkehr = (e.jaehrlich || e.art === 'geburt') && kalTeile(e.wann).jahr !== t.jahr;
-    const alterHier = [];
-    for (const p of e.leute || []) {
-      if (e.art === 'geburt') {
-        const a = kalAlter(e.wann, datum);
-        if (a && a.jahre > 0) alterHier.push(p.name + ' wird ' + a.jahre + '.');
-        continue;
-      }
-      const g = kalGeburtVon([p], alle);
-      if (!g) continue;
-      const a = kalAlter(g, e.wann);
-      if (a) alterHier.push(p.name + ': ' + kalAlterText(a));
-    }
-    blatt.append(el('button', { class: 'kal-eintrag', style: '--artfarbe:' + art.farbe, onclick: () => kalTerminBearbeiten(e, null, (d) => neuZeichnen(d || datum)) },
-      el('span', { class: 'kal-eintragzeichen', html: kalIcon(e.icon || art.icon, 24) }),
-      el('span', { class: 'kal-eintragtext' },
-        el('b', {}, e.titel || art.name),
-        el('span', { class: 'kal-eintragart' }, art.name + (wiederkehr ? ' · seit ' + kalTeile(e.wann).jahr : '') + (e.bis ? ' · bis ' + kalKurz(e.bis) : '') + (e.ort ? ' · ' + e.ort : '')),
-        (e.leute || []).length ? el('span', { class: 'kal-eintragleute' }, e.leute.map((p) => p.name).join(', ')) : null,
-        alterHier.length ? el('span', { class: 'kal-eintragalter' }, alterHier.join(' · ')) : null,
-        e.notiz ? el('span', { class: 'kal-eintragnotiz' }, e.notiz.length > 220 ? e.notiz.slice(0, 217) + ' …' : e.notiz) : null)));
+  for (const e of termine) blatt.append(kalEintragElement(e, datum, alle, neuZeichnen, false));
+
+  /* Wer an diesem Tag lebte — und wie alt war */
+  const alter = [];
+  for (const p of kalLeute(alle)) {
+    if (!p.geburt) continue;
+    const a = kalAlter(p.geburt, datum);
+    if (!a) continue;
+    if (p.tod && kalZeit(datum) > kalZeit(p.tod)) continue;
+    alter.push({ p, a });
+  }
+  if (alter.length) {
+    blatt.append(el('details', { class: 'kal-alterliste' },
+      el('summary', {}, 'Wer an diesem Tag lebte (' + alter.length + ')'),
+      ...alter.sort((x, y) => y.a.jahre - x.a.jahre).map(({ p, a }) => el('button', { class: 'kal-alterzeile-eintrag', onclick: () => kalPersonBlatt(p, neuZeichnen) },
+        el('b', {}, p.name), el('span', {}, kalAlterText(a))))));
   }
   if (jahrestage.length) {
     blatt.append(el('div', { class: 'kal-jahrestage' },
@@ -25397,6 +25775,62 @@ function kalTagesBlatt(datum, alle, neuZeichnen) {
         el('span', {}, j.termin.titel || kalArt(j.termin.art).name)))));
   }
   return blatt;
+}
+
+/* ----- Die Chronik: alles der Reihe nach ----- */
+function kalChronik(alle, neuZeichnen) {
+  const raus = el('div', { class: 'kal-chronik' });
+  const sortiert = kalSortiert(alle);
+  if (!sortiert.length) {
+    raus.append(el('div', { class: 'kal-leertag mitte' }, 'Noch nichts eingetragen. Der erste Tag wartet.'));
+    return raus;
+  }
+  const proJahr = {};
+  for (const e of sortiert) { const j = kalTeile(e.wann).jahr; proJahr[j] = (proJahr[j] || 0) + 1; }
+  let letztesJahr = null;
+  for (const e of sortiert) {
+    const t = kalTeile(e.wann);
+    if (t.jahr !== letztesJahr) {
+      letztesJahr = t.jahr;
+      raus.append(el('button', { class: 'kal-chronikjahr' + (t.jahr === _kal.jahr ? ' an' : ''), onclick: () => { _kal.ansicht = 'monat'; neuZeichnen(kalDatum(t.jahr, t.monat || 1, 1)); } },
+        String(t.jahr), el('i', {}, proJahr[t.jahr] === 1 ? 'ein Tag' : proJahr[t.jahr] + ' Tage')));
+    }
+    raus.append(kalEintragElement(e, e.wann, alle, neuZeichnen, true));
+  }
+  return raus;
+}
+
+/* ----- Ein Blatt über einen Menschen ----- */
+function kalPersonBlatt(person, neuZeichnen) {
+  const alle = kalTermine();
+  const schluessel = kalPersonSchluessel(person);
+  const p = kalLeute(alle).find((x) => x.schluessel === schluessel) || { schluessel, name: person.name || 'Jemand', geburt: '', tod: '', termine: [] };
+  const heute = kalHeute();
+  const lebt = p.geburt && !p.tod;
+  const alterHeute = p.geburt ? kalAlter(p.geburt, heute) : null;
+  const lebensalter = kalLebensalter(p);
+
+  const zeile = (name, wert) => wert ? el('div', { class: 'kal-personzeile' }, el('span', {}, name), el('b', {}, wert)) : null;
+  const kasten = el('div', { class: 'modal kal-personfenster' },
+    el('div', { class: 'kartenkopf' }, 'IM KALENDER'),
+    el('h2', {}, p.name),
+    el('div', { class: 'kal-personzeilen' },
+      zeile('Geboren', p.geburt ? kalLesbar(p.geburt, true) : ''),
+      zeile('Gestorben', p.tod ? kalLesbar(p.tod, true) : ''),
+      zeile(lebt ? 'Heute' : 'Wurde', lebt && alterHeute ? kalAlterText(alterHeute) : lebensalter ? lebensalter.jahre + ' Jahre' : ''),
+      zeile('Tage im Kalender', p.termine.length ? String(p.termine.length) : '')),
+    !p.geburt ? el('p', { class: 'kal-hinweis' }, 'Ohne Geburtsdatum kann der Kalender kein Alter rechnen. Trag einen Tag mit der Art „Geburt“ ein — dann steht bei jedem Ereignis, wie alt ' + p.name + ' war.') : null,
+    el('span', { class: 'kal-abschnitt' }, 'Alle Tage'),
+    el('div', { class: 'kal-personliste' }, ...kalSortiert(p.termine).map((e) => {
+      const a = p.geburt && e.art !== 'geburt' ? kalAlter(p.geburt, e.wann) : null;
+      return el('button', { class: 'kal-personeintrag', style: '--artfarbe:' + kalArt(e.art).farbe, onclick: () => { zu(); _kal.ansicht = 'monat'; neuZeichnen(e.wann); } },
+        el('i', { html: kalIcon(e.icon || kalArt(e.art).icon, 18) }),
+        el('span', {}, el('b', {}, e.titel || kalArt(e.art).name), el('small', {}, kalKurz(e.wann) + (a ? ' · ' + kalAlterText(a) : ''))));
+    })),
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => { _kal.filterPerson = _kal.filterPerson === schluessel ? '' : schluessel; zu(); neuZeichnen(); } }, _kal.filterPerson === schluessel ? 'Filter aufheben' : 'Nur diese Tage zeigen'),
+      el('button', { class: 'knopf voll', onclick: () => { zu(); kalTerminBearbeiten(null, _kal.tag || heute, (d) => neuZeichnen(d)); } }, 'Einen Tag dazu')));
+  const zu = zeigeDeck(kasten);
 }
 
 /* ----- Das ganze Jahr ----- */
@@ -25431,7 +25865,7 @@ function kalLebensbaender(alle, neuZeichnen) {
   const leute = kalLeute(alle);
   const raus = el('div', { class: 'kal-leben' });
   if (!leute.length) {
-    raus.append(el('div', { class: 'kal-leertag' }, 'Noch niemand im Kalender. Trag einen Tag ein und schreib einen Namen dazu — mehr braucht es nicht.'));
+    raus.append(el('div', { class: 'kal-leertag mitte' }, 'Noch niemand im Kalender. Trag einen Tag ein und schreib einen Namen dazu — mehr braucht es nicht.'));
     return raus;
   }
   const spanne = KAL_JAHR_BIS - KAL_JAHR_VON + 1;
@@ -25441,6 +25875,7 @@ function kalLebensbaender(alle, neuZeichnen) {
   for (let j = KAL_JAHR_VON; j <= KAL_JAHR_BIS; j += 5) {
     massband.append(el('i', { class: 'kal-massmarke', style: 'left:' + (anteil(kalDatum(j, 1, 1)) * 100).toFixed(2) + '%' }, String(j)));
   }
+  massband.append(el('i', { class: 'kal-massheute', style: 'left:' + (anteil(kalHeute()) * 100).toFixed(2) + '%', title: 'heute' }));
   raus.append(massband);
 
   for (const p of leute) {
@@ -25455,14 +25890,15 @@ function kalLebensbaender(alle, neuZeichnen) {
     for (const e of p.termine) {
       const art = kalArt(e.art);
       spur.append(el('button', {
-        class: 'kal-kerbe art-' + e.art, style: 'left:' + (anteil(e.wann) * 100).toFixed(2) + '%;--artfarbe:' + art.farbe,
+        class: 'kal-kerbe', style: 'left:' + (anteil(e.wann) * 100).toFixed(2) + '%;--artfarbe:' + art.farbe,
         title: (e.titel || art.name) + ' · ' + kalLesbar(e.wann),
         onclick: () => { _kal.ansicht = 'monat'; neuZeichnen(e.wann); }
       }, el('i', { html: kalIcon(e.icon || art.icon, 12) })));
     }
     const alterText = lebt ? 'wurde ' + kalLebensalter(p).jahre + ' Jahre' : p.geburt ? kalAlterText(kalAlter(p.geburt, kalHeute())) + ' alt' : p.termine.length + (p.termine.length === 1 ? ' Eintrag' : ' Einträge');
-    band.append(el('div', { class: 'kal-bandname' }, el('b', {}, p.name),
-      el('small', {}, (p.geburt ? '* ' + kalKurz(p.geburt) : '') + (p.tod ? '  † ' + kalKurz(p.tod) : '') + (p.geburt || p.tod ? ' · ' : '') + alterText)), spur);
+    band.append(el('button', { class: 'kal-bandname', title: 'Alles über ' + p.name, onclick: () => kalPersonBlatt(p, neuZeichnen) },
+      el('b', {}, p.name),
+      el('small', {}, (p.geburt ? '✻ ' + kalKurz(p.geburt) : '') + (p.tod ? '   † ' + kalKurz(p.tod) : '') + (p.geburt || p.tod ? ' · ' : '') + alterText)), spur);
     raus.append(band);
   }
   return raus;

@@ -2307,3 +2307,62 @@ Platz mit dem groessten Abstand. Und weil Rechnung und Wirklichkeit
 auseinandergehen koennen, prueft `tischzitatRuecken` am Ende **gemessen** nach
 (`tischzitatStoert`) und probiert bis zu vierzehn Plaetze durch. Nur diese
 Pruefung stimmt wirklich - die gerechnete war zweimal zu optimistisch.
+
+## Der springende Cursor (5.30.0) — bitte nie wieder
+
+Beim Schreiben in formatiertem Text sprang der Cursor mitten in ein Wort
+weiter oben. Zwei Ursachen, beide im selben Muster: **beim Messen wurde
+geschrieben.**
+
+1. `caretKasten` (36-caret.js) und `zentriereZeileRich` (45-schreibraum.js)
+   haben, wenn ein zusammengefallener Bereich kein Rechteck lieferte (Safari:
+   am Zeilenende, in leeren Zeilen, an Elementgrenzen), einen unsichtbaren
+   Messpunkt **in den Text gesetzt** und danach `normalize()` gerufen.
+   `insertNode` spaltet den Textknoten am Cursor, `normalize()` fuegt ihn
+   wieder zusammen — und die Auswahl haengt an (Knoten, Position). Danach
+   zeigt sie woandershin. Auf iOS kommt dazu, dass die Autokorrektur eigene
+   Bereiche im Text haelt, die durch jede DOM-Aenderung ungueltig werden.
+   **Neu:** `caretRechteck(sel, feld)` in 36-caret.js misst nur noch. Der
+   Bereich wird auf einer KOPIE um ein Zeichen geweitet; eine Kopie beruehrt
+   das Dokument nicht. Es gibt im ganzen Quelltext kein `normalize()` mehr.
+2. `spiegelBeiAuswahl` hing an `selectionchange` und rief fuer **jeden**
+   formatierten Text `zentriereZeile()` — also auch mitten in der Tippgeste,
+   mit der man den Cursor setzt. Ein Scroll waehrend einer noch nicht
+   abgeschlossenen Tippgeste verschiebt auf iOS den Cursor. **Neu:** beim
+   Setzen des Cursors wird nicht mehr gescrollt; nur die Schreibmaschine
+   (`D.einst.typewriter`) zieht die Zeile nach, und beim `input` bleibt es
+   wie bisher.
+
+**Regel daraus:** In einem contenteditable niemals messen, indem man etwas
+einsetzt. Und niemals auf `selectionchange` scrollen, ausser der Nutzer hat
+genau das bestellt.
+
+## Kalender: Aussehen und Bedienung (5.30.0)
+
+Vier gemeldete Fehler, alle behoben:
+
+- **Der Tipp-Zustand blieb auf dem iPad kleben** und sah aus wie eine
+  Auswahl — deshalb schien immer „Geburt" gewaehlt. Alle Zeigerzustaende des
+  Kalenders stehen jetzt in `@media (hover: hover) and (pointer: fine)`, und
+  der gewaehlte Zustand (`.kal-artknopf.an`) ist deutlich statt zart.
+  **Dasselbe gilt fuer jedes neue Bedienteil: hover nur hinter der Abfrage.**
+- **Die Zahlen bei „Wann"** sassen schlecht. Jahr/Monat/Tag sind jetzt ein
+  zusammenhaengendes Feld mit eigenen Pfeilen, Serifenziffern und
+  `tabular-nums`; die Breiten sind fest (`5.4em / 1fr / 7.4em`).
+- **„Es dauert laenger — bis"** war unverstaendlich: heisst jetzt „Zieht sich
+  ueber mehrere Tage", und das Datumsfeld erscheint erst, wenn es angehakt ist.
+- **„Dazu" neben dem Namensfeld** stiess mit dem Feldnamen „Dazu" zusammen.
+  Der Knopf heisst „+ Name", das Notizfeld heisst „Notiz".
+
+Dazu die Ansicht selbst: kein Kachelraster mehr, sondern ein Kassenbuch —
+Papierfaser, Falz in der Mitte, Haarlinien statt Kaesten, Wochenenden zart
+getoent, und der gewaehlte Tag mit Tinte umkringelt (`.kal-zelle.gewaehlt::after`,
+eine unrunde `border-radius`, damit es von Hand aussieht).
+
+**Neu dazu:** Suche ueber alle Felder, Filter nach Art (Tipp auf das Zeichen)
+und nach Person, die Ansicht **Chronik** (alles der Reihe nach, nach Jahren),
+ein **Personenblatt** (Lebensdaten, Alter heute, alle Tage mit Alter), „Wer an
+diesem Tag lebte", Abstand in Tagen zu heute, **Abschreiben** eines Tages,
+sechs zusaetzliche Zeichen ohne Art (Anker, Feder, Welle, Fenster, Faden,
+Glocke) und Tastatur: Pfeile = Tag/Woche, Bild auf/ab = vier Wochen, `n` = neuer
+Tag.

@@ -1,49 +1,44 @@
 /* ===================== 61b — DER KALENDER, SICHTBAR =====================
-   Das Buch liegt aufgeschlagen auf dem Tisch. Ein Tippen, und es klappt auf:
-   ein Monat, ein Tag, ein Leben.
+   Ein Buch liegt auf dem Tisch. Ein Tippen, und es klappt auf: ein Monat,
+   ein Tag, ein Leben.
 
    Zu den Zeichen: keine Torten, keine Herzchen. Für Geburt und Tod nimmt der
    Kalender, was in deutschen Familienbüchern seit jeher steht — den Stern und
-   das Kreuzzeichen, * und †. Alles andere sind geritzte Linien: ein Weg, der
-   sich gabelt; eine Naht; ein Siegel. Zeichen, keine Bildchen.
+   das Kreuzzeichen. Alles andere sind geritzte Linien: ein Weg, der sich
+   gabelt; eine Naht; ein Siegel. Zeichen, keine Bildchen.
 
    Und wer ein eigenes will, zeichnet es selbst. */
 
 /* ----- Die geritzten Zeichen. 24×24, nur Linien. ----- */
+/* Jedes Zeichen hat einen eigenen Namen — es ist ein Zeichen, keine Art.
+   Wer ein Siegel für eine Reise nehmen will, soll das dürfen. */
 const KAL_ICONS = {
-  /* Geburt: der Stern der Familienbücher */
-  keim: '<path d="M12 4v16M5 7.5l14 9M19 7.5l-14 9"/>',
-  /* Tod: das Kreuzzeichen der Familienbücher — schmal, aufrecht */
-  kreuzweg: '<path d="M12 3v18M7.5 8h9"/>',
-  /* Begegnung: zwei Wege laufen zusammen */
-  zweiwege: '<path d="M4 4c3 5 5 7 8 8 3-1 5-3 8-8M12 12v8"/>',
-  /* Abschied: einer wird zu zweien */
-  wegfort: '<path d="M12 4v8M12 12c-3 1-5 3-8 8M12 12c3 1 5 3 8 8"/>',
-  /* Bund: zwei Ringe, ineinander */
-  ring: '<circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/>',
-  /* Bruch: eine Linie, die reißt */
-  riss: '<path d="M3 12h6l2-4 2 8 2-4h6"/>',
-  /* Reise: ein Pfad, gestrichelt */
-  pfad: '<path d="M3 18c4 0 4-6 8-6s4 6 8 6" stroke-dasharray="3 3"/><path d="M17 15l3 3-3 3"/>',
-  /* Ankunft: eine Schwelle, über die jemand tritt */
-  schwelle: '<path d="M4 20h16M8 20V8h8v12M3 12h5"/>',
-  /* Wunde: eine genähte Naht */
-  naht: '<path d="M3 12h18M7 9v6M11 9v6M15 9v6"/>',
-  /* Fund: ein Stein in der Hand */
-  stein: '<path d="M6 15c0-4 3-7 6-7s6 3 6 7-3 5-6 5-6-1-6-5z"/><path d="M9 13c1-1 2-1.5 3-1.5"/>',
-  /* Verlust: die Stelle, wo etwas war */
-  leer: '<circle cx="12" cy="12" r="7" stroke-dasharray="2.5 3.5"/>',
-  /* Schwur: ein Siegel */
-  siegel: '<circle cx="12" cy="12" r="7"/><path d="M9 12l2 2 4-4"/>',
-  /* Geheimnis: ein Schlüsselloch */
-  schloss: '<circle cx="12" cy="10" r="3"/><path d="M10.5 12.5L9.5 18h5l-1-5.5"/>',
-  /* Wende: der Weg knickt ab */
-  scheide: '<path d="M4 20V9a4 4 0 014-4h9"/><path d="M14 2l4 3-4 3"/>',
-  /* Brief: ein gefaltetes Blatt */
-  faltung: '<path d="M4 6h16v12H4z"/><path d="M4 6l8 6 8-6"/>',
-  /* Ereignis: ein Punkt, der zählt */
-  punktkreis: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>'
+  keim: { name: 'Stern', d: '<path d="M12 4v16M5 7.5l14 9M19 7.5l-14 9"/>' },
+  kreuzweg: { name: 'Kreuz', d: '<path d="M12 3v18M7.5 8h9"/>' },
+  zweiwege: { name: 'Gabelung', d: '<path d="M4 4c3 5 5 7 8 8 3-1 5-3 8-8M12 12v8"/>' },
+  wegfort: { name: 'Trennung', d: '<path d="M12 4v8M12 12c-3 1-5 3-8 8M12 12c3 1 5 3 8 8"/>' },
+  ring: { name: 'Ringe', d: '<circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/>' },
+  riss: { name: 'Riss', d: '<path d="M3 12h6l2-4 2 8 2-4h6"/>' },
+  pfad: { name: 'Pfad', d: '<path d="M3 18c4 0 4-6 8-6s4 6 8 6" stroke-dasharray="3 3"/><path d="M17 15l3 3-3 3"/>' },
+  schwelle: { name: 'Schwelle', d: '<path d="M4 20h16M8 20V8h8v12M3 12h5"/>' },
+  naht: { name: 'Naht', d: '<path d="M3 12h18M7 9v6M11 9v6M15 9v6"/>' },
+  stein: { name: 'Stein', d: '<path d="M6 15c0-4 3-7 6-7s6 3 6 7-3 5-6 5-6-1-6-5z"/><path d="M9 13c1-1 2-1.5 3-1.5"/>' },
+  leer: { name: 'Leerstelle', d: '<circle cx="12" cy="12" r="7" stroke-dasharray="2.5 3.5"/>' },
+  siegel: { name: 'Siegel', d: '<circle cx="12" cy="12" r="7"/><path d="M9 12l2 2 4-4"/>' },
+  schloss: { name: 'Schlüsselloch', d: '<circle cx="12" cy="10" r="3"/><path d="M10.5 12.5L9.5 18h5l-1-5.5"/>' },
+  scheide: { name: 'Knick', d: '<path d="M4 20V9a4 4 0 014-4h9"/><path d="M14 2l4 3-4 3"/>' },
+  faltung: { name: 'Brief', d: '<path d="M4 6h16v12H4z"/><path d="M4 6l8 6 8-6"/>' },
+  punktkreis: { name: 'Punkt', d: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>' },
+  /* Ein paar Zeichen, die zu keiner Art gehören — nur zum Nehmen */
+  anker: { name: 'Anker', d: '<circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21M6 12h12M4 15a8 8 0 0016 0"/>' },
+  feder: { name: 'Feder', d: '<path d="M4 20c6-1 11-5 14-12M18 3c-6 1-10 4-12 9l-1 5 5-1"/>' },
+  welle: { name: 'Welle', d: '<path d="M3 10c3-3 5 3 8 0s5 3 8 0M3 16c3-3 5 3 8 0s5 3 8 0"/>' },
+  fenster: { name: 'Fenster', d: '<path d="M5 4h14v16H5z"/><path d="M12 4v16M5 12h14"/>' },
+  faden: { name: 'Faden', d: '<path d="M4 6c5 0 5 12 10 12s6-8 6-8"/><circle cx="4" cy="6" r="1.4"/>' },
+  glocke: { name: 'Glocke', d: '<path d="M7 17V11a5 5 0 0110 0v6M4 17h16M10.5 20h3"/>' }
 };
+const KAL_ICON_IDS = Object.keys(KAL_ICONS);
+
 /* Ein Zeichen als SVG. Eigene Zeichen ('eigen:<id>') werden aus ihren Strichen gebaut. */
 function kalIcon(schluessel, groesse = 22) {
   const s = String(schluessel || '');
@@ -52,8 +47,13 @@ function kalIcon(schluessel, groesse = 22) {
     if (d && Array.isArray(d.striche)) return kalStricheSVG(d.striche, groesse);
     return kalIcon('punktkreis', groesse);
   }
-  const pfad = KAL_ICONS[s] || KAL_ICONS.punktkreis;
-  return '<svg viewBox="0 0 24 24" width="' + groesse + '" height="' + groesse + '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + pfad + '</svg>';
+  const eintrag = KAL_ICONS[s] || KAL_ICONS.punktkreis;
+  return '<svg viewBox="0 0 24 24" width="' + groesse + '" height="' + groesse + '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + eintrag.d + '</svg>';
+}
+function kalIconName(schluessel) {
+  const s = String(schluessel || '');
+  if (s.startsWith('eigen:')) return 'Eigenes';
+  return (KAL_ICONS[s] || KAL_ICONS.punktkreis).name;
 }
 /* Selbstgezeichnete Zeichen: Striche in 0..1, hier auf 24 gerechnet. */
 function kalStricheSVG(striche, groesse = 22) {
@@ -79,7 +79,6 @@ function kalIconMalen(fertig) {
   let striche = [], aktuell = null;
   const male = () => {
     ctx.clearRect(0, 0, groesse, groesse);
-    /* Hilfsraster: ein Kreuz, damit das Zeichen mittig wird */
     ctx.strokeStyle = 'rgba(160,140,110,.28)'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(groesse / 2, 12); ctx.lineTo(groesse / 2, groesse - 12); ctx.moveTo(12, groesse / 2); ctx.lineTo(groesse - 12, groesse / 2); ctx.stroke();
     ctx.strokeStyle = 'rgba(160,140,110,.16)';
@@ -102,7 +101,7 @@ function kalIconMalen(fertig) {
   const vorschauen = () => { vorschau.innerHTML = striche.length ? kalStricheSVG(striche, 30) : ''; };
   const kasten = el('div', { class: 'modal kal-malfenster' },
     el('div', { class: 'kartenkopf' }, 'EIN EIGENES ZEICHEN'),
-    el('p', { class: 'kal-hinweis' }, 'Zeichne es in Ruhe. Es wird auf Strichstärke gebracht und überall dort klein dargestellt, wo der Termin steht — im Raster, im Tag, im Lebensband.'),
+    el('p', { class: 'kal-hinweis' }, 'Zeichne es in Ruhe. Überall, wo der Tag steht, wird es klein dargestellt — im Raster, im Tagesblatt, im Lebensband.'),
     leinwand,
     el('div', { class: 'kal-malfuss' }, el('span', {}, 'So klein wird es:'), vorschau),
     el('div', { class: 'reihe' },
@@ -122,16 +121,17 @@ function kalIconMalen(fertig) {
 /* ----- Das Zeichen wählen ----- */
 function kalIconWaehlen(aktuell, fertig) {
   const eigene = kalEigeneIcons();
-  const knopf = (schluessel, name) => el('button', {
-    class: 'kal-iconwahl' + (schluessel === aktuell ? ' an' : ''), title: name,
+  const knopf = (schluessel) => el('button', {
+    class: 'kal-iconwahl' + (schluessel === aktuell ? ' an' : ''), title: kalIconName(schluessel),
     onclick: () => { zu(); fertig(schluessel); }
-  }, el('span', { class: 'kal-iconbild', html: kalIcon(schluessel, 26) }), el('small', {}, name));
+  }, el('span', { class: 'kal-iconbild', html: kalIcon(schluessel, 26) }), el('small', {}, kalIconName(schluessel)));
   const kasten = el('div', { class: 'modal kal-iconfenster' },
     el('div', { class: 'kartenkopf' }, 'DAS ZEICHEN'),
-    el('div', { class: 'kal-icongitter' }, ...KAL_ARTEN.map((a) => knopf(a.icon, a.name))),
-    eigene.length ? el('div', { class: 'kal-abschnitt' }, 'Deine eigenen') : null,
+    el('p', { class: 'kal-hinweis' }, 'Ein Zeichen für diesen Tag. Es muss nicht zur Art passen — wenn ein Anker besser trifft als ein Stern, nimm den Anker.'),
+    el('div', { class: 'kal-icongitter' }, ...KAL_ICON_IDS.map((id) => knopf(id))),
+    eigene.length ? el('span', { class: 'kal-abschnitt' }, 'Selbst gezeichnet') : null,
     eigene.length ? el('div', { class: 'kal-icongitter' }, ...eigene.map((d) => el('div', { class: 'kal-eigenwahl' },
-      knopf('eigen:' + d.id, 'Eigenes'),
+      knopf('eigen:' + d.id),
       el('button', { class: 'kal-iconweg', title: 'Dieses Zeichen wegwerfen', onclick: async () => { if (await frage('Dieses Zeichen wegwerfen?', { ja: 'Wegwerfen' })) { await loesche(d.id, true); zu(); kalIconWaehlen(aktuell, fertig); } } }, '×'))) ) : null,
     el('div', { class: 'reihe' },
       el('button', { class: 'knopf zart', onclick: () => { zu(); kalIconMalen(fertig); } }, 'Selbst zeichnen'),
@@ -139,7 +139,7 @@ function kalIconWaehlen(aktuell, fertig) {
   const zu = zeigeDeck(kasten);
 }
 
-/* ----- Ein Termin: anlegen und ändern ----- */
+/* ----- Ein Tag: eintragen und ändern ----- */
 /* Namen sind freier Text. Wer will, hängt eine vorhandene Figur daran — wer
    nicht will, tippt einfach einen Namen. Der Kalender gehört dem Kopf, nicht
    der Textsammlung. */
@@ -148,14 +148,15 @@ function kalTerminBearbeiten(doc, vorgabe, danach) {
   const stand = saubererTermin(doc || { wann: vorgabe || kalHeute(), art: 'ereignis' }) || saubererTermin({ wann: kalHeute() });
   let art = stand.art, icon = stand.icon, leute = stand.leute.slice();
 
-  const titel = el('input', { type: 'text', value: stand.titel, placeholder: 'Was geschieht? (darf leer bleiben)', maxlength: '200' });
+  const titel = el('input', { type: 'text', class: 'kal-titelfeld', value: stand.titel, placeholder: 'Was geschieht? (darf leer bleiben)', maxlength: '200' });
   const wannTeile = kalTeile(stand.wann);
-  const jahr = el('input', { type: 'number', class: 'kal-jahr', min: String(KAL_JAHR_VON), max: String(KAL_JAHR_BIS), value: String(wannTeile.jahr) });
+  const jahr = el('input', { type: 'number', class: 'kal-jahr', min: String(KAL_JAHR_VON), max: String(KAL_JAHR_BIS), step: '1', inputmode: 'numeric', value: String(wannTeile.jahr) });
   const monat = el('select', { class: 'kal-monat' }, el('option', { value: '' }, 'ganzes Jahr'), ...KAL_MONATE.map((m, i) => el('option', { value: String(i + 1) }, m)));
   const tag = el('select', { class: 'kal-tag' });
-  const wochentag = el('span', { class: 'kal-wochentag' });
+  const wochentag = el('div', { class: 'kal-wochentag' });
   monat.value = wannTeile.monat == null ? '' : String(wannTeile.monat);
-  const fuelleTage = () => {
+
+  function fuelleTage() {
     const j = Number(jahr.value) || KAL_JAHR_VON, m = Number(monat.value) || 0;
     const alt = tag.value;
     tag.innerHTML = '';
@@ -164,90 +165,105 @@ function kalTerminBearbeiten(doc, vorgabe, danach) {
     tag.value = alt && Number(alt) <= kalMonatstage(j, m || 1) ? alt : '';
     tag.disabled = !m;
     zeigeWochentag();
-  };
+  }
   const gewaehltesDatum = () => kalDatum(Number(jahr.value), monat.value ? Number(monat.value) : null, tag.value ? Number(tag.value) : null);
-  const zeigeWochentag = () => {
+  function zeigeWochentag() {
     const d = gewaehltesDatum();
     const t = kalTeile(d);
+    wochentag.innerHTML = '';
     if (t && t.genau === 'tag') {
       const mond = typeof mondphase === 'function' ? mondphase(kalZeit(d)) : null;
-      const mondwort = mond == null ? '' : mond < .03 || mond > .97 ? ' · Neumond' : Math.abs(mond - .5) < .03 ? ' · Vollmond' : '';
-      wochentag.textContent = KAL_TAGE[kalWochentag(d)] + ' · KW ' + kalWoche(d) + ' · ' + kalJahreszeit(d) + mondwort;
-    } else if (t) wochentag.textContent = t.genau === 'monat' ? 'ungefähr — irgendwann in dem Monat' : 'ungefähr — irgendwann in dem Jahr';
-    else wochentag.textContent = '';
+      const mondwort = mond == null ? '' : mond < .04 || mond > .96 ? 'Neumond' : Math.abs(mond - .5) < .04 ? 'Vollmond' : '';
+      anfuegen(wochentag,
+        el('b', {}, KAL_TAGE[kalWochentag(d)]),
+        el('span', {}, 'KW ' + kalWoche(d)), el('span', {}, kalJahreszeit(d)),
+        mondwort ? el('span', {}, mondwort) : null);
+    } else if (t) {
+      anfuegen(wochentag, el('em', {}, t.genau === 'monat' ? 'ungefähr — irgendwann in dem Monat' : 'ungefähr — irgendwann in dem Jahr'));
+    }
     zeigeAlter();
-  };
+  }
   jahr.addEventListener('input', fuelleTage); monat.addEventListener('change', fuelleTage); tag.addEventListener('change', zeigeWochentag);
 
-  /* Zeitraum: nur wenn gewünscht */
+  /* Ein Zeitraum — nur wenn es einer ist */
   const bisAn = el('input', { type: 'checkbox' });
-  /* Ein Datumsfeld kann nur ganze Tage. Ein ungenaues Ende ('2026-08') waere
-     darin unsichtbar - dann lieber gar keins zeigen als ein leeres Feld. */
   const bisTag = kalTeile(stand.bis) && kalTeile(stand.bis).genau === 'tag' ? stand.bis : '';
   const bisFeld = el('input', { type: 'date', class: 'kal-bis', min: KAL_JAHR_VON + '-01-01', max: KAL_JAHR_BIS + '-12-31', value: bisTag });
   bisAn.checked = !!bisTag;
-  const bisZeile = el('label', { class: 'kal-bisreihe' }, bisAn, el('span', {}, 'Es dauert länger — bis'), bisFeld);
+  const bisFeldZeile = el('div', { class: 'kal-bisfeld' }, el('span', {}, 'letzter Tag'), bisFeld);
+  const bisZeile = el('div', { class: 'kal-spanne' },
+    el('label', { class: 'kal-kaestchen' }, bisAn, el('span', {}, 'Zieht sich über mehrere Tage')),
+    bisFeldZeile);
+  const bisZeigen = () => { bisFeldZeile.style.display = bisAn.checked ? '' : 'none'; };
+  bisAn.addEventListener('change', bisZeigen);
 
   /* Die Art */
   const artWahl = el('div', { class: 'kal-artwahl' });
-  const zeichneArten = () => {
+  function zeichneArten() {
     artWahl.innerHTML = '';
     for (const a of KAL_ARTEN) {
-      artWahl.append(el('button', { type: 'button', class: 'kal-artknopf' + (a.id === art ? ' an' : ''), title: a.name, style: '--artfarbe:' + a.farbe, onclick: () => { art = a.id; zeichneArten(); zeigeZeichen(); zeigeAlter(); } },
+      artWahl.append(el('button', { type: 'button', class: 'kal-artknopf' + (a.id === art ? ' an' : ''), title: a.name, style: '--artfarbe:' + a.farbe, 'aria-pressed': a.id === art ? 'true' : 'false', onclick: () => { art = a.id; zeichneArten(); zeigeZeichen(); zeigeAlter(); } },
         el('span', { class: 'kal-artbild', html: kalIcon(a.icon, 20) }), el('small', {}, a.name)));
     }
-  };
+  }
   zeichneArten();
 
   /* Das Zeichen */
   const zeichenKnopf = el('button', { type: 'button', class: 'kal-zeichenknopf', onclick: () => kalIconWaehlen(icon || kalArt(art).icon, (neuIcon) => { icon = neuIcon; zeigeZeichen(); }) });
-  const zeigeZeichen = () => { zeichenKnopf.innerHTML = ''; anfuegen(zeichenKnopf, el('span', { class: 'kal-iconbild', html: kalIcon(icon || kalArt(art).icon, 24) }), el('small', {}, icon ? 'eigenes Zeichen' : 'Zeichen der Art')); };
+  function zeigeZeichen() {
+    zeichenKnopf.innerHTML = '';
+    anfuegen(zeichenKnopf,
+      el('span', { class: 'kal-iconbild', html: kalIcon(icon || kalArt(art).icon, 24) }),
+      el('span', { class: 'kal-zeichentext' },
+        el('b', {}, kalIconName(icon || kalArt(art).icon)),
+        el('small', {}, icon ? 'selbst gewählt · tippen zum Ändern' : 'das Zeichen der Art · tippen zum Ändern')));
+  }
   zeigeZeichen();
 
-  /* Die Leute: frei getippt. Vorhandene Figuren werden vorgeschlagen, mehr nicht. */
+  /* Die Leute: frei getippt. */
   const leuteReihe = el('div', { class: 'kal-leute' });
-  const namensfeld = el('input', { type: 'text', placeholder: 'Ein Name — einfach tippen', maxlength: '120', list: 'kal-namensliste' });
+  const namensfeld = el('input', { type: 'text', class: 'kal-namensfeld', placeholder: 'Ein Name — einfach tippen', maxlength: '120', list: 'kal-namensliste' });
   const alterZeile = el('div', { class: 'kal-alterzeile' });
-  const zeigeLeute = () => {
+  function zeigeLeute() {
     leuteReihe.innerHTML = '';
     for (const p of leute) {
       leuteReihe.append(el('span', { class: 'kal-person' }, p.name,
-        el('button', { type: 'button', title: 'Weg damit', onclick: () => { leute = leute.filter((x) => x !== p); zeigeLeute(); } }, '×')));
+        el('button', { type: 'button', title: 'Diesen Namen wieder wegnehmen', onclick: () => { leute = leute.filter((x) => x !== p); zeigeLeute(); } }, '×')));
     }
     if (!leute.length) leuteReihe.append(el('span', { class: 'kal-leerhinweis' }, 'Noch niemand. Muss auch nicht sein.'));
     zeigeAlter();
-  };
+  }
   const nameDazu = () => {
     const n = namensfeld.value.trim();
-    if (!n) return;
+    if (!n) { namensfeld.focus(); return; }
     if (leute.some((p) => p.name.toLowerCase() === n.toLowerCase())) { namensfeld.value = ''; return; }
-    /* Gibt es zufällig eine Figur mit dem Namen, wird sie mitverknüpft — sonst nicht. */
     const figur = [...D.docs.values()].find((d) => d.typ === 'figur' && !d.geloescht && String(d.titel || '').toLowerCase() === n.toLowerCase());
     leute.push({ id: figur ? figur.id : '', name: n });
-    namensfeld.value = ''; zeigeLeute();
+    namensfeld.value = ''; zeigeLeute(); namensfeld.focus();
   };
   namensfeld.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); nameDazu(); } });
-  /* Vorschläge: bereits im Kalender genannte Namen und vorhandene Figuren */
   const vorschlaege = new Set([...kalLeute().map((p) => p.name), ...[...D.docs.values()].filter((d) => d.typ === 'figur' && !d.geloescht && d.titel).map((d) => d.titel)]);
   const liste = el('datalist', { id: 'kal-namensliste' }, ...[...vorschlaege].slice(0, 200).map((n) => el('option', { value: n })));
 
   /* Wie alt jemand an diesem Tag ist — sofort, während man tippt */
-  const zeigeAlter = () => {
+  function zeigeAlter() {
     alterZeile.innerHTML = '';
     const d = gewaehltesDatum();
     if (!d || art === 'geburt') return;
-    const zeilen = [];
     for (const p of leute) {
       const g = kalGeburtVon([p]);
-      if (!g) continue;
-      const a = kalAlter(g, d);
-      if (a) zeilen.push(p.name + ' ist an diesem Tag ' + kalAlterText(a) + '.');
-      else zeilen.push(p.name + ' ist an diesem Tag noch nicht geboren.');
       const tod = kalTodVon([p]);
-      if (tod && kalZeit(d) > kalZeit(tod)) zeilen.push(p.name + ' ist zu diesem Zeitpunkt bereits gestorben (' + kalLesbar(tod) + ').');
+      if (!g && !tod) continue;
+      if (g) {
+        const a = kalAlter(g, d);
+        alterZeile.append(el('div', { class: 'kal-alterhinweis' + (a ? '' : ' warn') },
+          el('b', {}, p.name), a ? ' ist an diesem Tag ' + kalAlterText(a) + '.' : ' ist an diesem Tag noch nicht geboren (Geburt: ' + kalLesbar(g) + ').'));
+      }
+      if (tod && kalZeit(d) > kalZeit(tod)) {
+        alterZeile.append(el('div', { class: 'kal-alterhinweis warn' }, el('b', {}, p.name), ' ist zu diesem Zeitpunkt bereits gestorben (' + kalLesbar(tod) + ').'));
+      }
     }
-    for (const z of zeilen) alterZeile.append(el('div', { class: 'kal-alterhinweis' + (z.includes('noch nicht geboren') || z.includes('bereits gestorben') ? ' warn' : '') }, z));
-  };
+  }
 
   const notiz = el('textarea', { class: 'kal-notiz', rows: '4', placeholder: 'Was noch dazugehört. Was niemand sonst weiß.', maxlength: '4000' }, stand.notiz);
   const ort = el('input', { type: 'text', value: stand.ort, placeholder: 'Wo? (darf leer bleiben)', maxlength: '200' });
@@ -257,21 +273,32 @@ function kalTerminBearbeiten(doc, vorgabe, danach) {
   const kasten = el('div', { class: 'modal kal-fenster' },
     el('div', { class: 'kartenkopf' }, neu ? 'EIN NEUER TAG' : 'DIESEN TAG ÄNDERN'),
     feld('Was', titel),
-    feld('Wann', el('div', { class: 'kal-datumreihe' }, jahr, monat, tag), null),
-    wochentag,
-    bisZeile,
+    el('div', { class: 'kal-feld' }, el('span', { class: 'kal-feldname' }, 'Wann'),
+      el('div', { class: 'kal-datumreihe' },
+        el('span', { class: 'kal-wahlfeld jahr' }, jahr),
+        el('span', { class: 'kal-wahlfeld monat' }, monat),
+        el('span', { class: 'kal-wahlfeld tag' }, tag)),
+      wochentag,
+      el('small', { class: 'kal-feldunter' }, 'Nur das Jahr oder nur den Monat zu wissen, genügt auch — dann steht der Tag als „ungefähr“ im Kalender.'),
+      bisZeile),
     feld('Art', artWahl),
     feld('Zeichen', zeichenKnopf),
-    feld('Wer', el('div', {}, leuteReihe, el('div', { class: 'kal-namenreihe' }, namensfeld, el('button', { type: 'button', class: 'knopf zart', onclick: nameDazu }, 'Dazu'), liste)),
-      'Tipp einfach einen Namen. Er muss zu keiner Figur und keinem Text gehören.'),
-    alterZeile,
+    el('div', { class: 'kal-feld' }, el('span', { class: 'kal-feldname' }, 'Wer'),
+      leuteReihe,
+      el('div', { class: 'kal-namenreihe' }, namensfeld, el('button', { type: 'button', class: 'kal-namedazu', title: 'Diesen Namen zum Tag legen', onclick: nameDazu }, '+ Name'), liste),
+      el('small', { class: 'kal-feldunter' }, 'Einfach tippen. Der Name muss zu keiner Figur und keinem Text gehören.'),
+      alterZeile),
     feld('Wo', ort),
-    feld('Dazu', notiz),
-    el('label', { class: 'kal-bisreihe' }, jaehrlich, el('span', {}, 'Kehrt jedes Jahr wieder')),
+    feld('Notiz', notiz),
+    el('label', { class: 'kal-kaestchen' }, jaehrlich, el('span', {}, 'Kehrt jedes Jahr wieder')),
     el('div', { class: 'reihe' },
       !neu ? el('button', { class: 'knopf zart gefahr', onclick: async () => {
         if (await frage('Diesen Tag aus dem Kalender nehmen?', { ja: 'Herausnehmen' })) { await loesche(doc.id); zu(); if (danach) danach(); }
       } }, 'Herausnehmen') : null,
+      !neu ? el('button', { class: 'knopf zart', title: 'Denselben Tag noch einmal, zum Abwandeln', onclick: () => {
+        const kopie = neuDoc('termin', Object.assign(saubererTermin(doc), { titel: (doc.titel || kalArt(doc.art).name) + ' (noch einmal)' }));
+        zu(); toast('Abgeschrieben.'); kalTerminBearbeiten(kopie, null, danach);
+      } }, 'Abschreiben') : null,
       el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
       el('button', { class: 'knopf voll', onclick: () => {
         const wann = gewaehltesDatum();
@@ -288,16 +315,17 @@ function kalTerminBearbeiten(doc, vorgabe, danach) {
         if (danach) danach(wann);
       } }, neu ? 'Eintragen' : 'Übernehmen')));
   const zu = zeigeDeck(kasten);
-  /* Erst jetzt fuellen: zeigeWochentag ruft zeigeAlter, und das braucht
-     alterZeile und leute - beides steht erst hier vollstaendig. */
+  /* Erst jetzt füllen: zeigeWochentag ruft zeigeAlter, und das braucht
+     alterZeile und leute — beides steht erst hier vollständig. */
   fuelleTage();
   if (wannTeile.tag != null) { tag.value = String(wannTeile.tag); zeigeWochentag(); }
+  bisZeigen();
   zeigeLeute();
   setTimeout(() => titel.focus(), 60);
 }
 
 /* ----- Der große Kalender ----- */
-let _kal = { jahr: 0, monat: 0, tag: '', ansicht: 'monat' };
+let _kal = { jahr: 0, monat: 0, tag: '', ansicht: 'monat', suche: '', filterArt: '', filterPerson: '' };
 function kalenderOeffnen(startDatum) {
   const heute = kalHeute();
   const start = kalGueltig(startDatum) ? startDatum : (_kal.tag || heute);
@@ -305,28 +333,59 @@ function kalenderOeffnen(startDatum) {
   _kal.jahr = t.jahr; _kal.monat = t.monat || 1; _kal.tag = t.genau === 'tag' ? start : kalDatum(t.jahr, t.monat || 1, 1);
 
   const buehne = el('div', { class: 'kal-buehne' });
-  const kasten = el('div', { class: 'kal-buch' }, buehne);
-  const zu = zeigeDeck(kasten);
+  const kasten = el('div', { class: 'kal-buch' }, el('i', { class: 'kal-falz', 'aria-hidden': 'true' }), buehne);
+  const zu = zeigeDeck(kasten, () => document.removeEventListener('keydown', taste));
   kasten.classList.add('klappt-auf');
-  const neuZeichnen = (datum) => { if (datum && kalGueltig(datum)) { const p = kalTeile(datum); _kal.jahr = p.jahr; _kal.monat = p.monat || 1; if (p.genau === 'tag') _kal.tag = datum; } zeichneKalender(buehne, neuZeichnen, zu); };
+  const neuZeichnen = (datum) => {
+    if (datum && kalGueltig(datum)) { const p = kalTeile(datum); _kal.jahr = p.jahr; _kal.monat = p.monat || 1; if (p.genau === 'tag') _kal.tag = datum; }
+    zeichneKalender(buehne, neuZeichnen, zu);
+  };
+  /* Mit den Pfeiltasten durch die Tage — schneller als jedes Tippen. */
+  const taste = (ev) => {
+    if (!kasten.isConnected) { document.removeEventListener('keydown', taste); return; }
+    const ziel = ev.target;
+    if (ziel && (ziel.tagName === 'INPUT' || ziel.tagName === 'TEXTAREA' || ziel.tagName === 'SELECT')) return;
+    if (document.querySelectorAll('.schleier').length > 1) return;   /* ein Fenster liegt darüber */
+    if (_kal.ansicht !== 'monat') return;
+    const springe = (tage) => {
+      const d = new Date(kalZeit(_kal.tag) + tage * 86400000);
+      const ziel2 = kalDatum(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());
+      if (!ziel2) return;
+      ev.preventDefault(); neuZeichnen(ziel2);
+    };
+    if (ev.key === 'ArrowLeft') springe(-1);
+    else if (ev.key === 'ArrowRight') springe(1);
+    else if (ev.key === 'ArrowUp') springe(-7);
+    else if (ev.key === 'ArrowDown') springe(7);
+    else if (ev.key === 'PageUp') springe(-28);
+    else if (ev.key === 'PageDown') springe(28);
+    else if (ev.key === 'n' || ev.key === 'N') { ev.preventDefault(); kalTerminBearbeiten(null, _kal.tag, (d) => neuZeichnen(d)); }
+  };
+  document.addEventListener('keydown', taste);
   zeichneKalender(buehne, neuZeichnen, zu);
+}
+
+/* Was gerade gezeigt wird — Suche und Filter greifen überall gleich. */
+function kalGefiltert(alle) {
+  let liste = alle;
+  if (_kal.filterArt) liste = liste.filter((e) => e.art === _kal.filterArt);
+  if (_kal.filterPerson) liste = liste.filter((e) => (e.leute || []).some((p) => kalPersonSchluessel(p) === _kal.filterPerson));
+  const q = _kal.suche.trim().toLowerCase();
+  if (q) {
+    liste = liste.filter((e) => [e.titel, e.notiz, e.ort, kalArt(e.art).name, (e.leute || []).map((p) => p.name).join(' '), kalLesbar(e.wann)]
+      .join(' ').toLowerCase().includes(q));
+  }
+  return liste;
 }
 
 function zeichneKalender(buehne, neuZeichnen, schliessen) {
   const heute = kalHeute();
-  const alle = kalTermine();
+  const roh = kalTermine();
+  const alle = kalGefiltert(roh);
+  const gefiltert = alle.length !== roh.length;
   buehne.innerHTML = '';
 
-  /* --- Kopf: Jahr und Monat --- */
-  const jahrLeiste = el('div', { class: 'kal-jahrleiste' });
-  const mitInhalt = new Set(kalJahreMitInhalt(alle));
-  for (let j = KAL_JAHR_VON; j <= KAL_JAHR_BIS; j++) {
-    jahrLeiste.append(el('button', {
-      class: 'kal-jahrknopf' + (j === _kal.jahr ? ' an' : '') + (mitInhalt.has(j) ? ' voll' : ''),
-      'data-jahr': String(j),
-      onclick: () => neuZeichnen(kalDatum(j, _kal.monat, 1))
-    }, String(j)));
-  }
+  /* --- Kopf --- */
   const monatName = el('h2', { class: 'kal-monatname' }, KAL_MONATE[_kal.monat - 1], el('i', {}, String(_kal.jahr)));
   const blaettern = (schritt) => {
     let m = _kal.monat + schritt, j = _kal.jahr;
@@ -334,52 +393,81 @@ function zeichneKalender(buehne, neuZeichnen, schliessen) {
     if (j < KAL_JAHR_VON || j > KAL_JAHR_BIS) return;
     neuZeichnen(kalDatum(j, m, 1));
   };
-  const kopf = el('div', { class: 'kal-kopf' },
-    el('button', { class: 'kal-blaetter', title: 'Ein Monat zurück', onclick: () => blaettern(-1) }, '‹'),
-    monatName,
-    el('button', { class: 'kal-blaetter', title: 'Ein Monat vor', onclick: () => blaettern(1) }, '›'),
-    el('div', { class: 'kal-kopfrechts' },
-      el('button', { class: 'knopf zart', onclick: () => neuZeichnen(heute) }, 'Heute'),
-      el('button', { class: 'kal-ansichtknopf' + (_kal.ansicht === 'jahr' ? ' an' : ''), title: 'Das ganze Jahr auf einen Blick', onclick: () => { _kal.ansicht = _kal.ansicht === 'jahr' ? 'monat' : 'jahr'; neuZeichnen(); } }, 'Jahr'),
-      el('button', { class: 'kal-ansichtknopf' + (_kal.ansicht === 'leben' ? ' an' : ''), title: 'Die Lebensbänder aller Leute', onclick: () => { _kal.ansicht = _kal.ansicht === 'leben' ? 'monat' : 'leben'; neuZeichnen(); } }, 'Leben'),
-      el('button', { class: 'kal-schliessen', title: 'Den Kalender zuklappen', onclick: () => schliessen() }, '×')));
+  const suchfeld = el('input', { type: 'search', class: 'kal-suchfeld', placeholder: 'Suchen …', value: _kal.suche });
+  suchfeld.addEventListener('input', entprellt(() => { _kal.suche = suchfeld.value; neuZeichnen(); }, 280, true));
+  const ansicht = (id, name, titelText) => el('button', {
+    class: 'kal-ansichtknopf' + (_kal.ansicht === id ? ' an' : ''), title: titelText,
+    onclick: () => { _kal.ansicht = id; neuZeichnen(); }
+  }, name);
+  buehne.append(el('div', { class: 'kal-kopf' },
+    el('div', { class: 'kal-kopfzeile' },
+      el('button', { class: 'kal-blaetter', title: 'Ein Monat zurück', onclick: () => blaettern(-1) }, '‹'),
+      monatName,
+      el('button', { class: 'kal-blaetter', title: 'Ein Monat vor', onclick: () => blaettern(1) }, '›'),
+      el('div', { class: 'kal-kopfrechts' },
+        el('button', { class: 'kal-heuteknopf', title: 'Zum heutigen Tag', onclick: () => neuZeichnen(heute) }, 'Heute'),
+        el('button', { class: 'kal-schliessen', title: 'Den Kalender zuklappen', onclick: () => schliessen() }, '×'))),
+    el('div', { class: 'kal-kopfzeile zwei' },
+      el('div', { class: 'kal-ansichten' },
+        ansicht('monat', 'Monat', 'Ein Monat, Tag für Tag'),
+        ansicht('jahr', 'Jahr', 'Das ganze Jahr auf einen Blick'),
+        ansicht('leben', 'Leben', 'Die Lebensbänder aller Leute'),
+        ansicht('chronik', 'Chronik', 'Alles der Reihe nach')),
+      el('div', { class: 'kal-suche' }, el('span', { class: 'kal-lupe', html: ik('suche') }), suchfeld))));
 
-  buehne.append(kopf, jahrLeiste);
-  /* Das gewählte Jahr in den Blick rücken */
+  /* --- Filter: nur sichtbar, wenn einer gesetzt ist --- */
+  if (_kal.filterArt || _kal.filterPerson || _kal.suche.trim()) {
+    const chip = (text, weg) => el('button', { class: 'kal-filterchip', onclick: () => { weg(); neuZeichnen(); } }, text, el('i', {}, '×'));
+    buehne.append(el('div', { class: 'kal-filterzeile' },
+      el('span', {}, alle.length === 1 ? 'ein Tag passt' : alle.length + ' Tage passen'),
+      _kal.suche.trim() ? chip('„' + _kal.suche.trim() + '“', () => { _kal.suche = ''; }) : null,
+      _kal.filterArt ? chip(kalArt(_kal.filterArt).name, () => { _kal.filterArt = ''; }) : null,
+      _kal.filterPerson ? chip((kalLeute(roh).find((p) => p.schluessel === _kal.filterPerson) || { name: 'jemand' }).name, () => { _kal.filterPerson = ''; }) : null));
+  }
+
+  /* --- Jahresleiste --- */
+  const jahrLeiste = el('div', { class: 'kal-jahrleiste' });
+  const mitInhalt = new Set(kalJahreMitInhalt(alle));
+  for (let j = KAL_JAHR_VON; j <= KAL_JAHR_BIS; j++) {
+    jahrLeiste.append(el('button', {
+      class: 'kal-jahrknopf' + (j === _kal.jahr ? ' an' : '') + (mitInhalt.has(j) ? ' voll' : ''),
+      onclick: () => neuZeichnen(kalDatum(j, _kal.monat, 1))
+    }, String(j)));
+  }
+  buehne.append(jahrLeiste);
   requestAnimationFrame(() => { const an = jahrLeiste.querySelector('.an'); if (an) an.scrollIntoView({ block: 'nearest', inline: 'center' }); });
 
-  if (_kal.ansicht === 'jahr') { buehne.append(kalJahresBild(alle, neuZeichnen)); return; }
-  if (_kal.ansicht === 'leben') { buehne.append(kalLebensbaender(alle, neuZeichnen)); return; }
-
-  /* --- Das Monatsraster --- */
-  const raster = el('div', { class: 'kal-raster' });
-  raster.append(el('div', { class: 'kal-kw-kopf' }, 'KW'));
-  for (const d of KAL_TAGE_KURZ) raster.append(el('div', { class: 'kal-wochenkopf' }, d));
-  const zaehlung = kalMonatsZaehlung(_kal.jahr, _kal.monat, alle);
-  for (const woche of kalRaster(_kal.jahr, _kal.monat)) {
-    raster.append(el('div', { class: 'kal-kw' }, woche.kw ? String(woche.kw) : ''));
-    for (const zelle of woche.tage) {
-      const termine = zelle.fremd ? kalAmTag(zelle.datum, alle) : (zaehlung[zelle.tag] || []);
-      const istHeute = zelle.datum === heute;
-      const gewaehlt = zelle.datum === _kal.tag;
-      const zellElement = el('button', {
-        class: 'kal-zelle' + (zelle.fremd ? ' fremd' : '') + (istHeute ? ' heute' : '') + (gewaehlt ? ' gewaehlt' : '') + (termine.length ? ' voll' : ''),
-        onclick: () => { _kal.tag = zelle.datum; if (zelle.fremd) neuZeichnen(zelle.datum); else { _kal.tag = zelle.datum; neuZeichnen(); } },
-        ondblclick: () => kalTerminBearbeiten(null, zelle.datum, (d) => neuZeichnen(d))
-      },
-        el('span', { class: 'kal-zahl' }, String(zelle.tag)),
-        termine.length ? el('span', { class: 'kal-marken' }, ...termine.slice(0, 4).map((e) => el('i', { class: 'kal-marke', style: '--artfarbe:' + kalArt(e.art).farbe, html: kalIcon(e.icon || kalArt(e.art).icon, 13) }))) : null,
-        termine.length > 4 ? el('span', { class: 'kal-mehr' }, '+' + (termine.length - 4)) : null);
-      raster.append(zellElement);
+  if (_kal.ansicht === 'jahr') buehne.append(kalJahresBild(alle, neuZeichnen));
+  else if (_kal.ansicht === 'leben') buehne.append(kalLebensbaender(alle, neuZeichnen));
+  else if (_kal.ansicht === 'chronik') buehne.append(kalChronik(alle, neuZeichnen));
+  else {
+    /* --- Das Monatsraster --- */
+    const raster = el('div', { class: 'kal-raster' });
+    raster.append(el('div', { class: 'kal-kw-kopf' }, 'KW'));
+    for (const d of KAL_TAGE_KURZ) raster.append(el('div', { class: 'kal-wochenkopf' }, d));
+    const zaehlung = kalMonatsZaehlung(_kal.jahr, _kal.monat, alle);
+    for (const woche of kalRaster(_kal.jahr, _kal.monat)) {
+      raster.append(el('div', { class: 'kal-kw' }, woche.kw ? String(woche.kw) : ''));
+      for (const zelle of woche.tage) {
+        const termine = zelle.fremd ? kalAmTag(zelle.datum, alle) : (zaehlung[zelle.tag] || []);
+        const wt = kalWochentag(zelle.datum);
+        raster.append(el('button', {
+          class: 'kal-zelle' + (zelle.fremd ? ' fremd' : '') + (zelle.datum === heute ? ' heute' : '') +
+            (zelle.datum === _kal.tag ? ' gewaehlt' : '') + (termine.length ? ' voll' : '') + (wt >= 5 ? ' wochenende' : ''),
+          onclick: () => { _kal.tag = zelle.datum; neuZeichnen(zelle.fremd ? zelle.datum : undefined); },
+          ondblclick: () => kalTerminBearbeiten(null, zelle.datum, (d) => neuZeichnen(d))
+        },
+          el('span', { class: 'kal-zahl' }, String(zelle.tag)),
+          termine.length ? el('span', { class: 'kal-marken' }, ...termine.slice(0, 4).map((e) => el('i', { class: 'kal-marke', style: '--artfarbe:' + kalArt(e.art).farbe, html: kalIcon(e.icon || kalArt(e.art).icon, 13) }))) : null,
+          termine.length > 4 ? el('span', { class: 'kal-mehr' }, '+' + (termine.length - 4)) : null));
+      }
     }
+    buehne.append(raster);
+    buehne.append(kalTagesBlatt(_kal.tag, alle, neuZeichnen));
   }
-  buehne.append(raster);
-
-  /* --- Der gewählte Tag --- */
-  buehne.append(kalTagesBlatt(_kal.tag, alle, neuZeichnen));
 
   /* --- Was nicht sein kann --- */
-  const w = kalWidersprueche(alle);
+  const w = kalWidersprueche(roh);
   if (w.length) {
     buehne.append(el('details', { class: 'kal-widersprueche' },
       el('summary', {}, w.length === 1 ? 'Eine Stelle passt nicht zusammen' : w.length + ' Stellen passen nicht zusammen'),
@@ -388,49 +476,79 @@ function zeichneKalender(buehne, neuZeichnen, schliessen) {
         el('span', {}, x.text),
         x.termin ? el('button', { class: 'kal-wlink', onclick: () => neuZeichnen(x.termin.wann) }, 'hinsehen') : null))));
   }
+  if (gefiltert && !alle.length) buehne.append(el('div', { class: 'kal-leertag mitte' }, 'Dazu steht nichts im Kalender.'));
+}
+
+/* ----- Ein Eintrag, wie er überall aussieht ----- */
+function kalEintragElement(e, bezug, alle, neuZeichnen, mitDatum) {
+  const art = kalArt(e.art);
+  const t = kalTeile(bezug);
+  const wiederkehr = (e.jaehrlich || e.art === 'geburt') && t && kalTeile(e.wann).jahr !== t.jahr;
+  const alterHier = [];
+  for (const p of e.leute || []) {
+    if (e.art === 'geburt') {
+      const a = bezug ? kalAlter(e.wann, bezug) : null;
+      if (a && a.jahre > 0) alterHier.push(p.name + ' wird ' + a.jahre);
+      continue;
+    }
+    const g = kalGeburtVon([p], alle);
+    if (!g) continue;
+    const a = kalAlter(g, e.wann);
+    if (a) alterHier.push(p.name + ': ' + kalAlterText(a));
+  }
+  return el('div', { class: 'kal-eintrag', style: '--artfarbe:' + art.farbe },
+    el('button', { class: 'kal-eintragzeichen', title: 'Nur „' + art.name + '“ zeigen', onclick: () => { _kal.filterArt = _kal.filterArt === e.art ? '' : e.art; neuZeichnen(); }, html: kalIcon(e.icon || art.icon, 24) }),
+    el('button', { class: 'kal-eintragtext', onclick: () => kalTerminBearbeiten(e, null, (d) => neuZeichnen(d || bezug)) },
+      el('b', {}, e.titel || art.name),
+      el('span', { class: 'kal-eintragart' },
+        (mitDatum ? kalKurz(e.wann) + ' · ' : '') + art.name +
+        (wiederkehr ? ' · seit ' + kalTeile(e.wann).jahr : '') + (e.bis ? ' · bis ' + kalKurz(e.bis) : '') + (e.ort ? ' · ' + e.ort : '')),
+      alterHier.length ? el('span', { class: 'kal-eintragalter' }, alterHier.join('  ·  ')) : null,
+      e.notiz ? el('span', { class: 'kal-eintragnotiz' }, e.notiz.length > 220 ? e.notiz.slice(0, 217) + ' …' : e.notiz) : null),
+    (e.leute || []).length ? el('span', { class: 'kal-eintragleute' }, ...e.leute.map((p) => el('button', {
+      class: 'kal-personknopf', title: 'Alles über ' + p.name,
+      onclick: () => kalPersonBlatt(p, neuZeichnen)
+    }, p.name))) : null);
 }
 
 /* ----- Das Tagesblatt ----- */
 function kalTagesBlatt(datum, alle, neuZeichnen) {
-  const t = kalTeile(datum);
+  const heute = kalHeute();
   const termine = kalAmTag(datum, alle);
   const jahrestage = kalJahrestage(datum, alle);
   const mond = typeof mondphase === 'function' ? mondphase(kalZeit(datum)) : null;
-  const mondwort = mond == null ? '' : mond < .04 || mond > .96 ? 'Neumond' : Math.abs(mond - .5) < .04 ? 'Vollmond' : mond < .5 ? 'zunehmend' : 'abnehmend';
+  const mondwort = mond == null ? '' : mond < .04 || mond > .96 ? 'Neumond' : Math.abs(mond - .5) < .04 ? 'Vollmond' : mond < .5 ? 'zunehmender Mond' : 'abnehmender Mond';
+  const tageWeg = Math.round((kalZeit(datum) - kalZeit(heute)) / 86400000);
+  const abstand = tageWeg === 0 ? 'heute' : tageWeg > 0
+    ? (tageWeg === 1 ? 'morgen' : 'in ' + tageWeg.toLocaleString('de-DE') + ' Tagen')
+    : (tageWeg === -1 ? 'gestern' : 'vor ' + Math.abs(tageWeg).toLocaleString('de-DE') + ' Tagen');
 
   const blatt = el('div', { class: 'kal-tagesblatt' },
     el('div', { class: 'kal-tageskopf' },
-      el('div', {},
+      el('div', { class: 'kal-tagestitel' },
         el('h3', {}, kalLesbar(datum, true)),
-        el('small', {}, 'KW ' + kalWoche(datum) + ' · ' + kalJahreszeit(datum) + (mondwort ? ' · Mond: ' + mondwort : ''))),
+        el('small', {}, 'KW ' + kalWoche(datum) + ' · ' + kalJahreszeit(datum) + (mondwort ? ' · ' + mondwort : '') + ' · ' + abstand)),
       el('button', { class: 'knopf voll', onclick: () => kalTerminBearbeiten(null, datum, (d) => neuZeichnen(d)) }, 'Hier etwas eintragen')));
 
   if (!termine.length) {
     blatt.append(el('div', { class: 'kal-leertag' }, 'An diesem Tag steht noch nichts. Ein leerer Tag ist kein leerer Tag — er ist einer, an dem noch alles möglich ist.'));
   }
-  for (const e of termine) {
-    const art = kalArt(e.art);
-    const wiederkehr = (e.jaehrlich || e.art === 'geburt') && kalTeile(e.wann).jahr !== t.jahr;
-    const alterHier = [];
-    for (const p of e.leute || []) {
-      if (e.art === 'geburt') {
-        const a = kalAlter(e.wann, datum);
-        if (a && a.jahre > 0) alterHier.push(p.name + ' wird ' + a.jahre + '.');
-        continue;
-      }
-      const g = kalGeburtVon([p], alle);
-      if (!g) continue;
-      const a = kalAlter(g, e.wann);
-      if (a) alterHier.push(p.name + ': ' + kalAlterText(a));
-    }
-    blatt.append(el('button', { class: 'kal-eintrag', style: '--artfarbe:' + art.farbe, onclick: () => kalTerminBearbeiten(e, null, (d) => neuZeichnen(d || datum)) },
-      el('span', { class: 'kal-eintragzeichen', html: kalIcon(e.icon || art.icon, 24) }),
-      el('span', { class: 'kal-eintragtext' },
-        el('b', {}, e.titel || art.name),
-        el('span', { class: 'kal-eintragart' }, art.name + (wiederkehr ? ' · seit ' + kalTeile(e.wann).jahr : '') + (e.bis ? ' · bis ' + kalKurz(e.bis) : '') + (e.ort ? ' · ' + e.ort : '')),
-        (e.leute || []).length ? el('span', { class: 'kal-eintragleute' }, e.leute.map((p) => p.name).join(', ')) : null,
-        alterHier.length ? el('span', { class: 'kal-eintragalter' }, alterHier.join(' · ')) : null,
-        e.notiz ? el('span', { class: 'kal-eintragnotiz' }, e.notiz.length > 220 ? e.notiz.slice(0, 217) + ' …' : e.notiz) : null)));
+  for (const e of termine) blatt.append(kalEintragElement(e, datum, alle, neuZeichnen, false));
+
+  /* Wer an diesem Tag lebte — und wie alt war */
+  const alter = [];
+  for (const p of kalLeute(alle)) {
+    if (!p.geburt) continue;
+    const a = kalAlter(p.geburt, datum);
+    if (!a) continue;
+    if (p.tod && kalZeit(datum) > kalZeit(p.tod)) continue;
+    alter.push({ p, a });
+  }
+  if (alter.length) {
+    blatt.append(el('details', { class: 'kal-alterliste' },
+      el('summary', {}, 'Wer an diesem Tag lebte (' + alter.length + ')'),
+      ...alter.sort((x, y) => y.a.jahre - x.a.jahre).map(({ p, a }) => el('button', { class: 'kal-alterzeile-eintrag', onclick: () => kalPersonBlatt(p, neuZeichnen) },
+        el('b', {}, p.name), el('span', {}, kalAlterText(a))))));
   }
   if (jahrestage.length) {
     blatt.append(el('div', { class: 'kal-jahrestage' },
@@ -440,6 +558,62 @@ function kalTagesBlatt(datum, alle, neuZeichnen) {
         el('span', {}, j.termin.titel || kalArt(j.termin.art).name)))));
   }
   return blatt;
+}
+
+/* ----- Die Chronik: alles der Reihe nach ----- */
+function kalChronik(alle, neuZeichnen) {
+  const raus = el('div', { class: 'kal-chronik' });
+  const sortiert = kalSortiert(alle);
+  if (!sortiert.length) {
+    raus.append(el('div', { class: 'kal-leertag mitte' }, 'Noch nichts eingetragen. Der erste Tag wartet.'));
+    return raus;
+  }
+  const proJahr = {};
+  for (const e of sortiert) { const j = kalTeile(e.wann).jahr; proJahr[j] = (proJahr[j] || 0) + 1; }
+  let letztesJahr = null;
+  for (const e of sortiert) {
+    const t = kalTeile(e.wann);
+    if (t.jahr !== letztesJahr) {
+      letztesJahr = t.jahr;
+      raus.append(el('button', { class: 'kal-chronikjahr' + (t.jahr === _kal.jahr ? ' an' : ''), onclick: () => { _kal.ansicht = 'monat'; neuZeichnen(kalDatum(t.jahr, t.monat || 1, 1)); } },
+        String(t.jahr), el('i', {}, proJahr[t.jahr] === 1 ? 'ein Tag' : proJahr[t.jahr] + ' Tage')));
+    }
+    raus.append(kalEintragElement(e, e.wann, alle, neuZeichnen, true));
+  }
+  return raus;
+}
+
+/* ----- Ein Blatt über einen Menschen ----- */
+function kalPersonBlatt(person, neuZeichnen) {
+  const alle = kalTermine();
+  const schluessel = kalPersonSchluessel(person);
+  const p = kalLeute(alle).find((x) => x.schluessel === schluessel) || { schluessel, name: person.name || 'Jemand', geburt: '', tod: '', termine: [] };
+  const heute = kalHeute();
+  const lebt = p.geburt && !p.tod;
+  const alterHeute = p.geburt ? kalAlter(p.geburt, heute) : null;
+  const lebensalter = kalLebensalter(p);
+
+  const zeile = (name, wert) => wert ? el('div', { class: 'kal-personzeile' }, el('span', {}, name), el('b', {}, wert)) : null;
+  const kasten = el('div', { class: 'modal kal-personfenster' },
+    el('div', { class: 'kartenkopf' }, 'IM KALENDER'),
+    el('h2', {}, p.name),
+    el('div', { class: 'kal-personzeilen' },
+      zeile('Geboren', p.geburt ? kalLesbar(p.geburt, true) : ''),
+      zeile('Gestorben', p.tod ? kalLesbar(p.tod, true) : ''),
+      zeile(lebt ? 'Heute' : 'Wurde', lebt && alterHeute ? kalAlterText(alterHeute) : lebensalter ? lebensalter.jahre + ' Jahre' : ''),
+      zeile('Tage im Kalender', p.termine.length ? String(p.termine.length) : '')),
+    !p.geburt ? el('p', { class: 'kal-hinweis' }, 'Ohne Geburtsdatum kann der Kalender kein Alter rechnen. Trag einen Tag mit der Art „Geburt“ ein — dann steht bei jedem Ereignis, wie alt ' + p.name + ' war.') : null,
+    el('span', { class: 'kal-abschnitt' }, 'Alle Tage'),
+    el('div', { class: 'kal-personliste' }, ...kalSortiert(p.termine).map((e) => {
+      const a = p.geburt && e.art !== 'geburt' ? kalAlter(p.geburt, e.wann) : null;
+      return el('button', { class: 'kal-personeintrag', style: '--artfarbe:' + kalArt(e.art).farbe, onclick: () => { zu(); _kal.ansicht = 'monat'; neuZeichnen(e.wann); } },
+        el('i', { html: kalIcon(e.icon || kalArt(e.art).icon, 18) }),
+        el('span', {}, el('b', {}, e.titel || kalArt(e.art).name), el('small', {}, kalKurz(e.wann) + (a ? ' · ' + kalAlterText(a) : ''))));
+    })),
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => { _kal.filterPerson = _kal.filterPerson === schluessel ? '' : schluessel; zu(); neuZeichnen(); } }, _kal.filterPerson === schluessel ? 'Filter aufheben' : 'Nur diese Tage zeigen'),
+      el('button', { class: 'knopf voll', onclick: () => { zu(); kalTerminBearbeiten(null, _kal.tag || heute, (d) => neuZeichnen(d)); } }, 'Einen Tag dazu')));
+  const zu = zeigeDeck(kasten);
 }
 
 /* ----- Das ganze Jahr ----- */
@@ -474,7 +648,7 @@ function kalLebensbaender(alle, neuZeichnen) {
   const leute = kalLeute(alle);
   const raus = el('div', { class: 'kal-leben' });
   if (!leute.length) {
-    raus.append(el('div', { class: 'kal-leertag' }, 'Noch niemand im Kalender. Trag einen Tag ein und schreib einen Namen dazu — mehr braucht es nicht.'));
+    raus.append(el('div', { class: 'kal-leertag mitte' }, 'Noch niemand im Kalender. Trag einen Tag ein und schreib einen Namen dazu — mehr braucht es nicht.'));
     return raus;
   }
   const spanne = KAL_JAHR_BIS - KAL_JAHR_VON + 1;
@@ -484,6 +658,7 @@ function kalLebensbaender(alle, neuZeichnen) {
   for (let j = KAL_JAHR_VON; j <= KAL_JAHR_BIS; j += 5) {
     massband.append(el('i', { class: 'kal-massmarke', style: 'left:' + (anteil(kalDatum(j, 1, 1)) * 100).toFixed(2) + '%' }, String(j)));
   }
+  massband.append(el('i', { class: 'kal-massheute', style: 'left:' + (anteil(kalHeute()) * 100).toFixed(2) + '%', title: 'heute' }));
   raus.append(massband);
 
   for (const p of leute) {
@@ -498,14 +673,15 @@ function kalLebensbaender(alle, neuZeichnen) {
     for (const e of p.termine) {
       const art = kalArt(e.art);
       spur.append(el('button', {
-        class: 'kal-kerbe art-' + e.art, style: 'left:' + (anteil(e.wann) * 100).toFixed(2) + '%;--artfarbe:' + art.farbe,
+        class: 'kal-kerbe', style: 'left:' + (anteil(e.wann) * 100).toFixed(2) + '%;--artfarbe:' + art.farbe,
         title: (e.titel || art.name) + ' · ' + kalLesbar(e.wann),
         onclick: () => { _kal.ansicht = 'monat'; neuZeichnen(e.wann); }
       }, el('i', { html: kalIcon(e.icon || art.icon, 12) })));
     }
     const alterText = lebt ? 'wurde ' + kalLebensalter(p).jahre + ' Jahre' : p.geburt ? kalAlterText(kalAlter(p.geburt, kalHeute())) + ' alt' : p.termine.length + (p.termine.length === 1 ? ' Eintrag' : ' Einträge');
-    band.append(el('div', { class: 'kal-bandname' }, el('b', {}, p.name),
-      el('small', {}, (p.geburt ? '* ' + kalKurz(p.geburt) : '') + (p.tod ? '  † ' + kalKurz(p.tod) : '') + (p.geburt || p.tod ? ' · ' : '') + alterText)), spur);
+    band.append(el('button', { class: 'kal-bandname', title: 'Alles über ' + p.name, onclick: () => kalPersonBlatt(p, neuZeichnen) },
+      el('b', {}, p.name),
+      el('small', {}, (p.geburt ? '✻ ' + kalKurz(p.geburt) : '') + (p.tod ? '   † ' + kalKurz(p.tod) : '') + (p.geburt || p.tod ? ' · ' : '') + alterText)), spur);
     raus.append(band);
   }
   return raus;

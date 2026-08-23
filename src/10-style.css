@@ -3110,185 +3110,413 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
 
 /* ============================================================
    DER KALENDER, AUFGEKLAPPT (61b)
+   Kein Formular, sondern ein Buch: Papierfaser, Serifen, Tinte,
+   und ein Falz in der Mitte. Alle Zeigerzustaende sind hinter
+   (hover: hover) versteckt — auf dem iPad bleibt ein Tipp sonst
+   kleben und sieht aus wie eine Auswahl.
    ============================================================ */
 .kal-buch {
-  width: min(1120px, 96vw); max-height: 92vh; display: flex; flex-direction: column;
-  background: linear-gradient(178deg, var(--papier), color-mix(in srgb, var(--papier) 88%, var(--hg2)));
-  border-radius: 16px; box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 1px var(--linie);
+  width: min(1140px, 96vw); max-height: 92vh; display: flex; flex-direction: column; position: relative;
+  color: var(--tinte);
+  background:
+    repeating-linear-gradient(94deg, rgba(120,96,60,.028) 0 2px, transparent 2px 5px),
+    radial-gradient(120% 90% at 50% 0%, rgba(255,246,225,.5), transparent 60%),
+    linear-gradient(178deg, var(--papier), color-mix(in srgb, var(--papier) 86%, var(--hg2)));
+  border-radius: 6px 6px 8px 8px;
+  box-shadow: 0 34px 90px rgba(0,0,0,.5), 0 0 0 1px color-mix(in srgb, var(--tinte) 18%, transparent),
+    inset 0 1px 0 rgba(255,255,255,.5);
   overflow: hidden;
 }
-.kal-buch.klappt-auf { animation: kal-aufklappen .52s cubic-bezier(.2,.9,.25,1); transform-origin: 50% 12%; }
+/* Der Falz: das Buch hat eine Mitte. */
+.kal-falz {
+  position: absolute; left: 50%; top: 0; bottom: 0; width: 26px; margin-left: -13px; pointer-events: none; z-index: 1;
+  background: linear-gradient(90deg, transparent, rgba(90,66,36,.05) 35%, rgba(90,66,36,.09) 50%, rgba(90,66,36,.05) 65%, transparent);
+}
+@media (max-width: 900px) { .kal-falz { display: none; } }
+.kal-buch.klappt-auf { animation: kal-aufklappen .55s cubic-bezier(.2,.9,.25,1); transform-origin: 50% 8%; }
 @keyframes kal-aufklappen {
-  0% { opacity: 0; transform: perspective(1400px) rotateX(-58deg) scale(.92); }
-  60% { opacity: 1; transform: perspective(1400px) rotateX(6deg) scale(1.01); }
-  100% { opacity: 1; transform: perspective(1400px) rotateX(0) scale(1); }
+  0% { opacity: 0; transform: perspective(1500px) rotateX(-62deg) scale(.9); }
+  62% { opacity: 1; transform: perspective(1500px) rotateX(5deg) scale(1.008); }
+  100% { opacity: 1; transform: perspective(1500px) rotateX(0) scale(1); }
 }
-.kal-buehne { overflow-y: auto; overscroll-behavior: contain; padding: 0 0 18px; position: relative; }
-.kal-kopf {
-  position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 8px;
-  padding: 14px 16px 10px; background: color-mix(in srgb, var(--papier) 94%, transparent);
-  backdrop-filter: blur(8px); border-bottom: 1px solid var(--linie);
-}
-.kal-monatname { font-family: Georgia, "Iowan Old Style", serif; font-size: 24px; margin: 0; display: flex; align-items: baseline; gap: 9px; }
-.kal-monatname i { font-style: normal; font-size: 16px; color: var(--blass); font-variant-numeric: tabular-nums; }
-.kal-blaetter { width: 34px; height: 34px; border-radius: 50%; font-size: 21px; line-height: 1; color: var(--blass); display: grid; place-items: center; flex: none; }
-.kal-blaetter:hover { background: var(--hg2); color: var(--tinte); }
-.kal-kopfrechts { margin-left: auto; display: flex; align-items: center; gap: 6px; }
-.kal-ansichtknopf { padding: 6px 12px; border-radius: 999px; font-size: 13px; color: var(--blass); border: 1px solid var(--linie); }
-.kal-ansichtknopf.an { background: var(--akzent); color: var(--papier); border-color: transparent; }
-.kal-schliessen { width: 34px; height: 34px; border-radius: 50%; font-size: 22px; line-height: 1; color: var(--blass); display: grid; place-items: center; }
-.kal-schliessen:hover { background: rgba(176,53,43,.12); color: #b0352b; }
+.kal-buehne { overflow-y: auto; overscroll-behavior: contain; padding: 0 0 20px; position: relative; z-index: 2; }
 
-.kal-jahrleiste { display: flex; gap: 3px; overflow-x: auto; overscroll-behavior-x: contain; padding: 8px 16px 10px; scroll-behavior: smooth; border-bottom: 1px solid var(--linie); }
-.kal-jahrknopf {
-  flex: none; padding: 4px 9px; border-radius: 8px; font-size: 12.5px; color: var(--blass);
-  font-variant-numeric: tabular-nums; position: relative; transition: background .18s, color .18s;
+/* ----- Kopf ----- */
+.kal-kopf {
+  position: sticky; top: 0; z-index: 6;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--papier) 97%, transparent) 70%, color-mix(in srgb, var(--papier) 82%, transparent));
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid color-mix(in srgb, var(--tinte) 16%, transparent);
+  padding: 13px 18px 9px;
 }
-.kal-jahrknopf:hover { background: var(--hg2); color: var(--tinte); }
-.kal-jahrknopf.voll::after { content: ""; position: absolute; left: 50%; bottom: 1px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--akzent); opacity: .75; }
+.kal-kopfzeile { display: flex; align-items: center; gap: 8px; }
+.kal-kopfzeile.zwei { margin-top: 9px; gap: 10px; flex-wrap: wrap; }
+.kal-monatname {
+  font-family: ui-serif, "New York", "Iowan Old Style", Georgia, serif;
+  font-size: 26px; font-weight: 600; margin: 0; display: flex; align-items: baseline; gap: 10px; letter-spacing: -.01em;
+}
+.kal-monatname i { font-style: normal; font-size: 16px; color: var(--blass); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.kal-blaetter {
+  width: 36px; height: 36px; border-radius: 50%; font-size: 24px; line-height: 1; color: var(--blass);
+  display: grid; place-items: center; flex: none; transition: background .16s, color .16s;
+}
+.kal-kopfrechts { margin-left: auto; display: flex; align-items: center; gap: 7px; }
+.kal-heuteknopf {
+  padding: 6px 14px; border-radius: 999px; font-size: 13px; color: var(--akzent);
+  border: 1px solid color-mix(in srgb, var(--akzent) 42%, transparent); letter-spacing: .02em;
+}
+.kal-schliessen { width: 36px; height: 36px; border-radius: 50%; font-size: 24px; line-height: 1; color: var(--blass); display: grid; place-items: center; }
+.kal-ansichten { display: flex; gap: 2px; padding: 2px; border-radius: 999px; background: color-mix(in srgb, var(--tinte) 7%, transparent); }
+.kal-ansichtknopf {
+  padding: 6px 14px; border-radius: 999px; font-size: 13px; color: var(--blass); letter-spacing: .02em;
+  transition: background .18s, color .18s;
+}
+.kal-ansichtknopf.an { background: var(--papier); color: var(--tinte); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.14); }
+.kal-suche { margin-left: auto; display: flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--tinte) 15%, transparent); background: color-mix(in srgb, var(--papier) 60%, transparent); min-width: 190px; }
+.kal-lupe { display: flex; color: var(--blass); flex: none; }
+.kal-suchfeld { border: none; background: none; outline: none; font-size: 13.5px; width: 100%; color: var(--tinte); }
+.kal-suchfeld::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+.kal-filterzeile { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; padding: 9px 18px 0; font-size: 12.5px; color: var(--blass); font-style: italic; }
+.kal-filterchip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px 3px 11px; border-radius: 999px; font-style: normal;
+  background: color-mix(in srgb, var(--akzent) 13%, transparent); color: var(--akzent); font-size: 12.5px;
+}
+.kal-filterchip i { font-style: normal; font-size: 14px; opacity: .7; }
+
+/* ----- Die Jahresleiste: ein Lineal ----- */
+.kal-jahrleiste {
+  display: flex; gap: 1px; overflow-x: auto; overscroll-behavior-x: contain; padding: 9px 18px 11px; scroll-behavior: smooth;
+  border-bottom: 1px solid color-mix(in srgb, var(--tinte) 12%, transparent);
+  scrollbar-width: none;
+}
+.kal-jahrleiste::-webkit-scrollbar { display: none; }
+.kal-jahrknopf {
+  flex: none; padding: 3px 9px 7px; border-radius: 5px; font-size: 12.5px; color: var(--blass);
+  font-variant-numeric: tabular-nums; position: relative; transition: background .16s, color .16s;
+  font-family: ui-serif, "New York", Georgia, serif;
+}
+.kal-jahrknopf::before { content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 4px; background: color-mix(in srgb, var(--tinte) 22%, transparent); }
+.kal-jahrknopf.voll::after { content: ""; position: absolute; left: 50%; bottom: 1px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--akzent); }
 .kal-jahrknopf.an { background: var(--tinte); color: var(--papier); font-weight: 600; }
+.kal-jahrknopf.an::before { background: transparent; }
 .kal-jahrknopf.an.voll::after { background: var(--papier); }
 
-.kal-raster { display: grid; grid-template-columns: 30px repeat(7, 1fr); gap: 4px; padding: 12px 16px 6px; }
-.kal-wochenkopf, .kal-kw-kopf { text-align: center; font-size: 11px; letter-spacing: .09em; color: var(--blass); text-transform: uppercase; padding-bottom: 4px; }
-.kal-kw-kopf, .kal-kw { font-size: 10.5px; color: color-mix(in srgb, var(--blass) 65%, transparent); display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+/* ----- Das Monatsraster: ein Kassenbuch, keine Kacheln ----- */
+.kal-raster {
+  display: grid; grid-template-columns: 34px repeat(7, 1fr); gap: 0; padding: 6px 18px 4px;
+  border-collapse: collapse;
+}
+.kal-wochenkopf, .kal-kw-kopf {
+  text-align: center; font-size: 10.5px; letter-spacing: .16em; color: var(--blass); text-transform: uppercase;
+  padding: 6px 0 7px; border-bottom: 1.5px solid color-mix(in srgb, var(--tinte) 30%, transparent);
+}
+.kal-kw-kopf, .kal-kw {
+  font-size: 10px; color: color-mix(in srgb, var(--blass) 70%, transparent); display: grid; place-items: center;
+  font-variant-numeric: tabular-nums; border-right: 1px solid color-mix(in srgb, var(--tinte) 14%, transparent);
+}
 .kal-zelle {
-  position: relative; min-height: 68px; border-radius: 10px; border: 1px solid var(--linie);
-  background: color-mix(in srgb, var(--papier) 70%, transparent);
-  display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 5px 6px;
-  transition: background .16s, border-color .16s, transform .12s;
+  position: relative; min-height: 74px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  padding: 5px 7px; text-align: left;
+  border-right: 1px solid color-mix(in srgb, var(--tinte) 9%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--tinte) 9%, transparent);
+  transition: background .16s;
 }
-.kal-zelle:hover { background: var(--hg2); transform: translateY(-1px); }
-.kal-zelle.fremd { opacity: .38; }
-.kal-zelle .kal-zahl { font-size: 13.5px; color: var(--tinte); font-variant-numeric: tabular-nums; }
-.kal-zelle.heute { border-color: var(--akzent); box-shadow: inset 0 0 0 1px var(--akzent); }
+.kal-zelle.wochenende { background: color-mix(in srgb, var(--tinte) 3.5%, transparent); }
+.kal-zelle.fremd { opacity: .3; }
+.kal-zelle .kal-zahl {
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 15px; color: var(--tinte);
+  font-variant-numeric: tabular-nums; line-height: 1;
+}
 .kal-zelle.heute .kal-zahl { color: var(--akzent); font-weight: 700; }
-.kal-zelle.gewaehlt { background: var(--tinte); border-color: var(--tinte); }
-.kal-zelle.gewaehlt .kal-zahl, .kal-zelle.gewaehlt .kal-mehr { color: var(--papier); }
-.kal-marken { display: flex; flex-wrap: wrap; gap: 2px; margin-top: auto; }
-.kal-marke { display: flex; color: var(--artfarbe, var(--blass)); }
-.kal-zelle.gewaehlt .kal-marke { color: color-mix(in srgb, var(--artfarbe, #ffffff) 70%, white); }
-.kal-mehr { font-size: 10px; color: var(--blass); }
-
-.kal-tagesblatt { margin: 10px 16px 0; padding: 14px 16px; border-radius: 14px; background: var(--hg2); border: 1px solid var(--linie); }
-.kal-tageskopf { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
-.kal-tageskopf h3 { font-family: Georgia, "Iowan Old Style", serif; font-size: 19px; margin: 0 0 2px; }
-.kal-tageskopf small { color: var(--blass); font-size: 12.5px; }
-.kal-tageskopf .knopf { margin-left: auto; }
-.kal-leertag { color: var(--blass); font-size: 13.5px; line-height: 1.55; font-style: italic; padding: 6px 0; }
-.kal-eintrag {
-  display: flex; gap: 11px; width: 100%; text-align: left; padding: 10px 12px; border-radius: 11px;
-  background: var(--papier); border: 1px solid var(--linie); border-left: 3px solid var(--artfarbe, var(--blass));
-  margin-bottom: 7px; transition: transform .12s, box-shadow .16s;
+.kal-zelle.heute::before {
+  content: ""; position: absolute; left: 4px; right: 4px; top: 3px; height: 2px; border-radius: 1px;
+  background: var(--akzent); opacity: .75;
 }
-.kal-eintrag:hover { transform: translateX(2px); box-shadow: 0 4px 14px rgba(0,0,0,.1); }
-.kal-eintragzeichen { color: var(--artfarbe, var(--blass)); display: flex; flex: none; padding-top: 1px; }
-.kal-eintragtext { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.kal-eintragtext b { font-size: 14.5px; }
-.kal-eintragart { font-size: 12px; color: var(--blass); letter-spacing: .02em; }
-.kal-eintragleute { font-size: 12.5px; color: var(--artfarbe, var(--blass)); }
-.kal-eintragalter { font-size: 12.5px; color: var(--tinte); opacity: .78; font-variant-numeric: tabular-nums; }
-.kal-eintragnotiz { font-size: 12.5px; color: var(--blass); line-height: 1.5; margin-top: 2px; white-space: pre-wrap; }
-.kal-abschnitt { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--blass); display: block; margin: 12px 0 6px; }
-.kal-jahrestage { border-top: 1px dashed var(--linie); margin-top: 10px; }
-.kal-jahrestag { display: flex; gap: 9px; align-items: baseline; width: 100%; text-align: left; padding: 6px 8px; border-radius: 8px; font-size: 13px; }
-.kal-jahrestag:hover { background: var(--papier); }
-.kal-jahrestag b { color: var(--akzent); font-size: 12.5px; flex: none; }
-.kal-jahrestag span { color: var(--blass); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Der gewaehlte Tag ist eingekreist — mit Tinte, nicht mit einem Kasten. */
+.kal-zelle.gewaehlt::after {
+  content: ""; position: absolute; left: 2px; top: 1px; width: 30px; height: 26px;
+  border: 1.8px solid var(--akzent); border-radius: 48% 52% 50% 50% / 55% 45% 55% 45%;
+  transform: rotate(-3deg); pointer-events: none;
+}
+.kal-zelle.gewaehlt { background: color-mix(in srgb, var(--akzent) 7%, transparent); }
+.kal-marken { display: flex; flex-wrap: wrap; gap: 3px; margin-top: auto; }
+.kal-marke { display: flex; color: var(--artfarbe, var(--blass)); }
+.kal-mehr { font-size: 10px; color: var(--blass); font-variant-numeric: tabular-nums; }
 
-.kal-widersprueche { margin: 12px 16px 0; border: 1px solid rgba(176,53,43,.3); border-radius: 12px; background: rgba(176,53,43,.06); padding: 10px 14px; }
-.kal-widersprueche summary { cursor: pointer; font-size: 13.5px; color: #b0352b; }
-.kal-widerspruch { display: flex; gap: 9px; align-items: baseline; font-size: 13px; padding: 6px 0; border-top: 1px solid rgba(176,53,43,.14); }
-.kal-wsym { width: 18px; height: 18px; border-radius: 50%; background: rgba(176,53,43,.16); color: #b0352b; display: grid; place-items: center; font-size: 12px; font-weight: 700; flex: none; }
+/* ----- Das Tagesblatt ----- */
+.kal-tagesblatt {
+  margin: 14px 18px 0; padding: 15px 17px; border-radius: 3px;
+  background: linear-gradient(178deg, color-mix(in srgb, var(--papier) 92%, #fff), color-mix(in srgb, var(--papier) 70%, var(--hg2)));
+  box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 6px 20px rgba(0,0,0,.08);
+  border-left: 2px solid color-mix(in srgb, var(--akzent) 55%, transparent);
+}
+.kal-tageskopf { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.kal-tagestitel { min-width: 0; }
+.kal-tageskopf h3 { font-family: ui-serif, "New York", Georgia, serif; font-size: 20px; font-weight: 600; margin: 0 0 3px; }
+.kal-tageskopf small { color: var(--blass); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.kal-tageskopf .knopf { margin-left: auto; }
+.kal-leertag { color: var(--blass); font-size: 13.5px; line-height: 1.6; font-style: italic; padding: 8px 0; font-family: ui-serif, "New York", Georgia, serif; }
+.kal-leertag.mitte { text-align: center; padding: 34px 24px; }
+
+.kal-eintrag {
+  display: flex; gap: 11px; align-items: flex-start; width: 100%; padding: 10px 4px 11px;
+  border-bottom: 1px solid color-mix(in srgb, var(--tinte) 10%, transparent);
+}
+.kal-eintrag:last-child { border-bottom: none; }
+.kal-eintragzeichen {
+  color: var(--artfarbe, var(--blass)); display: flex; flex: none; padding: 3px; margin-top: -1px; border-radius: 7px;
+  transition: background .16s;
+}
+.kal-eintragtext { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; text-align: left; border-radius: 6px; padding: 1px 3px; }
+.kal-eintragtext b { font-family: ui-serif, "New York", Georgia, serif; font-size: 16px; font-weight: 600; }
+.kal-eintragart { font-size: 12px; color: var(--blass); letter-spacing: .03em; }
+.kal-eintragalter { font-size: 12.5px; color: color-mix(in srgb, var(--tinte) 72%, transparent); font-variant-numeric: tabular-nums; }
+.kal-eintragnotiz { font-size: 13px; color: var(--blass); line-height: 1.55; margin-top: 3px; white-space: pre-wrap; font-family: ui-serif, "New York", Georgia, serif; }
+.kal-eintragleute { display: flex; flex-wrap: wrap; gap: 4px; align-items: flex-start; flex: none; max-width: 40%; justify-content: flex-end; }
+.kal-personknopf {
+  font-size: 12.5px; padding: 2px 9px; border-radius: 999px; color: var(--artfarbe, var(--blass));
+  border: 1px solid color-mix(in srgb, var(--artfarbe, #888) 34%, transparent);
+}
+.kal-abschnitt { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--blass); display: block; margin: 14px 0 7px; }
+.kal-alterliste { margin-top: 12px; border-top: 1px dashed color-mix(in srgb, var(--tinte) 18%, transparent); padding-top: 8px; }
+.kal-alterliste summary { cursor: pointer; font-size: 12.5px; color: var(--blass); letter-spacing: .02em; }
+.kal-alterzeile-eintrag { display: flex; gap: 10px; width: 100%; text-align: left; padding: 5px 7px; border-radius: 6px; font-size: 13px; }
+.kal-alterzeile-eintrag b { font-weight: 600; }
+.kal-alterzeile-eintrag span { color: var(--blass); margin-left: auto; font-variant-numeric: tabular-nums; }
+.kal-jahrestage { border-top: 1px dashed color-mix(in srgb, var(--tinte) 18%, transparent); margin-top: 12px; }
+.kal-jahrestag { display: flex; gap: 10px; align-items: baseline; width: 100%; text-align: left; padding: 6px 8px; border-radius: 6px; font-size: 13px; }
+.kal-jahrestag b { color: var(--akzent); font-size: 12.5px; flex: none; font-variant-numeric: tabular-nums; }
+.kal-jahrestag span { color: var(--blass); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: ui-serif, "New York", Georgia, serif; }
+
+/* ----- Die Chronik ----- */
+.kal-chronik { padding: 6px 18px 0; }
+.kal-chronikjahr {
+  display: flex; align-items: baseline; gap: 11px; width: 100%; text-align: left; margin: 18px 0 3px; padding: 4px 2px;
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 22px; font-weight: 600; color: var(--tinte);
+  border-bottom: 1.5px solid color-mix(in srgb, var(--tinte) 24%, transparent); font-variant-numeric: tabular-nums;
+}
+.kal-chronikjahr:first-child { margin-top: 4px; }
+.kal-chronikjahr.an { color: var(--akzent); border-bottom-color: color-mix(in srgb, var(--akzent) 50%, transparent); }
+.kal-chronikjahr i { font-style: normal; font-size: 12px; color: var(--blass); margin-left: auto; font-family: ui-rounded, -apple-system, system-ui, sans-serif; }
+
+/* ----- Was nicht sein kann ----- */
+.kal-widersprueche { margin: 14px 18px 0; border: 1px solid rgba(176,53,43,.28); border-radius: 4px; background: rgba(176,53,43,.05); padding: 10px 14px; }
+.kal-widersprueche summary { cursor: pointer; font-size: 13.5px; color: #b0352b; font-family: ui-serif, "New York", Georgia, serif; }
+.kal-widerspruch { display: flex; gap: 9px; align-items: baseline; font-size: 13px; padding: 7px 0; border-top: 1px solid rgba(176,53,43,.12); }
+.kal-wsym { width: 18px; height: 18px; border-radius: 50%; background: rgba(176,53,43,.15); color: #b0352b; display: grid; place-items: center; font-size: 12px; font-weight: 700; flex: none; }
 .kal-wlink { color: var(--akzent); text-decoration: underline; font-size: 12.5px; flex: none; margin-left: auto; }
 
-.kal-jahresbild { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; padding: 14px 16px; }
-.kal-mini { border: 1px solid var(--linie); border-radius: 12px; padding: 9px 10px; background: color-mix(in srgb, var(--papier) 70%, transparent); }
-.kal-mini.voll { border-color: color-mix(in srgb, var(--akzent) 45%, var(--linie)); }
-.kal-mininame { display: flex; align-items: baseline; gap: 6px; width: 100%; font-family: Georgia, "Iowan Old Style", serif; font-size: 15px; margin-bottom: 6px; }
-.kal-mininame i { font-style: normal; font-size: 11px; color: var(--papier); background: var(--akzent); border-radius: 999px; padding: 1px 6px; margin-left: auto; }
+/* ----- Das ganze Jahr ----- */
+.kal-jahresbild { display: grid; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); gap: 16px; padding: 16px 18px; }
+.kal-mini { border-bottom: 1px solid color-mix(in srgb, var(--tinte) 12%, transparent); padding: 0 4px 12px; }
+.kal-mininame {
+  display: flex; align-items: baseline; gap: 6px; width: 100%; margin-bottom: 8px; padding-bottom: 4px;
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 16px; font-weight: 600;
+  border-bottom: 1px solid color-mix(in srgb, var(--tinte) 18%, transparent);
+}
+.kal-mini.voll .kal-mininame { color: var(--akzent); }
+.kal-mininame i { font-style: normal; font-size: 10.5px; color: var(--papier); background: var(--akzent); border-radius: 999px; padding: 1px 7px; margin-left: auto; font-family: ui-rounded, -apple-system, system-ui, sans-serif; }
 .kal-minigitter { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
-.kal-minikopf { text-align: center; font-size: 9px; color: var(--blass); padding-bottom: 2px; }
-.kal-minitag { aspect-ratio: 1; border-radius: 4px; font-size: 10px; color: var(--blass); display: grid; place-items: center; font-variant-numeric: tabular-nums; }
-.kal-minitag:hover { background: var(--hg2); color: var(--tinte); }
-.kal-minitag.fremd { opacity: .22; }
-.kal-minitag.voll { background: color-mix(in srgb, var(--akzent) 24%, transparent); color: var(--tinte); font-weight: 600; }
+.kal-minikopf { text-align: center; font-size: 9px; color: var(--blass); padding-bottom: 3px; letter-spacing: .06em; }
+.kal-minitag { aspect-ratio: 1; border-radius: 3px; font-size: 10px; color: var(--blass); display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+.kal-minitag.fremd { opacity: .18; }
+.kal-minitag.voll { background: color-mix(in srgb, var(--akzent) 26%, transparent); color: var(--tinte); font-weight: 700; }
 .kal-minitag.heute { box-shadow: inset 0 0 0 1.5px var(--akzent); color: var(--akzent); }
 
-.kal-leben { padding: 14px 16px; }
-.kal-massband { position: relative; height: 20px; margin: 0 0 10px 190px; border-bottom: 1px solid var(--linie); }
-.kal-massmarke { position: absolute; top: 0; font-size: 10.5px; color: var(--blass); transform: translateX(-50%); font-style: normal; font-variant-numeric: tabular-nums; }
-.kal-band { display: flex; align-items: center; gap: 12px; padding: 5px 0; border-bottom: 1px solid var(--linie); }
-.kal-bandname { width: 178px; flex: none; display: flex; flex-direction: column; }
-.kal-bandname b { font-size: 13.5px; }
+/* ----- Die Lebensbänder ----- */
+.kal-leben { padding: 16px 18px; }
+.kal-massband { position: relative; height: 22px; margin: 0 0 12px 190px; border-bottom: 1.5px solid color-mix(in srgb, var(--tinte) 26%, transparent); }
+.kal-massmarke { position: absolute; top: 2px; font-size: 10.5px; color: var(--blass); transform: translateX(-50%); font-style: normal; font-variant-numeric: tabular-nums; }
+.kal-massmarke::after { content: ""; position: absolute; left: 50%; bottom: -7px; width: 1px; height: 5px; background: color-mix(in srgb, var(--tinte) 30%, transparent); }
+.kal-massheute { position: absolute; top: 0; bottom: -8px; width: 1.5px; background: var(--akzent); opacity: .7; }
+.kal-band { display: flex; align-items: center; gap: 12px; padding: 6px 0; border-bottom: 1px solid color-mix(in srgb, var(--tinte) 10%, transparent); }
+.kal-bandname { width: 178px; flex: none; display: flex; flex-direction: column; text-align: left; padding: 3px 6px; border-radius: 6px; }
+.kal-bandname b { font-family: ui-serif, "New York", Georgia, serif; font-size: 14.5px; font-weight: 600; }
 .kal-bandname small { font-size: 11px; color: var(--blass); font-variant-numeric: tabular-nums; }
 .kal-spur { position: relative; flex: 1; height: 30px; }
-.kal-lebenslinie { position: absolute; top: 13px; height: 4px; border-radius: 2px; background: linear-gradient(90deg, color-mix(in srgb, var(--akzent) 60%, transparent), color-mix(in srgb, var(--akzent) 20%, transparent)); }
-.kal-lebenslinie.zuende { background: linear-gradient(90deg, color-mix(in srgb, var(--akzent) 65%, transparent), color-mix(in srgb, var(--blass) 55%, transparent)); }
+.kal-spur::before { content: ""; position: absolute; left: 0; right: 0; top: 14.5px; height: 1px; background: color-mix(in srgb, var(--tinte) 8%, transparent); }
+.kal-lebenslinie { position: absolute; top: 13px; height: 4px; border-radius: 2px; background: linear-gradient(90deg, color-mix(in srgb, var(--akzent) 62%, transparent), color-mix(in srgb, var(--akzent) 22%, transparent)); }
+.kal-lebenslinie.zuende { background: linear-gradient(90deg, color-mix(in srgb, var(--akzent) 66%, transparent), color-mix(in srgb, var(--blass) 55%, transparent)); }
 .kal-kerbe { position: absolute; top: 4px; width: 18px; height: 22px; margin-left: -9px; display: grid; place-items: center; color: var(--artfarbe, var(--blass)); border-radius: 5px; transition: transform .14s, background .14s; }
-.kal-kerbe:hover { background: var(--hg2); transform: scale(1.25); z-index: 2; }
 .kal-kerbe i { display: flex; }
 
 /* ----- Das Fenster zum Eintragen ----- */
-.kal-fenster { width: min(560px, 94vw); max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-.kal-feld { display: flex; flex-direction: column; gap: 5px; }
-.kal-feldname { font-size: 11.5px; letter-spacing: .11em; text-transform: uppercase; color: var(--blass); }
-.kal-feldunter { font-size: 12px; color: var(--blass); line-height: 1.45; }
-.kal-datumreihe { display: flex; gap: 7px; }
-.kal-datumreihe .kal-jahr { width: 92px; }
-.kal-datumreihe select { flex: 1; min-width: 0; }
-.kal-wochentag { font-size: 12.5px; color: var(--akzent); min-height: 17px; margin-top: -4px; }
-.kal-bisreihe { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--blass); }
-.kal-bisreihe input[type="date"] { flex: 1; min-width: 0; }
-.kal-artwahl { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 5px; }
-.kal-artknopf { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 4px; border-radius: 9px; border: 1px solid var(--linie); color: var(--blass); transition: background .15s, color .15s, border-color .15s; }
-.kal-artknopf small { font-size: 10.5px; }
-.kal-artknopf:hover { background: var(--hg2); }
-.kal-artknopf.an { background: color-mix(in srgb, var(--artfarbe) 16%, transparent); border-color: var(--artfarbe); color: var(--artfarbe); }
-.kal-artbild, .kal-iconbild { display: flex; }
-.kal-zeichenknopf { display: flex; align-items: center; gap: 9px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--linie); color: var(--tinte); align-self: flex-start; }
-.kal-zeichenknopf:hover { background: var(--hg2); }
-.kal-zeichenknopf small { color: var(--blass); font-size: 12.5px; }
-.kal-leute { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; min-height: 26px; align-items: center; }
-.kal-person { display: inline-flex; align-items: center; gap: 5px; padding: 3px 5px 3px 10px; border-radius: 999px; background: var(--hg2); font-size: 13px; }
-.kal-person button { width: 18px; height: 18px; border-radius: 50%; color: var(--blass); font-size: 14px; line-height: 1; display: grid; place-items: center; }
-.kal-person button:hover { background: rgba(176,53,43,.16); color: #b0352b; }
-.kal-leerhinweis { font-size: 12.5px; color: var(--blass); font-style: italic; }
-.kal-namenreihe { display: flex; gap: 6px; }
-.kal-namenreihe input { flex: 1; min-width: 0; }
-.kal-alterzeile { display: flex; flex-direction: column; gap: 3px; }
-.kal-alterhinweis { font-size: 12.5px; color: var(--blass); padding: 5px 9px; border-radius: 7px; background: var(--hg2); }
-.kal-alterhinweis.warn { background: rgba(176,53,43,.1); color: #b0352b; }
-.kal-notiz { width: 100%; resize: vertical; }
-.kal-hinweis { font-size: 13px; color: var(--blass); line-height: 1.5; }
+.kal-fenster { width: min(580px, 94vw); max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; gap: 13px; }
+.kal-feld { display: flex; flex-direction: column; gap: 6px; }
+.kal-feldname { font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--blass); }
+.kal-feldunter { font-size: 12px; color: var(--blass); line-height: 1.5; }
+.kal-titelfeld { font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; }
 
-.kal-iconfenster { width: min(460px, 94vw); max-height: 88vh; overflow-y: auto; }
-.kal-icongitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 6px; margin: 8px 0; }
-.kal-iconwahl { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 9px 4px; border-radius: 10px; border: 1px solid var(--linie); color: var(--tinte); }
-.kal-iconwahl small { font-size: 10.5px; color: var(--blass); }
-.kal-iconwahl:hover { background: var(--hg2); }
-.kal-iconwahl.an { border-color: var(--akzent); background: color-mix(in srgb, var(--akzent) 12%, transparent); }
+/* Wann: drei Felder, die zusammengehoeren und wie eine Zeile aussehen */
+.kal-datumreihe {
+  display: flex; align-items: stretch; border-radius: 9px; overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--tinte) 20%, transparent);
+  background: color-mix(in srgb, var(--papier) 70%, transparent);
+}
+.kal-wahlfeld { position: relative; display: flex; align-items: center; }
+.kal-wahlfeld + .kal-wahlfeld { border-left: 1px solid color-mix(in srgb, var(--tinte) 14%, transparent); }
+.kal-wahlfeld.jahr { flex: 0 0 5.4em; }
+.kal-wahlfeld.monat { flex: 1 1 auto; min-width: 0; }
+.kal-wahlfeld.tag { flex: 0 0 7.4em; }
+.kal-wahlfeld input, .kal-wahlfeld select {
+  width: 100%; border: none; background: none; outline: none; color: var(--tinte);
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 16px; font-variant-numeric: tabular-nums;
+  padding: 11px 12px; -webkit-appearance: none; appearance: none; text-align: left;
+}
+.kal-wahlfeld.jahr input { text-align: center; letter-spacing: .02em; }
+.kal-wahlfeld.tag select { text-align: right; padding-right: 26px; }
+.kal-wahlfeld select { padding-right: 26px; cursor: pointer; }
+.kal-wahlfeld select:disabled { color: var(--blass); }
+/* Der eigene Pfeil — der vom System passt nicht zum Papier. */
+.kal-wahlfeld.monat::after, .kal-wahlfeld.tag::after {
+  content: ""; position: absolute; right: 11px; top: 50%; width: 7px; height: 7px; margin-top: -5px;
+  border-right: 1.6px solid var(--blass); border-bottom: 1.6px solid var(--blass);
+  transform: rotate(45deg); pointer-events: none;
+}
+.kal-wahlfeld input[type="number"]::-webkit-outer-spin-button,
+.kal-wahlfeld input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.kal-wochentag {
+  display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; min-height: 18px;
+  font-size: 12.5px; color: var(--akzent); font-family: ui-serif, "New York", Georgia, serif;
+}
+.kal-wochentag b { font-weight: 600; }
+.kal-wochentag span { color: var(--blass); font-variant-numeric: tabular-nums; }
+.kal-wochentag em { color: var(--blass); font-style: italic; }
+
+.kal-spanne { display: flex; flex-direction: column; gap: 7px; margin-top: 3px; }
+.kal-kaestchen { display: flex; align-items: center; gap: 9px; font-size: 13.5px; color: var(--tinte); cursor: pointer; }
+.kal-kaestchen input { flex: none; width: 17px; height: 17px; accent-color: var(--akzent); }
+.kal-bisfeld { display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: var(--blass); padding-left: 26px; }
+.kal-bisfeld input { flex: 1; min-width: 0; }
+
+.kal-artwahl { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; }
+.kal-artknopf {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 9px 4px; border-radius: 9px;
+  border: 1px solid color-mix(in srgb, var(--tinte) 15%, transparent); color: var(--blass);
+  transition: background .15s, color .15s, border-color .15s, box-shadow .15s;
+}
+.kal-artknopf small { font-size: 10.5px; letter-spacing: .01em; }
+/* Der gewaehlte Zustand muss auf den ersten Blick zu sehen sein — sonst
+   sieht ein klebengebliebener Tipp genauso aus wie eine Auswahl. */
+.kal-artknopf.an {
+  background: color-mix(in srgb, var(--artfarbe) 20%, transparent);
+  border-color: var(--artfarbe); color: var(--artfarbe);
+  box-shadow: inset 0 0 0 1px var(--artfarbe);
+}
+.kal-artknopf.an small { font-weight: 700; }
+.kal-artbild, .kal-iconbild { display: flex; }
+.kal-zeichenknopf {
+  display: flex; align-items: center; gap: 11px; padding: 10px 14px; border-radius: 9px;
+  border: 1px solid color-mix(in srgb, var(--tinte) 15%, transparent); color: var(--tinte); align-self: flex-start; text-align: left;
+}
+.kal-zeichentext { display: flex; flex-direction: column; }
+.kal-zeichentext b { font-size: 14px; font-weight: 600; }
+.kal-zeichentext small { color: var(--blass); font-size: 12px; }
+
+.kal-leute { display: flex; flex-wrap: wrap; gap: 6px; min-height: 26px; align-items: center; }
+.kal-person {
+  display: inline-flex; align-items: center; gap: 5px; padding: 4px 5px 4px 11px; border-radius: 999px;
+  background: color-mix(in srgb, var(--akzent) 12%, transparent); color: var(--tinte); font-size: 13px;
+}
+.kal-person button { width: 19px; height: 19px; border-radius: 50%; color: var(--blass); font-size: 15px; line-height: 1; display: grid; place-items: center; }
+.kal-leerhinweis { font-size: 12.5px; color: var(--blass); font-style: italic; }
+.kal-namenreihe { display: flex; gap: 7px; }
+.kal-namensfeld { flex: 1; min-width: 0; }
+.kal-namedazu {
+  flex: none; padding: 0 15px; border-radius: 9px; font-size: 13.5px; color: var(--akzent);
+  border: 1px dashed color-mix(in srgb, var(--akzent) 45%, transparent); white-space: nowrap;
+}
+.kal-alterzeile { display: flex; flex-direction: column; gap: 4px; }
+.kal-alterhinweis {
+  font-size: 12.5px; color: var(--blass); padding: 6px 10px; border-radius: 7px;
+  background: color-mix(in srgb, var(--tinte) 5%, transparent); border-left: 2px solid color-mix(in srgb, var(--tinte) 20%, transparent);
+}
+.kal-alterhinweis b { color: var(--tinte); font-weight: 600; }
+.kal-alterhinweis.warn { background: rgba(176,53,43,.09); color: #b0352b; border-left-color: #b0352b; }
+.kal-alterhinweis.warn b { color: #b0352b; }
+.kal-notiz { width: 100%; resize: vertical; font-family: ui-serif, "New York", Georgia, serif; }
+.kal-hinweis { font-size: 13px; color: var(--blass); line-height: 1.55; }
+
+/* ----- Das Zeichenfenster ----- */
+.kal-iconfenster { width: min(480px, 94vw); max-height: 88vh; overflow-y: auto; }
+.kal-icongitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 7px; margin: 10px 0; }
+.kal-iconwahl {
+  display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px 4px; border-radius: 9px;
+  border: 1px solid color-mix(in srgb, var(--tinte) 13%, transparent); color: var(--tinte);
+}
+.kal-iconwahl small { font-size: 10px; color: var(--blass); text-align: center; line-height: 1.2; }
+.kal-iconwahl.an { border-color: var(--akzent); box-shadow: inset 0 0 0 1px var(--akzent); background: color-mix(in srgb, var(--akzent) 12%, transparent); color: var(--akzent); }
+.kal-iconwahl.an small { color: var(--akzent); font-weight: 700; }
 .kal-eigenwahl { position: relative; }
 .kal-eigenwahl .kal-iconwahl { width: 100%; }
-.kal-iconweg { position: absolute; right: -3px; top: -3px; width: 20px; height: 20px; border-radius: 50%; background: var(--papier); border: 1px solid var(--linie); color: var(--blass); font-size: 13px; line-height: 1; display: grid; place-items: center; }
-.kal-iconweg:hover { background: rgba(176,53,43,.16); color: #b0352b; }
-.kal-malfenster { width: min(340px, 92vw); display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
-.kal-malpad { width: 100%; aspect-ratio: 1; border-radius: 12px; border: 1px solid var(--linie); background: var(--papier); touch-action: none; cursor: crosshair; }
+.kal-iconweg { position: absolute; right: -4px; top: -4px; width: 21px; height: 21px; border-radius: 50%; background: var(--papier); border: 1px solid var(--linie); color: var(--blass); font-size: 14px; line-height: 1; display: grid; place-items: center; }
+.kal-malfenster { width: min(340px, 92vw); display: flex; flex-direction: column; gap: 11px; align-items: stretch; }
+.kal-malpad { width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--tinte) 16%, transparent); background: var(--papier); touch-action: none; cursor: crosshair; }
 .kal-malfuss { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--blass); }
 .kal-malvorschau { display: flex; color: var(--tinte); }
 
+/* ----- Das Blatt über einen Menschen ----- */
+.kal-personfenster { width: min(520px, 94vw); max-height: 88vh; overflow-y: auto; }
+.kal-personfenster h2 { font-family: ui-serif, "New York", Georgia, serif; font-size: 24px; margin: 4px 0 12px; }
+.kal-personzeilen { display: flex; flex-direction: column; gap: 1px; }
+.kal-personzeile { display: flex; align-items: baseline; gap: 12px; padding: 7px 2px; border-bottom: 1px solid color-mix(in srgb, var(--tinte) 10%, transparent); font-size: 13.5px; }
+.kal-personzeile span { color: var(--blass); }
+.kal-personzeile b { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 600; }
+.kal-personliste { display: flex; flex-direction: column; gap: 2px; }
+.kal-personeintrag { display: flex; align-items: flex-start; gap: 10px; width: 100%; text-align: left; padding: 8px 9px; border-radius: 7px; border-left: 2px solid var(--artfarbe, var(--blass)); }
+.kal-personeintrag i { display: flex; color: var(--artfarbe, var(--blass)); flex: none; padding-top: 1px; }
+.kal-personeintrag span { display: flex; flex-direction: column; min-width: 0; }
+.kal-personeintrag b { font-size: 14px; font-weight: 600; font-family: ui-serif, "New York", Georgia, serif; }
+.kal-personeintrag small { font-size: 12px; color: var(--blass); font-variant-numeric: tabular-nums; }
+
+/* ----- Zeigerzustände: nur mit echtem Zeiger. Auf dem iPad bliebe ein
+   Tipp sonst kleben und sähe aus wie eine Auswahl. ----- */
+@media (hover: hover) and (pointer: fine) {
+  .kal-blaetter:hover { background: color-mix(in srgb, var(--tinte) 8%, transparent); color: var(--tinte); }
+  .kal-heuteknopf:hover { background: color-mix(in srgb, var(--akzent) 12%, transparent); }
+  .kal-schliessen:hover { background: rgba(176,53,43,.12); color: #b0352b; }
+  .kal-ansichtknopf:hover:not(.an) { color: var(--tinte); }
+  .kal-jahrknopf:hover:not(.an) { background: color-mix(in srgb, var(--tinte) 8%, transparent); color: var(--tinte); }
+  .kal-zelle:hover:not(.gewaehlt) { background: color-mix(in srgb, var(--tinte) 6%, transparent); }
+  .kal-eintragtext:hover { background: color-mix(in srgb, var(--tinte) 5%, transparent); }
+  .kal-eintragzeichen:hover { background: color-mix(in srgb, var(--artfarbe, #888) 16%, transparent); }
+  .kal-personknopf:hover { background: color-mix(in srgb, var(--artfarbe, #888) 15%, transparent); }
+  .kal-jahrestag:hover, .kal-alterzeile-eintrag:hover, .kal-personeintrag:hover { background: color-mix(in srgb, var(--tinte) 6%, transparent); }
+  .kal-minitag:hover { background: color-mix(in srgb, var(--tinte) 12%, transparent); color: var(--tinte); }
+  .kal-kerbe:hover { background: color-mix(in srgb, var(--tinte) 10%, transparent); transform: scale(1.3); z-index: 2; }
+  .kal-bandname:hover { background: color-mix(in srgb, var(--tinte) 6%, transparent); }
+  .kal-artknopf:hover:not(.an) { background: color-mix(in srgb, var(--tinte) 6%, transparent); color: var(--tinte); }
+  .kal-iconwahl:hover:not(.an) { background: color-mix(in srgb, var(--tinte) 6%, transparent); }
+  .kal-zeichenknopf:hover { background: color-mix(in srgb, var(--tinte) 6%, transparent); }
+  .kal-namedazu:hover { background: color-mix(in srgb, var(--akzent) 10%, transparent); }
+  .kal-person button:hover { background: rgba(176,53,43,.16); color: #b0352b; }
+  .kal-iconweg:hover { background: rgba(176,53,43,.16); color: #b0352b; }
+  .kal-chronikjahr:hover { color: var(--akzent); }
+  .kal-filterchip:hover { background: color-mix(in srgb, var(--akzent) 22%, transparent); }
+}
+/* Beim Tippen kurz ein Echo — das ersetzt den Zeigerzustand auf dem iPad. */
+.kal-zelle:active, .kal-artknopf:active, .kal-iconwahl:active, .kal-jahrknopf:active,
+.kal-eintragtext:active, .kal-personeintrag:active, .kal-minitag:active { filter: brightness(.94); }
+
 @media (max-width: 760px) {
-  .kal-raster { grid-template-columns: 22px repeat(7, 1fr); gap: 2px; padding: 10px 8px 4px; }
-  .kal-zelle { min-height: 52px; padding: 3px 4px; border-radius: 7px; }
-  .kal-zelle .kal-zahl { font-size: 12px; }
-  .kal-monatname { font-size: 19px; }
-  .kal-tagesblatt { margin: 8px 8px 0; padding: 11px 12px; }
-  .kal-bandname { width: 110px; }
-  .kal-massband { margin-left: 122px; }
-  .kal-kopfrechts .knopf { padding: 5px 9px; font-size: 12.5px; }
+  .kal-raster { grid-template-columns: 24px repeat(7, 1fr); padding: 6px 8px 4px; }
+  .kal-zelle { min-height: 56px; padding: 3px 4px; }
+  .kal-zelle .kal-zahl { font-size: 13px; }
+  .kal-zelle.gewaehlt::after { width: 24px; height: 22px; }
+  .kal-monatname { font-size: 20px; }
+  .kal-kopf { padding: 11px 12px 8px; }
+  .kal-tagesblatt { margin: 10px 10px 0; padding: 12px 13px; }
+  .kal-chronik, .kal-jahrleiste, .kal-filterzeile { padding-inline: 12px; }
+  .kal-bandname { width: 118px; }
+  .kal-massband { margin-left: 130px; }
+  .kal-suche { min-width: 0; flex: 1; }
+  .kal-eintragleute { max-width: 100%; justify-content: flex-start; }
+  .kal-eintrag { flex-wrap: wrap; }
 }
 @media (prefers-reduced-motion: reduce) {
   .kal-buch.klappt-auf { animation: none; }
   .desk-ding.kalender.hat-heute::after { animation: none; }
-  .kal-zelle, .kal-eintrag, .kal-kerbe, .kalender-bild { transition: none; }
+  .kal-zelle, .kal-eintragtext, .kal-kerbe, .kalender-bild, .kal-ansichtknopf, .kal-artknopf { transition: none; }
 }

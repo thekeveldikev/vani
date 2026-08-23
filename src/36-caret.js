@@ -68,22 +68,52 @@ function caretKastenTextfeld(feld) {
   return kasten;
 }
 
+/* Wo der Cursor steht — gemessen, ohne den Text anzufassen.
+
+   Ein zusammengefallener Bereich hat in Safari oft kein Rechteck: am
+   Zeilenende, in leeren Zeilen, an Elementgrenzen. Frueher wurde dafuer ein
+   unsichtbarer Messpunkt in den Text gesetzt und danach normalize() gerufen.
+   Das ist ein Schreiben ins Dokument: normalize() verschmilzt Textknoten, und
+   die Auswahl haengt an (Knoten, Position) — sie zeigt danach woandershin.
+   Der Cursor sprang mitten im Tippen in ein Wort weiter oben.
+
+   Deshalb wird jetzt nur noch gemessen. Der Bereich wird auf einer KOPIE um
+   ein Zeichen geweitet; eine Kopie beruehrt das Dokument nicht. */
+function caretRechteck(sel, feld) {
+  if (!sel || !sel.rangeCount) return null;
+  let r;
+  try { r = sel.getRangeAt(0).cloneRange(); } catch (e) { return null; }
+  let box = r.getBoundingClientRect();
+  if (box && box.height) return box;
+  const knoten = r.startContainer, pos = r.startOffset;
+  const messe = (setz) => {
+    try { const k = r.cloneRange(); setz(k); const b = k.getBoundingClientRect(); return b && b.height ? b : null; }
+    catch (e) { return null; }
+  };
+  if (knoten && knoten.nodeType === 3) {
+    const laenge = knoten.nodeValue ? knoten.nodeValue.length : 0;
+    /* Erst das Zeichen davor (am Zeilenende das richtige), sonst das danach. */
+    box = (pos > 0 ? messe((k) => { k.setStart(knoten, pos - 1); k.setEnd(knoten, pos); }) : null)
+      || (pos < laenge ? messe((k) => { k.setStart(knoten, pos); k.setEnd(knoten, pos + 1); }) : null);
+    if (box) return box;
+  }
+  /* Immer noch nichts: das Element nehmen, in dem der Cursor steht. */
+  let elm = knoten && (knoten.nodeType === 1 ? knoten : knoten.parentElement);
+  if (knoten && knoten.nodeType === 1 && knoten.childNodes && knoten.childNodes[pos] && knoten.childNodes[pos].nodeType === 1) {
+    elm = knoten.childNodes[pos];
+  }
+  if (elm && feld && feld.contains && !feld.contains(elm)) elm = feld;
+  const rr = elm && elm.getBoundingClientRect ? elm.getBoundingClientRect() : null;
+  return rr && rr.height ? rr : null;
+}
+
 /* Rechteck des Cursors im Fenster — für Rich-Text über die Auswahl. */
 function caretKasten(feld) {
   if (!feld) return null;
   if (feld.isContentEditable) {
     const sel = window.getSelection && window.getSelection();
     if (!sel || !sel.rangeCount || !feld.contains(sel.anchorNode)) return null;
-    const r = sel.getRangeAt(0).cloneRange();
-    let box = r.getBoundingClientRect();
-    if (!box || (!box.height && !box.width)) {
-      /* Leere Zeile: ein unsichtbarer Messpunkt verrät die Lage. */
-      const mess = document.createElement('span'); mess.textContent = '​';
-      try {
-        r.insertNode(mess); box = mess.getBoundingClientRect();
-        const eltern = mess.parentNode; mess.remove(); if (eltern) eltern.normalize();
-      } catch (e) { return null; }
-    }
+    const box = caretRechteck(sel, feld);
     return box && box.height ? { top: box.top, bottom: box.bottom, height: box.height } : null;
   }
   if (feld.tagName === 'TEXTAREA') return caretKastenTextfeld(feld);
