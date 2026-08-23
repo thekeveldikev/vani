@@ -3589,6 +3589,361 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
   .tb-weg:hover, .tz-weg:hover { background: rgba(176,53,43,.16); color: #b0352b; }
 }
 
+/* ============================================================
+   DAS ALBUM (62 / 62b / 62c)
+   Ein dickes Buch. Links wer sie ist, rechts was für ein Mensch
+   das ist. Geblättert wird um den Falz.
+   ============================================================ */
+
+/* ----- Der Raum: das Buch liegt da ----- */
+.alb-raum { display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 30px 20px 60px; }
+.alb-regalbuch {
+  position: relative; width: min(420px, 78vw); aspect-ratio: 3 / 4; perspective: 1400px;
+  transition: transform .4s cubic-bezier(.2,.9,.3,1);
+}
+.alb-rb-block {
+  position: absolute; right: -2px; top: 8px; bottom: 8px; width: var(--dicke, 20px); border-radius: 0 4px 4px 0;
+  background: repeating-linear-gradient(90deg, #efe6d2 0 2px, #d8ccb2 2px 3.5px);
+  box-shadow: inset -2px 0 5px rgba(0,0,0,.28);
+}
+.alb-rb-deckel {
+  position: absolute; inset: 0; border-radius: 5px 8px 8px 5px; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  background:
+    repeating-linear-gradient(103deg, rgba(255,255,255,.035) 0 2px, transparent 2px 6px),
+    radial-gradient(120% 80% at 30% 15%, rgba(255,225,180,.16), transparent 60%),
+    linear-gradient(155deg, #6b4a30, #3d281a 70%, #2a1a10);
+  box-shadow: 0 26px 54px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,228,190,.16), inset -8px 0 18px rgba(0,0,0,.35);
+}
+.alb-rb-praegung { position: absolute; inset: 14px; border-radius: 3px; border: 1.5px solid rgba(226,190,132,.36); box-shadow: inset 0 0 0 4px rgba(0,0,0,.12); }
+.alb-rb-titel {
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 30px; letter-spacing: .34em; text-indent: .34em;
+  color: #e6c98d; text-shadow: 0 1px 0 rgba(0,0,0,.6), 0 0 20px rgba(230,201,141,.24); z-index: 1;
+}
+.alb-rb-unter { font-size: 12px; letter-spacing: .2em; color: rgba(230,201,141,.6); text-transform: uppercase; z-index: 1; }
+.alb-rb-ecke { position: absolute; width: 24px; height: 24px; border: 2px solid rgba(226,190,132,.42); }
+.alb-rb-ecke.e1 { left: 8px; top: 8px; border-right: none; border-bottom: none; border-radius: 4px 0 0 0; }
+.alb-rb-ecke.e2 { right: 8px; top: 8px; border-left: none; border-bottom: none; border-radius: 0 4px 0 0; }
+.alb-rb-ecke.e3 { left: 8px; bottom: 8px; border-right: none; border-top: none; border-radius: 0 0 0 4px; }
+.alb-rb-ecke.e4 { right: 8px; bottom: 8px; border-left: none; border-top: none; border-radius: 0 0 4px 0; }
+.alb-rb-band { position: absolute; right: 42px; top: -6px; width: 15px; height: 84px; background: linear-gradient(180deg, #a8452f, #7d3020); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); box-shadow: 0 3px 7px rgba(0,0,0,.4); }
+.alb-raumtext { max-width: 46ch; text-align: center; color: var(--blass); font-size: 14px; line-height: 1.65; font-family: ui-serif, "New York", Georgia, serif; }
+
+/* ----- Das aufgeschlagene Buch ----- */
+.alb-huelle { width: min(1240px, 97vw); max-height: 94vh; display: flex; }
+.alb-buch {
+  flex: 1; min-width: 0; max-height: 94vh; display: flex; flex-direction: column; color: var(--tinte);
+  border-radius: 4px; overflow: hidden;
+  background: linear-gradient(178deg, #4a3524, #2c1e14);
+  box-shadow: 0 34px 90px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,225,180,.14);
+  padding: 9px;
+}
+.alb-buch.schlaegt-auf { animation: alb-aufschlagen .82s cubic-bezier(.2,.85,.25,1); transform-origin: 50% 60%; }
+@keyframes alb-aufschlagen {
+  0% { opacity: 0; transform: perspective(1800px) rotateX(-40deg) rotateY(24deg) scale(.86); }
+  55% { opacity: 1; transform: perspective(1800px) rotateX(6deg) rotateY(-3deg) scale(1.012); }
+  100% { opacity: 1; transform: none; }
+}
+.alb-buehne { flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--papier); border-radius: 2px; overflow: hidden; }
+
+/* ----- Die feste Leiste oben ----- */
+.alb-kopf {
+  flex: none; padding: 11px 16px 8px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--papier) 97%, transparent), color-mix(in srgb, var(--papier) 84%, var(--hg2)));
+  border-bottom: 1px solid color-mix(in srgb, var(--tinte) 15%, transparent);
+}
+.alb-kopfzeile { display: flex; align-items: center; gap: 10px; }
+.alb-suche { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--tinte) 16%, transparent); background: color-mix(in srgb, var(--papier) 70%, transparent); }
+.alb-lupe { display: flex; color: var(--blass); flex: none; }
+.alb-suchfeld { flex: 1; min-width: 0; border: none; background: none; outline: none; font-size: 14.5px; color: var(--tinte); }
+.alb-suchfeld::-webkit-search-cancel-button { -webkit-appearance: none; }
+.alb-kopfrechts { display: flex; align-items: center; gap: 7px; flex: none; }
+.alb-neuknopf { padding: 7px 15px; border-radius: 999px; font-size: 13.5px; color: var(--akzent); border: 1px dashed color-mix(in srgb, var(--akzent) 48%, transparent); white-space: nowrap; }
+.alb-zuknopf { width: 34px; height: 34px; border-radius: 50%; font-size: 23px; line-height: 1; color: var(--blass); display: grid; place-items: center; }
+.alb-register { display: flex; gap: 2px; margin-top: 8px; overflow-x: auto; scrollbar-width: none; }
+.alb-register::-webkit-scrollbar { display: none; }
+.alb-regknopf {
+  flex: none; width: 25px; height: 25px; border-radius: 5px; font-size: 12.5px; color: var(--blass);
+  font-family: ui-serif, "New York", Georgia, serif; display: grid; place-items: center;
+}
+.alb-regknopf.an { background: var(--tinte); color: var(--papier); font-weight: 600; }
+.alb-suchhinweis { margin-top: 7px; font-size: 12.5px; color: var(--blass); font-style: italic; }
+
+/* ----- Der Block mit den zwei Seiten ----- */
+.alb-block {
+  flex: 1; min-height: 0; display: flex; position: relative; perspective: 2400px;
+  background: linear-gradient(90deg, #efe6d2 0 6px, transparent 6px), linear-gradient(270deg, #efe6d2 0 6px, transparent 6px);
+}
+.alb-seite {
+  flex: 1 1 50%; min-width: 0; overflow-y: auto; overscroll-behavior: contain; position: relative;
+  padding: 20px 22px 30px;
+  background:
+    repeating-linear-gradient(96deg, rgba(120,96,60,.022) 0 2px, transparent 2px 5px),
+    linear-gradient(178deg, color-mix(in srgb, var(--papier) 96%, #fff), color-mix(in srgb, var(--papier) 78%, var(--hg2)));
+}
+.alb-seite.links { box-shadow: inset -22px 0 30px -24px rgba(60,40,20,.55); }
+.alb-seite.rechts { box-shadow: inset 22px 0 30px -24px rgba(60,40,20,.55); }
+.alb-falz { flex: none; width: 2px; background: linear-gradient(180deg, transparent, rgba(80,55,28,.3), transparent); }
+.alb-seitenband { position: absolute; right: 0; top: 34px; width: 6px; height: 92px; border-radius: 3px 0 0 3px; opacity: .8; }
+
+/* Der Kopf der linken Seite */
+.alb-seitenkopf { margin-bottom: 16px; position: relative; }
+.alb-name { display: flex; align-items: baseline; gap: 10px; text-align: left; max-width: 100%; }
+.alb-name b {
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 30px; font-weight: 600; line-height: 1.15;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.alb-nameunter { font-style: normal; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--blass); opacity: 0; transition: opacity .2s; flex: none; }
+.alb-name:hover .alb-nameunter, .alb-name:focus-visible .alb-nameunter { opacity: 1; }
+.alb-namenlinie { display: block; height: 2px; margin-top: 7px; border-radius: 1px; background: linear-gradient(90deg, var(--figurfarbe, var(--akzent)), transparent 78%); }
+.alb-lebensdaten { font-size: 13px; color: var(--blass); font-variant-numeric: tabular-nums; margin-top: 3px; }
+.alb-alter { font-size: 12.5px; color: var(--figurfarbe, var(--akzent)); font-style: italic; margin-top: 1px; }
+
+/* ----- Die Stücke auf der Seite ----- */
+.alb-stuecke { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 11px 12px; }
+.alb-etikettreihe { flex: 1 1 100%; display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 3px; }
+.alb-feldname { display: block; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--blass); margin-bottom: 3px; }
+
+.alb-etikett {
+  display: inline-flex; flex-direction: column; gap: 1px; padding: 5px 11px; border-radius: 3px;
+  background: linear-gradient(178deg, #f6efdd, #e8dcc0); box-shadow: 0 1px 3px rgba(70,50,25,.22);
+  border-left: 3px solid var(--figurfarbe, var(--akzent));
+}
+.alb-etikett i { font-style: normal; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: #9a8664; }
+.alb-etikett b { font-size: 14px; font-weight: 600; color: #3a2c1e; }
+
+.alb-zeile { flex: 1 1 44%; min-width: 150px; }
+.alb-zeiletext { font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 16px; line-height: 1.35; color: var(--tinte); display: block; }
+
+.alb-karte {
+  flex: 1 1 44%; min-width: 165px; padding: 10px 13px 11px; border-radius: 2px;
+  background: linear-gradient(178deg, #fdfaf1, #f2ead6);
+  box-shadow: 0 2px 6px rgba(70,50,25,.18); border-top: 3px solid var(--figurfarbe, var(--akzent));
+}
+.alb-karte p { font-size: 14px; line-height: 1.5; margin: 0; }
+.alb-karte p + p { margin-top: 6px; padding-top: 6px; border-top: 1px dotted rgba(120,96,60,.3); }
+
+.alb-liste { flex: 1 1 44%; min-width: 165px; }
+.alb-liste ul { list-style: none; margin: 0; padding: 0; }
+.alb-liste li { font-size: 14px; line-height: 1.5; padding-left: 15px; position: relative; margin-bottom: 3px; }
+.alb-liste li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 6px; height: 1.5px; background: var(--figurfarbe, var(--blass)); border-radius: 1px; }
+.alb-rolle { font-style: normal; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--blass); margin-right: 6px; }
+.alb-verweis { color: var(--figurfarbe, var(--akzent)); border-bottom: 1px dotted currentColor; font-size: 14px; }
+
+.alb-wolke { flex: 1 1 100%; }
+.alb-wolkeworte { display: flex; flex-wrap: wrap; gap: 5px; }
+.alb-wort {
+  display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 13px;
+  background: color-mix(in srgb, var(--figurfarbe, #888) 13%, transparent);
+  border: 1px solid color-mix(in srgb, var(--figurfarbe, #888) 30%, transparent); color: var(--tinte);
+}
+
+.alb-band {
+  flex: 1 1 100%; padding: 7px 14px; border-radius: 2px; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--figurfarbe, #888) 16%, transparent), transparent 85%);
+  border-left: 3px solid var(--figurfarbe, var(--akzent));
+}
+.alb-band .alb-feldname { margin: 0; flex: none; }
+.alb-band b { font-family: ui-serif, "New York", Georgia, serif; font-size: 15.5px; font-weight: 600; }
+
+.alb-sprueche { flex: 1 1 100%; display: flex; flex-direction: column; gap: 10px; }
+.alb-spruch {
+  position: relative; margin: 0; padding: 4px 6px 4px 30px;
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; line-height: 1.45; font-style: italic; color: var(--tinte);
+}
+.alb-anfuehrung { position: absolute; left: 0; top: -6px; font-size: 40px; line-height: 1; color: var(--figurfarbe, var(--akzent)); opacity: .5; font-style: normal; }
+.alb-spruch i { display: block; font-style: normal; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--blass); margin-top: 4px; }
+
+.alb-notiz { flex: 1 1 100%; padding: 11px 14px; border-radius: 2px; background: color-mix(in srgb, var(--tinte) 4%, transparent); border-left: 2px solid color-mix(in srgb, var(--tinte) 20%, transparent); }
+.alb-notiztext { font-size: 14px; line-height: 1.6; white-space: pre-wrap; font-family: ui-serif, "New York", Georgia, serif; }
+
+/* Die Klebezettel: ordentlich nebeneinander, nicht kreuz und quer */
+.alb-zettelbrett { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; padding-top: 14px; border-top: 1px dashed color-mix(in srgb, var(--tinte) 18%, transparent); }
+.alb-zettel {
+  position: relative; flex: 0 1 auto; width: 132px; min-height: 96px; padding: 14px 10px 10px;
+  font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 13px; line-height: 1.35; color: #3a2f22;
+  box-shadow: 1px 2px 5px rgba(70,50,25,.3);
+}
+.alb-zettel.ton-butter { background: linear-gradient(178deg, #fdf3c4, #f5e59a); }
+.alb-zettel.ton-rose { background: linear-gradient(178deg, #fbe0e2, #f3c7cb); }
+.alb-zettel.ton-himmel { background: linear-gradient(178deg, #dceaf6, #c3daee); }
+.alb-zettel.ton-moos { background: linear-gradient(178deg, #e2f0d8, #cbe2bb); }
+.alb-zettel.ton-sand { background: linear-gradient(178deg, #f2e8d8, #e2d4bc); }
+.alb-klebstreifen { position: absolute; left: 50%; top: -6px; width: 44px; height: 14px; margin-left: -22px; background: rgba(240,232,208,.66); box-shadow: 0 1px 2px rgba(0,0,0,.14); transform: rotate(-2deg); }
+
+/* ----- Die leere Doppelseite ----- */
+.alb-neuefigur {
+  display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; padding: 16px 18px; border-radius: 4px;
+  border: 2px dashed color-mix(in srgb, var(--akzent) 40%, transparent); color: var(--tinte);
+  transition: background .18s, border-color .18s;
+}
+.alb-nf-kreuz { font-size: 34px; line-height: 1; color: var(--akzent); font-family: ui-serif, Georgia, serif; flex: none; }
+.alb-nf-text { display: flex; flex-direction: column; }
+.alb-nf-text b { font-family: ui-serif, "New York", Georgia, serif; font-size: 19px; font-weight: 600; }
+.alb-nf-text small { font-size: 12.5px; color: var(--blass); }
+.alb-leerhinweis { margin-top: 20px; font-size: 14px; line-height: 1.65; color: var(--blass); font-style: italic; font-family: ui-serif, "New York", Georgia, serif; }
+
+/* ----- Das Blatt, das sich dreht ----- */
+.alb-blatt {
+  position: absolute; top: 0; bottom: 0; left: 50%; width: 50%; z-index: 8;
+  transform-style: preserve-3d; transform-origin: left center; pointer-events: none;
+  transform: rotateY(0deg);
+}
+.alb-blatt.zurueck { left: 0; transform-origin: right center; }
+.alb-blatt.laeuft { transition: transform .58s cubic-bezier(.4,.02,.3,1); transform: rotateY(-178deg); }
+.alb-blatt.zurueck.laeuft { transform: rotateY(178deg); }
+.alb-blattseite { position: absolute; inset: 0; backface-visibility: hidden; overflow: hidden; }
+.alb-blattseite.hinten { transform: rotateY(180deg); }
+.alb-blattseite .alb-seite { position: absolute; inset: 0; overflow: hidden; }
+.alb-blattschatten {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, rgba(60,40,20,.28), transparent 40%);
+  opacity: 0; transition: opacity .3s;
+}
+.alb-blatt.laeuft .alb-blattschatten { opacity: 1; }
+
+/* ----- Der Fuß ----- */
+.alb-fuss {
+  flex: none; display: flex; align-items: center; gap: 12px; padding: 8px 16px 10px;
+  border-top: 1px solid color-mix(in srgb, var(--tinte) 14%, transparent);
+  background: color-mix(in srgb, var(--papier) 88%, var(--hg2));
+}
+.alb-blaetter { width: 40px; height: 36px; border-radius: 8px; font-size: 24px; line-height: 1; color: var(--blass); display: grid; place-items: center; flex: none; }
+.alb-blaetter[disabled] { opacity: .28; pointer-events: none; }
+.alb-seitenzahl { flex: 1; min-width: 0; text-align: center; display: flex; flex-direction: column; gap: 1px; }
+.alb-seitenzahl b { font-family: ui-serif, "New York", Georgia, serif; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.alb-seitenzahl b.leer { color: var(--blass); font-style: italic; font-weight: 400; }
+.alb-seitenzahl small { font-size: 11px; color: var(--blass); font-variant-numeric: tabular-nums; }
+
+/* ============================================================
+   DAS BLATT ZUR FIGUR (62c)
+   ============================================================ */
+.albb-blatt { width: min(680px, 95vw); max-height: 92vh; display: flex; flex-direction: column; gap: 10px; }
+.albb-kopf { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.albb-name {
+  flex: 1; min-width: 200px; font-family: ui-serif, "New York", Georgia, serif; font-size: 22px; font-weight: 600;
+  padding: 9px 13px;
+}
+.albb-namenshall { font-size: 12.5px; color: var(--blass); min-height: 17px; margin-top: -4px; }
+.albb-namenshall .blass { font-style: italic; }
+.albb-farben { display: flex; gap: 4px; flex: none; }
+.albb-farbe { width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent; transition: transform .14s, border-color .14s; }
+.albb-farbe.an { border-color: var(--tinte); transform: scale(1.18); }
+.albb-farbe.zufall { background: none; border: 1px dashed var(--linie); color: var(--blass); font-size: 12px; display: grid; place-items: center; }
+
+.albb-reiter { display: flex; gap: 3px; overflow-x: auto; padding-bottom: 3px; scrollbar-width: none; flex: none; }
+.albb-reiter::-webkit-scrollbar { display: none; }
+.albb-reiterknopf {
+  flex: none; display: flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px;
+  font-size: 13px; color: var(--blass); border: 1px solid transparent; white-space: nowrap;
+}
+.albb-reiterknopf.an { background: var(--tinte); color: var(--papier); font-weight: 600; }
+.albb-reiterknopf i { font-style: normal; font-size: 10.5px; padding: 0 6px; border-radius: 999px; background: color-mix(in srgb, var(--akzent) 22%, transparent); color: var(--akzent); }
+.albb-reiterknopf.an i { background: rgba(255,255,255,.24); color: var(--papier); }
+
+.albb-impuls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12.5px; color: var(--blass); padding: 7px 11px; border-radius: 8px; background: color-mix(in srgb, var(--tinte) 4%, transparent); flex: none; }
+.albb-impulsknopf { color: var(--akzent); border-bottom: 1px dotted currentColor; font-size: 12.5px; }
+.albb-impulswuerfel { width: 22px; height: 22px; border-radius: 50%; color: var(--blass); font-size: 13px; display: grid; place-items: center; margin-left: auto; }
+
+.albb-inhalt { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 14px; padding: 2px 2px 6px; }
+.albb-feld { display: flex; flex-direction: column; gap: 5px; }
+.albb-feldkopf { display: flex; align-items: center; gap: 8px; }
+.albb-feldname { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--blass); }
+.albb-hilfe { font-size: 12px; color: var(--blass); line-height: 1.45; font-style: italic; }
+.albb-feld.eigen { padding: 9px 11px; border-radius: 8px; border: 1px dashed var(--linie); }
+.albb-weg { width: 24px; height: 24px; border-radius: 50%; flex: none; color: var(--blass); font-size: 16px; line-height: 1; display: grid; place-items: center; margin-left: auto; }
+.albb-leer { font-size: 12.5px; color: var(--blass); font-style: italic; }
+.albb-dazu, .albb-eigenneu, .albb-waehlen {
+  align-self: flex-start; padding: 7px 14px; border-radius: 8px; font-size: 13px; color: var(--akzent);
+  border: 1px dashed color-mix(in srgb, var(--akzent) 42%, transparent);
+}
+.albb-eigenneu { margin-top: 6px; color: var(--blass); border-color: var(--linie); }
+.albb-mehrliste { display: flex; flex-direction: column; gap: 5px; }
+.albb-mehrzeile { display: flex; gap: 6px; align-items: center; }
+.albb-mehrzeile input { flex: 1; min-width: 0; }
+.albb-gewaehlt { display: flex; flex-wrap: wrap; gap: 5px; min-height: 24px; align-items: center; }
+.albb-chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 3px 5px 3px 11px; border-radius: 999px; font-size: 13px;
+  background: color-mix(in srgb, var(--akzent) 13%, transparent);
+}
+.albb-chip button { width: 18px; height: 18px; border-radius: 50%; color: var(--blass); font-size: 14px; line-height: 1; display: grid; place-items: center; }
+.albb-datum { font-variant-numeric: tabular-nums; }
+.albb-datum.falsch { border-color: #b0352b; }
+.albb-datumhinweis { font-size: 12px; color: var(--akzent); }
+.albb-datumhinweis .warn { color: #b0352b; }
+.albb-notizfeld { width: 100%; resize: vertical; font-family: ui-serif, "New York", Georgia, serif; }
+.albb-fuss { flex: none; flex-wrap: wrap; }
+
+/* Der Wortschatz */
+.albw-fenster { width: min(640px, 95vw); max-height: 90vh; display: flex; flex-direction: column; gap: 9px; }
+.albw-suche { width: 100%; }
+.albw-gewaehlt { display: flex; flex-wrap: wrap; gap: 5px; min-height: 24px; align-items: center; }
+.albw-gitter { flex: 1; min-height: 200px; overflow-y: auto; overscroll-behavior: contain; }
+.albw-gruppe { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--blass); margin: 13px 0 6px; }
+.albw-gruppe:first-child { margin-top: 2px; }
+.albw-worte { display: flex; flex-wrap: wrap; gap: 5px; }
+.albw-wort {
+  padding: 4px 11px; border-radius: 999px; font-size: 13px; color: var(--tinte);
+  border: 1px solid color-mix(in srgb, var(--tinte) 15%, transparent);
+}
+.albw-wort.an { background: var(--akzent); color: var(--papier); border-color: transparent; font-weight: 600; }
+
+/* Die Klebezettel im Blatt */
+.albb-zettelraum { display: flex; flex-direction: column; gap: 10px; }
+.albb-zettelgitter { display: flex; flex-wrap: wrap; gap: 10px; }
+.albb-zettel { position: relative; width: 168px; padding: 10px 9px 8px; border-radius: 2px; box-shadow: 1px 2px 5px rgba(70,50,25,.26); }
+.albb-zettel.ton-butter { background: linear-gradient(178deg, #fdf3c4, #f5e59a); }
+.albb-zettel.ton-rose { background: linear-gradient(178deg, #fbe0e2, #f3c7cb); }
+.albb-zettel.ton-himmel { background: linear-gradient(178deg, #dceaf6, #c3daee); }
+.albb-zettel.ton-moos { background: linear-gradient(178deg, #e2f0d8, #cbe2bb); }
+.albb-zettel.ton-sand { background: linear-gradient(178deg, #f2e8d8, #e2d4bc); }
+.albb-zettel textarea {
+  width: 100%; border: none; background: none; outline: none; resize: vertical; color: #3a2f22;
+  font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 14px; line-height: 1.35;
+}
+.albb-zettel .albb-weg { position: absolute; right: 2px; top: 2px; margin: 0; color: rgba(70,50,25,.5); }
+.albb-toene { display: flex; gap: 3px; margin-top: 5px; }
+.albb-ton { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(70,50,25,.24); }
+.albb-ton.an { box-shadow: 0 0 0 2px rgba(70,50,25,.5); }
+.albb-ton.ton-butter { background: #f5e59a; } .albb-ton.ton-rose { background: #f3c7cb; }
+.albb-ton.ton-himmel { background: #c3daee; } .albb-ton.ton-moos { background: #cbe2bb; }
+.albb-ton.ton-sand { background: #e2d4bc; }
+
+/* ----- Zeigerzustände nur mit echtem Zeiger ----- */
+@media (hover: hover) and (pointer: fine) {
+  .alb-regalbuch:hover { transform: translateY(-6px) rotateY(-4deg); }
+  .alb-regknopf:hover:not(.an), .alb-blaetter:hover:not([disabled]) { background: color-mix(in srgb, var(--tinte) 8%, transparent); color: var(--tinte); }
+  .alb-neuknopf:hover { background: color-mix(in srgb, var(--akzent) 11%, transparent); }
+  .alb-zuknopf:hover { background: rgba(176,53,43,.12); color: #b0352b; }
+  .alb-neuefigur:hover { background: color-mix(in srgb, var(--akzent) 8%, transparent); border-color: var(--akzent); }
+  .alb-verweis:hover { background: color-mix(in srgb, var(--figurfarbe, #888) 14%, transparent); }
+  .albb-reiterknopf:hover:not(.an) { background: color-mix(in srgb, var(--tinte) 7%, transparent); color: var(--tinte); }
+  .albb-dazu:hover, .albb-eigenneu:hover, .albb-waehlen:hover { background: color-mix(in srgb, var(--akzent) 9%, transparent); }
+  .albw-wort:hover:not(.an) { background: color-mix(in srgb, var(--tinte) 8%, transparent); }
+  .albb-weg:hover, .albb-chip button:hover { background: rgba(176,53,43,.16); color: #b0352b; }
+  .albb-farbe:hover { transform: scale(1.15); }
+}
+.alb-regknopf:active, .albw-wort:active, .albb-reiterknopf:active, .alb-blaetter:active { filter: brightness(.94); }
+
+@media (max-width: 900px) {
+  /* Auf schmalen Geräten liegt immer nur eine Seite offen — sonst wird die
+     Schrift unlesbar. Geblättert wird trotzdem wie im Buch. */
+  .alb-block { flex-direction: column; }
+  .alb-seite { flex: none; min-height: 46%; }
+  .alb-falz { width: auto; height: 2px; background: linear-gradient(90deg, transparent, rgba(80,55,28,.3), transparent); }
+  .alb-blatt { display: none; }
+  .alb-huelle { width: 100%; }
+  .alb-buch { padding: 5px; }
+  .alb-name b { font-size: 24px; }
+  .alb-zeile, .alb-karte, .alb-liste { flex: 1 1 100%; }
+  .albb-blatt { width: 96vw; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .alb-buch.schlaegt-auf, .alb-blatt.laeuft { animation: none; transition: none; }
+  .alb-regalbuch, .albb-farbe, .alb-nameunter { transition: none; }
+}
+
 </style>
 </head>
 <body>
@@ -3615,7 +3970,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.31.0';
+const APP_VERSION = '5.32.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -3838,6 +4193,7 @@ const IK = {
   schreibtisch: '<path d="M3 14h18"/><path d="M5 14v6M19 14v6"/><path d="M8 14v-3.5a2 2 0 0 1 2-2h1"/><path d="M14 5.5 12.5 10h4L15 5.5h-1Z"/><path d="M13.2 10.5v3.5"/><circle cx="7" cy="10.5" r="1.2"/>',
   lasso: '<path d="M12 4c4.4 0 8 2 8 4.8S16.4 13.6 12 13.6 4 11.6 4 8.8 7.6 4 12 4Z" stroke-dasharray="3 2.2"/><path d="M8.5 13.2c-.6 2.2-.2 4.3 1.4 6.3"/><circle cx="10.4" cy="20" r="1.2"/>',
   gliederung: '<path d="M5 6h3M10 6h9"/><path d="M7 11h3M12 11h7"/><path d="M7 16h3M12 16h7"/><path d="M5 20h3M10 20h9"/>',
+  album: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15"/><path d="M9 7.5h5M9 11h6"/><path d="M16.5 3v6l-1.7-1.4L13 9V3"/>',
   mikro: '<rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M6 11.5a6 6 0 0 0 12 0"/><path d="M12 17.5V21M9 21h6"/>',
   schnipsel: '<path d="M21 12a8 8 0 0 1-8 8c-1.6 0-3-.4-4.3-1L4 20l1.2-4A8 8 0 1 1 21 12Z"/>',
   hefte: '<path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4Z"/><path d="M5 4v14"/><path d="M9 8h6M9 11.5h6"/>',
@@ -7458,6 +7814,7 @@ const ALLE_RAEUME = [
   { id: 'hefte', name: 'Hefte', icon: 'hefte' },
   { id: 'projekte', name: 'Projekte', icon: 'projekte' },
   { id: 'cluster', name: 'Cluster', icon: 'cluster' },
+  { id: 'album', name: 'Album', icon: 'album' },
   { id: 'woerter', name: 'Wörter', icon: 'woerter' },
   { id: 'klang', name: 'Klang', icon: 'klang' },
   { id: 'goodnotes', name: 'Goodnotes', icon: 'buchzu', standard: false },
@@ -16925,6 +17282,22 @@ const ANLEITUNG = [
         'Die kleine Zahl am Namen sagt, in wie vielen Szenen er vorkommt. Ein Tipp: Notiz lesen, Ändern, „Wo kommt … vor?", Verbindungen, Entfernen.',
         'Das Beste: [[Name]] in doppelten Klammern im Text springt direkt zur Figur — weil der Name ihr Titel ist.'
       ], b: 'Figur „Tante Ruth", Ort „Der Hafen", Ding „Das rote Auto". In der Szene steht: „Sie wartete am [[Der Hafen]], wie jeden Sonntag." Ein Tipp auf den Namen, und ich lese meine Notiz.' }
+    ]
+  },
+  {
+    id: 'album', titel: 'Album', icon: 'album', raum: 'album',
+    kurz: 'Ein dickes Buch, in dem die Figuren wohnen — eine Doppelseite für jede.',
+    abschnitte: [
+      { t: 'Aufschlagen', p: ['Im Raum liegt das Buch. Ein Tippen, und es klappt auf. Geblättert wird mit den Pfeilen unten, mit den Pfeiltasten, oder indem du quer über die Seite wischst. „n" legt eine neue Figur an.'] },
+      { t: 'Eine Doppelseite pro Figur', p: ['Links steht, wer sie ist und wie sie aussieht. Rechts, was für ein Mensch das ist, was ihr geschah, wie sie klingt und wohin sie gehört. Diese Aufteilung ändert sich nie — so findest du auch nach dreißig Figuren noch alles wieder.'] },
+      { t: 'Nichts muss', p: ['Jedes Feld darf leer bleiben. Was leer ist, steht nicht auf der Seite — und man sieht ihm auch nicht an, dass es fehlt. Nachtragen geht jederzeit: oben links auf den Namen tippen. Was du wieder herausnimmst, verschwindet von der Seite.'], b: 'Nur Name und ein Satz unter „Sagt"? Dann steht genau das da, und die Seite sieht trotzdem fertig aus.' },
+      { t: 'Was du eintragen kannst', p: ['Sechs Gruppen: Der Kopf der Seite (Spitzname, Alter, geboren, gestorben, Orte), Wie sie aussieht (von Statur und Händen bis Narben, Geruch und was in den Taschen ist), Was für ein Mensch das ist (Wesenszüge, der Widerspruch, Eigenheiten, Ängste, die Lüge die sie glaubt, will und braucht), Was ihr geschehen ist (Ereignisse, Wendepunkt, Familie), Wie sie klingt (Sätze, die erste Zeile, was sie nie sagt) und Wo sie hingehört (Geschichten, Rolle, Ort, Klang). Dazu Notizen und eigene Kategorien.'] },
+      { t: 'Wesenszüge', p: ['Ein Wortschatz von vierhundert Wörtern in sechzehn Gruppen — von „sanftmütig" bis „hintergründig". Suchen, antippen, fertig. Und was du selbst hineinschreibst, merkt sich VANI und schlägt es bei der nächsten Figur mit vor.'] },
+      { t: 'Geburtstag und Todestag', p: ['Trägst du ein Datum ein, steht es sofort auch im Kalender — und rechnet dort das Alter mit. Änderst du es, ändert sich der Kalendereintrag; nimmst du es weg, verschwindet er.'] },
+      { t: 'Wer wen kennt', p: ['Bei Familie, „Steht nahe", „Bewundert" und „Verachtet" schreibst du die Rolle davor: „Mutter — Ilva". Wer schon im Album steht, wird erkannt und verlinkt: ein Tipp, und du bist auf ihrer Seite.'] },
+      { t: 'Klebezettel', p: ['Bis zu fünfzehn pro Figur, in fünf Farben. Sie kleben unten rechts auf der Doppelseite, ordentlich nebeneinander.'] },
+      { t: 'Suchen und finden', p: ['Oben liegt die Suchleiste — sie sucht zuerst im Namen, dann in allem anderen. Daneben das Register: ein Buchstabe, ein Sprung. Die Figuren stehen immer alphabetisch, egal wann du sie angelegt hast.'] },
+      { t: 'Als Blatt ablegen', p: ['Im Blatt zur Figur legt der Knopf alles, was du eingetragen hast, als Text bei den Blättern ab — zum Weiterschreiben.'] }
     ]
   },
   {
@@ -26528,6 +26901,1059 @@ function baueTischkalender() {
           el('em', {}, (e.titel || kalArt(e.art).name).slice(0, 22))))
           : [el('span', { class: 'kal-blattleer' }, 'nichts notiert')])),
       el('i', { class: 'kal-spirale' }), el('i', { class: 'kal-band' })));
+}
+
+/* ===================== 62 — DAS ALBUM =====================
+   Ein dickes Buch, in dem die Figuren wohnen. Eine Doppelseite für jede.
+
+   Das Prinzip, an dem sich alles ausrichtet: **Nichts muss.** Jedes Feld darf
+   leer bleiben. Was leer ist, steht nicht auf der Seite — und man sieht ihm
+   auch nicht an, dass es fehlt. Was eingetragen ist, bekommt seine feste
+   Form: dieselbe Kategorie sieht auf jeder Seite gleich aus, sonst wäre das
+   Buch nach zwanzig Figuren unlesbar.
+
+   Die Seite soll gelebt aussehen, nicht gewürfelt. Deshalb ist jede Schräge
+   und jeder Platz aus Figur und Feld *gerechnet* (`albumDreh`), nicht
+   gewürfelt: dieselbe Figur sieht bei jedem Aufschlagen genau gleich aus.
+
+   Dieses Modul kennt kein DOM. Es weiß, welche Felder es gibt, was in sie
+   hineindarf, wie sie sortiert werden und was einer Figur noch fehlt. */
+
+/* ----- Die Formen, in denen etwas auf der Seite erscheint ----- */
+/* zeile   — mit der Hand auf die Seite geschrieben
+   zettel  — ein kleiner Papierschnipsel, angeklebt
+   etikett — ein Schildchen mit Aufdruck
+   karte   — eine Karteikarte mit Kopfzeile
+   band    — ein schmales Band quer über die Seite
+   wolke   — viele kurze Wörter nebeneinander
+   spruch  — in Serifen gesetzt, wie ein Zitat
+   liste   — Einträge untereinander, jeder mit Anstrich */
+
+const ALBUM_GRUPPEN = [
+  ['kopf', 'Der Kopf der Seite'],
+  ['aussehen', 'Wie sie aussieht'],
+  ['wesen', 'Was für ein Mensch das ist'],
+  ['leben', 'Was ihr geschehen ist'],
+  ['stimme', 'Wie sie klingt'],
+  ['welt', 'Wo sie hingehört'],
+  ['rand', 'An den Rand geschrieben']
+];
+
+/* {du} wird durch den Namen der Figur ersetzt, sobald einer dasteht. */
+const ALBUM_FELDER = [
+  /* ---------- Kopf ---------- */
+  { id: 'nennung', gruppe: 'kopf', name: 'Spitzname, Alias', form: 'etikett', mehrfach: true, platz: 'Wie wird {du} noch genannt?', hilfe: 'Alles, was statt des Namens fällt — zärtlich, spöttisch, amtlich.' },
+  { id: 'alter', gruppe: 'kopf', name: 'Alter', form: 'etikett', platz: 'Wie alt?' },
+  { id: 'geboren', gruppe: 'kopf', name: 'Geboren am', form: 'etikett', art: 'datum', hilfe: 'Wird gleich in den Kalender eingetragen — dort rechnet er dann das Alter mit.' },
+  { id: 'gestorben', gruppe: 'kopf', name: 'Gestorben am', form: 'etikett', art: 'datum', hilfe: 'Kommt ebenfalls in den Kalender.' },
+  { id: 'geburtsort', gruppe: 'kopf', name: 'Geburtsort', form: 'etikett', platz: 'Wo kam {du} zur Welt?' },
+  { id: 'wohnort', gruppe: 'kopf', name: 'Wohnt', form: 'etikett', platz: 'Wo lebt {du} jetzt?' },
+
+  /* ---------- Aussehen ---------- */
+  { id: 'statur', gruppe: 'aussehen', name: 'Statur', form: 'zeile', platz: 'Groß, klein, schmal, breit …' },
+  { id: 'haare', gruppe: 'aussehen', name: 'Haare', form: 'zeile', platz: 'Farbe, Länge, wie sie liegen' },
+  { id: 'augen', gruppe: 'aussehen', name: 'Augen', form: 'zeile', platz: 'Farbe — und wie sie schauen' },
+  { id: 'gesicht', gruppe: 'aussehen', name: 'Gesicht', form: 'zeile', platz: 'Was einem zuerst auffällt' },
+  { id: 'haut', gruppe: 'aussehen', name: 'Haut', form: 'zeile' },
+  { id: 'haende', gruppe: 'aussehen', name: 'Hände', form: 'zeile', platz: 'Hände verraten mehr als Gesichter.' },
+  { id: 'narben', gruppe: 'aussehen', name: 'Narben', form: 'liste', mehrfach: true, platz: 'Wo — und woher?' },
+  { id: 'muttermale', gruppe: 'aussehen', name: 'Muttermale, Sommersprossen', form: 'zeile' },
+  { id: 'zeichnung', gruppe: 'aussehen', name: 'Tätowierungen, Zeichen', form: 'liste', mehrfach: true },
+  { id: 'zaehne', gruppe: 'aussehen', name: 'Zähne, Lächeln', form: 'zeile' },
+  { id: 'gang', gruppe: 'aussehen', name: 'Gang, Haltung', form: 'zeile', platz: 'Wie {du} sich bewegt' },
+  { id: 'kleidung', gruppe: 'aussehen', name: 'Kleidung', form: 'zeile', platz: 'Was {du} trägt — und was nie' },
+  { id: 'getragen', gruppe: 'aussehen', name: 'Trägt immer bei sich', form: 'liste', mehrfach: true, platz: 'Was in den Taschen ist', hilfe: 'Drei Gegenstände sagen mehr über einen Menschen als drei Absätze.' },
+  { id: 'schmuck', gruppe: 'aussehen', name: 'Schmuck', form: 'zeile' },
+  { id: 'geruch', gruppe: 'aussehen', name: 'Riecht nach', form: 'zeile', hilfe: 'Der Geruch ist der schnellste Weg in eine Erinnerung.' },
+
+  /* ---------- Wesen ---------- */
+  { id: 'wesen', gruppe: 'wesen', name: 'Wesenszüge', form: 'wolke', mehrfach: true, wortschatz: true, platz: 'Wählen oder eigene schreiben' },
+  { id: 'widerspruch', gruppe: 'wesen', name: 'Der Widerspruch', form: 'karte', platz: 'Mutig — und hat Angst vor Fahrstühlen.', hilfe: 'Zwei Dinge, die nicht zusammenpassen und trotzdem beide wahr sind. Daran wird ein Mensch daraus.' },
+  { id: 'eigenheit', gruppe: 'wesen', name: 'Eigenheiten', form: 'liste', mehrfach: true, platz: 'Was {du} tut, ohne es zu merken', hilfe: 'Kleine Angewohnheiten, Ticks, wiederkehrende Gesten — davon lebt eine Figur.' },
+  { id: 'leidenschaft', gruppe: 'wesen', name: 'Leidenschaften', form: 'wolke', mehrfach: true, platz: 'Wofür {du} brennt' },
+  { id: 'angst', gruppe: 'wesen', name: 'Hat Angst vor', form: 'karte', mehrfach: true, platz: 'Wovor?' },
+  { id: 'fehler', gruppe: 'wesen', name: 'Größter Fehler', form: 'karte', platz: 'Was {du} immer wieder falsch macht' },
+  { id: 'luege', gruppe: 'wesen', name: 'Die Lüge, die sie glaubt', form: 'karte', platz: 'Was {du} über sich für wahr hält — und was nicht stimmt', hilfe: 'Der stärkste Motor einer Figur: eine Überzeugung über sich selbst, die falsch ist.' },
+  { id: 'will', gruppe: 'wesen', name: 'Will', form: 'karte', platz: 'Was {du} zu bekommen versucht' },
+  { id: 'braucht', gruppe: 'wesen', name: 'Braucht in Wahrheit', form: 'karte', platz: 'Was {du} wirklich fehlt', hilfe: 'Zwischen „will" und „braucht" liegt die ganze Geschichte.' },
+  { id: 'bewundert', gruppe: 'wesen', name: 'Bewundert', form: 'liste', mehrfach: true, verweis: true, platz: 'Wen?' },
+  { id: 'verachtet', gruppe: 'wesen', name: 'Verachtet', form: 'liste', mehrfach: true, verweis: true },
+  { id: 'unbeobachtet', gruppe: 'wesen', name: 'Wenn niemand zusieht', form: 'karte', platz: 'Was {du} allein tut', hilfe: 'Der ehrlichste Ort einer Figur.' },
+  { id: 'streit', gruppe: 'wesen', name: 'Im Streit', form: 'zeile', platz: 'Laut, kalt, weinend, witzig?' },
+  { id: 'kannnicht', gruppe: 'wesen', name: 'Kann nicht', form: 'zeile', platz: 'Etwas ganz Konkretes: schwimmen, lügen, danke sagen' },
+  { id: 'aberglaube', gruppe: 'wesen', name: 'Aberglaube', form: 'zeile' },
+
+  /* ---------- Leben ---------- */
+  { id: 'ereignis', gruppe: 'leben', name: 'Wichtig in {du}s Vergangenheit', form: 'liste', mehrfach: true, platz: 'Was ist geschehen?', hilfe: 'Was vor der Geschichte lag und bis heute nachwirkt.' },
+  { id: 'wendepunkt', gruppe: 'leben', name: 'Der Wendepunkt', form: 'karte', platz: 'Der Tag, an dem {du} ein anderer wurde' },
+  { id: 'spaet', gruppe: 'leben', name: 'Zu spät verstanden', form: 'karte', platz: 'Was {du} erst begriff, als es nichts mehr half' },
+  { id: 'geweint', gruppe: 'leben', name: 'Zuletzt geweint, als', form: 'zeile' },
+  { id: 'narbe', gruppe: 'leben', name: 'Die Wunde, über die nicht geredet wird', form: 'karte' },
+  { id: 'familie', gruppe: 'leben', name: 'Familie', form: 'liste', mehrfach: true, verweis: true, platz: 'Wer gehört dazu?', hilfe: 'Schreib die Verwandtschaft dazu: „Mutter", „Bruder", „Ziehvater". Wer schon im Album steht, wird erkannt.' },
+  { id: 'naehe', gruppe: 'leben', name: 'Steht nahe', form: 'liste', mehrfach: true, verweis: true, platz: 'Freunde, Feinde, alles dazwischen' },
+
+  /* ---------- Stimme ---------- */
+  { id: 'zitat', gruppe: 'stimme', name: 'Sagt', form: 'spruch', mehrfach: true, platz: 'Ein Satz, wie nur {du} ihn sagt', hilfe: 'So viele du willst. Sie stehen groß und schön auf der Seite.' },
+  { id: 'ersteZeile', gruppe: 'stimme', name: 'Die erste Zeile', form: 'spruch', platz: 'Das Erste, was man {du} sagen hört', hilfe: 'Der erste Satz einer Figur ist ihr Versprechen an den Leser.' },
+  { id: 'sagtNie', gruppe: 'stimme', name: 'Sagt nie', form: 'karte', platz: 'Ein Wort, ein Satz — der nie über {du}s Lippen kommt' },
+  { id: 'stimme', gruppe: 'stimme', name: 'Stimme', form: 'zeile', platz: 'Hoch, rau, leise, zu schnell?' },
+  { id: 'redensart', gruppe: 'stimme', name: 'Redensarten', form: 'wolke', mehrfach: true, platz: 'Was {du} ständig sagt' },
+
+  /* ---------- Welt ---------- */
+  { id: 'geschichte', gruppe: 'welt', name: 'Kommt vor in', form: 'band', mehrfach: true, platz: 'In welcher Geschichte?', hilfe: 'Frei hineinschreiben — Titel, Arbeitstitel, „das mit dem Deich".' },
+  { id: 'rolle', gruppe: 'welt', name: 'Rolle in der Geschichte', form: 'etikett', platz: 'Hauptfigur, Widersacher, die Stimme der Vernunft …' },
+  { id: 'ort', gruppe: 'welt', name: 'Ihr Ort', form: 'zeile', platz: 'Wo man {du} suchen würde' },
+  { id: 'beruf', gruppe: 'welt', name: 'Tut den ganzen Tag', form: 'zeile', platz: 'Beruf, Handwerk, Beschäftigung' },
+  { id: 'jahreszeit', gruppe: 'welt', name: 'Jahreszeit', form: 'etikett', platz: 'Welche Jahreszeit ist {du}?' },
+  { id: 'klang', gruppe: 'welt', name: 'Klingt nach', form: 'zeile', platz: 'Ein Geräusch, ein Instrument, ein Lied' },
+  { id: 'bleibt', gruppe: 'welt', name: 'Was bleibt, wenn sie geht', form: 'karte', platz: 'Was im Raum zurückbleibt' },
+
+  /* ---------- Rand ---------- */
+  { id: 'notiz', gruppe: 'rand', name: 'Notizen', form: 'notizfeld', platz: 'Alles, was sonst nirgends hinpasst.' }
+];
+const ALBUM_FELD_IDS = ALBUM_FELDER.map((f) => f.id);
+function albumFeld(id) { return ALBUM_FELDER.find((f) => f.id === id) || null; }
+/* Der Name der Figur steht im Feldnamen, sobald es einen gibt. */
+function albumBeschriftung(text, name) {
+  const n = String(name || '').trim();
+  return String(text || '').replace(/\{du\}/g, n || 'ihr');
+}
+
+/* ----- Der Wortschatz für Wesenszüge -----
+   Von den geläufigen bis zu den seltenen. Alles wählbar, eigene jederzeit
+   dazu. Gruppen nur zum Blättern — beim Suchen zählt die ganze Liste. */
+const ALBUM_WESEN = [
+  ['warm', 'Warm', ['warmherzig', 'zugewandt', 'herzlich', 'gutmütig', 'sanftmütig', 'zärtlich', 'behutsam', 'fürsorglich', 'nachsichtig', 'langmütig', 'barmherzig', 'großmütig', 'treuherzig', 'arglos', 'gutgläubig', 'anhänglich', 'mitfühlend', 'feinfühlig', 'aufmerksam', 'geduldig', 'versöhnlich', 'gastfreundlich', 'freigebig', 'tröstlich', 'wohlwollend']],
+  ['kalt', 'Kühl', ['spröde', 'unterkühlt', 'schroff', 'ruppig', 'abweisend', 'unnahbar', 'menschenscheu', 'wortkarg', 'verschlossen', 'hartherzig', 'unbarmherzig', 'nachtragend', 'kleinlich', 'pedantisch', 'streng', 'unerbittlich', 'schneidend', 'herablassend', 'gleichgültig', 'abgebrüht', 'distanziert', 'reserviert', 'verschwiegen', 'undurchdringlich', 'frostig']],
+  ['feuer', 'Feuer', ['aufbrausend', 'jähzornig', 'hitzköpfig', 'ungestüm', 'draufgängerisch', 'waghalsig', 'tollkühn', 'trotzig', 'aufsässig', 'rebellisch', 'streitlustig', 'leidenschaftlich', 'lebenshungrig', 'übermütig', 'unbändig', 'stürmisch', 'ruhelos', 'unstet', 'sprunghaft', 'fahrig', 'hastig', 'getrieben', 'ehrgeizig', 'unnachgiebig', 'kampflustig']],
+  ['still', 'Still', ['gelassen', 'bedächtig', 'besonnen', 'ruhig', 'ausgeglichen', 'unaufgeregt', 'still', 'in sich gekehrt', 'nachdenklich', 'grüblerisch', 'schwermütig', 'schwerblütig', 'melancholisch', 'traumverloren', 'selbstvergessen', 'versonnen', 'zurückhaltend', 'bescheiden', 'demütig', 'anspruchslos', 'genügsam', 'andächtig', 'sanft', 'leise', 'friedfertig']],
+  ['klug', 'Klug', ['scharfsinnig', 'geistesgegenwärtig', 'schlagfertig', 'wach', 'hellhörig', 'aufgeweckt', 'findig', 'einfallsreich', 'erfinderisch', 'weitsichtig', 'umsichtig', 'lebensklug', 'buchgelehrt', 'belesen', 'wissbegierig', 'neugierig', 'forschend', 'kritisch', 'nüchtern', 'analytisch', 'hintersinnig', 'doppelbödig', 'listig', 'gewitzt', 'altklug']],
+  ['dunkel', 'Dunkel', ['verschlagen', 'durchtrieben', 'hinterhältig', 'falsch', 'berechnend', 'skrupellos', 'grausam', 'rachsüchtig', 'neidisch', 'missgünstig', 'eifersüchtig', 'misstrauisch', 'argwöhnisch', 'zynisch', 'bitter', 'verbittert', 'hasserfüllt', 'kaltblütig', 'gefühllos', 'manipulativ', 'heuchlerisch', 'käuflich', 'verlogen', 'niederträchtig', 'abgründig']],
+  ['stark', 'Standfest', ['standhaft', 'unbeirrbar', 'beharrlich', 'zäh', 'unverwüstlich', 'aufrecht', 'unbestechlich', 'gerecht', 'verlässlich', 'treu', 'pflichtbewusst', 'gewissenhaft', 'mutig', 'furchtlos', 'tapfer', 'entschlossen', 'zielstrebig', 'diszipliniert', 'ausdauernd', 'belastbar', 'bodenständig', 'sachlich', 'geradlinig', 'wahrhaftig', 'lauter']],
+  ['schwach', 'Zerbrechlich', ['zaghaft', 'ängstlich', 'hasenherzig', 'feige', 'schreckhaft', 'unsicher', 'selbstzweifelnd', 'wankelmütig', 'nachgiebig', 'leicht zu kränken', 'empfindlich', 'dünnhäutig', 'zerbrechlich', 'weinerlich', 'anlehnungsbedürftig', 'unentschlossen', 'zögerlich', 'schwankend', 'leicht zu führen', 'überfordert', 'erschöpft', 'ausgebrannt', 'kraftlos', 'verzagt', 'mutlos']],
+  ['laut', 'Nach außen', ['redselig', 'geschwätzig', 'gesellig', 'aufgeschlossen', 'kontaktfreudig', 'charmant', 'gewinnend', 'mitreißend', 'unterhaltsam', 'witzig', 'verschmitzt', 'spitzbübisch', 'schelmisch', 'ironisch', 'spöttisch', 'prahlerisch', 'eitel', 'selbstverliebt', 'geltungssüchtig', 'großspurig', 'auftrumpfend', 'raumgreifend', 'anmaßend', 'hochmütig', 'selbstgerecht']],
+  ['schräg', 'Verschroben', ['eigenbrötlerisch', 'wunderlich', 'schrullig', 'kauzig', 'verschroben', 'weltfremd', 'zerstreut', 'geistesabwesend', 'versponnen', 'exzentrisch', 'unangepasst', 'eigensinnig', 'störrisch', 'dickköpfig', 'querköpfig', 'unberechenbar', 'launisch', 'wetterfühlig', 'mondsüchtig', 'abergläubisch', 'pedantisch ordentlich', 'sammelwütig', 'umständlich', 'skurril', 'sonderbar']],
+  ['koerper', 'Im Körper', ['leichtfüßig', 'tänzerisch', 'geschmeidig', 'fingerfertig', 'geschickt', 'kräftig', 'zäh gebaut', 'schwerfällig', 'ungelenk', 'unbeholfen', 'tollpatschig', 'linkisch', 'breitbeinig', 'katzenhaft', 'kerzengerade', 'gebeugt', 'unruhig in den Händen', 'nie stillsitzend', 'trägen Schrittes', 'sportlich', 'abgehärtet', 'verweichlicht', 'kurzatmig', 'unermüdlich', 'schlafarm']],
+  ['sehnsucht', 'Sehnsüchtig', ['heimwehkrank', 'fernwehkrank', 'ruhesuchend', 'liebesbedürftig', 'anerkennungshungrig', 'nachtwach', 'zukunftsblind', 'vergangenheitsverliebt', 'nostalgisch', 'unzufrieden', 'rastlos', 'unbehaust', 'wurzellos', 'sesshaft', 'reiselustig', 'abenteuerlustig', 'gottesfürchtig', 'zweifelnd', 'hoffnungsvoll', 'hoffnungslos', 'schicksalsergeben', 'aufbegehrend', 'lebensmüde', 'lebensgierig', 'wartend']],
+  ['moral', 'Im Gewissen', ['grundehrlich', 'aufrichtig', 'prinzipientreu', 'unbeugsam', 'rechtschaffen', 'ehrenhaft', 'wortbrüchig', 'opportunistisch', 'wendehalsig', 'anpassungsfähig', 'bestechlich', 'pflichtvergessen', 'gewissenlos', 'schuldbewusst', 'reumütig', 'unbelehrbar', 'selbstkritisch', 'ausredenreich', 'verantwortungsvoll', 'drückebergerisch', 'solidarisch', 'eigennützig', 'selbstlos', 'aufopfernd', 'berechnend gütig']],
+  ['gemuet', 'Im Gemüt', ['heiter', 'sonnig', 'gutgelaunt', 'unbeschwert', 'trübsinnig', 'griesgrämig', 'muffig', 'sauertöpfisch', 'grantig', 'brummig', 'launenhaft', 'wechselhaft', 'gleichmütig', 'stoisch', 'gefasst', 'hochgestimmt', 'niedergeschlagen', 'trübe gestimmt', 'leichtlebig', 'sorglos', 'sorgenvoll', 'zerknirscht', 'gelöst', 'angespannt', 'aufgekratzt']],
+  ['umgang', 'Im Umgang', ['höflich', 'zuvorkommend', 'taktvoll', 'feinsinnig', 'grobschlächtig', 'ungehobelt', 'derb', 'flegelhaft', 'förmlich', 'steif', 'ungezwungen', 'salopp', 'vertraulich', 'aufdringlich', 'zudringlich', 'diskret', 'taktlos', 'schlagfertig höflich', 'schweigsam höflich', 'unterwürfig', 'gebieterisch', 'befehlend', 'bittend', 'schmeichlerisch', 'unbestechlich freundlich']],
+  ['selten', 'Seltene Wörter', ['hintergründig', 'abgeklärt', 'seelenruhig', 'todernst', 'schalkhaft', 'trotzköpfig', 'wehleidig', 'sanguinisch', 'phlegmatisch', 'cholerisch', 'maulfaul', 'grundgütig', 'urkomisch', 'bitterernst', 'butterweich', 'eisenhart', 'himmelstürmend', 'erdverbunden', 'lichtscheu', 'sonnenhungrig', 'nachtblind vor Angst', 'unbeirrt freundlich', 'liebenswürdig grausam', 'traurig komisch', 'komisch traurig']]
+];
+const ALBUM_WESEN_ALLE = ALBUM_WESEN.flatMap(([, , w]) => w);
+
+/* ----- Eine Figur ----- */
+function saubereAlbumFigur(f) {
+  if (!f || typeof f !== 'object') return null;
+  const raus = { name: String(f.name || f.titel || '').slice(0, 120).trim(), felder: {}, eigene: [], zettel: [], farbe: '' };
+  if (/^#[0-9a-f]{6}$/i.test(String(f.farbe || ''))) raus.farbe = String(f.farbe);
+  const quelle = f.felder && typeof f.felder === 'object' ? f.felder : {};
+  for (const feld of ALBUM_FELDER) {
+    const w = quelle[feld.id];
+    if (w == null) continue;
+    if (feld.mehrfach) {
+      if (!Array.isArray(w)) continue;
+      const liste = w.map((x) => String(x == null ? '' : x).slice(0, 600).trim()).filter(Boolean);
+      /* keine Doppelten, aber die Reihenfolge bleibt */
+      const gesehen = new Set(), sauber = [];
+      for (const x of liste) { const k = x.toLowerCase(); if (!gesehen.has(k)) { gesehen.add(k); sauber.push(x); } }
+      if (sauber.length) raus.felder[feld.id] = sauber.slice(0, 200);
+    } else {
+      const s = String(w).slice(0, feld.form === 'notizfeld' ? 20000 : 1200).trim();
+      if (s) raus.felder[feld.id] = s;
+    }
+  }
+  /* Eigene Kategorien: Name + Inhalt, alles frei */
+  if (Array.isArray(f.eigene)) {
+    for (const e of f.eigene.slice(0, 60)) {
+      if (!e || typeof e !== 'object') continue;
+      const name = String(e.name || '').slice(0, 80).trim();
+      const wert = String(e.wert || '').slice(0, 1200).trim();
+      if (name && wert) raus.eigene.push({ name, wert, gruppe: ALBUM_GRUPPEN.some(([g]) => g === e.gruppe) ? e.gruppe : 'rand' });
+    }
+  }
+  /* Klebezettel: höchstens fünfzehn */
+  if (Array.isArray(f.zettel)) {
+    for (const z of f.zettel.slice(0, ALBUM_ZETTEL_MAX)) {
+      if (!z || typeof z !== 'object') continue;
+      const text = String(z.text || '').slice(0, 400).trim();
+      if (!text) continue;
+      raus.zettel.push({ text, ton: ALBUM_ZETTELTOENE.includes(z.ton) ? z.ton : ALBUM_ZETTELTOENE[raus.zettel.length % ALBUM_ZETTELTOENE.length] });
+    }
+  }
+  return raus;
+}
+const ALBUM_ZETTEL_MAX = 15;
+const ALBUM_ZETTELTOENE = ['butter', 'rose', 'himmel', 'moos', 'sand'];
+/* Die Farben, mit denen eine Figur ihr Band bekommt. */
+const ALBUM_FARBEN = ['#a8452f', '#7d5ea7', '#4f7d86', '#7d9a6a', '#b0762f', '#8f4f4a', '#4a5a7d', '#8a6a86', '#7a7d4a', '#6b6f78'];
+
+/* ----- Der Bestand ----- */
+function albumFiguren() {
+  return [...D.docs.values()].filter((d) => d.typ === 'albumfigur' && !d.geloescht).sort(albumVergleich);
+}
+/* Alphabetisch, wie im Register — und wer noch keinen Namen hat, kommt zuletzt. */
+function albumVergleich(a, b) {
+  const na = String((a && a.name) || '').trim(), nb = String((b && b.name) || '').trim();
+  if (!na && !nb) return (a.angelegt || 0) - (b.angelegt || 0);
+  if (!na) return 1;
+  if (!nb) return -1;
+  return na.localeCompare(nb, 'de', { sensitivity: 'base' }) || (a.angelegt || 0) - (b.angelegt || 0);
+}
+/* Nach was gesucht wird: Name zuerst, aber alles zählt. */
+function albumSuche(frage, liste) {
+  const q = String(frage || '').trim().toLowerCase();
+  const alle = liste || albumFiguren();
+  if (!q) return alle;
+  const punkte = (f) => {
+    const name = String(f.name || '').toLowerCase();
+    if (name === q) return 4;
+    if (name.startsWith(q)) return 3;
+    if (name.includes(q)) return 2;
+    return albumVolltext(f).includes(q) ? 1 : 0;
+  };
+  return alle.map((f) => ({ f, p: punkte(f) })).filter((x) => x.p > 0)
+    .sort((a, b) => b.p - a.p || albumVergleich(a.f, b.f)).map((x) => x.f);
+}
+function albumVolltext(f) {
+  const teile = [f.name];
+  for (const [, w] of Object.entries(f.felder || {})) teile.push(Array.isArray(w) ? w.join(' ') : w);
+  for (const e of f.eigene || []) teile.push(e.name, e.wert);
+  for (const z of f.zettel || []) teile.push(z.text);
+  return teile.join(' ').toLowerCase();
+}
+/* Was auf der Seite steht — nur, was wirklich gefüllt ist, in fester Reihenfolge. */
+function albumStuecke(f) {
+  const raus = [];
+  for (const feld of ALBUM_FELDER) {
+    const w = (f.felder || {})[feld.id];
+    if (w == null) continue;
+    if (Array.isArray(w) ? !w.length : !String(w).trim()) continue;
+    raus.push({ feld, wert: w });
+  }
+  /* Aus einer beschaedigten Sicherung kann hier alles Moegliche stehen.
+     Was keine Liste von Paaren ist, wird uebergangen statt die Seite zu
+     zerlegen. */
+  if (Array.isArray(f.eigene)) {
+    for (const e of f.eigene) {
+      if (!e || typeof e !== 'object' || !e.name || !e.wert) continue;
+      raus.push({ feld: { id: 'eigen:' + e.name, gruppe: e.gruppe || 'rand', name: String(e.name), form: 'zeile', eigen: true }, wert: String(e.wert) });
+    }
+  }
+  return raus;
+}
+function albumZettel(f) { return Array.isArray(f && f.zettel) ? f.zettel.filter((z) => z && typeof z === 'object' && String(z.text || '').trim()) : []; }
+function albumIstLeer(f) { return !String(f.name || '').trim() && !albumStuecke(f).length && !albumZettel(f).length; }
+
+/* Wie viel schon dasteht — für den Rücken des Buches und die Übersicht. */
+function albumFuelle(f) {
+  const moeglich = ALBUM_FELDER.length;
+  const da = albumStuecke(f).filter((s) => !s.feld.eigen).length;
+  return Math.max(0, Math.min(1, da / Math.max(1, moeglich)));
+}
+/* Was der Figur noch fehlt — der Impuls, nicht der Vorwurf. */
+function albumFehlt(f, zufall) {
+  const leer = ALBUM_FELDER.filter((feld) => {
+    if (feld.form === 'notizfeld') return false;
+    const w = (f.felder || {})[feld.id];
+    return w == null || (Array.isArray(w) ? !w.length : !String(w).trim());
+  });
+  if (!leer.length) return null;
+  const i = typeof zufall === 'number' ? zufall % leer.length : Math.floor(Math.random() * leer.length);
+  return leer[i];
+}
+
+/* ----- Verweise: wer im Album schon steht ----- */
+/* Ein Eintrag darf „Mutter — Ilva" heißen. Erkannt wird, was hinter dem
+   Gedankenstrich steht oder der ganze Eintrag. */
+function albumVerweisName(eintrag) {
+  const s = String(eintrag || '').trim();
+  const m = /^(.{1,40}?)\s*[—–-]\s*(.+)$/.exec(s);
+  return (m ? m[2] : s).trim();
+}
+function albumVerweisRolle(eintrag) {
+  const m = /^(.{1,40}?)\s*[—–-]\s*(.+)$/.exec(String(eintrag || '').trim());
+  return m ? m[1].trim() : '';
+}
+function albumFindeFigur(name, liste) {
+  const n = String(name || '').trim().toLowerCase();
+  if (!n) return null;
+  return (liste || albumFiguren()).find((f) => String(f.name || '').trim().toLowerCase() === n) || null;
+}
+/* Alle Verbindungen zwischen Figuren — Grundlage für den Stammbaum später. */
+function albumBeziehungen(liste) {
+  const alle = liste || albumFiguren();
+  const raus = [];
+  for (const f of alle) {
+    for (const feldId of ['familie', 'naehe', 'bewundert', 'verachtet']) {
+      for (const eintrag of (f.felder || {})[feldId] || []) {
+        const name = albumVerweisName(eintrag);
+        const ziel = albumFindeFigur(name, alle);
+        raus.push({ von: f.id, vonName: f.name, art: feldId, rolle: albumVerweisRolle(eintrag), name, zu: ziel ? ziel.id : '' });
+      }
+    }
+  }
+  return raus;
+}
+
+/* ----- Immer dieselbe Schräge, immer derselbe Platz -----
+   Aus Figur und Feld gerechnet: dieselbe Seite sieht bei jedem Aufschlagen
+   genau gleich aus. Gewürfelt wäre sie bei jedem Blättern anders — und das
+   wäre kein gelebtes Buch, sondern ein zappelndes. */
+function albumHash(...teile) {
+  let h = 2166136261;
+  const s = teile.join('|');
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0);
+}
+function albumDreh(figurId, feldId, weite = 1.6) {
+  const h = albumHash(figurId, feldId);
+  return Math.round(((h % 2000) / 1000 - 1) * weite * 10) / 10;
+}
+function albumFarbe(f) {
+  if (f && /^#[0-9a-f]{6}$/i.test(String(f.farbe || ''))) return f.farbe;
+  return ALBUM_FARBEN[albumHash((f && f.id) || '', (f && f.name) || '') % ALBUM_FARBEN.length];
+}
+/* Der Buchstabe für das Register. */
+function albumBuchstabe(f) {
+  const n = String((f && f.name) || '').trim();
+  if (!n) return '#';
+  const c = n[0].toUpperCase();
+  return /[A-ZÄÖÜ]/.test(c) ? (({ 'Ä': 'A', 'Ö': 'O', 'Ü': 'U' })[c] || c) : '#';
+}
+function albumRegister(liste) {
+  const raus = [];
+  (liste || albumFiguren()).forEach((f, i) => {
+    const b = albumBuchstabe(f);
+    if (!raus.length || raus[raus.length - 1].buchstabe !== b) raus.push({ buchstabe: b, von: i, anzahl: 0 });
+    raus[raus.length - 1].anzahl++;
+  });
+  return raus;
+}
+
+/* ----- Das Alter, wenn ein Geburtsdatum dasteht ----- */
+function albumAlterText(f, stichtag) {
+  const g = (f.felder || {}).geboren;
+  if (!g || typeof kalAlter !== 'function' || !kalGueltig(g)) return '';
+  const t = (f.felder || {}).gestorben;
+  if (t && kalGueltig(t)) {
+    const a = kalAlter(g, t);
+    return a ? 'wurde ' + a.jahre + ' Jahre alt' : '';
+  }
+  const a = kalAlter(g, stichtag || kalHeute());
+  return a ? 'heute ' + kalAlterText(a) : '';
+}
+
+/* ===================== 62b — DAS ALBUM, AUFGESCHLAGEN =====================
+   Der Raum zeigt ein dickes Buch. Ein Tippen, und es klappt auf.
+
+   Geblättert wird wie in einem Buch: Ein Blatt hebt sich, dreht sich um den
+   Falz und legt sich auf die andere Seite. Vorderseite des Blattes ist die
+   rechte Seite, die man verlässt; Rückseite ist die linke Seite, auf die man
+   kommt — genau wie bei Papier. Deshalb sieht man beim Drehen auch beides.
+
+   Eine Doppelseite gehört einer Figur. Links steht, wer sie ist und wie sie
+   aussieht; rechts, was für ein Mensch das ist, was ihr geschah, wie sie
+   klingt und wohin sie gehört. Diese Aufteilung ändert sich nie — nur so
+   findet man nach dreißig Figuren noch etwas wieder. */
+
+const ALB_LINKS = ['kopf', 'aussehen'];
+const ALB_RECHTS = ['wesen', 'leben', 'stimme', 'welt', 'rand'];
+
+let _alb = { i: 0, suche: '', offen: false, dreht: false };
+
+/* ----- Der Raum: das Buch liegt da ----- */
+RENDER.album = function (haupt) {
+  const figuren = albumFiguren();
+  const dicke = Math.min(38, 10 + figuren.length * 1.4);
+  const buch = el('button', {
+    class: 'alb-regalbuch', title: figuren.length ? 'Das Album — ' + figuren.length + (figuren.length === 1 ? ' Figur' : ' Figuren') : 'Das Album — noch leer',
+    style: '--dicke:' + dicke.toFixed(1) + 'px',
+    onclick: () => albumOeffnen(0)
+  },
+    el('i', { class: 'alb-rb-block' }),
+    el('div', { class: 'alb-rb-deckel' },
+      el('i', { class: 'alb-rb-praegung' }),
+      el('span', { class: 'alb-rb-titel' }, 'ALBUM'),
+      el('span', { class: 'alb-rb-unter' }, figuren.length ? figuren.length + (figuren.length === 1 ? ' Figur' : ' Figuren') : 'noch leer'),
+      el('i', { class: 'alb-rb-ecke e1' }), el('i', { class: 'alb-rb-ecke e2' }),
+      el('i', { class: 'alb-rb-ecke e3' }), el('i', { class: 'alb-rb-ecke e4' })),
+    el('i', { class: 'alb-rb-band' }));
+
+  const kopf = raumkopf('Das Album', figuren.length
+    ? figuren.length + (figuren.length === 1 ? ' Figur wohnt darin.' : ' Figuren wohnen darin.')
+    : 'Ein dickes Buch mit lauter leeren Seiten. Eine Doppelseite für jede Figur.',
+    el('button', { class: 'knopf voll', onclick: () => albumNeueFigur() }, 'Eine Figur anlegen'));
+
+  const inhalt = el('div', { class: 'inhalt alb-raum' }, buch,
+    el('p', { class: 'alb-raumtext' }, figuren.length
+      ? 'Schlag es auf und blättere. Oben links auf jeder Doppelseite steht der Name — ein Tippen darauf, und du kannst alles nachtragen oder wieder wegnehmen.'
+      : 'Noch steht nichts darin. Leg die erste Figur an — und lass ruhig fast alles leer. Was leer bleibt, steht später einfach nicht auf der Seite.'));
+  haupt.append(kopf, inhalt);
+};
+
+/* ----- Das Buch aufschlagen ----- */
+function albumOeffnen(start, zuFigurId) {
+  const figuren = albumFiguren();
+  _alb.suche = '';
+  _alb.i = zuFigurId ? Math.max(0, figuren.findIndex((f) => f.id === zuFigurId)) : begrenze(start, 0, Math.max(0, figuren.length), 0);
+
+  const buehne = el('div', { class: 'alb-buehne' });
+  const kasten = el('div', { class: 'alb-buch' }, buehne);
+  const huelle = el('div', { class: 'alb-huelle' }, kasten);
+  const zu = zeigeDeck(huelle, () => { document.removeEventListener('keydown', taste); _alb.offen = false; });
+  _alb.offen = true;
+  /* Der Deckel klappt auf */
+  kasten.classList.add('schlaegt-auf');
+  setTimeout(() => kasten.classList.remove('schlaegt-auf'), 900);
+
+  const neu = (i) => { if (i != null) _alb.i = i; albumZeichne(buehne, neu, zu); };
+  const taste = (ev) => {
+    if (!kasten.isConnected) { document.removeEventListener('keydown', taste); return; }
+    const z = ev.target;
+    if (z && (z.tagName === 'INPUT' || z.tagName === 'TEXTAREA' || z.tagName === 'SELECT')) return;
+    if (document.querySelectorAll('.schleier').length > 1) return;
+    if (ev.key === 'ArrowRight' || ev.key === 'PageDown') { ev.preventDefault(); albumBlaettern(1, buehne, neu); }
+    else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); albumBlaettern(-1, buehne, neu); }
+    else if (ev.key === 'n' || ev.key === 'N') { ev.preventDefault(); albumNeueFigur((id) => { const f = albumFiguren(); neu(Math.max(0, f.findIndex((x) => x.id === id))); }); }
+  };
+  document.addEventListener('keydown', taste);
+  albumZeichne(buehne, neu, zu);
+}
+
+/* Welche Figuren gerade im Buch stehen (Suche wirkt wie ein Register). */
+function albumSichtbare() {
+  const alle = albumFiguren();
+  return _alb.suche.trim() ? albumSuche(_alb.suche, alle) : alle;
+}
+
+function albumZeichne(buehne, neu, schliessen) {
+  const liste = albumSichtbare();
+  /* Hinter der letzten Figur liegt immer eine leere Doppelseite: dort wird
+     die nächste angelegt. So ist das Buch nie zu Ende. */
+  const anzahl = liste.length + 1;
+  _alb.i = begrenze(_alb.i, 0, anzahl - 1, 0);
+  const figur = liste[_alb.i] || null;
+
+  buehne.innerHTML = '';
+  buehne.append(albumKopfleiste(liste, neu, schliessen));
+
+  const block = el('div', { class: 'alb-block' },
+    albumSeite(figur, 'links', neu),
+    el('i', { class: 'alb-falz', 'aria-hidden': 'true' }),
+    albumSeite(figur, 'rechts', neu));
+  buehne.append(block);
+  buehne.append(albumFuss(liste, neu));
+
+  /* Wischen zum Blättern */
+  let start = null;
+  block.addEventListener('pointerdown', (ev) => { if (ev.target.closest('button, input, textarea, a')) return; start = { x: ev.clientX, y: ev.clientY, t: Date.now() }; });
+  block.addEventListener('pointerup', (ev) => {
+    if (!start) return;
+    const dx = ev.clientX - start.x, dy = ev.clientY - start.y;
+    const s = start; start = null;
+    if (Date.now() - s.t > 700 || Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx)) return;
+    albumBlaettern(dx < 0 ? 1 : -1, buehne, neu);
+  });
+}
+
+/* ----- Die feste Leiste oben: Suche, Register, Zuklappen ----- */
+function albumKopfleiste(liste, neu, schliessen) {
+  const suchfeld = el('input', { type: 'search', class: 'alb-suchfeld', placeholder: 'Figur suchen …', value: _alb.suche });
+  suchfeld.addEventListener('input', entprellt(() => { _alb.suche = suchfeld.value; _alb.i = 0; neu(); setTimeout(() => { const f = document.querySelector('.alb-suchfeld'); if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); } }, 0); }, 240, true));
+
+  const register = el('div', { class: 'alb-register' });
+  for (const r of albumRegister(liste)) {
+    register.append(el('button', { class: 'alb-regknopf' + (_alb.i >= r.von && _alb.i < r.von + r.anzahl ? ' an' : ''), title: r.anzahl + (r.anzahl === 1 ? ' Figur' : ' Figuren'), onclick: () => neu(r.von) }, r.buchstabe));
+  }
+
+  return el('div', { class: 'alb-kopf' },
+    el('div', { class: 'alb-kopfzeile' },
+      el('div', { class: 'alb-suche' }, el('span', { class: 'alb-lupe', html: ik('suche') }), suchfeld),
+      el('div', { class: 'alb-kopfrechts' },
+        el('button', { class: 'alb-neuknopf', title: 'Eine neue Figur anlegen (n)', onclick: () => albumNeueFigur((id) => { _alb.suche = ''; const f = albumFiguren(); neu(Math.max(0, f.findIndex((x) => x.id === id))); }) }, '+ Figur'),
+        el('button', { class: 'alb-zuknopf', title: 'Das Album zuklappen', onclick: () => schliessen() }, '×'))),
+    register.children.length ? register : null,
+    _alb.suche.trim() ? el('div', { class: 'alb-suchhinweis' }, liste.length === 1 ? 'eine Figur passt' : liste.length + ' Figuren passen') : null);
+}
+
+/* ----- Der Fuß: blättern und wissen, wo man ist ----- */
+function albumFuss(liste, neu) {
+  const anzahl = liste.length + 1;
+  const figur = liste[_alb.i] || null;
+  return el('div', { class: 'alb-fuss' },
+    el('button', { class: 'alb-blaetter links', title: 'Zurückblättern', disabled: _alb.i <= 0 ? '' : null, onclick: () => albumBlaettern(-1, document.querySelector('.alb-buehne'), neu) }, '‹'),
+    el('div', { class: 'alb-seitenzahl' },
+      figur ? el('b', {}, figur.name || 'ohne Namen') : el('b', { class: 'leer' }, 'leere Doppelseite'),
+      el('small', {}, (_alb.i + 1) + ' von ' + anzahl)),
+    el('button', { class: 'alb-blaetter rechts', title: 'Weiterblättern', disabled: _alb.i >= anzahl - 1 ? '' : null, onclick: () => albumBlaettern(1, document.querySelector('.alb-buehne'), neu) }, '›'));
+}
+
+/* ----- Das Blättern: ein Blatt dreht sich um den Falz ----- */
+function albumBlaettern(richtung, buehne, neu) {
+  if (!buehne || _alb.dreht) return;
+  const liste = albumSichtbare();
+  const anzahl = liste.length + 1;
+  const ziel = _alb.i + richtung;
+  if (ziel < 0 || ziel > anzahl - 1) return;
+
+  const block = buehne.querySelector('.alb-block');
+  const stillsteht = (typeof document !== 'undefined' && document.hidden) ||
+    (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (!block || stillsteht) { neu(ziel); return; }
+
+  const alt = liste[_alb.i] || null, neuF = liste[ziel] || null;
+  /* Vorder- und Rückseite des Blattes, das sich dreht. */
+  const vorn = richtung > 0 ? albumSeite(alt, 'rechts', neu, true) : albumSeite(alt, 'links', neu, true);
+  const hinten = richtung > 0 ? albumSeite(neuF, 'links', neu, true) : albumSeite(neuF, 'rechts', neu, true);
+  const blatt = el('div', { class: 'alb-blatt ' + (richtung > 0 ? 'vor' : 'zurueck') },
+    el('div', { class: 'alb-blattseite vorn' }, vorn),
+    el('div', { class: 'alb-blattseite hinten' }, hinten),
+    el('i', { class: 'alb-blattschatten' }));
+  block.append(blatt);
+  _alb.dreht = true;
+  /* Erst wenn das Blatt oben liegt, wird darunter schon die neue Seite gebaut. */
+  setTimeout(() => {
+    const untenLinks = block.querySelector('.alb-seite.links'), untenRechts = block.querySelector('.alb-seite.rechts');
+    if (richtung > 0 && untenRechts) untenRechts.replaceWith(albumSeite(neuF, 'rechts', neu));
+    if (richtung < 0 && untenLinks) untenLinks.replaceWith(albumSeite(neuF, 'links', neu));
+  }, 30);
+  requestAnimationFrame(() => blatt.classList.add('laeuft'));
+  /* Kein requestAnimationFrame zum Aufräumen: der steht bei verstecktem
+     Fenster still, und dann bliebe das Blatt für immer quer im Buch liegen. */
+  setTimeout(() => { _alb.dreht = false; neu(ziel); }, 620);
+}
+
+/* ----- Eine Seite ----- */
+function albumSeite(figur, welche, neu, flach) {
+  const seite = el('div', { class: 'alb-seite ' + welche });
+  if (!figur) {
+    /* Die leere Doppelseite: links das Angebot, rechts nur Papier. */
+    if (welche === 'links') {
+      seite.append(el('button', { class: 'alb-neuefigur', onclick: () => albumNeueFigur((id) => { const f = albumFiguren(); if (neu) neu(Math.max(0, f.findIndex((x) => x.id === id))); }) },
+        el('span', { class: 'alb-nf-kreuz' }, '+'),
+        el('span', { class: 'alb-nf-text' }, el('b', {}, 'Eine Figur anlegen'), el('small', {}, 'Hier wohnt noch niemand.'))));
+      seite.append(el('div', { class: 'alb-leerhinweis' }, 'Trag ein, was du weißt. Alles andere darf leer bleiben — es steht dann einfach nicht auf der Seite, und man sieht ihm nicht an, dass es fehlt.'));
+    }
+    return seite;
+  }
+  const farbe = albumFarbe(figur);
+  seite.style.setProperty('--figurfarbe', farbe);
+
+  if (welche === 'links') {
+    seite.append(albumSeitenkopf(figur, neu));
+    const stuecke = albumStuecke(figur).filter((s) => ALB_LINKS.includes(s.feld.gruppe));
+    seite.append(albumStueckFeld(figur, stuecke, flach));
+  } else {
+    const stuecke = albumStuecke(figur).filter((s) => ALB_RECHTS.includes(s.feld.gruppe));
+    seite.append(albumStueckFeld(figur, stuecke, flach));
+    if (albumZettel(figur).length) seite.append(albumZettelBrett(figur));
+    seite.append(el('i', { class: 'alb-seitenband', style: 'background:' + farbe }));
+  }
+  return seite;
+}
+
+/* Der Kopf der linken Seite: Name, Lebensdaten, Alter — und der Weg zum Ändern. */
+function albumSeitenkopf(figur, neu) {
+  const alter = albumAlterText(figur);
+  const g = (figur.felder || {}).geboren, t = (figur.felder || {}).gestorben;
+  const lebensdaten = [g && kalGueltig(g) ? '✻ ' + kalKurz(g) : '', t && kalGueltig(t) ? '† ' + kalKurz(t) : ''].filter(Boolean).join('   ');
+  return el('div', { class: 'alb-seitenkopf' },
+    el('button', { class: 'alb-name', title: 'Alles zu dieser Figur — nachtragen, ändern, wegnehmen', onclick: () => albumBearbeiten(figur, () => { if (neu) neu(); }) },
+      el('b', {}, figur.name || 'ohne Namen'),
+      el('i', { class: 'alb-nameunter' }, 'ändern')),
+    lebensdaten ? el('div', { class: 'alb-lebensdaten' }, lebensdaten) : null,
+    alter ? el('div', { class: 'alb-alter' }, alter) : null,
+    el('i', { class: 'alb-namenlinie' }));
+}
+
+/* Alle gefüllten Stücke einer Seite, jedes in seiner festen Form. */
+function albumStueckFeld(figur, stuecke, flach) {
+  const feld = el('div', { class: 'alb-stuecke' });
+  if (!stuecke.length) return feld;
+  /* Etiketten sammeln sich in einer Reihe — sonst zerfasert der Kopf. */
+  const etiketten = stuecke.filter((s) => s.feld.form === 'etikett');
+  const rest = stuecke.filter((s) => s.feld.form !== 'etikett');
+  if (etiketten.length) {
+    const reihe = el('div', { class: 'alb-etikettreihe' });
+    for (const s of etiketten) reihe.append(albumStueck(figur, s, flach));
+    feld.append(reihe);
+  }
+  for (const s of rest) feld.append(albumStueck(figur, s, flach));
+  return feld;
+}
+
+function albumStueck(figur, s, flach) {
+  const { feld, wert } = s;
+  const name = albumBeschriftung(feld.name, figur.name);
+  const dreh = flach ? 0 : albumDreh(figur.id, feld.id, feld.form === 'zettel' ? 2.6 : 1.4);
+  const stil = 'transform: rotate(' + dreh + 'deg)';
+  const liste = Array.isArray(wert) ? wert : [wert];
+
+  if (feld.form === 'etikett') {
+    return el('span', { class: 'alb-etikett', style: stil, title: name },
+      el('i', {}, name), el('b', {}, liste.join(' · ')));
+  }
+  if (feld.form === 'spruch') {
+    return el('div', { class: 'alb-sprueche' }, ...liste.map((z, i) => el('blockquote', {
+      class: 'alb-spruch', style: flach ? '' : 'transform: rotate(' + albumDreh(figur.id, feld.id + i, 1.1) + 'deg)'
+    }, el('span', { class: 'alb-anfuehrung' }, '„'), z, el('i', {}, name))));
+  }
+  if (feld.form === 'wolke') {
+    return el('div', { class: 'alb-wolke', style: stil },
+      el('span', { class: 'alb-feldname' }, name),
+      el('div', { class: 'alb-wolkeworte' }, ...liste.map((w, i) => el('span', {
+        class: 'alb-wort', style: flach ? '' : 'transform: rotate(' + albumDreh(figur.id, feld.id + ':' + i, 2.2) + 'deg)'
+      }, w))));
+  }
+  if (feld.form === 'band') {
+    return el('div', { class: 'alb-band', style: stil },
+      el('span', { class: 'alb-feldname' }, name),
+      el('b', {}, liste.join('  ·  ')));
+  }
+  if (feld.form === 'liste') {
+    return el('div', { class: 'alb-liste', style: stil },
+      el('span', { class: 'alb-feldname' }, name),
+      el('ul', {}, ...liste.map((z) => {
+        const ziel = feld.verweis ? albumFindeFigur(albumVerweisName(z)) : null;
+        const rolle = feld.verweis ? albumVerweisRolle(z) : '';
+        return el('li', {},
+          rolle ? el('i', { class: 'alb-rolle' }, rolle) : null,
+          ziel ? el('button', { class: 'alb-verweis', title: 'Im Album nachschlagen', onclick: () => albumSpringeZu(ziel.id) }, albumVerweisName(z)) : (rolle ? albumVerweisName(z) : z));
+      })));
+  }
+  if (feld.form === 'notizfeld') {
+    return el('div', { class: 'alb-notiz', style: stil },
+      el('span', { class: 'alb-feldname' }, name),
+      el('div', { class: 'alb-notiztext' }, liste.join('\n')));
+  }
+  if (feld.form === 'karte') {
+    return el('div', { class: 'alb-karte', style: stil },
+      el('span', { class: 'alb-feldname' }, name),
+      ...liste.map((z) => el('p', {}, z)));
+  }
+  /* zeile: mit der Hand auf die Seite geschrieben */
+  return el('div', { class: 'alb-zeile', style: stil },
+    el('span', { class: 'alb-feldname' }, name),
+    el('span', { class: 'alb-zeiletext' }, liste.join(' · ')));
+}
+
+/* Die Klebezettel: geordnet an einer Stelle, nicht wild über die Seite. */
+function albumZettelBrett(figur) {
+  const brett = el('div', { class: 'alb-zettelbrett' });
+  albumZettel(figur).forEach((z, i) => {
+    brett.append(el('div', {
+      class: 'alb-zettel ton-' + (z.ton || 'butter'),
+      style: 'transform: rotate(' + albumDreh(figur.id, 'zettel' + i, 3.2) + 'deg)'
+    }, el('i', { class: 'alb-klebstreifen' }), el('span', {}, z.text)));
+  });
+  return brett;
+}
+
+/* Von einem Verweis zur Figur springen — auch quer durch die Suche. */
+function albumSpringeZu(id) {
+  const liste = albumFiguren();
+  const i = liste.findIndex((f) => f.id === id);
+  if (i < 0) return;
+  _alb.suche = '';
+  const buehne = document.querySelector('.alb-buehne');
+  if (!buehne) { albumOeffnen(i); return; }
+  const zu = () => { const h = document.querySelector('.alb-huelle'); const s = h && h.closest('.schleier'); if (s) s.remove(); };
+  const neu = (j) => { if (j != null) _alb.i = j; albumZeichne(buehne, neu, zu); };
+  neu(i);
+}
+
+/* ===================== 62c — DAS BLATT ZUR FIGUR =====================
+   Hier wird eingetragen. Alles darf leer bleiben — das ist keine Nachlässigkeit,
+   das ist die Bauart: was leer bleibt, steht später nicht auf der Doppelseite.
+
+   Gespeichert wird sofort, bei jedem Anschlag (entprellt). Es gibt kein
+   „Übernehmen", das man vergessen könnte.
+
+   Geburts- und Todesdatum wandern von hier in den Kalender und bleiben mit der
+   Figur verbunden (`ausAlbum`): wird das Datum geändert, ändert sich der
+   Kalendereintrag mit; wird es gelöscht, verschwindet er. */
+
+function albumNeueFigur(danach) {
+  const doc = neuDoc('albumfigur', { name: '', felder: {}, eigene: [], zettel: [], farbe: '' });
+  albumBearbeiten(doc, () => { if (danach) danach(doc.id); }, true);
+}
+
+/* ----- Der Kalender bekommt Bescheid ----- */
+function albumKalenderAbgleich(figur) {
+  if (typeof saubererTermin !== 'function') return;
+  for (const [feldId, art] of [['geboren', 'geburt'], ['gestorben', 'tod']]) {
+    const datum = (figur.felder || {})[feldId];
+    const marke = 'album:' + figur.id + ':' + art;
+    const vorhanden = [...D.docs.values()].find((d) => d.typ === 'termin' && !d.geloescht && d.ausAlbum === marke);
+    const gueltig = datum && typeof kalGueltig === 'function' && kalGueltig(datum);
+    if (!gueltig) {
+      /* Kein Datum mehr: der Eintrag geht in den Papierkorb, nicht ins Nichts. */
+      if (vorhanden && typeof loesche === 'function') loesche(vorhanden.id, true);
+      continue;
+    }
+    const felder = saubererTermin({
+      wann: datum, art,
+      titel: art === 'geburt' ? (figur.name ? figur.name + ' kommt zur Welt' : 'Geburt') : (figur.name ? figur.name + ' stirbt' : 'Tod'),
+      leute: [{ id: figur.id, name: figur.name || 'ohne Namen' }]
+    });
+    if (!felder) continue;
+    if (vorhanden) { Object.assign(vorhanden, felder); speichere(vorhanden); }
+    else neuDoc('termin', Object.assign({ ausAlbum: marke }, felder));
+  }
+}
+
+/* ----- Das Blatt ----- */
+function albumBearbeiten(doc, danach, frisch) {
+  const stand = saubereAlbumFigur(doc) || { name: '', felder: {}, eigene: [], zettel: [], farbe: '' };
+  let gruppe = 'kopf';
+
+  const sichern = entprellt(() => {
+    const sauber = saubereAlbumFigur(stand);
+    doc.name = sauber.name;
+    doc.titel = sauber.name;          /* damit Suche und Papierkorb es lesbar finden */
+    doc.felder = sauber.felder;
+    doc.eigene = sauber.eigene;
+    doc.zettel = sauber.zettel;
+    doc.farbe = sauber.farbe;
+    speichere(doc);
+    albumKalenderAbgleich(doc);
+    if (danach) danach();
+  }, 420, true);
+  const merke = () => sichern();
+
+  /* --- Kopfzeile: Name und Farbe --- */
+  const namensfeld = el('input', { type: 'text', class: 'albb-name', value: stand.name, placeholder: 'Wie heißt sie? (darf auch später kommen)', maxlength: '120' });
+  namensfeld.addEventListener('input', () => { stand.name = namensfeld.value; kopfzeileAuffrischen(); merke(); });
+  const namenshall = el('div', { class: 'albb-namenshall' });
+  const kopfzeileAuffrischen = () => {
+    namenshall.innerHTML = '';
+    const n = stand.name.trim();
+    anfuegen(namenshall, n ? el('span', {}, 'Überall auf dieser Seite steht ab jetzt „' + n + '“.') : el('span', { class: 'blass' }, 'Ohne Namen steht die Figur ganz hinten im Buch — nachtragen geht jederzeit.'));
+  };
+
+  const farbreihe = el('div', { class: 'albb-farben' });
+  const farbenZeichnen = () => {
+    farbreihe.innerHTML = '';
+    for (const f of ALBUM_FARBEN) {
+      farbreihe.append(el('button', {
+        class: 'albb-farbe' + (albumFarbe(Object.assign({ id: doc.id }, stand)) === f ? ' an' : ''),
+        style: 'background:' + f, title: 'Bandfarbe dieser Figur',
+        onclick: () => { stand.farbe = f; farbenZeichnen(); merke(); }
+      }));
+    }
+    farbreihe.append(el('button', { class: 'albb-farbe zufall', title: 'Wieder die Farbe, die VANI vergibt', onclick: () => { stand.farbe = ''; farbenZeichnen(); merke(); } }, '↺'));
+  };
+
+  /* --- Gruppenreiter --- */
+  const reiter = el('div', { class: 'albb-reiter' });
+  const inhalt = el('div', { class: 'albb-inhalt' });
+  const reiterZeichnen = () => {
+    reiter.innerHTML = '';
+    for (const [id, name] of ALBUM_GRUPPEN) {
+      const n = ALBUM_FELDER.filter((f) => f.gruppe === id).filter((f) => {
+        const w = stand.felder[f.id];
+        return w != null && (Array.isArray(w) ? w.length : String(w).trim());
+      }).length + stand.eigene.filter((e) => e.gruppe === id).length;
+      reiter.append(el('button', { class: 'albb-reiterknopf' + (gruppe === id ? ' an' : ''), onclick: () => { gruppe = id; reiterZeichnen(); inhaltZeichnen(); inhalt.scrollTop = 0; } },
+        name, n ? el('i', {}, String(n)) : null));
+    }
+    reiter.append(el('button', { class: 'albb-reiterknopf' + (gruppe === 'zettel' ? ' an' : ''), onclick: () => { gruppe = 'zettel'; reiterZeichnen(); inhaltZeichnen(); inhalt.scrollTop = 0; } },
+      'Klebezettel', stand.zettel.length ? el('i', {}, String(stand.zettel.length)) : null));
+  };
+
+  /* --- Der Inhalt je Gruppe --- */
+  const inhaltZeichnen = () => {
+    inhalt.innerHTML = '';
+    if (gruppe === 'zettel') { inhalt.append(albumZettelBearbeiten(stand, merke)); return; }
+    for (const feld of ALBUM_FELDER.filter((f) => f.gruppe === gruppe)) {
+      inhalt.append(albumFeldEingabe(feld, stand, doc, merke));
+    }
+    /* Eigene Kategorien dieser Gruppe */
+    const eigene = stand.eigene.filter((e) => (e.gruppe || 'rand') === gruppe);
+    for (const e of eigene) {
+      inhalt.append(el('div', { class: 'albb-feld eigen' },
+        el('div', { class: 'albb-feldkopf' },
+          el('span', { class: 'albb-feldname' }, e.name),
+          el('button', { class: 'albb-weg', title: 'Diese eigene Kategorie wegnehmen', onclick: () => { stand.eigene = stand.eigene.filter((x) => x !== e); inhaltZeichnen(); reiterZeichnen(); merke(); } }, '×')),
+        (() => { const t = el('input', { type: 'text', value: e.wert, maxlength: '1200' }); t.addEventListener('input', () => { e.wert = t.value; merke(); }); return t; })()));
+    }
+    inhalt.append(el('button', { class: 'albb-eigenneu', onclick: async () => {
+      const name = await eingabe({ titel: 'Eine eigene Kategorie', platzhalter: 'z. B. „Lieblingswort", „Wie sie flucht", „Was im Rucksack ist"', ok: 'Anlegen' });
+      if (!name || !name.trim()) return;
+      stand.eigene.push({ name: name.trim().slice(0, 80), wert: '', gruppe });
+      inhaltZeichnen(); reiterZeichnen(); merke();
+      setTimeout(() => { const felder = inhalt.querySelectorAll('.albb-feld.eigen input'); const l = felder[felder.length - 1]; if (l) l.focus(); }, 40);
+    } }, '+ Eigene Kategorie hier'));
+  };
+
+  /* --- Der Impuls: was fehlt noch? --- */
+  const impuls = el('div', { class: 'albb-impuls' });
+  const impulsZeichnen = () => {
+    impuls.innerHTML = '';
+    const fehlt = albumFehlt(stand, albumHash(doc.id, String(Math.floor(Date.now() / 60000))));
+    if (!fehlt) { anfuegen(impuls, el('span', {}, 'Alles ausgefüllt. Das muss nicht sein — aber es ist schön.')); return; }
+    anfuegen(impuls,
+      el('span', {}, 'Noch offen: '),
+      el('button', { class: 'albb-impulsknopf', onclick: () => { gruppe = fehlt.gruppe; reiterZeichnen(); inhaltZeichnen(); setTimeout(() => { const z = inhalt.querySelector('[data-feld="' + fehlt.id + '"] input, [data-feld="' + fehlt.id + '"] textarea'); if (z) { z.focus(); z.scrollIntoView({ block: 'center' }); } }, 40); } },
+        albumBeschriftung(fehlt.name, stand.name)),
+      el('button', { class: 'albb-impulswuerfel', title: 'Etwas anderes vorschlagen', onclick: impulsZeichnen }, '↻'));
+  };
+
+  const kasten = el('div', { class: 'modal albb-blatt' },
+    el('div', { class: 'kartenkopf' }, frisch ? 'EINE NEUE FIGUR' : 'DIESE FIGUR'),
+    el('div', { class: 'albb-kopf' }, namensfeld, farbreihe),
+    namenshall,
+    reiter,
+    impuls,
+    inhalt,
+    el('div', { class: 'reihe albb-fuss' },
+      el('button', { class: 'knopf zart gefahr', onclick: async () => {
+        if (await frage((stand.name ? '„' + stand.name + '“' : 'Diese Figur') + ' aus dem Album nehmen?', { ja: 'Herausnehmen' })) {
+          sichern.sofort();
+          await loesche(doc.id);
+          zu(); if (danach) danach();
+        }
+      } }, 'Aus dem Album nehmen'),
+      el('button', { class: 'knopf zart', title: 'Alles zu dieser Figur als Blatt ablegen — zum Weiterschreiben', onclick: () => { albumAlsBlatt(stand, doc); } }, 'Als Blatt ablegen'),
+      el('button', { class: 'knopf voll', onclick: () => { sichern.sofort(); zu(); if (danach) danach(); } }, 'Fertig')));
+  const zu = zeigeDeck(kasten, () => { sichern.sofort(); if (danach) danach(); });
+
+  kopfzeileAuffrischen(); farbenZeichnen(); reiterZeichnen(); inhaltZeichnen(); impulsZeichnen();
+  setTimeout(() => { if (frisch) namensfeld.focus(); }, 60);
+}
+
+/* ----- Ein einzelnes Feld ----- */
+function albumFeldEingabe(feld, stand, doc, merke) {
+  const name = albumBeschriftung(feld.name, stand.name);
+  const platz = albumBeschriftung(feld.platz || '', stand.name);
+  const kasten = el('div', { class: 'albb-feld', 'data-feld': feld.id });
+  kasten.append(el('div', { class: 'albb-feldkopf' }, el('span', { class: 'albb-feldname' }, name)));
+  if (feld.hilfe) kasten.append(el('small', { class: 'albb-hilfe' }, feld.hilfe));
+
+  /* Wortschatz-Feld: große Auswahl plus eigene */
+  if (feld.wortschatz) {
+    const gewaehlt = () => stand.felder[feld.id] || [];
+    const reihe = el('div', { class: 'albb-gewaehlt' });
+    const zeichneReihe = () => {
+      reihe.innerHTML = '';
+      const w = gewaehlt();
+      if (!w.length) { reihe.append(el('span', { class: 'albb-leer' }, 'Noch nichts gewählt.')); return; }
+      for (const wort of w) {
+        reihe.append(el('span', { class: 'albb-chip' }, wort,
+          el('button', { title: 'Wieder wegnehmen', onclick: () => { stand.felder[feld.id] = gewaehlt().filter((x) => x !== wort); if (!stand.felder[feld.id].length) delete stand.felder[feld.id]; zeichneReihe(); merke(); } }, '×')));
+      }
+    };
+    zeichneReihe();
+    kasten.append(reihe, el('button', { class: 'albb-waehlen', onclick: () => albumWortschatz(gewaehlt(), (neu) => {
+      if (neu.length) stand.felder[feld.id] = neu; else delete stand.felder[feld.id];
+      zeichneReihe(); merke();
+    }) }, 'Aus dem Wortschatz wählen  ·  ' + ALBUM_WESEN_ALLE.length + ' Wörter'));
+    return kasten;
+  }
+
+  /* Mehrfach: Liste mit Hinzufügen */
+  if (feld.mehrfach) {
+    const liste = el('div', { class: 'albb-mehrliste' });
+    const feldEintraege = () => stand.felder[feld.id] || [];
+    const zeichne = () => {
+      liste.innerHTML = '';
+      const w = feldEintraege();
+      w.forEach((eintrag, i) => {
+        const t = el('input', { type: 'text', value: eintrag, maxlength: '600' });
+        t.addEventListener('input', () => { const a = feldEintraege().slice(); a[i] = t.value; stand.felder[feld.id] = a; merke(); });
+        liste.append(el('div', { class: 'albb-mehrzeile' }, t,
+          el('button', { class: 'albb-weg', title: 'Weg damit', onclick: () => { const a = feldEintraege().filter((_, j) => j !== i); if (a.length) stand.felder[feld.id] = a; else delete stand.felder[feld.id]; zeichne(); merke(); } }, '×')));
+      });
+      if (!w.length) liste.append(el('div', { class: 'albb-leer' }, 'Noch nichts eingetragen.'));
+    };
+    zeichne();
+    const dazu = () => {
+      stand.felder[feld.id] = [...feldEintraege(), ''];
+      zeichne(); merke();
+      const felder = liste.querySelectorAll('input'); const l = felder[felder.length - 1]; if (l) l.focus();
+    };
+    kasten.append(liste);
+    /* Verweise: aus dem Album und aus dem Salon vorschlagen */
+    if (feld.verweis) {
+      const vorschlaege = albumVorschlaege();
+      const dl = el('datalist', { id: 'albb-verweise' }, ...vorschlaege.slice(0, 300).map((n) => el('option', { value: n })));
+      kasten.append(dl);
+      liste.querySelectorAll('input').forEach((i) => i.setAttribute('list', 'albb-verweise'));
+      kasten.append(el('small', { class: 'albb-hilfe' }, 'Wer schon im Album steht, wird erkannt und verlinkt. Schreib die Rolle davor: „Mutter — Ilva".'));
+    }
+    kasten.append(el('button', { class: 'albb-dazu', onclick: dazu }, '+ ' + (platz || 'Dazu')));
+    return kasten;
+  }
+
+  /* Datum */
+  if (feld.art === 'datum') {
+    const t = el('input', { type: 'text', class: 'albb-datum', value: stand.felder[feld.id] || '', placeholder: 'JJJJ-MM-TT — oder nur JJJJ', maxlength: '10' });
+    const hinweis = el('small', { class: 'albb-datumhinweis' });
+    const pruefe = () => {
+      const v = t.value.trim();
+      hinweis.innerHTML = '';
+      if (!v) { delete stand.felder[feld.id]; t.classList.remove('falsch'); merke(); return; }
+      if (typeof kalGueltig === 'function' && kalGueltig(v)) {
+        t.classList.remove('falsch');
+        stand.felder[feld.id] = v;
+        anfuegen(hinweis, el('span', {}, kalLesbar(v, true) + ' — steht damit auch im Kalender.'));
+        merke();
+      } else {
+        t.classList.add('falsch');
+        anfuegen(hinweis, el('span', { class: 'warn' }, 'So kann VANI das Datum nicht lesen. Zwischen ' + KAL_JAHR_VON + ' und ' + KAL_JAHR_BIS + ', z. B. 2011-04-09.'));
+      }
+    };
+    t.addEventListener('input', pruefe);
+    kasten.append(t, hinweis);
+    if (stand.felder[feld.id]) pruefe();
+    return kasten;
+  }
+
+  /* Notizfeld */
+  if (feld.form === 'notizfeld') {
+    const t = el('textarea', { class: 'albb-notizfeld', rows: '7', placeholder: platz, maxlength: '20000' }, stand.felder[feld.id] || '');
+    t.addEventListener('input', () => { const v = t.value; if (v.trim()) stand.felder[feld.id] = v; else delete stand.felder[feld.id]; merke(); });
+    kasten.append(t);
+    return kasten;
+  }
+
+  /* Einfaches Feld */
+  const t = el('input', { type: 'text', value: stand.felder[feld.id] || '', placeholder: platz, maxlength: '1200' });
+  t.addEventListener('input', () => { const v = t.value; if (v.trim()) stand.felder[feld.id] = v; else delete stand.felder[feld.id]; merke(); });
+  kasten.append(t);
+  return kasten;
+}
+
+/* Wen man verlinken kann: alle Figuren im Album und alle Stimmen im Salon. */
+function albumVorschlaege() {
+  const raus = albumFiguren().map((f) => f.name).filter(Boolean);
+  if (typeof SALON_FEST !== 'undefined') for (const a of SALON_FEST) raus.push(a.name);
+  for (const d of D.docs.values()) if (d.typ === 'figur' && !d.geloescht && d.titel) raus.push(d.titel);
+  return [...new Set(raus)];
+}
+
+/* ----- Der Wortschatz ----- */
+function albumWortschatz(gewaehlt, fertig) {
+  let wahl = [...gewaehlt];
+  const eigene = albumEigeneWorte();
+  const suchfeld = el('input', { type: 'search', class: 'albw-suche', placeholder: 'Suchen — oder ein eigenes Wort schreiben und Enter' });
+  const gitter = el('div', { class: 'albw-gitter' });
+  const gewaehltReihe = el('div', { class: 'albw-gewaehlt' });
+
+  const zeigeGewaehlt = () => {
+    gewaehltReihe.innerHTML = '';
+    if (!wahl.length) { gewaehltReihe.append(el('span', { class: 'albb-leer' }, 'Noch nichts gewählt.')); return; }
+    for (const w of wahl) gewaehltReihe.append(el('span', { class: 'albb-chip' }, w,
+      el('button', { onclick: () => { wahl = wahl.filter((x) => x !== w); zeigeGewaehlt(); zeichne(); } }, '×')));
+  };
+  const umschalten = (w) => { wahl = wahl.includes(w) ? wahl.filter((x) => x !== w) : [...wahl, w]; zeigeGewaehlt(); zeichne(); };
+  const zeichne = () => {
+    const q = suchfeld.value.trim().toLowerCase();
+    gitter.innerHTML = '';
+    const gruppen = q
+      ? [['treffer', 'Treffer', [...ALBUM_WESEN_ALLE, ...eigene].filter((w) => w.toLowerCase().includes(q))]]
+      : [...ALBUM_WESEN, ...(eigene.length ? [['eigene', 'Deine eigenen', eigene]] : [])];
+    for (const [id, name, worte] of gruppen) {
+      if (!worte.length) continue;
+      gitter.append(el('div', { class: 'albw-gruppe' }, name));
+      const reihe = el('div', { class: 'albw-worte' });
+      for (const w of worte) reihe.append(el('button', { class: 'albw-wort' + (wahl.includes(w) ? ' an' : ''), onclick: () => umschalten(w) }, w));
+      gitter.append(reihe);
+    }
+    if (!gitter.children.length) gitter.append(el('div', { class: 'albb-leer' }, 'Kein Wort passt. Schreib es und drück Enter — dann gehört es dir.'));
+  };
+  suchfeld.addEventListener('input', zeichne);
+  suchfeld.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Enter') return;
+    ev.preventDefault();
+    const w = suchfeld.value.trim();
+    if (!w) return;
+    if (!ALBUM_WESEN_ALLE.includes(w) && !eigene.includes(w)) { albumWortMerken(w); eigene.push(w); }
+    if (!wahl.includes(w)) wahl.push(w);
+    suchfeld.value = ''; zeigeGewaehlt(); zeichne();
+  });
+
+  const kasten = el('div', { class: 'modal albw-fenster' },
+    el('div', { class: 'kartenkopf' }, 'WESENSZÜGE'),
+    el('p', { class: 'albb-hilfe' }, 'Nimm so viele du willst. Was du selbst schreibst, merkt sich VANI und schlägt es bei der nächsten Figur mit vor.'),
+    suchfeld, gewaehltReihe, gitter,
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
+      el('button', { class: 'knopf voll', onclick: () => { zu(); fertig(wahl); } }, 'Übernehmen')));
+  const zu = zeigeDeck(kasten);
+  zeigeGewaehlt(); zeichne();
+  setTimeout(() => suchfeld.focus(), 60);
+}
+/* Eigene Wörter liegen bei den Einstellungen — sie gehören allen Figuren. */
+function albumEigeneWorte() {
+  const w = D.einst.albumWorte;
+  return Array.isArray(w) ? w.filter((x) => typeof x === 'string' && x.trim()).slice(0, 400) : [];
+}
+function albumWortMerken(wort) {
+  const w = albumEigeneWorte();
+  if (w.includes(wort)) return;
+  D.einst.albumWorte = [...w, String(wort).slice(0, 60)].slice(-400);
+  speichereEinst();
+}
+
+/* ----- Die Klebezettel ----- */
+function albumZettelBearbeiten(stand, merke) {
+  const kasten = el('div', { class: 'albb-zettelraum' });
+  const zeichne = () => {
+    kasten.innerHTML = '';
+    kasten.append(el('small', { class: 'albb-hilfe' }, 'Bis zu ' + ALBUM_ZETTEL_MAX + ' Zettel. Sie kleben unten rechts auf der Doppelseite, ordentlich nebeneinander — nicht kreuz und quer.'));
+    const brett = el('div', { class: 'albb-zettelgitter' });
+    stand.zettel.forEach((z, i) => {
+      const t = el('textarea', { rows: '3', maxlength: '400', placeholder: 'Was noch dazugehört …' }, z.text);
+      t.addEventListener('input', () => { z.text = t.value; merke(); });
+      const toene = el('div', { class: 'albb-toene' });
+      for (const ton of ALBUM_ZETTELTOENE) {
+        toene.append(el('button', { class: 'albb-ton ton-' + ton + (z.ton === ton ? ' an' : ''), title: 'Farbe des Zettels', onclick: () => { z.ton = ton; zeichne(); merke(); } }));
+      }
+      brett.append(el('div', { class: 'albb-zettel ton-' + (z.ton || 'butter') }, t, toene,
+        el('button', { class: 'albb-weg', title: 'Zettel abnehmen', onclick: () => { stand.zettel.splice(i, 1); zeichne(); merke(); } }, '×')));
+    });
+    kasten.append(brett);
+    if (stand.zettel.length < ALBUM_ZETTEL_MAX) {
+      kasten.append(el('button', { class: 'albb-dazu', onclick: () => {
+        stand.zettel.push({ text: '', ton: ALBUM_ZETTELTOENE[stand.zettel.length % ALBUM_ZETTELTOENE.length] });
+        zeichne(); merke();
+        const alle = kasten.querySelectorAll('textarea'); const l = alle[alle.length - 1]; if (l) l.focus();
+      } }, '+ Zettel  ·  noch ' + (ALBUM_ZETTEL_MAX - stand.zettel.length) + ' frei'));
+    } else {
+      kasten.append(el('div', { class: 'albb-leer' }, 'Alle ' + ALBUM_ZETTEL_MAX + ' Zettel kleben. Nimm einen ab, wenn ein neuer soll.'));
+    }
+  };
+  zeichne();
+  return kasten;
+}
+
+/* ----- Die Figur als Blatt ablegen ----- */
+function albumAlsBlatt(stand, doc) {
+  const zeilen = [];
+  const name = stand.name || 'Ohne Namen';
+  zeilen.push(name);
+  const alter = albumAlterText(Object.assign({ id: doc.id }, stand));
+  if (alter) zeilen.push(alter);
+  zeilen.push('');
+  for (const [gid, gname] of ALBUM_GRUPPEN) {
+    const stuecke = albumStuecke(Object.assign({ id: doc.id }, stand)).filter((s) => s.feld.gruppe === gid);
+    if (!stuecke.length) continue;
+    zeilen.push(gname.toUpperCase());
+    for (const s of stuecke) {
+      const w = Array.isArray(s.wert) ? s.wert.join(', ') : s.wert;
+      zeilen.push(albumBeschriftung(s.feld.name, name) + ': ' + w);
+    }
+    zeilen.push('');
+  }
+  if (stand.zettel.length) {
+    zeilen.push('ZETTEL');
+    for (const z of stand.zettel) zeilen.push('· ' + z.text);
+  }
+  const b = blattAusText(name + ' — aus dem Album', zeilen.join('\n').trim());
+  toast('Liegt bei den Blättern. Jetzt kannst du daraus schreiben.', 4200);
+  return b;
 }
 
 /* ================================================================

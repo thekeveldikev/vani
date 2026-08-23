@@ -3569,3 +3569,358 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
   .tb-platzknopf:hover, .tb-eintrag:not(.schon):hover { background: color-mix(in srgb, var(--tinte) 8%, transparent); }
   .tb-weg:hover, .tz-weg:hover { background: rgba(176,53,43,.16); color: #b0352b; }
 }
+
+/* ============================================================
+   DAS ALBUM (62 / 62b / 62c)
+   Ein dickes Buch. Links wer sie ist, rechts was für ein Mensch
+   das ist. Geblättert wird um den Falz.
+   ============================================================ */
+
+/* ----- Der Raum: das Buch liegt da ----- */
+.alb-raum { display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 30px 20px 60px; }
+.alb-regalbuch {
+  position: relative; width: min(420px, 78vw); aspect-ratio: 3 / 4; perspective: 1400px;
+  transition: transform .4s cubic-bezier(.2,.9,.3,1);
+}
+.alb-rb-block {
+  position: absolute; right: -2px; top: 8px; bottom: 8px; width: var(--dicke, 20px); border-radius: 0 4px 4px 0;
+  background: repeating-linear-gradient(90deg, #efe6d2 0 2px, #d8ccb2 2px 3.5px);
+  box-shadow: inset -2px 0 5px rgba(0,0,0,.28);
+}
+.alb-rb-deckel {
+  position: absolute; inset: 0; border-radius: 5px 8px 8px 5px; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  background:
+    repeating-linear-gradient(103deg, rgba(255,255,255,.035) 0 2px, transparent 2px 6px),
+    radial-gradient(120% 80% at 30% 15%, rgba(255,225,180,.16), transparent 60%),
+    linear-gradient(155deg, #6b4a30, #3d281a 70%, #2a1a10);
+  box-shadow: 0 26px 54px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,228,190,.16), inset -8px 0 18px rgba(0,0,0,.35);
+}
+.alb-rb-praegung { position: absolute; inset: 14px; border-radius: 3px; border: 1.5px solid rgba(226,190,132,.36); box-shadow: inset 0 0 0 4px rgba(0,0,0,.12); }
+.alb-rb-titel {
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 30px; letter-spacing: .34em; text-indent: .34em;
+  color: #e6c98d; text-shadow: 0 1px 0 rgba(0,0,0,.6), 0 0 20px rgba(230,201,141,.24); z-index: 1;
+}
+.alb-rb-unter { font-size: 12px; letter-spacing: .2em; color: rgba(230,201,141,.6); text-transform: uppercase; z-index: 1; }
+.alb-rb-ecke { position: absolute; width: 24px; height: 24px; border: 2px solid rgba(226,190,132,.42); }
+.alb-rb-ecke.e1 { left: 8px; top: 8px; border-right: none; border-bottom: none; border-radius: 4px 0 0 0; }
+.alb-rb-ecke.e2 { right: 8px; top: 8px; border-left: none; border-bottom: none; border-radius: 0 4px 0 0; }
+.alb-rb-ecke.e3 { left: 8px; bottom: 8px; border-right: none; border-top: none; border-radius: 0 0 0 4px; }
+.alb-rb-ecke.e4 { right: 8px; bottom: 8px; border-left: none; border-top: none; border-radius: 0 0 4px 0; }
+.alb-rb-band { position: absolute; right: 42px; top: -6px; width: 15px; height: 84px; background: linear-gradient(180deg, #a8452f, #7d3020); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); box-shadow: 0 3px 7px rgba(0,0,0,.4); }
+.alb-raumtext { max-width: 46ch; text-align: center; color: var(--blass); font-size: 14px; line-height: 1.65; font-family: ui-serif, "New York", Georgia, serif; }
+
+/* ----- Das aufgeschlagene Buch ----- */
+.alb-huelle { width: min(1240px, 97vw); max-height: 94vh; display: flex; }
+.alb-buch {
+  flex: 1; min-width: 0; max-height: 94vh; display: flex; flex-direction: column; color: var(--tinte);
+  border-radius: 4px; overflow: hidden;
+  background: linear-gradient(178deg, #4a3524, #2c1e14);
+  box-shadow: 0 34px 90px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,225,180,.14);
+  padding: 9px;
+}
+.alb-buch.schlaegt-auf { animation: alb-aufschlagen .82s cubic-bezier(.2,.85,.25,1); transform-origin: 50% 60%; }
+@keyframes alb-aufschlagen {
+  0% { opacity: 0; transform: perspective(1800px) rotateX(-40deg) rotateY(24deg) scale(.86); }
+  55% { opacity: 1; transform: perspective(1800px) rotateX(6deg) rotateY(-3deg) scale(1.012); }
+  100% { opacity: 1; transform: none; }
+}
+.alb-buehne { flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--papier); border-radius: 2px; overflow: hidden; }
+
+/* ----- Die feste Leiste oben ----- */
+.alb-kopf {
+  flex: none; padding: 11px 16px 8px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--papier) 97%, transparent), color-mix(in srgb, var(--papier) 84%, var(--hg2)));
+  border-bottom: 1px solid color-mix(in srgb, var(--tinte) 15%, transparent);
+}
+.alb-kopfzeile { display: flex; align-items: center; gap: 10px; }
+.alb-suche { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--tinte) 16%, transparent); background: color-mix(in srgb, var(--papier) 70%, transparent); }
+.alb-lupe { display: flex; color: var(--blass); flex: none; }
+.alb-suchfeld { flex: 1; min-width: 0; border: none; background: none; outline: none; font-size: 14.5px; color: var(--tinte); }
+.alb-suchfeld::-webkit-search-cancel-button { -webkit-appearance: none; }
+.alb-kopfrechts { display: flex; align-items: center; gap: 7px; flex: none; }
+.alb-neuknopf { padding: 7px 15px; border-radius: 999px; font-size: 13.5px; color: var(--akzent); border: 1px dashed color-mix(in srgb, var(--akzent) 48%, transparent); white-space: nowrap; }
+.alb-zuknopf { width: 34px; height: 34px; border-radius: 50%; font-size: 23px; line-height: 1; color: var(--blass); display: grid; place-items: center; }
+.alb-register { display: flex; gap: 2px; margin-top: 8px; overflow-x: auto; scrollbar-width: none; }
+.alb-register::-webkit-scrollbar { display: none; }
+.alb-regknopf {
+  flex: none; width: 25px; height: 25px; border-radius: 5px; font-size: 12.5px; color: var(--blass);
+  font-family: ui-serif, "New York", Georgia, serif; display: grid; place-items: center;
+}
+.alb-regknopf.an { background: var(--tinte); color: var(--papier); font-weight: 600; }
+.alb-suchhinweis { margin-top: 7px; font-size: 12.5px; color: var(--blass); font-style: italic; }
+
+/* ----- Der Block mit den zwei Seiten ----- */
+.alb-block {
+  flex: 1; min-height: 0; display: flex; position: relative; perspective: 2400px;
+  background: linear-gradient(90deg, #efe6d2 0 6px, transparent 6px), linear-gradient(270deg, #efe6d2 0 6px, transparent 6px);
+}
+.alb-seite {
+  flex: 1 1 50%; min-width: 0; overflow-y: auto; overscroll-behavior: contain; position: relative;
+  padding: 20px 22px 30px;
+  background:
+    repeating-linear-gradient(96deg, rgba(120,96,60,.022) 0 2px, transparent 2px 5px),
+    linear-gradient(178deg, color-mix(in srgb, var(--papier) 96%, #fff), color-mix(in srgb, var(--papier) 78%, var(--hg2)));
+}
+.alb-seite.links { box-shadow: inset -22px 0 30px -24px rgba(60,40,20,.55); }
+.alb-seite.rechts { box-shadow: inset 22px 0 30px -24px rgba(60,40,20,.55); }
+.alb-falz { flex: none; width: 2px; background: linear-gradient(180deg, transparent, rgba(80,55,28,.3), transparent); }
+.alb-seitenband { position: absolute; right: 0; top: 34px; width: 6px; height: 92px; border-radius: 3px 0 0 3px; opacity: .8; }
+
+/* Der Kopf der linken Seite */
+.alb-seitenkopf { margin-bottom: 16px; position: relative; }
+.alb-name { display: flex; align-items: baseline; gap: 10px; text-align: left; max-width: 100%; }
+.alb-name b {
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 30px; font-weight: 600; line-height: 1.15;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.alb-nameunter { font-style: normal; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--blass); opacity: 0; transition: opacity .2s; flex: none; }
+.alb-name:hover .alb-nameunter, .alb-name:focus-visible .alb-nameunter { opacity: 1; }
+.alb-namenlinie { display: block; height: 2px; margin-top: 7px; border-radius: 1px; background: linear-gradient(90deg, var(--figurfarbe, var(--akzent)), transparent 78%); }
+.alb-lebensdaten { font-size: 13px; color: var(--blass); font-variant-numeric: tabular-nums; margin-top: 3px; }
+.alb-alter { font-size: 12.5px; color: var(--figurfarbe, var(--akzent)); font-style: italic; margin-top: 1px; }
+
+/* ----- Die Stücke auf der Seite ----- */
+.alb-stuecke { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 11px 12px; }
+.alb-etikettreihe { flex: 1 1 100%; display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 3px; }
+.alb-feldname { display: block; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--blass); margin-bottom: 3px; }
+
+.alb-etikett {
+  display: inline-flex; flex-direction: column; gap: 1px; padding: 5px 11px; border-radius: 3px;
+  background: linear-gradient(178deg, #f6efdd, #e8dcc0); box-shadow: 0 1px 3px rgba(70,50,25,.22);
+  border-left: 3px solid var(--figurfarbe, var(--akzent));
+}
+.alb-etikett i { font-style: normal; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: #9a8664; }
+.alb-etikett b { font-size: 14px; font-weight: 600; color: #3a2c1e; }
+
+.alb-zeile { flex: 1 1 44%; min-width: 150px; }
+.alb-zeiletext { font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 16px; line-height: 1.35; color: var(--tinte); display: block; }
+
+.alb-karte {
+  flex: 1 1 44%; min-width: 165px; padding: 10px 13px 11px; border-radius: 2px;
+  background: linear-gradient(178deg, #fdfaf1, #f2ead6);
+  box-shadow: 0 2px 6px rgba(70,50,25,.18); border-top: 3px solid var(--figurfarbe, var(--akzent));
+}
+.alb-karte p { font-size: 14px; line-height: 1.5; margin: 0; }
+.alb-karte p + p { margin-top: 6px; padding-top: 6px; border-top: 1px dotted rgba(120,96,60,.3); }
+
+.alb-liste { flex: 1 1 44%; min-width: 165px; }
+.alb-liste ul { list-style: none; margin: 0; padding: 0; }
+.alb-liste li { font-size: 14px; line-height: 1.5; padding-left: 15px; position: relative; margin-bottom: 3px; }
+.alb-liste li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 6px; height: 1.5px; background: var(--figurfarbe, var(--blass)); border-radius: 1px; }
+.alb-rolle { font-style: normal; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--blass); margin-right: 6px; }
+.alb-verweis { color: var(--figurfarbe, var(--akzent)); border-bottom: 1px dotted currentColor; font-size: 14px; }
+
+.alb-wolke { flex: 1 1 100%; }
+.alb-wolkeworte { display: flex; flex-wrap: wrap; gap: 5px; }
+.alb-wort {
+  display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 13px;
+  background: color-mix(in srgb, var(--figurfarbe, #888) 13%, transparent);
+  border: 1px solid color-mix(in srgb, var(--figurfarbe, #888) 30%, transparent); color: var(--tinte);
+}
+
+.alb-band {
+  flex: 1 1 100%; padding: 7px 14px; border-radius: 2px; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--figurfarbe, #888) 16%, transparent), transparent 85%);
+  border-left: 3px solid var(--figurfarbe, var(--akzent));
+}
+.alb-band .alb-feldname { margin: 0; flex: none; }
+.alb-band b { font-family: ui-serif, "New York", Georgia, serif; font-size: 15.5px; font-weight: 600; }
+
+.alb-sprueche { flex: 1 1 100%; display: flex; flex-direction: column; gap: 10px; }
+.alb-spruch {
+  position: relative; margin: 0; padding: 4px 6px 4px 30px;
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; line-height: 1.45; font-style: italic; color: var(--tinte);
+}
+.alb-anfuehrung { position: absolute; left: 0; top: -6px; font-size: 40px; line-height: 1; color: var(--figurfarbe, var(--akzent)); opacity: .5; font-style: normal; }
+.alb-spruch i { display: block; font-style: normal; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--blass); margin-top: 4px; }
+
+.alb-notiz { flex: 1 1 100%; padding: 11px 14px; border-radius: 2px; background: color-mix(in srgb, var(--tinte) 4%, transparent); border-left: 2px solid color-mix(in srgb, var(--tinte) 20%, transparent); }
+.alb-notiztext { font-size: 14px; line-height: 1.6; white-space: pre-wrap; font-family: ui-serif, "New York", Georgia, serif; }
+
+/* Die Klebezettel: ordentlich nebeneinander, nicht kreuz und quer */
+.alb-zettelbrett { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; padding-top: 14px; border-top: 1px dashed color-mix(in srgb, var(--tinte) 18%, transparent); }
+.alb-zettel {
+  position: relative; flex: 0 1 auto; width: 132px; min-height: 96px; padding: 14px 10px 10px;
+  font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 13px; line-height: 1.35; color: #3a2f22;
+  box-shadow: 1px 2px 5px rgba(70,50,25,.3);
+}
+.alb-zettel.ton-butter { background: linear-gradient(178deg, #fdf3c4, #f5e59a); }
+.alb-zettel.ton-rose { background: linear-gradient(178deg, #fbe0e2, #f3c7cb); }
+.alb-zettel.ton-himmel { background: linear-gradient(178deg, #dceaf6, #c3daee); }
+.alb-zettel.ton-moos { background: linear-gradient(178deg, #e2f0d8, #cbe2bb); }
+.alb-zettel.ton-sand { background: linear-gradient(178deg, #f2e8d8, #e2d4bc); }
+.alb-klebstreifen { position: absolute; left: 50%; top: -6px; width: 44px; height: 14px; margin-left: -22px; background: rgba(240,232,208,.66); box-shadow: 0 1px 2px rgba(0,0,0,.14); transform: rotate(-2deg); }
+
+/* ----- Die leere Doppelseite ----- */
+.alb-neuefigur {
+  display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; padding: 16px 18px; border-radius: 4px;
+  border: 2px dashed color-mix(in srgb, var(--akzent) 40%, transparent); color: var(--tinte);
+  transition: background .18s, border-color .18s;
+}
+.alb-nf-kreuz { font-size: 34px; line-height: 1; color: var(--akzent); font-family: ui-serif, Georgia, serif; flex: none; }
+.alb-nf-text { display: flex; flex-direction: column; }
+.alb-nf-text b { font-family: ui-serif, "New York", Georgia, serif; font-size: 19px; font-weight: 600; }
+.alb-nf-text small { font-size: 12.5px; color: var(--blass); }
+.alb-leerhinweis { margin-top: 20px; font-size: 14px; line-height: 1.65; color: var(--blass); font-style: italic; font-family: ui-serif, "New York", Georgia, serif; }
+
+/* ----- Das Blatt, das sich dreht ----- */
+.alb-blatt {
+  position: absolute; top: 0; bottom: 0; left: 50%; width: 50%; z-index: 8;
+  transform-style: preserve-3d; transform-origin: left center; pointer-events: none;
+  transform: rotateY(0deg);
+}
+.alb-blatt.zurueck { left: 0; transform-origin: right center; }
+.alb-blatt.laeuft { transition: transform .58s cubic-bezier(.4,.02,.3,1); transform: rotateY(-178deg); }
+.alb-blatt.zurueck.laeuft { transform: rotateY(178deg); }
+.alb-blattseite { position: absolute; inset: 0; backface-visibility: hidden; overflow: hidden; }
+.alb-blattseite.hinten { transform: rotateY(180deg); }
+.alb-blattseite .alb-seite { position: absolute; inset: 0; overflow: hidden; }
+.alb-blattschatten {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, rgba(60,40,20,.28), transparent 40%);
+  opacity: 0; transition: opacity .3s;
+}
+.alb-blatt.laeuft .alb-blattschatten { opacity: 1; }
+
+/* ----- Der Fuß ----- */
+.alb-fuss {
+  flex: none; display: flex; align-items: center; gap: 12px; padding: 8px 16px 10px;
+  border-top: 1px solid color-mix(in srgb, var(--tinte) 14%, transparent);
+  background: color-mix(in srgb, var(--papier) 88%, var(--hg2));
+}
+.alb-blaetter { width: 40px; height: 36px; border-radius: 8px; font-size: 24px; line-height: 1; color: var(--blass); display: grid; place-items: center; flex: none; }
+.alb-blaetter[disabled] { opacity: .28; pointer-events: none; }
+.alb-seitenzahl { flex: 1; min-width: 0; text-align: center; display: flex; flex-direction: column; gap: 1px; }
+.alb-seitenzahl b { font-family: ui-serif, "New York", Georgia, serif; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.alb-seitenzahl b.leer { color: var(--blass); font-style: italic; font-weight: 400; }
+.alb-seitenzahl small { font-size: 11px; color: var(--blass); font-variant-numeric: tabular-nums; }
+
+/* ============================================================
+   DAS BLATT ZUR FIGUR (62c)
+   ============================================================ */
+.albb-blatt { width: min(680px, 95vw); max-height: 92vh; display: flex; flex-direction: column; gap: 10px; }
+.albb-kopf { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.albb-name {
+  flex: 1; min-width: 200px; font-family: ui-serif, "New York", Georgia, serif; font-size: 22px; font-weight: 600;
+  padding: 9px 13px;
+}
+.albb-namenshall { font-size: 12.5px; color: var(--blass); min-height: 17px; margin-top: -4px; }
+.albb-namenshall .blass { font-style: italic; }
+.albb-farben { display: flex; gap: 4px; flex: none; }
+.albb-farbe { width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent; transition: transform .14s, border-color .14s; }
+.albb-farbe.an { border-color: var(--tinte); transform: scale(1.18); }
+.albb-farbe.zufall { background: none; border: 1px dashed var(--linie); color: var(--blass); font-size: 12px; display: grid; place-items: center; }
+
+.albb-reiter { display: flex; gap: 3px; overflow-x: auto; padding-bottom: 3px; scrollbar-width: none; flex: none; }
+.albb-reiter::-webkit-scrollbar { display: none; }
+.albb-reiterknopf {
+  flex: none; display: flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px;
+  font-size: 13px; color: var(--blass); border: 1px solid transparent; white-space: nowrap;
+}
+.albb-reiterknopf.an { background: var(--tinte); color: var(--papier); font-weight: 600; }
+.albb-reiterknopf i { font-style: normal; font-size: 10.5px; padding: 0 6px; border-radius: 999px; background: color-mix(in srgb, var(--akzent) 22%, transparent); color: var(--akzent); }
+.albb-reiterknopf.an i { background: rgba(255,255,255,.24); color: var(--papier); }
+
+.albb-impuls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12.5px; color: var(--blass); padding: 7px 11px; border-radius: 8px; background: color-mix(in srgb, var(--tinte) 4%, transparent); flex: none; }
+.albb-impulsknopf { color: var(--akzent); border-bottom: 1px dotted currentColor; font-size: 12.5px; }
+.albb-impulswuerfel { width: 22px; height: 22px; border-radius: 50%; color: var(--blass); font-size: 13px; display: grid; place-items: center; margin-left: auto; }
+
+.albb-inhalt { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 14px; padding: 2px 2px 6px; }
+.albb-feld { display: flex; flex-direction: column; gap: 5px; }
+.albb-feldkopf { display: flex; align-items: center; gap: 8px; }
+.albb-feldname { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--blass); }
+.albb-hilfe { font-size: 12px; color: var(--blass); line-height: 1.45; font-style: italic; }
+.albb-feld.eigen { padding: 9px 11px; border-radius: 8px; border: 1px dashed var(--linie); }
+.albb-weg { width: 24px; height: 24px; border-radius: 50%; flex: none; color: var(--blass); font-size: 16px; line-height: 1; display: grid; place-items: center; margin-left: auto; }
+.albb-leer { font-size: 12.5px; color: var(--blass); font-style: italic; }
+.albb-dazu, .albb-eigenneu, .albb-waehlen {
+  align-self: flex-start; padding: 7px 14px; border-radius: 8px; font-size: 13px; color: var(--akzent);
+  border: 1px dashed color-mix(in srgb, var(--akzent) 42%, transparent);
+}
+.albb-eigenneu { margin-top: 6px; color: var(--blass); border-color: var(--linie); }
+.albb-mehrliste { display: flex; flex-direction: column; gap: 5px; }
+.albb-mehrzeile { display: flex; gap: 6px; align-items: center; }
+.albb-mehrzeile input { flex: 1; min-width: 0; }
+.albb-gewaehlt { display: flex; flex-wrap: wrap; gap: 5px; min-height: 24px; align-items: center; }
+.albb-chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 3px 5px 3px 11px; border-radius: 999px; font-size: 13px;
+  background: color-mix(in srgb, var(--akzent) 13%, transparent);
+}
+.albb-chip button { width: 18px; height: 18px; border-radius: 50%; color: var(--blass); font-size: 14px; line-height: 1; display: grid; place-items: center; }
+.albb-datum { font-variant-numeric: tabular-nums; }
+.albb-datum.falsch { border-color: #b0352b; }
+.albb-datumhinweis { font-size: 12px; color: var(--akzent); }
+.albb-datumhinweis .warn { color: #b0352b; }
+.albb-notizfeld { width: 100%; resize: vertical; font-family: ui-serif, "New York", Georgia, serif; }
+.albb-fuss { flex: none; flex-wrap: wrap; }
+
+/* Der Wortschatz */
+.albw-fenster { width: min(640px, 95vw); max-height: 90vh; display: flex; flex-direction: column; gap: 9px; }
+.albw-suche { width: 100%; }
+.albw-gewaehlt { display: flex; flex-wrap: wrap; gap: 5px; min-height: 24px; align-items: center; }
+.albw-gitter { flex: 1; min-height: 200px; overflow-y: auto; overscroll-behavior: contain; }
+.albw-gruppe { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--blass); margin: 13px 0 6px; }
+.albw-gruppe:first-child { margin-top: 2px; }
+.albw-worte { display: flex; flex-wrap: wrap; gap: 5px; }
+.albw-wort {
+  padding: 4px 11px; border-radius: 999px; font-size: 13px; color: var(--tinte);
+  border: 1px solid color-mix(in srgb, var(--tinte) 15%, transparent);
+}
+.albw-wort.an { background: var(--akzent); color: var(--papier); border-color: transparent; font-weight: 600; }
+
+/* Die Klebezettel im Blatt */
+.albb-zettelraum { display: flex; flex-direction: column; gap: 10px; }
+.albb-zettelgitter { display: flex; flex-wrap: wrap; gap: 10px; }
+.albb-zettel { position: relative; width: 168px; padding: 10px 9px 8px; border-radius: 2px; box-shadow: 1px 2px 5px rgba(70,50,25,.26); }
+.albb-zettel.ton-butter { background: linear-gradient(178deg, #fdf3c4, #f5e59a); }
+.albb-zettel.ton-rose { background: linear-gradient(178deg, #fbe0e2, #f3c7cb); }
+.albb-zettel.ton-himmel { background: linear-gradient(178deg, #dceaf6, #c3daee); }
+.albb-zettel.ton-moos { background: linear-gradient(178deg, #e2f0d8, #cbe2bb); }
+.albb-zettel.ton-sand { background: linear-gradient(178deg, #f2e8d8, #e2d4bc); }
+.albb-zettel textarea {
+  width: 100%; border: none; background: none; outline: none; resize: vertical; color: #3a2f22;
+  font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 14px; line-height: 1.35;
+}
+.albb-zettel .albb-weg { position: absolute; right: 2px; top: 2px; margin: 0; color: rgba(70,50,25,.5); }
+.albb-toene { display: flex; gap: 3px; margin-top: 5px; }
+.albb-ton { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(70,50,25,.24); }
+.albb-ton.an { box-shadow: 0 0 0 2px rgba(70,50,25,.5); }
+.albb-ton.ton-butter { background: #f5e59a; } .albb-ton.ton-rose { background: #f3c7cb; }
+.albb-ton.ton-himmel { background: #c3daee; } .albb-ton.ton-moos { background: #cbe2bb; }
+.albb-ton.ton-sand { background: #e2d4bc; }
+
+/* ----- Zeigerzustände nur mit echtem Zeiger ----- */
+@media (hover: hover) and (pointer: fine) {
+  .alb-regalbuch:hover { transform: translateY(-6px) rotateY(-4deg); }
+  .alb-regknopf:hover:not(.an), .alb-blaetter:hover:not([disabled]) { background: color-mix(in srgb, var(--tinte) 8%, transparent); color: var(--tinte); }
+  .alb-neuknopf:hover { background: color-mix(in srgb, var(--akzent) 11%, transparent); }
+  .alb-zuknopf:hover { background: rgba(176,53,43,.12); color: #b0352b; }
+  .alb-neuefigur:hover { background: color-mix(in srgb, var(--akzent) 8%, transparent); border-color: var(--akzent); }
+  .alb-verweis:hover { background: color-mix(in srgb, var(--figurfarbe, #888) 14%, transparent); }
+  .albb-reiterknopf:hover:not(.an) { background: color-mix(in srgb, var(--tinte) 7%, transparent); color: var(--tinte); }
+  .albb-dazu:hover, .albb-eigenneu:hover, .albb-waehlen:hover { background: color-mix(in srgb, var(--akzent) 9%, transparent); }
+  .albw-wort:hover:not(.an) { background: color-mix(in srgb, var(--tinte) 8%, transparent); }
+  .albb-weg:hover, .albb-chip button:hover { background: rgba(176,53,43,.16); color: #b0352b; }
+  .albb-farbe:hover { transform: scale(1.15); }
+}
+.alb-regknopf:active, .albw-wort:active, .albb-reiterknopf:active, .alb-blaetter:active { filter: brightness(.94); }
+
+@media (max-width: 900px) {
+  /* Auf schmalen Geräten liegt immer nur eine Seite offen — sonst wird die
+     Schrift unlesbar. Geblättert wird trotzdem wie im Buch. */
+  .alb-block { flex-direction: column; }
+  .alb-seite { flex: none; min-height: 46%; }
+  .alb-falz { width: auto; height: 2px; background: linear-gradient(90deg, transparent, rgba(80,55,28,.3), transparent); }
+  .alb-blatt { display: none; }
+  .alb-huelle { width: 100%; }
+  .alb-buch { padding: 5px; }
+  .alb-name b { font-size: 24px; }
+  .alb-zeile, .alb-karte, .alb-liste { flex: 1 1 100%; }
+  .albb-blatt { width: 96vw; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .alb-buch.schlaegt-auf, .alb-blatt.laeuft { animation: none; transition: none; }
+  .alb-regalbuch, .albb-farbe, .alb-nameunter { transition: none; }
+}

@@ -2466,3 +2466,57 @@ Fassung parallel, Werke, Aufgaben), Gespraechsstimme in `56f` (englisch und
 deutsch), langer Text, Kern und Aufgaben in `56g`, Lesungssatz in `56h`.
 Das Foto stammt von Gage Skidmore (CC BY-SA 3.0) und ist wie alle anderen in
 `autoren/quellen.json` belegt.
+
+## Das Album (5.32.0)
+
+Ein eigener Raum (`album`). Darin liegt ein dickes Buch; ein Tippen, und es
+klappt auf. **Eine Doppelseite je Figur.** Drei Module: `62-album.js` ist das
+Rechenwerk ohne DOM, `62b` das Buch, `62c` das Blatt zum Eintragen.
+
+**Das Gesetz des Albums: nichts muss.** Jedes Feld darf leer bleiben. Was leer
+ist, steht nicht auf der Seite — und man sieht ihm auch nicht an, dass es
+fehlt. `albumStuecke(f)` liefert nur Gefuelltes, in der Reihenfolge von
+`ALBUM_FELDER`. **Wer ein Feld ergaenzt, ergaenzt es dort — die Reihenfolge auf
+der Seite folgt immer dieser Liste, nie der Eingabereihenfolge.**
+
+**Feste Formen.** Jede Kategorie hat eine `form` und sieht damit auf jeder
+Seite gleich aus: `etikett` (Schildchen), `zeile` (mit der Hand geschrieben),
+`karte`, `liste`, `wolke` (Woerter), `spruch` (Serifen, gross), `band`,
+`notizfeld`. Ohne das waere das Buch nach zwanzig Figuren unlesbar.
+
+**Links und rechts liegen fest** (`ALB_LINKS` / `ALB_RECHTS`): links wer sie ist
+und wie sie aussieht, rechts Wesen, Leben, Stimme, Welt, Rand. Nicht aendern —
+das Wiederfinden haengt daran.
+
+**Gelebt, nicht gewuerfelt.** Jede Schraege kommt aus `albumDreh(figurId,
+feldId)`, also aus einem Hash. Dieselbe Figur sieht bei jedem Aufschlagen
+**genau gleich** aus. Mit `Math.random()` waere es ein zappelndes Buch.
+
+**Blaettern.** `albumBlaettern` baut ein Blatt mit Vorder- und Rueckseite und
+dreht es um den Falz (`rotateY`); waehrend es oben liegt, wird darunter schon
+die neue Seite gebaut. Aufgeraeumt wird per `setTimeout`, **nicht** per
+`requestAnimationFrame` — der steht bei verstecktem Fenster still, und dann
+laege das Blatt fuer immer quer im Buch. Unter 900 px liegt nur eine Seite
+offen; dort wird ohne Dreh gewechselt.
+
+**Alphabetisch, immer.** `albumVergleich` sortiert ueber `localeCompare` mit
+`sensitivity: 'base'` (Aerger steht bei A), Namenlose zuletzt. Wer zuerst ein
+C anlegt und danach ein A, findet das A trotzdem vorn.
+
+**Der Kalender haengt mit dran.** Geburts- und Todesdatum aus dem Album legen
+einen Termin an, der ueber `ausAlbum: 'album:<figurId>:<art>'` mit der Figur
+verbunden bleibt: Datum aendern aendert den Termin, Datum loeschen raeumt ihn
+in den Papierkorb. **Nie einen zweiten Termin anlegen — immer ueber diese
+Marke suchen.**
+
+**Verweise.** Bei Familie, „Steht nahe", „Bewundert", „Verachtet" gilt
+„Rolle — Name" (`albumVerweisRolle` / `albumVerweisName`). Steht der Name im
+Album, wird verlinkt. `albumBeziehungen()` gibt den ganzen Graphen zurueck —
+Grundlage fuer einen Stammbaum spaeter.
+
+**Der Wortschatz**: 400 Woerter in 16 Gruppen, alle eindeutig (ein Test wacht
+darueber). Eigene Woerter liegen in `D.einst.albumWorte` und gelten fuer alle
+Figuren.
+
+Beschaedigte Daten duerfen die Seite nicht zerlegen: `albumStuecke` und
+`albumZettel` pruefen jeden Eintrag einzeln, statt blind zu iterieren.

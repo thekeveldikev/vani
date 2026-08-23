@@ -12,6 +12,7 @@ const ALLE_RAEUME = [
   { id: 'hefte', name: 'Hefte', icon: 'hefte' },
   { id: 'projekte', name: 'Projekte', icon: 'projekte' },
   { id: 'cluster', name: 'Cluster', icon: 'cluster' },
+  { id: 'album', name: 'Album', icon: 'album' },
   { id: 'woerter', name: 'Wörter', icon: 'woerter' },
   { id: 'klang', name: 'Klang', icon: 'klang' },
   { id: 'goodnotes', name: 'Goodnotes', icon: 'buchzu', standard: false },

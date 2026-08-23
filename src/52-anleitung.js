@@ -226,6 +226,22 @@ const ANLEITUNG = [
     ]
   },
   {
+    id: 'album', titel: 'Album', icon: 'album', raum: 'album',
+    kurz: 'Ein dickes Buch, in dem die Figuren wohnen — eine Doppelseite für jede.',
+    abschnitte: [
+      { t: 'Aufschlagen', p: ['Im Raum liegt das Buch. Ein Tippen, und es klappt auf. Geblättert wird mit den Pfeilen unten, mit den Pfeiltasten, oder indem du quer über die Seite wischst. „n" legt eine neue Figur an.'] },
+      { t: 'Eine Doppelseite pro Figur', p: ['Links steht, wer sie ist und wie sie aussieht. Rechts, was für ein Mensch das ist, was ihr geschah, wie sie klingt und wohin sie gehört. Diese Aufteilung ändert sich nie — so findest du auch nach dreißig Figuren noch alles wieder.'] },
+      { t: 'Nichts muss', p: ['Jedes Feld darf leer bleiben. Was leer ist, steht nicht auf der Seite — und man sieht ihm auch nicht an, dass es fehlt. Nachtragen geht jederzeit: oben links auf den Namen tippen. Was du wieder herausnimmst, verschwindet von der Seite.'], b: 'Nur Name und ein Satz unter „Sagt"? Dann steht genau das da, und die Seite sieht trotzdem fertig aus.' },
+      { t: 'Was du eintragen kannst', p: ['Sechs Gruppen: Der Kopf der Seite (Spitzname, Alter, geboren, gestorben, Orte), Wie sie aussieht (von Statur und Händen bis Narben, Geruch und was in den Taschen ist), Was für ein Mensch das ist (Wesenszüge, der Widerspruch, Eigenheiten, Ängste, die Lüge die sie glaubt, will und braucht), Was ihr geschehen ist (Ereignisse, Wendepunkt, Familie), Wie sie klingt (Sätze, die erste Zeile, was sie nie sagt) und Wo sie hingehört (Geschichten, Rolle, Ort, Klang). Dazu Notizen und eigene Kategorien.'] },
+      { t: 'Wesenszüge', p: ['Ein Wortschatz von vierhundert Wörtern in sechzehn Gruppen — von „sanftmütig" bis „hintergründig". Suchen, antippen, fertig. Und was du selbst hineinschreibst, merkt sich VANI und schlägt es bei der nächsten Figur mit vor.'] },
+      { t: 'Geburtstag und Todestag', p: ['Trägst du ein Datum ein, steht es sofort auch im Kalender — und rechnet dort das Alter mit. Änderst du es, ändert sich der Kalendereintrag; nimmst du es weg, verschwindet er.'] },
+      { t: 'Wer wen kennt', p: ['Bei Familie, „Steht nahe", „Bewundert" und „Verachtet" schreibst du die Rolle davor: „Mutter — Ilva". Wer schon im Album steht, wird erkannt und verlinkt: ein Tipp, und du bist auf ihrer Seite.'] },
+      { t: 'Klebezettel', p: ['Bis zu fünfzehn pro Figur, in fünf Farben. Sie kleben unten rechts auf der Doppelseite, ordentlich nebeneinander.'] },
+      { t: 'Suchen und finden', p: ['Oben liegt die Suchleiste — sie sucht zuerst im Namen, dann in allem anderen. Daneben das Register: ein Buchstabe, ein Sprung. Die Figuren stehen immer alphabetisch, egal wann du sie angelegt hast.'] },
+      { t: 'Als Blatt ablegen', p: ['Im Blatt zur Figur legt der Knopf alles, was du eingetragen hast, als Text bei den Blättern ab — zum Weiterschreiben.'] }
+    ]
+  },
+  {
     id: 'cluster', titel: 'Cluster', icon: 'cluster', raum: 'cluster',
     kurz: 'Bretter zum Denken: Blasen und Fäden dazwischen.',
     abschnitte: [
