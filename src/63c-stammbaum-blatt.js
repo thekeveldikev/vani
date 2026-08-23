@@ -110,6 +110,30 @@ function teppichAusAlbum(doc, neu) {
   zeichne();
 }
 
+/* ----- Einen Namen von Hand ablegen -----
+   Gerechnet ist gut, aber manchmal weiss man es besser. Wer einen Namen
+   zieht, nagelt ihn fest; alle anderen ordnen sich weiter von selbst um ihn
+   herum. Zurueck geht es jederzeit — einzeln in der Kartusche oder fuer
+   alle mit dem Knopf in der Leiste. */
+async function teppichPersonSetzen(doc, personId, x, y, neu) {
+  if (!doc) return;
+  await teppichSchreiben(doc, (b) => {
+    const p = b.leute.find((q) => q.id === personId);
+    if (p) { p.festX = x; p.festY = y; }
+    return b;
+  });
+  if (neu) neu();
+}
+async function teppichPersonLoesen(doc, personId, neu) {
+  if (!doc) return;
+  await teppichSchreiben(doc, (b) => {
+    const p = b.leute.find((q) => q.id === personId);
+    if (p) { p.festX = null; p.festY = null; }
+    return b;
+  });
+  if (neu) neu();
+}
+
 /* ================= DIE KARTUSCHE ================= */
 function teppichKartusche(doc, personId, neu, frisch) {
   if (!doc) return;
@@ -251,6 +275,10 @@ function teppichKartusche(doc, personId, neu, frisch) {
         zu(); if (neu) neu();
       } }, 'Von der Wand nehmen'),
       brandKnopf,
+      (lebend() || person).festX != null ? el('button', {
+        class: 'knopf zart', title: 'Diesen Namen wieder von VANI einordnen lassen',
+        onclick: async () => { await teppichPersonLoesen(doc, personId, neu); zu(); }
+      }, 'Wieder einordnen lassen') : null,
       !albumFigur ? el('button', { class: 'knopf zart', title: 'Eine Doppelseite im Album anlegen und mit diesem Namen verbinden', onclick: () => teppichInsAlbum(doc, personId, () => { kopfAuffrischen(); if (neu) neu(); }) }, 'Ins Album übernehmen') : null,
       el('button', { class: 'knopf voll', onclick: () => { sichern.sofort(); zu(); if (neu) neu(); } }, 'Fertig')));
 

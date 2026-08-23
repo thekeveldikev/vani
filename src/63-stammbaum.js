@@ -423,62 +423,105 @@ function teppichOrdnung(baum) {
   const y = new Map();
   let naechsteReihe = 0;
 
+  /* Die Reihen. Frueher wurden sie schlicht durchgezaehlt — das ergab eine
+     Treppe, die von links oben nach rechts unten lief, und sah aus wie eine
+     Liste mit Kurven statt wie ein Baum.
+
+     Jetzt anders herum, so wie ein Baum wirklich waechst:
+
+     1. Die BLAETTER (wer keine Kinder hat) bekommen der Reihe nach einen
+        Platz — aber in der Reihenfolge, in der man den Baum von den
+        Wurzeln aus durchlaeuft. Dadurch stehen Geschwister beieinander und
+        die Aeste kreuzen sich kaum.
+     2. Jeder ELTERNTEIL rueckt in die MITTE seiner Kinder. Wer vier Kinder
+        hat, haengt in deren Mitte — und faechert damit nach oben UND nach
+        unten auf.
+     3. Wer dabei uebrig bleibt (Angeheiratete ohne Kinder, Einzelne),
+        haengt sich an den, mit dem er verbunden ist.
+     4. Zum Schluss werden Ueberlappungen in jeder Spalte auseinandergezogen. */
   for (const inselNr of reihenfolgeInsel) {
     const drin = leute.filter((p) => insel.get(p.id) === inselNr);
-    const maxGen = Math.max(...drin.map((p) => gen.get(p.id) || 0));
-    /* Je Generation eine Spalte mit den Leuten darin. */
-    const spalten = [];
-    for (let g = 0; g <= maxGen; g++) spalten.push(drin.filter((p) => (gen.get(p.id) || 0) === g).map((p) => p.id));
-
-    /* Erste Anordnung: von oben nach unten durchgehen und Kinder direkt
-       unter ihre Eltern hängen. Das ergibt schon fast das Bild. */
+    const drinIds = new Set(drin.map((p) => p.id));
     const platz = new Map();
     let zaehler = naechsteReihe;
-    const setzen = (id) => { if (!platz.has(id)) platz.set(id, zaehler++); };
 
-    for (let g = 0; g <= maxGen; g++) {
-      /* Sortiert nach der Reihe der Eltern, damit sich Äste nicht kreuzen. */
-      const sortiert = spalten[g].slice().sort((a, b) => {
-        const ea = (eltern.get(a) || []).map((e) => platz.has(e) ? platz.get(e) : 1e9);
-        const eb = (eltern.get(b) || []).map((e) => platz.has(e) ? platz.get(e) : 1e9);
-        const ma = ea.length ? ea.reduce((s, x) => s + x, 0) / ea.length : 1e9;
-        const mb = eb.length ? eb.reduce((s, x) => s + x, 0) / eb.length : 1e9;
-        return ma - mb || String(a).localeCompare(String(b));
-      });
-      for (const id of sortiert) {
-        setzen(id);
-        /* Der Partner kommt sofort daneben, wenn er in dieselbe Spalte gehört. */
-        for (const q of paare.get(id) || []) {
-          if ((gen.get(q) || 0) === g && !platz.has(q) && insel.get(q) === inselNr) setzen(q);
+    /* --- 1. Die Blaetter, in der Reihenfolge eines Durchlaufs von oben --- */
+    const wurzeln = drin.filter((p) => !(eltern.get(p.id) || []).length)
+      .sort((a, b) => (gen.get(a.id) || 0) - (gen.get(b.id) || 0) || String(a.id).localeCompare(String(b.id)));
+    const besucht = new Set();
+    const blattReihe = new Map();
+
+    const durchlauf = (id, tiefe) => {
+      /* Zykluswache: kein Knoten wird zweimal betreten. */
+      if (besucht.has(id) || !drinIds.has(id) || tiefe > 400) return;
+      besucht.add(id);
+      /* Erst die Partner daneben, dann die Kinder darunter — so bleiben
+         Eheleute zusammen und ihre Kinder unter beiden. */
+      const kids = (kinder.get(id) || []).filter((k) => drinIds.has(k));
+      const mitPartner = [];
+      for (const q of paare.get(id) || []) {
+        if (!drinIds.has(q) || besucht.has(q)) continue;
+        if ((gen.get(q) || 0) !== (gen.get(id) || 0)) continue;
+        besucht.add(q);
+        mitPartner.push(q);
+        for (const k of kinder.get(q) || []) if (drinIds.has(k) && !kids.includes(k)) kids.push(k);
+      }
+      if (!kids.length) {
+        /* Ein Blatt: es bekommt jetzt seinen Platz. */
+        blattReihe.set(id, zaehler++);
+        for (const q of mitPartner) blattReihe.set(q, zaehler++);
+        return;
+      }
+      kids.sort((a, b) => String(a).localeCompare(String(b)));
+      for (const k of kids) durchlauf(k, tiefe + 1);
+      /* Der Partner steht direkt neben dem, mit dem er verbunden ist. */
+      for (const q of mitPartner) platz.set(q, null);
+    };
+    for (const w of wurzeln) durchlauf(w.id, 0);
+    /* Wer im Durchlauf nicht vorkam (haengt nur ueber einen Bund daran),
+       kommt hinten dran, damit niemand verlorengeht. */
+    for (const p of drin) if (!besucht.has(p.id)) { besucht.add(p.id); if (!(kinder.get(p.id) || []).some((k) => drinIds.has(k))) blattReihe.set(p.id, zaehler++); }
+
+    /* --- 2. Von unten nach oben: jeder Elternteil in die Mitte der Kinder --- */
+    const maxGen = Math.max(...drin.map((p) => gen.get(p.id) || 0));
+    for (const [id, r] of blattReihe) platz.set(id, r);
+    for (let g = maxGen; g >= 0; g--) {
+      const spalte = drin.filter((p) => (gen.get(p.id) || 0) === g);
+      for (const p of spalte) {
+        if (platz.get(p.id) != null) continue;
+        const kids = (kinder.get(p.id) || []).filter((k) => platz.get(k) != null);
+        if (kids.length) {
+          platz.set(p.id, kids.reduce((sum, k) => sum + platz.get(k), 0) / kids.length);
         }
       }
     }
+
+    /* --- 3. Wer immer noch nichts hat, haengt sich an seine Verbindung --- */
+    for (let runde = 0; runde < 4; runde++) {
+      for (const p of drin) {
+        if (platz.get(p.id) != null) continue;
+        const anker = [...(paare.get(p.id) || []), ...(eltern.get(p.id) || []), ...(kinder.get(p.id) || [])]
+          .filter((q) => platz.get(q) != null);
+        if (anker.length) platz.set(p.id, anker.reduce((sum, q) => sum + platz.get(q), 0) / anker.length + 0.5);
+      }
+    }
+    for (const p of drin) if (platz.get(p.id) == null) platz.set(p.id, zaehler++);
+
     for (const [id, r] of platz) y.set(id, r);
-    naechsteReihe = zaehler + 1;   /* eine Leerreihe zwischen zwei Inseln */
+    let groesstes = naechsteReihe;
+    for (const p of drin) groesstes = Math.max(groesstes, y.get(p.id) || 0);
+    naechsteReihe = groesstes + 2;   /* zwei Leerreihen zwischen zwei Inseln */
   }
 
-  /* Feinschliff: mehrere Durchgänge, in denen jeder in die Mitte seiner
-     Verwandten rückt. Danach werden Überlappungen in jeder Spalte wieder
-     auseinandergezogen. Vier Durchgänge reichen; mehr bewegt kaum noch
-     etwas und kostet bei dreihundert Namen spürbar Zeit. */
+  /* Ueberlappungen in jeder Spalte aufloesen und danach noch einmal die
+     Mitte suchen — wenige Runden, sonst faellt der Faecher wieder zusammen. */
   const spaltenListe = new Map();
   for (const p of leute) {
     const g = gen.get(p.id) || 0;
     if (!spaltenListe.has(g)) spaltenListe.set(g, []);
     spaltenListe.get(g).push(p.id);
   }
-
-  for (let runde = 0; runde < 4; runde++) {
-    for (const [, ids] of spaltenListe) {
-      for (const id of ids) {
-        const verwandt = [...(eltern.get(id) || []), ...(kinder.get(id) || []), ...(paare.get(id) || [])]
-          .filter((q) => y.has(q));
-        if (!verwandt.length) continue;
-        const mitte = verwandt.reduce((s, q) => s + y.get(q), 0) / verwandt.length;
-        y.set(id, (y.get(id) + mitte) / 2);
-      }
-    }
-    /* Auseinanderziehen: in jeder Spalte mindestens ein Reihenabstand. */
+  const entzerren = () => {
     for (const [, ids] of spaltenListe) {
       const sortiert = ids.slice().sort((a, b) => y.get(a) - y.get(b));
       for (let i = 1; i < sortiert.length; i++) {
@@ -486,12 +529,24 @@ function teppichOrdnung(baum) {
         if (jetzt - vorher < 1) y.set(sortiert[i], vorher + 1);
       }
     }
+  };
+  entzerren();
+  for (let runde = 0; runde < 3; runde++) {
+    for (const [, ids] of spaltenListe) {
+      for (const id of ids) {
+        const verwandt = [...(eltern.get(id) || []), ...(kinder.get(id) || []), ...(paare.get(id) || [])]
+          .filter((q) => y.has(q));
+        if (!verwandt.length) continue;
+        const mitte = verwandt.reduce((sum, q) => sum + y.get(q), 0) / verwandt.length;
+        y.set(id, y.get(id) * 0.65 + mitte * 0.35);
+      }
+    }
+    entzerren();
   }
 
-  /* Zum Schluss die Paare wieder zusammenholen. Der Feinschliff oben zieht
-     jeden in die Mitte seiner Verwandten — dabei rutschen Eheleute leicht
-     auseinander, und dann laufen ihre Kinderäste über Kreuz. Ein Paar
-     gehört nebeneinander, auch wenn die Rechnung etwas anderes will. */
+  /* Zum Schluss die Paare wieder zusammenholen. Der Feinschliff zieht jeden
+     in die Mitte seiner Verwandten — dabei rutschen Eheleute leicht
+     auseinander, und dann laufen ihre Kinderaeste ueber Kreuz. */
   for (let runde = 0; runde < 3; runde++) {
     for (const p of leute) {
       for (const q of paare.get(p.id) || []) {
@@ -504,13 +559,7 @@ function teppichOrdnung(baum) {
         y.set(q, a < b ? mitte + 0.5 : mitte - 0.5);
       }
     }
-    for (const [, ids] of spaltenListe) {
-      const sortiert = ids.slice().sort((a, b) => y.get(a) - y.get(b));
-      for (let i = 1; i < sortiert.length; i++) {
-        const vorher = y.get(sortiert[i - 1]), jetzt = y.get(sortiert[i]);
-        if (jetzt - vorher < 1) y.set(sortiert[i], vorher + 1);
-      }
-    }
+    entzerren();
   }
 
   /* Alles nach oben schieben, damit die erste Reihe bei 0 liegt. */

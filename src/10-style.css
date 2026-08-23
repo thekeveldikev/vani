@@ -5204,3 +5204,240 @@ html[data-thema="tinte"] .knopf.gefahr, html[data-thema="kerze"] .knopf.gefahr {
    ein Mast. */
 .tep-stammkoerper { fill: #ded6bd; stroke: #b9b096; stroke-width: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,.5)); }
 .tep-rinde { fill: none; stroke: #b3aa90; stroke-width: 1.4; stroke-linecap: round; opacity: .7; }
+
+/* Zweiglein, Getier am Fuß und der Name unter dem Finger. */
+.tep-zweig { fill: none; stroke: #ded6bd; stroke-width: 1.6; stroke-linecap: round; opacity: .8; }
+.tep-tierlinie { fill: none; stroke: #ded6bd; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .72; }
+.tep-tierauge { fill: #ded6bd; opacity: .72; }
+.tep-fusstier { pointer-events: none; }
+.tep-person.zieht { cursor: grabbing; }
+.tep-person.zieht .tep-bandgrund { fill: #d3d8c0; stroke: #e0b26a; stroke-width: 2; }
+.tep-person.zieht { filter: drop-shadow(0 6px 10px rgba(0,0,0,.55)); }
+.tep-wk.ordnen { font-size: 16px; }
+
+/* ===================== DER TEPPICH — ILLUSTRATION STATT STRICHZEICHNUNG =====================
+   Alles, was vorher eine Linie mit Strichbreite war, ist jetzt ein Körper mit
+   heller Kante und dunklem Rücken. Das ist der ganze Unterschied zwischen
+   einem Diagramm und einer Zeichnung. */
+
+/* ----- Holz ----- */
+.tep-ast {
+  fill: #e4dcc2; stroke: #b0a689; stroke-width: .55; stroke-linejoin: round;
+}
+.tep-astkante { fill: none; stroke: #f6efd9; stroke-width: 1.1; stroke-linecap: round; opacity: .75; }
+.tep-astschatten { fill: none; stroke: #8d846c; stroke-width: 1.2; stroke-linecap: round; opacity: .5; }
+.tep-aeste { filter: drop-shadow(0 2px 2.5px rgba(0,0,0,.5)); }
+
+.tep-stammkoerper { fill: #e4dcc2; stroke: #aba184; stroke-width: .8; }
+.tep-rinde { fill: none; stroke: #a89e81; stroke-width: 1.5; stroke-linecap: round; opacity: .6; }
+.tep-rindefein { fill: none; stroke: #a89e81; stroke-width: .9; stroke-linecap: round; opacity: .4; }
+.tep-wurzel { fill: none; stroke: #e4dcc2; stroke-width: 7; stroke-linecap: round; opacity: .9; }
+.tep-zweig { stroke: #dcd4ba; stroke-width: 1.5; }
+
+/* ----- Laub: vier Töne, mit Adern, ohne Gewiege ----- */
+.tep-blattform { stroke: rgba(120,132,100,.55); stroke-width: .45; stroke-linejoin: round; }
+.tep-blatt.ton-0 .tep-blattform { fill: #ccd4ba; }
+.tep-blatt.ton-1 .tep-blattform { fill: #bcc7a6; }
+.tep-blatt.ton-2 .tep-blattform { fill: #d8dec6; }
+.tep-blatt.ton-3 .tep-blattform { fill: #aeba97; }
+.tep-blattader { fill: none; stroke: rgba(96,108,80,.5); stroke-width: .7; stroke-linecap: round; }
+.tep-laub { filter: drop-shadow(0 1.5px 1.5px rgba(0,0,0,.4)); }
+/* Das Wiegen ist raus: es soll eindrucksvoll daliegen, nicht zappeln. */
+.tep-tuch .tep-blatt { animation: none !important; }
+
+/* ----- Namensbänder: Schriftrollen ----- */
+.tep-bandgrund {
+  fill: url(#tep-bandfarbe); stroke: #7c8370; stroke-width: .7; stroke-linejoin: round;
+}
+.tep-bandrolle { fill: #7f8672; stroke: #656c5a; stroke-width: .6; }
+.tep-bandknick { fill: none; stroke: rgba(60,68,50,.32); stroke-width: 2.4; stroke-linecap: round; }
+.tep-baender { filter: drop-shadow(0 3px 3.5px rgba(0,0,0,.55)); }
+.tep-name { fill: #232a1c; }
+.tep-jahre { fill: #48503a; }
+
+/* ----- Medaillon ----- */
+.tep-zkreis { fill: #2a3326; stroke: #cfc7ab; stroke-width: 1.3; }
+.tep-zperlen {
+  fill: none; stroke: #d9d0b2; stroke-width: 2.6;
+  stroke-dasharray: 0.1 3.35; stroke-linecap: round; opacity: .85;
+}
+.tep-zinnen { fill: none; stroke: rgba(217,208,178,.4); stroke-width: .7; }
+.tep-zform { stroke: #e6ddc0; stroke-width: 1.55; }
+
+/* ----- Getier ----- */
+.tep-tierlinie { stroke-width: 1.8; opacity: .8; }
+
+/* ----- Fallende Blätter: echte Blätter, die unten wegblassen ----- */
+.tep-fallblatt {
+  position: absolute; top: -30px; width: 20px; height: 19px; pointer-events: none; z-index: 3;
+  opacity: 0; will-change: transform, opacity;
+  animation: tep-taumelt var(--dauer, 10s) cubic-bezier(.42,0,.58,1) forwards;
+}
+.tep-fallblatt svg { display: block; overflow: visible; }
+.tep-fbform { stroke: rgba(90,100,72,.5); stroke-width: .5; }
+.tep-fallblatt.ton-0 .tep-fbform { fill: #ccd4ba; }
+.tep-fallblatt.ton-1 .tep-fbform { fill: #c2a86a; }
+.tep-fallblatt.ton-2 .tep-fbform { fill: #d8dec6; }
+.tep-fallblatt.ton-3 .tep-fbform { fill: #a98f52; }
+.tep-fbader { fill: none; stroke: rgba(80,90,64,.45); stroke-width: .7; }
+@keyframes tep-taumelt {
+  0%   { transform: translate(0, 0) rotate(0deg) rotateY(0deg); opacity: 0; }
+  6%   { opacity: .95; }
+  30%  { transform: translate(var(--drift, 0px), 30vh) rotate(calc(var(--dreh, 360deg) * .3)) rotateY(calc(var(--kipp, 200deg) * .3)); }
+  60%  { transform: translate(var(--drift2, 0px), 62vh) rotate(calc(var(--dreh, 360deg) * .62)) rotateY(calc(var(--kipp, 200deg) * .62)); }
+  82%  { opacity: .85; }
+  100% { transform: translate(var(--drift, 0px), 104vh) rotate(var(--dreh, 360deg)) rotateY(var(--kipp, 200deg)); opacity: 0; }
+}
+
+/* ----- Wer keine Bewegung will ----- */
+@media (prefers-reduced-motion: reduce) {
+  .tep-fallblatt { display: none; }
+}
+
+/* Die Schildchen am Faden: Pergament mit gekerbten Enden und einem Loch, in
+   dem der Faden hängt. Vorher waren es schwarze Kästchen — die sahen aus wie
+   Bildschirmelemente, nicht wie etwas, das an einem Faden hängt. */
+.tep-rbgrund {
+  fill: #ded5b8; stroke: var(--fadenfarbe, #8a8270); stroke-width: 1;
+  filter: drop-shadow(0 1.5px 2px rgba(0,0,0,.5));
+}
+.tep-rbloch { fill: rgba(70,60,40,.55); }
+.tep-rbtext {
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 8.5px;
+  fill: #33301f; letter-spacing: .01em;
+}
+
+/* ===================== DER TEPPICH — LIEBE ZUM DETAIL ===================== */
+
+/* ----- Das Astwerk ----- */
+.tep-ast.zweig { stroke-width: .4; }
+.tep-astkante.duenn { stroke-width: .7; opacity: .6; }
+.tep-triebranke {
+  fill: none; stroke: #ded6bd; stroke-width: 1.3; stroke-linecap: round; opacity: .85;
+}
+
+/* ----- Eicheln ----- */
+.tep-eichelfrucht { fill: #c9a86a; stroke: #8f7440; stroke-width: .5; }
+.tep-eichelkappe { fill: #8a6d3c; stroke: #6b5329; stroke-width: .5; }
+.tep-eichelstiel { fill: none; stroke: #8a6d3c; stroke-width: .9; stroke-linecap: round; }
+
+/* ----- Der Baum wächst beim Aufschlagen -----
+   Generation für Generation: erst das Holz vom Stamm aus, dann legt sich das
+   Laub darauf, zuletzt setzen sich die Bänder. Wer keine Bewegung will,
+   sieht den Baum einfach fertig dastehen. */
+.tep-tuch:not(.ohne-wind) .tep-astgruppe {
+  animation: tep-waechst .7s cubic-bezier(.22,.9,.3,1) backwards;
+  animation-delay: calc(var(--gen, 0) * 130ms);
+  transform-box: fill-box; transform-origin: 0% 50%;
+}
+@keyframes tep-waechst { from { opacity: 0; scale: .84 1; } to { opacity: 1; scale: 1 1; } }
+.tep-tuch:not(.ohne-wind) .tep-laubgruppe {
+  animation: tep-laubkommt .8s cubic-bezier(.2,.9,.3,1) backwards;
+  animation-delay: calc(var(--gen, 0) * 130ms + 320ms);
+}
+@keyframes tep-laubkommt { from { opacity: 0; } to { opacity: 1; } }
+.tep-tuch:not(.ohne-wind) .tep-person {
+  animation: tep-bandkommt .55s cubic-bezier(.2,1.1,.35,1) backwards;
+  animation-delay: calc(var(--gen, 0) * 130ms + 480ms);
+}
+@keyframes tep-bandkommt { from { opacity: 0; translate: -14px 0; } to { opacity: 1; translate: 0 0; } }
+.tep-tuch:not(.ohne-wind) .tep-ranke {
+  animation: tep-rankeauf .8s ease backwards;
+  animation-delay: calc(var(--n, 0) * 22ms + 900ms);
+}
+
+/* ----- Das Tuch: Kette, Schuss und Alter ----- */
+.tep-alterfleck { pointer-events: none; }
+
+/* ----- Der Rahmen: vergoldete Innenkante und geschnitzte Ecken ----- */
+.tep-rahmen {
+  background:
+    repeating-linear-gradient(97deg, rgba(0,0,0,.07) 0 2px, transparent 2px 8px),
+    radial-gradient(70% 50% at 30% 10%, rgba(255,220,170,.09), transparent 65%),
+    linear-gradient(160deg, #4b3623, #241a10);
+  box-shadow:
+    inset 0 0 0 9px #2e2114,
+    inset 0 0 0 10px rgba(214,176,106,.55),
+    inset 0 0 0 12px rgba(0,0,0,.35),
+    0 22px 52px rgba(0,0,0,.55);
+}
+.tep-randband {
+  background:
+    repeating-linear-gradient(90deg, rgba(120,96,60,.05) 0 1px, transparent 1px 4px),
+    linear-gradient(180deg, #e2dbc1, #c7be9d);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 0 -1px 0 rgba(0,0,0,.25);
+  border-top: 1px solid rgba(214,176,106,.5); border-bottom: 1px solid rgba(214,176,106,.5);
+}
+.tep-randband span { text-shadow: 0 1px 0 rgba(255,255,255,.5); }
+
+/* ----- Wer angefasst wird, leuchtet -----
+   Auf einer Wand mit dreißig Namen ist das der schnellste Weg zu sehen, was
+   an einem Menschen alles hängt. */
+@media (hover: hover) and (pointer: fine) {
+  .tep-person:hover .tep-bandgrund { fill: #d6dbc4; stroke: #d6b06a; stroke-width: 1.4; }
+  .tep-person:hover .tep-zperlen { stroke: #f0d9a0; }
+  .tep-person:hover .tep-name { fill: #14180f; }
+  .tep-ranke:hover .tep-rankelinie { stroke-width: 3.6; opacity: 1; }
+  .tep-ranke:hover .tep-rbgrund { fill: #f0e7c8; }
+  .tep-astgruppe:hover .tep-ast { fill: #efe7cd; }
+}
+
+/* ----- Das Brandloch glimmt ----- */
+.tep-tuch:not(.ohne-wind) .tep-person.gebrannt .tep-glut {
+  animation: tep-glimmt 5.5s ease-in-out infinite alternate;
+}
+@keyframes tep-glimmt { from { opacity: .8; scale: .98; } to { opacity: 1; scale: 1.03; } }
+.tep-person.gebrannt .tep-loch { filter: url(#tep-brand); }
+
+/* ----- Das Getier ----- */
+.tep-fusstier .tep-tierlinie { stroke: #e0d8bf; }
+.tep-tierform { fill: #c9a06a; stroke: #8a6a3f; stroke-width: .6; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tep-astgruppe, .tep-laubgruppe, .tep-person, .tep-ranke, .tep-person.gebrannt .tep-glut { animation: none !important; }
+}
+
+/* ----- Der Fuß des Baumes -----
+   Stamm, Wurzelanläufe, Rinde und Getier sind jetzt Körper, keine Striche.
+   Die hinteren Wurzeln liegen etwas dunkler: so entsteht Tiefe. */
+.tep-wurzelwerk.hinten .tep-wurzel { fill: #cfc7ae; stroke: #a49a80; }
+.tep-wurzelwerk.vorn .tep-wurzel { fill: #e4dcc2; stroke: #aba184; }
+.tep-wurzel { stroke-width: .6; stroke-linejoin: round; }
+.tep-wurzelhaar { fill: none; stroke: #cfc7ae; stroke-width: 1.2; stroke-linecap: round; opacity: .7; }
+.tep-stammkoerper { fill: #e4dcc2; stroke: #aba184; stroke-width: .8; stroke-linejoin: round; }
+.tep-rinde { fill: none; stroke: #a89e81; stroke-width: 1.15; stroke-linecap: round; opacity: .55; }
+.tep-rindefein { fill: none; stroke: #a89e81; stroke-width: .8; stroke-linecap: round; opacity: .38; }
+.tep-astlochrand { fill: #b3aa8e; stroke: #8d846c; stroke-width: .8; }
+.tep-astlochtief { fill: #4a4132; }
+
+/* Getier: gefüllte Silhouetten wie in einem Wappen, keine Kritzelei. */
+.tep-tierkoerper { fill: #ded6bd; stroke: #a89e81; stroke-width: .7; stroke-linejoin: round; }
+.tep-tierkante { fill: none; stroke: #f4eeda; stroke-width: .9; opacity: .55; }
+.tep-tierlinie { fill: none; stroke: #a89e81; stroke-width: 1.1; stroke-linecap: round; opacity: .85; }
+.tep-tierauge { fill: #4a4132; }
+.tep-tierauge.dunkel { fill: #33301f; }
+.tep-schuppen { fill: none; stroke: #a89e81; stroke-width: .55; stroke-linecap: round; opacity: .5; }
+.tep-fusstier { filter: drop-shadow(0 2px 2.5px rgba(0,0,0,.5)); }
+
+/* Der Innenkasten: er ist so breit wie das Tuch, mindestens aber so breit
+   wie die Fläche. Zentrierte man das Tuch direkt in der scrollenden Fläche,
+   wäre sein Überhang nach LINKS nicht mehr erreichbar — bei starkem Zoom
+   käme man nie wieder an den Stamm. */
+.tep-flaeche { display: block; }
+.tep-innen {
+  width: max-content; min-width: 100%; min-height: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Der Hund: was hinter dem Rumpf liegt, ist dunkler — daraus entsteht Tiefe
+   statt einer flachen Silhouette. */
+.tep-tierhinten { fill: #c2b99e; stroke: #9c937a; stroke-width: .6; stroke-linejoin: round; }
+.tep-tierohr { fill: #c9c0a5; stroke: #9c937a; stroke-width: .6; }
+
+/* Rabe, Ringelnatter, Farn und Pilze am Fuß des Stammes. */
+.tep-tierfluegel { fill: #cbc2a7; stroke: #9c937a; stroke-width: .55; stroke-linejoin: round; }
+.tep-tierlinie.duenn { stroke-width: .7; opacity: .65; }
+.tep-farnlinie { fill: none; stroke: #cbd3b8; stroke-width: 1.25; stroke-linecap: round; opacity: .8; }
+.tep-pilzhut { fill: #d3c9ac; stroke: #a2977a; stroke-width: .6; }
+.tep-pilzstiel { fill: #e2dac0; stroke: #a2977a; stroke-width: .55; }
+.tep-unterholz { filter: drop-shadow(0 1.5px 2px rgba(0,0,0,.45)); }

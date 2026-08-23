@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.35.0 (23. August 2026)
+# Übergabe an Codex — Stand VANI 5.36.0 (23. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -112,6 +112,11 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   9.4.1783, 9. April 1783, April 1783, 1783, zweistellige Jahre und „Maerz“ ohne Umlaut. Gespeichert wird
   weiterhin die eine Form, mit der sich rechnen lässt.
 - **5.35** Zwei neue Räume aus einer parallelen Sitzung: **Der Wandteppich** (Stammbaum, in dem auch die Fäden zählen, die keine Familie sind) und **Das Kabinett** (ein Schrank, in dessen Fächern große, selten gebrauchte Werkzeuge wohnen — der Wandteppich liegt im ersten Fach). In der Leiste steht nur das Kabinett.
+- **5.36** Der Wandteppich fächert auf statt treppab zu laufen: die Reihen werden jetzt von den Blättern her
+  gerechnet (Durchlauf von den Wurzeln, dann jeder Elternteil in die Mitte seiner Kinder). Ein Elternpaar
+  zieht EINEN Ast zum Kind statt zwei fast gleicher. Dazu Laubbüschel, Zweiglein, Schlange und Hund am Fuß
+  des Stammes — und Namen lassen sich von Hand ziehen (person.festX/festY, Rasterschritte); der Rundpfeil
+  in der Leiste holt alle wieder in die gerechnete Ordnung.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

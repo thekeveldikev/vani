@@ -16,8 +16,9 @@ const TEP_SPALTE = 300;     /* Breite einer Generation in Bildpunkten */
 const TEP_REIHE = 118;      /* Höhe einer Namensreihe — hoch genug, dass ein
                                Zeichen über dem Band nicht in die Reihe
                                darüber ragt, und ein Brandloch erst recht nicht */
-const TEP_RAND_X = 230;
-const TEP_RAND_Y = 150;
+const TEP_RAND_X = 268;
+const TEP_RAND_Y = 112;      /* oben knapp — der Baum soll das Tuch füllen */
+const TEP_FUSS = 232;        /* unten mehr: dort steht der Stamm mit Wurzeln */
 const TEP_BAND_B = 168;     /* Mindestbreite eines Namensbands */
 const TEP_BAND_H = 30;
 
@@ -173,7 +174,10 @@ function teppichZeichne(kasten, flaeche, rahmen, neu, schliessen) {
   flaeche.innerHTML = '';
   flaeche.dataset.gemalt = _tep.id;
   const svg = teppichSVG(doc, baum, ordnung, neu);
-  flaeche.append(svg);
+  /* Das Tuch liegt in einem Innenkasten. Zentrierte man es direkt in der
+     scrollenden Flaeche, waere der Ueberhang nach LINKS nicht mehr
+     erreichbar — bei starkem Zoom kaeme man nie wieder an den Stamm. */
+  flaeche.append(el('div', { class: 'tep-innen' }, svg));
 
   if (warSchon) { flaeche.scrollLeft = scrollL; flaeche.scrollTop = scrollT; }
   else {
@@ -205,6 +209,16 @@ function teppichLeisteInhalt(doc, baum, ordnung, flaeche, neu, schliessen) {
         el('button', { class: 'tep-wk zahl', title: 'Wieder auf Normalgröße (0)', onclick: () => { _tep.zoom = 1; neu(); } }, Math.round(_tep.zoom * 100) + '%'),
         el('button', { class: 'tep-wk', title: 'Größer (+)', onclick: () => teppichZoom(0.2, flaeche, neu) }, '+'),
         el('button', { class: 'tep-wk', title: 'Alles ins Bild', onclick: () => teppichEinpassen(flaeche, neu) }, '⤢'),
+        baum.leute.some((p) => p.festX != null && p.festY != null)
+          ? el('button', {
+            class: 'tep-wk ordnen', title: 'Alles wieder ordnen lassen — die von Hand geschobenen Namen kehren an ihren gerechneten Platz zurück',
+            onclick: async () => {
+              const wieviele = baum.leute.filter((p) => p.festX != null && p.festY != null).length;
+              if (!(await frage(wieviele === 1 ? 'Den von Hand geschobenen Namen wieder einordnen lassen?' : 'Alle ' + wieviele + ' von Hand geschobenen Namen wieder einordnen lassen?', { ja: 'Ordnen lassen' }))) return;
+              await teppichSchreiben(doc, (b) => { for (const p of b.leute) { p.festX = null; p.festY = null; } return b; });
+              neu();
+            }
+          }, '↺') : null,
         el('span', { class: 'tep-ltrenner' }),
         el('button', { class: 'knopf zart klein', title: 'Alle Namen und Fäden (v)', onclick: () => teppichVerzeichnis(doc, neu) }, 'Verzeichnis'),
         el('button', { class: 'knopf zart klein', title: 'Tuch, Spruch, Titel', onclick: () => teppichEinstellungen(doc, neu) }, 'Der Rahmen'),
@@ -279,7 +293,7 @@ function teppichSVG(doc, baum, ordnung, neu) {
   const knoten = ordnung.knoten;
   const wo = new Map(knoten.map((k) => [k.id, k]));
   const breite = TEP_RAND_X * 2 + Math.max(1, ordnung.spalten) * TEP_SPALTE;
-  const hoehe = TEP_RAND_Y * 2 + Math.max(1, ordnung.reihen) * TEP_REIHE;
+  const hoehe = TEP_RAND_Y + Math.max(1, ordnung.reihen) * TEP_REIHE + TEP_FUSS;
 
   const px = (k) => TEP_RAND_X + k.x * TEP_SPALTE;
   const py = (k) => TEP_RAND_Y + k.y * TEP_REIHE;
@@ -295,6 +309,19 @@ function teppichSVG(doc, baum, ordnung, neu) {
   /* --- Der Grund --- */
   svg.append(sv('rect', { x: 0, y: 0, width: breite, height: hoehe, class: 'tep-grund' }));
   svg.append(sv('rect', { x: 0, y: 0, width: breite, height: hoehe, class: 'tep-webung', fill: 'url(#tep-webe)' }));
+  /* Alter: ein paar unregelmaessige Flecken im Gewebe, gerechnet aus dem
+     Titel — derselbe Teppich hat immer dieselben Stellen. Ohne sie sieht
+     das Tuch aus wie frisch aus der Fabrik. */
+  for (let i = 0; i < 7; i++) {
+    const fx = teppichZufall(baum.titel || 'tuch', 'fx' + i) * breite;
+    const fy = teppichZufall(baum.titel || 'tuch', 'fy' + i) * hoehe;
+    const fr = 60 + teppichZufall(baum.titel || 'tuch', 'fr' + i) * 190;
+    svg.append(sv('ellipse', {
+      cx: fx.toFixed(0), cy: fy.toFixed(0), rx: fr.toFixed(0), ry: (fr * (0.5 + teppichZufall(baum.titel || 'tuch', 'fq' + i) * 0.5)).toFixed(0),
+      class: 'tep-alterfleck',
+      fill: i % 2 ? 'rgba(255,238,200,.028)' : 'rgba(0,0,0,.05)'
+    }));
+  }
   svg.append(sv('rect', { x: 0, y: 0, width: breite, height: hoehe, class: 'tep-schatten', fill: 'url(#tep-vignette)' }));
 
   const gAeste = sv('g', { class: 'tep-aeste' });
@@ -307,52 +334,75 @@ function teppichSVG(doc, baum, ordnung, neu) {
      Ältesten. Der Ansatz ist dick, die Gabel schon dünner: so sieht man dem
      Baum an, wo er anfängt. */
   const wurzeln = knoten.filter((k) => !k.eltern.length);
-  const stammX = 92, stammY = hoehe - 26;
-  /* Die Gabel sitzt tief — der Stamm ist kurz und dick, das Klettern
-     übernehmen die Äste. Stand die Gabel weit oben, sah der Stamm aus wie
-     ein Mast und nicht wie ein Baum. */
+  const stammX = 118, stammY = hoehe - 34;
   const zielY = wurzeln.length ? wurzeln.reduce((s, k) => s + py(k), 0) / wurzeln.length : hoehe / 2;
-  const gabelX = stammX + 46;
+  const gabelX = stammX + 58;
   const gabelY = stammY - Math.max(120, Math.min(300, (stammY - zielY) * 0.45));
+
+  /* Wie reich geschmückt wird, hängt davon ab, wie viel auf dem Tuch hängt.
+     Bei dreihundert Namen wäre volles Laub an jedem Ast eine Zeichenorgie,
+     die niemand einzeln ansieht — und ein Browser, der minutenlang malt. */
+  const astZahl = knoten.reduce((n, k) => n + Math.max(1, k.eltern.length ? 1 : 0), wurzeln.length);
+  const dichte = astZahl > 90 ? 0.4 : astZahl > 45 ? 0.7 : 1;
+
+  /* Beim Aufschlagen wächst der Baum: Generation für Generation kommt das
+     Holz, dann legt sich das Laub darauf. Die Nummer steuert, wann. */
+  const astwerk = (a, b, dick, salz, stufe) => {
+    const w = teppichAstwerk(a, b, dick, salz, dichte);
+    const n = String(Math.min(stufe || 0, 12));
+    w.holz.style.setProperty('--gen', n);
+    w.laub.style.setProperty('--gen', n);
+    gAeste.append(w.holz);
+    gLaub.append(w.laub);
+  };
+
   if (knoten.length) {
-    gAeste.append(sv('path', { d: teppichWurzelPfad(stammX, stammY), class: 'tep-wurzel' }));
-    /* Ein Körper, keine Linie: unten breit, oben schmal, mit zwei
-       Rindenrissen darin. */
-    gAeste.append(sv('path', { d: teppichStammPfad(stammX, stammY, gabelX, gabelY, 40, 15), class: 'tep-stammkoerper' }));
-    gAeste.append(sv('path', { d: teppichRinde(stammX, stammY, gabelX, gabelY), class: 'tep-rinde' }));
+    /* Erst die hinteren Wurzeln, dann der Stamm darüber, dann die vorderen:
+       so liegt der Stamm MITTEN im Wurzelwerk statt davor. */
+    gAeste.append(teppichWurzeln(stammX, stammY, 112, baum.titel || 'wurzel', false));
+    const stammBahn = teppichStammKoerper(stammX, stammY, gabelX, gabelY, 112, 24, baum.titel || 'stamm');
+    gAeste.append(sv('path', { d: _flaeche(stammBahn).d, class: 'tep-stammkoerper' }));
+    gAeste.append(sv('path', { d: _kante(stammBahn, 1), class: 'tep-astkante' }));
+    gAeste.append(sv('path', { d: _kante(stammBahn, -1), class: 'tep-astschatten' }));
+    gAeste.append(sv('path', { d: teppichBarkPfad(stammBahn, baum.titel || 'rinde', 11), class: 'tep-rinde' }));
+    gAeste.append(sv('path', { d: teppichSchrundenPfad(stammBahn, baum.titel || 'schrunde', 9), class: 'tep-rindefein' }));
+    gAeste.append(teppichAstloch(stammBahn, baum.titel || 'loch'));
+    gAeste.append(teppichWurzeln(stammX, stammY, 112, baum.titel || 'wurzel', true));
     for (const k of wurzeln) {
-      gAeste.append(teppichAst({ x: gabelX, y: gabelY }, { x: px(k) - teppichBandBreite(k.person) / 2 - 8, y: py(k) }, 8, k.id + ':stamm'));
+      astwerk({ x: gabelX, y: gabelY }, { x: px(k) - teppichBandBreite(k.person) / 2 - 8, y: py(k) }, 9, k.id + ':stamm', 0);
     }
   }
 
   /* --- Die Äste: Eltern zu Kindern --- */
   for (const k of knoten) {
-    for (const eId of k.eltern) {
-      const e = wo.get(eId);
-      if (!e) continue;
-      const dicke = Math.max(2.4, 7 - k.gen * 0.55);
-      gAeste.append(teppichAst(
-        { x: px(e) + teppichBandBreite(e.person) / 2 + 5, y: py(e) },
-        { x: px(k) - teppichBandBreite(k.person) / 2 - 5, y: py(k) },
-        dicke, eId + '>' + k.id));
+    const dick = Math.max(2.6, 7.5 - k.gen * 0.55);
+    const bis = { x: px(k) - teppichBandBreite(k.person) / 2 - 5, y: py(k) };
+    /* Sind beide Eltern ein Paar, wächst EIN Ast aus ihrer Mitte — nicht
+       zwei fast gleiche nebeneinander. */
+    const paarEltern = k.eltern.length === 2 && wo.get(k.eltern[0]) && wo.get(k.eltern[1]) &&
+      (wo.get(k.eltern[0]).paare || []).includes(k.eltern[1]);
+    if (paarEltern) {
+      const a = wo.get(k.eltern[0]), b = wo.get(k.eltern[1]);
+      const rechts = Math.max(px(a) + teppichBandBreite(a.person) / 2, px(b) + teppichBandBreite(b.person) / 2) + 5;
+      astwerk({ x: rechts, y: (py(a) + py(b)) / 2 }, bis, dick, k.eltern.join('+') + '>' + k.id, k.gen);
+    } else {
+      for (const eId of k.eltern) {
+        const e = wo.get(eId);
+        if (!e) continue;
+        astwerk({ x: px(e) + teppichBandBreite(e.person) / 2 + 5, y: py(e) }, bis, dick, eId + '>' + k.id, k.gen);
+      }
     }
-    /* Paare: ein kurzer Bogen dazwischen */
+    /* Paare: ein kurzer Bogen dazwischen, unter den Bändern durch. */
     for (const pId of k.paare) {
-      if (k.id > pId) continue;   /* nur einmal je Paar */
+      if (k.id > pId) continue;
       const p = wo.get(pId);
       if (!p) continue;
-      /* Der Bund läuft unter den Bändern durch, nicht mitten hindurch. */
       const oben = py(k) < py(p) ? k : p, unten = py(k) < py(p) ? p : k;
       gAeste.append(sv('path', {
         d: teppichBogen(px(oben), py(oben) + TEP_BAND_H / 2 + 3, px(unten), py(unten) - TEP_BAND_H / 2 - 3),
         class: 'tep-bund'
       }));
     }
-  }
-
-  /* --- Das Laub --- */
-  for (const pfad of gAeste.querySelectorAll('path.tep-ast')) {
-    for (const blatt of teppichBlaetterAn(pfad)) gLaub.append(blatt);
   }
 
   /* --- Die Ranken: alles, was kein Gerüst ist --- */
@@ -374,9 +424,24 @@ function teppichSVG(doc, baum, ordnung, neu) {
   });
 
   /* --- Das Wappen des Hauses, unten am Stamm --- */
-  if (knoten.length) gBaender.append(teppichWappen(stammX + 26, Math.min(stammY - 130, (stammY + gabelY) / 2), baum));
+  /* Das Wappen hängt NEBEN dem Stamm an einem Nagel, nicht mitten darauf —
+     dort verdeckte es die Rinde und sah aus wie aufgeklebt. */
+  if (knoten.length) gBaender.append(teppichWappen(stammX + 146, Math.min(stammY - 150, (stammY + gabelY) / 2 + 20), baum));
 
-  /* --- Kleines Getier --- */
+  /* --- Kleines Getier --- Am Fuß des Baumes sitzt still etwas, so wie in
+     alten Wandteppichen unten in den Ecken. Und ab und zu huscht eines
+     über einen Ast. */
+  if (knoten.length) {
+    gTiere.append(teppichSchlange(stammX + 300, stammY - 10));
+    if (knoten.length > 3) gTiere.append(teppichRabe(stammX + 132, stammY - 26));
+    /* Unterholz: Farn und Pilze, links und rechts vom Stamm. */
+    gTiere.append(teppichFarn(stammX - 108, stammY - 4, 1.15, false));
+    gTiere.append(teppichFarn(stammX - 74, stammY - 2, 0.85, true));
+    gTiere.append(teppichFarn(stammX + 196, stammY - 4, 1, true));
+    gTiere.append(teppichPilz(stammX - 132, stammY - 3, 1.25, 'p1'));
+    gTiere.append(teppichPilz(stammX - 120, stammY - 2, 0.85, 'p2'));
+    gTiere.append(teppichPilz(stammX + 226, stammY - 3, 1.05, 'p3'));
+  }
   if (_tep.tiere && knoten.length > 2) gTiere.append(teppichEichhoernchen(breite, hoehe));
 
   svg.append(gAeste, gLaub, gRanken, gBaender, gTiere);
@@ -404,6 +469,14 @@ function teppichDefs() {
   brand.append(sv('feDisplacementMap', { in: 'SourceGraphic', in2: 'rauschen', scale: '11', xChannelSelector: 'R', yChannelSelector: 'G' }));
   defs.append(brand);
 
+  /* Der Stoff des Namensbands: oben heller, unten im Schatten. Ein flaches
+     Grau sah aus wie Papier aus dem Drucker. */
+  const bandfarbe = sv('linearGradient', { id: 'tep-bandfarbe', x1: '0', y1: '0', x2: '0', y2: '1' });
+  bandfarbe.append(sv('stop', { offset: '0%', 'stop-color': '#c3c9b2' }));
+  bandfarbe.append(sv('stop', { offset: '45%', 'stop-color': '#aeb59c' }));
+  bandfarbe.append(sv('stop', { offset: '100%', 'stop-color': '#949c82' }));
+  defs.append(bandfarbe);
+
   const glut = sv('radialGradient', { id: 'tep-glut', cx: '50%', cy: '50%', r: '50%' });
   glut.append(sv('stop', { offset: '0%', 'stop-color': '#0a0806' }));
   glut.append(sv('stop', { offset: '62%', 'stop-color': '#120d09' }));
@@ -414,67 +487,230 @@ function teppichDefs() {
   return defs;
 }
 
-/* Ein Ast: kein Strich, sondern eine Kurve, die zum Ende hin dünner wird. */
-function teppichAst(a, b, dicke, salz) {
+/* ===================== DAS ASTWERK =====================
+   Ein echter Ast ist keine Kurve. Er ist ein Körper, der sich gabelt, an den
+   Gabelungen anschwillt, in Zweige ausläuft, und an deren Enden hängt das
+   Laub in Büscheln — mit Eicheln dazwischen und einer Ranke, die sich am
+   Ende einrollt.
+
+   Deshalb wird hier nicht gestrichen, sondern gebaut: die Mittellinie wird
+   abgetastet, quer aufgetragen und zu einer geschlossenen Fläche geschlossen.
+   Aus derselben Mittellinie kommen dann die Zweige, das Laub und die Eicheln
+   — alles aus der Kennung gerechnet, damit derselbe Ast beim nächsten
+   Aufschlagen dieselben Knoten hat. */
+
+const TEP_AST_PUNKTE = 30;
+
+function _bez(t, p0, c1, c2, p3) {
+  const u = 1 - t;
+  return u * u * u * p0 + 3 * u * u * t * c1 + 3 * u * t * t * c2 + t * t * t * p3;
+}
+function _bezAbleitung(t, p0, c1, c2, p3) {
+  const u = 1 - t;
+  return 3 * u * u * (c1 - p0) + 6 * u * t * (c2 - c1) + 3 * t * t * (p3 - c2);
+}
+function _zahl(n) { return (Math.round(n * 10) / 10).toString(); }
+
+/* Aus einer Mittellinie (Punkte + Querrichtungen + Breiten) eine Fläche. */
+function _flaeche(punkte) {
+  const links = [], rechts = [];
+  for (const p of punkte) {
+    links.push([p.x + p.nx * p.w, p.y + p.ny * p.w]);
+    rechts.push([p.x - p.nx * p.w, p.y - p.ny * p.w]);
+  }
+  let d = 'M ' + _zahl(links[0][0]) + ' ' + _zahl(links[0][1]);
+  for (let i = 1; i < links.length; i++) d += ' L ' + _zahl(links[i][0]) + ' ' + _zahl(links[i][1]);
+  for (let i = rechts.length - 1; i >= 0; i--) d += ' L ' + _zahl(rechts[i][0]) + ' ' + _zahl(rechts[i][1]);
+  return { d: d + ' Z', links, rechts };
+}
+function _kante(punkte, seite) {
+  let d = '';
+  punkte.forEach((p, i) => {
+    const x = p.x + p.nx * p.w * seite, y = p.y + p.ny * p.w * seite;
+    d += (i ? ' L ' : 'M ') + _zahl(x) + ' ' + _zahl(y);
+  });
+  return d;
+}
+
+/* Ein gerades Stück Holz: von einem Punkt in eine Richtung, mit Krümmung. */
+function _zweigLinie(x, y, winkel, laenge, bogen, dickA, dickB, punkte) {
+  const n = punkte || 12;
+  const raus = [];
+  const rad = winkel * Math.PI / 180, bog = bogen * Math.PI / 180;
+  for (let i = 0; i <= n; i++) {
+    const t = i / n;
+    /* Der Zweig biegt sich zunehmend — deshalb wächst der Winkel mit t². */
+    const w = rad + bog * t * t;
+    const s = laenge * t;
+    raus.push({
+      x: x + Math.cos(rad) * s * (1 - t * 0.18) + Math.cos(w) * s * t * 0.18,
+      y: y + Math.sin(rad) * s * (1 - t * 0.18) + Math.sin(w) * s * t * 0.18,
+      winkel: (w * 180) / Math.PI,
+      t
+    });
+  }
+  /* Querrichtungen aus den Nachbarpunkten */
+  for (let i = 0; i <= n; i++) {
+    const a = raus[Math.max(0, i - 1)], b = raus[Math.min(n, i + 1)];
+    const tx = b.x - a.x, ty = b.y - a.y;
+    const len = Math.sqrt(tx * tx + ty * ty) || 1;
+    raus[i].nx = -ty / len; raus[i].ny = tx / len;
+    raus[i].w = Math.max(0.35, (dickA + (dickB - dickA) * raus[i].t) / 2);
+  }
+  return raus;
+}
+
+/* Eine kleine Einrollung am Ende eines Zweigs — die Spitze eines jungen
+   Triebs. Sie macht mehr aus als alles andere: sie sagt „gewachsen“. */
+function _ranke(x, y, winkel, groesse, richtung) {
+  let d = 'M ' + _zahl(x) + ' ' + _zahl(y);
+  let wx = x, wy = y, w = winkel, r = groesse;
+  for (let i = 0; i < 5; i++) {
+    w += richtung * 62;
+    r *= 0.72;
+    const nx = wx + Math.cos((w - richtung * 31) * Math.PI / 180) * r;
+    const ny = wy + Math.sin((w - richtung * 31) * Math.PI / 180) * r;
+    const ex = wx + Math.cos(w * Math.PI / 180) * r * 0.9;
+    const ey = wy + Math.sin(w * Math.PI / 180) * r * 0.9;
+    d += ' Q ' + _zahl(nx) + ' ' + _zahl(ny) + ' ' + _zahl(ex) + ' ' + _zahl(ey);
+    wx = ex; wy = ey;
+  }
+  return d;
+}
+
+/* Ein Laubbüschel: mehrere Blätter fächerförmig um einen Punkt. */
+function _bueschel(x, y, winkel, wieviele, salz, gross) {
+  const raus = [];
+  for (let i = 0; i < wieviele; i++) {
+    const faecher = (i - (wieviele - 1) / 2) * (58 / Math.max(1, wieviele - 1) + 14);
+    const dreh = winkel + faecher + teppichDreh(salz, 'bf' + i, 9);
+    const g = 0.34 + teppichZufall(salz, 'bg' + i) * 0.3;
+    const weg = 4 + teppichZufall(salz, 'bw' + i) * 7;
+    const ton = 'ton-' + (teppichHash(salz, 'bt' + i) % 4);
+    const gr = sv('g', {
+      class: 'tep-blatt ' + ton,
+      transform: 'translate(' + _zahl(x + Math.cos(dreh * Math.PI / 180) * weg) + ' ' + _zahl(y + Math.sin(dreh * Math.PI / 180) * weg) + ') ' +
+        'rotate(' + Math.round(dreh + 90) + ') scale(' + ((gross || 1) * g).toFixed(2) + ')'
+    });
+    gr.append(sv('path', { d: TEP_EICHENBLATT, class: 'tep-blattform' }));
+    gr.append(sv('path', { d: TEP_BLATTADERN, class: 'tep-blattader' }));
+    raus.push(gr);
+  }
+  return raus;
+}
+
+/* Eine Eichel. Ohne sie ist es irgendein Baum; mit ihr ist es eine Eiche. */
+function _eichel(x, y, winkel, salz) {
+  const g = sv('g', {
+    class: 'tep-eichel',
+    transform: 'translate(' + _zahl(x) + ' ' + _zahl(y) + ') rotate(' + Math.round(winkel + 90) + ') scale(' + (0.7 + teppichZufall(salz, 'eg') * 0.4).toFixed(2) + ')'
+  });
+  g.append(sv('path', { class: 'tep-eichelfrucht', d: 'M -3.6 -1 C -3.6 4.6 -2 7.4 0 7.4 C 2 7.4 3.6 4.6 3.6 -1 Z' }));
+  g.append(sv('path', { class: 'tep-eichelkappe', d: 'M -4.6 -1.6 C -4.6 -4.4 -2.6 -5.8 0 -5.8 C 2.6 -5.8 4.6 -4.4 4.6 -1.6 C 4.6 -0.2 2.6 0.4 0 0.4 C -2.6 0.4 -4.6 -0.2 -4.6 -1.6 Z' }));
+  g.append(sv('path', { class: 'tep-eichelstiel', d: 'M 0 -5.8 L 0 -8.4' }));
+  return g;
+}
+
+/* ----- Das ganze Astwerk zwischen zwei Punkten ----- */
+function teppichAstwerk(a, b, dicke, salz, dichte) {
+  const d = dichte == null ? 1 : dichte;
+  const holz = sv('g', { class: 'tep-astgruppe', 'data-salz': salz });
+  const laub = sv('g', { class: 'tep-laubgruppe' });
+
+  /* --- Die Mittellinie --- */
   const dx = b.x - a.x;
-  const hoch = teppichZufall(salz, 'hoch') * 26 - 13;
+  const hoch = teppichZufall(salz, 'hoch') * 30 - 15;
   const c1x = a.x + dx * 0.42, c1y = a.y + hoch * 0.4;
   const c2x = a.x + dx * 0.62, c2y = b.y - hoch * 0.6;
-  return sv('path', {
-    d: 'M ' + a.x.toFixed(1) + ' ' + a.y.toFixed(1) + ' C ' + c1x.toFixed(1) + ' ' + c1y.toFixed(1) + ', ' + c2x.toFixed(1) + ' ' + c2y.toFixed(1) + ', ' + b.x.toFixed(1) + ' ' + b.y.toFixed(1),
-    class: 'tep-ast', 'stroke-width': dicke.toFixed(1), 'data-salz': salz
+  const dickA = dicke, dickB = Math.max(1.6, dicke * 0.32);
+  const wobbel = 0.5 + teppichZufall(salz, 'wob') * 5.5;
+  const phase = teppichZufall(salz, 'ph') * 6.28;
+
+  const mitte = [];
+  for (let i = 0; i <= TEP_AST_PUNKTE; i++) {
+    const t = i / TEP_AST_PUNKTE;
+    const x = _bez(t, a.x, c1x, c2x, b.x), y = _bez(t, a.y, c1y, c2y, b.y);
+    const tx = _bezAbleitung(t, a.x, c1x, c2x, b.x), ty = _bezAbleitung(t, a.y, c1y, c2y, b.y);
+    const len = Math.sqrt(tx * tx + ty * ty) || 1;
+    const grund = dickA + (dickB - dickA) * (t * t * 0.6 + t * 0.4);
+    /* Am Ansatz schwillt der Ast an — dort, wo er aus dem Holz kommt. */
+    const knoten = 1 + Math.exp(-t * 14) * 0.55 + Math.sin(t * wobbel + phase) * 0.1;
+    mitte.push({
+      x, y, t, nx: -ty / len, ny: tx / len,
+      w: Math.max(0.9, grund * knoten) / 2,
+      winkel: Math.atan2(ty, tx) * 180 / Math.PI
+    });
+  }
+
+  const f = _flaeche(mitte);
+  /* Die Mittellinie wird mitgegeben: das Eichhörnchen soll AUF dem Ast
+     laufen. Liefe es am Umriss entlang, käme es außen wieder zurück. */
+  holz.setAttribute('data-mittel', mitte.map((q, i) => (i ? 'L ' : 'M ') + _zahl(q.x) + ' ' + _zahl(q.y)).join(' '));
+  holz.append(sv('path', { d: f.d, class: 'tep-ast', 'data-salz': salz }));
+  holz.append(sv('path', { d: _kante(mitte, 1), class: 'tep-astkante' }));
+  holz.append(sv('path', { d: _kante(mitte, -1), class: 'tep-astschatten' }));
+
+  /* --- Zweige, die sich abspalten --- */
+  const wieviele = d >= 1 ? 4 : d >= 0.7 ? 2 : 1;
+  const zweigEnden = [];
+  for (let i = 0; i < wieviele; i++) {
+    const t = 0.24 + (i / wieviele) * 0.6 + teppichZufall(salz, 'zt' + i) * 0.1;
+    const stelle = mitte[Math.max(1, Math.min(TEP_AST_PUNKTE - 1, Math.round(t * TEP_AST_PUNKTE)))];
+    const seite = teppichZufall(salz, 'zs' + i) > 0.5 ? 1 : -1;
+    const ab = stelle.winkel + seite * (34 + teppichZufall(salz, 'zw' + i) * 30);
+    const laenge = (24 + teppichZufall(salz, 'zl' + i) * 30) * (0.6 + d * 0.4);
+    const zweigDick = stelle.w * 1.5;
+    const linie = _zweigLinie(stelle.x, stelle.y, ab, laenge, seite * 26, zweigDick, 0.9, 10);
+    holz.append(sv('path', { d: _flaeche(linie).d, class: 'tep-ast zweig' }));
+    holz.append(sv('path', { d: _kante(linie, 1), class: 'tep-astkante duenn' }));
+    const spitze = linie[linie.length - 1];
+    zweigEnden.push(spitze);
+
+    /* Ein zweiter, kleinerer Trieb am Zweig — die dritte Ordnung. */
+    if (d >= 1 && teppichZufall(salz, 'zz' + i) > 0.45) {
+      const mittig = linie[Math.round(linie.length * 0.55)];
+      const ab2 = mittig.winkel - seite * (30 + teppichZufall(salz, 'z2w' + i) * 24);
+      const linie2 = _zweigLinie(mittig.x, mittig.y, ab2, laenge * 0.5, -seite * 20, mittig.w * 1.4, 0.7, 8);
+      holz.append(sv('path', { d: _flaeche(linie2).d, class: 'tep-ast zweig' }));
+      zweigEnden.push(linie2[linie2.length - 1]);
+    }
+
+    /* Und an der Spitze eine Einrollung — nicht an jedem, das wäre Zucker. */
+    if (d >= 1 && teppichZufall(salz, 'zr' + i) > 0.55) {
+      holz.append(sv('path', { d: _ranke(spitze.x, spitze.y, spitze.winkel, 7, seite), class: 'tep-triebranke' }));
+    }
+  }
+
+  /* --- Das Laub an den Zweigenden und an der Astspitze --- */
+  const alleEnden = zweigEnden.concat([mitte[TEP_AST_PUNKTE]]);
+  alleEnden.forEach((e, i) => {
+    const n = d >= 1 ? (teppichZufall(salz, 'bn' + i) > 0.4 ? 6 : 4) : d >= 0.7 ? 3 : 2;
+    for (const blatt of _bueschel(e.x, e.y, e.winkel, n, salz + ':' + i, 1)) laub.append(blatt);
+    /* Ungefähr an jedem dritten Büschel hängt eine Eichel. */
+    if (d >= 1 && teppichHash(salz, 'ei' + i) % 3 === 0) {
+      laub.append(_eichel(e.x + Math.cos(e.winkel * Math.PI / 180) * 5, e.y + Math.sin(e.winkel * Math.PI / 180) * 5 + 4, e.winkel, salz + ':' + i));
+    }
   });
+  /* Ein paar einzelne Blätter direkt am Ast — sonst ist der Ast nackt. */
+  if (d >= 0.7) {
+    for (let i = 0; i < (d >= 1 ? 3 : 2); i++) {
+      const stelle = mitte[Math.round((0.3 + i * 0.22) * TEP_AST_PUNKTE)];
+      const seite = teppichZufall(salz, 'es' + i) > 0.5 ? 1 : -1;
+      for (const blatt of _bueschel(stelle.x, stelle.y, stelle.winkel + seite * 70, 2, salz + ':e' + i, 0.85)) laub.append(blatt);
+    }
+  }
+
+  return { holz, laub };
 }
+
 function teppichBogen(x1, y1, x2, y2) {
   const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
   const weg = Math.abs(y2 - y1) > Math.abs(x2 - x1) ? 22 : 0;
   return 'M ' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' Q ' + (mx + weg).toFixed(1) + ' ' + my.toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1);
 }
-/* Der Stamm als Fläche: zwei Kurven, die sich nach oben annähern. So
-   verjüngt er sich wirklich, statt nur dünner gestrichelt zu sein. */
-function teppichStammPfad(x0, y0, x1, y1, unten, oben) {
-  const hu = unten / 2, ho = oben / 2;
-  const my = (y0 + y1) / 2, mx = (x0 + x1) / 2;
-  return 'M ' + (x0 - hu) + ' ' + y0 +
-    ' C ' + (x0 - hu * 0.9) + ' ' + (my + 30) + ', ' + (mx - ho * 1.5) + ' ' + (my - 10) + ', ' + (x1 - ho) + ' ' + y1 +
-    ' L ' + (x1 + ho) + ' ' + y1 +
-    ' C ' + (mx + ho * 1.7) + ' ' + (my - 6) + ', ' + (x0 + hu * 1.05) + ' ' + (my + 34) + ', ' + (x0 + hu) + ' ' + y0 + ' Z';
-}
-function teppichRinde(x0, y0, x1, y1) {
-  const my = (y0 + y1) / 2, mx = (x0 + x1) / 2;
-  return 'M ' + (x0 - 7) + ' ' + (y0 - 14) + ' C ' + (x0 - 5) + ' ' + (my + 20) + ', ' + (mx - 4) + ' ' + (my - 20) + ', ' + (x1 - 3) + ' ' + (y1 + 12) +
-    ' M ' + (x0 + 9) + ' ' + (y0 - 22) + ' C ' + (x0 + 8) + ' ' + (my + 10) + ', ' + (mx + 5) + ' ' + (my - 26) + ', ' + (x1 + 4) + ' ' + (y1 + 18);
-}
-function teppichWurzelPfad(x, y) {
-  return 'M ' + x + ' ' + y + ' C ' + (x - 26) + ' ' + (y + 6) + ', ' + (x - 46) + ' ' + (y + 2) + ', ' + (x - 64) + ' ' + (y + 12) +
-    ' M ' + x + ' ' + y + ' C ' + (x + 22) + ' ' + (y + 8) + ', ' + (x + 44) + ' ' + (y + 6) + ', ' + (x + 66) + ' ' + (y + 14);
-}
 
-/* Eichenlaub entlang eines Astes. Gerechnet aus der Kennung des Astes, damit
-   dasselbe Blatt beim nächsten Aufschlagen an derselben Stelle sitzt. */
-function teppichBlaetterAn(pfad) {
-  const raus = [];
-  let laenge = 0;
-  try { laenge = pfad.getTotalLength(); } catch (e) { return raus; }
-  if (!laenge || !Number.isFinite(laenge)) return raus;
-  const salz = pfad.getAttribute('data-salz') || '';
-  const wieviele = Math.max(2, Math.min(6, Math.round(laenge / 76)));
-  for (let i = 0; i < wieviele; i++) {
-    const t = (i + 0.5) / wieviele + (teppichZufall(salz, 'l' + i) - 0.5) * 0.12;
-    let p; try { p = pfad.getPointAtLength(Math.max(0, Math.min(laenge, t * laenge))); } catch (e) { continue; }
-    const dreh = teppichDreh(salz, 'd' + i, 80);
-    const gross = 0.46 + teppichZufall(salz, 'g' + i) * 0.3;
-    const seite = teppichZufall(salz, 's' + i) > 0.5 ? 1 : -1;
-    const g = sv('g', {
-      class: 'tep-blatt', style: '--wiege:' + (2.6 + teppichZufall(salz, 'w' + i) * 2.4).toFixed(1) + 's;--versatz:' + (teppichZufall(salz, 'v' + i) * 3).toFixed(2) + 's',
-      transform: 'translate(' + p.x.toFixed(1) + ' ' + p.y.toFixed(1) + ') rotate(' + dreh.toFixed(0) + ') scale(' + (gross * seite).toFixed(2) + ' ' + gross.toFixed(2) + ')'
-    });
-    g.append(sv('path', { d: TEP_EICHENBLATT, class: 'tep-blattform' }));
-    raus.push(g);
-  }
-  return raus;
-}
-/* Ein Eichenblatt, gelappt — gezeichnet, nicht gerundet. */
+/* Mittelrippe und Seitenadern — ohne sie ist ein Blatt nur ein Fleck. */
+const TEP_BLATTADERN = 'M0 -1 L0 -20 M0 -6 l -3.5 -2.5 M0 -6 l 3.5 -2.5 M0 -11 l -3.2 -2.4 M0 -11 l 3.2 -2.4 M0 -15.5 l -2.6 -2 M0 -15.5 l 2.6 -2';
 const TEP_EICHENBLATT = 'M0 0 C 3 -1 5 -4 4 -6 C 7 -6 9 -8 8 -10 C 11 -10 13 -12 12 -14 C 14 -15 15 -17 13 -18 C 15 -20 14 -22 12 -22 C 11 -24 8 -24 7 -22 C 5 -23 3 -22 3 -20 C 1 -21 -1 -19 0 -17 L 0 0 Z M0 0 C -3 -1 -5 -4 -4 -6 C -7 -6 -9 -8 -8 -10 C -11 -10 -13 -12 -12 -14 C -14 -15 -15 -17 -13 -18 C -15 -20 -14 -22 -12 -22 C -11 -24 -8 -24 -7 -22 C -5 -23 -3 -22 -3 -20 C -1 -21 1 -19 0 -17';
 
 /* Eine Ranke: alles, was kein Gerüst ist. Sie schwingt weit aus, damit sie
@@ -507,10 +743,17 @@ function teppichRanke(x1, y1, x2, y2, art, faden, baum, neu) {
     const bx = 0.25 * x1 + 0.5 * mx + 0.25 * x2;
     const by = 0.25 * y1 + 0.5 * my + 0.25 * y2;
     const text = faden.wort.length > 34 ? faden.wort.slice(0, 33) + '…' : faden.wort;
-    const b = Math.max(38, text.length * 5.4 + 14);
-    const kl = sv('g', { class: 'tep-rankenband', transform: 'translate(' + bx.toFixed(1) + ' ' + by.toFixed(1) + ')' });
-    kl.append(sv('rect', { x: (-b / 2).toFixed(1), y: -8, width: b.toFixed(1), height: 16, rx: 2, class: 'tep-rbgrund' }));
-    const t2 = sv('text', { x: 0, y: 4, class: 'tep-rbtext', 'text-anchor': 'middle' });
+    /* Ein kleines Pergamentschildchen am Faden, kein schwarzes Kaestchen:
+       gekerbte Enden, ein Loch mit dem Faden hindurch, Schrift in Tinte. */
+    const b = Math.max(40, text.length * 5.2 + 22);
+    const hb = b / 2;
+    const kl = sv('g', { class: 'tep-rankenband', transform: 'translate(' + bx.toFixed(1) + ' ' + by.toFixed(1) + ') rotate(' + teppichDreh(faden.id, 'schild', 2.5) + ')' });
+    kl.append(sv('path', {
+      class: 'tep-rbgrund',
+      d: 'M ' + (-hb) + ' -9 L ' + (hb - 5) + ' -9 L ' + hb + ' 0 L ' + (hb - 5) + ' 9 L ' + (-hb) + ' 9 L ' + (-hb + 5) + ' 0 Z'
+    }));
+    kl.append(sv('circle', { cx: (-hb + 8).toFixed(1), cy: 0, r: 1.4, class: 'tep-rbloch' }));
+    const t2 = sv('text', { x: 3, y: 3.2, class: 'tep-rbtext', 'text-anchor': 'middle' });
     t2.textContent = text;
     kl.append(t2);
     g.append(kl);
@@ -536,7 +779,7 @@ function teppichBand(k, x, y, baum, treffer, i, neu) {
   const g = sv('g', {
     class: 'tep-person' + (blass ? ' blass' : '') + (hell ? ' hervor' : '') + (p.gebrannt ? ' gebrannt' : ''),
     transform: 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') rotate(' + dreh + ')',
-    style: '--n:' + Math.min(i, 40), tabindex: '0', role: 'button'
+    style: '--n:' + Math.min(i, 40) + ';--gen:' + Math.min(k.gen, 12), tabindex: '0', role: 'button'
   });
 
   /* Das Brandloch liegt hinter dem Band, leicht versetzt nach oben. */
@@ -545,17 +788,24 @@ function teppichBand(k, x, y, baum, treffer, i, neu) {
     g.append(sv('circle', { cx: 0, cy: -30, r: (r + 7).toFixed(1), fill: 'url(#tep-glut)', class: 'tep-glut' }));
     g.append(sv('circle', { cx: 0, cy: -30, r: r.toFixed(1), class: 'tep-loch', filter: 'url(#tep-brand)' }));
   } else if (p.zeichen && p.zeichen !== 'keins') {
-    const z = sv('g', { class: 'tep-zeichen', transform: 'translate(0 -30)' });
-    z.append(sv('circle', { cx: 0, cy: 0, r: 17, class: 'tep-zkreis' }));
+    const z = sv('g', { class: 'tep-zeichen', transform: 'translate(0 -34)' });
+    z.append(sv('circle', { cx: 0, cy: 0, r: 18, class: 'tep-zkreis' }));
+    /* Ein Perlenrand ums Medaillon — der macht aus einem Kreis ein Kleinod. */
+    z.append(sv('circle', { cx: 0, cy: 0, r: 18, class: 'tep-zperlen' }));
+    z.append(sv('circle', { cx: 0, cy: 0, r: 14.4, class: 'tep-zinnen' }));
     z.append(sv('path', { d: TEP_ZEICHEN_PFADE[p.zeichen] || '', class: 'tep-zform' }));
     g.append(z);
   }
 
   const b = teppichBandBreite(p);
   const h = TEP_BAND_H + (jahre ? 8 : 0);
+  /* Erst die eingerollten Enden (sie liegen hinter dem Band), dann das Band,
+     dann die beiden Knickschatten darauf. */
+  g.append(sv('path', { d: teppichBandRolle(b, h, -1), class: 'tep-bandrolle' }));
+  g.append(sv('path', { d: teppichBandRolle(b, h, 1), class: 'tep-bandrolle' }));
   g.append(sv('path', { d: teppichBandPfad(b, h), class: 'tep-bandgrund' }));
-  g.append(sv('path', { d: teppichBandZipfel(b, h, -1), class: 'tep-bandzipfel' }));
-  g.append(sv('path', { d: teppichBandZipfel(b, h, 1), class: 'tep-bandzipfel' }));
+  g.append(sv('path', { d: teppichBandKnick(b, h, -1), class: 'tep-bandknick' }));
+  g.append(sv('path', { d: teppichBandKnick(b, h, 1), class: 'tep-bandknick' }));
 
   const t = sv('text', { x: 0, y: jahre ? -2 : 4, class: 'tep-name', 'text-anchor': 'middle' });
   t.textContent = name.length > 46 ? name.slice(0, 45) + '…' : name;
@@ -573,25 +823,73 @@ function teppichBand(k, x, y, baum, treffer, i, neu) {
   g.append(titel);
 
   const auf = (ev) => { ev.stopPropagation(); teppichKartusche(D.docs.get(_tep.id), p.id, neu); };
-  g.addEventListener('click', auf);
   g.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); auf(ev); } });
+
+  /* Ziehen statt Tippen — aber erst ab ein paar Bildpunkten. Sonst
+     verschiebt jeder etwas zittrige Tipp den Namen um einen Millimeter, und
+     die gerechnete Ordnung ist still hin. */
+  let zug = null;
+  g.addEventListener('pointerdown', (ev) => {
+    if (ev.button != null && ev.button !== 0) return;
+    zug = { x: ev.clientX, y: ev.clientY, gezogen: false, x0: x, y0: y };
+    try { g.setPointerCapture(ev.pointerId); } catch (e) {}
+  });
+  g.addEventListener('pointermove', (ev) => {
+    if (!zug) return;
+    const dx = ev.clientX - zug.x, dy = ev.clientY - zug.y;
+    if (!zug.gezogen && Math.abs(dx) + Math.abs(dy) < 7) return;
+    if (!zug.gezogen) { zug.gezogen = true; g.classList.add('zieht'); }
+    ev.preventDefault();
+    const z = _tep.zoom || 1;
+    zug.neuX = zug.x0 + dx / z;
+    zug.neuY = zug.y0 + dy / z;
+    g.setAttribute('transform', 'translate(' + zug.neuX.toFixed(1) + ' ' + zug.neuY.toFixed(1) + ') rotate(' + dreh + ')');
+  });
+  const loslassen = (ev) => {
+    if (!zug) return;
+    const s = zug; zug = null;
+    g.classList.remove('zieht');
+    try { g.releasePointerCapture(ev.pointerId); } catch (e) {}
+    if (!s.gezogen) { auf(ev); return; }
+    /* In Rasterschritten ablegen: so bleibt die Wand geordnet, auch wenn
+       man von Hand nachhilft. */
+    const rasterX = (s.neuX - TEP_RAND_X) / TEP_SPALTE;
+    const rasterY = (s.neuY - TEP_RAND_Y) / TEP_REIHE;
+    teppichPersonSetzen(D.docs.get(_tep.id), p.id,
+      Math.round(rasterX * 4) / 4, Math.round(rasterY * 4) / 4, neu);
+  };
+  g.addEventListener('pointerup', loslassen);
+  g.addEventListener('pointercancel', () => { if (zug) { zug = null; g.classList.remove('zieht'); if (neu) neu(); } });
   return g;
 }
 
-/* Der Streifen selbst: oben und unten leicht gewellt, wie gewebter Stoff. */
+/* ----- Das Namensband -----
+   Eine Schriftrolle, kein Rechteck: der Streifen ist oben und unten leicht
+   gewellt, an beiden Enden rollt er sich ein, und dort, wo er sich rollt,
+   liegt ein Schatten. Vorher war es ein graues Kästchen mit zwei Zipfeln —
+   das sah aus wie ein Etikett, nicht wie Stoff. */
 function teppichBandPfad(b, h) {
   const hb = b / 2, hh = h / 2;
   return 'M ' + (-hb) + ' ' + (-hh) +
-    ' C ' + (-hb / 2) + ' ' + (-hh - 3) + ', ' + (hb / 2) + ' ' + (-hh + 2) + ', ' + hb + ' ' + (-hh) +
+    ' C ' + (-hb * 0.55) + ' ' + (-hh - 2.6) + ', ' + (hb * 0.55) + ' ' + (-hh + 1.8) + ', ' + hb + ' ' + (-hh) +
     ' L ' + hb + ' ' + hh +
-    ' C ' + (hb / 2) + ' ' + (hh + 3) + ', ' + (-hb / 2) + ' ' + (hh - 2) + ', ' + (-hb) + ' ' + hh + ' Z';
+    ' C ' + (hb * 0.55) + ' ' + (hh + 2.6) + ', ' + (-hb * 0.55) + ' ' + (hh - 1.8) + ', ' + (-hb) + ' ' + hh + ' Z';
 }
-/* Die eingeschlagenen Enden — dunkler, weil der Stoff dort doppelt liegt. */
-function teppichBandZipfel(b, h, seite) {
+/* Das eingerollte Ende: aussen die Rolle, innen die sichtbare Rückseite. */
+function teppichBandRolle(b, h, seite) {
   const hb = b / 2, hh = h / 2;
   const x = seite < 0 ? -hb : hb;
-  const t = seite < 0 ? -13 : 13;
-  return 'M ' + x + ' ' + (-hh) + ' L ' + (x + t) + ' ' + (-hh - 5) + ' L ' + (x + t) + ' ' + (hh + 5) + ' L ' + x + ' ' + hh + ' Z';
+  const r = seite < 0 ? -1 : 1;
+  const w = 15 * r, tief = 6 * r;
+  return 'M ' + x + ' ' + (-hh) +
+    ' C ' + (x + w * 0.75) + ' ' + (-hh - 5) + ', ' + (x + w) + ' ' + (-hh + 3) + ', ' + (x + w * 0.82) + ' ' + (hh * 0.15) +
+    ' C ' + (x + w * 0.7) + ' ' + (hh + 5) + ', ' + (x + tief) + ' ' + (hh + 4) + ', ' + x + ' ' + hh + ' Z';
+}
+/* Der Knick, wo sich der Stoff rollt — ein schmaler Schatten auf dem Band. */
+function teppichBandKnick(b, h, seite) {
+  const hb = b / 2, hh = h / 2;
+  const x = seite < 0 ? -hb + 3 : hb - 3;
+  return 'M ' + x + ' ' + (-hh + 0.6) + ' C ' + (x + seite * 2.4) + ' ' + (-hh * 0.2) + ', ' + (x + seite * 2.4) + ' ' + (hh * 0.2) + ', ' + x + ' ' + (hh - 0.6);
 }
 
 /* Das Wappen des Hauses: geritzt, nicht gemalt. */
@@ -633,6 +931,273 @@ const TEP_ZEICHEN_PFADE = {
   dolch: 'M0 -11 L2.4 -5 L2.4 3 L0 6 L-2.4 3 L-2.4 -5 Z M-7 -5 H7 M0 6 V10'
 };
 
+/* ===================== DER FUSS DES BAUMES =====================
+   Ein alter Baum steht nicht auf einem Strich. Er hat einen Stamm, der sich
+   nach unten weit öffnet, Wurzelanläufe, die auseinanderlaufen und sich
+   überkreuzen, eine Rinde voller Risse, ein Astloch, das jemand kennt —
+   und unten sitzt Getier, wie in jedem alten Wandteppich.
+
+   Alles wird aus derselben Maschinerie gebaut wie die Äste: eine
+   Mittellinie, quer aufgetragen, zu einer Fläche geschlossen. Deshalb sieht
+   eine Wurzel aus wie Holz und nicht wie eine dicke Linie. */
+
+/* Eine Mittellinie aus frei gesetzten Punkten (Wurzeln, Schlangen, Ranken):
+   die Querrichtungen und Breiten werden aus den Nachbarn gerechnet. */
+function _bahn(punkte, breiten) {
+  const n = punkte.length;
+  const raus = [];
+  for (let i = 0; i < n; i++) {
+    const a = punkte[Math.max(0, i - 1)], b = punkte[Math.min(n - 1, i + 1)];
+    const tx = b[0] - a[0], ty = b[1] - a[1];
+    const len = Math.sqrt(tx * tx + ty * ty) || 1;
+    raus.push({
+      x: punkte[i][0], y: punkte[i][1],
+      nx: -ty / len, ny: tx / len,
+      w: Math.max(0.4, breiten[i] / 2),
+      winkel: Math.atan2(ty, tx) * 180 / Math.PI
+    });
+  }
+  return raus;
+}
+/* Eine weiche Kurve durch Punkte — für Wurzeln, die sich krümmen. */
+function _kurve(x0, y0, winkel, laenge, biegung, n) {
+  const punkte = [];
+  const rad = winkel * Math.PI / 180;
+  for (let i = 0; i <= n; i++) {
+    const t = i / n;
+    const w = rad + (biegung * Math.PI / 180) * t * t;
+    punkte.push([
+      x0 + Math.cos(rad) * laenge * t * (1 - t * 0.22) + Math.cos(w) * laenge * t * t * 0.3,
+      y0 + Math.sin(rad) * laenge * t * (1 - t * 0.22) + Math.sin(w) * laenge * t * t * 0.3
+    ]);
+  }
+  return punkte;
+}
+
+/* ----- Der Stamm -----
+   Die Breite folgt keiner Geraden: oben schlank, unten reißt sie auf. Das
+   ist der Unterschied zwischen einem Pfosten und einem alten Baum. */
+function teppichStammKoerper(x0, y0, x1, y1, unten, oben, salz) {
+  const n = 30;
+  const punkte = [], breiten = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n;                      /* 0 = unten am Boden, 1 = Gabel */
+    /* Der Stamm steht nicht senkrecht: er lehnt sich leicht in den Wuchs. */
+    const schwung = Math.sin(t * Math.PI) * 13;
+    punkte.push([x0 + (x1 - x0) * t + schwung, y0 + (y1 - y0) * t]);
+    /* Der Wurzelanlauf: unten öffnet sich der Stamm stark. */
+    const anlauf = Math.pow(1 - t, 3.2) * 1.5;
+    const knorrig = 1 + Math.sin(t * 9 + teppichZufall(salz, 'k') * 6) * 0.07;
+    breiten.push((oben + (unten - oben) * Math.pow(1 - t, 1.7)) * (1 + anlauf * 0.55) * knorrig);
+  }
+  return _bahn(punkte, breiten);
+}
+
+/* Rinde: lange Längsrisse in verschiedenen Tiefen, dazu Querschrunden.
+   Sie folgen der Mittellinie, damit sie sich mit dem Stamm biegen. */
+function teppichBarkPfad(bahn, salz, wieviele) {
+  let d = '';
+  for (let r = 0; r < wieviele; r++) {
+    /* Jeder Riss haelt seine Seite — vorher wanderten sie quer und
+       ergaben ein Netz statt einer Rinde. */
+    const seite = -0.82 + (r / Math.max(1, wieviele - 1)) * 1.64 + (teppichZufall(salz, 'bs' + r) - 0.5) * 0.16;
+    const von = Math.floor(teppichZufall(salz, 'bv' + r) * bahn.length * 0.7);
+    const laenge = Math.round(4 + teppichZufall(salz, 'bb' + r) * bahn.length * 0.42);
+    const bis = Math.min(bahn.length - 1, von + laenge);
+    for (let i = von; i <= bis; i++) {
+      const p = bahn[i];
+      const wackel = Math.sin(i * 0.42 + r * 1.7) * 0.055;
+      const x = p.x + p.nx * p.w * (seite + wackel);
+      const y = p.y + p.ny * p.w * (seite + wackel);
+      d += (i === von ? ' M ' : ' L ') + (Math.round(x * 10) / 10) + ' ' + (Math.round(y * 10) / 10);
+    }
+  }
+  return d.trim();
+}
+function teppichSchrundenPfad(bahn, salz, wieviele) {
+  let d = '';
+  for (let i = 0; i < wieviele; i++) {
+    const stelle = bahn[Math.round((0.08 + (i / wieviele) * 0.8) * (bahn.length - 1))];
+    const breite = stelle.w * (0.5 + teppichZufall(salz, 'sw' + i) * 0.7);
+    const von = (teppichZufall(salz, 'sv' + i) - 0.5) * 0.7;
+    d += ' M ' + (stelle.x + stelle.nx * stelle.w * von).toFixed(1) + ' ' + (stelle.y + stelle.ny * stelle.w * von).toFixed(1) +
+      ' q ' + (stelle.nx * breite * 0.5 + 2).toFixed(1) + ' ' + (stelle.ny * breite * 0.5 - 3).toFixed(1) +
+      ' ' + (stelle.nx * breite).toFixed(1) + ' ' + (stelle.ny * breite).toFixed(1);
+  }
+  return d.trim();
+}
+
+/* Ein Astloch — die Stelle, an der vor Jahren ein Ast abbrach. */
+function teppichAstloch(bahn, salz) {
+  const stelle = bahn[Math.round(bahn.length * 0.55)];
+  const g = sv('g', { class: 'tep-astloch', transform: 'translate(' + stelle.x.toFixed(1) + ' ' + stelle.y.toFixed(1) + ') rotate(' + (stelle.winkel + 90).toFixed(0) + ')' });
+  g.append(sv('ellipse', { cx: 0, cy: 0, rx: 7.5, ry: 5.2, class: 'tep-astlochrand' }));
+  g.append(sv('ellipse', { cx: 0, cy: .6, rx: 5.4, ry: 3.4, class: 'tep-astlochtief' }));
+  return g;
+}
+
+/* ----- Die Wurzeln -----
+   Neun Anläufe, die in alle Richtungen auseinanderlaufen und sich am Ende
+   nach unten in den Grund biegen. Sie laufen spitz aus — vorher endeten sie
+   stumpf und sahen aus wie Bretter, die jemand an den Stamm gelehnt hat.
+
+   Die hinteren werden VOR dem Stamm gezeichnet (und verschwinden dahinter),
+   die vorderen danach. So liegt der Stamm mitten im Wurzelwerk. */
+const TEP_WURZELN = [
+  /* [Winkel, Länge, Dicke, vorne?]  — 0° ist rechts, 90° ist unten */
+  [186, 1.00, 1.00, true], [168, 0.74, 0.72, false], [200, 0.62, 0.66, false],
+  [150, 0.52, 0.52, true], [214, 0.86, 0.80, true], [131, 0.40, 0.44, false],
+  [-6, 0.92, 0.94, true], [-24, 0.58, 0.62, false], [16, 0.66, 0.70, true],
+  [96, 0.34, 0.58, true]
+];
+function teppichWurzeln(x, y, dick, salz, vorne) {
+  const g = sv('g', { class: 'tep-wurzelwerk' + (vorne ? ' vorn' : ' hinten') });
+  TEP_WURZELN.forEach((w, i) => {
+    if (!!w[3] !== !!vorne) return;
+    const nachLinks = w[0] > 90 && w[0] < 270;
+    const streu = (teppichZufall(salz, 'ws' + i) - 0.5) * 16;
+    const laenge = (52 + w[1] * 96) * (0.85 + teppichZufall(salz, 'wl' + i) * 0.3);
+    /* Am Ende taucht die Wurzel in den Grund — deshalb biegt sie nach unten. */
+    const biegung = (nachLinks ? -1 : 1) * (46 + teppichZufall(salz, 'wb' + i) * 34);
+    const startX = x + (nachLinks ? -1 : 1) * dick * (0.1 + teppichZufall(salz, 'wx' + i) * 0.24);
+    const startY = y - 14 - teppichZufall(salz, 'wy' + i) * 26;
+    const punkte = _kurve(startX, startY, w[0] + streu, laenge, biegung, 14);
+    const dickA = dick * 0.3 * w[2];
+    /* Spitz auslaufen: die letzten Punkte gehen auf fast null. */
+    const breiten = punkte.map((q, k) => {
+      const t = k / (punkte.length - 1);
+      return Math.max(0.5, dickA * Math.pow(1 - t, 1.5) * (1 + Math.sin(t * 7 + i) * 0.09));
+    });
+    const bahn = _bahn(punkte, breiten);
+    g.append(sv('path', { d: _flaeche(bahn).d, class: 'tep-wurzel' }));
+    g.append(sv('path', { d: _kante(bahn, nachLinks ? -1 : 1), class: 'tep-astkante duenn' }));
+    /* Eine Nebenwurzel, die sich abzweigt — keine Wurzel läuft allein. */
+    if (teppichZufall(salz, 'wn' + i) > 0.45) {
+      const wo = bahn[Math.round(bahn.length * 0.55)];
+      const ab = wo.winkel + (nachLinks ? -1 : 1) * (28 + teppichZufall(salz, 'wa' + i) * 22);
+      const p2 = _kurve(wo.x, wo.y, ab, laenge * 0.45, biegung * 0.6, 8);
+      const b2 = p2.map((q, k) => Math.max(0.4, wo.w * 1.5 * Math.pow(1 - k / (p2.length - 1), 1.4)));
+      g.append(sv('path', { d: _flaeche(_bahn(p2, b2)).d, class: 'tep-wurzel' }));
+    }
+    /* Feine Haarwurzeln an der Spitze */
+    const spitze = bahn[bahn.length - 1];
+    for (let h = 0; h < 3; h++) {
+      const ab = spitze.winkel + (h - 1) * 22 + (teppichZufall(salz, 'wh' + i + h) - 0.5) * 12;
+      const l = 8 + teppichZufall(salz, 'whl' + i + h) * 12;
+      g.append(sv('path', {
+        class: 'tep-wurzelhaar',
+        d: 'M ' + spitze.x.toFixed(1) + ' ' + spitze.y.toFixed(1) +
+          ' q ' + (Math.cos(ab * Math.PI / 180) * l * 0.6).toFixed(1) + ' ' + (Math.sin(ab * Math.PI / 180) * l * 0.4 + 2).toFixed(1) +
+          ' ' + (Math.cos(ab * Math.PI / 180) * l).toFixed(1) + ' ' + (Math.sin(ab * Math.PI / 180) * l + 3).toFixed(1)
+      }));
+    }
+  });
+  return g;
+}
+
+/* ----- Der Rabe -----
+   Ein Vogel ist mit wenigen Linien zu treffen, ein Vierbeiner nicht: Rumpf,
+   Kopf, Schnabel, Schwanz — vier Formen, und es steht ein Rabe da. Er sitzt
+   auf einer Wurzel und sieht nach links, weg vom Stamm. */
+function teppichRabe(x, y) {
+  const g = sv('g', { class: 'tep-fusstier rabe', transform: 'translate(' + x + ' ' + y + ') scale(1.25)', 'aria-hidden': 'true' });
+  /* Die Beine zuerst — sie liegen hinter dem Rumpf */
+  g.append(sv('path', { class: 'tep-tierlinie', d: 'M -1 -7 L -1.5 0 M -1.5 0 l -3 1 M -1.5 0 l 3 .6 M 3 -7 L 3 0 M 3 0 l -3 1 M 3 0 l 3 .6' }));
+  /* Rumpf, Hals, Kopf, Schwanz — ein Umriss */
+  g.append(sv('path', {
+    class: 'tep-tierkoerper',
+    d: 'M -6 -10 C -10 -13 -11 -17 -10 -21 C -9 -25 -6 -27 -3 -27 ' +
+      'C -1 -27 0 -26 1 -25 L -8 -23.5 C -9.4 -23.2 -9.4 -22 -8 -21.8 ' +
+      'L 1 -21 C 2 -18 2 -16 3 -14 ' +
+      'C 7 -12 12 -10 17 -8 C 19 -7.4 19 -6 17 -6 ' +
+      'C 11 -6 5 -7 1 -8 C -1 -8.6 -4 -9.4 -6 -10 Z'
+  }));
+  /* Der Flügel liegt angelegt auf dem Rumpf */
+  g.append(sv('path', {
+    class: 'tep-tierfluegel',
+    d: 'M -3 -12 C 1 -13 6 -12 10 -10 C 12 -9 12 -7.6 10 -7.4 C 5 -7.4 0 -8.6 -3 -10 Z'
+  }));
+  g.append(sv('path', { class: 'tep-tierlinie duenn', d: 'M 0 -11 C 4 -10.6 8 -9.6 11 -8.4 M -1 -9.6 C 3 -9.2 7 -8.4 10 -7.6' }));
+  g.append(sv('circle', { cx: -5.4, cy: -23.4, r: 1.05, class: 'tep-tierauge dunkel' }));
+  return g;
+}
+
+/* ----- Die Schlange -----
+   Ein Leib, der sich einmal ringelt und den Kopf hebt. Aus derselben
+   Maschinerie wie die Äste: eine Mittellinie, quer aufgetragen. Der Ring am
+   Schwanz macht aus dem Wurm eine Schlange. */
+function teppichSchlange(x, y) {
+  const g = sv('g', { class: 'tep-fusstier schlange', transform: 'translate(' + x + ' ' + y + ')', 'aria-hidden': 'true' });
+  const punkte = [], breiten = [];
+  const n = 46;
+  for (let i = 0; i <= n; i++) {
+    const t = i / n;
+    let px, py;
+    if (t < 0.46) {
+      /* Der Ring: anderthalb Windungen, flach gelegt. */
+      const u = t / 0.46;
+      const winkel = -Math.PI * 0.4 + u * Math.PI * 2.6;
+      const r = 5 + u * 15;
+      px = -30 + Math.cos(winkel) * r;
+      py = -2 + Math.sin(winkel) * r * 0.46;
+    } else {
+      /* Und hinaus, in einem Bogen, der am Ende den Kopf hebt. */
+      const u = (t - 0.46) / 0.54;
+      px = -30 + 17 + u * 62;
+      py = -2 + Math.sin(u * Math.PI * 0.95) * 11 - Math.pow(u, 3.2) * 22;
+    }
+    punkte.push([px, py]);
+    /* Am Schwanzende spitz, in der Mitte des Leibes am dicksten, am Hals
+       wieder schlank. */
+    breiten.push(0.9 + Math.sin(Math.min(1, t * 1.18) * Math.PI) * 6.2);
+  }
+  const bahn = _bahn(punkte, breiten);
+  g.append(sv('path', { d: _flaeche(bahn).d, class: 'tep-tierkoerper' }));
+  g.append(sv('path', { d: _kante(bahn, -1), class: 'tep-tierkante' }));
+  /* Der Kopf am Ende der Bahn */
+  const k = bahn[bahn.length - 1];
+  const kg = sv('g', { transform: 'translate(' + k.x.toFixed(1) + ' ' + k.y.toFixed(1) + ') rotate(' + k.winkel.toFixed(0) + ')' });
+  kg.append(sv('path', { class: 'tep-tierkoerper', d: 'M -2 -3.6 C 3 -4.6 8.4 -3.2 10.2 -1 C 11.2 0.3 10.8 1.8 9 2.6 C 5.6 4.3 0.6 4 -2 3 Z' }));
+  kg.append(sv('path', { class: 'tep-tierlinie duenn', d: 'M 10.2 0.6 l 5.6 1.5 M 14.2 1.3 l 2.8 -1.8 M 14.2 1.3 l 2.4 2.2' }));
+  kg.append(sv('circle', { cx: 5.6, cy: -1.6, r: 1.2, class: 'tep-tierauge dunkel' }));
+  g.append(kg);
+  /* Schuppenbögen auf dem Rücken */
+  let schuppen = '';
+  for (let i = 5; i < n - 6; i += 3) {
+    const q = bahn[i];
+    schuppen += ' M ' + (q.x - q.nx * q.w * 0.55).toFixed(1) + ' ' + (q.y - q.ny * q.w * 0.55).toFixed(1) +
+      ' q ' + (q.nx * q.w * 0.55 + 1.5).toFixed(1) + ' ' + (q.ny * q.w * 0.55).toFixed(1) +
+      ' ' + (q.nx * q.w * 1.1).toFixed(1) + ' ' + (q.ny * q.w * 1.1).toFixed(1);
+  }
+  g.append(sv('path', { class: 'tep-schuppen', d: schuppen.trim() }));
+  return g;
+}
+
+/* ----- Unterholz -----
+   Farn und Pilze am Fuß des Stammes. Kleinigkeiten, aber sie machen aus
+   einem Baum auf grünem Grund einen Baum, der irgendwo steht. */
+function teppichFarn(x, y, groesse, spiegel) {
+  const g = sv('g', { class: 'tep-unterholz farn', transform: 'translate(' + x + ' ' + y + ') scale(' + (spiegel ? -groesse : groesse) + ' ' + groesse + ')', 'aria-hidden': 'true' });
+  let d = 'M 0 0 C 2 -10 6 -20 13 -28';
+  for (let i = 1; i <= 7; i++) {
+    const t = i / 8;
+    const px = 2 * (t * 6.5) + t * t * 5;
+    const py = -t * 28;
+    const l = 11 * (1 - t * 0.72);
+    d += ' M ' + px.toFixed(1) + ' ' + py.toFixed(1) + ' q ' + (-l * 0.5).toFixed(1) + ' ' + (-l * 0.35).toFixed(1) + ' ' + (-l).toFixed(1) + ' ' + (-l * 0.15).toFixed(1);
+    d += ' M ' + px.toFixed(1) + ' ' + py.toFixed(1) + ' q ' + (l * 0.5).toFixed(1) + ' ' + (-l * 0.45).toFixed(1) + ' ' + (l * 0.9).toFixed(1) + ' ' + (-l * 0.3).toFixed(1);
+  }
+  g.append(sv('path', { class: 'tep-farnlinie', d }));
+  return g;
+}
+function teppichPilz(x, y, groesse, salz) {
+  const g = sv('g', { class: 'tep-unterholz pilz', transform: 'translate(' + x + ' ' + y + ') scale(' + groesse + ')', 'aria-hidden': 'true' });
+  g.append(sv('path', { class: 'tep-pilzstiel', d: 'M -1.6 0 C -1.8 -3 -1.6 -5.4 -1.2 -7 L 1.2 -7 C 1.6 -5.4 1.8 -3 1.6 0 Z' }));
+  g.append(sv('path', { class: 'tep-pilzhut', d: 'M -6.4 -7 C -6.4 -11.4 -3.4 -13.6 0 -13.6 C 3.4 -13.6 6.4 -11.4 6.4 -7 C 6.4 -5.8 3.4 -5.2 0 -5.2 C -3.4 -5.2 -6.4 -5.8 -6.4 -7 Z' }));
+  g.append(sv('path', { class: 'tep-tierlinie duenn', d: 'M -3.6 -7.4 h 7.2' }));
+  return g;
+}
+
 /* Ein Eichhörnchen, das ab und zu über den Teppich huscht. */
 function teppichEichhoernchen(breite, hoehe) {
   const g = sv('g', { class: 'tep-tier eichhorn', 'aria-hidden': 'true' });
@@ -665,7 +1230,7 @@ function teppichAnimationenAn(flaeche, svg, baum) {
   const fall = setInterval(() => {
     if (document.hidden || !svg.isConnected || !_tep.laub || !scheibe) return;
     teppichBlattFallen(scheibe);
-  }, 3400);
+  }, 2600);
 
   let tier = null;
   const tierLaufen = () => {
@@ -673,10 +1238,10 @@ function teppichAnimationenAn(flaeche, svg, baum) {
     if (!document.hidden && _tep.tiere) {
       const e = svg.querySelector('.tep-tier');
       if (e) {
-        const aeste = [...svg.querySelectorAll('path.tep-ast')];
+        const aeste = [...svg.querySelectorAll('.tep-astgruppe[data-mittel]')];
         if (aeste.length) {
           const welcher = aeste[Math.floor(Math.random() * aeste.length)];
-          e.style.offsetPath = 'path("' + welcher.getAttribute('d') + '")';
+          e.style.offsetPath = 'path("' + welcher.getAttribute('data-mittel') + '")';
           e.classList.remove('laeuft');
           /* Ein Neustart der Animation braucht einen Takt Pause. */
           setTimeout(() => e.classList.add('laeuft'), 30);
@@ -694,13 +1259,20 @@ function teppichAnimationenAn(flaeche, svg, baum) {
 /* Ein Blatt löst sich und segelt nach unten. Es liegt über dem Tuch, nicht
    darin — sonst müsste bei jedem Blatt der ganze Teppich neu gezeichnet
    werden. */
-function teppichBlattFallen(flaeche) {
-  const b = el('i', { class: 'tep-fallblatt' });
-  const x = 10 + Math.random() * 80;
-  b.style.left = x + '%';
-  b.style.setProperty('--drift', (Math.random() * 90 - 45).toFixed(0) + 'px');
-  b.style.setProperty('--dauer', (7 + Math.random() * 5).toFixed(1) + 's');
-  b.style.setProperty('--dreh', (Math.random() * 720 - 360).toFixed(0) + 'deg');
-  flaeche.append(b);
-  setTimeout(() => b.remove(), 13000);
+function teppichBlattFallen(scheibe) {
+  /* Ein echtes Blatt, kein Achteck: dasselbe Eichenblatt wie am Ast, nur
+     größer und in Bewegung. Es taumelt herunter und verblasst am Boden. */
+  const ton = Math.floor(Math.random() * 4);
+  const b = el('i', { class: 'tep-fallblatt ton-' + ton });
+  b.innerHTML = '<svg viewBox="-16 -26 32 30" width="20" height="19" aria-hidden="true">' +
+    '<path class="tep-fbform" d="' + TEP_EICHENBLATT + '"/>' +
+    '<path class="tep-fbader" d="' + TEP_BLATTADERN + '"/></svg>';
+  b.style.left = (8 + Math.random() * 82) + '%';
+  b.style.setProperty('--drift', (Math.random() * 120 - 60).toFixed(0) + 'px');
+  b.style.setProperty('--drift2', (Math.random() * 80 - 40).toFixed(0) + 'px');
+  b.style.setProperty('--dauer', (8 + Math.random() * 6).toFixed(1) + 's');
+  b.style.setProperty('--dreh', (Math.random() * 900 - 450).toFixed(0) + 'deg');
+  b.style.setProperty('--kipp', (Math.random() * 700 - 350).toFixed(0) + 'deg');
+  scheibe.append(b);
+  setTimeout(() => b.remove(), 15000);
 }
