@@ -29,7 +29,8 @@ test('Schaltjahre und Monatslängen stimmen', async () => {
   assert.equal(k.kalGueltig('2024-02-29'), true, 'den 29. Februar gibt es 2024');
   assert.equal(k.kalGueltig('2025-02-29'), false, 'und 2025 nicht');
   assert.equal(k.kalGueltig('2025-13-01'), false);
-  assert.equal(k.kalGueltig('1999-01-01'), false, 'vor 2000 reicht der Kalender nicht');
+  assert.equal(k.kalGueltig('1999-01-01'), true, 'auch 1999 — der Kalender reicht bis 1600 zurück');
+  assert.equal(k.kalGueltig('1599-12-31'), false, 'vor 1600 reicht er nicht');
   assert.equal(k.kalGueltig('2051-01-01'), false, 'nach 2050 auch nicht');
   assert.equal(k.kalGueltig('2000-01-01'), true);
   assert.equal(k.kalGueltig('2050-12-31'), true);
@@ -129,7 +130,8 @@ test('Ein Termin wird sauber angenommen — oder abgewiesen', async () => {
   assert.equal(t.art, 'ereignis', 'eine unbekannte Art wird zur allgemeinen');
   assert.equal(t.titel.length, 200, 'zu lange Titel werden gekappt');
   assert.equal(JSON.stringify(t.leute), JSON.stringify([{ id: '', name: 'Mira' }, { id: 'f1', name: 'Jonas' }]), 'Namenlose fallen heraus');
-  assert.equal(k.saubererTermin({ wann: '1998-01-01' }), null, 'außerhalb des Bereichs: kein Termin');
+  assert.equal(k.saubererTermin({ wann: '1598-01-01' }), null, 'außerhalb des Bereichs: kein Termin');
+  assert.ok(k.saubererTermin({ wann: '1783-04-09' }), 'innerhalb aber schon — der Kalender reicht bis 1600');
   assert.equal(k.saubererTermin({}), null);
   assert.equal(k.saubererTermin({ wann: '2026-02-30' }), null, 'den 30. Februar gibt es nicht');
   /* Ein Ende vor dem Anfang wird verworfen, nicht übernommen */
@@ -248,4 +250,33 @@ test('Der Kalender sortiert wie ein Kalender', async () => {
   termin(k, { wann: '2026-01-01', art: 'reise', titel: 'Früher' });
   const s = k.kalSortiert(k.kalTermine()).map((t) => t.titel);
   assert.equal(JSON.stringify(s), JSON.stringify(['Früher', 'Anfang', 'Mitte', 'Ende']), 'am selben Tag: erst geboren, dann gelebt, dann gestorben');
+});
+
+test('Der Kalender reicht bis 1600 zurück — gezeigt wird er trotzdem ab 2000', async () => {
+  const k = await frisch();
+  assert.equal(k.KAL_JAHR_VON, 1600, 'so weit reicht er');
+  assert.equal(k.KAL_ZEIGE_VON, 2000, 'so weit fängt er an zu zeigen');
+  assert.equal(k.kalGueltig('1783-04-09'), true);
+  assert.equal(k.kalGueltig('1600-01-01'), true);
+  assert.equal(k.kalGueltig('1599-12-31'), false);
+  assert.equal(k.kalGueltig('2051-01-01'), false);
+  /* Das Alter rechnet über Jahrhunderte hinweg richtig — auch über 1700 und
+     1800 hinweg, die keine Schaltjahre waren */
+  assert.equal(k.kalAlter('1783-04-09', '1845-04-08').jahre, 61, 'einen Tag vor dem Geburtstag');
+  assert.equal(k.kalAlter('1783-04-09', '1845-04-09').jahre, 62);
+  assert.equal(k.kalGueltig('1700-02-29'), false, '1700 war kein Schaltjahr');
+  assert.equal(k.kalGueltig('1600-02-29'), true, '1600 aber schon');
+});
+
+test('Die Ansicht fängt bei 2000 an — und weiter unten nur, wenn dort etwas steht', async () => {
+  const k = await frisch();
+  assert.equal(k.kalZeigeVon([]), 2000, 'ohne Inhalt kein leeres Jahrhundert zeichnen');
+  assert.equal(k.kalZeigeVon([{ wann: '2011-04-09' }]), 2000, 'was nach 2000 liegt, verschiebt nichts');
+  assert.equal(k.kalZeigeVon([{ wann: '1783-04-09' }]), 1783, 'wo wirklich etwas steht, reicht sie hin');
+  assert.equal(k.kalZeigeVon([{ wann: '1783-04-09' }, { wann: '1899-01-01' }]), 1783, 'bis zum frühesten');
+  assert.equal(k.kalZeigeVon([{ wann: 'unfug' }]), 2000, 'Unsinn verschiebt nichts');
+  /* Aufklappen von Hand geht bis 1600, aber nie darüber hinaus */
+  assert.equal(k.kalZeigeVon([], 1650), 1650);
+  assert.equal(k.kalZeigeVon([], 1200), 1600, 'weiter als der Kalender geht es nicht');
+  assert.equal(k.kalZeigeVon([], 2030), 2000, 'nach oben verschiebt es die Ansicht nicht');
 });

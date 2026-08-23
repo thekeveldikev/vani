@@ -192,7 +192,10 @@ async function figurAnlegenOderAendern(p, alt) {
   return neuDoc('figur', { parent: p.id, projekt: p.id, titel: name, art, notiz, ord: figurenVon(p).length });
 }
 function baueFigurenUndOrte(p) {
-  const liste = figurenVon(p).sort((a, b) => (FIGUR_ARTEN.findIndex((x) => x[0] === a.art) - FIGUR_ARTEN.findIndex((x) => x[0] === b.art)) || (a.titel || '').localeCompare(b.titel || '', 'de'));
+  /* Eine Art, die es nicht (mehr) gibt, bekommt -1 und stünde vor allen
+     anderen. Unbekanntes gehört ans Ende, nicht an den Anfang. */
+  const artRang = (x) => { const i = FIGUR_ARTEN.findIndex((a) => a[0] === x.art); return i < 0 ? FIGUR_ARTEN.length : i; };
+  const liste = figurenVon(p).sort((a, b) => (artRang(a) - artRang(b)) || (a.titel || '').localeCompare(b.titel || '', 'de'));
   const band = el('div', { class: 'figurenband' });
   for (const f of liste) {
     const vorkommen = figurVorkommen(p, f.titel);
@@ -382,10 +385,16 @@ function szenenGesten(karte, s, p) {
     const geschwister = kinder(zielKapitelId, 'szene').filter((x) => x.id !== s.id);
     let einfuegen = geschwister.length;
     if (zielKarte) {
+      /* Die Karte unter dem Finger kann zu einer anderen Pinnwand gehören
+         (überlappende Wände) oder inzwischen weg sein. Dann gibt findIndex
+         -1 zurück, und ein splice(-1) legt die Szene VOR die letzte statt
+         an den Anfang. In dem Fall hängen wir sie einfach hinten an. */
       const zielSzene = D.docs.get(zielKarte.dataset.id);
-      const zi = geschwister.findIndex((x) => x.id === zielSzene.id);
-      const r = zielKarte.getBoundingClientRect();
-      einfuegen = e.clientX < r.left + r.width / 2 ? zi : zi + 1;
+      const zi = zielSzene ? geschwister.findIndex((x) => x.id === zielSzene.id) : -1;
+      if (zi >= 0) {
+        const r = zielKarte.getBoundingClientRect();
+        einfuegen = e.clientX < r.left + r.width / 2 ? zi : zi + 1;
+      }
     }
     s.parent = zielKapitelId;
     geschwister.splice(einfuegen, 0, s);

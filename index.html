@@ -509,7 +509,7 @@ html[data-thema="tinte"] .menue button.rot, html[data-thema="kerze"] .menue butt
 .gliederung { display: grid; gap: 2px; max-height: 58dvh; overflow: auto; }
 .gliederung-seite { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--blass); margin: 10px 0 3px; }
 .gliederung-punkt { text-align: left; padding: 6px 10px; border-radius: 9px; font-size: 15px; }
-.gliederung-punkt:hover { background: var(--hg2); }
+@media (hover: hover) and (pointer: fine) { .gliederung-punkt:hover { background: var(--hg2); } }
 .gliederung-punkt.ebene-1 { font-weight: 600; } .gliederung-punkt.ebene-2 { padding-left: 24px; } .gliederung-punkt.ebene-3 { padding-left: 38px; font-size: 14px; color: var(--blass); }
 /* Papiervorlagen: Cornell (Randspalte + Zusammenfassung), Storyboard (2×3), Dialogblatt (zwei Spalten) */
 .papierseite.cornell { background-image: linear-gradient(90deg, transparent calc(30% - .5px), var(--linie) calc(30% - .5px), var(--linie) calc(30% + .5px), transparent calc(30% + .5px)), linear-gradient(transparent calc(100% - 96px), var(--linie) calc(100% - 96px), var(--linie) calc(100% - 95px), transparent calc(100% - 95px)); }
@@ -553,19 +553,23 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 @keyframes ding-landet { from { opacity: 0; transform: translateY(10px) rotate(var(--dreh, 0deg)) scale(.96); } to { opacity: 1; transform: translateY(0) rotate(var(--dreh, 0deg)) scale(1); } }
 .desk-ding.lampe.tritt-auf, .desk-ding.leuchter.tritt-auf, .desk-ding.uhr.tritt-auf, .desk-ding.stuhl.tritt-auf { animation-name: ding-kommt; }
 @keyframes ding-kommt { from { opacity: 0; } to { opacity: 1; } }
-/* Beschriftung beim Darüberfahren — nur mit Maus */
-@media (hover: hover) {
+/* Beschriftung beim Darüberfahren — nur mit Maus.
+   Auch `pointer: fine` muss dastehen: ein iPad mit angeschlossenem Trackpad
+   meldet `hover: hover`, der Finger auf demselben Gerät hinterlässt aber
+   weiterhin einen klebenden Hover — und das Schildchen bliebe stehen. */
+@media (hover: hover) and (pointer: fine) {
   .desk-ding[title]:hover::after { content: attr(title); position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; padding: 4px 10px; border-radius: 8px; background: rgba(20,16,12,.92); color: #f1e4c8; font-size: 12px; font-family: ui-rounded, -apple-system, system-ui, sans-serif; pointer-events: none; z-index: 30; box-shadow: 0 2px 8px rgba(0,0,0,.5); }
   .desk-ding.lampe[title]:hover::after, .desk-ding.manuskript[title]:hover::after { display: none; }
 }
 .lampe-aus .desk-malerei { filter: saturate(.85); transition: filter .6s; }
-.desk-ding:hover { transform: rotate(var(--dreh, 0deg)) translateY(-3px); filter: drop-shadow(0 12px 14px rgba(0,0,0,.65)) brightness(1.06); }
+@media (hover: hover) and (pointer: fine) { .desk-ding:hover { transform: rotate(var(--dreh, 0deg)) translateY(-3px); filter: drop-shadow(0 12px 14px rgba(0,0,0,.65)) brightness(1.06); } }
 .desk-ding:active { transform: rotate(var(--dreh, 0deg)) scale(.98); }
 .lampe-aus .desk-ding:not(.lampe):not(.leuchter) { filter: drop-shadow(0 7px 9px rgba(0,0,0,.6)) brightness(.62) saturate(.8); }
 /* ---- Die Lampe mit Zugschnur: Messingfuß und -arm, Bernsteinschirm, ein weicher Kegel aus Licht ---- */
 .desk-ding.lampe { left: 1%; top: calc(44% - 150px); width: 240px; height: 320px; filter: none; cursor: default; z-index: 3; pointer-events: none; }
 .desk-ding.lampe .schirm, .desk-ding.lampe .knauf { pointer-events: auto; }
-.desk-ding.lampe:hover, .desk-ding.lampe:active { transform: none; filter: none; }
+.desk-ding.lampe:active { transform: none; filter: none; }
+@media (hover: hover) and (pointer: fine) { .desk-ding.lampe:hover { transform: none; filter: none; } }
 /* Der Schein an der Wand hinter dem Schirm */
 .desk-ding.lampe::before { content: ""; position: absolute; left: 18px; top: 16px; width: 220px; height: 160px; border-radius: 50%; pointer-events: none; mix-blend-mode: screen; transition: opacity .5s;
   background: radial-gradient(ellipse at 50% 62%, rgba(255,196,110,calc(.3 * var(--lampe))), rgba(255,176,86,calc(.09 * var(--lampe))) 48%, transparent 72%); }
@@ -648,7 +652,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .tinte-bild .feder.f1 { left: 46px; bottom: 22px; transform: rotate(22deg); } .tinte-bild .feder.f2 { left: 6px; bottom: 4px; transform: rotate(-70deg); height: 58px; filter: brightness(.85); }
 /* ---- Das Bücherbord: eine Reihe stehender Bücher, jedes greifbar ---- */
 .desk-ding-halter.buecher { left: 8%; top: calc(44% + 26px); width: min(320px, 33%); filter: none; }
-.desk-ding-halter.buecher:hover { transform: none; }
+@media (hover: hover) and (pointer: fine) { .desk-ding-halter.buecher:hover { transform: none; } }
 .buecher-bord { position: relative; display: flex; align-items: flex-end; gap: 0; padding: 0 6px 6px; min-height: 110px; }
 .bord-buch { position: relative; flex: 0 0 auto; width: 64px; aspect-ratio: 3 / 4; margin-right: var(--ueberlapp, -14px); border-radius: 2px 5px 5px 2px; overflow: hidden; background: #4a3a2a;
   transform: rotate(var(--lehn, 0deg)); transform-origin: bottom center; box-shadow: 0 4px 7px rgba(0,0,0,.6), inset 2px 0 4px rgba(255,255,255,.14), -1px 0 0 rgba(0,0,0,.5);
@@ -656,10 +660,12 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .bord-buch img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .bord-buch::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 7px; z-index: 2; pointer-events: none; background: linear-gradient(90deg, rgba(0,0,0,.5), rgba(255,255,255,.14) 55%, rgba(0,0,0,.14)); }
 .bord-buch::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, rgba(255,255,255,.18), rgba(255,255,255,0) 36%, rgba(0,0,0,.2) 100%); }
-.bord-buch:hover::after, .bord-buch:focus-visible::after { background: linear-gradient(105deg, rgba(255,255,255,.26), rgba(255,255,255,0) 40%, rgba(0,0,0,.12) 100%); }
+.bord-buch:focus-visible::after { background: linear-gradient(105deg, rgba(255,255,255,.26), rgba(255,255,255,0) 40%, rgba(0,0,0,.12) 100%); }
+@media (hover: hover) and (pointer: fine) { .bord-buch:hover::after { background: linear-gradient(105deg, rgba(255,255,255,.26), rgba(255,255,255,0) 40%, rgba(0,0,0,.12) 100%); } }
 .bord-buch.ohne-cover span { position: absolute; inset: 0; display: grid; place-items: center; padding: 6px; font-family: ui-serif, "New York", Georgia, serif; font-size: 11px; color: #f1e4c8; text-align: center; line-height: 1.2; }
 .bord-buch .leseband { position: absolute; right: 6px; top: 0; width: 5px; border-radius: 0 0 2px 2px; background: #c0533f; box-shadow: 0 1px 2px rgba(0,0,0,.5); }
-.bord-buch:hover, .bord-buch:focus-visible, .bord-buch:active { transform: translateY(-14px) rotate(0deg) scale(1.08); z-index: 20; box-shadow: 0 16px 22px rgba(0,0,0,.7), inset 2px 0 4px rgba(255,255,255,.14); }
+.bord-buch:focus-visible, .bord-buch:active { transform: translateY(-14px) rotate(0deg) scale(1.08); z-index: 20; box-shadow: 0 16px 22px rgba(0,0,0,.7), inset 2px 0 4px rgba(255,255,255,.14); }
+@media (hover: hover) and (pointer: fine) { .bord-buch:hover { transform: translateY(-14px) rotate(0deg) scale(1.08); z-index: 20; box-shadow: 0 16px 22px rgba(0,0,0,.7), inset 2px 0 4px rgba(255,255,255,.14); } }
 .bordbrett { position: absolute; left: -4px; right: -4px; bottom: -5px; height: 9px; border-radius: 3px; background: linear-gradient(#7a5636, #3a2818); box-shadow: 0 8px 12px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14); }
 .bord-fuss { position: absolute; left: 6px; bottom: -30px; padding: 3px 10px; border-radius: 8px; background: rgba(255,230,180,.1); color: #e8c27a; font-size: 12px; letter-spacing: .04em; white-space: nowrap; }
 @media (max-width: 760px) { .bord-buch { width: 52px; } }
@@ -726,7 +732,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .desk-korb .knuell { position: absolute; width: 22px; height: 20px; border-radius: 45% 55% 50% 50%; background: radial-gradient(circle at 35% 35%, #f3e9d4, #c9bda0 70%); box-shadow: inset -3px -3px 6px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.5); }
 .desk-korb .k1 { left: 6px; top: -10px; transform: rotate(-12deg); } .desk-korb .k2 { left: 26px; top: -14px; transform: rotate(18deg); } .desk-korb .k3 { left: 42px; top: -6px; transform: rotate(-30deg); width: 18px; height: 16px; }
 .desk-schublade { position: absolute; left: 30%; right: 30%; bottom: 0; height: 36px; border-radius: 6px 6px 0 0; background: linear-gradient(#2c1f16, #1b120d); box-shadow: inset 0 2px 0 rgba(255,255,255,.08), 0 -2px 8px rgba(0,0,0,.4); z-index: 3; transition: transform .25s; }
-.desk-schublade:hover { transform: translateY(-4px); }
+@media (hover: hover) and (pointer: fine) { .desk-schublade:hover { transform: translateY(-4px); } }
 .desk-schublade .griffknauf { position: absolute; left: 50%; top: 50%; width: 36px; height: 10px; margin: -5px 0 0 -18px; border-radius: 5px; background: linear-gradient(#d9b463, #7a5a2a); box-shadow: 0 1px 2px rgba(0,0,0,.6); }
 .desk-einrichten { position: absolute; right: 12px; top: 12px; z-index: 4; background: rgba(20,16,12,.6); color: #e8c27a; }
 @media (max-width: 760px) {
@@ -768,7 +774,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 @keyframes teelicht-flackert { from { transform: scaleY(1) rotate(-3deg); } to { transform: scaleY(1.18) rotate(3deg); } }
 /* Das aufgeschlagene Buch */
 .desk-ding-halter.offenbuch { right: 12%; top: calc(44% + 250px); width: 214px; filter: drop-shadow(0 10px 12px rgba(0,0,0,.6)); --dreh: 3deg; }
-.desk-ding-halter.offenbuch:hover { transform: rotate(var(--dreh)) translateY(-3px); }
+@media (hover: hover) and (pointer: fine) { .desk-ding-halter.offenbuch:hover { transform: rotate(var(--dreh)) translateY(-3px); } }
 .ob-buch { position: relative; width: 214px; height: 140px; display: flex; gap: 0; perspective: 700px; cursor: pointer; }
 .ob-blatt { position: relative; width: 104px; height: 136px; background: linear-gradient(90deg, #efe6d0, #f8f1e0 30%, #f4ecda); overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,.4); transform-origin: right center; backface-visibility: hidden; }
 .ob-blatt.links { border-radius: 5px 1px 1px 5px; box-shadow: inset -10px 0 14px -10px rgba(0,0,0,.45), 0 2px 4px rgba(0,0,0,.4); margin-top: 4px; }
@@ -869,7 +875,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .lesestapel-raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 16px; margin: 8px 0 14px; }
 .lesestapel-buch { text-align: left; display: grid; gap: 5px; }
 .lesestapel-cover { aspect-ratio: 3 / 4; border-radius: 3px 7px 7px 3px; overflow: hidden; background: #3a2e24; box-shadow: 0 6px 14px rgba(0,0,0,.35), inset 3px 0 5px rgba(255,255,255,.15); position: relative; transition: transform .22s; }
-.lesestapel-buch:hover .lesestapel-cover { transform: translateY(-4px) rotate(-.6deg); }
+@media (hover: hover) and (pointer: fine) { .lesestapel-buch:hover .lesestapel-cover { transform: translateY(-4px) rotate(-.6deg); } }
 .lesestapel-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .lesestapel-buch.ohne-cover .lesestapel-cover span { position: absolute; inset: 0; display: grid; place-items: center; padding: 10px; color: #f1e4c8; font-family: ui-serif, Georgia, serif; text-align: center; font-size: 14px; }
 .lesestapel-titel { font-size: 13.5px; font-weight: 600; line-height: 1.25; }
@@ -932,7 +938,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .lese-kopf .rundknopf { position: relative; }
 .buchsuche-treffer { display: grid; gap: 4px; max-height: 52dvh; overflow: auto; }
 .buchsuche-treffer button { text-align: left; padding: 8px 10px; border-radius: 9px; font-size: 14px; line-height: 1.4; }
-.buchsuche-treffer button:hover { background: var(--hg2); }
+@media (hover: hover) and (pointer: fine) { .buchsuche-treffer button:hover { background: var(--hg2); } }
 .buchsuche-treffer b { color: var(--akzent); font-weight: 600; }
 .buchsuche-treffer small { display: block; color: var(--blass); font-size: 12px; }
 .lese-notizen { display: grid; gap: 8px; max-height: 40dvh; overflow: auto; margin: 6px 0; }
@@ -1204,7 +1210,7 @@ html[data-thema="tinte"] .denkblase.b-gelb, html[data-thema="kerze"] .denkblase.
   transition: transform .22s cubic-bezier(.2,.8,.2,1), box-shadow .22s ease;
 }
 .wortkiste-waehlen { position: absolute; inset: 0; width: 100%; display: grid; grid-template-columns: 13px 1fr; text-align: left; color: inherit; }
-.wortkiste-mini:hover { transform: translateY(-3px) rotate(-.25deg); box-shadow: 0 9px 19px var(--schein), inset 0 0 0 1px rgba(38,27,18,.18); }
+@media (hover: hover) and (pointer: fine) { .wortkiste-mini:hover { transform: translateY(-3px) rotate(-.25deg); box-shadow: 0 9px 19px var(--schein), inset 0 0 0 1px rgba(38,27,18,.18); } }
 .wortkiste-mini.an { box-shadow: 0 0 0 3px var(--papier), 0 0 0 5px var(--akzent), 0 9px 19px var(--schein); }
 .wortkiste-ruecken { background: linear-gradient(90deg, rgba(0,0,0,.28), rgba(255,255,255,.11), rgba(0,0,0,.16)); }
 .wortkiste-mini-inhalt { min-width: 0; display: flex; flex-direction: column; gap: 5px; padding: 17px 31px 15px 13px; }
@@ -1212,7 +1218,8 @@ html[data-thema="tinte"] .denkblase.b-gelb, html[data-thema="kerze"] .denkblase.
 .wortkiste-mini small { color: rgba(255,250,241,.78); font-size: 11.5px; }
 .wortkiste-mini em { overflow: hidden; color: rgba(255,250,241,.76); font: italic 11.5px/1.35 ui-serif, Georgia, serif; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .wortkiste-menue { position: absolute; z-index: 2; top: 5px; right: 8px; padding: 6px; border-radius: 9px; color: rgba(255,255,255,.84); letter-spacing: 1px; }
-.wortkiste-menue:hover, .wortkiste-menue:focus-visible { background: rgba(0,0,0,.16); color: white; }
+.wortkiste-menue:focus-visible { background: rgba(0,0,0,.16); color: white; }
+@media (hover: hover) and (pointer: fine) { .wortkiste-menue:hover { background: rgba(0,0,0,.16); color: white; } }
 .wortkisten-arbeit { min-height: 310px; }
 .wortkisten-titelzeile { display: flex; align-items: flex-start; justify-content: space-between; gap: 13px; }
 .wortkisten-titelzeile h2 { font: 600 clamp(21px,4vw,29px)/1.2 ui-serif, Georgia, serif; }
@@ -1664,7 +1671,7 @@ textarea:focus-visible, input:focus-visible, [contenteditable]:focus-visible, .s
 
 /* Hefte: kombinierbare, unaufdringliche Umschläge. */
 .heftdeckel { --heft1:#8c5a3b; --heft2:var(--heft1); --heftband:#d6bd92; background-color: var(--heft1); transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, filter .28s ease; isolation: isolate; }
-.heftdeckel:hover { transform: translateY(-4px) rotate(-.25deg); box-shadow: 0 11px 26px var(--schein), inset -2px 0 6px rgba(0,0,0,.1); }
+@media (hover: hover) and (pointer: fine) { .heftdeckel:hover { transform: translateY(-4px) rotate(-.25deg); box-shadow: 0 11px 26px var(--schein), inset -2px 0 6px rgba(0,0,0,.1); } }
 .heftdeckel::before { left: 8px; width: 6px; z-index: 2; background: linear-gradient(90deg, rgba(0,0,0,.28), var(--heftband), rgba(255,255,255,.16)); box-shadow: 2px 0 3px rgba(0,0,0,.16); }
 .heftdeckel::after { z-index: -1; mix-blend-mode: soft-light; }
 .heftdeckel.muster-schlicht { background-image: linear-gradient(145deg, var(--heft1), color-mix(in srgb, var(--heft2) 82%, #111)); }
@@ -1749,7 +1756,7 @@ html[data-thema="tinte"] .heft-tisch, html[data-thema="kerze"] .heft-tisch { bac
 .heft-stapel { position: relative; display: flex; gap: 0; padding: 20px 24px 30px; }
 .heft-stapel .heft-halter { width: 150px; margin-left: -110px; transform: translateY(calc(var(--lage, 0) * -3px)) rotate(var(--dreh, 0deg)); }
 .heft-stapel .heft-halter:first-child { margin-left: 0; }
-.heft-stapel .heft-halter:hover { transform: translateY(-16px) rotate(var(--dreh, 0deg)); z-index: 3; }
+@media (hover: hover) and (pointer: fine) { .heft-stapel .heft-halter:hover { transform: translateY(-16px) rotate(var(--dreh, 0deg)); z-index: 3; } }
 /* ===== Das Regal: Bretter und stehende Rücken ===== */
 .buecherregal { display: grid; gap: 34px; padding: 10px 6px 30px; }
 .regalbrett { position: relative; padding: 0 18px 0; }
@@ -1761,7 +1768,8 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 .brettschild { position: absolute; right: 26px; bottom: -13px; font-size: 10px; letter-spacing: .12em; color: #fff6e0; opacity: .85; z-index: 2; }
 .heftruecken { position: relative; border-radius: 3px 3px 2px 2px; color: rgba(255,252,240,.95); box-shadow: inset -3px 0 6px rgba(0,0,0,.28), inset 2px 0 3px rgba(255,255,255,.14), 0 2px 4px rgba(0,0,0,.25);
   background: linear-gradient(90deg, color-mix(in srgb, var(--heft1) 80%, #000), var(--heft1) 35%, var(--heft2) 80%, color-mix(in srgb, var(--heft2) 75%, #000)); display: grid; place-items: center; transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease; overflow: hidden; }
-.heftruecken:hover, .heftruecken.zieht { transform: translateY(-12px) rotate(-1.5deg); box-shadow: 0 10px 18px rgba(0,0,0,.35); z-index: 2; }
+.heftruecken.zieht { transform: translateY(-12px) rotate(-1.5deg); box-shadow: 0 10px 18px rgba(0,0,0,.35); z-index: 2; }
+@media (hover: hover) and (pointer: fine) { .heftruecken:hover { transform: translateY(-12px) rotate(-1.5deg); box-shadow: 0 10px 18px rgba(0,0,0,.35); z-index: 2; } }
 .heftruecken .rtitel { writing-mode: vertical-rl; transform: rotate(180deg); font-family: ui-serif, "New York", Georgia, serif; font-size: 13px; font-weight: 600; letter-spacing: .04em; max-height: 80%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,.4); }
 .heftruecken.schrift-hand .rtitel { font-family: "Bradley Hand", "Noteworthy", "Segoe Print", cursive; font-size: 14px; }
 .heftruecken.schrift-klar .rtitel { font-family: ui-rounded, -apple-system, system-ui, sans-serif; }
@@ -1805,14 +1813,16 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 .groesse-klein .regal { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
 .groesse-gross .regal { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 .groesse-klein .heftruecken { transform: scale(.85); transform-origin: bottom; } .groesse-gross .heftruecken { transform: scale(1.18); transform-origin: bottom; }
-.groesse-klein .heftruecken:hover, .groesse-klein .heftruecken.zieht { transform: scale(.85) translateY(-12px) rotate(-1.5deg); }
-.groesse-gross .heftruecken:hover, .groesse-gross .heftruecken.zieht { transform: scale(1.18) translateY(-12px) rotate(-1.5deg); }
+.groesse-klein .heftruecken.zieht { transform: scale(.85) translateY(-12px) rotate(-1.5deg); }
+@media (hover: hover) and (pointer: fine) { .groesse-klein .heftruecken:hover { transform: scale(.85) translateY(-12px) rotate(-1.5deg); } }
+.groesse-gross .heftruecken.zieht { transform: scale(1.18) translateY(-12px) rotate(-1.5deg); }
+@media (hover: hover) and (pointer: fine) { .groesse-gross .heftruecken:hover { transform: scale(1.18) translateY(-12px) rotate(-1.5deg); } }
 .ordentlich .heft-halter { --dreh: 0deg !important; }
 .ordentlich .heft-stapel .heft-halter { transform: translateY(calc(var(--lage, 0) * -3px)); }
 .heft-atelier .einstellgruppe { display: grid; gap: 9px; padding: 13px 0; border-top: 1px solid var(--linie); }
 .heft-farben { display: flex; gap: 7px; flex-wrap: wrap; }
 .heft-farbpunkt { width: 29px; height: 29px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.16), 0 1px 3px var(--schein); transition: transform .18s ease; }
-.heft-farbpunkt:hover { transform: scale(1.12); }
+@media (hover: hover) and (pointer: fine) { .heft-farbpunkt:hover { transform: scale(1.12); } }
 .heft-freifarben { display: flex; gap: 12px; flex-wrap: wrap; color: var(--blass); font-size: 12px; }
 .heft-freifarben label { display: flex; align-items: center; gap: 7px; }
 .heft-freifarben input[type="color"] { width: 35px; height: 27px; padding: 0; border-radius: 8px; overflow: hidden; }
@@ -1863,7 +1873,7 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 /* Stiftkasten */
 .kritzelleiste { max-width: calc(100% - 24px); flex-wrap: wrap; border-radius: 19px; }
 .stiftfarbe { transition: transform .17s ease, box-shadow .17s ease; }
-.stiftfarbe:hover { transform: scale(1.08); }
+@media (hover: hover) and (pointer: fine) { .stiftfarbe:hover { transform: scale(1.08); } }
 .stift-eigen { position: relative; width: 30px; height: 30px; display: grid; place-items: center; overflow: hidden; border-radius: 50%; color: white; background: conic-gradient(#d75b55,#e9b54e,#71a36a,#5d8eb6,#8d69a7,#d75b55); }
 .stift-eigen input { position: absolute; inset: 0; opacity: 0; }
 .stift-dicke { display: flex; align-items: center; gap: 7px; min-width: 132px; }
@@ -1883,7 +1893,7 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 
 /* Bewegungen bleiben weich, aber nie im Weg. */
 .karte, .blattkarte, .projektkarte, .wieder-fund { transition: transform .24s cubic-bezier(.2,.8,.2,1), box-shadow .24s ease, background-color .24s ease; }
-button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translateY(-2px); box-shadow: 0 7px 18px var(--schein), inset 0 0 0 1px var(--linie); }
+@media (hover: hover) and (pointer: fine) { button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translateY(-2px); box-shadow: 0 7px 18px var(--schein), inset 0 0 0 1px var(--linie); } }
 .papierseite { animation: seite-landet .32s cubic-bezier(.2,.8,.2,1); }
 @keyframes seite-landet { from { opacity: .3; transform: translateX(12px) rotate(.25deg); } }
 
@@ -1937,7 +1947,8 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 .anleitung-koerper { flex: 1; min-height: 0; display: grid; grid-template-columns: 224px minmax(0, 1fr); width: 100%; max-width: 1060px; margin: 0 auto; }
 .anleitung-nav { overflow-y: auto; padding: 16px 10px calc(env(safe-area-inset-bottom) + 40px) 22px; display: flex; flex-direction: column; gap: 2px; }
 .anleitung-navknopf { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 10px; font-size: 14px; text-align: left; color: var(--tinte); }
-.anleitung-navknopf:hover, .anleitung-navknopf:active { background: var(--karte); }
+.anleitung-navknopf:active { background: var(--karte); }
+@media (hover: hover) and (pointer: fine) { .anleitung-navknopf:hover { background: var(--karte); } }
 .anleitung-navknopf svg.ik { width: 17px; height: 17px; color: var(--blass); }
 .anleitung-inhalt { overflow-y: auto; padding: 16px 22px calc(env(safe-area-inset-bottom) + 70px); }
 .anleitung-kapitel { padding: 14px 0 26px; border-bottom: 1px solid var(--linie); scroll-margin-top: 12px; }
@@ -2290,7 +2301,7 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 .salon-rahmen { position: relative; width: 100%; max-width: 250px; padding: 16px 16px 14px; border-radius: 5px; text-align: center; cursor: pointer; transform: rotate(calc((var(--n, 0) - 1.5) * .5deg)); transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s;
   box-shadow: 0 18px 30px rgba(0,0,0,.35), 0 2px 4px rgba(0,0,0,.3), inset 0 0 0 2px rgba(0,0,0,.25), inset 0 0 0 5px rgba(255,255,255,.12), inset 0 0 0 7px rgba(0,0,0,.18); animation: salon-haengt .7s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--n, 0) * 90ms); }
 @keyframes salon-haengt { from { opacity: 0; transform: translateY(-10px) rotate(calc((var(--n, 0) - 1.5) * .5deg + 2deg)); } }
-.salon-rahmen:hover { transform: rotate(0deg) translateY(-4px) scale(1.02); box-shadow: 0 28px 40px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.3), inset 0 0 0 2px rgba(0,0,0,.25), inset 0 0 0 5px rgba(255,255,255,.14), inset 0 0 0 7px rgba(0,0,0,.18); }
+@media (hover: hover) and (pointer: fine) { .salon-rahmen:hover { transform: rotate(0deg) translateY(-4px) scale(1.02); box-shadow: 0 28px 40px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.3), inset 0 0 0 2px rgba(0,0,0,.25), inset 0 0 0 5px rgba(255,255,255,.14), inset 0 0 0 7px rgba(0,0,0,.18); } }
 .salon-rahmen:active { transform: rotate(0deg) scale(.99); }
 .salon-rahmen.nuss { background: linear-gradient(135deg, #7a5230, #4a2e18 45%, #6b4628 70%, #3a2212); }
 .salon-rahmen.gold { background: linear-gradient(135deg, #e2bd6a, #9a7130 40%, #d9b463 62%, #7a5622); }
@@ -2304,7 +2315,7 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 .salon-passepartout { background: #efe7d6; padding: 12px; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15), inset 0 2px 6px rgba(0,0,0,.18); }
 .salon-foto { position: relative; aspect-ratio: 3 / 4; overflow: hidden; background: #2a2422; box-shadow: inset 0 0 0 1px rgba(0,0,0,.4); }
 .salon-foto img { width: 100%; height: 100%; object-fit: cover; display: block; filter: sepia(.18) contrast(1.04) saturate(.92); transition: filter .4s; }
-.salon-rahmen:hover .salon-foto img { filter: sepia(.05) contrast(1.06) saturate(1); }
+@media (hover: hover) and (pointer: fine) { .salon-rahmen:hover .salon-foto img { filter: sepia(.05) contrast(1.06) saturate(1); } }
 .salon-glas { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, rgba(255,255,255,.22), rgba(255,255,255,0) 38%, rgba(255,255,255,0) 70%, rgba(255,255,255,.08)); }
 .salon-monogramm { display: grid; place-items: center; height: 100%; font: 600 64px ui-serif, "New York", Georgia, serif; color: #cdbb93; }
 .salon-schild { margin: 12px auto 0; padding: 5px 10px 4px; width: fit-content; max-width: 100%; border-radius: 3px; background: linear-gradient(#e8c878, #a8832f); color: #2b1d0c; box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 1px 2px rgba(0,0,0,.4); text-align: center; }
@@ -2312,7 +2323,7 @@ button.karte:hover, .blattkarte:hover, .projektkarte:hover { transform: translat
 .salon-schild span { display: block; font-size: 9.5px; letter-spacing: .04em; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .salon-kurz { font: italic 13px/1.45 ui-serif, "New York", Georgia, serif; color: color-mix(in srgb, var(--tinte) 78%, transparent); text-align: center; max-width: 260px; }
 .salon-tageskarte { display: grid; gap: 4px; width: 100%; max-width: 260px; padding: 12px 14px 10px; border-radius: 12px; text-align: left; background: rgba(255,245,225,.92); color: #2c2218; box-shadow: 0 6px 16px rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.08); transform: rotate(.6deg); transition: transform .25s; }
-.salon-tageskarte:hover { transform: rotate(0) translateY(-2px); }
+@media (hover: hover) and (pointer: fine) { .salon-tageskarte:hover { transform: rotate(0) translateY(-2px); } }
 .salon-tageskarte .st-ueber { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #8a6a2e; }
 .salon-tageskarte .st-text { font: 14px/1.45 ui-serif, "New York", Georgia, serif; }
 .salon-tageskarte .st-fuss { font-size: 10.5px; color: rgba(44,34,24,.6); }
@@ -2379,7 +2390,7 @@ html[data-thema="tinte"] .salon-galerie, html[data-thema="kerze"] .salon-galerie
 .salon-rahmen.gast .salon-schild { background: linear-gradient(#d8d2c4, #8f897c); }
 /* Schreibaufgabe des Tages */
 .salon-aufgabe-heute { display: flex; gap: 14px; align-items: center; width: 100%; margin-top: 18px; padding: 14px 16px; border-radius: 16px; text-align: left; background: var(--karte); box-shadow: 0 1px 5px var(--schein), inset 0 0 0 1px var(--linie); transition: transform .2s; }
-.salon-aufgabe-heute:hover { transform: translateY(-2px); }
+@media (hover: hover) and (pointer: fine) { .salon-aufgabe-heute:hover { transform: translateY(-2px); } }
 .salon-aufgabe-heute .sa-foto { width: 52px; height: 64px; border-radius: 3px; overflow: hidden; flex: none; box-shadow: 0 0 0 3px #a8832f, 0 3px 8px rgba(0,0,0,.3); background: #2a2422; }
 .salon-aufgabe-heute .sa-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .salon-aufgabe-heute .sa-text { display: grid; gap: 3px; min-width: 0; }
@@ -2389,7 +2400,7 @@ html[data-thema="tinte"] .salon-galerie, html[data-thema="kerze"] .salon-galerie
 .salon-sockel { height: 14px; margin-top: 18px; border-radius: 3px; background: linear-gradient(#7a5636, #3a2818); box-shadow: 0 6px 14px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.14); }
 /* Aufgaben im Fenster */
 .salon-aufgabe { display: grid; gap: 4px; width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
-.salon-aufgabe:hover { background: color-mix(in srgb, var(--karte) 85%, var(--akzent)); }
+@media (hover: hover) and (pointer: fine) { .salon-aufgabe:hover { background: color-mix(in srgb, var(--karte) 85%, var(--akzent)); } }
 .salon-aufgabe i { font: italic 15px/1.45 ui-serif, "New York", Georgia, serif; }
 .salon-aufgabe small { font-size: 12px; color: var(--blass); }
 .salon-hinweis { font-size: 12.5px; color: var(--blass); margin-bottom: 10px; }
@@ -2398,7 +2409,7 @@ html[data-thema="tinte"] .salon-galerie, html[data-thema="kerze"] .salon-galerie
 .salon-bretter { display: flex; align-items: flex-end; gap: 3px; flex-wrap: wrap; padding: 0 8px; }
 .salon-buchruecken { position: relative; width: 34px; height: var(--h, 160px); border-radius: 2px 2px 1px 1px; text-align: left; cursor: pointer; overflow: hidden; transform: rotate(calc((var(--i, 0) % 3 - 1) * .6deg)); transform-origin: bottom; transition: transform .2s;
   background: linear-gradient(90deg, rgba(0,0,0,.25), transparent 30%, rgba(255,255,255,.08) 70%, rgba(0,0,0,.2)), hsl(calc(var(--i, 0) * 47), 32%, 36%); box-shadow: 0 2px 4px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.2); color: #f3e7c9; }
-.salon-buchruecken:hover { transform: translateY(-6px); }
+@media (hover: hover) and (pointer: fine) { .salon-buchruecken:hover { transform: translateY(-6px); } }
 .salon-buchruecken span { position: absolute; left: 50%; top: 10px; bottom: 22px; writing-mode: vertical-rl; transform: translateX(-50%); font: 600 11px ui-serif, "New York", Georgia, serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .02em; }
 .salon-buchruecken small { position: absolute; left: 0; right: 0; bottom: 4px; text-align: center; font-size: 8.5px; opacity: .8; }
 .salon-buchruecken.gelesen { box-shadow: 0 2px 4px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.2), 0 0 0 2px #c9a25a; }
@@ -2525,7 +2536,7 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .inhalt, html[data-thema="ker
 #raum[data-ort] .kopf h1 { text-shadow: 0 1px 0 rgba(255,255,255,.25); }
 #raum[data-ort="zuhause"] .karte, #raum[data-ort="hefte"] .karte { box-shadow: 0 8px 20px var(--schein), inset 0 0 0 1px var(--linie); }
 /* Die Lettern des Setzkastens kippen beim Darüberfahren */
-#raum[data-ort="woerter"] .wortkarte:hover { transform: translateY(-3px) rotate(var(--dreh, 0deg)); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 -2px 0 rgba(0,0,0,.4), 0 8px 14px rgba(0,0,0,.35); }
+@media (hover: hover) and (pointer: fine) { #raum[data-ort="woerter"] .wortkarte:hover { transform: translateY(-3px) rotate(var(--dreh, 0deg)); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 -2px 0 rgba(0,0,0,.4), 0 8px 14px rgba(0,0,0,.35); } }
 
 /* ----- Salon, Stufe drei: die Wand ist ein Zimmer ----- */
 .salon-galerie.zimmer { display: block; padding: 30px 26px 150px; min-height: 520px; }
@@ -2537,11 +2548,12 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .inhalt, html[data-thema="ker
 .salon-reihe.gaeste .salon-schild b { font-size: 11.5px; } .salon-reihe.gaeste .salon-schild span { font-size: 8.5px; }
 .salon-reihe.gaeste .salon-lampe { width: 52px; margin-left: -26px; }
 .salon-sessel { position: absolute; z-index: 2; left: calc(50% - 18% - 260px); bottom: 16px; width: 100px; height: 120px; border-radius: 16px; background: transparent; cursor: pointer; }
-.salon-sessel:hover, .salon-sessel:focus-visible { box-shadow: 0 0 0 2px rgba(255,220,150,.35), 0 0 30px rgba(255,200,120,.3); outline: none; }
+.salon-sessel:focus-visible { box-shadow: 0 0 0 2px rgba(255,220,150,.35), 0 0 30px rgba(255,200,120,.3); outline: none; }
+@media (hover: hover) and (pointer: fine) { .salon-sessel:hover { box-shadow: 0 0 0 2px rgba(255,220,150,.35), 0 0 30px rgba(255,200,120,.3); outline: none; } }
 .salon-sessel::after { content: "Setz dich"; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); font-size: 11px; letter-spacing: .08em; color: rgba(255,240,215,.75); white-space: nowrap; opacity: 0; transition: opacity .2s; }
-.salon-sessel:hover::after { opacity: 1; }
+@media (hover: hover) and (pointer: fine) { .salon-sessel:hover::after { opacity: 1; } }
 .salon-kaminknopf { position: absolute; z-index: 2; left: calc(50% - 90px); bottom: 8px; width: 180px; height: 110px; background: transparent; border-radius: 8px; cursor: pointer; }
-.salon-kaminknopf:hover { box-shadow: 0 0 0 2px rgba(255,200,120,.3); }
+@media (hover: hover) and (pointer: fine) { .salon-kaminknopf:hover { box-shadow: 0 0 0 2px rgba(255,200,120,.3); } }
 @media (max-width: 760px) { .salon-galerie.zimmer { padding-bottom: 130px; } }
 .salon-konsole { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-top: 14px; }
 .salon-konsole .salon-tageskarte { max-width: none; transform: none; background: var(--karte); color: var(--tinte); box-shadow: 0 1px 5px var(--schein), inset 0 0 0 1px var(--linie); }
@@ -2566,11 +2578,11 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .inhalt, html[data-thema="ker
 .ringe-jahre { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .ringe-bild { display: grid; place-items: center; margin: 4px 0; }
 .ringe-bild svg { max-width: 100%; height: auto; }
-.ringe-bild .ring { cursor: pointer; transition: opacity .2s; } .ringe-bild .ring:hover { opacity: 1 !important; filter: brightness(1.1); }
+.ringe-bild .ring { cursor: pointer; transition: opacity .2s; } @media (hover: hover) and (pointer: fine) { .ringe-bild .ring:hover { opacity: 1 !important; filter: brightness(1.1); } }
 .ringe-unter { font: italic 14px/1.5 ui-serif, "New York", Georgia, serif; text-align: center; margin: 4px 0 8px; }
 .ringe-hinweis { font-size: 12px; color: var(--blass); text-align: center; }
 .ringe-liste { margin-top: 10px; } .ringe-liste .gruppe { font-size: 11.5px; letter-spacing: .08em; color: var(--blass); margin: 8px 0 4px; }
-.ringe-eintrag { display: grid; width: 100%; text-align: left; padding: 8px 10px; border-radius: 10px; } .ringe-eintrag:hover { background: var(--karte); }
+.ringe-eintrag { display: grid; width: 100%; text-align: left; padding: 8px 10px; border-radius: 10px; } @media (hover: hover) and (pointer: fine) { .ringe-eintrag:hover { background: var(--karte); } }
 .ringe-eintrag b { font-weight: 600; font-size: 14px; } .ringe-eintrag small { font-size: 12px; color: var(--blass); }
 .ringe-leer { font-style: italic; color: var(--blass); padding: 8px 10px; }
 /* ----- Textlupe ----- */
@@ -2594,7 +2606,7 @@ mark.lupe-wdh { background: rgba(255,196,90,.45); color: inherit; border-radius:
 /* ===================== 5.26: Orte, Stufe vier — Details, Bewegung, Tippen ===================== */
 .ort-kulisse .ort-bild { height: 150px; }
 .ort-tipp { cursor: pointer; outline: none; transition: filter .2s; transform-box: view-box; }
-.ort-tipp:hover { filter: brightness(1.08); }
+@media (hover: hover) and (pointer: fine) { .ort-tipp:hover { filter: brightness(1.08); } }
 .ort-tipp:focus-visible { filter: drop-shadow(0 0 4px rgba(255,220,150,.9)); }
 .ort-tipp.tippt { animation: ort-wackeln .95s cubic-bezier(.3,1.4,.5,1); }
 @keyframes ort-wackeln { 0% { transform: none; } 18% { transform: rotate(-5deg) translateY(-1.5px); } 42% { transform: rotate(4deg); } 66% { transform: rotate(-2deg); } 100% { transform: none; } }
@@ -2649,7 +2661,7 @@ html[data-orte-bewegung="aus"] .ort-tipp.tippt { animation-duration: .95s !impor
 #raum[data-ort="blaetter"] .blattliste { gap: 20px 18px; }
 #raum[data-ort="blaetter"] .blattliste > * { position: relative; border-radius: 2px; padding: 22px 22px 16px 36px; color: #2c2218; background: repeating-linear-gradient(transparent 0 25px, rgba(90,110,170,.17) 25px 26px) 0 16px / 100% 26px, linear-gradient(170deg, #fbf6e8, #f1e6d0); box-shadow: 0 1px 0 #e5d9c0, 0 3px 0 -1px #f5ecd9, 0 4px 0 -1px #e5d9c0, 0 12px 22px var(--schein); transform: rotate(-.45deg); transition: transform .25s, box-shadow .25s; }
 #raum[data-ort="blaetter"] .blattliste > *:nth-child(3n) { transform: rotate(.55deg); } #raum[data-ort="blaetter"] .blattliste > *:nth-child(3n+2) { transform: rotate(-.2deg); }
-#raum[data-ort="blaetter"] .blattliste > *:hover { transform: rotate(0) translateY(-4px); box-shadow: 0 1px 0 #e5d9c0, 0 3px 0 -1px #f5ecd9, 0 4px 0 -1px #e5d9c0, 0 18px 28px var(--schein); }
+@media (hover: hover) and (pointer: fine) { #raum[data-ort="blaetter"] .blattliste > *:hover { transform: rotate(0) translateY(-4px); box-shadow: 0 1px 0 #e5d9c0, 0 3px 0 -1px #f5ecd9, 0 4px 0 -1px #e5d9c0, 0 18px 28px var(--schein); } }
 #raum[data-ort="blaetter"] .blattliste > *::before { content: ""; position: absolute; left: 27px; top: 0; bottom: 0; width: 1px; background: rgba(200,80,80,.38); }
 #raum[data-ort="blaetter"] .blattliste > *::after { content: ""; position: absolute; right: 0; top: 0; width: 0; height: 0; border-style: solid; border-width: 0 20px 20px 0; border-color: transparent var(--hg) transparent transparent; filter: drop-shadow(-1px 1px 1px rgba(0,0,0,.18)); }
 #raum[data-ort="blaetter"] .blattliste > * .btitel { font: 700 16px/26px ui-serif, "New York", Georgia, serif; color: #2c2218; margin: 0; }
@@ -2881,7 +2893,7 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
 .abschnitt-kopfzeile h2 { margin: 0; flex: none; }
 .abschnitt-fassung { margin-left: auto; font-size: 11.5px; color: var(--blass); font-variant-numeric: tabular-nums; }
 .still-aktualisieren { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; font-size: 12.5px; color: var(--blass); background: none; box-shadow: inset 0 0 0 1px var(--linie); border-radius: 100px; }
-.still-aktualisieren:hover { color: var(--tinte); box-shadow: inset 0 0 0 1px var(--blass); }
+@media (hover: hover) and (pointer: fine) { .still-aktualisieren:hover { color: var(--tinte); box-shadow: inset 0 0 0 1px var(--blass); } }
 .still-aktualisieren svg.ik { width: 14px; height: 14px; }
 .still-aktualisieren[data-laeuft] { opacity: .6; }
 /* ----- Personenblatt ----- */
@@ -2913,7 +2925,7 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
 .salon-eigenerrahmen .se-quelle { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #8a7a62; }
 .salon-eigenerrahmen .se-schild { position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%); padding: 2px 12px; border-radius: 3px; background: linear-gradient(#d9b463, #a8832f); color: #2f2412; font: 700 9.5px ui-rounded, system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,.4); }
 .salon-eigenerrahmen-ecke { position: absolute; left: 50%; top: -14px; width: 10px; height: 14px; margin-left: -5px; background: linear-gradient(#e8c27a, #8a6a2e); border-radius: 2px; }
-.salon-eigenerrahmen:hover { box-shadow: 0 0 0 6px #a8832f, 0 0 0 8px rgba(255,236,190,.5), 0 18px 36px rgba(0,0,0,.5); }
+@media (hover: hover) and (pointer: fine) { .salon-eigenerrahmen:hover { box-shadow: 0 0 0 6px #a8832f, 0 0 0 8px rgba(255,236,190,.5), 0 18px 36px rgba(0,0,0,.5); } }
 @media (max-width: 600px) { .salon-eigenerrahmen { max-width: 90%; } }
 /* ----- Die Speicheranzeige: ein ruhiger Punkt im Schreibraum ----- */
 .speicheranzeige { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 100px; background: none; color: var(--blass); font-size: 12px; line-height: 1; opacity: .55; transition: opacity .4s ease, background .3s ease; }
@@ -2971,7 +2983,7 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
   opacity: 0; transition: opacity .35s ease; pointer-events: none;
 }
 .scrollleiste.sichtbar { opacity: 1; pointer-events: auto; }
-.scrollleiste:hover { opacity: 1; pointer-events: auto; }
+@media (hover: hover) and (pointer: fine) { .scrollleiste:hover { opacity: 1; pointer-events: auto; } }
 .scrollleiste.unnoetig { display: none; }
 .sl-spur {
   position: absolute; left: 50%; transform: translateX(-50%); top: 26px; bottom: 26px; width: 20px;
@@ -2985,9 +2997,12 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
   box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
   transition: background .2s, width .18s, margin-left .18s;
 }
-.scrollleiste:hover .sl-griff, .scrollleiste.zieht .sl-griff {
+.scrollleiste.zieht .sl-griff {
   background: var(--akzent); width: 14px; margin-left: -7px;
 }
+@media (hover: hover) and (pointer: fine) { .scrollleiste:hover .sl-griff {
+  background: var(--akzent); width: 14px; margin-left: -7px;
+} }
 .sl-marken { position: absolute; left: 50%; transform: translateX(-50%); top: 26px; bottom: 26px; width: 20px; pointer-events: none; }
 .sl-marke { position: absolute; left: 3px; width: 6px; height: 2px; border-radius: 1px; background: var(--blass); opacity: .5; }
 .sl-marke.stark { left: 1px; width: 10px; height: 2.5px; opacity: .8; background: var(--akzent); }
@@ -3005,8 +3020,9 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
   opacity: 0; transition: opacity .25s, color .2s;
 }
 .sl-sprung.hoch { top: 0; } .sl-sprung.runter { bottom: 0; }
-.scrollleiste.sichtbar .sl-sprung, .scrollleiste:hover .sl-sprung { opacity: .85; }
-.sl-sprung:hover { color: var(--akzent); }
+.scrollleiste.sichtbar .sl-sprung { opacity: .85; }
+@media (hover: hover) and (pointer: fine) { .scrollleiste:hover .sl-sprung { opacity: .85; } }
+@media (hover: hover) and (pointer: fine) { .sl-sprung:hover { color: var(--akzent); } }
 @media (max-width: 700px) { .scrollleiste { width: 30px; right: 0; } .sl-fahne { right: 34px; } }
 @media (prefers-reduced-motion: reduce) { .scrollleiste, .sl-griff, .sl-fahne, .sl-sprung { transition: none; } }
 
@@ -3032,7 +3048,7 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
   text-shadow: 0 -1px 0 rgba(255,238,208,.42), 0 1px 0 rgba(0,0,0,.5), 0 2px 4px rgba(0,0,0,.34);
 }
 html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(60,40,22,.5); }
-.desk-zitat.geritzt:hover { text-shadow: 0 -1px 0 rgba(255,240,215,.34), 0 1px 1px rgba(0,0,0,.7), 0 0 14px rgba(255,200,120,.25); }
+@media (hover: hover) and (pointer: fine) { .desk-zitat.geritzt:hover { text-shadow: 0 -1px 0 rgba(255,240,215,.34), 0 1px 1px rgba(0,0,0,.7), 0 0 14px rgba(255,200,120,.25); } }
 .desk-zitat.geritzt:focus-visible { outline: 2px solid var(--akzent); outline-offset: 3px; border-radius: 6px; }
 .desk-zitat .tz-schrift { white-space: pre-wrap; }
 /* Jedes Zeichen steht schon da — es ist nur noch nicht geschnitten. */
@@ -3084,7 +3100,7 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
   position: absolute; z-index: 3; right: 5%; top: calc(46% + 316px); width: 34px; height: 34px;
   opacity: .34; transition: opacity .25s, transform .25s;
 }
-.desk-ritzen:hover { opacity: 1; transform: rotate(-12deg) scale(1.08); }
+@media (hover: hover) and (pointer: fine) { .desk-ritzen:hover { opacity: 1; transform: rotate(-12deg) scale(1.08); } }
 .desk-ritzen .tz-klinge { position: absolute; left: 15px; top: 2px; width: 4px; height: 17px; background: linear-gradient(180deg, #e8e2d6, #9aa0a6); border-radius: 1px 1px 2px 2px; box-shadow: 0 1px 2px rgba(0,0,0,.5); }
 .desk-ritzen .tz-griff { position: absolute; left: 13px; top: 17px; width: 8px; height: 15px; background: linear-gradient(180deg, #6d4a2c, #3f2a17); border-radius: 2px 2px 3px 3px; }
 @media (max-width: 760px) { .desk-zitat { max-width: 124px; font-size: 11px; } .desk-ritzen { right: 3%; } }
@@ -3121,7 +3137,7 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
   border-radius: 3px;
 }
 .kalender-bild > .kal-band { position: absolute; left: 50%; bottom: -7px; width: 5px; height: 16px; margin-left: 14px; background: linear-gradient(180deg, #a8452f, #7d3020); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 74%, 0 100%); display: block; }
-.desk-ding.kalender:hover .kalender-bild { transform: rotate(-2deg) translateY(-3px) scale(1.03); }
+@media (hover: hover) and (pointer: fine) { .desk-ding.kalender:hover .kalender-bild { transform: rotate(-2deg) translateY(-3px) scale(1.03); } }
 .desk-ding.kalender.hat-heute .kal-blatttag { color: #a8452f; }
 .desk-ding.kalender.hat-heute::after {
   content: ""; position: absolute; right: -3px; top: -3px; width: 9px; height: 9px; border-radius: 50%;
@@ -3695,7 +3711,8 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
   overflow: hidden; text-overflow: ellipsis;
 }
 .alb-nameunter { font-style: normal; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--blass); opacity: 0; transition: opacity .2s; flex: none; }
-.alb-name:hover .alb-nameunter, .alb-name:focus-visible .alb-nameunter { opacity: 1; }
+.alb-name:focus-visible .alb-nameunter { opacity: 1; }
+@media (hover: hover) and (pointer: fine) { .alb-name:hover .alb-nameunter { opacity: 1; } }
 .alb-namenlinie { display: block; height: 2px; margin-top: 7px; border-radius: 1px; background: linear-gradient(90deg, var(--figurfarbe, var(--akzent)), transparent 78%); }
 .alb-lebensdaten { font-size: 13px; color: var(--blass); font-variant-numeric: tabular-nums; margin-top: 3px; }
 .alb-alter { font-size: 12.5px; color: var(--figurfarbe, var(--akzent)); font-style: italic; margin-top: 1px; }
@@ -3826,7 +3843,7 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
 .alb-blaetter[disabled] { opacity: .28; pointer-events: none; }
 .alb-seitenzahl { flex: 1; min-width: 0; text-align: center; display: flex; flex-direction: column; gap: 1px; }
 .alb-seitenzahl b { font-family: ui-serif, "New York", Georgia, serif; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.alb-seitenzahl b.leer { color: var(--blass); font-style: italic; font-weight: 400; }
+.alb-seitenzahl b.ohnenamen { color: var(--blass); font-style: italic; font-weight: 400; }
 .alb-seitenzahl small { font-size: 11px; color: var(--blass); font-variant-numeric: tabular-nums; }
 
 /* ============================================================
@@ -4292,6 +4309,380 @@ html[data-thema="papier"] .desk-zitat.geritzt { -webkit-text-stroke-color: rgba(
   .alb-regalbuch, .alb-bildplatte, .alb-fadenhaken, .albr-karte { transition: none; }
 }
 
+/* ================= DAS ALBUM — AUSBAUSTUFE 3 =================
+   Der Buchblock bekommt Tiefe, ein Lesebändchen und ein Titelblatt; das
+   Blättern bekommt eine Wölbung; alles Neue bewegt sich beim Erscheinen
+   einmal kurz und liegt dann still. */
+
+/* ----- Die Blattkanten links und rechts: man sieht, wie weit man ist ----- */
+.alb-buch { --stapel-links: 0; --stapel-rechts: 0; }
+.alb-stapel {
+  position: absolute; top: 26px; bottom: 26px; width: calc(2px + var(--kanten, 0) * 1.05px);
+  pointer-events: none; z-index: 0; border-radius: 2px;
+  transition: width .5s cubic-bezier(.3,.9,.3,1), opacity .4s;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,250,235,.92) 0 1px, rgba(176,152,110,.5) 1px 2.1px),
+    linear-gradient(90deg, #efe6cf, #cbbb96);
+  opacity: calc(.25 + var(--kanten, 0) * .05);
+}
+.alb-stapel.links { --kanten: var(--stapel-links); left: 30px; box-shadow: -1px 0 5px rgba(0,0,0,.35); }
+.alb-stapel.rechts { --kanten: var(--stapel-rechts); right: 6px; box-shadow: 1px 0 5px rgba(0,0,0,.35); }
+
+/* ----- Das Lesebändchen ----- */
+.alb-band {
+  position: absolute; top: -14px; left: calc(50% - 9px); width: 18px; height: 118px; z-index: 9;
+  border: 0; padding: 0; cursor: pointer; background: none;
+  transform-origin: 50% 0; animation: alb-bandfaellt .7s cubic-bezier(.25,1.3,.4,1);
+}
+.alb-band i {
+  display: block; width: 100%; height: 100%; border-radius: 1px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bandfarbe, #a8452f) 82%, #fff 18%), var(--bandfarbe, #a8452f));
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
+  box-shadow: 1px 2px 7px rgba(0,0,0,.4);
+  transition: height .35s cubic-bezier(.3,.9,.3,1), filter .25s;
+}
+.alb-band.hier i { height: 132%; filter: saturate(1.15); }
+@keyframes alb-bandfaellt { 0% { transform: translateY(-40px) rotate(-6deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+.alb-merken { flex: none; border: 0; background: none; padding: 4px 8px; cursor: pointer; border-radius: 8px; opacity: .5; transition: opacity .2s, transform .2s; }
+.alb-merken.an { opacity: 1; }
+.alb-merkband { display: block; width: 11px; height: 22px; border-radius: 1px; background: var(--bandfarbe, #a8452f); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%); }
+.alb-merken:not(.an) .alb-merkband { background: rgba(120,90,50,.4); }
+.alb-markezeile {
+  display: inline-flex; align-items: center; gap: 9px; margin: 10px auto 0; padding: 7px 15px 7px 9px;
+  border: 1px solid var(--rand); border-radius: 999px; background: var(--karte); color: var(--tinte);
+  font-size: 13px; cursor: pointer; transition: transform .2s, box-shadow .2s;
+}
+.alb-markezeile i { width: 8px; height: 18px; border-radius: 1px; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%); }
+
+/* ----- Das Titelblatt ----- */
+.alb-seite.ist-titel .alb-seiteninhalt { display: flex; flex-direction: column; }
+.alb-titelblatt { margin: auto 0; text-align: center; padding: 8px 0 20px; }
+.alb-tb-titel {
+  font-family: ui-serif, "New York", Georgia, serif; font-size: clamp(34px, 5.6vh, 54px); line-height: 1.05;
+  letter-spacing: .02em; color: #4b3620;
+  animation: alb-tb-auf .8s cubic-bezier(.2,.9,.3,1) both;
+}
+.alb-tb-unter {
+  margin-top: 10px; font-size: 11px; letter-spacing: .34em; text-transform: uppercase; color: rgba(110,84,46,.7);
+  animation: alb-tb-auf .8s .12s cubic-bezier(.2,.9,.3,1) both;
+}
+@keyframes alb-tb-auf { from { opacity: 0; transform: translateY(10px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+.alb-tb-linie { display: block; width: 54%; height: 1px; margin: 22px auto; background: linear-gradient(90deg, transparent, rgba(120,90,50,.5), transparent); position: relative; }
+.alb-tb-linie::after { content: "❧"; position: absolute; left: 50%; top: -11px; transform: translateX(-50%); font-size: 14px; color: rgba(120,90,50,.6); background: transparent; padding: 0 8px; }
+.alb-tb-zahlen { display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: rgba(90,68,40,.86); }
+.alb-tb-zahlen span { animation: alb-tb-auf .6s both; }
+.alb-tb-zahlen span:nth-child(2) { animation-delay: .18s; }
+.alb-tb-zahlen span:nth-child(3) { animation-delay: .24s; }
+.alb-tb-zahlen span:nth-child(4) { animation-delay: .3s; }
+.alb-tb-datum { margin-top: 18px; font-size: 11px; font-style: italic; color: rgba(120,90,50,.62); }
+.alb-tb-fleuron { display: block; height: 18px; opacity: .5; background: radial-gradient(circle at 50% 50%, rgba(120,90,50,.55) 0 1.6px, transparent 1.6px), linear-gradient(90deg, transparent 42%, rgba(120,90,50,.35) 42% 58%, transparent 58%); background-size: 100% 100%, 100% 1px; background-position: center, center; background-repeat: no-repeat; }
+.alb-tb-fleuron.oben { margin-bottom: 20px; }
+.alb-tb-fleuron.unten { margin-top: 24px; }
+.alb-tb-inhaltkopf { font-family: ui-serif, "New York", Georgia, serif; font-size: 19px; text-align: center; color: #4b3620; margin-bottom: 16px; }
+.alb-tb-verzeichnis { display: flex; flex-direction: column; gap: 12px; }
+.alb-tb-gruppe { display: grid; grid-template-columns: 30px 1fr; gap: 8px; align-items: start; }
+.alb-tb-buchstabe {
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 21px; color: rgba(120,90,50,.8);
+  border: 0; background: none; cursor: pointer; padding: 0; line-height: 1.1; text-align: left;
+  transition: color .2s, transform .2s;
+}
+.alb-tb-namen { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.alb-tb-name {
+  display: flex; align-items: baseline; gap: 6px; width: 100%; border: 0; background: none; cursor: pointer;
+  padding: 3px 2px; font-size: 13.5px; color: var(--tinte); text-align: left; border-radius: 4px;
+  transition: background .18s, padding-left .18s;
+}
+.alb-tb-name span { flex: none; max-width: 78%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.alb-tb-name::after { content: ""; flex: 1; height: 1px; margin: 0 2px 3px; background: repeating-linear-gradient(90deg, rgba(120,90,50,.4) 0 1.5px, transparent 1.5px 5px); }
+.alb-tb-name i { flex: none; font-style: normal; font-size: 11.5px; color: rgba(120,90,50,.7); font-variant-numeric: tabular-nums; }
+.alb-tb-offen { margin-top: 18px; font-size: 12px; font-style: italic; color: rgba(120,90,50,.68); text-align: center; }
+
+/* ----- Die Frage ----- */
+.alb-frage {
+  margin-top: 22px; padding: 14px 16px 12px; border-radius: 3px; position: relative;
+  border: 1px dashed rgba(120,90,50,.32); background: rgba(255,252,240,.5);
+}
+.alb-fragetext { margin: 6px 0 10px; font-family: ui-serif, "New York", Georgia, serif; font-size: 15px; line-height: 1.5; color: #4d3a22; }
+.alb-fragereihe { display: flex; gap: 8px; align-items: center; }
+.alb-fragewuerfel, .alb-frageschreiben {
+  border: 1px solid rgba(120,90,50,.3); background: rgba(255,255,255,.4); color: rgba(100,74,40,.9);
+  border-radius: 999px; cursor: pointer; font-size: 11.5px; padding: 4px 11px; transition: background .18s, transform .18s;
+}
+.alb-fragewuerfel { width: 26px; height: 26px; padding: 0; font-size: 13px; }
+.alb-fragewuerfel:active { transform: rotate(180deg); }
+
+/* ----- Geschichten als Knöpfe ----- */
+.alb-bandreihe { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.alb-geschichte {
+  border: 1px solid rgba(120,90,50,.3); background: rgba(255,255,255,.45); color: var(--tinte);
+  border-radius: 3px; cursor: pointer; font-size: 12.5px; padding: 2px 9px;
+  font-family: ui-serif, "New York", Georgia, serif; transition: background .18s, border-color .18s;
+}
+.alb-geschichte.an { background: var(--figurfarbe, var(--akzent)); border-color: transparent; color: #fff; }
+
+/* ----- Werkzeuge in der Kopfleiste ----- */
+.alb-werkzeug.anders { background: rgba(168,69,47,.14); border-color: rgba(168,69,47,.4); color: #8d3a26; }
+.alb-suchhinweis { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.alb-hinweisweg {
+  border: 0; background: none; color: var(--akzent); cursor: pointer; font-size: 11px;
+  text-decoration: underline; text-underline-offset: 2px; padding: 2px 4px;
+}
+
+/* ----- Ordnung und Geschichten wählen ----- */
+.albo-fenster { width: min(480px, 94vw); }
+.albo-vor { font-size: 12.5px; color: var(--blass); line-height: 1.5; margin: 0 0 12px; }
+.albo-wahl {
+  display: block; width: 100%; text-align: left; border: 1px solid var(--rand); background: var(--karte);
+  border-radius: 10px; padding: 10px 13px; margin-bottom: 7px; cursor: pointer; color: var(--tinte);
+  transition: border-color .18s, transform .18s, background .18s;
+}
+.albo-wahl b { display: block; font-size: 14px; font-weight: 600; }
+.albo-wahl small { display: block; margin-top: 2px; font-size: 11.5px; color: var(--blass); }
+.albo-wahl.an { border-color: var(--akzent); background: color-mix(in srgb, var(--akzent) 10%, var(--karte)); }
+.albo-wahl.an b::after { content: "  ✓"; color: var(--akzent); }
+
+/* ----- Das Netz ----- */
+.albn-fenster { width: min(720px, 95vw); max-height: 92vh; overflow-y: auto; }
+.albn-vor { font-size: 12.5px; color: var(--blass); line-height: 1.5; margin: 0 0 10px; }
+.albn-buehne {
+  border: 1px solid var(--rand); border-radius: 12px; padding: 10px; background: var(--karte);
+  display: flex; justify-content: center;
+}
+.albn-svg { width: 100%; height: auto; max-height: 58vh; aspect-ratio: 1; overflow: visible; }
+.albn-kante {
+  fill: none; stroke-width: .45; opacity: .5;
+  stroke-dasharray: 200; stroke-dashoffset: 200;
+  animation: albn-zieht .9s cubic-bezier(.3,.8,.3,1) both;
+  animation-delay: calc(var(--n, 0) * 22ms);
+}
+@keyframes albn-zieht { to { stroke-dashoffset: 0; } }
+.albn-kante.art-familie { stroke: #7d5ea7; }
+.albn-kante.art-naehe { stroke: #4f7d86; }
+.albn-kante.art-bewundert { stroke: #b0762f; }
+.albn-kante.art-verachtet { stroke: #a8452f; stroke-dasharray: 3 2.4; animation: none; opacity: .55; }
+.albn-knoten { cursor: pointer; animation: albn-setzt .5s cubic-bezier(.25,1.2,.4,1) both; animation-delay: calc(var(--n, 0) * 26ms); transform-box: fill-box; transform-origin: center; }
+@keyframes albn-setzt { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+.albn-punkt { transition: r .2s; stroke: var(--papier); stroke-width: .8; }
+.albn-knoten.allein .albn-punkt { fill-opacity: .35; stroke-dasharray: 1.5 1.2; }
+.albn-name { font-size: 3.1px; fill: var(--tinte); font-family: ui-serif, "New York", Georgia, serif; pointer-events: none; }
+.albn-knoten:focus-visible { outline: none; }
+.albn-knoten:focus-visible .albn-punkt { stroke: var(--akzent); stroke-width: 1.4; }
+.albn-legende { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin: 10px 0 4px; font-size: 11.5px; color: var(--blass); }
+.albn-le { display: inline-flex; align-items: center; gap: 5px; }
+.albn-le i { width: 16px; height: 2px; border-radius: 1px; }
+.albn-le.art-familie i { background: #7d5ea7; }
+.albn-le.art-naehe i { background: #4f7d86; }
+.albn-le.art-bewundert i { background: #b0762f; }
+.albn-le.art-verachtet i { background: repeating-linear-gradient(90deg, #a8452f 0 3px, transparent 3px 5px); }
+.albn-allein { margin-top: 10px; font-size: 12.5px; color: var(--blass); line-height: 1.7; }
+.albn-allein b { color: var(--tinte); font-weight: 600; }
+.albn-alleinname { border: 0; background: none; color: var(--akzent); cursor: pointer; font-size: 12.5px; padding: 0; }
+.albn-zwillinge { margin-top: 12px; }
+.albn-zwillinge summary { cursor: pointer; font-size: 13px; color: var(--tinte); }
+.albn-zwillinge > p { font-size: 11.5px; color: var(--blass); line-height: 1.5; margin: 8px 0; }
+.albn-zwilling { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 6px 0; border-top: 1px solid var(--rand); }
+.albn-zwilling button { border: 0; background: none; color: var(--akzent); cursor: pointer; font-size: 13px; padding: 0; }
+.albn-zwilling i { font-style: normal; font-size: 11px; color: var(--blass); font-variant-numeric: tabular-nums; }
+.albn-vergleichen { margin-left: auto; border: 1px solid var(--rand) !important; border-radius: 999px; padding: 3px 10px !important; font-size: 11px !important; color: var(--blass) !important; }
+
+/* ----- Zwei vergleichen ----- */
+.albv-fenster { width: min(560px, 94vw); max-height: 90vh; overflow-y: auto; }
+.albv-stand { text-align: center; font-size: 13px; color: var(--blass); margin-bottom: 12px; min-height: 18px; }
+.albv-wahl { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.albv-kandidat {
+  display: flex; align-items: center; gap: 9px; border: 1px solid var(--rand); background: var(--karte);
+  border-radius: 10px; padding: 8px 10px; cursor: pointer; color: var(--tinte); font-size: 13px; text-align: left;
+  transition: border-color .18s, transform .18s;
+}
+.albv-kandidat span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.albv-mono {
+  flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--figurfarbe, var(--akzent)); color: #fff; font-size: 11.5px; font-weight: 600; letter-spacing: .04em;
+}
+.albv-kandidat.a, .albv-kandidat.b { border-color: var(--figurfarbe, var(--akzent)); box-shadow: 0 0 0 2px color-mix(in srgb, var(--figurfarbe, var(--akzent)) 26%, transparent); }
+
+.albg-fenster { width: min(760px, 95vw); max-height: 92vh; overflow-y: auto; }
+.albg-kopf { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin-bottom: 10px; }
+.albg-wer { text-align: center; padding: 9px 8px; border-radius: 10px; border-top: 3px solid var(--figurfarbe, var(--akzent)); background: var(--karte); }
+.albg-wer b { display: block; font-size: 15px; }
+.albg-wer small { display: block; font-size: 11px; color: var(--blass); margin-top: 2px; }
+.albg-mitte { font-style: normal; font-size: 13px; color: var(--blass); font-variant-numeric: tabular-nums; }
+.albg-hinweis { font-size: 12px; color: var(--blass); text-align: center; margin: 6px 0 12px; }
+.albg-tafel { display: flex; flex-direction: column; }
+.albg-zeile {
+  display: grid; grid-template-columns: 1fr minmax(90px, 150px) 1fr; gap: 10px; align-items: baseline;
+  padding: 8px 6px; border-top: 1px solid var(--rand); font-size: 13px; line-height: 1.45;
+  animation: albg-rein .4s ease both; animation-delay: calc(var(--n, 0) * 18ms);
+}
+@keyframes albg-rein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.albg-links { text-align: right; }
+.albg-feld { text-align: center; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--blass); }
+.albg-nichts { color: var(--rand); font-style: normal; }
+.albg-zeile.gleich { background: color-mix(in srgb, var(--akzent) 8%, transparent); border-radius: 6px; }
+.albg-zeile.gleich .albg-feld { color: var(--akzent); }
+
+/* ----- Die Übersicht: Ordnung und Filter ----- */
+.albr-leiste { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0 12px; }
+.albr-ord {
+  border: 1px solid var(--rand); background: var(--karte); color: var(--blass); border-radius: 999px;
+  padding: 4px 11px; font-size: 11.5px; cursor: pointer; transition: background .18s, color .18s, border-color .18s;
+  max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.albr-ord.an { background: var(--akzent); border-color: transparent; color: #fff; }
+.albr-trenner { width: 1px; height: 16px; background: var(--rand); margin: 0 4px; }
+.albr-karte { animation: albr-rein .42s cubic-bezier(.25,1.1,.4,1) both; animation-delay: calc(var(--n, 0) * 26ms); }
+@keyframes albr-rein { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: none; } }
+
+/* ----- Der Füllstand im Blatt ----- */
+.albb-fuelle { margin: 6px 0 10px; }
+.albb-fuelle i { display: block; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--akzent), color-mix(in srgb, var(--akzent) 55%, #fff)); width: 0; transition: width .5s cubic-bezier(.3,.9,.3,1); }
+.albb-fuelle small { display: block; margin-top: 5px; font-size: 11px; color: var(--blass); }
+
+/* ----- Die Klebezettel setzen sich auf ----- */
+.alb-zettel { animation: alb-zettel-legt .5s cubic-bezier(.25,1.15,.4,1) both; animation-delay: calc(var(--nz, 0) * 55ms + 180ms); }
+@keyframes alb-zettel-legt {
+  from { opacity: 0; transform: translateY(-14px) rotate(0deg) scale(1.06); }
+  to { opacity: 1; }
+}
+
+/* ----- Das Blättern bekommt eine Wölbung -----
+   Ein Blatt Papier ist im Umschlagen nicht flach: es krümmt sich, und über
+   die Krümmung wandert ein Lichtstreifen. Der Falzschatten sitzt an der
+   Kante, um die es sich dreht. */
+.alb-blatt.laeuft { transition: transform .62s cubic-bezier(.36,.02,.28,1); }
+.alb-blattfalz {
+  position: absolute; top: 0; bottom: 0; width: 46px; pointer-events: none; opacity: 0;
+  transition: opacity .3s;
+}
+.alb-blatt.vor .alb-blattseite.vorn .alb-blattfalz { left: 0; background: linear-gradient(90deg, rgba(60,40,20,.4), transparent); }
+.alb-blatt.vor .alb-blattseite.hinten .alb-blattfalz { right: 0; background: linear-gradient(270deg, rgba(60,40,20,.4), transparent); }
+.alb-blatt.zurueck .alb-blattseite.vorn .alb-blattfalz { right: 0; background: linear-gradient(270deg, rgba(60,40,20,.4), transparent); }
+.alb-blatt.zurueck .alb-blattseite.hinten .alb-blattfalz { left: 0; background: linear-gradient(90deg, rgba(60,40,20,.4), transparent); }
+.alb-blatt.laeuft .alb-blattfalz { opacity: 1; }
+.alb-blattglanz { animation: alb-glanz .62s cubic-bezier(.36,.02,.28,1); }
+@keyframes alb-glanz { 0% { opacity: 0; } 45% { opacity: .55; } 100% { opacity: 0; } }
+
+/* ----- Der Name schreibt sich, wenn die Seite sich setzt ----- */
+.alb-block.setzt-sich .alb-name.schreibt b {
+  animation: alb-nameschreibt .8s cubic-bezier(.3,.85,.3,1) both;
+}
+@keyframes alb-nameschreibt {
+  from { clip-path: inset(0 100% 0 0); opacity: .3; }
+  to { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+.alb-block.setzt-sich .alb-namenlinie { animation: alb-linienzieht .7s .1s cubic-bezier(.3,.85,.3,1) both; }
+@keyframes alb-linienzieht { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.alb-namenlinie { transform-origin: left center; }
+
+/* ----- Nur wo es eine echte Maus gibt -----
+   Auf dem iPad bleibt ein :hover nach dem Tippen kleben und sieht aus wie
+   eine Auswahl, die man nicht mehr los wird. */
+@media (hover: hover) and (pointer: fine) {
+  .alb-markezeile:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,.12); }
+  .alb-merken:hover { opacity: 1; transform: translateY(1px); }
+  .alb-tb-name:hover { background: color-mix(in srgb, var(--figurfarbe, var(--akzent)) 12%, transparent); padding-left: 8px; }
+  .alb-tb-buchstabe:hover { color: var(--akzent); transform: translateX(2px); }
+  .alb-fragewuerfel:hover, .alb-frageschreiben:hover { background: rgba(255,255,255,.85); }
+  .alb-geschichte:hover { background: rgba(255,255,255,.9); border-color: rgba(120,90,50,.55); }
+  .alb-geschichte.an:hover { background: var(--figurfarbe, var(--akzent)); }
+  .albo-wahl:hover { border-color: var(--akzent); transform: translateX(2px); }
+  .albv-kandidat:hover { border-color: var(--akzent); transform: translateY(-1px); }
+  .albr-ord:hover { border-color: var(--akzent); color: var(--tinte); }
+  .albr-ord.an:hover { color: #fff; }
+  .albn-knoten:hover .albn-punkt { r: 6.4; }
+  .albn-alleinname:hover, .albn-zwilling button:hover { text-decoration: underline; }
+  .alb-hinweisweg:hover { color: var(--tinte); }
+}
+
+/* ----- Kleine Fenster ----- */
+@media (max-width: 720px) {
+  .alb-stapel { display: none; }
+  .albg-zeile { grid-template-columns: 1fr; gap: 2px; text-align: center; }
+  .albg-links { text-align: center; }
+  .albn-svg { max-height: 46vh; }
+  .albv-wahl { grid-template-columns: 1fr 1fr; }
+}
+
+/* ----- Wer keine Bewegung will, bekommt keine ----- */
+@media (prefers-reduced-motion: reduce) {
+  .alb-band, .alb-tb-titel, .alb-tb-unter, .alb-tb-zahlen span, .albn-kante, .albn-knoten,
+  .albg-zeile, .albr-karte, .alb-zettel, .alb-blattglanz,
+  .alb-block.setzt-sich .alb-name.schreibt b, .alb-block.setzt-sich .alb-namenlinie {
+    animation: none !important;
+  }
+  .alb-stapel, .alb-band i, .albb-fuelle i { transition: none !important; }
+  .albn-kante { stroke-dashoffset: 0; }
+}
+
+/* Der Kalender reicht bis 1600 zurück, zeigt sich aber ab 2000. Wer weiter
+   zurück will, klappt die Jahresleiste auf. */
+.kal-jahrfrueher {
+  flex: none; border: 1px dashed var(--rand); background: none; color: var(--blass);
+  border-radius: 999px; padding: 3px 11px; font-size: 11px; cursor: pointer; white-space: nowrap;
+  transition: color .18s, border-color .18s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .kal-jahrfrueher:hover { color: var(--tinte); border-color: var(--akzent); }
+}
+
+/* Die Blattkanten liegen in der Rinne neben den Seiten — dort, wo man sie
+   in einem aufgeschlagenen Buch auch sieht. Dafür braucht der Deckel etwas
+   mehr Rand, sonst laufen sie unter die Seite. */
+.alb-buch { padding: 12px 22px 12px 46px; }
+.alb-stapel { top: 34px; bottom: 34px; width: calc(3px + var(--kanten, 0) * .78px); }
+.alb-stapel.links { left: 34px; }
+.alb-stapel.rechts { right: 7px; }
+
+/* Ein Buch, das aufgeschlagen daliegt, füllt den Tisch. Vorher richtete sich
+   seine Höhe nach dem Inhalt, und bei einer knappen Seite blieb unten
+   Tischplatte übrig. */
+.alb-buch { min-height: min(880px, 92vh); }
+.alb-seite { min-height: 0; }
+
+/* Der Schmuck gehört zur Seite, nicht zum Text: Rahmen, Fleurons, Laufkopf,
+   Initiale und Seitenzahl bleiben liegen, während der Inhalt scrollt. Vorher
+   scrollte alles mit — bei einer vollen Figur wanderte der Rahmen mitten
+   durch den Text. */
+.alb-seite { overflow: hidden; }
+.alb-seiteninhalt { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+
+/* Eine Buchseite scrollt nach unten, nie zur Seite. Die leicht schief
+   gesetzten Stücke ragen um ein Pixel über den Rand — und ein Pixel genügt
+   dem Browser für einen vollen Querbalken. */
+.alb-seiteninhalt { overflow-x: hidden; }
+
+/* Und wenn schon ein Balken, dann keiner aus dem Betriebssystem: ein
+   schmaler Strich in der Farbe des Papiers, sonst liegt ein Stück Fenster
+   mitten im Leder. */
+.alb-seiteninhalt { scrollbar-width: thin; scrollbar-color: rgba(120,90,50,.32) transparent; }
+.alb-seiteninhalt::-webkit-scrollbar { width: 7px; height: 0; }
+.alb-seiteninhalt::-webkit-scrollbar-track { background: transparent; }
+.alb-seiteninhalt::-webkit-scrollbar-thumb { background: rgba(120,90,50,.3); border-radius: 4px; }
+.alb-seiteninhalt::-webkit-scrollbar-thumb:active { background: rgba(120,90,50,.5); }
+
+/* ===================== NACHGEZOGENES =====================
+   Drei Dinge, die im Code schon so gemeint waren, in der CSS aber fehlten. */
+
+/* `.knopf zart gefahr` wurde an drei Stellen vergeben — für das Löschen einer
+   Figur, eines Kalendereintrags, eines Bildnisses. Nur gab es die Klasse
+   nirgends. Ein Löschknopf, der genauso aussieht wie „Als Blatt ablegen"
+   direkt daneben, ist kein Stilproblem, sondern eine Falle. */
+.knopf.gefahr { color: #a8392b; }
+.knopf.gefahr:active { background: rgba(168,57,43,.12); }
+html[data-thema="tinte"] .knopf.gefahr, html[data-thema="kerze"] .knopf.gefahr { color: #e07b6a; }
+@media (hover: hover) and (pointer: fine) {
+  .knopf.gefahr:hover { color: #8d2e22; background: rgba(168,57,43,.09); box-shadow: 0 1px 4px var(--schein), inset 0 0 0 1px rgba(168,57,43,.35); }
+  html[data-thema="tinte"] .knopf.gefahr:hover, html[data-thema="kerze"] .knopf.gefahr:hover { color: #f0958a; }
+}
+
+/* `.leer .klein` gilt für ein KIND. An sechs Stellen steht aber `leer klein`
+   auf demselben Element — dort griff bisher die volle Regel mit 46 px
+   Polsterung, und ein „Nichts Passendes." füllte die halbe Liste. */
+.leer.klein {
+  padding: 18px 14px; font-size: 14px;
+  font-family: ui-rounded, -apple-system, system-ui, sans-serif; font-style: normal;
+}
+
 </style>
 </head>
 <body>
@@ -4318,7 +4709,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.33.0';
+const APP_VERSION = '5.34.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -5363,7 +5754,12 @@ function autogrow(ta) {
     for (const [p, oben] of merker) if (p.scrollTop !== oben) p.scrollTop = oben;
   };
   ta.addEventListener('input', anpassen);
-  requestAnimationFrame(anpassen);
+  /* Sofort messen und gleich noch einmal, wenn das Feld im Baum hängt. Ein
+     requestAnimationFrame allein genügt nicht: der steht still, solange das
+     Fenster verdeckt ist — das Feld bliebe auf Standardhöhe mit
+     abgeschnittenem Text, bis jemand das erste Zeichen tippt. */
+  anpassen();
+  setTimeout(anpassen, 0);
   return anpassen;
 }
 
@@ -6207,7 +6603,10 @@ function scrollleiste(bereich, optionen = {}) {
 
   (optionen.ziel || bereich.parentNode || document.body).append(leiste);
   bereich._leiste = { element: leiste, stellen, markenSetzen, ab: abraeumen };
-  requestAnimationFrame(() => { stellen(); markenSetzen(); sichtbar(2200); });
+  /* Kein requestAnimationFrame: der steht still, solange das Fenster verdeckt
+     ist. Baut sich der Bereich in einem Hintergrund-Tab auf, bekäme die Leiste
+     nie eine Höhe und der Einblendzähler liefe nie an. */
+  setTimeout(() => { stellen(); markenSetzen(); sichtbar(2200); }, 0);
   return bereich._leiste;
 }
 
@@ -11287,7 +11686,18 @@ function merkeHeftLagen() {
 }
 function spieleHeftLagen() {
   if (!_heftLagen.size) return;
-  requestAnimationFrame(() => {
+  /* Die Hefte gleiten von ihrer alten an ihre neue Stelle: erst dorthin
+     zurückgesetzt, wo sie waren, dann losgelassen.
+
+     Das lief über zwei requestAnimationFrame-Schritte — und der steht still,
+     sobald das Fenster verdeckt ist. Wechselte man direkt nach dem
+     Wegstellen die App, blieben sämtliche Hefte versetzt und verzerrt auf
+     ihrer alten Stelle stehen, bis man zurückkam. Deshalb setTimeout, und
+     wenn ohnehin niemand hinsieht, wird gar nicht erst verschoben. */
+  const stillsteht = (typeof document !== 'undefined' && document.hidden) ||
+    (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (stillsteht) { _heftLagen.clear(); return; }
+  setTimeout(() => {
     $$('[data-heft]').forEach((e) => {
       const alt = _heftLagen.get(e.dataset.heft);
       if (!alt) return;
@@ -11297,11 +11707,14 @@ function spieleHeftLagen() {
       e.style.transition = 'none';
       e.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sx + ',' + sy + ')';
       e.style.transformOrigin = 'top left';
-      requestAnimationFrame(() => {
+      /* Ein Sicherheitsnetz: was auch immer dazwischenkommt — nach
+         spätestens 700 ms steht kein Heft mehr schief. */
+      setTimeout(() => {
         e.style.transition = 'transform .55s cubic-bezier(.2,.8,.2,1)';
         e.style.transform = '';
         setTimeout(() => { e.style.transition = ''; e.style.transformOrigin = ''; }, 600);
-      });
+      }, 16);
+      setTimeout(() => { e.style.transition = ''; e.style.transform = ''; e.style.transformOrigin = ''; }, 700);
     });
     _heftLagen.clear();
   });
@@ -11578,7 +11991,10 @@ async function figurAnlegenOderAendern(p, alt) {
   return neuDoc('figur', { parent: p.id, projekt: p.id, titel: name, art, notiz, ord: figurenVon(p).length });
 }
 function baueFigurenUndOrte(p) {
-  const liste = figurenVon(p).sort((a, b) => (FIGUR_ARTEN.findIndex((x) => x[0] === a.art) - FIGUR_ARTEN.findIndex((x) => x[0] === b.art)) || (a.titel || '').localeCompare(b.titel || '', 'de'));
+  /* Eine Art, die es nicht (mehr) gibt, bekommt -1 und stünde vor allen
+     anderen. Unbekanntes gehört ans Ende, nicht an den Anfang. */
+  const artRang = (x) => { const i = FIGUR_ARTEN.findIndex((a) => a[0] === x.art); return i < 0 ? FIGUR_ARTEN.length : i; };
+  const liste = figurenVon(p).sort((a, b) => (artRang(a) - artRang(b)) || (a.titel || '').localeCompare(b.titel || '', 'de'));
   const band = el('div', { class: 'figurenband' });
   for (const f of liste) {
     const vorkommen = figurVorkommen(p, f.titel);
@@ -11768,10 +12184,16 @@ function szenenGesten(karte, s, p) {
     const geschwister = kinder(zielKapitelId, 'szene').filter((x) => x.id !== s.id);
     let einfuegen = geschwister.length;
     if (zielKarte) {
+      /* Die Karte unter dem Finger kann zu einer anderen Pinnwand gehören
+         (überlappende Wände) oder inzwischen weg sein. Dann gibt findIndex
+         -1 zurück, und ein splice(-1) legt die Szene VOR die letzte statt
+         an den Anfang. In dem Fall hängen wir sie einfach hinten an. */
       const zielSzene = D.docs.get(zielKarte.dataset.id);
-      const zi = geschwister.findIndex((x) => x.id === zielSzene.id);
-      const r = zielKarte.getBoundingClientRect();
-      einfuegen = e.clientX < r.left + r.width / 2 ? zi : zi + 1;
+      const zi = zielSzene ? geschwister.findIndex((x) => x.id === zielSzene.id) : -1;
+      if (zi >= 0) {
+        const r = zielKarte.getBoundingClientRect();
+        einfuegen = e.clientX < r.left + r.width / 2 ? zi : zi + 1;
+      }
     }
     s.parent = zielKapitelId;
     geschwister.splice(einfuegen, 0, s);
@@ -17473,6 +17895,9 @@ const ANLEITUNG = [
       { t: 'Leuchter, Uhr und der zweite Stuhl', p: ['Der Leuchter brennt wirklich ab: Jede Kerze, die ich im Schreibraum anzünde, nimmt den sieben Kerzen etwas Wachs — nach zwanzig Schreibstunden sind sie herunter, dann „neue aufstecken" als kleines Ritual. Die Standuhr zeigt die Zeit, antippen sagt, wie lange ich schon am Tisch sitze; wer mag, lässt sie ticken (Einrichten), zur vollen Stunde ein leiser Glockenschlag. Der zweite Stuhl ist der Faden — ein Gespräch am Tisch.'] },
       { t: 'Der Papierkorb unterm Tisch', p: ['Links unten, mit zerknüllten Blättern: der Papierkorb. Antippen zeigt, was zuletzt hineinflog; eines „glätten" holt es zurück — an seinen alten Ort.'] },
       { t: 'Die Dinge', p: ['Die Manuskripte in der Mitte sind meine drei zuletzt bearbeiteten Texte — antippen schreibt weiter. Tintenfass und Feder: ein neues Blatt. Die Tasse: der Schreibtag (sie dampft, wenn ich heute geschrieben habe; die Zahl sind die Wörter). Das Glas mit dem Fundstück: der Funke des Tages. Der Brief: eine Zeitkapsel an mich selbst. Die Karteikarten: eine Wortkiste abfragen. Die Lupe: suchen. Der Bleistiftstummel: schnell einen Schnipsel. Das Notizbuch mit den Zetteln: mein letztes Heft. Der Bücherstapel: der Lesestapel. Die Lampe: heller oder dunkler. Der Leuchter: Schreibzeit anzünden — öffnet ein Blatt und die Kerze brennt. Das Fenster: die Grillen und der Wind des Nachtgartens (Klang); spielt im Klangraum Regen, regnet es vor dem Fenster, bei Gewitter wetterleuchtet es.'] },
+      { t: 'Der Kalender', p: ['Links auf dem Tisch, etwas über dem Briefumschlag, liegt ein Kalender. Ein Tipp schlägt ihn auf. Vier Ansichten: Monat (Tag für Tag), Jahr (alle zwölf Monate auf einen Blick), Leben (ein Strich pro Mensch, mit Kerben für die Ereignisse) und Chronik (alles der Reihe nach).', 'Ein Termin braucht nur ein Datum. Alles andere — Art, Titel, Notiz, Ort, wer dabei war, Zeichen und Farbe — darf leer bleiben. Die Namen bei „Wer“ sind frei hineingeschrieben: der Kalender hängt nicht an deinen Figuren und deinen Texten, du kannst eintragen, was du willst.'] },
+      { t: 'Wie weit der Kalender reicht', p: ['Von 1600 bis 2050. Gezeigt wird er ab 2000 — vierhundert Jahresknöpfe wären keine Leiste mehr, sondern eine Wand. Steht wirklich etwas früher darin, reicht die Leiste von allein bis dorthin; sonst klappt „‹ früher“ sie Schritt für Schritt weiter auf.', 'So kannst du auch eine Figur eintragen, die 1783 geboren wurde — mit richtigem Alter und richtigem Lebensband.'] },
+      { t: 'Jahrestage und Widersprüche', p: ['Ein Geburtstag kehrt jedes Jahr wieder — bis zum Todestag, dann nicht mehr. Und wenn etwas nicht sein kann — gestorben vor der Geburt, zwei Geburtsdaten für dieselbe Person —, sagt der Kalender es ruhig dazu, ohne zu meckern.'] },
       { t: 'Die Schublade', p: ['Unten am Tisch. Darin: drei Fundstücke aus meinen eigenen Texten (wie auf dem Zuhause, nur verstaut), eine winzige Lupe, Bindfaden (Cluster), getrocknete Blätter (die losen Blätter), Briefmarken (etwas hinausschicken), ein Schlüssel ohne Schloss (Feinheiten) — und ein Stück Metall unbekannter Herkunft: ein alter Schnipsel, der entweder bedeutungslos ist oder der Schlüssel zu einem ganzen Roman.'] },
       { t: 'Brief an mich', p: ['Ich schreibe, wähle „in einem Monat" (oder einer Woche, einem Jahr) — der Brief wird versiegelt und liegt auf dem Tisch. Vor dem Datum lässt er sich nicht öffnen. Ist es so weit, pocht das Siegel. Öffnen, lesen, antworten (wird ein neues Blatt) oder wegwerfen.'], b: 'Am Anfang eines Projekts einen Brief „in drei Monaten": was ich hoffe, was ich fürchte, wo ich stehen will.' },
       { t: 'Das Bücherbord und die Cover', p: ['Die Bücher stehen in einer Reihe auf einem Brett, leicht gelehnt, jedes für sich greifbar — Darüberfahren hebt eines heraus, ein rotes Leseband zeigt, wie weit ich bin. Cover holt VANI aus dem Netz über die ISBN (aus dem Impressum der PDF oder dem Koffer): beim Auflegen still im Hintergrund, für alles schon Aufgelegte mit „Schöne Cover holen" im Lesestapel, je Buch mit „Cover aus dem Netz (ISBN)" — notfalls tippe ich die ISBN selbst.'] },
@@ -17637,22 +18062,29 @@ const ANLEITUNG = [
     id: 'album', titel: 'Album', icon: 'album', raum: 'album',
     kurz: 'Ein dickes Buch, in dem die Figuren wohnen — eine Doppelseite für jede.',
     abschnitte: [
-      { t: 'Aufschlagen', p: ['Im Raum liegt das Buch. Ein Tippen, und es klappt auf. Geblättert wird mit den Pfeilen unten, mit den Pfeiltasten, oder indem du quer über die Seite wischst. „n" legt eine neue Figur an.'] },
+      { t: 'Aufschlagen', p: ['Im Raum liegt das Buch. Ein Tippen, und es klappt auf. Zuerst kommt das Titelblatt: was darin steht, wie viele Figuren, wie viele Einträge — und rechts das Verzeichnis, in dem ein Tipp auf einen Namen sofort zu ihr springt.', 'Geblättert wird mit den Pfeilen unten, mit den Pfeiltasten, oder indem du quer über die Seite wischst. Springst du weiter, fliegen mehrere Blätter — wie wenn man den Daumen durchlaufen lässt. An den Aussenkanten siehst du, wie dick der Stapel links und rechts noch ist.'] },
+      { t: 'Das Lesebändchen', p: ['Unten neben der Seitenzahl hängt ein kleines Band. Ein Tipp, und es liegt bei dieser Figur; noch einer, und es ist wieder heraus. Beim nächsten Aufschlagen liegt das Buch dort. Gemerkt wird die Figur, nicht die Seitenzahl — sortierst du das Buch um, liegt das Band trotzdem bei ihr. Mit der Taste „b".'] },
       { t: 'Eine Doppelseite pro Figur', p: ['Links steht, wer sie ist und wie sie aussieht. Rechts, was für ein Mensch das ist, was ihr geschah, wie sie klingt und wohin sie gehört. Diese Aufteilung ändert sich nie — so findest du auch nach dreißig Figuren noch alles wieder.'] },
       { t: 'Nichts muss', p: ['Jedes Feld darf leer bleiben. Was leer ist, steht nicht auf der Seite — und man sieht ihm auch nicht an, dass es fehlt. Nachtragen geht jederzeit: oben links auf den Namen tippen. Was du wieder herausnimmst, verschwindet von der Seite.'], b: 'Nur Name und ein Satz unter „Sagt"? Dann steht genau das da, und die Seite sieht trotzdem fertig aus.' },
       { t: 'Was du eintragen kannst', p: ['Sechs Gruppen: Der Kopf der Seite (Spitzname, Alter, geboren, gestorben, Orte), Wie sie aussieht (von Statur und Händen bis Narben, Geruch und was in den Taschen ist), Was für ein Mensch das ist (Wesenszüge, der Widerspruch, Eigenheiten, Ängste, die Lüge die sie glaubt, will und braucht), Was ihr geschehen ist (Ereignisse, Wendepunkt, Familie), Wie sie klingt (Sätze, die erste Zeile, was sie nie sagt) und Wo sie hingehört (Geschichten, Rolle, Ort, Klang). Dazu Notizen und eigene Kategorien.'] },
       { t: 'Wesenszüge', p: ['Ein Wortschatz von vierhundert Wörtern in sechzehn Gruppen — von „sanftmütig" bis „hintergründig". Suchen, antippen, fertig. Und was du selbst hineinschreibst, merkt sich VANI und schlägt es bei der nächsten Figur mit vor.'] },
-      { t: 'Geburtstag und Todestag', p: ['Trägst du ein Datum ein, steht es sofort auch im Kalender — und rechnet dort das Alter mit. Änderst du es, ändert sich der Kalendereintrag; nimmst du es weg, verschwindet er.'] },
+      { t: 'Geburtstag und Todestag', p: ['Trägst du ein Datum ein, steht es sofort auch im Kalender — und rechnet dort das Alter mit. Änderst du es, ändert sich der Kalendereintrag; nimmst du es weg, verschwindet er.', 'Der Kalender reicht von 1600 bis 2050. Eine Figur, die 1783 geboren wurde, kannst du also eintragen; oben auf der Seite steht dann „✻ 9. Apr 1783 † 9. Apr 1845 — wurde 62 Jahre alt".'] },
       { t: 'Wer wen kennt', p: ['Bei Familie, „Steht nahe", „Bewundert" und „Verachtet" schreibst du die Rolle davor: „Mutter — Ilva". Wer schon im Album steht, wird erkannt und verlinkt: ein Tipp, und du bist auf ihrer Seite.'] },
-      { t: 'Klebezettel', p: ['Bis zu fünfzehn pro Figur, in fünf Farben. Sie kleben unten rechts auf der Doppelseite, ordentlich nebeneinander.'] },
-      { t: 'Suchen und finden', p: ['Oben liegt die Suchleiste — sie sucht zuerst im Namen, dann in allem anderen. Daneben das Register: ein Buchstabe, ein Sprung. Die Figuren stehen immer alphabetisch, egal wann du sie angelegt hast.'] },
-      { t: 'Das Bildnis', p: ['Auf der linken Seite hängt ein gerahmtes Bildnis. Tipp darauf: ein Foto vom Gerät, oder selbst gezeichnet. Lässt du es leer, stehen dort die Anfangsbuchstaben — und das sieht aus, als wäre es so gemeint.'] },
+      { t: 'Klebezettel', p: ['Bis zu fünfzehn pro Figur, in fünf Farben. Sie kleben links unten auf der Doppelseite, ordentlich nebeneinander — dort haben sie Platz, und die linke Seite bekommt das Gewicht.'] },
+      { t: 'Suchen und finden', p: ['Oben liegt die Suchleiste — sie sucht zuerst im Namen, dann in allem anderen. Daneben das Register: ein Buchstabe, ein Sprung.'] },
+      { t: 'In welcher Ordnung', p: ['Alphabetisch ist die Ruhelage, und sie bleibt es: so liegt jede Figur immer an derselben Stelle. Der Knopf oben schaltet für einen Moment um — nach Fülle, die Stillen zuerst, zuletzt angefasst, nach Anlage, nach Geburtstag. Solange eine andere Ordnung gilt, steht sie sichtbar oben, damit du weisst, warum die Seiten woanders liegen.'] },
+      { t: 'Eine Geschichte allein', p: ['Was du bei „Kommt vor in" einträgst, wird gezählt. Der Knopf daneben zeigt dann nur noch die Figuren einer Geschichte — oder du tippst direkt auf den Namen der Geschichte auf der Seite. „Filter weg" holt alle zurück.'] },
+      { t: 'Das Bildnis', p: ['Standardmässig ist es aus. Ein Gesicht festzulegen nimmt einem etwas weg: solange keins dasteht, darf die Figur aussehen, wie sie im Kopf gerade aussieht. Statt eines Bildes liegt ein grosser, blasser Anfangsbuchstabe im Papier.', 'Wer eins will, schaltet es in den Feinheiten unter „Album" ein. Dann hängt auf der linken Seite ein gerahmtes Bildnis: ein Foto vom Gerät, oder selbst gezeichnet.'] },
       { t: 'Offene Fäden', p: ['Alles, was du in einer Geschichte legst, ist ein Versprechen an den Leser: der Schlüssel in der Schublade, der Cousin in Marseille, die Warnung vor dem Obstgarten. Trag sie unter „Offene Fäden" ein und setz einen Haken, sobald sie eingelöst sind. Unten im Buch steht, wie viele bei dieser Figur noch offen sind; in der Übersicht siehst du alle offenen Fäden des ganzen Albums.'] },
       { t: 'Der Bogen', p: ['„Am Anfang ist X" und „Am Ende ist X" — zwei Karten nebeneinander, und dazwischen steht die ganze Wandlung. Dazu der Leitsatz, der groß über der Doppelseite steht.'] },
       { t: 'Was das Buch selbst weiß', p: ['Links unter dem Steckbrief läuft die Zeitleiste: alle Kalendertermine dieser Figur, mit dem Alter, das sie damals hatte. Rechts steht, in welchen deiner Texte der Name vorkommt — mit der Stelle im Zusammenhang. Und wenn etwas nicht zusammenpasst (ein Alter, das nicht zum Geburtsdatum passt; „lebt" trotz Todesdatum), sagt es das ruhig dazu.'] },
       { t: 'Die Übersicht', p: ['Der Knopf „Übersicht" zeigt alle Figuren als Karten mit Bildnis und Füllstand. Darunter: alle offenen Fäden — und alle Namen, die in deinen Figuren genannt werden, aber selbst noch nicht im Album wohnen. Ein Tipp, und sie sind angelegt.'] },
+      { t: 'Das Netz', p: ['Der Knopf „Netz" legt alle Figuren auf einen Kreis und zieht Linien dazwischen: Familie, Nähe, Bewunderung, Verachtung. Ein Tipp auf einen Punkt schlägt die Figur auf. Wer keine Linie hat, steht aussen allein — das ist kein Fehler, aber oft ein Hinweis. Darunter meldet das Netz Paare, die sich auffällig ähneln.'] },
+      { t: 'Zwei nebeneinander', p: ['„Zwei vergleichen" legt zwei Figuren Feld für Feld nebeneinander. Was wortgleich ist, wird markiert. Nicht um zu bewerten, sondern um zu sehen, wo zwei einander zu ähnlich geraten sind.'] },
+      { t: 'Abschreiben', p: ['Im Blatt zur Figur nimmt „Abschreiben" alles mit in eine neue Figur — für Geschwister, Zwillinge, dieselbe Figur zehn Jahre später. Nur Geburts- und Todestag bleiben leer: die stehen im Kalender, und zwei Einträge für jemanden, den es so gar nicht gibt, wären dort ein Ärgernis.'] },
+      { t: 'Eine Frage', p: ['Unten rechts steht eine Frage an die Figur — „Was würde sie nie zugeben, obwohl es stimmt?" Kein Feld, keine Pflicht. Der Pfeil dreht auf eine andere; „antworten" klebt deine Antwort als Zettel auf die linke Seite. Dieselbe Figur bekommt beim Aufschlagen immer dieselbe Frage, bis du weiterdrehst.'] },
       { t: 'Als Blatt ablegen', p: ['Im Blatt zur Figur legt der Knopf alles, was du eingetragen hast, als Text bei den Blättern ab — zum Weiterschreiben.'] },
-      { t: 'Tasten', p: ['Pfeile links und rechts blättern, Bild auf und ab ebenso, Pos1 und Ende springen an den Anfang und ans Ende. „n" legt eine neue Figur an, „z" schlägt irgendeine auf.'] }
+      { t: 'Tasten', p: ['Pfeile links und rechts blättern, Bild auf und ab ebenso, Pos1 springt aufs Titelblatt und Ende ans Ende. „n" legt eine neue Figur an, „z" schlägt irgendeine auf, „b" legt das Lesebändchen hinein oder nimmt es heraus.'] }
     ]
   },
   {
@@ -19755,6 +20187,16 @@ function schreibtischSignatur() {
     (() => { const f = typeof heuteVorEinemJahr === 'function' ? heuteVorEinemJahr([...D.docs.values()]) : null; return f ? f.doc.id : ''; })()
   ]);
 }
+/* Der Würfel für „Überraschung": einmal je Einstellung, dann gemerkt.
+   Stellt man wieder auf etwas Festes und später zurück auf Zufall, fällt er
+   neu — das ist gewollt. */
+const _deskWurf = new Map();
+function schreibtischWurf(was, wahl, moeglich) {
+  if (wahl !== 'zufall') { _deskWurf.delete(was); return wahl; }
+  if (!_deskWurf.has(was)) _deskWurf.set(was, moeglich[Math.floor(Math.random() * moeglich.length)]);
+  return _deskWurf.get(was);
+}
+
 RENDER.schreibtisch = function (haupt) {
   if (!sessionStorage.getItem('vani-session-start')) sessionStorage.setItem('vani-session-start', String(Date.now()));
   const e = saubererSchreibtisch(D.einst.schreibtisch);
@@ -19762,9 +20204,12 @@ RENDER.schreibtisch = function (haupt) {
   const erstesMal = !sessionStorage.getItem('vani-desk-gesehen');
   const szene = el('div', { class: 'desk-szene holz-' + e.holz + ' wetter-' + wetter + (e.kerzen ? ' kerzen-an' : '') + (e.lampeAn ? '' : ' lampe-aus'), style: '--lampe:' + e.lampe + ';--unordnung:' + e.unordnung });
   const leinwand = el('canvas', { class: 'desk-malerei' });
-  /* „Überraschung" wird beim Betreten gewürfelt — und bleibt, solange der Tisch steht */
-  const tageszeitWahl = e.tageszeit === 'zufall' ? ['morgen', 'mittag', 'golden', 'abend', 'nacht'][Math.floor(Math.random() * 5)] : e.tageszeit;
-  const jahreszeitWahl = e.jahreszeit === 'zufall' ? ['fruehling', 'sommer', 'herbst', 'winter'][Math.floor(Math.random() * 4)] : e.jahreszeit;
+  /* „Überraschung" wird einmal gewürfelt — und bleibt dann liegen, solange
+     die App offen ist. Vorher fiel der Würfel bei JEDEM Neuzeichnen: kam man
+     aus einem anderen Raum zurück, sprang der Tisch von Abend auf Mittag.
+     Das war keine Überraschung mehr, sondern Unruhe. */
+  const tageszeitWahl = schreibtischWurf('tageszeit', e.tageszeit, ['morgen', 'mittag', 'golden', 'abend', 'nacht']);
+  const jahreszeitWahl = schreibtischWurf('jahreszeit', e.jahreszeit, ['fruehling', 'sommer', 'herbst', 'winter']);
   const maler = schreibtischMaler(leinwand, { holz: e.holz, lampe: e.lampe, lampeAn: e.lampeAn, wetter, kerzen: e.kerzen, unordnung: e.unordnung, alter: schreibtischAlter(D.stats.tage), kleckse: e.kleckse, tageszeitWahl, jahreszeitWahl });
   const dinge = el('div', { class: 'desk-dinge' });
   szene.append(leinwand, dinge);
@@ -21247,7 +21692,21 @@ async function epubOeffnen(b) {
 
   const spaltenBreite = () => Math.max(200, inhalt.clientWidth);
   const schritt = () => spaltenBreite() + 48;
-  async function ladeKapitel(i, anteil = 0, richtung = 0) {
+  /* Auf das nächste Bild warten — aber nie ewig.
+   requestAnimationFrame steht still, sobald das Fenster verdeckt ist. Wer
+   beim Kapitelwechsel die App wechselt, sass sonst in einem Kapitel fest,
+   das nie fertig lud: L.busy blieb stehen und Blättern war tot. Der Wecker
+   daneben löst das Warten spätestens nach 120 ms auf. */
+function naechstesBild() {
+  return new Promise((fertig) => {
+    let getan = false;
+    const einmal = () => { if (!getan) { getan = true; fertig(); } };
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(einmal);
+    setTimeout(einmal, 120);
+  });
+}
+
+async function ladeKapitel(i, anteil = 0, richtung = 0) {
     if (!L.buch || L.busy) return;
     L.busy = true;
     const k = Math.max(0, Math.min(L.buch.spine.length - 1, i));
@@ -21260,9 +21719,9 @@ async function epubOeffnen(b) {
     const breit = buehne.clientWidth, zwei = breit > 900;
     const rand = zwei ? L.e.epubRand : Math.max(L.e.epubRand, Math.round((breit - 720) / 2));
     inhalt.style.left = rand + 'px'; inhalt.style.right = rand + 'px';
-    await new Promise((r) => requestAnimationFrame(r));
+    await naechstesBild();
     inhalt.style.columnWidth = (zwei ? (spaltenBreite() - 48) / 2 : spaltenBreite()) + 'px'; inhalt.style.columnGap = '48px';
-    await new Promise((r) => requestAnimationFrame(r));
+    await naechstesBild();
     L.seiten = Math.max(1, Math.round((inhalt.scrollWidth + 48) / schritt()));
     L.seite = anteil >= 1 ? L.seiten - 1 : Math.min(L.seiten - 1, Math.round(anteil * L.seiten));
     stelleSeite(richtung, true);
@@ -26121,8 +26580,24 @@ function zeigeJahresringe(jahr) {
    rechnet es für jeden Tag aus, und er merkt, wenn etwas nicht sein kann —
    wenn jemand vor seiner Geburt auftritt oder nach seinem Tod. */
 
-const KAL_JAHR_VON = 2000;
+/* Der Kalender reicht bis 1600 zurueck — eine Romanfigur kann 1783 geboren
+   sein, und die muss man eintragen koennen. GEZEIGT wird trotzdem ab 2000:
+   vierhundert Jahresknoepfe waeren keine Leiste mehr, sondern eine Wand.
+   Wer weiter zurueck will, klappt die Leiste auf; und wo tatsaechlich etwas
+   frueher steht, reicht sie von allein bis dorthin. */
+const KAL_JAHR_VON = 1600;
 const KAL_JAHR_BIS = 2050;
+const KAL_ZEIGE_VON = 2000;
+/* Ab welchem Jahr die Ansichten anfangen: bei 2000 — es sei denn, es steht
+   wirklich etwas frueher im Kalender, dann von dort an. */
+function kalZeigeVon(liste, untergrenze) {
+  let von = Math.max(KAL_JAHR_VON, Math.min(KAL_ZEIGE_VON, untergrenze == null ? KAL_ZEIGE_VON : untergrenze));
+  for (const e of liste || kalTermine()) {
+    const t = kalTeile(e.wann);
+    if (t && t.jahr < von) von = t.jahr;
+  }
+  return Math.max(KAL_JAHR_VON, von);
+}
 const KAL_MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const KAL_MONATE_KURZ = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
 const KAL_TAGE = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
@@ -26872,7 +27347,7 @@ function kalTerminBearbeiten(doc, vorgabe, danach) {
 }
 
 /* ----- Der große Kalender ----- */
-let _kal = { jahr: 0, monat: 0, tag: '', ansicht: 'monat', suche: '', filterArt: '', filterPerson: '' };
+let _kal = { jahr: 0, monat: 0, tag: '', ansicht: 'monat', suche: '', filterArt: '', filterPerson: '', zeigeVon: 0 };
 function kalenderOeffnen(startDatum) {
   const heute = kalHeute();
   const start = kalGueltig(startDatum) ? startDatum : (_kal.tag || heute);
@@ -26975,7 +27450,16 @@ function zeichneKalender(buehne, neuZeichnen, schliessen) {
   /* --- Jahresleiste --- */
   const jahrLeiste = el('div', { class: 'kal-jahrleiste' });
   const mitInhalt = new Set(kalJahreMitInhalt(alle));
-  for (let j = KAL_JAHR_VON; j <= KAL_JAHR_BIS; j++) {
+  /* Die Leiste faengt bei 2000 an — oder frueher, wenn dort etwas steht oder
+     man sie aufgeklappt hat. Der Kalender selbst reicht bis 1600 zurueck. */
+  const von = Math.min(kalZeigeVon(alle, _kal.zeigeVon || null), _kal.jahr || KAL_ZEIGE_VON);
+  if (von > KAL_JAHR_VON) {
+    jahrLeiste.append(el('button', {
+      class: 'kal-jahrfrueher', title: 'Weiter zurück — der Kalender reicht bis ' + KAL_JAHR_VON,
+      onclick: () => { _kal.zeigeVon = Math.max(KAL_JAHR_VON, von - 50); neuZeichnen(); }
+    }, '‹ früher'));
+  }
+  for (let j = von; j <= KAL_JAHR_BIS; j++) {
     jahrLeiste.append(el('button', {
       class: 'kal-jahrknopf' + (j === _kal.jahr ? ' an' : '') + (mitInhalt.has(j) ? ' voll' : ''),
       onclick: () => neuZeichnen(kalDatum(j, _kal.monat, 1))
@@ -27198,11 +27682,16 @@ function kalLebensbaender(alle, neuZeichnen) {
     raus.append(el('div', { class: 'kal-leertag mitte' }, 'Noch niemand im Kalender. Trag einen Tag ein und schreib einen Namen dazu — mehr braucht es nicht.'));
     return raus;
   }
-  const spanne = KAL_JAHR_BIS - KAL_JAHR_VON + 1;
-  const anteil = (datum) => { const t = kalTeile(datum); return t ? ((t.jahr - KAL_JAHR_VON) + ((t.monat || 1) - 1) / 12) / spanne : 0; };
+  /* Die Leiste spannt sich ueber die Jahre, in denen wirklich jemand lebt —
+     mindestens ab 2000. Vierhundert leere Jahre zu zeichnen, nur weil der
+     Kalender so weit zurueckreicht, waere eine leere Wand. */
+  const von = kalZeigeVon(alle);
+  const spanne = KAL_JAHR_BIS - von + 1;
+  const anteil = (datum) => { const t = kalTeile(datum); return t ? ((t.jahr - von) + ((t.monat || 1) - 1) / 12) / spanne : 0; };
+  const schritt = spanne > 200 ? 50 : spanne > 90 ? 25 : spanne > 60 ? 10 : 5;
 
   const massband = el('div', { class: 'kal-massband' });
-  for (let j = KAL_JAHR_VON; j <= KAL_JAHR_BIS; j += 5) {
+  for (let j = Math.ceil(von / schritt) * schritt; j <= KAL_JAHR_BIS; j += schritt) {
     massband.append(el('i', { class: 'kal-massmarke', style: 'left:' + (anteil(kalDatum(j, 1, 1)) * 100).toFixed(2) + '%' }, String(j)));
   }
   massband.append(el('i', { class: 'kal-massheute', style: 'left:' + (anteil(kalHeute()) * 100).toFixed(2) + '%', title: 'heute' }));
@@ -27753,38 +28242,367 @@ function albumMonogramm(f) {
   return n.slice(0, 2).toUpperCase();
 }
 
+/* ===================== 62d — DAS ALBUM, AUSBAUSTUFE 3 =====================
+   Ordnung, Filter, Gegenüberstellung, Netz — und die Fragen, die ein Album
+   stellen kann, wenn man es lange genug aufschlägt.
+
+   Alles hier ist reines Rechnen: kein DOM, keine Zufallszahl, nichts, was
+   sich beim zweiten Hinsehen anders verhält. */
+
+/* ----- In welcher Ordnung das Buch liegt -----
+   Alphabetisch ist die Voreinstellung und bleibt es: ein Album, dessen Seiten
+   je nach Laune woanders liegen, ist kein Buch. Die anderen Ordnungen sind
+   Werkzeuge, keine Zustände — sie stehen sichtbar oben, damit man weiß,
+   warum die Reihenfolge gerade nicht die gewohnte ist. */
+const ALBUM_ORDNUNGEN = [
+  ['alphabet', 'Alphabetisch', 'Wie im Register — A bis Z, Namenlose zuletzt.'],
+  ['gefuellt', 'Nach Fülle', 'Wer am meisten von sich preisgegeben hat, zuerst.'],
+  ['leer', 'Die Stillen zuerst', 'Wer kaum etwas hergibt, steht vorn — damit du sie findest.'],
+  ['geaendert', 'Zuletzt angefasst', 'An wem du zuletzt geschrieben hast.'],
+  ['angelegt', 'Nach Anlage', 'In der Reihenfolge, in der sie ins Buch kamen.'],
+  ['geburt', 'Nach Geburtstag', 'Die Ältesten voran; wer kein Datum hat, kommt danach.']
+];
+function albumOrdnungName(id) {
+  const o = ALBUM_ORDNUNGEN.find((x) => x[0] === id);
+  return o ? o[1] : ALBUM_ORDNUNGEN[0][1];
+}
+function albumGeordnet(liste, ordnung) {
+  const a = (liste || albumFiguren()).slice();
+  if (ordnung === 'gefuellt') return a.sort((x, y) => albumFuelle(y) - albumFuelle(x) || albumVergleich(x, y));
+  if (ordnung === 'leer') return a.sort((x, y) => albumFuelle(x) - albumFuelle(y) || albumVergleich(x, y));
+  if (ordnung === 'geaendert') return a.sort((x, y) => (y.geaendert || 0) - (x.geaendert || 0) || albumVergleich(x, y));
+  if (ordnung === 'angelegt') return a.sort((x, y) => (x.angelegt || 0) - (y.angelegt || 0) || albumVergleich(x, y));
+  if (ordnung === 'geburt') {
+    /* Der Kalender reicht bis 1600 zurueck, also reicht seine Rechnung auch
+       fuer eine Figur von 1783. Eine zweite Datumsrechnung im Album waere ein
+       zweiter Ort, an dem dasselbe schiefgehen kann. */
+    const stempel = (f) => {
+      const g = (f.felder || {}).geboren;
+      return g && kalGueltig(g) ? kalZeit(g) : null;
+    };
+    return a.sort((x, y) => {
+      const gx = stempel(x), gy = stempel(y);
+      if (gx != null && gy != null) return gx - gy || albumVergleich(x, y);
+      if (gx) return -1;
+      if (gy) return 1;
+      return albumVergleich(x, y);
+    });
+  }
+  return a.sort(albumVergleich);
+}
+
+/* ----- Nach Geschichten getrennt -----
+   Frei hineingeschrieben, also frei wieder herausgelesen: was in „Kommt vor
+   in" steht, wird gezählt, nicht verwaltet. Wer nichts einträgt, wird auch
+   nicht gefragt. */
+function albumGeschichten(liste) {
+  const karte = new Map();
+  for (const f of liste || albumFiguren()) {
+    for (const g of (f.felder || {}).geschichte || []) {
+      const name = String(g || '').trim();
+      if (!name) continue;
+      const k = name.toLowerCase();
+      if (!karte.has(k)) karte.set(k, { name, anzahl: 0 });
+      karte.get(k).anzahl++;
+    }
+  }
+  return [...karte.values()].sort((a, b) => b.anzahl - a.anzahl || a.name.localeCompare(b.name, 'de'));
+}
+function albumInGeschichte(f, geschichte) {
+  const g = String(geschichte || '').trim().toLowerCase();
+  if (!g) return true;
+  return ((f.felder || {}).geschichte || []).some((x) => String(x || '').trim().toLowerCase() === g);
+}
+/* Suche, Filter und Ordnung in einem Griff. Wird gesucht, ordnet die Suche —
+   nach Güte des Treffers, nicht nach Alphabet; alles andere wäre ärgerlich. */
+function albumAuswahl(alle, einstellung) {
+  const e = einstellung || {};
+  let liste = alle || albumFiguren();
+  if (e.geschichte) liste = liste.filter((f) => albumInGeschichte(f, e.geschichte));
+  if (String(e.suche || '').trim()) return albumSuche(e.suche, liste);
+  return albumGeordnet(liste, e.ordnung);
+}
+
+/* ----- Eine Figur abschreiben -----
+   Zwillinge, Geschwister, dieselbe Figur zehn Jahre später: es ist mühsam,
+   dreißig Felder noch einmal zu tippen. Die Abschrift nimmt alles mit — außer
+   dem, was nur einmal auf der Welt sein darf: Geburts- und Todestag. Die
+   stehen im Kalender, und zwei Einträge am selben Tag für zwei Figuren, von
+   denen eine gar nicht gemeint war, wären ein Ärgernis. */
+const ALBUM_NICHT_ABSCHREIBEN = ['geboren', 'gestorben'];
+function albumAbschrift(f, neuerName) {
+  const q = saubereAlbumFigur(f) || { name: '', felder: {}, eigene: [], zettel: [], farbe: '' };
+  const felder = {};
+  for (const id of Object.keys(q.felder)) {
+    if (ALBUM_NICHT_ABSCHREIBEN.includes(id)) continue;
+    const w = q.felder[id];
+    felder[id] = Array.isArray(w) ? w.slice() : w;
+  }
+  const roh = neuerName != null ? neuerName : (q.name ? q.name + ' (Abschrift)' : '');
+  return {
+    name: String(roh).trim().slice(0, 120),
+    felder,
+    eigene: q.eigene.map((e) => ({ name: e.name, wert: e.wert, gruppe: e.gruppe })),
+    zettel: q.zettel.map((z) => ({ text: z.text, ton: z.ton })),
+    farbe: q.farbe
+  };
+}
+
+/* ----- Zwei nebeneinander -----
+   Nicht um zu bewerten, sondern um zu sehen, wo zwei Figuren einander zu
+   ähnlich geraten sind. Gezeigt wird nur, wo mindestens eine etwas sagt. */
+function albumGegenueber(a, b) {
+  const hol = (f, id) => {
+    const w = ((f && f.felder) || {})[id];
+    if (w == null) return '';
+    return Array.isArray(w) ? w.filter(Boolean).join(' · ') : String(w).trim();
+  };
+  const raus = [];
+  for (const feld of ALBUM_FELDER) {
+    const wa = hol(a, feld.id), wb = hol(b, feld.id);
+    if (!wa && !wb) continue;
+    raus.push({
+      feld, a: wa, b: wb,
+      gleich: !!wa && !!wb && wa.toLowerCase() === wb.toLowerCase(),
+      nurEiner: !wa || !wb
+    });
+  }
+  return raus;
+}
+/* Wie ähnlich sind sich zwei? Gezählt über die Felder, in denen mehrere
+   Stichworte stehen — dort verrät sich, ob zwei Figuren dieselbe sind. */
+const ALBUM_AEHNLICH_FELDER = ['wesen', 'schwaeche', 'leidenschaft', 'eigenheit', 'geschichte', 'nennung'];
+function albumAehnlichkeit(a, b) {
+  let treffer = 0, moeglich = 0;
+  for (const id of ALBUM_AEHNLICH_FELDER) {
+    const la = new Set((((a && a.felder) || {})[id] || []).map((x) => String(x).trim().toLowerCase()).filter(Boolean));
+    const lb = new Set((((b && b.felder) || {})[id] || []).map((x) => String(x).trim().toLowerCase()).filter(Boolean));
+    if (!la.size || !lb.size) continue;
+    moeglich += Math.max(la.size, lb.size);
+    for (const x of la) if (lb.has(x)) treffer++;
+  }
+  return moeglich ? treffer / moeglich : 0;
+}
+/* Wer sich zu sehr gleicht, sollte es erfahren — leise, nicht als Vorwurf. */
+function albumZwillinge(liste, schwelle) {
+  const grenze = schwelle == null ? 0.34 : schwelle;
+  const alle = (liste || albumFiguren()).filter((f) => !albumIstLeer(f));
+  const raus = [];
+  for (let i = 0; i < alle.length; i++) {
+    for (let j = i + 1; j < alle.length; j++) {
+      const wert = albumAehnlichkeit(alle[i], alle[j]);
+      if (wert >= grenze) raus.push({ a: alle[i], b: alle[j], wert });
+    }
+  }
+  return raus.sort((x, y) => y.wert - x.wert).slice(0, 12);
+}
+
+/* ----- Das Netz -----
+   Alle Figuren auf einem Kreis, die Verbindungen als Sehnen dazwischen.
+   Kein Stammbaum (der wird einmal ein eigener Raum), sondern ein Blick
+   darauf, wer überhaupt mit wem zu tun hat — und wer allein steht. */
+const ALBUM_NETZ_ARTEN = { familie: 'Familie', naehe: 'Nähe', bewundert: 'bewundert', verachtet: 'verachtet' };
+function albumNetz(liste) {
+  const alle = (liste || albumFiguren()).slice(0, 60);
+  const n = alle.length;
+  const knoten = alle.map((f, i) => {
+    const winkel = (i / Math.max(1, n)) * Math.PI * 2 - Math.PI / 2;
+    return {
+      id: f.id, name: f.name || 'ohne Namen', figur: f, farbe: albumFarbe(f), winkel, grad: 0,
+      x: Math.round((50 + Math.cos(winkel) * 37) * 100) / 100,
+      y: Math.round((50 + Math.sin(winkel) * 37) * 100) / 100
+    };
+  });
+  const wo = new Map(knoten.map((k) => [k.id, k]));
+  const kanten = [], gesehen = new Set();
+  for (const b of albumBeziehungen(alle)) {
+    if (!b.zu || b.zu === b.von) continue;
+    const von = wo.get(b.von), zu = wo.get(b.zu);
+    if (!von || !zu) continue;
+    const schluessel = [b.von, b.zu].sort().join('>') + '|' + b.art;
+    if (gesehen.has(schluessel)) continue;
+    gesehen.add(schluessel);
+    von.grad++; zu.grad++;
+    kanten.push({ von, zu, art: b.art, rolle: b.rolle, artName: ALBUM_NETZ_ARTEN[b.art] || b.art });
+  }
+  return { knoten, kanten, allein: knoten.filter((k) => !k.grad) };
+}
+
+/* ----- Die Fragen -----
+   Ein Album, das nur aufnimmt, ist ein Formular. Ein Album, das fragt, ist ein
+   Gegenüber. Die Frage zu einer Figur ist gerechnet, nicht gewürfelt: dieselbe
+   Figur bekommt beim Aufschlagen dieselbe Frage — bis man weiterdreht. */
+const ALBUM_FRAGEN = [
+  'Was würde {du} nie zugeben, obwohl es stimmt?',
+  'Wovon träumt {du}, wenn der Traum gut ausgeht?',
+  'Welches Geräusch macht {du} unruhig?',
+  'Was hat {du} als Kind besessen und verloren?',
+  'Wen ruft {du} an, wenn es zwei Uhr nachts ist?',
+  'Was tut {du}, wenn niemand zusieht?',
+  'Welche Lüge erzählt {du} sich jeden Morgen?',
+  'Woran erkennt man, dass {du} Angst hat?',
+  'Was hat {du} zuletzt weggeworfen — und warum erst jetzt?',
+  'Welches Wort benutzt {du} zu oft?',
+  'Was bewahrt {du} auf, obwohl es keinen Wert hat?',
+  'Wofür hat {du} sich zuletzt geschämt?',
+  'Was würde {du} tun, wenn Geld keine Rolle spielte?',
+  'Wen hat {du} enttäuscht, ohne es zu merken?',
+  'Wie geht {du} durch einen Raum voller Fremder?',
+  'Was isst {du}, wenn es schlecht steht?',
+  'Welche Narbe hat {du} — und welche Geschichte wird dazu erzählt?',
+  'Was hat {du} nie gelernt, obwohl alle es können?',
+  'Welchen Rat gibt {du} anderen und befolgt ihn nie?',
+  'Was liegt in der Schublade, die {du} niemandem zeigt?',
+  'Wann hat {du} zuletzt geweint, und war jemand dabei?',
+  'Welche Tür ist zugefallen und bleibt zu?',
+  'Was riecht für {du} nach Zuhause?',
+  'Wen beneidet {du} still?',
+  'Was tut {du}, um nicht nachdenken zu müssen?',
+  'Welche Frage will {du} nicht gestellt bekommen?',
+  'Was haben Mutter oder Vater immer gesagt?',
+  'Was stünde auf dem Grabstein — und was sollte dort stehen?',
+  'Wovor läuft {du} davon, ohne es zu nennen?',
+  'Welche Kleinigkeit macht {du} glücklich?',
+  'Wem hat {du} nie verziehen?',
+  'Was kann {du} besser als alle, ohne stolz darauf zu sein?',
+  'Wie sieht es bei {du} aus, wenn Besuch kommt — und wie sonst?',
+  'Was war der erste echte Verlust?',
+  'Welche Berührung erträgt {du} nicht?',
+  'Was hat {du} sich vorgenommen und nie getan?',
+  'Bei wem würde {du} sich entschuldigen, wenn es leicht wäre?',
+  'Wie klingt {du}s Lachen — und wann ist es echt?',
+  'Was besitzt {du}, das älter ist als {du} selbst?',
+  'Was nimmt {du} mit, wenn das Haus brennt?',
+  'Woran glaubt {du}, auch wenn es unvernünftig ist?',
+  'Wie sagt {du}, dass jemand wichtig ist, ohne es zu sagen?',
+  'Was tut {du}, wenn jemand weint?',
+  'Welche Regel bricht {du} regelmäßig?',
+  'Was hat {du} gestohlen — und wie klein war es?',
+  'Wovon hat {du} zu viel, wovon zu wenig?',
+  'Wo hört {du} auf zu verhandeln?',
+  'Welche Erinnerung ruft {du} auf, wenn es hell werden soll?',
+  'Was denkt {du} über den eigenen Namen?',
+  'Wer war {du}, bevor die Geschichte anfing?',
+  'Was hat {du} sich abgewöhnt und vermisst es doch?',
+  'Wen würde {du} verteidigen, auch wenn es falsch wäre?',
+  'Wie geht {du} mit Warten um?',
+  'Was ist {du}s liebste Uhrzeit?',
+  'Welchen Umweg nimmt {du} freiwillig?',
+  'Was würde {du} nie besitzen wollen?',
+  'Wem sieht {du} ähnlich, und stört das?',
+  'Was blieb vom zuletzt Gelesenen oder Gehörten hängen?',
+  'Wie verabschiedet sich {du}?',
+  'Was tut {du} morgens als Erstes?',
+  'Welche Arbeit macht {du} gern mit den Händen?',
+  'Was hält {du} für gefährlich, das andere harmlos finden?',
+  'Wann hat {du} zuletzt etwas zum ersten Mal getan?',
+  'Was ist die größte unbezahlte Schuld?',
+  'Welche Tageszeit gehört {du} allein?',
+  'Was würde {du} retten, wenn man nur eines retten darf?',
+  'Was tut {du} mit einem Brief, den {du} nicht öffnen will?',
+  'Welches Versprechen hat {du} gebrochen?',
+  'Was macht {du} mit den Händen, wenn {du} lügt?',
+  'Woran merkt {du} selbst, dass es zu viel wird?'
+];
+function albumFrage(f, salz) {
+  const id = (f && f.id) || '', name = (f && f.name) || '';
+  const i = albumHash(id, name, String(salz || '')) % ALBUM_FRAGEN.length;
+  return albumBeschriftung(ALBUM_FRAGEN[i], name);
+}
+
+/* ----- Das Titelblatt -----
+   Ein Buch fängt nicht mit der ersten Figur an, sondern mit einem Blatt, auf
+   dem steht, was das hier überhaupt ist. */
+function albumTitelDaten(liste) {
+  const alle = liste || albumFiguren();
+  let zettel = 0, eintraege = 0, gefuellt = 0, angelegt = 0, beruehrt = 0;
+  for (const f of alle) {
+    zettel += albumZettel(f).length;
+    eintraege += albumStuecke(f).length;
+    if (!albumIstLeer(f)) gefuellt++;
+    if (f.angelegt && (!angelegt || f.angelegt < angelegt)) angelegt = f.angelegt;
+    if ((f.geaendert || 0) > beruehrt) beruehrt = f.geaendert || 0;
+  }
+  return {
+    anzahl: alle.length, gefuellt, zettel, eintraege,
+    offen: albumOffeneFaeden(alle).length, buchstaben: albumRegister(alle).length,
+    angelegt, beruehrt, geschichten: albumGeschichten(alle).length
+  };
+}
+
+/* ----- Wie dick der Stapel links und rechts ist -----
+   Damit man dem aufgeschlagenen Buch ansieht, wie weit man ist. Gedeckelt,
+   weil zweihundert gezeichnete Blattkanten niemandem helfen. */
+function albumStapel(i, gesamt, deckel) {
+  const d = deckel == null ? 16 : deckel;
+  const g = Math.max(1, gesamt || 1);
+  const stelle = Math.max(0, Math.min(g - 1, i || 0));
+  return {
+    links: Math.min(d, stelle),
+    rechts: Math.min(d, Math.max(0, g - 1 - stelle)),
+    anteil: g <= 1 ? 0 : stelle / (g - 1)
+  };
+}
+
+/* ----- Was auf welcher Doppelseite liegt -----
+   Das Buch hat vorn ein Titelblatt und hinten eine leere Doppelseite, auf der
+   die nächste Figur angelegt wird. Dazwischen die Figuren. Weil sich sonst
+   überall dieselbe Rechnerei wiederholen würde (und genau dort Fehler
+   entstehen), steht sie hier einmal. */
+function albumBlattAnzahl(liste) { return (liste ? liste.length : 0) + 2; }
+function albumBlattArt(i, liste) {
+  if (i <= 0) return 'titel';
+  return i <= (liste ? liste.length : 0) ? 'figur' : 'neu';
+}
+function albumFigurBei(i, liste) {
+  return albumBlattArt(i, liste) === 'figur' ? liste[i - 1] : null;
+}
+/* Wo liegt die Figur mit dieser Kennung? 0, wenn sie nicht dabei ist —
+   dann steht man auf dem Titelblatt und hat nichts kaputt gemacht. */
+function albumBlattVon(id, liste) {
+  const i = (liste || []).findIndex((f) => f.id === id);
+  return i < 0 ? 0 : i + 1;
+}
+
 /* ===================== 62b — DAS ALBUM, AUFGESCHLAGEN =====================
    Ein in Leder gebundenes Buch mit erhabenen Bünden auf dem Rücken,
    Messingecken und einer Schließe. Innen Bütten mit Wasserzeichen, ein
    doppelter Rahmen um den Satzspiegel, Fleurons in den Ecken, unten die
    Seitenzahl.
 
+   Vorn liegt ein Titelblatt. Dann kommt für jede Figur eine Doppelseite.
+   Ganz hinten wartet eine leere, auf der die nächste angelegt wird.
+
    Geblättert wird wie in einem Buch: Ein Blatt hebt sich, dreht sich um den
    Falz und legt sich auf die andere Seite. Vorderseite des Blattes ist die
    rechte Seite, die man verlässt; Rückseite ist die linke Seite, auf die man
-   kommt — genau wie bei Papier.
+   kommt — genau wie bei Papier. Springt man weiter als eine Seite, fliegen
+   mehrere Blätter versetzt hintereinander, wie wenn man den Daumen
+   durchlaufen lässt.
 
-   Eine Doppelseite gehört einer Figur. Links: das Bildnis, der Name, wer sie
-   ist und wie sie aussieht. Rechts: was für ein Mensch das ist, was ihr
-   geschah, wie sie klingt, wohin sie gehört — und was das Buch selbst über
-   sie weiß (Zeitleiste, Erwähnungen, offene Fäden).
+   Links: der Name, wer sie ist, wie sie aussieht, ihre Zeitleiste und die
+   Klebezettel. Rechts: was für ein Mensch das ist, was ihr geschah, wie sie
+   klingt, wohin sie gehört — und was das Buch selbst über sie weiß.
 
    Beide Seiten sind immer gleich groß. Eine halb leere Seite in einem
    kostbaren Buch ist keine Lücke, sondern Raum. */
 
 const ALB_LINKS = ['kopf', 'aussehen'];
 const ALB_RECHTS = ['wesen', 'leben', 'stimme', 'welt', 'rand'];
+/* Was der Seitenkopf schon zeigt, steht nicht noch einmal als Etikett. */
+const ALB_IM_KOPF = ['geboren', 'gestorben'];
 
-let _alb = { i: 0, suche: '', offen: false, dreht: false, ansicht: 'buch' };
+let _alb = { i: 0, suche: '', offen: false, dreht: false, ordnung: 'alphabet', geschichte: '', frageSalz: 0 };
 
 /* ----- Der Raum: das Buch liegt auf dem Pult ----- */
 RENDER.album = function (haupt) {
   const figuren = albumFiguren();
   const dicke = Math.min(46, 12 + figuren.length * 1.6);
+  const marke = albumMarkeFigur();
   const buch = el('button', {
     class: 'alb-regalbuch', title: figuren.length ? 'Das Album — ' + figuren.length + (figuren.length === 1 ? ' Figur' : ' Figuren') : 'Das Album — noch leer',
     style: '--dicke:' + dicke.toFixed(1) + 'px',
-    onclick: () => albumOeffnen(0)
+    onclick: () => albumOeffnen(0, marke ? marke.id : null)
   },
     el('i', { class: 'alb-rb-schnitt' }),
     el('i', { class: 'alb-rb-ruecken' },
@@ -27797,36 +28615,63 @@ RENDER.album = function (haupt) {
       el('span', { class: 'alb-rb-unter' }, figuren.length ? figuren.length + (figuren.length === 1 ? ' Figur' : ' Figuren') : 'noch leer'),
       ...['e1', 'e2', 'e3', 'e4'].map((e) => el('i', { class: 'alb-rb-ecke ' + e })),
       el('i', { class: 'alb-rb-schliesse' })),
-    el('i', { class: 'alb-rb-band' }));
+    el('i', { class: 'alb-rb-band' + (marke ? ' gesetzt' : '') }));
 
   const kopf = raumkopf('Das Album', figuren.length
     ? figuren.length + (figuren.length === 1 ? ' Figur wohnt darin.' : ' Figuren wohnen darin.')
     : 'Ein dickes Buch mit lauter leeren Seiten. Eine Doppelseite für jede Figur.',
     figuren.length ? el('button', { class: 'knopf zart', title: 'Alle Figuren auf einen Blick', onclick: () => albumRegal() }, 'Übersicht') : null,
+    figuren.length > 1 ? el('button', { class: 'knopf zart', title: 'Wer mit wem zu tun hat', onclick: () => albumNetzFenster() }, 'Das Netz') : null,
     el('button', { class: 'knopf voll', onclick: () => albumNeueFigur() }, 'Eine Figur anlegen'));
 
   const inhalt = el('div', { class: 'inhalt alb-raum' }, buch,
+    marke ? el('button', { class: 'alb-markezeile', onclick: () => albumOeffnen(0, marke.id) },
+      el('i', { style: 'background:' + albumFarbe(marke) }),
+      el('span', {}, 'Das Bändchen liegt bei ', el('b', {}, marke.name || 'ohne Namen'))) : null,
     el('p', { class: 'alb-raumtext' }, figuren.length
       ? 'Schlag es auf und blättere. Oben links auf jeder Doppelseite steht der Name — ein Tippen darauf, und du kannst alles nachtragen oder wieder wegnehmen.'
       : 'Noch steht nichts darin. Leg die erste Figur an — und lass ruhig fast alles leer. Was leer bleibt, steht später einfach nicht auf der Seite.'));
   haupt.append(kopf, inhalt);
 };
 
+/* ----- Das Lesebändchen -----
+   Ein Band, das man irgendwo hineinlegt und beim nächsten Mal wiederfindet.
+   Gemerkt wird die Figur, nicht die Seitenzahl: sortiert man das Buch um,
+   liegt das Band trotzdem bei ihr. */
+function albumMarkeFigur() {
+  const id = D.einst.albumMarke;
+  if (!id) return null;
+  const d = D.docs.get(id);
+  return d && d.typ === 'albumfigur' && !d.geloescht ? d : null;
+}
+function albumMarkeSetzen(figur) {
+  const marke = albumMarkeFigur();
+  D.einst.albumMarke = marke && figur && marke.id === figur.id ? '' : (figur ? figur.id : '');
+  speichereEinst();
+  return !!D.einst.albumMarke;
+}
+
 /* ----- Das Buch aufschlagen ----- */
 function albumOeffnen(start, zuFigurId) {
-  const figuren = albumFiguren();
   _alb.suche = '';
-  _alb.i = zuFigurId ? Math.max(0, figuren.findIndex((f) => f.id === zuFigurId)) : begrenze(start, 0, Math.max(0, figuren.length), 0);
+  const figuren = albumSichtbare();
+  /* Ein leeres Album auf dem Titelblatt aufzuschlagen hiesse: erst blaettern,
+     dann anfangen. Wo noch niemand wohnt, liegt gleich die leere Doppelseite
+     oben — das Titelblatt bleibt trotzdem davor. */
+  _alb.i = zuFigurId ? albumBlattVon(zuFigurId, figuren)
+    : figuren.length ? Math.max(0, Math.min(albumBlattAnzahl(figuren) - 1, start || 0)) : 1;
 
   const buehne = el('div', { class: 'alb-buehne' });
   const kasten = el('div', { class: 'alb-buch' },
     el('i', { class: 'alb-buchruecken' }, el('i', { class: 'alb-bund b1' }), el('i', { class: 'alb-bund b2' }), el('i', { class: 'alb-bund b3' })),
+    el('i', { class: 'alb-stapel links', 'aria-hidden': 'true' }),
+    el('i', { class: 'alb-stapel rechts', 'aria-hidden': 'true' }),
     buehne);
   const huelle = el('div', { class: 'alb-huelle' }, kasten);
   const zu = zeigeDeck(huelle, () => { document.removeEventListener('keydown', taste); _alb.offen = false; });
   _alb.offen = true;
   kasten.classList.add('schlaegt-auf');
-  setTimeout(() => kasten.classList.remove('schlaegt-auf'), 1000);
+  setTimeout(() => kasten.classList.remove('schlaegt-auf'), 1100);
 
   const neu = (i) => { if (i != null) _alb.i = i; albumZeichne(buehne, neu, zu); };
   const taste = (ev) => {
@@ -27834,37 +28679,57 @@ function albumOeffnen(start, zuFigurId) {
     const z = ev.target;
     if (z && (z.tagName === 'INPUT' || z.tagName === 'TEXTAREA' || z.tagName === 'SELECT')) return;
     if (document.querySelectorAll('.schleier').length > 1) return;
+    const liste = albumSichtbare();
     if (ev.key === 'ArrowRight' || ev.key === 'PageDown') { ev.preventDefault(); albumBlaettern(1, buehne, neu); }
     else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); albumBlaettern(-1, buehne, neu); }
-    else if (ev.key === 'Home') { ev.preventDefault(); neu(0); }
-    else if (ev.key === 'End') { ev.preventDefault(); neu(albumSichtbare().length); }
-    else if (ev.key === 'n' || ev.key === 'N') { ev.preventDefault(); albumNeueFigur((id) => { const f = albumFiguren(); neu(Math.max(0, f.findIndex((x) => x.id === id))); }); }
-    else if (ev.key === 'z' || ev.key === 'Z') { ev.preventDefault(); const l = albumSichtbare(); if (l.length) neu(Math.floor(Math.random() * l.length)); }
+    else if (ev.key === 'Home') { ev.preventDefault(); albumSpringen(0, neu); }
+    else if (ev.key === 'End') { ev.preventDefault(); albumSpringen(albumBlattAnzahl(liste) - 1, neu); }
+    else if (ev.key === 'n' || ev.key === 'N') { ev.preventDefault(); albumNeueFigur((id) => { _alb.suche = ''; neu(albumBlattVon(id, albumSichtbare())); }); }
+    else if (ev.key === 'z' || ev.key === 'Z') { ev.preventDefault(); if (liste.length) albumSpringen(1 + Math.floor(Math.random() * liste.length), neu); }
+    else if (ev.key === 'b' || ev.key === 'B') { ev.preventDefault(); const f = albumFigurBei(_alb.i, liste); if (f) { toast(albumMarkeSetzen(f) ? 'Das Bändchen liegt jetzt hier.' : 'Das Bändchen ist wieder heraus.'); neu(); } }
   };
   document.addEventListener('keydown', taste);
   albumZeichne(buehne, neu, zu);
 }
 
 function albumSichtbare() {
-  const alle = albumFiguren();
-  return _alb.suche.trim() ? albumSuche(_alb.suche, alle) : alle;
+  return albumAuswahl(albumFiguren(), { suche: _alb.suche, geschichte: _alb.geschichte, ordnung: _alb.ordnung });
 }
 
 function albumZeichne(buehne, neu, schliessen) {
   const liste = albumSichtbare();
-  const anzahl = liste.length + 1;
-  _alb.i = begrenze(_alb.i, 0, anzahl - 1, 0);
-  const figur = liste[_alb.i] || null;
+  const anzahl = albumBlattAnzahl(liste);
+  _alb.i = Math.max(0, Math.min(anzahl - 1, _alb.i));
 
   buehne.innerHTML = '';
   buehne.append(albumKopfleiste(liste, neu, schliessen));
 
   const block = el('div', { class: 'alb-block' },
-    albumSeite(figur, 'links', neu),
+    albumSeite(_alb.i, liste, 'links', neu),
     el('i', { class: 'alb-falz', 'aria-hidden': 'true' }),
-    albumSeite(figur, 'rechts', neu));
+    albumSeite(_alb.i, liste, 'rechts', neu));
   buehne.append(block);
   buehne.append(albumFuss(liste, neu));
+
+  /* Dem Buch ansehen, wie weit man ist: die Blattkanten links und rechts. */
+  const stapel = albumStapel(_alb.i, anzahl);
+  const buch = buehne.closest('.alb-buch');
+  if (buch) {
+    buch.style.setProperty('--stapel-links', String(stapel.links));
+    buch.style.setProperty('--stapel-rechts', String(stapel.rechts));
+  }
+
+  /* Das Lesebändchen hängt bei der Figur, bei der es liegt. */
+  const marke = albumMarkeFigur();
+  if (marke) {
+    const wo = albumBlattVon(marke.id, liste);
+    if (wo) block.append(el('button', {
+      class: 'alb-band' + (wo === _alb.i ? ' hier' : ''),
+      style: '--bandfarbe:' + albumFarbe(marke),
+      title: wo === _alb.i ? 'Das Bändchen liegt hier — noch einmal tippen, und es kommt heraus' : 'Zum Bändchen: ' + (marke.name || 'ohne Namen'),
+      onclick: () => { if (wo === _alb.i) { albumMarkeSetzen(marke); neu(); } else albumSpringen(wo, neu); }
+    }, el('i', {})));
+  }
 
   /* Die Stücke setzen sich wie Tinte — der Reihe nach, ganz kurz. */
   const stillsteht = (typeof document !== 'undefined' && document.hidden) ||
@@ -27873,12 +28738,15 @@ function albumZeichne(buehne, neu, schliessen) {
     const stuecke = [...block.querySelectorAll('.alb-stueck')];
     stuecke.forEach((s, i) => s.style.setProperty('--n', String(Math.min(i, 18))));
     block.classList.add('setzt-sich');
-    setTimeout(() => block.classList.remove('setzt-sich'), 1400);
+    setTimeout(() => block.classList.remove('setzt-sich'), 1500);
   }
 
   /* Wischen zum Blättern */
   let start = null;
-  block.addEventListener('pointerdown', (ev) => { if (ev.target.closest('button, input, textarea, a, .alb-seite')) { if (!ev.target.closest('button, input, textarea, a')) start = { x: ev.clientX, y: ev.clientY, t: Date.now() }; return; } start = { x: ev.clientX, y: ev.clientY, t: Date.now() }; });
+  block.addEventListener('pointerdown', (ev) => {
+    if (ev.target.closest('button, input, textarea, a')) { start = null; return; }
+    start = { x: ev.clientX, y: ev.clientY, t: Date.now() };
+  });
   block.addEventListener('pointerup', (ev) => {
     if (!start) return;
     const dx = ev.clientX - start.x, dy = ev.clientY - start.y;
@@ -27892,94 +28760,157 @@ function albumZeichne(buehne, neu, schliessen) {
 function albumKopfleiste(liste, neu, schliessen) {
   const suchfeld = el('input', { type: 'search', class: 'alb-suchfeld', placeholder: 'Figur suchen …', value: _alb.suche });
   suchfeld.addEventListener('input', entprellt(() => {
-    _alb.suche = suchfeld.value; _alb.i = 0; neu();
+    _alb.suche = suchfeld.value; _alb.i = _alb.suche.trim() ? 1 : 0; neu();
     setTimeout(() => { const f = document.querySelector('.alb-suchfeld'); if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); } }, 0);
   }, 240, true));
 
   const register = el('div', { class: 'alb-register' });
   for (const r of albumRegister(liste)) {
-    register.append(el('button', { class: 'alb-regknopf' + (_alb.i >= r.von && _alb.i < r.von + r.anzahl ? ' an' : ''), title: r.anzahl + (r.anzahl === 1 ? ' Figur' : ' Figuren'), onclick: () => neu(r.von) }, r.buchstabe));
+    register.append(el('button', {
+      class: 'alb-regknopf' + (_alb.i >= r.von + 1 && _alb.i < r.von + 1 + r.anzahl ? ' an' : ''),
+      title: r.anzahl + (r.anzahl === 1 ? ' Figur' : ' Figuren'),
+      onclick: () => albumSpringen(r.von + 1, neu)
+    }, r.buchstabe));
   }
+
+  const geschichten = albumGeschichten(albumFiguren());
+  const gefiltert = !!_alb.geschichte;
+  const alle = albumFiguren().length;
 
   return el('div', { class: 'alb-kopf' },
     el('div', { class: 'alb-kopfzeile' },
       el('div', { class: 'alb-suche' }, el('span', { class: 'alb-lupe', html: ik('suche') }), suchfeld),
       el('div', { class: 'alb-kopfrechts' },
+        alle > 1 ? el('button', { class: 'alb-werkzeug' + (_alb.ordnung !== 'alphabet' ? ' anders' : ''), title: 'In welcher Ordnung die Seiten liegen', onclick: () => albumOrdnungWaehlen(neu) }, albumOrdnungName(_alb.ordnung)) : null,
+        geschichten.length ? el('button', { class: 'alb-werkzeug' + (gefiltert ? ' anders' : ''), title: 'Nur eine Geschichte zeigen', onclick: () => albumGeschichteWaehlen(geschichten, neu) }, gefiltert ? _alb.geschichte : 'Alle Geschichten') : null,
         el('button', { class: 'alb-werkzeug', title: 'Alle Figuren auf einen Blick', onclick: () => albumRegal(neu) }, 'Übersicht'),
-        liste.length > 2 ? el('button', { class: 'alb-werkzeug', title: 'Irgendeine Figur aufschlagen (z)', onclick: () => neu(Math.floor(Math.random() * liste.length)) }, 'Zufall') : null,
-        el('button', { class: 'alb-neuknopf', title: 'Eine neue Figur anlegen (n)', onclick: () => albumNeueFigur((id) => { _alb.suche = ''; const f = albumFiguren(); neu(Math.max(0, f.findIndex((x) => x.id === id))); }) }, '+ Figur'),
+        alle > 1 ? el('button', { class: 'alb-werkzeug', title: 'Wer mit wem zu tun hat', onclick: () => albumNetzFenster() }, 'Netz') : null,
+        liste.length > 2 ? el('button', { class: 'alb-werkzeug', title: 'Irgendeine Figur aufschlagen (z)', onclick: () => albumSpringen(1 + Math.floor(Math.random() * liste.length), neu) }, 'Zufall') : null,
+        el('button', { class: 'alb-neuknopf', title: 'Eine neue Figur anlegen (n)', onclick: () => albumNeueFigur((id) => { _alb.suche = ''; neu(albumBlattVon(id, albumSichtbare())); }) }, '+ Figur'),
         el('button', { class: 'alb-zuknopf', title: 'Das Album zuklappen', onclick: () => schliessen() }, '×'))),
     register.children.length ? register : null,
-    _alb.suche.trim() ? el('div', { class: 'alb-suchhinweis' }, liste.length === 1 ? 'eine Figur passt' : liste.length + ' Figuren passen') : null);
+    _alb.suche.trim() || gefiltert
+      ? el('div', { class: 'alb-suchhinweis' },
+        el('span', {}, liste.length === 1 ? 'eine Figur' : liste.length + ' Figuren'),
+        gefiltert ? el('button', { class: 'alb-hinweisweg', onclick: () => { _alb.geschichte = ''; _alb.i = 0; neu(); } }, 'Filter weg') : null,
+        _alb.suche.trim() ? el('button', { class: 'alb-hinweisweg', onclick: () => { _alb.suche = ''; _alb.i = 0; neu(); } }, 'Suche weg') : null)
+      : null);
+}
+
+/* Springen statt blättern, aber nicht ohne Bewegung: über mehrere Seiten
+   fliegen mehrere Blätter. */
+function albumSpringen(ziel, neu) {
+  const buehne = document.querySelector('.alb-buehne');
+  const weite = ziel - _alb.i;
+  if (!buehne || !weite) { if (neu) neu(ziel); return; }
+  albumBlaettern(weite > 0 ? 1 : -1, buehne, neu, ziel);
 }
 
 function albumFuss(liste, neu) {
-  const anzahl = liste.length + 1;
-  const figur = liste[_alb.i] || null;
+  const anzahl = albumBlattAnzahl(liste);
+  const art = albumBlattArt(_alb.i, liste);
+  const figur = albumFigurBei(_alb.i, liste);
   const offene = figur ? albumFaeden(figur).filter((x) => !x.erledigt).length : 0;
+  const marke = albumMarkeFigur();
   return el('div', { class: 'alb-fuss' },
     el('button', { class: 'alb-blaetter links', title: 'Zurückblättern', disabled: _alb.i <= 0 ? '' : null, onclick: () => albumBlaettern(-1, document.querySelector('.alb-buehne'), neu) }, '‹'),
     el('div', { class: 'alb-seitenzahl' },
-      figur ? el('b', {}, figur.name || 'ohne Namen') : el('b', { class: 'leer' }, 'leere Doppelseite'),
+      art === 'titel' ? el('b', { class: 'ohnenamen' }, 'Titelblatt')
+        : art === 'neu' ? el('b', { class: 'ohnenamen' }, 'leere Doppelseite')
+          : el('b', {}, figur.name || 'ohne Namen'),
       el('small', {}, (_alb.i + 1) + ' von ' + anzahl + (offene ? '  ·  ' + offene + (offene === 1 ? ' offener Faden' : ' offene Fäden') : ''))),
+    figur ? el('button', {
+      class: 'alb-merken' + (marke && marke.id === figur.id ? ' an' : ''),
+      title: marke && marke.id === figur.id ? 'Das Bändchen wieder herausnehmen (b)' : 'Das Lesebändchen hier hineinlegen (b)',
+      onclick: () => { toast(albumMarkeSetzen(figur) ? 'Das Bändchen liegt jetzt hier.' : 'Das Bändchen ist wieder heraus.'); neu(); }
+    }, el('i', { class: 'alb-merkband', style: '--bandfarbe:' + albumFarbe(figur) })) : null,
     el('button', { class: 'alb-blaetter rechts', title: 'Weiterblättern', disabled: _alb.i >= anzahl - 1 ? '' : null, onclick: () => albumBlaettern(1, document.querySelector('.alb-buehne'), neu) }, '›'));
 }
 
-/* ----- Das Blättern ----- */
-function albumBlaettern(richtung, buehne, neu) {
+/* ----- Das Blättern -----
+   Ein Blatt hebt sich und dreht sich um den Falz. Geht es über mehrere
+   Seiten, fliegen bis zu vier — versetzt, damit es aussieht wie ein
+   durchlaufender Daumen und nicht wie ein Sprung. */
+const ALB_BLATT_MS = 620;
+function albumBlaettern(richtung, buehne, neu, zielSprung) {
   if (!buehne || _alb.dreht) return;
   const liste = albumSichtbare();
-  const anzahl = liste.length + 1;
-  const ziel = _alb.i + richtung;
-  if (ziel < 0 || ziel > anzahl - 1) return;
+  const anzahl = albumBlattAnzahl(liste);
+  const ziel = Math.max(0, Math.min(anzahl - 1, zielSprung != null ? zielSprung : _alb.i + richtung));
+  if (ziel === _alb.i) return;
 
   const block = buehne.querySelector('.alb-block');
   const stillsteht = (typeof document !== 'undefined' && document.hidden) ||
     (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) ||
     (typeof matchMedia === 'function' && matchMedia('(max-width: 900px)').matches);
-  if (!block || stillsteht) { neu(ziel); return; }
+  if (!block || stillsteht) { if (neu) neu(ziel); return; }
 
-  const alt = liste[_alb.i] || null, neuF = liste[ziel] || null;
-  const vorn = richtung > 0 ? albumSeite(alt, 'rechts', neu, true) : albumSeite(alt, 'links', neu, true);
-  const hinten = richtung > 0 ? albumSeite(neuF, 'links', neu, true) : albumSeite(neuF, 'rechts', neu, true);
-  const blatt = el('div', { class: 'alb-blatt ' + (richtung > 0 ? 'vor' : 'zurueck') },
-    el('div', { class: 'alb-blattseite vorn' }, vorn, el('i', { class: 'alb-blattglanz' })),
-    el('div', { class: 'alb-blattseite hinten' }, hinten, el('i', { class: 'alb-blattglanz' })));
-  block.append(blatt);
-  block.classList.add('blaettert');
+  const vor = ziel > _alb.i;
+  const weite = Math.abs(ziel - _alb.i);
+  const blaetter = Math.min(4, weite);
+  const versatz = blaetter > 1 ? 70 : 0;
   _alb.dreht = true;
+
+  for (let n = 0; n < blaetter; n++) {
+    /* Die Zwischenblätter zeigen die Seiten, über die man hinwegfliegt. */
+    const vonStelle = vor ? Math.min(_alb.i + n, anzahl - 1) : Math.max(_alb.i - n, 0);
+    const nachStelle = vor ? Math.min(vonStelle + 1, anzahl - 1) : Math.max(vonStelle - 1, 0);
+    const vorn = albumSeite(vonStelle, liste, vor ? 'rechts' : 'links', neu, true);
+    const hinten = albumSeite(nachStelle, liste, vor ? 'links' : 'rechts', neu, true);
+    const blatt = el('div', { class: 'alb-blatt ' + (vor ? 'vor' : 'zurueck'), style: 'z-index:' + (30 - n) },
+      el('div', { class: 'alb-blattseite vorn' }, vorn, el('i', { class: 'alb-blattglanz' }), el('i', { class: 'alb-blattfalz' })),
+      el('div', { class: 'alb-blattseite hinten' }, hinten, el('i', { class: 'alb-blattglanz' }), el('i', { class: 'alb-blattfalz' })));
+    block.append(blatt);
+    /* Kein requestAnimationFrame: der steht still, sobald das Fenster
+       verdeckt ist — dann bliebe das Blatt für immer hochkant stehen. */
+    setTimeout(() => blatt.classList.add('laeuft'), 16 + n * versatz);
+  }
+  block.classList.add('blaettert');
+
+  /* Die ruhende Seite darunter wird schon getauscht, damit hinter dem
+     fliegenden Blatt nicht das Alte durchscheint. */
   setTimeout(() => {
-    const untenLinks = block.querySelector(':scope > .alb-seite.links'), untenRechts = block.querySelector(':scope > .alb-seite.rechts');
-    if (richtung > 0 && untenRechts) untenRechts.replaceWith(albumSeite(neuF, 'rechts', neu));
-    if (richtung < 0 && untenLinks) untenLinks.replaceWith(albumSeite(neuF, 'links', neu));
+    const untenLinks = block.querySelector(':scope > .alb-seite.links');
+    const untenRechts = block.querySelector(':scope > .alb-seite.rechts');
+    if (vor && untenRechts) untenRechts.replaceWith(albumSeite(ziel, liste, 'rechts', neu));
+    if (!vor && untenLinks) untenLinks.replaceWith(albumSeite(ziel, liste, 'links', neu));
   }, 30);
-  requestAnimationFrame(() => blatt.classList.add('laeuft'));
-  setTimeout(() => { _alb.dreht = false; neu(ziel); }, 660);
+
+  setTimeout(() => { _alb.dreht = false; if (neu) neu(ziel); }, ALB_BLATT_MS + (blaetter - 1) * versatz + 40);
 }
 
-/* ----- Eine Seite ----- */
-function albumSeite(figur, welche, neu, flach) {
-  const seite = el('div', { class: 'alb-seite ' + welche });
-  /* Der Inhalt liegt in einem eigenen Bereich; der Seitenfuss ist ein
-     Geschwisterelement danach. So laeuft der Text nie unter die Seitenzahl —
-     ein aufgelegtes Band davor war eine Verlegenheitsloesung und sah beim
+/* ----- Eine Seite -----
+   `stelle` ist die Doppelseite im Buch, nicht die Figur: 0 ist das
+   Titelblatt, ganz hinten liegt die leere. So steht die Rechnerei an einer
+   Stelle und nicht an sieben. */
+function albumSeite(stelle, liste, welche, neu, flach) {
+  const art = albumBlattArt(stelle, liste);
+  const figur = albumFigurBei(stelle, liste);
+  const seite = el('div', { class: 'alb-seite ' + welche + ' ist-' + art });
+  /* Der Inhalt liegt in einem eigenen Bereich; der Seitenfuß ist ein
+     Geschwisterelement danach. So läuft der Text nie unter die Seitenzahl —
+     ein aufgelegtes Band davor war eine Verlegenheitslösung und sah beim
      Scrollen aus wie ein Fehler. */
   const inhalt = el('div', { class: 'alb-seiteninhalt' });
   const anhaengen = (...k) => anfuegen(inhalt, ...k);
-  /* Der Schmuck, den jede Seite trägt — auch eine leere. */
-  const schmuck = () => [
-    el('i', { class: 'alb-rahmen', 'aria-hidden': 'true' }),
-    ...['e1', 'e2', 'e3', 'e4'].map((e) => el('i', { class: 'alb-fleuron ' + e, 'aria-hidden': 'true' }))
-  ];
+  seite.append(el('i', { class: 'alb-rahmen', 'aria-hidden': 'true' }),
+    ...['e1', 'e2', 'e3', 'e4'].map((e) => el('i', { class: 'alb-fleuron ' + e, 'aria-hidden': 'true' })));
 
-  if (!figur) {
-    seite.append(...schmuck());
+  if (art === 'titel') {
+    seite.append(el('div', { class: 'alb-laufkopf' }, ''));
+    anhaengen(...albumTitelseite(welche, liste, neu));
+    seite.append(inhalt);
+    seite.append(el('div', { class: 'alb-seitenfuss' }, welche === 'links' ? '' : 'i'));
+    return seite;
+  }
+
+  if (art === 'neu') {
     seite.append(el('div', { class: 'alb-laufkopf' }, welche === 'links' ? 'DAS ALBUM' : ''));
     if (welche === 'links') {
       anhaengen(el('div', { class: 'alb-leereseite' },
-        el('button', { class: 'alb-neuefigur', onclick: () => albumNeueFigur((id) => { const f = albumFiguren(); if (neu) neu(Math.max(0, f.findIndex((x) => x.id === id))); }) },
+        el('button', { class: 'alb-neuefigur', onclick: () => albumNeueFigur((id) => { if (neu) neu(albumBlattVon(id, albumSichtbare())); }) },
           el('span', { class: 'alb-nf-kreuz' }, '+'),
-          el('span', { class: 'alb-nf-text' }, el('b', {}, 'Eine Figur anlegen'), el('small', {}, 'Hier wohnt noch niemand.'))),
+          el('span', { class: 'alb-nf-text' }, el('b', {}, 'Eine Figur anlegen'), el('small', {}, liste.length ? 'Die nächste Doppelseite gehört ihr.' : 'Hier wohnt noch niemand.'))),
         el('div', { class: 'alb-leerhinweis' }, 'Trag ein, was du weißt. Alles andere darf leer bleiben — es steht dann einfach nicht auf der Seite, und man sieht ihm nicht an, dass es fehlt.')));
     } else {
       anhaengen(el('div', { class: 'alb-leerornament' }, el('i'), el('span', {}, 'leer'), el('i')));
@@ -27990,10 +28921,10 @@ function albumSeite(figur, welche, neu, flach) {
   }
 
   const farbe = albumFarbe(figur);
+  const nummer = (stelle - 1) * 2 + (welche === 'links' ? 1 : 2);
   seite.style.setProperty('--figurfarbe', farbe);
-  seite.append(...schmuck());
-  /* Eine grosse, blasse Initiale liegt im Papier — wie in einem alten Buch.
-     Sie fuellt die Seite, ohne etwas zu behaupten: ein Buchstabe legt kein
+  /* Eine große, blasse Initiale liegt im Papier — wie in einem alten Buch.
+     Sie füllt die Seite, ohne etwas zu behaupten: ein Buchstabe legt kein
      Gesicht fest. */
   seite.append(el('i', { class: 'alb-initiale', 'aria-hidden': 'true' }, welche === 'links' ? albumMonogramm(figur)[0] : albumBuchstabe(figur)));
   seite.append(el('div', { class: 'alb-laufkopf' },
@@ -28004,14 +28935,20 @@ function albumSeite(figur, welche, neu, flach) {
   if (welche === 'links') {
     if (motto) anhaengen(el('div', { class: 'alb-stueck alb-motto' }, el('span', {}, motto)));
     if (albumBildnisAn()) anhaengen(albumBildplatte(figur, neu));
-    anhaengen(albumSeitenkopf(figur, neu));
-    const stuecke = albumStuecke(figur).filter((s) => ALB_LINKS.includes(s.feld.gruppe));
+    anhaengen(albumSeitenkopf(figur, neu, flach));
+    /* Geburts- und Todestag stehen bereits im Seitenkopf, mit Stern und
+       Kreuz und in Sprache statt in Ziffern. Noch einmal als Etikett mit
+       „1783-04-09" darunter waere Doppelung — und die haesslichere. */
+    const stuecke = albumStuecke(figur).filter((s) => ALB_LINKS.includes(s.feld.gruppe) && !ALB_IM_KOPF.includes(s.feld.id));
     anhaengen(albumStueckFeld(figur, stuecke, flach));
-    /* Die Zeitleiste steht links: sie gehoert zur Biografie, nicht zum Wesen —
-       und sie gibt der linken Seite das Gewicht, das ihr sonst fehlt. */
+    /* Die Zeitleiste steht links: sie gehört zur Biografie, nicht zum Wesen. */
     let zeit = null;
     if (!flach) { zeit = albumZeitleisteBlock(figur, neu); if (zeit) anhaengen(zeit); }
-    if (!stuecke.length && !zeit) anhaengen(el('div', { class: 'alb-leerornament zart' }, el('i'), el('span', {}, 'noch nichts eingetragen'), el('i')));
+    /* Die Klebezettel kleben links, unter dem Steckbrief — dort haben sie
+       Platz, und die linke Seite bekommt das Gewicht, das ihr sonst fehlt. */
+    const zettel = albumZettel(figur);
+    if (zettel.length) anhaengen(albumZettelBrett(figur));
+    if (!stuecke.length && !zeit && !zettel.length) anhaengen(el('div', { class: 'alb-leerornament zart' }, el('i'), el('span', {}, 'noch nichts eingetragen'), el('i')));
   } else {
     const stuecke = albumStuecke(figur).filter((s) => ALB_RECHTS.includes(s.feld.gruppe) && s.feld.id !== 'motto');
     anhaengen(albumStueckFeld(figur, stuecke, flach));
@@ -28020,14 +28957,102 @@ function albumSeite(figur, welche, neu, flach) {
       if (erw) anhaengen(erw);
       const w = albumWiderspruchBlock(figur);
       if (w) anhaengen(w);
+      anhaengen(albumFrageBlock(figur, neu));
     }
-    if (albumZettel(figur).length) anhaengen(albumZettelBrett(figur));
-    if (!stuecke.length && !albumZettel(figur).length) anhaengen(el('div', { class: 'alb-leerornament zart' }, el('i'), el('span', {}, 'noch nichts eingetragen'), el('i')));
+    if (!stuecke.length) anhaengen(el('div', { class: 'alb-leerornament zart' }, el('i'), el('span', {}, 'noch nichts eingetragen'), el('i')));
   }
   seite.append(inhalt);
   seite.append(el('i', { class: 'alb-seitenband', style: 'background:' + farbe, title: figur.name }));
-  seite.append(el('div', { class: 'alb-seitenfuss' }, welche === 'links' ? String(_alb.i * 2 + 1) : String(_alb.i * 2 + 2)));
+  seite.append(el('div', { class: 'alb-seitenfuss' }, String(nummer)));
   return seite;
+}
+
+/* ----- Das Titelblatt -----
+   Links steht, was das Buch ist. Rechts steht, was darin vorkommt — das
+   Verzeichnis, in dem man mit einem Tippen landet. */
+function albumTitelseite(welche, liste, neu) {
+  const d = albumTitelDaten(albumFiguren());
+  if (welche === 'links') {
+    const zeilen = [
+      d.anzahl ? d.anzahl + (d.anzahl === 1 ? ' Figur' : ' Figuren') : 'noch keine Figur',
+      d.eintraege ? d.eintraege + (d.eintraege === 1 ? ' Eintrag' : ' Einträge') : '',
+      d.zettel ? d.zettel + ' Klebezettel' : '',
+      d.geschichten ? d.geschichten + (d.geschichten === 1 ? ' Geschichte' : ' Geschichten') : ''
+    ].filter(Boolean);
+    return [
+      el('div', { class: 'alb-titelblatt' },
+        el('i', { class: 'alb-tb-fleuron oben', 'aria-hidden': 'true' }),
+        el('div', { class: 'alb-tb-titel' }, 'Das Album'),
+        el('div', { class: 'alb-tb-unter' }, 'Ein Buch der Figuren'),
+        el('i', { class: 'alb-tb-linie', 'aria-hidden': 'true' }),
+        el('div', { class: 'alb-tb-zahlen' }, ...zeilen.map((z) => el('span', {}, z))),
+        d.angelegt ? el('div', { class: 'alb-tb-datum' }, 'Angefangen ' + fmtDatum(d.angelegt)) : null,
+        el('i', { class: 'alb-tb-fleuron unten', 'aria-hidden': 'true' }))
+    ];
+  }
+  const register = albumRegister(liste);
+  return [
+    el('div', { class: 'alb-tb-inhaltkopf' }, 'Was darin steht'),
+    liste.length
+      ? el('div', { class: 'alb-tb-verzeichnis' }, ...register.map((r) => el('div', { class: 'alb-tb-gruppe' },
+        el('button', { class: 'alb-tb-buchstabe', title: r.anzahl + (r.anzahl === 1 ? ' Figur' : ' Figuren'), onclick: () => albumSpringen(r.von + 1, neu) }, r.buchstabe),
+        el('div', { class: 'alb-tb-namen' }, ...liste.slice(r.von, r.von + r.anzahl).map((f, k) => el('button', {
+          class: 'alb-tb-name', style: '--figurfarbe:' + albumFarbe(f),
+          onclick: () => albumSpringen(r.von + 1 + k, neu)
+        }, el('span', {}, f.name || 'ohne Namen'), el('i', {}, String((r.von + k) * 2 + 1))))))))
+      : el('div', { class: 'alb-leerornament zart' }, el('i'), el('span', {}, 'noch niemand'), el('i')),
+    d.offen ? el('div', { class: 'alb-tb-offen' }, d.offen === 1 ? 'Ein Faden ist noch offen.' : d.offen + ' Fäden sind noch offen.') : null
+  ];
+}
+
+/* ----- Die Frage an die Figur -----
+   Kein Feld, keine Pflicht: ein Satz, der da steht und wartet. Wer mag,
+   nimmt ihn und klebt die Antwort als Zettel auf die andere Seite. */
+function albumFrageBlock(figur, neu) {
+  const frage = albumFrage(figur, _alb.frageSalz);
+  return el('div', { class: 'alb-stueck alb-frage' },
+    el('span', { class: 'alb-feldname' }, 'Eine Frage'),
+    el('p', { class: 'alb-fragetext' }, frage),
+    el('div', { class: 'alb-fragereihe' },
+      el('button', { class: 'alb-fragewuerfel', title: 'Eine andere Frage', onclick: () => { _alb.frageSalz++; if (neu) neu(); } }, '↻'),
+      el('button', { class: 'alb-frageschreiben', title: 'Die Antwort als Klebezettel ins Album kleben', onclick: () => albumFrageBeantworten(figur, frage, neu) }, 'antworten')));
+}
+async function albumFrageBeantworten(figur, frage, neu) {
+  if (albumZettel(figur).length >= ALBUM_ZETTEL_MAX) { toast('Fünfzehn Klebezettel sind genug — nimm erst einen ab.'); return; }
+  const antwort = await eingabe({ titel: frage, platzhalter: 'Was fällt dir ein?', ok: 'Ankleben', mehrzeilig: true });
+  if (!antwort || !antwort.trim()) return;
+  const zettel = (Array.isArray(figur.zettel) ? figur.zettel : []).slice();
+  zettel.push({ text: antwort.trim().slice(0, 400), ton: ALBUM_ZETTELTOENE[albumHash(figur.id, frage) % ALBUM_ZETTELTOENE.length] });
+  figur.zettel = zettel;
+  speichere(figur);
+  toast('Klebt links auf der Seite.');
+  if (neu) neu();
+}
+
+/* ----- Die Ordnung und der Geschichten-Filter ----- */
+function albumOrdnungWaehlen(neu) {
+  const kasten = el('div', { class: 'modal albo-fenster' },
+    el('div', { class: 'kartenkopf' }, 'IN WELCHER ORDNUNG'),
+    el('p', { class: 'albo-vor' }, 'Alphabetisch ist die Ruhelage — dort liegt jede Figur immer an derselben Stelle. Die anderen Ordnungen sind zum Suchen gedacht, nicht zum Wohnen.'),
+    ...ALBUM_ORDNUNGEN.map((o) => el('button', {
+      class: 'albo-wahl' + (_alb.ordnung === o[0] ? ' an' : ''),
+      onclick: () => { _alb.ordnung = o[0]; _alb.i = 0; zu(); if (neu) neu(); }
+    }, el('b', {}, o[1]), el('small', {}, o[2]))),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Zurück')));
+  const zu = zeigeDeck(kasten);
+}
+function albumGeschichteWaehlen(geschichten, neu) {
+  const kasten = el('div', { class: 'modal albo-fenster' },
+    el('div', { class: 'kartenkopf' }, 'WELCHE GESCHICHTE'),
+    el('p', { class: 'albo-vor' }, 'Was du bei „Kommt vor in" eingetragen hast, steht hier. Es wird nur gezählt, nicht verwaltet — schreib hinein, was du willst.'),
+    el('button', { class: 'albo-wahl' + (!_alb.geschichte ? ' an' : ''), onclick: () => { _alb.geschichte = ''; _alb.i = 0; zu(); if (neu) neu(); } },
+      el('b', {}, 'Alle Geschichten'), el('small', {}, 'Das ganze Album')),
+    ...geschichten.map((g) => el('button', {
+      class: 'albo-wahl' + (_alb.geschichte === g.name ? ' an' : ''),
+      onclick: () => { _alb.geschichte = g.name; _alb.i = 0; zu(); if (neu) neu(); }
+    }, el('b', {}, g.name), el('small', {}, g.anzahl + (g.anzahl === 1 ? ' Figur' : ' Figuren')))),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Zurück')));
+  const zu = zeigeDeck(kasten);
 }
 
 /* Das Bildnis: Foto, selbst gezeichnet — oder ein Monogramm, das aussieht,
@@ -28060,12 +29085,12 @@ function albumStricheSVG(striche, groesse = 150) {
   return '<svg viewBox="0 0 100 100" width="' + groesse + '" height="' + groesse + '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + linien + '</svg>';
 }
 
-function albumSeitenkopf(figur, neu) {
+function albumSeitenkopf(figur, neu, flach) {
   const alter = albumAlterText(figur);
   const g = (figur.felder || {}).geboren, t = (figur.felder || {}).gestorben;
   const lebensdaten = [g && kalGueltig(g) ? '✻ ' + kalKurz(g) : '', t && kalGueltig(t) ? '† ' + kalKurz(t) : ''].filter(Boolean).join('   ');
   return el('div', { class: 'alb-seitenkopf' },
-    el('button', { class: 'alb-name', title: 'Alles zu dieser Figur — nachtragen, ändern, wegnehmen', onclick: () => albumBearbeiten(figur, () => { if (neu) neu(); }) },
+    el('button', { class: 'alb-name' + (flach ? '' : ' schreibt'), title: 'Alles zu dieser Figur — nachtragen, ändern, wegnehmen', onclick: () => albumBearbeiten(figur, () => { if (neu) neu(); }) },
       el('b', {}, figur.name || 'ohne Namen'),
       el('i', { class: 'alb-nameunter' }, 'ändern')),
     lebensdaten ? el('div', { class: 'alb-lebensdaten' }, lebensdaten) : null,
@@ -28119,9 +29144,9 @@ function albumStueck(figur, s, flach) {
       }, el('i', { class: 'alb-fadenhaken' }, x.erledigt ? '✓' : ''), el('span', {}, x.text))));
   }
   if (feld.form === 'spruch') {
-    /* Zitate stehen fuer sich. Unter jedem noch einmal „Sagt" zu schreiben,
-       waere Beiwerk — die Anfuehrungszeichen sagen es bereits. Nur wo der
-       Feldname etwas HINZUFUEGT (die erste Zeile), steht er einmal darueber. */
+    /* Zitate stehen für sich. Unter jedem noch einmal „Sagt" zu schreiben,
+       wäre Beiwerk — die Anführungszeichen sagen es bereits. Nur wo der
+       Feldname etwas HINZUFÜGT (die erste Zeile), steht er einmal darüber. */
     const eigenerName = feld.id !== 'zitat';
     return el('div', { class: 'alb-stueck alb-sprueche' + (eigenerName ? ' benannt' : '') },
       eigenerName ? el('span', { class: 'alb-feldname' }, name) : null,
@@ -28137,6 +29162,22 @@ function albumStueck(figur, s, flach) {
       }, w))));
   }
   if (feld.form === 'band') {
+    /* Geschichten sind anklickbar: ein Tippen, und das Buch zeigt nur noch,
+       wer darin vorkommt. */
+    if (feld.id === 'geschichte') {
+      return el('div', { class: 'alb-stueck alb-band', style: stil },
+        el('span', { class: 'alb-feldname' }, name),
+        el('span', { class: 'alb-bandreihe' }, ...liste.map((z) => el('button', {
+          class: 'alb-geschichte' + (_alb.geschichte === z ? ' an' : ''),
+          title: _alb.geschichte === z ? 'Wieder alle Figuren zeigen' : 'Nur die Figuren aus „' + z + '" zeigen',
+          onclick: () => {
+            _alb.geschichte = _alb.geschichte === z ? '' : z; _alb.suche = '';
+            _alb.i = albumBlattVon(figur.id, albumSichtbare()) || 0;
+            const buehne = document.querySelector('.alb-buehne');
+            if (buehne) { const n = (j) => { if (j != null) _alb.i = j; albumZeichne(buehne, n, () => {}); }; n(); }
+          }
+        }, z))));
+    }
     return el('div', { class: 'alb-stueck alb-band', style: stil },
       el('span', { class: 'alb-feldname' }, name),
       el('b', {}, liste.join('  ·  ')));
@@ -28206,22 +29247,155 @@ function albumZettelBrett(figur) {
   albumZettel(figur).forEach((z, i) => {
     brett.append(el('div', {
       class: 'alb-zettel ton-' + (z.ton || 'butter'),
-      style: 'transform: rotate(' + albumDreh(figur.id, 'zettel' + i, 3) + 'deg)'
+      style: 'transform: rotate(' + albumDreh(figur.id, 'zettel' + i, 3) + 'deg); --nz:' + i
     }, el('i', { class: 'alb-klebstreifen' }), el('span', {}, z.text)));
   });
   return brett;
 }
 
 function albumSpringeZu(id) {
-  const liste = albumFiguren();
-  const i = liste.findIndex((f) => f.id === id);
-  if (i < 0) return;
   _alb.suche = '';
+  /* Steckt gerade ein Geschichten-Filter drin, in dem die gesuchte Figur
+     nicht vorkommt, muss er weg — sonst landet man wortlos am Titelblatt. */
+  if (!albumBlattVon(id, albumSichtbare())) _alb.geschichte = '';
+  const stelle = albumBlattVon(id, albumSichtbare());
   const buehne = document.querySelector('.alb-buehne');
-  if (!buehne) { albumOeffnen(i); return; }
-  const zu = () => { const h = document.querySelector('.alb-huelle'); const s = h && h.closest('.schleier'); if (s) s.remove(); };
-  const neu = (j) => { if (j != null) _alb.i = j; albumZeichne(buehne, neu, zu); };
-  neu(i);
+  if (!buehne) { albumOeffnen(stelle); return; }
+  const neu = (j) => {
+    if (j != null) _alb.i = j;
+    albumZeichne(buehne, neu, () => { const h = document.querySelector('.alb-huelle'); const s = h && h.closest('.schleier'); if (s) s.remove(); });
+  };
+  albumSpringen(stelle, neu);
+}
+
+/* ----- Das Netz: wer mit wem zu tun hat ----- */
+function albumNetzFenster() {
+  const alle = albumFiguren();
+  const netz = albumNetz(alle);
+  const zwillinge = albumZwillinge(alle);
+  const punkte = netz.knoten.length;
+  const radius = punkte > 34 ? 3.2 : punkte > 18 ? 4.2 : 5.4;
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const mach = (art, attrs) => {
+    const k = document.createElementNS(NS, art);
+    for (const a of Object.keys(attrs)) k.setAttribute(a, String(attrs[a]));
+    return k;
+  };
+  const svg = mach('svg', { viewBox: '0 0 100 100', class: 'albn-svg', preserveAspectRatio: 'xMidYMid meet' });
+
+  netz.kanten.forEach((k, i) => {
+    /* Eine Sehne, die sich zur Mitte hin krümmt — gerade Linien quer durch
+       den Kreis sähen aus wie ein zerbrochenes Rad. */
+    const mx = (k.von.x + k.zu.x) / 2, my = (k.von.y + k.zu.y) / 2;
+    const cx = 50 + (mx - 50) * 0.32, cy = 50 + (my - 50) * 0.32;
+    const pfad = mach('path', {
+      d: 'M' + k.von.x + ',' + k.von.y + ' Q' + cx.toFixed(2) + ',' + cy.toFixed(2) + ' ' + k.zu.x + ',' + k.zu.y,
+      class: 'albn-kante art-' + k.art, style: '--n:' + Math.min(i, 40)
+    });
+    const titel = mach('title', {});
+    titel.textContent = k.von.name + ' — ' + (k.rolle || k.artName) + ' — ' + k.zu.name;
+    pfad.append(titel);
+    svg.append(pfad);
+  });
+  netz.knoten.forEach((k, i) => {
+    const g = mach('g', { class: 'albn-knoten' + (k.grad ? '' : ' allein'), style: '--n:' + Math.min(i, 40), tabindex: '0', role: 'button' });
+    g.append(mach('circle', { cx: k.x, cy: k.y, r: radius, fill: k.farbe, class: 'albn-punkt' }));
+    const rechts = k.x >= 50;
+    const t = mach('text', {
+      x: (k.x + (rechts ? radius + 1.6 : -(radius + 1.6))).toFixed(2), y: (k.y + 1.1).toFixed(2),
+      class: 'albn-name', 'text-anchor': rechts ? 'start' : 'end'
+    });
+    t.textContent = k.name.length > 15 ? k.name.slice(0, 14) + '…' : k.name;
+    g.append(t);
+    const titel = mach('title', {});
+    titel.textContent = k.name + (k.grad ? ' · ' + k.grad + (k.grad === 1 ? ' Verbindung' : ' Verbindungen') : ' · steht allein');
+    g.append(titel);
+    const hin = () => { zu(); albumSpringeZu(k.id); };
+    g.addEventListener('click', hin);
+    g.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); hin(); } });
+    svg.append(g);
+  });
+
+  const kasten = el('div', { class: 'modal albn-fenster' },
+    el('div', { class: 'kartenkopf' }, 'DAS NETZ'),
+    el('p', { class: 'albn-vor' }, 'Wer bei Familie, Nähe, Bewunderung oder Verachtung genannt wird und selbst im Album wohnt, bekommt eine Linie. Wer keine hat, steht allein — das ist kein Fehler, aber oft ein Hinweis.'),
+    el('div', { class: 'albn-buehne' }, svg),
+    el('div', { class: 'albn-legende' },
+      ...Object.keys(ALBUM_NETZ_ARTEN).map((a) => el('span', { class: 'albn-le art-' + a }, el('i', {}), ALBUM_NETZ_ARTEN[a]))),
+    netz.allein.length ? el('div', { class: 'albn-allein' },
+      el('b', {}, netz.allein.length === 1 ? 'Eine Figur steht allein: ' : netz.allein.length + ' Figuren stehen allein: '),
+      ...netz.allein.slice(0, 12).map((k, i) => el('button', { class: 'albn-alleinname', onclick: () => { zu(); albumSpringeZu(k.id); } }, (i ? ', ' : '') + k.name))) : null,
+    zwillinge.length ? el('details', { class: 'albn-zwillinge' },
+      el('summary', {}, zwillinge.length === 1 ? 'Zwei Figuren ähneln sich auffällig' : zwillinge.length + ' Paare ähneln sich auffällig'),
+      el('p', {}, 'Gezählt über gemeinsame Wesenswörter, Schwächen, Leidenschaften, Eigenheiten und Geschichten. Das muss nichts heißen — Geschwister dürfen sich gleichen.'),
+      ...zwillinge.map((z) => el('div', { class: 'albn-zwilling' },
+        el('button', { onclick: () => { zu(); albumSpringeZu(z.a.id); } }, z.a.name || 'ohne Namen'),
+        el('i', {}, Math.round(z.wert * 100) + '%'),
+        el('button', { onclick: () => { zu(); albumSpringeZu(z.b.id); } }, z.b.name || 'ohne Namen'),
+        el('button', { class: 'albn-vergleichen', onclick: () => { zu(); albumGegenueberFenster(z.a, z.b); } }, 'nebeneinander')))) : null,
+    el('div', { class: 'reihe' },
+      alle.length > 1 ? el('button', { class: 'knopf zart', onclick: () => { zu(); albumVergleichWaehlen(); } }, 'Zwei vergleichen') : null,
+      el('button', { class: 'knopf zart', onclick: () => zu() }, 'Zurück ins Buch')));
+  const zu = zeigeDeck(kasten);
+}
+
+/* ----- Zwei nebeneinander ----- */
+function albumVergleichWaehlen(vorgabe) {
+  const alle = albumFiguren();
+  let a = vorgabe || null, b = null;
+  const gitter = el('div', { class: 'albv-wahl' });
+  const stand = el('div', { class: 'albv-stand' });
+  const losKnopf = el('button', { class: 'knopf voll', onclick: () => { const x = a, y = b; zu(); albumGegenueberFenster(x, y); } }, 'Nebeneinander legen');
+  const zeichne = () => {
+    gitter.innerHTML = '';
+    for (const f of alle) {
+      gitter.append(el('button', {
+        class: 'albv-kandidat' + (a && a.id === f.id ? ' a' : '') + (b && b.id === f.id ? ' b' : ''),
+        style: '--figurfarbe:' + albumFarbe(f),
+        onclick: () => {
+          if (a && a.id === f.id) a = null;
+          else if (b && b.id === f.id) b = null;
+          else if (!a) a = f;
+          else if (!b) b = f;
+          else { a = b; b = f; }
+          zeichne();
+        }
+      }, el('span', { class: 'albv-mono' }, albumMonogramm(f)), el('span', {}, f.name || 'ohne Namen')));
+    }
+    losKnopf.disabled = !(a && b);
+    stand.textContent = a && b ? (a.name || 'ohne Namen') + ' und ' + (b.name || 'ohne Namen') : a ? 'Und wer noch?' : 'Wähl zwei aus.';
+  };
+  const kasten = el('div', { class: 'modal albv-fenster' },
+    el('div', { class: 'kartenkopf' }, 'ZWEI VERGLEICHEN'),
+    stand, gitter,
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'), losKnopf));
+  const zu = zeigeDeck(kasten);
+  zeichne();
+}
+
+function albumGegenueberFenster(a, b) {
+  if (!a || !b) return;
+  const zeilen = albumGegenueber(a, b);
+  const gleiche = zeilen.filter((z) => z.gleich).length;
+  const kasten = el('div', { class: 'modal albg-fenster' },
+    el('div', { class: 'kartenkopf' }, 'NEBENEINANDER'),
+    el('div', { class: 'albg-kopf' },
+      el('div', { class: 'albg-wer', style: '--figurfarbe:' + albumFarbe(a) }, el('b', {}, a.name || 'ohne Namen'), el('small', {}, albumStuecke(a).length + ' Einträge')),
+      el('i', { class: 'albg-mitte', title: 'Wie viele der mehrfach besetzten Felder — Wesen, Schwächen, Leidenschaften, Eigenheiten, Geschichten, Spitznamen — die beiden gemeinsam haben.' }, Math.round(albumAehnlichkeit(a, b) * 100) + '%'),
+      el('div', { class: 'albg-wer', style: '--figurfarbe:' + albumFarbe(b) }, el('b', {}, b.name || 'ohne Namen'), el('small', {}, albumStuecke(b).length + ' Einträge'))),
+    gleiche ? el('p', { class: 'albg-hinweis' }, gleiche === 1 ? 'Ein Feld ist wortgleich — das ist markiert.' : gleiche + ' Felder sind wortgleich — das ist markiert.') : null,
+    zeilen.length
+      ? el('div', { class: 'albg-tafel' }, ...zeilen.map((z, i) => el('div', { class: 'albg-zeile' + (z.gleich ? ' gleich' : '') + (z.nurEiner ? ' einer' : ''), style: '--n:' + Math.min(i, 30) },
+        el('div', { class: 'albg-links' }, z.a || el('i', { class: 'albg-nichts' }, '—')),
+        el('div', { class: 'albg-feld' }, albumBeschriftung(z.feld.name, '')),
+        el('div', { class: 'albg-rechts' }, z.b || el('i', { class: 'albg-nichts' }, '—')))))
+      : el('p', { class: 'albg-hinweis' }, 'Beide sind noch leer — da gibt es nichts zu vergleichen.'),
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => { zu(); albumSpringeZu(a.id); } }, 'Zu ' + (a.name || 'links')),
+      el('button', { class: 'knopf zart', onclick: () => { zu(); albumSpringeZu(b.id); } }, 'Zu ' + (b.name || 'rechts')),
+      el('button', { class: 'knopf zart', onclick: () => zu() }, 'Schließen')));
+  const zu = zeigeDeck(kasten);
 }
 
 /* ----- Die Übersicht: alle Figuren auf einem Tisch ----- */
@@ -28229,19 +29403,41 @@ function albumRegal(neu) {
   const alle = albumFiguren();
   const fehlend = albumFehlendeFiguren(alle);
   const offene = albumOffeneFaeden(alle);
+  const geschichten = albumGeschichten(alle);
+  let ordnung = _alb.ordnung, filter = '';
   const suchfeld = el('input', { type: 'search', class: 'albr-suche', placeholder: 'Suchen …' });
   const gitter = el('div', { class: 'albr-gitter' });
+  const leiste = el('div', { class: 'albr-leiste' });
+
+  const springe = (f) => {
+    zu();
+    if (!neu) { albumOeffnen(0, f.id); return; }
+    _alb.suche = '';
+    if (!albumBlattVon(f.id, albumSichtbare())) _alb.geschichte = '';
+    neu(albumBlattVon(f.id, albumSichtbare()));
+  };
 
   const zeichne = () => {
-    const treffer = albumSuche(suchfeld.value, alle);
+    leiste.innerHTML = '';
+    for (const o of ALBUM_ORDNUNGEN) {
+      leiste.append(el('button', { class: 'albr-ord' + (ordnung === o[0] ? ' an' : ''), title: o[2], onclick: () => { ordnung = o[0]; zeichne(); } }, o[1]));
+    }
+    if (geschichten.length) {
+      leiste.append(el('span', { class: 'albr-trenner' }));
+      leiste.append(el('button', { class: 'albr-ord' + (!filter ? ' an' : ''), onclick: () => { filter = ''; zeichne(); } }, 'Alle'));
+      for (const g of geschichten.slice(0, 8)) {
+        leiste.append(el('button', { class: 'albr-ord' + (filter === g.name ? ' an' : ''), onclick: () => { filter = filter === g.name ? '' : g.name; zeichne(); } }, g.name));
+      }
+    }
+    const treffer = albumAuswahl(alle, { suche: suchfeld.value, geschichte: filter, ordnung });
     gitter.innerHTML = '';
     if (!treffer.length) { gitter.append(el('div', { class: 'albb-leer' }, 'Niemand passt dazu.')); return; }
-    for (const f of treffer) {
-      const farbe = albumFarbe(f);
+    treffer.forEach((f, i) => {
       const anzahl = albumStuecke(f).length;
-      const karte = el('button', { class: 'albr-karte', style: '--figurfarbe:' + farbe, onclick: () => { zu(); if (neu) { _alb.suche = ''; const i = albumFiguren().findIndex((x) => x.id === f.id); neu(Math.max(0, i)); } else albumOeffnen(0, f.id); } },
+      const offen = albumFaeden(f).filter((x) => !x.erledigt).length;
+      gitter.append(el('button', { class: 'albr-karte', style: '--figurfarbe:' + albumFarbe(f) + ';--n:' + Math.min(i, 24), onclick: () => springe(f) },
         el('span', { class: 'albr-bild' }, f.bild
-          ? (() => { const i = el('img', { alt: '', draggable: 'false' }); if (typeof setzeBild === 'function') setzeBild(i, f.bild); return i; })()
+          ? (() => { const im = el('img', { alt: '', draggable: 'false' }); if (typeof setzeBild === 'function') setzeBild(im, f.bild); return im; })()
           : Array.isArray(f.striche) && f.striche.length
             ? el('span', { class: 'albr-zeichnung', html: albumStricheSVG(f.striche, 54) })
             : el('span', { class: 'albr-monogramm' }, albumMonogramm(f))),
@@ -28249,16 +29445,15 @@ function albumRegal(neu) {
           el('b', {}, f.name || 'ohne Namen'),
           el('small', {}, [anzahl + (anzahl === 1 ? ' Eintrag' : ' Einträge'),
             albumZettel(f).length ? albumZettel(f).length + ' Zettel' : '',
-            albumFaeden(f).filter((x) => !x.erledigt).length ? albumFaeden(f).filter((x) => !x.erledigt).length + ' offen' : ''].filter(Boolean).join('  ·  '))),
-        el('i', { class: 'albr-fuelle', style: 'width:' + Math.round(albumFuelle(f) * 100) + '%' }));
-      gitter.append(karte);
-    }
+            offen ? offen + ' offen' : ''].filter(Boolean).join('  ·  '))),
+        el('i', { class: 'albr-fuelle', style: 'width:' + Math.round(albumFuelle(f) * 100) + '%' })));
+    });
   };
   suchfeld.addEventListener('input', zeichne);
 
   const kasten = el('div', { class: 'modal albr-fenster' },
     el('div', { class: 'kartenkopf' }, 'ALLE FIGUREN'),
-    suchfeld, gitter,
+    suchfeld, leiste, gitter,
     offene.length ? el('details', { class: 'albr-faeden' },
       el('summary', {}, offene.length === 1 ? 'Ein offener Faden im ganzen Album' : offene.length + ' offene Fäden im ganzen Album'),
       ...offene.slice(0, 40).map((x) => el('button', { class: 'albr-fadenzeile', onclick: () => { zu(); albumSpringeZu(x.figur.id); } },
@@ -28268,8 +29463,10 @@ function albumRegal(neu) {
       ...fehlend.slice(0, 30).map((x) => el('div', { class: 'albr-fehlendzeile' },
         el('b', {}, x.name),
         el('span', {}, 'genannt bei ' + [...new Set(x.wo)].slice(0, 3).join(', ')),
-        el('button', { class: 'albr-anlegen', onclick: () => { zu(); albumNeueFigurMitNamen(x.name, (id) => { if (neu) { const i = albumFiguren().findIndex((y) => y.id === id); neu(Math.max(0, i)); } }); } }, 'anlegen')))) : null,
-    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Zurück ins Buch')));
+        el('button', { class: 'albr-anlegen', onclick: () => { zu(); albumNeueFigurMitNamen(x.name, (id) => { if (neu) neu(albumBlattVon(id, albumSichtbare())); }); } }, 'anlegen')))) : null,
+    el('div', { class: 'reihe' },
+      alle.length > 1 ? el('button', { class: 'knopf zart', onclick: () => { zu(); albumVergleichWaehlen(); } }, 'Zwei vergleichen') : null,
+      el('button', { class: 'knopf zart', onclick: () => zu() }, 'Zurück ins Buch')));
   const zu = zeigeDeck(kasten);
   zeichne();
   setTimeout(() => suchfeld.focus(), 60);
@@ -28332,7 +29529,7 @@ function albumBearbeiten(doc, danach, frisch) {
     albumKalenderAbgleich(doc);
     if (danach) danach();
   }, 420, true);
-  const merke = () => sichern();
+  const merke = () => { sichern(); fuelleAuffrischen(); reiterZeichnen(); };
 
   /* --- Kopfzeile: Name und Farbe --- */
   const namensfeld = el('input', { type: 'text', class: 'albb-name', value: stand.name, placeholder: 'Wie heißt sie? (darf auch später kommen)', maxlength: '120' });
@@ -28342,6 +29539,17 @@ function albumBearbeiten(doc, danach, frisch) {
     namenshall.innerHTML = '';
     const n = stand.name.trim();
     anfuegen(namenshall, n ? el('span', {}, 'Überall auf dieser Seite steht ab jetzt „' + n + '“.') : el('span', { class: 'blass' }, 'Ohne Namen steht die Figur ganz hinten im Buch — nachtragen geht jederzeit.'));
+  };
+
+  /* Wie voll das Blatt schon ist. Kein Ziel, keine Note — nur ein Strich,
+     der wächst. Leer bleiben zu dürfen heißt nicht, dass man nicht sehen
+     darf, was schon dasteht. */
+  const fuellbalken = el('div', { class: 'albb-fuelle' }, el('i', {}), el('small', {}));
+  const fuelleAuffrischen = () => {
+    const anteil = albumFuelle(Object.assign({ id: doc.id }, stand));
+    const n = albumStuecke(Object.assign({ id: doc.id }, stand)).length;
+    fuellbalken.firstChild.style.width = Math.round(anteil * 100) + '%';
+    fuellbalken.lastChild.textContent = n ? n + (n === 1 ? ' Eintrag steht auf der Seite' : ' Einträge stehen auf der Seite') : 'Noch steht nichts auf der Seite — das ist in Ordnung.';
   };
 
   const farbreihe = el('div', { class: 'albb-farben' });
@@ -28416,6 +29624,7 @@ function albumBearbeiten(doc, danach, frisch) {
     el('div', { class: 'kartenkopf' }, frisch ? 'EINE NEUE FIGUR' : 'DIESE FIGUR'),
     el('div', { class: 'albb-kopf' }, namensfeld, farbreihe),
     namenshall,
+    fuellbalken,
     reiter,
     impuls,
     inhalt,
@@ -28428,10 +29637,11 @@ function albumBearbeiten(doc, danach, frisch) {
         }
       } }, 'Aus dem Album nehmen'),
       el('button', { class: 'knopf zart', title: 'Alles zu dieser Figur als Blatt ablegen — zum Weiterschreiben', onclick: () => { albumAlsBlatt(stand, doc); } }, 'Als Blatt ablegen'),
+      el('button', { class: 'knopf zart', title: 'Eine zweite Figur mit denselben Angaben anlegen — Geschwister, Zwillinge, dieselbe zehn Jahre später', onclick: () => albumAbschreiben(doc, stand, sichern, zu, danach) }, 'Abschreiben'),
       el('button', { class: 'knopf voll', onclick: () => { sichern.sofort(); zu(); if (danach) danach(); } }, 'Fertig')));
   const zu = zeigeDeck(kasten, () => { sichern.sofort(); if (danach) danach(); });
 
-  kopfzeileAuffrischen(); farbenZeichnen(); reiterZeichnen(); inhaltZeichnen(); impulsZeichnen();
+  kopfzeileAuffrischen(); farbenZeichnen(); reiterZeichnen(); inhaltZeichnen(); impulsZeichnen(); fuelleAuffrischen();
   setTimeout(() => { if (frisch) namensfeld.focus(); }, 60);
 }
 
@@ -28543,7 +29753,7 @@ function albumFeldEingabe(feld, stand, doc, merke) {
         merke();
       } else {
         t.classList.add('falsch');
-        anfuegen(hinweis, el('span', { class: 'warn' }, 'So kann VANI das Datum nicht lesen. Zwischen ' + KAL_JAHR_VON + ' und ' + KAL_JAHR_BIS + ', z. B. 2011-04-09.'));
+        anfuegen(hinweis, el('span', { class: 'warn' }, 'So kann VANI das Datum nicht lesen. Erwartet wird JJJJ, JJJJ-MM oder JJJJ-MM-TT, zwischen ' + KAL_JAHR_VON + ' und ' + KAL_JAHR_BIS + ' — z. B. 1783-04-09.'));
       }
     };
     t.addEventListener('input', pruefe);
@@ -28696,6 +29906,24 @@ function albumAlsBlatt(stand, doc) {
   const b = blattAusText(name + ' — aus dem Album', zeilen.join('\n').trim());
   toast('Liegt bei den Blättern. Jetzt kannst du daraus schreiben.', 4200);
   return b;
+}
+
+/* ----- Eine Figur abschreiben -----
+   Geschwister, Zwillinge, dieselbe Figur zehn Jahre spaeter: alles wird
+   uebernommen, nur Geburts- und Todestag bleiben leer. Die stehen im
+   Kalender, und zwei Eintraege fuer eine Figur, die es so gar nicht gibt,
+   waeren dort ein Aergernis. */
+async function albumAbschreiben(doc, stand, sichern, zu, danach) {
+  const vorschlag = albumAbschrift(Object.assign({ id: doc.id }, stand)).name;
+  const name = await eingabe({ titel: 'Wie soll die Abschrift heissen?', wert: vorschlag, platzhalter: 'Ein Name', ok: 'Abschreiben' });
+  if (name === null) return;
+  if (sichern && sichern.sofort) sichern.sofort();
+  const daten = albumAbschrift(Object.assign({ id: doc.id }, stand), name);
+  const kopie = neuDoc('albumfigur', Object.assign({ titel: daten.name }, daten));
+  const weg = ALBUM_NICHT_ABSCHREIBEN.filter((id) => (stand.felder || {})[id]).length;
+  toast(weg ? 'Abgeschrieben. Geburts- und Todestag sind bewusst leer geblieben.' : 'Abgeschrieben.', 5200);
+  zu();
+  albumBearbeiten(kopie, () => { if (danach) danach(); });
 }
 
 /* ----- Eine Figur mit vorgegebenem Namen anlegen -----

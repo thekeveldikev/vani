@@ -131,7 +131,10 @@ function scrollleiste(bereich, optionen = {}) {
 
   (optionen.ziel || bereich.parentNode || document.body).append(leiste);
   bereich._leiste = { element: leiste, stellen, markenSetzen, ab: abraeumen };
-  requestAnimationFrame(() => { stellen(); markenSetzen(); sichtbar(2200); });
+  /* Kein requestAnimationFrame: der steht still, solange das Fenster verdeckt
+     ist. Baut sich der Bereich in einem Hintergrund-Tab auf, bekäme die Leiste
+     nie eine Höhe und der Einblendzähler liefe nie an. */
+  setTimeout(() => { stellen(); markenSetzen(); sichtbar(2200); }, 0);
   return bereich._leiste;
 }
 

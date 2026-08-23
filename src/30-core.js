@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.33.0';
+const APP_VERSION = '5.34.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -1048,7 +1048,12 @@ function autogrow(ta) {
     for (const [p, oben] of merker) if (p.scrollTop !== oben) p.scrollTop = oben;
   };
   ta.addEventListener('input', anpassen);
-  requestAnimationFrame(anpassen);
+  /* Sofort messen und gleich noch einmal, wenn das Feld im Baum hängt. Ein
+     requestAnimationFrame allein genügt nicht: der steht still, solange das
+     Fenster verdeckt ist — das Feld bliebe auf Standardhöhe mit
+     abgeschnittenem Text, bis jemand das erste Zeichen tippt. */
+  anpassen();
+  setTimeout(anpassen, 0);
   return anpassen;
 }
 

@@ -55,7 +55,7 @@ function albumBearbeiten(doc, danach, frisch) {
     albumKalenderAbgleich(doc);
     if (danach) danach();
   }, 420, true);
-  const merke = () => sichern();
+  const merke = () => { sichern(); fuelleAuffrischen(); reiterZeichnen(); };
 
   /* --- Kopfzeile: Name und Farbe --- */
   const namensfeld = el('input', { type: 'text', class: 'albb-name', value: stand.name, placeholder: 'Wie heißt sie? (darf auch später kommen)', maxlength: '120' });
@@ -65,6 +65,17 @@ function albumBearbeiten(doc, danach, frisch) {
     namenshall.innerHTML = '';
     const n = stand.name.trim();
     anfuegen(namenshall, n ? el('span', {}, 'Überall auf dieser Seite steht ab jetzt „' + n + '“.') : el('span', { class: 'blass' }, 'Ohne Namen steht die Figur ganz hinten im Buch — nachtragen geht jederzeit.'));
+  };
+
+  /* Wie voll das Blatt schon ist. Kein Ziel, keine Note — nur ein Strich,
+     der wächst. Leer bleiben zu dürfen heißt nicht, dass man nicht sehen
+     darf, was schon dasteht. */
+  const fuellbalken = el('div', { class: 'albb-fuelle' }, el('i', {}), el('small', {}));
+  const fuelleAuffrischen = () => {
+    const anteil = albumFuelle(Object.assign({ id: doc.id }, stand));
+    const n = albumStuecke(Object.assign({ id: doc.id }, stand)).length;
+    fuellbalken.firstChild.style.width = Math.round(anteil * 100) + '%';
+    fuellbalken.lastChild.textContent = n ? n + (n === 1 ? ' Eintrag steht auf der Seite' : ' Einträge stehen auf der Seite') : 'Noch steht nichts auf der Seite — das ist in Ordnung.';
   };
 
   const farbreihe = el('div', { class: 'albb-farben' });
@@ -139,6 +150,7 @@ function albumBearbeiten(doc, danach, frisch) {
     el('div', { class: 'kartenkopf' }, frisch ? 'EINE NEUE FIGUR' : 'DIESE FIGUR'),
     el('div', { class: 'albb-kopf' }, namensfeld, farbreihe),
     namenshall,
+    fuellbalken,
     reiter,
     impuls,
     inhalt,
@@ -151,10 +163,11 @@ function albumBearbeiten(doc, danach, frisch) {
         }
       } }, 'Aus dem Album nehmen'),
       el('button', { class: 'knopf zart', title: 'Alles zu dieser Figur als Blatt ablegen — zum Weiterschreiben', onclick: () => { albumAlsBlatt(stand, doc); } }, 'Als Blatt ablegen'),
+      el('button', { class: 'knopf zart', title: 'Eine zweite Figur mit denselben Angaben anlegen — Geschwister, Zwillinge, dieselbe zehn Jahre später', onclick: () => albumAbschreiben(doc, stand, sichern, zu, danach) }, 'Abschreiben'),
       el('button', { class: 'knopf voll', onclick: () => { sichern.sofort(); zu(); if (danach) danach(); } }, 'Fertig')));
   const zu = zeigeDeck(kasten, () => { sichern.sofort(); if (danach) danach(); });
 
-  kopfzeileAuffrischen(); farbenZeichnen(); reiterZeichnen(); inhaltZeichnen(); impulsZeichnen();
+  kopfzeileAuffrischen(); farbenZeichnen(); reiterZeichnen(); inhaltZeichnen(); impulsZeichnen(); fuelleAuffrischen();
   setTimeout(() => { if (frisch) namensfeld.focus(); }, 60);
 }
 
@@ -266,7 +279,7 @@ function albumFeldEingabe(feld, stand, doc, merke) {
         merke();
       } else {
         t.classList.add('falsch');
-        anfuegen(hinweis, el('span', { class: 'warn' }, 'So kann VANI das Datum nicht lesen. Zwischen ' + KAL_JAHR_VON + ' und ' + KAL_JAHR_BIS + ', z. B. 2011-04-09.'));
+        anfuegen(hinweis, el('span', { class: 'warn' }, 'So kann VANI das Datum nicht lesen. Erwartet wird JJJJ, JJJJ-MM oder JJJJ-MM-TT, zwischen ' + KAL_JAHR_VON + ' und ' + KAL_JAHR_BIS + ' — z. B. 1783-04-09.'));
       }
     };
     t.addEventListener('input', pruefe);
@@ -419,6 +432,24 @@ function albumAlsBlatt(stand, doc) {
   const b = blattAusText(name + ' — aus dem Album', zeilen.join('\n').trim());
   toast('Liegt bei den Blättern. Jetzt kannst du daraus schreiben.', 4200);
   return b;
+}
+
+/* ----- Eine Figur abschreiben -----
+   Geschwister, Zwillinge, dieselbe Figur zehn Jahre spaeter: alles wird
+   uebernommen, nur Geburts- und Todestag bleiben leer. Die stehen im
+   Kalender, und zwei Eintraege fuer eine Figur, die es so gar nicht gibt,
+   waeren dort ein Aergernis. */
+async function albumAbschreiben(doc, stand, sichern, zu, danach) {
+  const vorschlag = albumAbschrift(Object.assign({ id: doc.id }, stand)).name;
+  const name = await eingabe({ titel: 'Wie soll die Abschrift heissen?', wert: vorschlag, platzhalter: 'Ein Name', ok: 'Abschreiben' });
+  if (name === null) return;
+  if (sichern && sichern.sofort) sichern.sofort();
+  const daten = albumAbschrift(Object.assign({ id: doc.id }, stand), name);
+  const kopie = neuDoc('albumfigur', Object.assign({ titel: daten.name }, daten));
+  const weg = ALBUM_NICHT_ABSCHREIBEN.filter((id) => (stand.felder || {})[id]).length;
+  toast(weg ? 'Abgeschrieben. Geburts- und Todestag sind bewusst leer geblieben.' : 'Abgeschrieben.', 5200);
+  zu();
+  albumBearbeiten(kopie, () => { if (danach) danach(); });
 }
 
 /* ----- Eine Figur mit vorgegebenem Namen anlegen -----

@@ -274,7 +274,18 @@ function merkeHeftLagen() {
 }
 function spieleHeftLagen() {
   if (!_heftLagen.size) return;
-  requestAnimationFrame(() => {
+  /* Die Hefte gleiten von ihrer alten an ihre neue Stelle: erst dorthin
+     zurückgesetzt, wo sie waren, dann losgelassen.
+
+     Das lief über zwei requestAnimationFrame-Schritte — und der steht still,
+     sobald das Fenster verdeckt ist. Wechselte man direkt nach dem
+     Wegstellen die App, blieben sämtliche Hefte versetzt und verzerrt auf
+     ihrer alten Stelle stehen, bis man zurückkam. Deshalb setTimeout, und
+     wenn ohnehin niemand hinsieht, wird gar nicht erst verschoben. */
+  const stillsteht = (typeof document !== 'undefined' && document.hidden) ||
+    (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (stillsteht) { _heftLagen.clear(); return; }
+  setTimeout(() => {
     $$('[data-heft]').forEach((e) => {
       const alt = _heftLagen.get(e.dataset.heft);
       if (!alt) return;
@@ -284,11 +295,14 @@ function spieleHeftLagen() {
       e.style.transition = 'none';
       e.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sx + ',' + sy + ')';
       e.style.transformOrigin = 'top left';
-      requestAnimationFrame(() => {
+      /* Ein Sicherheitsnetz: was auch immer dazwischenkommt — nach
+         spätestens 700 ms steht kein Heft mehr schief. */
+      setTimeout(() => {
         e.style.transition = 'transform .55s cubic-bezier(.2,.8,.2,1)';
         e.style.transform = '';
         setTimeout(() => { e.style.transition = ''; e.style.transformOrigin = ''; }, 600);
-      });
+      }, 16);
+      setTimeout(() => { e.style.transition = ''; e.style.transform = ''; e.style.transformOrigin = ''; }, 700);
     });
     _heftLagen.clear();
   });

@@ -16,8 +16,24 @@
    rechnet es für jeden Tag aus, und er merkt, wenn etwas nicht sein kann —
    wenn jemand vor seiner Geburt auftritt oder nach seinem Tod. */
 
-const KAL_JAHR_VON = 2000;
+/* Der Kalender reicht bis 1600 zurueck — eine Romanfigur kann 1783 geboren
+   sein, und die muss man eintragen koennen. GEZEIGT wird trotzdem ab 2000:
+   vierhundert Jahresknoepfe waeren keine Leiste mehr, sondern eine Wand.
+   Wer weiter zurueck will, klappt die Leiste auf; und wo tatsaechlich etwas
+   frueher steht, reicht sie von allein bis dorthin. */
+const KAL_JAHR_VON = 1600;
 const KAL_JAHR_BIS = 2050;
+const KAL_ZEIGE_VON = 2000;
+/* Ab welchem Jahr die Ansichten anfangen: bei 2000 — es sei denn, es steht
+   wirklich etwas frueher im Kalender, dann von dort an. */
+function kalZeigeVon(liste, untergrenze) {
+  let von = Math.max(KAL_JAHR_VON, Math.min(KAL_ZEIGE_VON, untergrenze == null ? KAL_ZEIGE_VON : untergrenze));
+  for (const e of liste || kalTermine()) {
+    const t = kalTeile(e.wann);
+    if (t && t.jahr < von) von = t.jahr;
+  }
+  return Math.max(KAL_JAHR_VON, von);
+}
 const KAL_MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 const KAL_MONATE_KURZ = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
 const KAL_TAGE = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];

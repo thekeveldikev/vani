@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.33.0 (23. August 2026)
+# Übergabe an Codex — Stand VANI 5.34.0 (23. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -48,6 +48,10 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
 | `src/45d-textlupe.js`, `src/59-jahresringe.js` | Textlupe, Klangkarte, Pausenerinnerung; das Jahr in Ringen |
 | `src/56a-salon-stimmen.js`, `src/57b-schreibmaschine.js` | Tolkien/Blyton/Paolini/Twain + englischer Rat mit deutscher Parallelfassung; die Schreibmaschine |
 | `src/56d-salon-einlesung.js`, `src/56e-salon-kenntnis.js`, `src/56f-salon-gespraech.js`, `src/56g-salon-mehr.js`, `src/56h-salon-lernen.js`, `src/57c-katze.js` | Einlesung (versiegelt, `einlesung/*.enc`), Kenntnis aus den Texten, Gespräch in Stimmen, mehr Themen/Aufgaben, Nachlesen und Chronik, die Katze |
+| `src/32-sicherheit.js` | Das Sicherheitsnetz: `sicherSpeichern` mit Wiederholungen, Rettungskopie im localStorage, Absturzprotokoll, wöchentliche Sicherung |
+| `src/54d-tischzitate.js`, `src/54e-tischblaetter.js` | Eigene Zitate ins Holz geritzt (gemessene Platzsuche, Schnitzanimation); die drei Blätter auf dem Tisch in zwei Modi (VANI wählt / selbst gewählt) |
+| `src/61-kalender.js`, `src/61b-kalender-ansicht.js` | Der Kalender auf dem Schreibtisch: 1600–2050 (gezeigt ab 2000), vier Ansichten, sechzehn gravierte Zeichen, freie Namen ohne Kopplung an Figuren |
+| `src/62-album.js`, `src/62b-album-buch.js`, `src/62c-album-blatt.js`, `src/62d-album-mehr.js` | Das Album: Figurendatenbank als Lederbuch. 62 = Kern (63 Felder, 400 Wesenswörter), 62b = das aufgeschlagene Buch, 62c = das Blatt zum Eintragen, 62d = Ordnungen, Geschichten-Filter, Netz, Gegenüberstellung, Fragen |
 | `vendor/pdf.min.js`, `vendor/pdf.worker.min.js`, `vendor/wasm/*` | pdf.js 6.2.108 + Decoder (Lizenzen liegen daneben) |
 | `autoren/*.jpg`, `autoren/quellen.json` | Porträts King/Kästner/Funke/Rothfuss (Wikimedia Commons, CC BY-SA 4.0 / CC0 / CC BY-SA 3.0 / CC BY-SA 3.0) |
 | `werkzeug/buecherkoffer.mjs`, `buecher/` | Bücherkoffer (AES-256-GCM, PBKDF2); nimmt PDF und EPUB |
@@ -89,6 +93,13 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   die versiegelte `einlesung/einlesung.enc` plus `umschlag.json`. Ohne Passwort ist im Repo nur Rauschen.
 - **5.27** Der Salon liest mit: Einlesung („splitternd", Stand 22.08.2026), Kenntnis aus den eigenen Texten, Gespräch
   in Stimmen, Reiter „Deine Welten"; Katze mit echten Geräuschen, Schreibmaschine entklemmt, Salonklang aus.
+- **5.28** Das Sicherheitsnetz (`src/32-sicherheit.js`): jedes Speichern wird wiederholt, eine Rettungskopie liegt im localStorage, Abstürze landen in einem Protokoll, einmal die Woche erinnert VANI an die Sicherung. Dazu ein schwerer Fund: `loesche()` leerte das Dokument, BEVOR der Papierkorb es angenommen hatte — nimmt der Papierkorb nichts an, wird jetzt auch nichts gelöscht.
+- **5.29** Salon: John Green mit Zitaten, Rat, Werkregal und Porträt. Schreibtisch: eigene Zitate ins Holz ritzen (drei Modi), die drei Blätter wahlweise selbst gewählt. Die smarte Scrollleiste.
+- **5.30** Der springende Cursor: `caretRechteck()` misst ohne DOM-Eingriff (kein `normalize()` mehr im ganzen `src/`), das Zentrieren ist entprellt, Kompositionen (Autokorrektur, Diktat) werden abgewartet. Diktat nach der iOS-Wahrheit gebaut: `continuous` wird dort ignoriert, deshalb zählt VANI die verbrauchten Teilergebnisse je Sitzung mit, statt Text doppelt einzusetzen.
+- **5.31** Der Kalender auf dem Schreibtisch. Frei eintragbar, ausdrücklich NICHT an Figuren und Texte gekoppelt: `termin.leute[].name` ist freier Text, `id` bleibt leer. Vier Ansichten, gravierte Zeichen statt Emoji.
+- **5.32** Das Album als eigener Raum: ein Lederbuch, eine Doppelseite je Figur, 63 Felder, 400 Wesenswörter, fünfzehn Klebezettel, alles darf leer bleiben und steht dann nicht auf der Seite.
+- **5.33** Album, zweite Ausbaustufe: Zitate ohne Beiwerk, der Seitenfuß liegt im Fluss statt aufgelegt, Bildnisse standardmäßig AUS (`D.einst.albumBildnis`, Feinheiten → Album) — ein Gesicht festzulegen nimmt einem etwas weg.
+- **5.34** Album, dritte Ausbaustufe: Titelblatt mit Verzeichnis, Blattstapel an den Außenkanten, Lesebändchen, Klebezettel fest auf der linken Seite, sechs Ordnungen, Geschichten-Filter, das Netz, zwei Figuren nebeneinander, Abschreiben, siebzig Fragen an die Figur. Der Kalender reicht jetzt bis **1600** zurück (gezeigt ab 2000), damit eine Figur von 1783 ein richtiges Alter bekommt.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

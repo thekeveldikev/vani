@@ -9,3 +9,6 @@ vani-sync-data/
 # Die Einlesung im Klartext bleibt lokal; ins Repo geht nur einlesung/einlesung.enc.
 einlesung/einlesung.json
 einlesung/*.quelle.js
+
+# Die Vorschau-Startdatei ist Werkzeug dieses Rechners, kein Teil der App.
+.claude/

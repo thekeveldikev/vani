@@ -491,6 +491,16 @@ function schreibtischSignatur() {
     (() => { const f = typeof heuteVorEinemJahr === 'function' ? heuteVorEinemJahr([...D.docs.values()]) : null; return f ? f.doc.id : ''; })()
   ]);
 }
+/* Der Würfel für „Überraschung": einmal je Einstellung, dann gemerkt.
+   Stellt man wieder auf etwas Festes und später zurück auf Zufall, fällt er
+   neu — das ist gewollt. */
+const _deskWurf = new Map();
+function schreibtischWurf(was, wahl, moeglich) {
+  if (wahl !== 'zufall') { _deskWurf.delete(was); return wahl; }
+  if (!_deskWurf.has(was)) _deskWurf.set(was, moeglich[Math.floor(Math.random() * moeglich.length)]);
+  return _deskWurf.get(was);
+}
+
 RENDER.schreibtisch = function (haupt) {
   if (!sessionStorage.getItem('vani-session-start')) sessionStorage.setItem('vani-session-start', String(Date.now()));
   const e = saubererSchreibtisch(D.einst.schreibtisch);
@@ -498,9 +508,12 @@ RENDER.schreibtisch = function (haupt) {
   const erstesMal = !sessionStorage.getItem('vani-desk-gesehen');
   const szene = el('div', { class: 'desk-szene holz-' + e.holz + ' wetter-' + wetter + (e.kerzen ? ' kerzen-an' : '') + (e.lampeAn ? '' : ' lampe-aus'), style: '--lampe:' + e.lampe + ';--unordnung:' + e.unordnung });
   const leinwand = el('canvas', { class: 'desk-malerei' });
-  /* „Überraschung" wird beim Betreten gewürfelt — und bleibt, solange der Tisch steht */
-  const tageszeitWahl = e.tageszeit === 'zufall' ? ['morgen', 'mittag', 'golden', 'abend', 'nacht'][Math.floor(Math.random() * 5)] : e.tageszeit;
-  const jahreszeitWahl = e.jahreszeit === 'zufall' ? ['fruehling', 'sommer', 'herbst', 'winter'][Math.floor(Math.random() * 4)] : e.jahreszeit;
+  /* „Überraschung" wird einmal gewürfelt — und bleibt dann liegen, solange
+     die App offen ist. Vorher fiel der Würfel bei JEDEM Neuzeichnen: kam man
+     aus einem anderen Raum zurück, sprang der Tisch von Abend auf Mittag.
+     Das war keine Überraschung mehr, sondern Unruhe. */
+  const tageszeitWahl = schreibtischWurf('tageszeit', e.tageszeit, ['morgen', 'mittag', 'golden', 'abend', 'nacht']);
+  const jahreszeitWahl = schreibtischWurf('jahreszeit', e.jahreszeit, ['fruehling', 'sommer', 'herbst', 'winter']);
   const maler = schreibtischMaler(leinwand, { holz: e.holz, lampe: e.lampe, lampeAn: e.lampeAn, wetter, kerzen: e.kerzen, unordnung: e.unordnung, alter: schreibtischAlter(D.stats.tage), kleckse: e.kleckse, tageszeitWahl, jahreszeitWahl });
   const dinge = el('div', { class: 'desk-dinge' });
   szene.append(leinwand, dinge);

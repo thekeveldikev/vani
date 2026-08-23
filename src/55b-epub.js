@@ -179,7 +179,21 @@ async function epubOeffnen(b) {
 
   const spaltenBreite = () => Math.max(200, inhalt.clientWidth);
   const schritt = () => spaltenBreite() + 48;
-  async function ladeKapitel(i, anteil = 0, richtung = 0) {
+  /* Auf das nächste Bild warten — aber nie ewig.
+   requestAnimationFrame steht still, sobald das Fenster verdeckt ist. Wer
+   beim Kapitelwechsel die App wechselt, sass sonst in einem Kapitel fest,
+   das nie fertig lud: L.busy blieb stehen und Blättern war tot. Der Wecker
+   daneben löst das Warten spätestens nach 120 ms auf. */
+function naechstesBild() {
+  return new Promise((fertig) => {
+    let getan = false;
+    const einmal = () => { if (!getan) { getan = true; fertig(); } };
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(einmal);
+    setTimeout(einmal, 120);
+  });
+}
+
+async function ladeKapitel(i, anteil = 0, richtung = 0) {
     if (!L.buch || L.busy) return;
     L.busy = true;
     const k = Math.max(0, Math.min(L.buch.spine.length - 1, i));
@@ -192,9 +206,9 @@ async function epubOeffnen(b) {
     const breit = buehne.clientWidth, zwei = breit > 900;
     const rand = zwei ? L.e.epubRand : Math.max(L.e.epubRand, Math.round((breit - 720) / 2));
     inhalt.style.left = rand + 'px'; inhalt.style.right = rand + 'px';
-    await new Promise((r) => requestAnimationFrame(r));
+    await naechstesBild();
     inhalt.style.columnWidth = (zwei ? (spaltenBreite() - 48) / 2 : spaltenBreite()) + 'px'; inhalt.style.columnGap = '48px';
-    await new Promise((r) => requestAnimationFrame(r));
+    await naechstesBild();
     L.seiten = Math.max(1, Math.round((inhalt.scrollWidth + 48) / schritt()));
     L.seite = anteil >= 1 ? L.seiten - 1 : Math.min(L.seiten - 1, Math.round(anteil * L.seiten));
     stelleSeite(richtung, true);

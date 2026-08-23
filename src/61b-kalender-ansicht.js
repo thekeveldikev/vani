@@ -335,7 +335,7 @@ function kalTerminBearbeiten(doc, vorgabe, danach) {
 }
 
 /* ----- Der große Kalender ----- */
-let _kal = { jahr: 0, monat: 0, tag: '', ansicht: 'monat', suche: '', filterArt: '', filterPerson: '' };
+let _kal = { jahr: 0, monat: 0, tag: '', ansicht: 'monat', suche: '', filterArt: '', filterPerson: '', zeigeVon: 0 };
 function kalenderOeffnen(startDatum) {
   const heute = kalHeute();
   const start = kalGueltig(startDatum) ? startDatum : (_kal.tag || heute);
@@ -438,7 +438,16 @@ function zeichneKalender(buehne, neuZeichnen, schliessen) {
   /* --- Jahresleiste --- */
   const jahrLeiste = el('div', { class: 'kal-jahrleiste' });
   const mitInhalt = new Set(kalJahreMitInhalt(alle));
-  for (let j = KAL_JAHR_VON; j <= KAL_JAHR_BIS; j++) {
+  /* Die Leiste faengt bei 2000 an — oder frueher, wenn dort etwas steht oder
+     man sie aufgeklappt hat. Der Kalender selbst reicht bis 1600 zurueck. */
+  const von = Math.min(kalZeigeVon(alle, _kal.zeigeVon || null), _kal.jahr || KAL_ZEIGE_VON);
+  if (von > KAL_JAHR_VON) {
+    jahrLeiste.append(el('button', {
+      class: 'kal-jahrfrueher', title: 'Weiter zurück — der Kalender reicht bis ' + KAL_JAHR_VON,
+      onclick: () => { _kal.zeigeVon = Math.max(KAL_JAHR_VON, von - 50); neuZeichnen(); }
+    }, '‹ früher'));
+  }
+  for (let j = von; j <= KAL_JAHR_BIS; j++) {
     jahrLeiste.append(el('button', {
       class: 'kal-jahrknopf' + (j === _kal.jahr ? ' an' : '') + (mitInhalt.has(j) ? ' voll' : ''),
       onclick: () => neuZeichnen(kalDatum(j, _kal.monat, 1))
@@ -661,11 +670,16 @@ function kalLebensbaender(alle, neuZeichnen) {
     raus.append(el('div', { class: 'kal-leertag mitte' }, 'Noch niemand im Kalender. Trag einen Tag ein und schreib einen Namen dazu — mehr braucht es nicht.'));
     return raus;
   }
-  const spanne = KAL_JAHR_BIS - KAL_JAHR_VON + 1;
-  const anteil = (datum) => { const t = kalTeile(datum); return t ? ((t.jahr - KAL_JAHR_VON) + ((t.monat || 1) - 1) / 12) / spanne : 0; };
+  /* Die Leiste spannt sich ueber die Jahre, in denen wirklich jemand lebt —
+     mindestens ab 2000. Vierhundert leere Jahre zu zeichnen, nur weil der
+     Kalender so weit zurueckreicht, waere eine leere Wand. */
+  const von = kalZeigeVon(alle);
+  const spanne = KAL_JAHR_BIS - von + 1;
+  const anteil = (datum) => { const t = kalTeile(datum); return t ? ((t.jahr - von) + ((t.monat || 1) - 1) / 12) / spanne : 0; };
+  const schritt = spanne > 200 ? 50 : spanne > 90 ? 25 : spanne > 60 ? 10 : 5;
 
   const massband = el('div', { class: 'kal-massband' });
-  for (let j = KAL_JAHR_VON; j <= KAL_JAHR_BIS; j += 5) {
+  for (let j = Math.ceil(von / schritt) * schritt; j <= KAL_JAHR_BIS; j += schritt) {
     massband.append(el('i', { class: 'kal-massmarke', style: 'left:' + (anteil(kalDatum(j, 1, 1)) * 100).toFixed(2) + '%' }, String(j)));
   }
   massband.append(el('i', { class: 'kal-massheute', style: 'left:' + (anteil(kalHeute()) * 100).toFixed(2) + '%', title: 'heute' }));

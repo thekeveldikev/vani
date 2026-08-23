@@ -741,3 +741,31 @@ test('Klangvertrag: der Fundus liegt neben der App und reist in die Desktop-Fass
   /* Das Werkzeug, das den Katalog schreibt, muss vorhanden und lesbar sein. */
   assert.ok(existsSync(join(wurzel, 'werkzeug', 'klang-katalog.mjs')));
 });
+
+test('Hover-Vertrag: keine :hover-Regel steht ohne den Schutz für Zeigegeräte', () => {
+  /* Auf dem iPad bleibt ein :hover nach dem Tippen kleben und sieht aus wie
+     eine Auswahl, die man nicht mehr loswird. Deshalb gehört jede
+     Hover-Regel hinter `@media (hover: hover) and (pointer: fine)`. */
+  const zeilen = lies('src/10-style.css').split('\n');
+  let tiefe = 0, inWache = false, wacheTiefe = 0;
+  const offen = [];
+  zeilen.forEach((z, i) => {
+    if (z.includes('@media') && z.includes('hover: hover')) { inWache = true; wacheTiefe = tiefe; }
+    if (z.includes(':hover') && z.includes('{') && !inWache) offen.push((i + 1) + ': ' + z.trim().split('{')[0].trim());
+    tiefe += (z.split('{').length - 1) - (z.split('}').length - 1);
+    if (inWache && tiefe <= wacheTiefe) inWache = false;
+  });
+  assert.equal(offen.length, 0, 'ungeschützte Hover-Regeln:\n' + offen.join('\n'));
+});
+
+test('Hover-Vertrag: was nicht am Zeiger hängt, bleibt draußen', () => {
+  /* Beim Schützen darf nichts mitgenommen werden, was auf dem iPad gebraucht
+     wird: Zieh- und Fokuszustände müssen ungeschützt stehen bleiben. */
+  const css = lies('src/10-style.css');
+  for (const noetig of ['.heftruecken.zieht', '.scrollleiste.zieht .sl-griff', '.bord-buch:focus-visible', '.salon-sessel:focus-visible', '.alb-name:focus-visible .alb-nameunter']) {
+    const stelle = css.indexOf(noetig);
+    assert.ok(stelle > 0, 'fehlt ganz: ' + noetig);
+    const zeile = css.slice(css.lastIndexOf('\n', stelle) + 1, css.indexOf('\n', stelle));
+    assert.ok(!zeile.includes('hover: hover'), noetig + ' steckt in der Hover-Wache und wäre auf dem iPad weg');
+  }
+});
