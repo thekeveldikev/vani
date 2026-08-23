@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.27.1 (23. August 2026)
+# Übergabe an Codex — Stand VANI 5.27.2 (23. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum

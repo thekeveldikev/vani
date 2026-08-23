@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.27.1';
+const APP_VERSION = '5.27.2';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -349,7 +349,7 @@ const STANDARD_EINST = {
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
   stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
   ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95,
-  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null, sitzung: null, salonBriefe: [], pausenErinnerung: true, schreibmaschine: null, salonTon: false, salonAnrede: ''
+  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null, sitzung: null, salonBriefe: [], pausenErinnerung: true, schreibmaschine: null, salonTon: false, salonAnrede: '', salonWerke: false
 };
 const D = {
   docs: new Map(),

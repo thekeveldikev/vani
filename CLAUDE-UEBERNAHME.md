@@ -2135,3 +2135,26 @@ Einlesung bleibt leer und bricht nichts, `anfuegen` überspringt null).
   nummer daneben (`.still-aktualisieren`), damit man zum Aktualisieren nicht mehr scrollen muss.
 
 Tests 178/178.
+
+### 5.27.2 — Der Mantel, der Werke-Schalter, eine Salon-Karte
+
+- **Der blaue Mantel** ist komplett neu gezeichnet. Vorher wirkte er wie eine Uniform: symmetrisch,
+  zwei Knopfreihen, Schulterklappen, breiter als lang. Jetzt hängt ein Trenchcoat am **Bügel**,
+  schmale Schulter (24 breit), langer Fall bis knapp über den Boden (Saum 34 breit, 68 hoch —
+  etwa doppelt so hoch wie breit, sonst sieht es aus wie eine Jacke), **Ärmel liegen innerhalb
+  der Silhouette** und sind nur durch Ton und Naht getrennt, Wickelschnitt mit Übertritt statt
+  Knopfreihen (zwei versetzte Knöpfe), hochgestellter Kragen mit asymmetrischen Hälften, Revers,
+  loser Gürtel mit versetzter Schnalle und zwei verschieden langen Enden, Sturmpatte, zwei
+  schräge Taschenpatten, vier dunkle Falten und zwei Lichtkanten, geschwungener Saum mit Schlitz.
+- **„Werke" ist abschaltbar und standardmäßig aus** (`D.einst.salonWerke`, in STANDARD_EINST):
+  betrifft den Reiter „Deine Werke" in „Deine Welten" und den Chip „Meine Werke" im Feld
+  „Jetzt gerade". Alles andere bleibt unberührt.
+- **Neue Karte „Salon" in den Feinheiten** (`salonKarte()` in 56-salon.js, eingehängt in
+  49-feinheiten.js hinter „Orte"): Werke zeigen, Salonklang, und der Zustand der Einlesung —
+  versiegelt mit „Umschlag öffnen" oder offen mit „Wegräumen" (`einlesungVergessen`). Der
+  Umschlag wird beim Aufbau nachgeladen (`einlesungBereit`), damit die Zeile stimmt, auch wenn
+  man den Salon noch nicht betreten hat.
+- Wieder ein `.append(null)` gefunden und auf `anfuegen()` umgestellt (Einlesungszeile in der
+  neuen Karte).
+
+Tests 178/178.

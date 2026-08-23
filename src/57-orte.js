@@ -72,21 +72,53 @@ function orteKulisse(raum, haupt) {
       '<rect x="40" y="26" width="300" height="10" rx="3" fill="#c9a25a"/><rect x="40" y="36" width="300" height="3" fill="rgba(0,0,0,.25)"/><g fill="#8a6a2e">' + [70, 130, 190, 250, 310].map((x) => '<circle cx="' + x + '" cy="42" r="4"/><rect x="' + (x - 2) + '" y="42" width="4" height="10"/>').join('') + '</g>' +
       /* Hut */
       '<g ' + T('hut', 'Der Hut nickt. Guten Tag.') + ' style="transform-origin:70px 44px"><path d="M70 50c-18 0-26 14-26 26h52c0-12-8-26-26-26z" fill="#2c2218"/><rect x="36" y="74" width="68" height="6" rx="3" fill="#2c2218"/><path d="M52 68h36" stroke="#8a1c12" stroke-width="3"/></g>' +
-      /* Der blaue Mantel, Detektivschnitt: langer Trenchcoat am Haken — Revers, Schulterklappen, Sturmpatte, Ärmel, Gürtel mit Schnalle, Taschenpatten, Falten, Saum */
-      '<g ' + T('mantel', 'Der Mantel schwingt. Draußen riecht es nach Regen — und nach einem Fall.') + ' style="transform-origin:130px 44px">' +
-      '<path d="M96 118 L102 60 C106 54 114 52 120 52 L140 52 C146 52 154 54 158 60 L164 118 Z" fill="url(#ortmantel)"/>' +
-      '<path d="M104 64 L100 116 M156 64 L160 116 M118 88 L116 116 M142 88 L144 116 M130 90 V116" stroke="rgba(0,0,0,.22)" stroke-width="1"/>' +
-      '<path d="M120 52 L98 66 L92 112 L102 116 L108 68 Z" fill="#34507a"/><path d="M140 52 L162 66 L168 112 L158 116 L152 68 Z" fill="#34507a"/>' +
-      '<path d="M100 66 L106 64 M160 66 L154 64" stroke="#22365a" stroke-width="1.4"/>' +
-      '<path d="M130 52 L118 72 L122 86 L130 76 L138 86 L142 72 Z" fill="#2a4266"/><path d="M130 52 L118 72 M130 52 L142 72" stroke="#1a2a44" stroke-width="1.2" fill="none"/>' +
-      '<path d="M110 56 L122 52 L130 60 L118 66 Z" fill="#3f5f8e"/><path d="M150 56 L138 52 L130 60 L142 66 Z" fill="#3f5f8e"/>' +
-      '<path d="M104 58 L118 54 M156 58 L142 54" stroke="#1a2a44" stroke-width="2.2" stroke-linecap="round"/><circle cx="118" cy="55" r="1.2" fill="#c9a25a"/><circle cx="142" cy="55" r="1.2" fill="#c9a25a"/>' +
-      '<path d="M140 56 L158 62 L156 74 L140 70 Z" fill="rgba(0,0,0,.12)"/>' +
-      '<rect x="100" y="84" width="60" height="5.5" fill="#1a2a44"/><rect x="125" y="82" width="10" height="9.5" rx="1.5" fill="none" stroke="#c9a25a" stroke-width="1.5"/><path d="M130 82 V91.5" stroke="#c9a25a" stroke-width="1"/>' +
-      '<g fill="#c9a25a"><circle cx="125" cy="70" r="1.6"/><circle cx="135" cy="70" r="1.6"/><circle cx="125" cy="77" r="1.6"/><circle cx="135" cy="77" r="1.6"/><circle cx="125" cy="96" r="1.6"/><circle cx="135" cy="96" r="1.6"/></g>' +
-      '<path d="M104 98 L114 96 L115 101 L105 103 Z M156 98 L146 96 L145 101 L155 103 Z" fill="#2a4266"/>' +
-      '<path d="M96 118 L164 118" stroke="#1a2a44" stroke-width="1.4"/><path d="M98 114 Q130 110 162 114" stroke="rgba(255,255,255,.08)" stroke-width="1" fill="none"/>' +
-      '<path d="M130 52 L130 44" stroke="#1a2a44" stroke-width="1.4"/></g>' +
+      /* Der blaue Mantel: ein langer Trenchcoat am Bügel — schmal wie ein hängendes
+         Kleidungsstück (doppelt so hoch wie breit), Schulter 24 breit, Saum 34, Fall bis
+         knapp über den Boden. Ärmel liegen INNERHALB der Silhouette, sonst wird er breit.
+         Wickelschnitt mit Übertritt statt Knopfreihen, hochgestellter Kragen, loser Gürtel. */
+      '<g ' + T('mantel', 'Der Mantel schwingt. Draußen riecht es nach Regen — und nach einem Fall.') + ' style="transform-origin:130px 40px">' +
+      /* Bügel */
+      '<path d="M130 40 q -1 -5 4 -6" fill="none" stroke="#9a7a3e" stroke-width="1.3" stroke-linecap="round"/>' +
+      '<path d="M121 49 q 9 -6 18 0" fill="none" stroke="#9a7a3e" stroke-width="1.6" stroke-linecap="round"/>' +
+      /* Silhouette: schmale Schulter, langer Fall, leicht schwingender Saum */
+      '<path d="M117 51 C 114.5 59 114 70 113 84 L111 116 q 5 3 10 1 l 4 -2 q 5 2 10 0 l 4 2 q 5 2 10 -1 L147 84 C 146 70 145.5 59 143 51 C 139 48.6 121 48.6 117 51 Z" fill="url(#ortmantel)"/>' +
+      '<path d="M117 51 C 121 48.6 139 48.6 143 51" fill="none" stroke="rgba(10,18,34,.35)" stroke-width="1"/>' +
+      /* Ärmel: innerhalb der Silhouette, nur durch Ton und Kante getrennt */
+      '<path d="M117 51 C 114.5 59 114 70 113 84 C 112.6 92 112.7 98 113.4 103 q 3.4 1.6 5.6 -.6 C 118.2 97 118 90 118.4 82 C 119 68 119.8 57.5 121.4 51.8 C 120 50.6 118.2 50.5 117 51 Z" fill="#2b4570"/>' +
+      '<path d="M121.4 51.8 C 119.8 57.5 119 68 118.4 82 C 118 90 118.2 97 119 102.4" fill="none" stroke="rgba(10,18,34,.3)" stroke-width="1"/>' +
+      '<path d="M143 51 C 145.5 59 146 70 147 84 C 147.4 92 147.3 98 146.6 103 q -3.4 1.6 -5.6 -.6 C 141.8 97 142 90 141.6 82 C 141 68 140.2 57.5 138.6 51.8 C 140 50.6 141.8 50.5 143 51 Z" fill="#35558a"/>' +
+      '<path d="M138.6 51.8 C 140.2 57.5 141 68 141.6 82 C 142 90 141.8 97 141 102.4" fill="none" stroke="rgba(10,18,34,.25)" stroke-width="1"/>' +
+      '<path d="M113.4 100 q 3.6 1.8 6 -.4 M146.6 100 q -3.6 1.8 -6 -.4" fill="none" stroke="rgba(10,18,34,.4)" stroke-width="1.8" stroke-linecap="round"/>' +
+      /* Falten im Rockteil */
+      '<g fill="none" stroke="rgba(10,18,34,.32)" stroke-width="1.1" stroke-linecap="round">' +
+      '<path d="M122 72 C 121 88 121 102 121 115"/><path d="M130 90 C 130 100 130 108 130 116"/>' +
+      '<path d="M138 70 C 139 86 139 100 139 114"/></g>' +
+      '<g fill="none" stroke="rgba(255,255,255,.09)" stroke-width="1" stroke-linecap="round">' +
+      '<path d="M125 78 C 124 92 124 104 124 115"/><path d="M135 76 C 136 92 136 104 136 115"/></g>' +
+      /* Übertritt: rechte Vorderkante liegt schräg über der linken */
+      '<path d="M131 54 C 128 70 129 94 131 116 q 7 1 13 -1 L147 84 C 146 70 145 58 142 50 q -5 -1 -8 3 Z" fill="#33517e"/>' +
+      '<path d="M131 54 C 128 70 129 94 131 116" fill="none" stroke="rgba(10,18,34,.45)" stroke-width="1.2"/>' +
+      /* Kragen: klein, hochgestellt, links höher */
+      '<path d="M123.6 47.4 C 121.8 53 123.4 57.6 127.6 60 L131 53.4 C 128.8 48.8 125.8 47 123.6 47.4 Z" fill="#25406b"/>' +
+      '<path d="M137.6 46.6 C 140.4 52 139.2 57.4 134.8 60.6 L131 53.4 C 132.8 48.6 136 46 137.6 46.6 Z" fill="#40639a"/>' +
+      '<path d="M123.6 47.4 C 128 44.6 134 44.6 137.6 46.6" fill="none" stroke="#1c2f4e" stroke-width="1.3" stroke-linecap="round"/>' +
+      /* Revers */
+      '<path d="M128 60 C 127.4 66 127.4 71 128 75 L131 64 Z" fill="#2a4266"/>' +
+      '<path d="M134.5 61 C 136 66 136 71 135.4 74 L131 64 Z" fill="#3f5f8e"/>' +
+      /* Gürtel: lose, Schnalle versetzt, Enden verschieden lang */
+      '<path d="M114 82 C 122 84.6 138 84.6 146 81.4" fill="none" stroke="#22365a" stroke-width="3.4" stroke-linecap="round"/>' +
+      '<path d="M114 82 C 122 84.6 138 84.6 146 81.4" fill="none" stroke="rgba(255,255,255,.10)" stroke-width=".9"/>' +
+      '<rect x="122" y="80.4" width="6" height="5" rx="1.2" fill="none" stroke="#c9a25a" stroke-width="1.1"/>' +
+      '<path d="M128 84 C 130.4 89 129.6 95 128 99" fill="none" stroke="#22365a" stroke-width="2.4" stroke-linecap="round"/>' +
+      '<path d="M124.6 84.6 C 123 89.6 123 94.6 123.8 99.6" fill="none" stroke="#22365a" stroke-width="2" stroke-linecap="round"/>' +
+      /* Sturmpatte und zwei schräge Taschenpatten */
+      '<path d="M137 50 C 142 52.6 145 57 146.4 62 L141 63.4 C 139.6 59.4 137.4 56 134.4 53.4 Z" fill="rgba(255,255,255,.07)"/>' +
+      '<path d="M117 90 l 7 -1.6 .8 3.4 -7 1.6 Z" fill="#2a4266"/><path d="M143 89.4 l -7 -1.6 -.8 3.4 7 1.6 Z" fill="#2a4266"/>' +
+      /* Zwei Knöpfe am Übertritt, versetzt */
+      '<circle cx="134.6" cy="63" r="1.3" fill="#c9a25a"/><circle cx="133.4" cy="71" r="1.3" fill="#c9a25a"/>' +
+      /* Saumkante und Schlitz */
+      '<path d="M111 116 q 5 3 10 1 l 4 -2 q 5 2 10 0 l 4 2 q 5 2 10 -1" fill="none" stroke="#1a2a44" stroke-width="1.2" stroke-linejoin="round"/>' +
+      '<path d="M128.6 104 C 128 109 128 113 128.6 117" fill="none" stroke="rgba(10,18,34,.3)" stroke-width="1"/></g>' +
       /* Schal (bewegt sich) und Jahreszeit am Haken */
       '<path class="ort-schal" d="M244 48c-6 20-2 40 4 60M256 48c6 20 2 40-4 60" stroke="#b0552f" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M240 104l8 6M256 104l-8 6" stroke="#b0552f" stroke-width="2"/>' +
       (jz === 'winter' ? '<g ' + T('zweig', 'Tannenzweig. Es duftet nach Dezember.') + ' style="transform-origin:310px 48px"><path d="M310 48l0 44M310 60l-10-8M310 60l10-8M310 74l-10-8M310 74l10-8M310 86l-8-6M310 86l8-6" stroke="#4a7a46" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="310" cy="52" r="4" fill="#c0392b"/></g>' : jz === 'fruehling' ? '<g ' + T('bluete', 'Die Blüte nickt. Frühling in der Diele.') + ' style="transform-origin:310px 50px"><g fill="#e9a9b8"><circle cx="305" cy="56" r="5"/><circle cx="315" cy="56" r="5"/><circle cx="310" cy="50" r="5"/><circle cx="310" cy="62" r="5"/><circle cx="310" cy="56" r="3" fill="#f2d98a"/></g><path d="M310 64v28" stroke="#4a7a46" stroke-width="2.5"/></g>' : jz === 'sommer' ? '<g ' + T('strohhut', 'Der Strohhut. Riecht nach Heu und Meer.') + ' style="transform-origin:310px 50px"><ellipse cx="310" cy="62" rx="26" ry="7" fill="#d9b463"/><path d="M296 62c0-12 6-18 14-18s14 6 14 18" fill="#e8c878"/><path d="M296 60h28" stroke="#b0352b" stroke-width="3"/></g>' : '<g ' + T('blatt', 'Ein Herbstblatt. Es knistert.') + ' style="transform-origin:310px 50px"><path d="M310 50c-14 6-16 22-4 30 12-8 10-24 4-30z" fill="#c8873a"/><path d="M308 54l-2 26" stroke="#8a4a22" stroke-width="1.2"/></g>') +

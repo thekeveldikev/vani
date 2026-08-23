@@ -752,6 +752,38 @@ RENDER.salon = function (haupt) {
   salonBriefeNachsehen();
 };
 
+/* ----- Die Karte in den Feinheiten: was der Salon zeigt ----- */
+function salonKarte() {
+  const zeile = (name, unter, s) => el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, name, unter ? el('div', { style: 'font-size:12.5px;color:var(--blass)' }, unter) : null), s);
+  const schalter = (lies, setze) => el('button', { class: 'schalter' + (lies() ? ' an' : ''), onclick: (e) => { setze(!lies()); e.currentTarget.classList.toggle('an', lies()); speichereEinst(); } }, el('i'));
+  const karte = el('div', { class: 'karte' },
+    zeile('Werke im Salon zeigen', 'Der Reiter „Deine Werke" in „Deine Welten" und der Chip „Meine Werke". Standardmäßig aus — der Rest bleibt davon unberührt.',
+      schalter(() => D.einst.salonWerke === true, (v) => { D.einst.salonWerke = v; })),
+    zeile('Salonklang', 'Kaminknistern und die Uhr, wenn du den Salon betrittst. Der Knopf oben im Salon schaltet dasselbe.',
+      schalter(() => D.einst.salonTon === true, (v) => { D.einst.salonTon = v; })));
+  /* Der Umschlag: Zustand und Knöpfe */
+  if (typeof einlesungDa === 'function') {
+    const stand = el('div', { class: 'einstellzeile' });
+    const baueStand = () => {
+      stand.innerHTML = '';
+      const u = typeof einlesungUmschlag === 'function' ? einlesungUmschlag() : null;
+      const da = einlesungDa();
+      anfuegen(stand, el('span', { class: 'ename' }, 'Die Einlesung',
+        el('div', { style: 'font-size:12.5px;color:var(--blass)' }, da
+          ? 'Offen auf diesem Gerät. Die Wand weiß, was sie gelesen hat.'
+          : u ? 'Versiegelt. Einmal das Passwort, dann bleibt sie hier.' : 'Neben dieser App liegt keine Einlesung.')),
+        da
+          ? el('button', { class: 'knopf zart', onclick: async () => { if (await frage('Die Einlesung von diesem Gerät nehmen? Der versiegelte Umschlag bleibt liegen — mit dem Passwort kannst du sie jederzeit wieder öffnen.', { ja: 'Wegräumen', gefahr: true })) { await einlesungVergessen(); toast('Die Einlesung liegt wieder im Umschlag.'); baueStand(); } } }, 'Wegräumen')
+          : u ? el('button', { class: 'knopf voll', onclick: async () => { if (await salonUmschlagOeffnen()) baueStand(); } }, 'Umschlag öffnen') : null);
+    };
+    baueStand();
+    /* Der Umschlag liegt vielleicht noch ungelesen daneben — nachholen und die Zeile neu bauen */
+    if (typeof einlesungBereit === 'function') einlesungBereit().then(() => { if (stand.isConnected) baueStand(); }).catch(() => {});
+    karte.append(stand);
+  }
+  return karte;
+}
+
 /* ----- Der Umschlag: die Einlesung einmal entsiegeln ----- */
 async function salonUmschlagOeffnen() {
   const u = typeof einlesungUmschlag === 'function' ? (einlesungUmschlag() || await einlesungUmschlagHolen()) : null;
@@ -830,7 +862,7 @@ function salonWeltenSeite(a) {
     if (ein) for (const w of ein.werke) werke.append(el('div', { class: 'sw-werk' },
       el('b', {}, w.titel), el('small', {}, w.form + ' · ' + w.woerter.toLocaleString('de-DE') + ' Wörter · ' + w.ton),
       el('i', {}, w.kurz)));
-    if (ein) felder.werke = werke;
+    if (ein && D.einst.salonWerke === true) felder.werke = werke;
 
     /* 3. Deine Leute — Figuren aus der Einlesung, die diese Stimme kommentiert hat */
     const leute = el('div', { class: 'sw-feld' });
@@ -881,7 +913,7 @@ function salonWeltenSeite(a) {
       for (const f of k.figuren.slice(0, 14)) chip(f.name, 'figur', () => zeige(gespraechAntwort(a, frageMit('wer', Object.assign({ art: 'figur' }, f)), k, { anrede, saat: salonHash(f.name + ':' + a.id) })));
       for (const o of k.orte.slice(0, 6)) chip(o.name, 'ort', () => zeige(gespraechAntwort(a, frageMit('wo', Object.assign({ art: 'ort' }, o)), k, { anrede, saat: salonHash(o.name + ':' + a.id) })));
       for (const b of k.begriffe.slice(0, 8)) chip(b.name, 'begriff', () => zeige(gespraechAntwort(a, frageMit('wer', Object.assign({ art: 'begriff' }, b)), k, { anrede, saat: salonHash(b.name + ':' + a.id) })));
-      chip('Meine Werke', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'werke' }, k, { anrede })));
+      if (D.einst.salonWerke === true) chip('Meine Werke', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'werke' }, k, { anrede })));
       chip('Zahlen', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'zahl' }, k, { anrede })));
       chip('Ein Satz von mir', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'stelle' }, k, { anrede, saat: Math.floor(Math.random() * 1e9) })));
       chip('Wo war ich zuletzt?', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'wann' }, k, { anrede })));

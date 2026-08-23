@@ -189,6 +189,7 @@ RENDER.feinheiten = function (haupt) {
 
   /* Räume als Orte: Kulissen und Häute, zuschaltbar */
   if (typeof orteKarte === 'function') inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Orte'), orteKarte()));
+  if (typeof salonKarte === 'function') inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'Salon'), salonKarte()));
 
   /* Räume: an/aus und Reihenfolge */
   const raumkarte = el('div', { class: 'karte' });
