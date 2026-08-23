@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.37.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.38.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -126,6 +126,12 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   eigenen; der Teppich schlägt die Bibliothek. Bedienung: Werkzeuge Hand/Faden, Ziehen von Name zu Name
   legt einen Faden an, ein Tipp nimmt eine Person in den Blick (Personenkarte unten links), die Legende
   ist nach Gruppen gebündelt mit Solo-Knopf.
+- **5.38** Der Baum. Das Holz wird ZWEIMAL gezeichnet: erst dunkel und breiter (`.tep-holzrand`, 7,5 px
+  Kontur), dann hell darauf (`.tep-holz`). Weil sich die dunklen Formen überlappen, verschmelzen Stamm und
+  Äste zu EINEM Umriss — vorher sah man an jeder Astwurzel eine Fuge. Der Stamm liegt diagonal (unten links
+  bis fast zur ersten Generation), ist knorrig (fünf Knoten, drei Wellenlängen Unruhe, links und rechts
+  verschieden) und läuft oben in die ersten Äste hinein. Äste bekommen Ellbogen (`_knorrigeMitte`) mit
+  einem Knoten an jedem Knick. Das Rautengitter ist wieder raus.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

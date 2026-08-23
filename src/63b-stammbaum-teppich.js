@@ -425,53 +425,75 @@ function teppichSVG(doc, baum, ordnung, neu) {
   }
   svg.append(sv('rect', { x: 0, y: 0, width: breite, height: hoehe, class: 'tep-schatten', fill: 'url(#tep-vignette)' }));
 
-  const gAeste = sv('g', { class: 'tep-aeste' });
+  /* Das Holz wird ZWEIMAL gezeichnet: erst dunkel und breiter (das gibt die
+     Kontur), dann hell darauf. Weil sich die dunklen Formen überlappen,
+     verschmelzen Stamm und Äste zu EINEM Umriss — ohne Fuge an jeder
+     Astwurzel. */
+  const gHolzRand = sv('g', { class: 'tep-holzrand' });
+  const gHolz = sv('g', { class: 'tep-holz' });
+  const gStriche = sv('g', { class: 'tep-striche' });
+  const gAeste = sv('g', { class: 'tep-aeste' }, gHolzRand, gHolz, gStriche);
   const gLaub = sv('g', { class: 'tep-laub' });
   const gRanken = sv('g', { class: 'tep-ranken' });
   const gBaender = sv('g', { class: 'tep-baender' });
   const gTiere = sv('g', { class: 'tep-tiere' });
 
-  /* --- Der Stamm --- Er steigt unten links auf und gabelt sich in die
-     Ältesten. Der Ansatz ist dick, die Gabel schon dünner: so sieht man dem
-     Baum an, wo er anfängt. */
-  const wurzeln = knoten.filter((k) => !k.eltern.length);
-  const stammX = 176, stammY = hoehe - 56;
-  const zielY = wurzeln.length ? wurzeln.reduce((s, k) => s + py(k), 0) / wurzeln.length : hoehe / 2;
-  const gabelX = stammX + 58;
-  const gabelY = stammY - Math.max(120, Math.min(300, (stammY - zielY) * 0.45));
+  /* Eine Holzform geht in beide Ebenen. */
+  const holz = (d, gen) => {
+    const rand = sv('path', { d, class: 'tep-holzform' });
+    const hell = sv('path', { d, class: 'tep-holzform' });
+    if (gen != null) { rand.style.setProperty('--gen', String(gen)); hell.style.setProperty('--gen', String(gen)); }
+    gHolzRand.append(rand);
+    gHolz.append(hell);
+  };
 
-  /* Wie reich geschmückt wird, hängt davon ab, wie viel auf dem Tuch hängt.
-     Bei dreihundert Namen wäre volles Laub an jedem Ast eine Zeichenorgie,
-     die niemand einzeln ansieht — und ein Browser, der minutenlang malt. */
-  const astZahl = knoten.reduce((n, k) => n + Math.max(1, k.eltern.length ? 1 : 0), wurzeln.length);
+  /* --- Der Stamm --- Er steigt unten links auf und lehnt sich weit nach
+     rechts: eine Diagonale durch das Bild, kein Mast in der Ecke. */
+  const wurzeln = knoten.filter((k) => !k.eltern.length);
+  const stammX = 130, stammY = hoehe - 40;
+  const zielY = wurzeln.length ? wurzeln.reduce((sum, k) => sum + py(k), 0) / wurzeln.length : hoehe / 2;
+  /* Weit nach rechts und weit hinauf — fast bis zur ersten Generation. */
+  const gabelX = TEP_RAND_X - 118;
+  const gabelY = Math.max(TEP_RAND_Y + 40, Math.min(stammY - 200, zielY + 30));
+
+  const astZahl = knoten.reduce((n, k) => n + (k.eltern.length ? 1 : 0), wurzeln.length);
   const dichte = astZahl > 90 ? 0.4 : astZahl > 45 ? 0.7 : 1;
 
-  /* Beim Aufschlagen wächst der Baum: Generation für Generation kommt das
-     Holz, dann legt sich das Laub darauf. Die Nummer steuert, wann. */
   const astwerk = (a, b, dick, salz, stufe) => {
     const w = teppichAstwerk(a, b, dick, salz, dichte);
     const n = String(Math.min(stufe || 0, 12));
-    w.holz.style.setProperty('--gen', n);
+    for (const d of w.formen) holz(d, n);
+    w.striche.style.setProperty('--gen', n);
     w.laub.style.setProperty('--gen', n);
-    gAeste.append(w.holz);
+    gStriche.append(w.striche);
     gLaub.append(w.laub);
   };
 
   if (knoten.length) {
-    /* Der Stamm ist von Hand gezeichnet, nicht gerechnet — siehe oben. */
-    gAeste.append(teppichGrund(stammX + 20, stammY + 14, 760));
-    gAeste.append(teppichStammBauen(stammX, stammY, stammY - gabelY));
+    gAeste.insertBefore(teppichGrund(stammX + 30, stammY + 12, 820), gHolzRand);
+    const stamm = teppichStammKoerper({ x: stammX, y: stammY }, { x: gabelX, y: gabelY }, 146, 46, baum.titel || 'stamm');
+    holz(_flaeche(stamm).d, '0');
+    gStriche.append(sv('path', { d: _kante(stamm, 1), class: 'tep-astkante' }));
+    gStriche.append(sv('path', { d: _kante(stamm, -1), class: 'tep-astschatten' }));
+    gStriche.append(sv('path', { d: teppichBarkPfad(stamm, baum.titel || 'rinde', 13), class: 'tep-rinde' }));
+    gStriche.append(sv('path', { d: teppichSchrundenPfad(stamm, baum.titel || 'schrunde', 9), class: 'tep-rindefein' }));
+    gStriche.append(teppichAstloch(stamm, baum.titel || 'loch'));
+
+    /* Die ersten Äste wachsen AUS der Stammspitze heraus: sie fangen dort
+       an, wo der Stamm noch dick ist, und sind selbst dick genug, dass die
+       dunklen Umrisse verschmelzen. Deshalb sieht man keine Ansatzstelle. */
+    const spitze = stamm[stamm.length - 4];
     for (const k of wurzeln) {
-      astwerk({ x: gabelX, y: gabelY }, { x: px(k) - teppichBandBreite(k.person) / 2 - 8, y: py(k) }, 9, k.id + ':stamm', 0);
+      astwerk({ x: spitze.x, y: spitze.y },
+        { x: px(k) - teppichBandBreite(k.person) / 2 - 8, y: py(k) },
+        Math.max(16, spitze.w * 1.5), k.id + ':stamm', 0);
     }
   }
 
   /* --- Die Äste: Eltern zu Kindern --- */
   for (const k of knoten) {
-    const dick = Math.max(2.6, 7.5 - k.gen * 0.55);
+    const dick = Math.max(3.4, 12 - k.gen * 1.1);
     const bis = { x: px(k) - teppichBandBreite(k.person) / 2 - 5, y: py(k) };
-    /* Sind beide Eltern ein Paar, wächst EIN Ast aus ihrer Mitte — nicht
-       zwei fast gleiche nebeneinander. */
     const paarEltern = k.eltern.length === 2 && wo.get(k.eltern[0]) && wo.get(k.eltern[1]) &&
       (wo.get(k.eltern[0]).paare || []).includes(k.eltern[1]);
     if (paarEltern) {
@@ -485,13 +507,12 @@ function teppichSVG(doc, baum, ordnung, neu) {
         astwerk({ x: px(e) + teppichBandBreite(e.person) / 2 + 5, y: py(e) }, bis, dick, eId + '>' + k.id, k.gen);
       }
     }
-    /* Paare: ein kurzer Bogen dazwischen, unter den Bändern durch. */
     for (const pId of k.paare) {
       if (k.id > pId) continue;
-      const p = wo.get(pId);
-      if (!p) continue;
-      const oben = py(k) < py(p) ? k : p, unten = py(k) < py(p) ? p : k;
-      gAeste.append(sv('path', {
+      const pp = wo.get(pId);
+      if (!pp) continue;
+      const oben = py(k) < py(pp) ? k : pp, unten = py(k) < py(pp) ? pp : k;
+      gStriche.append(sv('path', {
         d: teppichBogen(px(oben), py(oben) + TEP_BAND_H / 2 + 3, px(unten), py(unten) - TEP_BAND_H / 2 - 3),
         class: 'tep-bund'
       }));
@@ -624,20 +645,16 @@ function teppichDefs() {
   return defs;
 }
 
-/* ===================== DAS ASTWERK =====================
-   Ein echter Ast ist keine Kurve. Er ist ein Körper, der sich gabelt, an den
-   Gabelungen anschwillt, in Zweige ausläuft, und an deren Enden hängt das
-   Laub in Büscheln — mit Eicheln dazwischen und einer Ranke, die sich am
-   Ende einrollt.
+/* ===================== DIE GEOMETRIE DES HOLZES =====================
+   Alles, was auf dem Teppich aus Holz ist — Stamm, Äste, Zweige, Wurzeln,
+   sogar der Leib der Schlange — wird auf dieselbe Weise gebaut: eine
+   Mittellinie wird abgetastet, an jedem Punkt quer aufgetragen und zu einer
+   geschlossenen Fläche verbunden.
 
-   Deshalb wird hier nicht gestrichen, sondern gebaut: die Mittellinie wird
-   abgetastet, quer aufgetragen und zu einer geschlossenen Fläche geschlossen.
-   Aus derselben Mittellinie kommen dann die Zweige, das Laub und die Eicheln
-   — alles aus der Kennung gerechnet, damit derselbe Ast beim nächsten
-   Aufschlagen dieselben Knoten hat. */
+   Nur so verjüngt sich ein Ast wirklich, schwillt an einem Knoten an und
+   wird zu Holz statt zu einer Linie mit Strichbreite. */
 
-const TEP_AST_PUNKTE = 30;
-
+function _zahl(n) { return (Math.round(n * 10) / 10).toString(); }
 function _bez(t, p0, c1, c2, p3) {
   const u = 1 - t;
   return u * u * u * p0 + 3 * u * u * t * c1 + 3 * u * t * t * c2 + t * t * t * p3;
@@ -646,14 +663,10 @@ function _bezAbleitung(t, p0, c1, c2, p3) {
   const u = 1 - t;
   return 3 * u * u * (c1 - p0) + 6 * u * t * (c2 - c1) + 3 * t * t * (p3 - c2);
 }
-function _zahl(n) { return (Math.round(n * 10) / 10).toString(); }
 
-/* Aus einer Mittellinie (Punkte + Querrichtungen + Breiten) eine Fläche. */
-/* ----- Glatte Umrisse -----
-   Ein Umriss aus lauter geraden Stücken hat Facetten — beim Hineinzoomen
-   sieht man jede einzelne, und aus dem Ast wird ein Vieleck. Deshalb werden
-   die abgetasteten Punkte hier in Kurven übersetzt (Catmull-Rom nach
-   Bézier): der Umriss läuft durch dieselben Punkte, aber weich. */
+/* Ein Umriss aus lauter geraden Stücken hat Facetten — beim Hineinzoomen
+   sieht man jede einzelne. Deshalb werden die Punkte in Kurven übersetzt
+   (Catmull-Rom nach Bézier): derselbe Weg, aber weich. */
 function _glatt(punkte, anfang) {
   const n = punkte.length;
   if (n < 2) return '';
@@ -661,12 +674,13 @@ function _glatt(punkte, anfang) {
   let d = (anfang === false ? ' L ' : 'M ') + _zahl(punkte[0][0]) + ' ' + _zahl(punkte[0][1]);
   for (let i = 0; i < n - 1; i++) {
     const p0 = hol(i - 1), p1 = punkte[i], p2 = punkte[i + 1], p3 = hol(i + 2);
-    const c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = p1[1] + (p2[1] - p0[1]) / 6;
-    const c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = p2[1] - (p3[1] - p1[1]) / 6;
-    d += ' C ' + _zahl(c1x) + ' ' + _zahl(c1y) + ', ' + _zahl(c2x) + ' ' + _zahl(c2y) + ', ' + _zahl(p2[0]) + ' ' + _zahl(p2[1]);
+    d += ' C ' + _zahl(p1[0] + (p2[0] - p0[0]) / 6) + ' ' + _zahl(p1[1] + (p2[1] - p0[1]) / 6) +
+      ', ' + _zahl(p2[0] - (p3[0] - p1[0]) / 6) + ' ' + _zahl(p2[1] - (p3[1] - p1[1]) / 6) +
+      ', ' + _zahl(p2[0]) + ' ' + _zahl(p2[1]);
   }
   return d;
 }
+
 /* Links und rechts dürfen verschieden breit sein — ein alter Stamm ist
    nirgends symmetrisch, und die Wurzelanläufe sitzen auf beiden Seiten
    woanders. */
@@ -677,8 +691,7 @@ function _flaeche(punkte) {
     links.push([q.x + q.nx * wl, q.y + q.ny * wl]);
     rechts.push([q.x - q.nx * wr, q.y - q.ny * wr]);
   }
-  const zurueck = rechts.slice().reverse();
-  return { d: _glatt(links) + _glatt(zurueck, false) + ' Z', links, rechts };
+  return { d: _glatt(links) + _glatt(rechts.slice().reverse(), false) + ' Z', links, rechts };
 }
 function _kante(punkte, seite) {
   return _glatt(punkte.map((q) => {
@@ -687,36 +700,8 @@ function _kante(punkte, seite) {
   }));
 }
 
-/* Ein gerades Stück Holz: von einem Punkt in eine Richtung, mit Krümmung. */
-function _zweigLinie(x, y, winkel, laenge, bogen, dickA, dickB, punkte) {
-  const n = punkte || 12;
-  const raus = [];
-  const rad = winkel * Math.PI / 180, bog = bogen * Math.PI / 180;
-  for (let i = 0; i <= n; i++) {
-    const t = i / n;
-    /* Der Zweig biegt sich zunehmend — deshalb wächst der Winkel mit t². */
-    const w = rad + bog * t * t;
-    const s = laenge * t;
-    raus.push({
-      x: x + Math.cos(rad) * s * (1 - t * 0.18) + Math.cos(w) * s * t * 0.18,
-      y: y + Math.sin(rad) * s * (1 - t * 0.18) + Math.sin(w) * s * t * 0.18,
-      winkel: (w * 180) / Math.PI,
-      t
-    });
-  }
-  /* Querrichtungen aus den Nachbarpunkten */
-  for (let i = 0; i <= n; i++) {
-    const a = raus[Math.max(0, i - 1)], b = raus[Math.min(n, i + 1)];
-    const tx = b.x - a.x, ty = b.y - a.y;
-    const len = Math.sqrt(tx * tx + ty * ty) || 1;
-    raus[i].nx = -ty / len; raus[i].ny = tx / len;
-    raus[i].w = Math.max(0.35, (dickA + (dickB - dickA) * raus[i].t) / 2);
-  }
-  return raus;
-}
-
 /* Eine kleine Einrollung am Ende eines Zweigs — die Spitze eines jungen
-   Triebs. Sie macht mehr aus als alles andere: sie sagt „gewachsen“. */
+   Triebs. Sie sagt „gewachsen“ wie sonst nichts. */
 function _ranke(x, y, winkel, groesse, richtung) {
   let d = 'M ' + _zahl(x) + ' ' + _zahl(y);
   let wx = x, wy = y, w = winkel, r = groesse;
@@ -766,96 +751,226 @@ function _eichel(x, y, winkel, salz) {
   return g;
 }
 
-/* ----- Das ganze Astwerk zwischen zwei Punkten ----- */
+/* ===================== DAS HOLZ =====================
+   Ein Märchenbaum, kein Diagrammbaum. Drei Dinge machen den Unterschied:
+
+   1. EIN UMRISS UM ALLES. Stamm und Äste werden zweimal gezeichnet: zuerst
+      dunkel und ein Stück breiter, dann hell darauf. Weil sich die dunklen
+      Formen überlappen, verschmelzen sie zu EINER Kontur — der Stamm geht
+      ohne Naht in die Äste über, so wie bei einem gewachsenen Baum. Vorher
+      sah man an jeder Astwurzel eine Fuge.
+
+   2. DER STAMM LIEGT SCHRÄG. Er steigt von unten links auf und lehnt sich
+      weit nach rechts in den Wuchs. Ein senkrechter Stamm in der Bildmitte
+      ist ein Mast; ein schräger, der das Bild durchquert, ist ein Baum.
+
+   3. KNORRIG STATT GLATT. Weder Stamm noch Äste laufen als saubere Kurve.
+      Sie haben Ellbogen, an denen sie die Richtung wechseln, und an jedem
+      Ellbogen einen Knoten, an dem das Holz dicker ist. Alles aus der
+      Kennung gerechnet — derselbe Baum hat morgen dieselben Knoten. */
+
+/* Eine Mittellinie mit Ellbogen: der Weg von a nach b wird nicht als eine
+   Kurve gezogen, sondern über zwei, drei Knicke, die seitlich ausscheren. */
+function _knorrigeMitte(a, b, salz, knicke, ausschlag) {
+  const n = knicke == null ? 2 : knicke;
+  const weite = ausschlag == null ? 0.16 : ausschlag;
+  const dx = b.x - a.x, dy = b.y - a.y;
+  const laenge = Math.sqrt(dx * dx + dy * dy) || 1;
+  const nx = -dy / laenge, ny = dx / laenge;
+  const stuetzen = [[a.x, a.y]];
+  for (let i = 1; i <= n; i++) {
+    const t = i / (n + 1);
+    const seite = (teppichZufall(salz, 'kn' + i) - 0.5) * 2;
+    const laengs = (teppichZufall(salz, 'kl' + i) - 0.5) * 0.12;
+    stuetzen.push([
+      a.x + dx * (t + laengs) + nx * laenge * weite * seite,
+      a.y + dy * (t + laengs) + ny * laenge * weite * seite
+    ]);
+  }
+  stuetzen.push([b.x, b.y]);
+
+  /* Zwischen den Stützen weich abtasten — Catmull-Rom, damit die Knicke
+     Ellbogen werden und keine Ecken. */
+  const punkte = [];
+  const proAbschnitt = 9;
+  const hol = (i) => stuetzen[Math.max(0, Math.min(stuetzen.length - 1, i))];
+  for (let i = 0; i < stuetzen.length - 1; i++) {
+    const p0 = hol(i - 1), p1 = stuetzen[i], p2 = stuetzen[i + 1], p3 = hol(i + 2);
+    for (let k = 0; k < proAbschnitt; k++) {
+      const t = k / proAbschnitt, t2 = t * t, t3 = t2 * t;
+      punkte.push([
+        0.5 * ((2 * p1[0]) + (-p0[0] + p2[0]) * t + (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2 + (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3),
+        0.5 * ((2 * p1[1]) + (-p0[1] + p2[1]) * t + (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 + (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3)
+      ]);
+    }
+  }
+  punkte.push([b.x, b.y]);
+  /* Die Ellbogen merken: dort sitzen später die Knoten. */
+  const ellbogen = [];
+  for (let i = 1; i <= n; i++) ellbogen.push((i * proAbschnitt) / (punkte.length - 1));
+  return { punkte, ellbogen };
+}
+
+/* Das Breitenprofil eines Astes: von dick nach dünn, mit einem Knoten an
+   jedem Ellbogen und einer Anschwellung am Ansatz. */
+function _astbreite(t, dickA, dickB, ellbogen, salz) {
+  const grund = dickA + (dickB - dickA) * (t * t * 0.55 + t * 0.45);
+  let knoten = 1 + Math.exp(-t * 13) * 0.5;              /* der Ansatz */
+  for (let i = 0; i < ellbogen.length; i++) {
+    const d = (t - ellbogen[i]) / 0.075;
+    knoten += Math.exp(-d * d) * (0.2 + teppichZufall(salz, 'kd' + i) * 0.22);
+  }
+  const wellig = 1 + Math.sin(t * 17 + teppichZufall(salz, 'w') * 6) * 0.045;
+  return Math.max(0.9, grund * knoten * wellig);
+}
+
+/* ----- Ein Astwerk zwischen zwei Punkten -----
+   Gibt zwei Dinge zurück: die Holzformen (als reine Pfad-Angaben, damit sie
+   zweimal gezeichnet werden können) und das Laub. */
 function teppichAstwerk(a, b, dicke, salz, dichte) {
   const d = dichte == null ? 1 : dichte;
-  const holz = sv('g', { class: 'tep-astgruppe', 'data-salz': salz });
+  const formen = [];        /* nur die d-Angaben — Umriss und Fläche teilen sie sich */
+  const striche = sv('g', { class: 'tep-holzstriche' });
   const laub = sv('g', { class: 'tep-laubgruppe' });
 
-  /* --- Die Mittellinie --- */
-  const dx = b.x - a.x;
-  const hoch = teppichZufall(salz, 'hoch') * 30 - 15;
-  const c1x = a.x + dx * 0.42, c1y = a.y + hoch * 0.4;
-  const c2x = a.x + dx * 0.62, c2y = b.y - hoch * 0.6;
-  const dickA = dicke, dickB = Math.max(1.6, dicke * 0.32);
-  const wobbel = 0.5 + teppichZufall(salz, 'wob') * 5.5;
-  const phase = teppichZufall(salz, 'ph') * 6.28;
+  const knicke = d >= 1 ? 2 : 1;
+  const { punkte, ellbogen } = _knorrigeMitte(a, b, salz, knicke, 0.13);
+  const dickB = Math.max(1.6, dicke * 0.3);
+  const bahn = _bahn(punkte, punkte.map((q, i) => _astbreite(i / (punkte.length - 1), dicke, dickB, ellbogen, salz)));
 
-  const mitte = [];
-  for (let i = 0; i <= TEP_AST_PUNKTE; i++) {
-    const t = i / TEP_AST_PUNKTE;
-    const x = _bez(t, a.x, c1x, c2x, b.x), y = _bez(t, a.y, c1y, c2y, b.y);
-    const tx = _bezAbleitung(t, a.x, c1x, c2x, b.x), ty = _bezAbleitung(t, a.y, c1y, c2y, b.y);
-    const len = Math.sqrt(tx * tx + ty * ty) || 1;
-    const grund = dickA + (dickB - dickA) * (t * t * 0.6 + t * 0.4);
-    /* Am Ansatz schwillt der Ast an — dort, wo er aus dem Holz kommt. */
-    const knoten = 1 + Math.exp(-t * 14) * 0.55 + Math.sin(t * wobbel + phase) * 0.1;
-    mitte.push({
-      x, y, t, nx: -ty / len, ny: tx / len,
-      w: Math.max(0.9, grund * knoten) / 2,
-      winkel: Math.atan2(ty, tx) * 180 / Math.PI
-    });
+  formen.push(_flaeche(bahn).d);
+  striche.append(sv('path', { d: _kante(bahn, 1), class: 'tep-astkante' }));
+  striche.append(sv('path', { d: _kante(bahn, -1), class: 'tep-astschatten' }));
+  /* Ein paar Rindenstriche der Länge nach */
+  let rinde = '';
+  for (let r = 0; r < 3; r++) {
+    const seite = -0.5 + r * 0.5;
+    const von = 3 + r * 2, bis = Math.min(bahn.length - 3, von + 8 + r * 4);
+    for (let i = von; i <= bis; i++) {
+      const q = bahn[i];
+      rinde += (i === von ? ' M ' : ' L ') + _zahl(q.x + q.nx * q.w * seite) + ' ' + _zahl(q.y + q.ny * q.w * seite);
+    }
   }
-
-  const f = _flaeche(mitte);
-  /* Die Mittellinie wird mitgegeben: das Eichhörnchen soll AUF dem Ast
-     laufen. Liefe es am Umriss entlang, käme es außen wieder zurück. */
-  holz.setAttribute('data-mittel', mitte.map((q, i) => (i ? 'L ' : 'M ') + _zahl(q.x) + ' ' + _zahl(q.y)).join(' '));
-  holz.append(sv('path', { d: f.d, class: 'tep-ast', 'data-salz': salz }));
-  holz.append(sv('path', { d: _kante(mitte, 1), class: 'tep-astkante' }));
-  holz.append(sv('path', { d: _kante(mitte, -1), class: 'tep-astschatten' }));
+  striche.append(sv('path', { class: 'tep-rindefein', d: rinde.trim() }));
 
   /* --- Zweige, die sich abspalten --- */
   const wieviele = d >= 1 ? 4 : d >= 0.7 ? 2 : 1;
-  const zweigEnden = [];
+  const enden = [];
   for (let i = 0; i < wieviele; i++) {
-    const t = 0.24 + (i / wieviele) * 0.6 + teppichZufall(salz, 'zt' + i) * 0.1;
-    const stelle = mitte[Math.max(1, Math.min(TEP_AST_PUNKTE - 1, Math.round(t * TEP_AST_PUNKTE)))];
+    const t = 0.22 + (i / wieviele) * 0.62 + teppichZufall(salz, 'zt' + i) * 0.08;
+    const stelle = bahn[Math.max(1, Math.min(bahn.length - 2, Math.round(t * (bahn.length - 1))))];
     const seite = teppichZufall(salz, 'zs' + i) > 0.5 ? 1 : -1;
-    const ab = stelle.winkel + seite * (34 + teppichZufall(salz, 'zw' + i) * 30);
-    const laenge = (24 + teppichZufall(salz, 'zl' + i) * 30) * (0.6 + d * 0.4);
-    const zweigDick = stelle.w * 1.5;
-    const linie = _zweigLinie(stelle.x, stelle.y, ab, laenge, seite * 26, zweigDick, 0.9, 10);
-    holz.append(sv('path', { d: _flaeche(linie).d, class: 'tep-ast zweig' }));
-    holz.append(sv('path', { d: _kante(linie, 1), class: 'tep-astkante duenn' }));
-    const spitze = linie[linie.length - 1];
-    zweigEnden.push(spitze);
+    const ab = stelle.winkel + seite * (36 + teppichZufall(salz, 'zw' + i) * 32);
+    const laenge = (26 + teppichZufall(salz, 'zl' + i) * 34) * (0.6 + d * 0.4);
+    const ziel = {
+      x: stelle.x + Math.cos(ab * Math.PI / 180) * laenge,
+      y: stelle.y + Math.sin(ab * Math.PI / 180) * laenge
+    };
+    const zw = _knorrigeMitte({ x: stelle.x, y: stelle.y }, ziel, salz + ':z' + i, 1, 0.2);
+    const zbahn = _bahn(zw.punkte, zw.punkte.map((q, k) => _astbreite(k / (zw.punkte.length - 1), stelle.w * 1.7, 0.9, zw.ellbogen, salz + ':z' + i)));
+    formen.push(_flaeche(zbahn).d);
+    striche.append(sv('path', { d: _kante(zbahn, seite), class: 'tep-astkante duenn' }));
+    const spitze = zbahn[zbahn.length - 1];
+    enden.push(spitze);
 
-    /* Ein zweiter, kleinerer Trieb am Zweig — die dritte Ordnung. */
-    if (d >= 1 && teppichZufall(salz, 'zz' + i) > 0.45) {
-      const mittig = linie[Math.round(linie.length * 0.55)];
-      const ab2 = mittig.winkel - seite * (30 + teppichZufall(salz, 'z2w' + i) * 24);
-      const linie2 = _zweigLinie(mittig.x, mittig.y, ab2, laenge * 0.5, -seite * 20, mittig.w * 1.4, 0.7, 8);
-      holz.append(sv('path', { d: _flaeche(linie2).d, class: 'tep-ast zweig' }));
-      zweigEnden.push(linie2[linie2.length - 1]);
+    if (d >= 1 && teppichZufall(salz, 'zz' + i) > 0.42) {
+      const mittig = zbahn[Math.round(zbahn.length * 0.55)];
+      const ab2 = mittig.winkel - seite * (32 + teppichZufall(salz, 'z2w' + i) * 26);
+      const ziel2 = {
+        x: mittig.x + Math.cos(ab2 * Math.PI / 180) * laenge * 0.55,
+        y: mittig.y + Math.sin(ab2 * Math.PI / 180) * laenge * 0.55
+      };
+      const zw2 = _knorrigeMitte({ x: mittig.x, y: mittig.y }, ziel2, salz + ':y' + i, 1, 0.22);
+      const zbahn2 = _bahn(zw2.punkte, zw2.punkte.map((q, k) => _astbreite(k / (zw2.punkte.length - 1), mittig.w * 1.6, 0.7, zw2.ellbogen, salz + ':y' + i)));
+      formen.push(_flaeche(zbahn2).d);
+      enden.push(zbahn2[zbahn2.length - 1]);
     }
-
-    /* Und an der Spitze eine Einrollung — nicht an jedem, das wäre Zucker. */
     if (d >= 1 && teppichZufall(salz, 'zr' + i) > 0.55) {
-      holz.append(sv('path', { d: _ranke(spitze.x, spitze.y, spitze.winkel, 7, seite), class: 'tep-triebranke' }));
+      striche.append(sv('path', { d: _ranke(spitze.x, spitze.y, spitze.winkel, 7, seite), class: 'tep-triebranke' }));
     }
   }
 
-  /* --- Das Laub an den Zweigenden und an der Astspitze --- */
-  const alleEnden = zweigEnden.concat([mitte[TEP_AST_PUNKTE]]);
+  /* --- Das Laub an den Enden --- */
+  const alleEnden = enden.concat([bahn[bahn.length - 1]]);
   alleEnden.forEach((e, i) => {
     const n = d >= 1 ? (teppichZufall(salz, 'bn' + i) > 0.4 ? 6 : 4) : d >= 0.7 ? 3 : 2;
     for (const blatt of _bueschel(e.x, e.y, e.winkel, n, salz + ':' + i, 1)) laub.append(blatt);
-    /* Ungefähr an jedem dritten Büschel hängt eine Eichel. */
     if (d >= 1 && teppichHash(salz, 'ei' + i) % 3 === 0) {
       laub.append(_eichel(e.x + Math.cos(e.winkel * Math.PI / 180) * 5, e.y + Math.sin(e.winkel * Math.PI / 180) * 5 + 4, e.winkel, salz + ':' + i));
     }
   });
-  /* Ein paar einzelne Blätter direkt am Ast — sonst ist der Ast nackt. */
   if (d >= 0.7) {
     for (let i = 0; i < (d >= 1 ? 3 : 2); i++) {
-      const stelle = mitte[Math.round((0.3 + i * 0.22) * TEP_AST_PUNKTE)];
+      const stelle = bahn[Math.round((0.3 + i * 0.22) * (bahn.length - 1))];
       const seite = teppichZufall(salz, 'es' + i) > 0.5 ? 1 : -1;
       for (const blatt of _bueschel(stelle.x, stelle.y, stelle.winkel + seite * 70, 2, salz + ':e' + i, 0.85)) laub.append(blatt);
     }
   }
 
-  return { holz, laub };
+  return { formen, striche, laub, mittellinie: _glatt(punkte) };
+}
+
+/* ----- Der Stamm -----
+   Schräg, dick, knorrig — und er läuft oben in die ersten Äste hinein,
+   statt an einer Gabel aufzuhören. Unten öffnet er sich in Wurzelanläufe:
+   dafür sind links und rechts verschiedene Breiten nötig, sonst wäre der
+   Fuß symmetrisch wie ein Kelch. */
+const TEP_ANLAUF_LINKS = [[0.00, 0.95], [0.05, 0.62], [0.115, 0.34]];
+const TEP_ANLAUF_RECHTS = [[0.015, 0.78], [0.075, 0.44], [0.14, 0.22]];
+function _lappen(t, liste) {
+  let mehr = 0;
+  for (const [wo, staerke] of liste) {
+    const ab = Math.abs(t - wo);
+    if (ab > 0.115) continue;
+    mehr += staerke * Math.pow(Math.cos((ab / 0.115) * Math.PI / 2), 2);
+  }
+  return mehr;
+}
+
+function teppichStammKoerper(basis, gabel, dickUnten, dickOben, salz) {
+  const n = 56;
+  /* Der Stamm lehnt sich in den Wuchs: er geht erst steil hoch, legt sich
+     dann nach rechts. Das ist die Diagonale, die dem Bild seinen Schwung
+     gibt. */
+  const dx = gabel.x - basis.x, dy = gabel.y - basis.y;
+  const c1 = { x: basis.x + dx * 0.06, y: basis.y + dy * 0.46 };
+  const c2 = { x: basis.x + dx * 0.52, y: basis.y + dy * 0.86 };
+  const punkte = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n;
+    punkte.push([
+      _bez(t, basis.x, c1.x, c2.x, gabel.x),
+      _bez(t, basis.y, c1.y, c2.y, gabel.y)
+    ]);
+  }
+  const breiten = punkte.map((q, i) => {
+    const t = i / n;
+    /* Knoten an drei Stellen — dort, wo einmal ein Ast sass. */
+    /* Knoten, wo einmal ein Ast sass — kraeftig genug, dass man sie sieht.
+       Bei sechzehn Prozent war der Stamm glatt wie eine Saeule. */
+    let knoten = 1;
+    for (const [wo, staerke, breite] of [[0.13, 0.34, 0.055], [0.29, 0.26, 0.05], [0.47, 0.30, 0.045], [0.63, 0.22, 0.05], [0.79, 0.18, 0.04]]) {
+      const ab = (t - wo) / breite;
+      knoten += Math.exp(-ab * ab) * staerke;
+    }
+    /* Und eine Unruhe im Umriss, die nie ganz zur Ruhe kommt. */
+    const wellig = 1 + Math.sin(t * 9 + teppichZufall(salz, 'w1') * 6) * 0.085
+      + Math.sin(t * 21 + teppichZufall(salz, 'w2') * 6) * 0.045
+      + Math.sin(t * 41) * 0.02;
+    return (dickOben + (dickUnten - dickOben) * Math.pow(1 - t, 1.5)) * knoten * wellig;
+  });
+  const bahn = _bahn(punkte, breiten);
+  /* Der Fuss: links drei Lappen, rechts drei andere. */
+  bahn.forEach((q, i) => {
+    const t = i / n;
+    /* Links und rechts verschieden — ein Stamm schwillt nicht symmetrisch.
+       Dazu die Wurzelanlaeufe ganz unten. */
+    const unruheL = 1 + Math.sin(t * 15 + 1.7) * 0.07 + Math.sin(t * 33 + 0.4) * 0.03;
+    const unruheR = 1 + Math.sin(t * 15 + 4.1) * 0.07 + Math.sin(t * 33 + 2.9) * 0.03;
+    q.wl = q.w * unruheL * (1 + _lappen(t, TEP_ANLAUF_LINKS) * 1.45);
+    q.wr = q.w * unruheR * (1 + _lappen(t, TEP_ANLAUF_RECHTS) * 1.2);
+  });
+  return bahn;
 }
 
 function teppichBogen(x1, y1, x2, y2) {
@@ -1225,132 +1340,6 @@ function _kurve(x0, y0, winkel, laenge, biegung, n) {
     ]);
   }
   return punkte;
-}
-
-/* ===================== DER STAMM =====================
-   Fünf Anläufe mit gerechneter Geometrie haben je einen Fehler gegen einen
-   anderen getauscht: mal Kegel, mal Klingen, mal ein Sägeblatt. Ein alter
-   Baum lässt sich nicht aus Winkeln und Längen ableiten — er ist gewachsen,
-   und das sieht man ihm an.
-
-   Deshalb ist der Stamm hier von Hand gezeichnet: eine feste Silhouette, die
-   nur noch auf die richtige Höhe gebracht wird. Genau so würde ein
-   Holzschnitt entstehen. Sie lehnt sich nach rechts in den Wuchs, ist
-   nirgends symmetrisch, hat drei Wurzelanläufe links und zwei rechts, eine
-   Beule auf halber Höhe und ein Astloch, wo vor Jahren ein Ast abbrach.
-
-   Der Bezugsrahmen: (0,0) ist die Stammmitte am Boden, nach oben negativ,
-   die Höhe bis zur Gabel ist 400. */
-const TEP_STAMM_HOEHE = 400;
-
-const TEP_STAMM_UMRISS =
-  /* Links oben an der Gabel, dann die linke Seite hinunter */
-  'M -22 -400 ' +
-  'C -26 -352, -24 -320, -30 -288 ' +
-  'C -36 -256, -30 -232, -34 -204 ' +      /* eine Beule */
-  'C -38 -176, -32 -156, -38 -132 ' +
-  'C -44 -110, -52 -96, -62 -84 ' +        /* hier öffnet sich der Fuß */
-  /* Der erste Anlauf: weit nach links, flach auslaufend */
-  'C -84 -70, -112 -56, -152 -46 ' +
-  'C -172 -41, -186 -34, -196 -24 ' +
-  'C -186 -20, -168 -20, -150 -22 ' +      /* die Kehle dahinter */
-  'C -128 -25, -110 -26, -96 -22 ' +
-  /* Der zweite, kürzere Anlauf */
-  'C -110 -12, -128 -4, -146 2 ' +
-  'C -128 8, -104 6, -84 0 ' +
-  'C -70 -4, -60 -8, -52 -12 ' +
-  /* Der dritte, nach vorn unten */
-  'C -56 2, -60 12, -62 22 ' +
-  'C -48 20, -34 12, -24 2 ' +
-  'C -18 10, -10 18, 0 22 ' +              /* die Mitte, zum Betrachter hin */
-  'C 10 18, 20 10, 28 0 ' +
-  /* Rechts: zwei Anläufe */
-  'C 40 10, 56 18, 76 20 ' +
-  'C 96 22, 118 18, 136 10 ' +
-  'C 120 2, 100 -4, 84 -10 ' +
-  'C 102 -14, 126 -16, 148 -14 ' +
-  'C 168 -12, 182 -16, 190 -24 ' +
-  'C 176 -34, 152 -42, 126 -50 ' +
-  'C 104 -57, 86 -66, 74 -78 ' +
-  /* Und die rechte Seite hinauf zur Gabel */
-  'C 62 -94, 54 -112, 50 -134 ' +
-  'C 46 -160, 50 -184, 46 -210 ' +
-  'C 42 -238, 46 -262, 40 -292 ' +
-  'C 34 -322, 34 -356, 30 -400 Z';
-
-/* Die Grate auf den Wurzelanläufen: helle Kanten, die vom Stamm auf die
-   Anläufe hinauslaufen. Sie machen aus der Fläche eine Form. */
-const TEP_STAMM_GRATE =
-  'M -60 -84 C -86 -66, -122 -50, -170 -34 ' +
-  'M -56 -70 C -78 -50, -104 -30, -132 -14 ' +
-  'M -46 -54 C -50 -34, -54 -18, -56 -2 ' +
-  'M 4 -46 C 6 -26, 8 -10, 8 4 ' +
-  'M 60 -70 C 74 -50, 96 -30, 122 -12 ' +
-  'M 70 -82 C 96 -64, 130 -48, 168 -34';
-
-/* Die Kehlen dazwischen — dort, wo der Fuß nach innen geht, liegt Schatten. */
-const TEP_STAMM_KEHLEN =
-  'M -108 -30 C -92 -40, -78 -54, -70 -70 ' +
-  'M -84 -8 C -70 -20, -60 -34, -54 -48 ' +
-  'M -30 6 C -26 -8, -22 -22, -20 -36 ' +
-  'M 42 4 C 40 -10, 38 -24, 38 -38 ' +
-  'M 104 -4 C 92 -18, 82 -34, 76 -50 ' +
-  'M 150 -28 C 130 -40, 108 -54, 92 -70';
-
-/* Die Rinde: Längsrisse, die sich mit dem Stamm biegen, dazu Querschrunden.
-   Sie enden alle oberhalb des Fußes — dort übernehmen die Grate. */
-const TEP_STAMM_RINDE =
-  'M -20 -376 C -24 -320, -20 -268, -26 -212 C -30 -170, -26 -140, -32 -112 ' +
-  'M -6 -364 C -10 -300, -4 -244, -10 -188 C -14 -150, -8 -124, -14 -98 ' +
-  'M 8 -352 C 6 -296, 12 -238, 8 -184 C 5 -146, 10 -118, 6 -92 ' +
-  'M 22 -330 C 22 -278, 28 -226, 24 -176 C 21 -142, 26 -116, 22 -94 ' +
-  'M -30 -262 C -34 -230, -30 -206, -34 -180 ' +
-  'M 34 -300 C 34 -262, 38 -232, 36 -206 ' +
-  'M -14 -204 C -18 -178, -14 -158, -18 -136 ' +
-  'M 16 -244 C 14 -216, 18 -194, 16 -172';
-
-const TEP_STAMM_SCHRUNDEN =
-  'M -28 -340 q 14 4 26 -2 M 2 -290 q 12 5 22 -1 M -24 -238 q 16 5 28 -1 ' +
-  'M 6 -186 q 13 4 22 -2 M -26 -150 q 15 5 26 -1 M 10 -122 q 12 4 20 -2 ' +
-  'M -20 -96 q 16 5 28 0';
-
-/* Was über den Fuß hinausläuft: die dünnen Wurzeln, die weiterziehen und im
-   Grund verschwinden. Auch sie sind gezeichnet, nicht gerechnet. */
-const TEP_STAMM_WURZELN =
-  'M -196 -24 C -224 -18, -252 -12, -276 -2 C -288 3, -296 8, -300 14 ' +
-  'C -292 16, -280 14, -268 10 C -244 2, -218 -6, -194 -12 Z ' +
-  'M -146 2 C -176 10, -204 16, -226 24 C -236 28, -242 32, -244 36 ' +
-  'C -236 38, -224 36, -212 32 C -190 24, -166 16, -144 10 Z ' +
-  'M 190 -24 C 220 -18, 248 -10, 270 0 C 282 6, 290 11, 292 17 ' +
-  'C 284 19, 272 17, 260 12 C 236 2, 212 -6, 188 -12 Z ' +
-  'M 136 10 C 166 18, 194 26, 214 36 C 224 41, 230 45, 232 49 ' +
-  'C 224 51, 212 49, 200 44 C 178 34, 156 24, 134 18 Z';
-
-const TEP_STAMM_WURZELHAARE =
-  'M -300 14 q -14 6 -24 4 M -300 14 q -12 12 -22 14 M -292 18 q -16 10 -28 10 ' +
-  'M -244 36 q -12 8 -22 8 M -244 36 q -8 12 -14 16 ' +
-  'M 292 17 q 14 8 24 7 M 292 17 q 10 12 18 16 M 284 21 q 16 10 26 12 ' +
-  'M 232 49 q 12 8 20 9 M 232 49 q 6 12 10 16';
-
-/* Das Astloch sitzt links auf halber Höhe. */
-const TEP_STAMM_ASTLOCH = [-16, -222];
-
-/* Der ganze Stamm, auf die gewünschte Höhe gebracht. */
-function teppichStammBauen(x, y, hoehe) {
-  const s = hoehe / TEP_STAMM_HOEHE;
-  const g = sv('g', { class: 'tep-stamm', transform: 'translate(' + _zahl(x) + ' ' + _zahl(y) + ') scale(' + s.toFixed(3) + ')' });
-  g.append(sv('path', { d: TEP_STAMM_WURZELN, class: 'tep-wurzel' }));
-  g.append(sv('path', { d: TEP_STAMM_WURZELHAARE, class: 'tep-wurzelhaar' }));
-  g.append(sv('path', { d: TEP_STAMM_UMRISS, class: 'tep-stammkoerper' }));
-  g.append(sv('path', { d: TEP_STAMM_KEHLEN, class: 'tep-kehle' }));
-  g.append(sv('path', { d: TEP_STAMM_GRATE, class: 'tep-gratkante' }));
-  g.append(sv('path', { d: TEP_STAMM_RINDE, class: 'tep-rinde' }));
-  g.append(sv('path', { d: TEP_STAMM_SCHRUNDEN, class: 'tep-rindefein' }));
-  const loch = sv('g', { class: 'tep-astloch', transform: 'translate(' + TEP_STAMM_ASTLOCH[0] + ' ' + TEP_STAMM_ASTLOCH[1] + ')' });
-  loch.append(sv('ellipse', { cx: 0, cy: 0, rx: 11, ry: 7.5, class: 'tep-astlochrand' }));
-  loch.append(sv('ellipse', { cx: 0, cy: 1, rx: 8, ry: 5, class: 'tep-astlochtief' }));
-  g.append(loch);
-  return g;
 }
 
 /* ----- Die Rinde -----
