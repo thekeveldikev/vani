@@ -137,7 +137,9 @@ function oeffneSchreibraum(docId) {
   /* Das zweite Netz: während des Schreibens liegt der Text auch in der Rettungskopie —
      ein anderer Speicher, den der Browser anders behandelt. Kostet nichts und rettet alles. */
   const rettung = typeof rettungSchreiben === 'function' ? entprellt(() => {
-    rettungSchreiben(doc.id, doc.titel, istRich ? (($('.sr-text') || {}).textContent || doc.text) : ta.value);
+    rettungSchreiben(doc.id, doc.titel,
+      istRich ? (ta.textContent || doc.text || '') : ta.value,
+      istRich ? ta.innerHTML : null);
   }, 3000, true) : null;
   if (rettung) { _sr.rettung = rettung; }
   _sr.sichern = sichern;

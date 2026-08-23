@@ -631,7 +631,7 @@ async function holeFaden() {
     if (D.docs.has(d.id)) continue;
     D.docs.set(d.id, d);
     D.stats.letzte[d.id] = worte(d.text || '');
-    await dbPut('docs', d);
+    if (!(await sicherSpeichern('docs', d))) { D.docs.delete(d.id); continue; }
     dazu++;
   }
   speichereStats();

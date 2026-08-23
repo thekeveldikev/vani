@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.28.0';
+const APP_VERSION = '5.28.1';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -669,23 +669,33 @@ async function loesche(id, still, kinderDerWurzelBehalten = false) {
   const buendel = { id: uid(), wann: Date.now(), name: wurzel.titel || (wurzel.text || '').slice(0, 40) || wurzel.typ, typ: wurzel.typ, docs: [], referenzen: [] };
   /* Lose Zuordnungen überleben das Löschen ihres Ziels, dürfen danach aber
      nicht als unsichtbare, kaputte Verweise im Bestand hängen bleiben. */
+  const putzen = [];
   for (const d of D.docs.values()) {
     if (opferSet.has(d.id)) continue;
-    let geputzt = false;
-    if (d.projektRef && opferSet.has(d.projektRef)) { buendel.referenzen.push({ id: d.id, feld: 'projektRef', wert: d.projektRef }); delete d.projektRef; geputzt = true; }
-    if (d.quelle && opferSet.has(d.quelle)) { buendel.referenzen.push({ id: d.id, feld: 'quelle', wert: d.quelle }); delete d.quelle; geputzt = true; }
-    if (kinderDerWurzelBehalten && d.parent === id) { buendel.referenzen.push({ id: d.id, feld: 'parent', wert: d.parent }); delete d.parent; geputzt = true; }
-    if (geputzt) speichereStill(d);
+    if (d.projektRef && opferSet.has(d.projektRef)) { buendel.referenzen.push({ id: d.id, feld: 'projektRef', wert: d.projektRef }); putzen.push([d, 'projektRef']); }
+    if (d.quelle && opferSet.has(d.quelle)) { buendel.referenzen.push({ id: d.id, feld: 'quelle', wert: d.quelle }); putzen.push([d, 'quelle']); }
+    if (kinderDerWurzelBehalten && d.parent === id) { buendel.referenzen.push({ id: d.id, feld: 'parent', wert: d.parent }); putzen.push([d, 'parent']); }
   }
   for (const oid of opfer) {
     const d = D.docs.get(oid);
     if (!d) continue;
     buendel.docs.push(d);
     markiereAenderung(d, true);
-    D.docs.delete(oid);
-    await dbDel('docs', oid);
   }
-  await dbPut('papierkorb', buendel);
+  /* Die Reihenfolge ist die halbe Sicherheit: Erst muss der Papierkorb den
+     Inhalt wirklich haben, dann erst wird gelöscht. Andersherum wäre der Text
+     zwischen zwei Speichern verschwunden, wenn dazwischen etwas schiefgeht. */
+  if (!(await sicherSpeichern('papierkorb', buendel))) {
+    for (const d of buendel.docs) markiereAenderung(d, false);   /* nichts ist passiert */
+    toast('Der Papierkorb nimmt gerade nichts an — deshalb wurde auch nichts gelöscht. Alles ist noch da.', 8000);
+    return;
+  }
+  for (const [d, feld] of putzen) delete d[feld];
+  for (const d of new Set(putzen.map((x) => x[0]))) speichereStill(d);
+  for (const d of buendel.docs) {
+    D.docs.delete(d.id);
+    await dbDel('docs', d.id);
+  }
   if (!still) {
     toastMitAktion('Im Papierkorb.', 'Rückgängig', async () => {
       await holeZurueck(buendel.id);
@@ -697,16 +707,19 @@ async function loesche(id, still, kinderDerWurzelBehalten = false) {
 async function holeZurueck(buendelId) {
   const b = await dbGet('papierkorb', buendelId);
   if (!b) return false;
+  let allesDa = true;
   for (const d of b.docs) {
     markiereAenderung(d, false);
     D.docs.set(d.id, d);
-    await dbPut('docs', d);
+    if (!(await sicherSpeichern('docs', d))) allesDa = false;
   }
   for (const r of b.referenzen || []) {
     const d = D.docs.get(r.id);
     if (!d || !['projektRef', 'quelle', 'parent'].includes(r.feld) || typeof r.wert !== 'string') continue;
     d[r.feld] = r.wert; speichereStill(d);
   }
+  /* Der Papierkorb bleibt voll, solange nicht wirklich alles zurück ist. */
+  if (!allesDa) { toast('Ein Teil ließ sich noch nicht speichern — im Papierkorb liegt alles weiter bereit.', 8000); return false; }
   await dbDel('papierkorb', buendelId);
   return true;
 }
@@ -897,14 +910,21 @@ function setzeThema(name) {
 
 /* ----- Toast, Modale, Menüs ----- */
 function toast(text, ms = 2400) {
+  /* Ganz frueh beim Start und mitten in einem Absturz kann es die Buehne noch
+     nicht geben. Dann schweigt der Hinweis, statt einen zweiten Fehler auf den
+     ersten zu werfen. */
+  const buehne = $('#toasts');
+  if (!buehne) { try { console.warn('[vani]', text); } catch (e) {} return; }
   const t = el('div', { class: 'toast' }, text);
-  $('#toasts').append(t);
+  buehne.append(t);
   setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 450); }, ms);
 }
 function toastMitAktion(text, aktion, tu, ms = 5200) {
+  const buehne = $('#toasts');
+  if (!buehne) { toast(text, ms); return; }
   const knopf = el('button', { class: 'toastaktion', onclick: () => { t.remove(); tu(); } }, aktion);
   const t = el('div', { class: 'toast anfassbar' }, text, knopf);
-  $('#toasts').append(t);
+  buehne.append(t);
   setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 450); }, ms);
 }
 

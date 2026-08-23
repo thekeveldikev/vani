@@ -2207,3 +2207,33 @@ Tests: `test/sicherheit.mjs`. Der Sandkasten kann den Hauptspeicher gezielt
 zicken lassen (Hilfsfunktion `speicherZicken` im Test: ersetzt die Map eines
 Ladens in der Fake-IndexedDB) — so wird ein echter Ausfall geprueft, nicht nur
 der schoene Fall.
+
+**5.28.1 - was die Fehlersuche danach zutage brachte.** Sechs Stellen, alle aus
+derselben Familie: es wurde etwas weggeraeumt, bevor der Ersatz sicher stand.
+
+- `loesche()` in `src/30-core.js` hat **zuerst geloescht und danach den
+  Papierkorb gefuellt**. Ging der Papierkorb-Schreibvorgang schief, war der Text
+  aus Speicher *und* Datenbank weg und lag nirgends. Jetzt wird der Papierkorb
+  ueber `sicherSpeichern` gefuellt und erst bei Erfolg geloescht; scheitert es,
+  werden die Loeschmarker mit `markiereAenderung(d, false)` zurueckgenommen und
+  nichts passiert.
+- `holeZurueck()` hat den Papierkorb-Eintrag auch dann entfernt, wenn ein
+  Dokument gar nicht zurueckgeschrieben werden konnte. Jetzt bleibt er liegen,
+  bis wirklich alles wieder da ist.
+- Die Rettungskopie kannte nur `doc.text`. Bei **formatierten** Texten steht der
+  Inhalt aber in `doc.rich` - Zurueckholen haette im Heft nichts bewirkt. Neu:
+  `rettungSchreiben(id, titel, text, html)` legt das HTML mit dazu (Kappung bei
+  600 000 Zeichen, bei Platzmangel faellt es weg statt alles zu verlieren), und
+  `rettungEinsetzen(doc, rettung)` entscheidet, wohin es gehoert.
+- Das Einspielen einer Sicherung (`src/49-feinheiten.js`) hat Dokumente in den
+  Bestand gelegt, deren Speichern fehlschlug - sie waren nach dem Neustart weg.
+  Jetzt zaehlen nur die, die wirklich liegen.
+- `toast()` und `toastMitAktion()` sind ueber ein fehlendes `#toasts`
+  gestolpert. Genau in einem Absturz gibt es die Buehne unter Umstaenden nicht -
+  dann warf der Hinweis einen zweiten Fehler auf den ersten.
+- `speicherAnzeige()` hat sich bei jedem Oeffnen des Schreibraums neu an
+  `speicherHorchen` gehaengt und nie abgemeldet. Jetzt loest sie sich, sobald
+  sie aus dem Bild ist.
+
+Tests 191/191, `test/sicherheit.mjs` deckt die Papierkorb-Reihenfolge, den
+Rueckweg und den formatierten Fall mit ab.

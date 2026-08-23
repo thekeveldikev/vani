@@ -150,3 +150,82 @@ test('Die Wochensicherung wird fällig, wenn eine Woche vorbei ist', async () =>
   await k.dbPut('kv', { wann: Date.now() - 8 * 86400000, texte: 3, paket: {} }, 'sicherung-auto');
   assert.equal(await k.sicherungAutoFaellig(), true, 'nach acht Tagen wieder fällig');
 });
+
+test('Gelöscht wird erst, wenn der Papierkorb den Inhalt wirklich hat', async () => {
+  const k = await frisch();
+  const doc = k.sauberesDokument({ id: 'w1', typ: 'blatt', titel: 'Prüfblatt', text: 'Dieser Satz darf nicht verschwinden.', angelegt: 1, geaendert: 1 });
+  k.D.docs.set(doc.id, doc);
+  await k.dbPut('docs', doc);
+
+  /* Der Papierkorb streikt — dann darf nichts gelöscht werden */
+  const zick = speicherZicken(k, 'papierkorb', 99);
+  await k.loesche('w1', true);
+  assert.equal(k.D.docs.has('w1'), true, 'der Text ist noch da');
+  assert.equal(k.D.docs.get('w1').text, 'Dieser Satz darf nicht verschwinden.');
+  assert.ok(await k.dbGet('docs', 'w1'), 'und steht auch noch in der Datenbank');
+  zick.zurueck();
+
+  /* Jetzt richtig: löschen, im Papierkorb wiederfinden, zurückholen */
+  await k.loesche('w1', true);
+  assert.equal(k.D.docs.has('w1'), false, 'jetzt ist er weg');
+  const koerbe = await k.dbAlle('papierkorb');
+  const meiner = koerbe.find((b) => (b.docs || []).some((d) => d.id === 'w1'));
+  assert.ok(meiner, 'und liegt im Papierkorb');
+  assert.equal(await k.holeZurueck(meiner.id), true);
+  assert.equal(k.D.docs.get('w1').text, 'Dieser Satz darf nicht verschwinden.', 'vollständig zurück');
+});
+
+test('Der Papierkorb bleibt voll, solange nicht alles zurück ist', async () => {
+  const k = await frisch();
+  const doc = k.sauberesDokument({ id: 'w2', typ: 'blatt', titel: 'Zweites', text: 'Auch dieser bleibt.', angelegt: 1, geaendert: 1 });
+  k.D.docs.set(doc.id, doc);
+  await k.loesche('w2', true);
+  const meiner = (await k.dbAlle('papierkorb')).find((b) => (b.docs || []).some((d) => d.id === 'w2'));
+  const zick = speicherZicken(k, 'docs', 99);
+  assert.equal(await k.holeZurueck(meiner.id), false, 'ehrlich: hat nicht ganz geklappt');
+  zick.zurueck();
+  assert.ok(await k.dbGet('papierkorb', meiner.id), 'der Papierkorb hält den Inhalt weiter bereit');
+  assert.equal(await k.holeZurueck(meiner.id), true, 'der zweite Anlauf gelingt');
+  assert.equal(await k.dbGet('papierkorb', meiner.id), undefined, 'erst jetzt ist er leer');
+});
+
+test('Ein Hinweis ohne Bühne wirft keinen zweiten Fehler', async () => {
+  const k = await frisch();
+  assert.doesNotThrow(() => k.toast('Es gibt noch kein #toasts — das darf nicht knallen.'));
+});
+
+test('Formatierte Texte kommen formatiert zurück, nicht nackt', async () => {
+  const k = await frisch();
+  k.rettungLoeschen();
+  const heft = k.sauberesDokument({ id: 'r1', typ: 'blatt', titel: 'Mit Format', format: 'rich', rich: '<p>alt</p>', text: 'alt', angelegt: 1, geaendert: 1 });
+  k.rettungSchreiben('r1', 'Mit Format', 'Ein Satz mit Betonung.', '<p>Ein Satz mit <b>Betonung</b>.</p>');
+  const r = k.rettungLesen();
+  assert.ok(r.html.includes('<b>'), 'die Formatierung liegt mit in der Kopie');
+  assert.equal(k.rettungEinsetzen(heft, r), true);
+  assert.ok(heft.rich.includes('Betonung'), 'sie landet in doc.rich, wo das Heft sie liest');
+  /* Im Sandkasten gibt es kein document — sauberesRichHTML faellt dann auf reinen
+     Text zurueck. Dass <b> im Browser stehen bleibt, prueft RICH_TAGS. */
+  assert.ok(heft.text.includes('Betonung'), 'und der schlichte Spiegel stimmt auch');
+
+  /* Ohne HTML wird aus dem Text wieder etwas Formatiertes gemacht */
+  const heft2 = k.sauberesDokument({ id: 'r2', typ: 'blatt', format: 'rich', rich: '<p>alt</p>', text: 'alt', angelegt: 1, geaendert: 1 });
+  k.rettungEinsetzen(heft2, { text: 'Nur schlichter Text.', wann: 1 });
+  assert.ok(heft2.rich.includes('Nur schlichter Text.'), 'auch ohne HTML kommt der Satz an: ' + heft2.rich);
+
+  /* Schlichte Texte bleiben schlicht */
+  const blatt = k.sauberesDokument({ id: 'r3', typ: 'blatt', text: 'alt', angelegt: 1, geaendert: 1 });
+  k.rettungEinsetzen(blatt, { text: 'Neuer Satz.', html: '<p>egal</p>', wann: 1 });
+  assert.equal(blatt.text, 'Neuer Satz.');
+  assert.equal(blatt.rich, undefined, 'ein schlichtes Blatt bekommt kein rich angehängt');
+  k.rettungLoeschen();
+});
+
+test('Ist kein Platz für die Formatierung, überlebt wenigstens der Text', async () => {
+  const k = await frisch();
+  k.rettungLoeschen();
+  k.rettungSchreiben('r4', 'Riesig', 'Der Satz zählt.', '<p>' + 'x'.repeat(700000) + '</p>');
+  const r = k.rettungLesen();
+  assert.equal(r.html, undefined, 'zu viel HTML wird weggelassen');
+  assert.equal(r.text, 'Der Satz zählt.', 'der Text bleibt');
+  k.rettungLoeschen();
+});

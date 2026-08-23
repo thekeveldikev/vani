@@ -72,15 +72,37 @@ async function sicherSpeichern(store, wert, key, { versuche = 3 } = {}) {
 }
 
 /* ----- 2. Die Rettungskopie ----- */
-function rettungSchreiben(docId, titel, text) {
-  try {
-    if (text == null) return false;
-    localStorage.setItem(RETTUNG_SCHLUESSEL, JSON.stringify({
-      docId: String(docId || ''), titel: String(titel || '').slice(0, 200),
-      text: String(text).slice(0, 400000), wann: Date.now()
-    }));
-    return true;
-  } catch (e) { return false; }
+function rettungSchreiben(docId, titel, text, html) {
+  if (text == null) return false;
+  const basis = {
+    docId: String(docId || ''), titel: String(titel || '').slice(0, 200),
+    text: String(text).slice(0, 400000), wann: Date.now()
+  };
+  /* Formatierte Texte leben in doc.rich. Ohne das HTML kaeme der Satz zwar
+     zurueck, aber nackt - und im Heft gar nicht an. */
+  const voll = html && String(html).length <= 600000
+    ? Object.assign({ html: String(html) }, basis) : basis;
+  try { localStorage.setItem(RETTUNG_SCHLUESSEL, JSON.stringify(voll)); return true; }
+  catch (e) {
+    /* Kein Platz fuer die Formatierung? Dann wenigstens der Text. */
+    try { localStorage.setItem(RETTUNG_SCHLUESSEL, JSON.stringify(basis)); return true; } catch (x) { return false; }
+  }
+}
+
+/* Was aus der Rettungskopie wohin gehoert. Formatierte Texte stehen in
+   doc.rich, schlichte in doc.text - wird das verwechselt, kommt der Satz
+   scheinbar zurueck und ist im Heft trotzdem nicht zu sehen. */
+function rettungEinsetzen(doc, rettung) {
+  if (!doc || !rettung) return false;
+  if (doc.format !== 'rich') { doc.text = rettung.text; return true; }
+  let html = null;
+  if (rettung.html && typeof sauberesRichHTML === 'function') html = sauberesRichHTML(rettung.html);
+  else if (typeof richAusText === 'function') html = richAusText(rettung.text);
+  if (html == null) { doc.text = rettung.text; return true; }
+  doc.rich = html;
+  doc.text = typeof richReinerText === 'function'
+    ? richReinerText(html).replace(/\n{3,}/g, '\n\n').trimEnd() : rettung.text;
+  return true;
 }
 function rettungLesen() {
   try {
@@ -126,7 +148,7 @@ function rettungAnbieten() {
       doc ? el('button', { class: 'knopf voll', onclick: async () => {
         /* Der alte Stand bleibt als Version erhalten — nichts wird überschrieben, ohne dass es einen Weg zurück gibt. */
         try { if (typeof standEinfrieren === 'function') standEinfrieren(doc, 'vor der Rettung'); } catch (e) {}
-        doc.text = rettung.text; await sicherSpeichern('docs', doc); speichere(doc);
+        rettungEinsetzen(doc, rettung); await sicherSpeichern('docs', doc); speichere(doc);
         rettungLoeschen(); zu(); toast('Zurückgeholt. Der Stand von vorher liegt als Version daneben.', 5000);
         if (typeof oeffneSchreibraum === 'function') setTimeout(() => oeffneSchreibraum(doc.id), 120);
       } }, 'In den Text zurückholen') : null));
@@ -155,7 +177,7 @@ function absturzFangen(art, nachricht, quelle) {
     if (typeof _sr !== 'undefined' && _sr && _sr.doc) {
       const feld = document.querySelector('.sr-text');
       const text = feld ? (feld.value != null ? feld.value : feld.textContent) : _sr.doc.text;
-      rettungSchreiben(_sr.doc.id, _sr.doc.titel, text);
+      rettungSchreiben(_sr.doc.id, _sr.doc.titel, text, feld && feld.value == null ? feld.innerHTML : null);
     }
   } catch (e) {}
   protokollSchreiben(art, nachricht, quelle);
@@ -230,7 +252,7 @@ function sicherheitStarten() {
       if (typeof _sr !== 'undefined' && _sr && _sr.doc) {
         const feld = document.querySelector('.sr-text');
         const text = feld ? (feld.value != null ? feld.value : feld.textContent) : null;
-        if (text != null) rettungSchreiben(_sr.doc.id, _sr.doc.titel, text);
+        if (text != null) rettungSchreiben(_sr.doc.id, _sr.doc.titel, text, feld.value != null ? null : feld.innerHTML);
       }
     } catch (e) {}
   };
@@ -248,8 +270,12 @@ function speicherAnzeige() {
     onclick: () => { if (typeof zeigeSicherheit === 'function') zeigeSicherheit(); }
   }, punkt, wort);
   let ausblendTimer = 0;
+  let warVerbunden = false;
   const zeigen = (z) => {
-    if (!kasten.isConnected) return;
+    /* Ist die Anzeige aus dem Bild verschwunden, meldet sie sich ab —
+       sonst sammeln sich bei jedem Öffnen des Schreibraums tote Horcher an. */
+    if (!kasten.isConnected) { if (warVerbunden) { clearTimeout(ausblendTimer); loesen(); } return; }
+    warVerbunden = true;
     kasten.dataset.art = z.art;
     clearTimeout(ausblendTimer);
     if (z.art === 'schreibt') { wort.textContent = 'speichert …'; kasten.classList.add('sichtbar'); }
