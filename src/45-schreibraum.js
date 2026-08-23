@@ -54,6 +54,8 @@ function oeffneSchreibraum(docId) {
   if (_sr) schliesseSchreibraum();
   const doc = D.docs.get(docId);
   if (!doc) return;
+  /* Hefte, Projekte und Cluster haben ihren Text in Seiten, Szenen, Blasen — sie gehören in ihren Raum, nicht auf ein leeres Blatt */
+  if (doc.typ === 'heft' || doc.typ === 'projekt' || doc.typ === 'board' || doc.typ === 'wortkiste' || doc.typ === 'buch') { oeffneDoc(doc); return; }
 
   const startWorte = worte(doc.text);
 

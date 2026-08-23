@@ -6,3 +6,6 @@ node_modules/
 release/
 vani-sync-data/
 *.log
+# Die Einlesung im Klartext bleibt lokal; ins Repo geht nur einlesung/einlesung.enc.
+einlesung/einlesung.json
+einlesung/*.quelle.js

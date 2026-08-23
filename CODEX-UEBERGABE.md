@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.26.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.27.0 (23. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -38,6 +38,7 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
 | `src/45c-diktat.js`, `src/56b-salon-malerei.js`, `src/58-sitzung.js` | Diktat (Spracherkennung des Browsers), gemalter Salon (Canvas), Sitzung als Ritual + Wort-Diff für Stände |
 | `src/45d-textlupe.js`, `src/59-jahresringe.js` | Textlupe, Klangkarte, Pausenerinnerung; das Jahr in Ringen |
 | `src/56a-salon-stimmen.js`, `src/57b-schreibmaschine.js` | Tolkien/Blyton/Paolini/Twain + englischer Rat mit deutscher Parallelfassung; die Schreibmaschine |
+| `src/56d-salon-einlesung.js`, `src/56e-salon-kenntnis.js`, `src/56f-salon-gespraech.js`, `src/56g-salon-mehr.js`, `src/56h-salon-lernen.js`, `src/57c-katze.js` | Einlesung (versiegelt, `einlesung/*.enc`), Kenntnis aus den Texten, Gespräch in Stimmen, mehr Themen/Aufgaben, Nachlesen und Chronik, die Katze |
 | `vendor/pdf.min.js`, `vendor/pdf.worker.min.js`, `vendor/wasm/*` | pdf.js 6.2.108 + Decoder (Lizenzen liegen daneben) |
 | `autoren/*.jpg`, `autoren/quellen.json` | Porträts King/Kästner/Funke/Rothfuss (Wikimedia Commons, CC BY-SA 4.0 / CC0 / CC BY-SA 3.0 / CC BY-SA 3.0) |
 | `werkzeug/buecherkoffer.mjs`, `buecher/` | Bücherkoffer (AES-256-GCM, PBKDF2); nimmt PDF und EPUB |
@@ -75,6 +76,10 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   Textlupe, Klangkarte je Text, Pause nach 40 Minuten, Atemminute, „Heute vor einem Jahr" auf dem Tisch.
 - **5.26** Orte Stufe vier (Details, Tipp-Reaktionen, Bewegung, Spiegelzeile, Kameraspiegel), Schreibmaschine,
   vier Stimmen mehr im Salon, englischer Rat mit Übersetzung, „Setz dich" auf dem Sessel, Wortkisten-Rand.
+- **Werkzeug** `node werkzeug/einlesung-versiegeln.mjs [Passwort]` macht aus `einlesung/einlesung.json` (lokal, ignoriert)
+  die versiegelte `einlesung/einlesung.enc` plus `umschlag.json`. Ohne Passwort ist im Repo nur Rauschen.
+- **5.27** Der Salon liest mit: Einlesung („splitternd", Stand 22.08.2026), Kenntnis aus den eigenen Texten, Gespräch
+  in Stimmen, Reiter „Deine Welten"; Katze mit echten Geräuschen, Schreibmaschine entklemmt, Salonklang aus.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 
@@ -93,4 +98,4 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
 
 ## 5. Tests
 
-`npm test` → 170 grün (Stand 5.26.0). Hosting: `node --test hosting/tests/*.test.mjs` → 2 grün.
+`npm test` → 177 grün (Stand 5.27.0). Hosting: `node --test hosting/tests/*.test.mjs` → 2 grün.

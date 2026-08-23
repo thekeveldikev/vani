@@ -523,7 +523,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .desk-szene::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none; background: radial-gradient(ellipse at 50% 42%, transparent 52%, rgba(0,0,0,.38) 100%); }
 .desk-szene::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 26px; z-index: 1; pointer-events: none; background: linear-gradient(rgba(255,255,255,.05), rgba(0,0,0,0) 35%, rgba(0,0,0,.5)); }
 .desk-dinge { position: absolute; inset: 0; }
-.desk-fensterknopf { position: absolute; right: 30px; top: calc(44% - 58px); width: 38px; height: 38px; border-radius: 50%; background: rgba(20,16,12,.6); color: #e8c27a; display: grid; place-items: center; box-shadow: 0 0 0 1px rgba(232,194,122,.3); z-index: 3; }
+.desk-fensterknopf { position: absolute; left: 18px; top: 18px; width: 38px; height: 38px; border-radius: 50%; background: rgba(20,16,12,.6); color: #e8c27a; display: grid; place-items: center; box-shadow: 0 0 0 1px rgba(232,194,122,.3); z-index: 3; }
 .desk-fensterknopf svg.ik { width: 20px; height: 20px; }
 /* Alle Dinge: Schatten auf die Platte, leichtes Heben beim Darüberfahren */
 .desk-dinge { --px: 0px; --py: 0px; }
@@ -2643,7 +2643,7 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
 @media (prefers-reduced-motion: reduce) { .ort-kulisse.lebt * { animation-duration: 0s !important; } }
 
 /* ===================== Die Schreibmaschine ===================== */
-.sm-buehne { position: fixed; inset: 0; height: var(--vvh, 100dvh); z-index: 320; display: grid; grid-template-rows: auto 1fr auto; background: radial-gradient(ellipse at 50% 20%, #5a4430, #2a1c12 72%); color: #f3e7c9; overflow: hidden; --sm-tinte: #1d1d1f; }
+.sm-buehne { position: fixed; inset: 0; height: var(--vvh, 100dvh); z-index: 90; display: grid; grid-template-rows: auto 1fr auto; background: radial-gradient(ellipse at 50% 20%, #5a4430, #2a1c12 72%); color: #f3e7c9; overflow: hidden; --sm-tinte: #1d1d1f; }
 .sm-kopf { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 16px 6px; padding-top: calc(10px + env(safe-area-inset-top)); }
 .sm-kopf b { font: 600 16px ui-serif, "New York", Georgia, serif; }
 .sm-zaehler { font-size: 12px; color: rgba(243,231,201,.72); font-variant-numeric: tabular-nums; }
@@ -2723,3 +2723,127 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
 .wortkisten-randwahl button[data-rand="papier"] i { background: repeating-linear-gradient(180deg, #fbf6e8 0 3px, #e9ddc3 3px 4px); }
 .wortkisten-randwahl button[data-rand="farbe"] i { background: var(--randfarbe, #b0552f); }
 .wortkisten-randzeile > span { font: 600 11.5px/1.2 ui-rounded, -apple-system, system-ui, sans-serif; letter-spacing: .04em; color: var(--blass); }
+
+/* ===================== 5.27: die Katze, der Hauch, Feinschliff ===================== */
+.katze { cursor: pointer; outline: none; transform-box: view-box; touch-action: none; }
+.katze:focus-visible { filter: drop-shadow(0 0 4px rgba(255,220,150,.9)); }
+.katze * { transform-box: view-box; }
+.katze .katze-auge-auf { opacity: 0; transition: opacity .25s; }
+.katze .katze-auge-zu { opacity: 1; transition: opacity .25s; }
+.katze.wach .katze-auge-auf, .katze.gestreichelt .katze-auge-auf, .katze.doest .katze-auge-auf { opacity: 1; }
+.katze.wach .katze-auge-zu, .katze.gestreichelt .katze-auge-zu { opacity: 0; }
+.katze.doest .katze-auge-zu { opacity: .35; }
+.katze .katze-lid { transform: scaleY(0); }
+.katze.doest .katze-lid { transform: scaleY(.55); }
+.katze.wach .katze-lid { animation: katze-blinzeln 5.5s ease-in-out infinite; }
+.katze.blinzelt .katze-lid { animation: katze-blinzeln .9s ease-in-out 2; }
+@keyframes katze-blinzeln { 0%, 92%, 100% { transform: scaleY(0); } 95% { transform: scaleY(1); } }
+.katze .katze-zs { opacity: 0; transition: opacity .4s; }
+.katze.schlaeft .katze-zs { opacity: 1; }
+.ort-kulisse.lebt .katze.schlaeft .katze-z { animation: katze-z 3.6s ease-in-out infinite; }
+.ort-kulisse.lebt .katze.schlaeft .katze-z.b { animation-delay: 1.2s; } .ort-kulisse.lebt .katze.schlaeft .katze-z.c { animation-delay: 2.4s; }
+@keyframes katze-z { 0% { opacity: 0; transform: translate(0, 4px); } 25% { opacity: .9; } 100% { opacity: 0; transform: translate(4px, -10px); } }
+.ort-kulisse.lebt .katze .katze-leib { animation: katze-atmet 3.4s ease-in-out infinite alternate; }
+.ort-kulisse.lebt .katze.wach .katze-leib, .ort-kulisse.lebt .katze.gestreichelt .katze-leib { animation-duration: 2.2s; }
+@keyframes katze-atmet { from { transform: scale(1, 1); } to { transform: scale(1.015, 1.05); } }
+.ort-kulisse.lebt .katze .katze-schwanz { animation: katze-schwanz 6s ease-in-out infinite; }
+.ort-kulisse.lebt .katze.wach .katze-schwanz, .ort-kulisse.lebt .katze.gestreichelt .katze-schwanz { animation-duration: 2.4s; }
+@keyframes katze-schwanz { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-10deg); } 55% { transform: rotate(6deg); } 75% { transform: rotate(-3deg); } }
+.katze.ohrzuckt .katze-ohr.l { animation: katze-ohr .7s ease-in-out; } .katze.ohrzuckt .katze-ohr.r { animation: katze-ohr .7s ease-in-out .15s; }
+@keyframes katze-ohr { 30% { transform: rotate(-14deg); } 60% { transform: rotate(8deg); } 100% { transform: none; } }
+.katze.schnurrt .katze-leib { animation: katze-schnurrt .09s linear infinite !important; }
+@keyframes katze-schnurrt { 0% { transform: translate(0, 0); } 50% { transform: translate(.5px, -.3px); } 100% { transform: translate(-.4px, .2px); } }
+.katze.streckt { animation: katze-streckt 1.4s ease-in-out; }
+.katze.streckt .katze-pfote.b { animation: katze-pfote 1.4s ease-in-out; } .katze.streckt .katze-pfote.a { animation: katze-pfote 1.4s ease-in-out .1s; }
+@keyframes katze-streckt { 35% { transform: scale(1.14, .94); } 70% { transform: scale(1.1, .96); } 100% { transform: none; } }
+@keyframes katze-pfote { 35% { transform: translate(10px, 0); } 70% { transform: translate(8px, 0); } 100% { transform: none; } }
+.katze.putzt .katze-kopf { animation: katze-putzt 1.8s ease-in-out; }
+.katze.putzt .katze-pfote.b { animation: katze-pfote-hoch 1.8s ease-in-out; }
+@keyframes katze-putzt { 0%, 100% { transform: none; } 20% { transform: rotate(22deg) translate(-2px, 3px); } 35% { transform: rotate(14deg) translate(-1px, 2px); } 50% { transform: rotate(24deg) translate(-2px, 3px); } 65% { transform: rotate(12deg) translate(-1px, 2px); } 80% { transform: rotate(20deg) translate(-2px, 3px); } }
+@keyframes katze-pfote-hoch { 20%, 80% { transform: translate(4px, -9px); } 100% { transform: none; } }
+.katze.miaut .katze-kopf { animation: katze-miaut .7s ease-in-out; }
+@keyframes katze-miaut { 40% { transform: rotate(-10deg) translate(1px, -2px); } 100% { transform: none; } }
+.katze .katze-herzen { opacity: 0; }
+.katze.herzen .katze-herzen { opacity: 1; }
+.katze.herzen .katze-herz { animation: katze-herz 1.6s ease-out infinite; }
+.katze.herzen .katze-herz.h1 { animation-delay: .5s; } .katze.herzen .katze-herz.h2 { animation-delay: 1s; }
+@keyframes katze-herz { 0% { opacity: 0; transform: translate(0, 6px) scale(.6); } 25% { opacity: .95; } 100% { opacity: 0; transform: translate(3px, -22px) scale(1.1); } }
+.katze-pupillen { transition: transform .12s ease-out; }
+/* Der Hauch auf dem Spiegel */
+.ort-hauch { transition: opacity .5s; transform-box: view-box; }
+.ort-hauch.zeigt { animation: ort-hauch 3.6s ease-in-out both; }
+@keyframes ort-hauch { 0% { opacity: 0; } 18% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; } }
+/* Schreibmaschine: Hinweis ohne Fokus */
+.sm-fokushinweis { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); padding: 6px 12px; border-radius: 100px; background: rgba(20,16,12,.75); color: #f3e7c9; font-size: 12.5px; opacity: 0; pointer-events: none; transition: opacity .25s; white-space: nowrap; }
+.sm-buehne.ohne-fokus .sm-fokushinweis { opacity: 1; }
+/* Salon: Tonknopf zeigt den Zustand, Anrede */
+.salon-tonknopf { position: relative; }
+.salon-tonknopf:not(.an)::after { content: ""; position: absolute; left: 50%; top: 50%; width: 22px; height: 2px; margin: -1px 0 0 -11px; background: currentColor; transform: rotate(-40deg); opacity: .7; border-radius: 1px; }
+.salon-tonknopf.an { box-shadow: inset 0 0 0 1.5px var(--gold, #c9a25a); color: var(--akzent); }
+
+/* ----- Deine Welten: die Wand spricht über die eigenen Texte ----- */
+.salon-welten { display: grid; gap: 14px; }
+.sw-stand { font-size: 12px; color: var(--blass); margin: -4px 0 8px; }
+.sw-einlesung { display: grid; gap: 8px; padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, var(--karte) 70%, transparent); box-shadow: inset 0 0 0 1px var(--linie); }
+.sw-einlesung .salon-rat { font-size: 15.5px; }
+.sw-satz { font: 14.5px/1.55 ui-serif, "New York", Georgia, serif; margin: 0; }
+.sw-satz.en { font-style: italic; }
+.sw-frage { display: grid; gap: 2px; width: 100%; text-align: left; padding: 8px 12px; border-radius: 10px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.sw-frage i { font: italic 14px/1.45 ui-serif, "New York", Georgia, serif; } .sw-frage small { font-size: 11px; color: var(--blass); }
+.sw-live { display: grid; gap: 10px; }
+.sw-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.sw-chips .suchchip.figur { background: rgba(176,85,47,.12); } .sw-chips .suchchip.ort { background: rgba(95,119,82,.14); } .sw-chips .suchchip.begriff { background: rgba(184,146,63,.16); } .sw-chips .suchchip.sw-meta { font-style: italic; }
+.sw-fragezeile { display: flex; gap: 8px; align-items: center; }
+.sw-feld { flex: 1; min-width: 0; padding: 9px 12px; border-radius: 10px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-family: inherit; font-size: 14px; }
+.sw-antwort { display: grid; gap: 8px; }
+.sw-antwortbox { min-height: 40px; }
+.sw-belege { display: grid; gap: 6px; margin-top: 4px; }
+.sw-belege-titel { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--blass); }
+.sw-beleg { display: grid; gap: 2px; width: 100%; text-align: left; padding: 8px 12px; border-radius: 10px; background: color-mix(in srgb, var(--karte) 80%, transparent); box-shadow: inset 0 0 0 1px var(--linie); }
+.sw-beleg i { font: italic 13.5px/1.45 ui-serif, "New York", Georgia, serif; color: var(--tinte); } .sw-beleg small { font-size: 11px; color: var(--blass); }
+.sw-hinweis { font-size: 12px; color: var(--blass); line-height: 1.45; }
+.salon-runde.material .salon-blase-inhalt .salon-rat { font-size: 14.5px; }
+.salon-runde.material .sw-belege { margin-top: 6px; }
+.salon-ueber-kurz { font: italic 15px/1.5 ui-serif, "New York", Georgia, serif; }
+.salon-ueber-abs { font: 14.5px/1.6 ui-serif, "New York", Georgia, serif; margin: 8px 0; }
+.salon-aufgaben .salon-abschnitt { margin-top: 10px; }
+
+/* ----- Deine Welten, Stufe zwei: Einlesung, Reiter, Notizen ----- */
+.sw-reiter { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 4px; }
+.sw-reiterknopf { padding: 5px 11px; border-radius: 100px; font-size: 12.5px; color: var(--blass); }
+.sw-reiterknopf.an { background: var(--karte); color: var(--tinte); box-shadow: inset 0 0 0 1px var(--linie); }
+.sw-feld { display: none; gap: 10px; }
+.sw-feld.an { display: grid; }
+.sw-notiz { display: grid; gap: 4px; padding: 10px 13px; border-radius: 12px; background: color-mix(in srgb, var(--karte) 65%, transparent); box-shadow: inset 0 0 0 1px var(--linie); }
+.sw-notiz i { font: 14.5px/1.55 ui-serif, "New York", Georgia, serif; font-style: normal; }
+.sw-notiz i.en { font-style: italic; }
+.sw-notiz small { font: 13px/1.5 ui-serif, "New York", Georgia, serif; color: var(--blass); border-left: 2px solid var(--gold); padding-left: 8px; }
+.sw-mini { justify-self: start; font-size: 11px; color: var(--blass); text-decoration: underline; padding: 2px 0; }
+.sw-lieblingsstelle { display: grid; gap: 4px; padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, var(--akzent2) 10%, var(--karte)); box-shadow: inset 0 0 0 1px var(--linie); }
+.sw-lieblingsstelle i { font: italic 16px/1.5 ui-serif, "New York", Georgia, serif; }
+.sw-lieblingsstelle small { font-size: 11.5px; color: var(--blass); letter-spacing: .06em; text-transform: uppercase; }
+.sw-lieblingsstelle em { font: 13.5px/1.5 ui-serif, "New York", Georgia, serif; color: var(--tinte); }
+.sw-werk { display: grid; gap: 3px; padding: 10px 13px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.sw-werk b { font: 600 14.5px ui-rounded, system-ui, sans-serif; letter-spacing: .04em; }
+.sw-werk small { font-size: 11.5px; color: var(--blass); }
+.sw-werk i { font: 13.5px/1.5 ui-serif, "New York", Georgia, serif; font-style: normal; }
+.sw-einlesungkarte { display: grid; gap: 3px; padding: 10px 13px; border-radius: 12px; background: color-mix(in srgb, var(--karte) 80%, transparent); box-shadow: inset 0 0 0 1px var(--linie); }
+.sw-einlesungkarte b { font: 600 14px ui-rounded, system-ui, sans-serif; }
+.sw-einlesungkarte i { font: 13.5px/1.5 ui-serif, "New York", Georgia, serif; font-style: normal; }
+.sw-einlesungkarte small { font: 12.5px/1.5 ui-serif, "New York", Georgia, serif; color: var(--blass); }
+.sw-frage i.en { font-style: italic; }
+.sw-frage-fuss { color: var(--blass); opacity: .75; }
+.sw-feldfrage { flex: 1; min-width: 0; padding: 9px 12px; border-radius: 10px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); font-family: inherit; font-size: 14px; }
+.salon-welten .sw-antwortbox { min-height: 40px; }
+
+/* ----- Umschlag und Chronik ----- */
+.sw-umschlag { display: grid; gap: 6px; justify-items: start; padding: 14px 16px; border-radius: 14px; background: color-mix(in srgb, var(--karte) 75%, transparent); box-shadow: inset 0 0 0 1px var(--linie); margin-bottom: 10px; }
+.sw-umschlag i { font: 15px/1.55 ui-serif, "New York", Georgia, serif; font-style: normal; }
+.sw-umschlag small { font-size: 12px; color: var(--blass); }
+.sw-chronikzeile { display: grid; gap: 3px; padding: 10px 13px; border-radius: 12px; background: var(--karte); box-shadow: inset 0 0 0 1px var(--linie); }
+.sw-chronikzeile b { font: 600 13.5px ui-rounded, system-ui, sans-serif; }
+.sw-chronikzeile small { font-size: 11.5px; color: var(--blass); }
+.sw-chronikzeile i { font: 13.5px/1.5 ui-serif, "New York", Georgia, serif; font-style: normal; }
+.sw-chronikzeile.offen { background: color-mix(in srgb, var(--akzent2) 12%, var(--karte)); }
+.sw-chronikzeile .knopf { justify-self: start; margin-top: 6px; }
+.salon-themen .suchchip.still { background: none; color: var(--blass); box-shadow: inset 0 0 0 1px var(--linie); }

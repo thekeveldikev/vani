@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.26.0';
+const APP_VERSION = '5.27.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -29,6 +29,12 @@ const uid = () => (globalThis.crypto && typeof globalThis.crypto.randomUUID === 
   ? globalThis.crypto.randomUUID()
   : Date.now().toString(36) + Math.random().toString(36).slice(2, 11);
 
+/* Kinder anhängen wie el(): null und false werden übersprungen. `.append(null)` würde sonst
+   das Wort „null" in die Seite schreiben — genau das ist im Salon passiert. */
+function anfuegen(ziel, ...kinder) {
+  for (const kind of kinder.flat(9)) { if (kind == null || kind === false) continue; ziel.append(kind.nodeType ? kind : document.createTextNode(kind)); }
+  return ziel;
+}
 function el(tag, attrs = {}, ...kinder) {
   const e = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs || {})) {
@@ -343,7 +349,7 @@ const STANDARD_EINST = {
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
   stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
   ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95,
-  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null, sitzung: null, salonBriefe: [], pausenErinnerung: true, schreibmaschine: null
+  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null, sitzung: null, salonBriefe: [], pausenErinnerung: true, schreibmaschine: null, salonTon: false, salonAnrede: ''
 };
 const D = {
   docs: new Map(),
@@ -550,6 +556,11 @@ function sauberesDokument(quelle) {
     const k = d.klang && typeof d.klang === 'object' && !Array.isArray(d.klang) ? d.klang : {};
     const sauber = {}; for (const [id, v] of Object.entries(k).slice(0, 12)) if (typeof id === 'string' && Number.isFinite(Number(v))) sauber[id.slice(0, 40)] = begrenze(Number(v), 0, 1, 0);
     d.klang = sauber;
+  }
+  if (d.typ === 'lesung') {
+    /* Eine Lesung der Wand: zwei JSON-Zeichenketten, sonst nichts. */
+    d.stand = typeof d.stand === 'string' ? d.stand.slice(0, 200000) : '';
+    d.notizen = typeof d.notizen === 'string' ? d.notizen.slice(0, 100000) : '';
   }
   if (d.typ === 'mentor') {
     const zeilen = (a) => (Array.isArray(a) ? a : []).filter((s) => typeof s === 'string').map((s) => s.slice(0, 600)).slice(0, 80);
@@ -897,6 +908,7 @@ function toastMitAktion(text, aktion, tu, ms = 5200) {
 }
 
 function zeigeDeck(inhalt, beiZu) {
+  const fokusVorher = document.activeElement;
   const schleier = el('div', { class: 'schleier' }, inhalt);
   schleier.addEventListener('pointerdown', (e) => { if (e.target === schleier) zu(); });
   /* Escape schließt nur die oberste Lage — wie ein Tipp neben den Kasten. */
@@ -906,7 +918,7 @@ function zeigeDeck(inhalt, beiZu) {
     e.stopPropagation(); e.preventDefault();
     zu();
   };
-  const zu = () => { document.removeEventListener('keydown', beiTaste, true); schleier.remove(); if (beiZu) beiZu(); };
+  const zu = () => { document.removeEventListener('keydown', beiTaste, true); schleier.remove(); if (beiZu) beiZu(); if (fokusVorher && fokusVorher !== document.body && fokusVorher.isConnected && typeof fokusVorher.focus === 'function' && !$('#deck').querySelector('.schleier')) { try { fokusVorher.focus({ preventScroll: true }); } catch (e) {} } };
   document.addEventListener('keydown', beiTaste, true);
   $('#deck').append(schleier);
   return zu;

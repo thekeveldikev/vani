@@ -571,6 +571,27 @@ for (const a of SALON_AUTOREN) { const z = SALON_ZUSATZ[a.id]; if (z) Object.ass
 /* Englische Stimmen raten auf Englisch (56a): der deutsche Rat wandert nach `de` und bleibt als Übersetzung da */
 if (typeof SALON_RAT_EN !== 'undefined') for (const a of [...SALON_AUTOREN, ...SALON_GAESTE]) { const e = SALON_RAT_EN[a.id]; if (e && a.en) { a.de = { saetze: a.saetze, anfang: a.anfang, kern: a.kern, schluss: a.schluss }; Object.assign(a, e); } }
 const SALON_FEST = [...SALON_AUTOREN, ...SALON_GAESTE, ...(typeof SALON_GAESTE_MEHR !== 'undefined' ? SALON_GAESTE_MEHR : [])];
+/* Mehr (56g): Themen, Kern je Stimme (parallel in beiden Sprachen), Aufgaben mit Kategorie, lange Texte „Über" */
+if (typeof SALON_MEHR_THEMEN !== 'undefined') {
+  for (const t of SALON_MEHR_THEMEN) if (!SALON_THEMEN.some((x) => x[0] === t[0])) SALON_THEMEN.push(t);
+  /* Die enger gefassten neuen Stichworte fragen zuerst (sonst schluckt „Figuren" jede „Person"),
+     die weiteren („Weltenbau", „Zeigen") kommen ans Ende. */
+  if (typeof SALON_MEHR_STICHWORTE !== 'undefined') {
+    const frueh = ['titel', 'perspektive', 'tempo', 'humor', 'recherche', 'loslassen'];
+    for (const st of SALON_MEHR_STICHWORTE) { if (frueh.includes(st[0])) SALON_STICHWORTE.unshift(st); else SALON_STICHWORTE.push(st); }
+  }
+  for (const a of SALON_FEST) {
+    const mk = SALON_MEHR_KERN[a.id];
+    if (mk) {
+      if (a.en && mk.en && mk.de && a.de) { a.kern = [...a.kern, ...mk.en]; a.de.kern = [...a.de.kern, ...mk.de]; }
+      else if (mk.de) a.kern = [...(a.kern || []), ...mk.de];
+      else if (mk.en) a.kern = [...(a.kern || []), ...mk.en];
+    }
+    const ma = SALON_MEHR_AUFGABEN[a.id];
+    a.aufgaben = [...(a.aufgaben || []).map((x) => x.kat ? x : Object.assign({ kat: salonAufgabeKategorie(x.t) }, x)), ...(ma || [])];
+    if (SALON_UEBER[a.id]) a.ueber = SALON_UEBER[a.id];
+  }
+}
 /* Rat samt deutscher Fassung, wo es eine gibt */
 function salonRatDesTagesZweisprachig(autor, tagSchluessel) { return typeof salonRatZweisprachig === 'function' ? salonRatZweisprachig(autor, salonHash((tagSchluessel || '') + ':' + (autor && autor.id)), null) : salonRatDesTages(autor, tagSchluessel); }
 
@@ -599,20 +620,67 @@ function salonRahmen(a, i, onclick) {
     el('div', { class: 'salon-schild' }, el('b', {}, a.name), el('span', {}, [a.jahre, a.woher].filter(Boolean).join(' · '))));
 }
 
+/* ----- Die Kenntnis: was die Wand über die eigenen Texte weiß (56e), einmal je Stand gerechnet ----- */
+let _salonKenntnis = null;
+function salonKenntnis() {
+  if (typeof kenntnisSammeln !== 'function') return null;
+  const sig = kenntnisSignatur(D.docs);
+  if (_salonKenntnis && _salonKenntnis.sig === sig) return _salonKenntnis.k;
+  const k = kenntnisSammeln(D.docs, { statsTage: (D.stats && D.stats.tage) || null });
+  _salonKenntnis = { sig, k };
+  return k;
+}
+/* Eine Stimme antwortet auf eine Frage zum Material — oder null, wenn die Frage nichts davon berührt. */
+function salonFrageAntwort(a, frageText, saat) {
+  if (typeof gespraechAntwort !== 'function') return null;
+  const k = salonKenntnis();
+  /* Zuerst in den Texten auf dem Gerät, dann im Gedächtnis der Einlesung */
+  let ant = k && typeof kenntnisFrage === 'function' ? kenntnisFrage(k, frageText) : null;
+  if ((!ant || !ant.wesen) && typeof einlesungFrage === 'function') { const e = einlesungFrage(frageText); if (e) ant = e; }
+  if (!ant) return null;
+  if (ant.absicht === 'werk' && ant.werk) {
+    const w = ant.werk, en = !!a.en;
+    return { art: 'werk', text: (en ? '„' + w.titel + '". ' : '„' + w.titel + '". ') + w.kurz, de: '', belege: [], einlesung: { art: 'werk', name: w.titel, werk: w.form + ' · ' + w.woerter.toLocaleString('de-DE') + ' Wörter', kurz: w.ton, mehr: w.kurz } };
+  }
+  return gespraechAntwort(a, ant, k, { anrede: salonAnrede(), saat: saat != null ? saat : salonHash(frageText + ':' + a.id) });
+}
+/* Eine Antwort als Element: Text, Übersetzung (bei englischen Stimmen), Belegstellen zum Antippen. */
+function salonAntwortElement(a, antwort, { tippen = false } = {}) {
+  const box = el('div', { class: 'sw-antwort' });
+  const text = el('div', { class: 'salon-rat' + (a.en ? ' en' : '') });
+  box.append(text);
+  if (antwort.de) { const ueb = el('div', { class: 'salon-rat-de', hidden: 'hidden' }, antwort.de); box.append(ueb, el('button', { class: 'knopf zart salon-rat-knopf', onclick: (ev) => { ueb.hidden = !ueb.hidden; ev.currentTarget.textContent = ueb.hidden ? 'Übersetzung' : 'Übersetzung verbergen'; } }, 'Übersetzung')); }
+  if (antwort.einlesung) {
+    const e = antwort.einlesung;
+    box.append(el('div', { class: 'sw-einlesungkarte' },
+      el('span', { class: 'sw-belege-titel' }, 'Aus der Einlesung' + (e.werk ? ' · ' + e.werk : '')),
+      el('b', {}, e.name), el('i', {}, e.kurz), e.mehr ? el('small', {}, e.mehr) : null));
+  }
+  if (antwort.belege && antwort.belege.length) {
+    const bel = el('div', { class: 'sw-belege' }, el('span', { class: 'sw-belege-titel' }, 'Aus deinen Seiten'));
+    for (const b of antwort.belege) bel.append(el('button', { class: 'sw-beleg', title: 'Stelle öffnen', onclick: () => { const d = D.docs.get(b.id); if (d) { oeffneDoc(d); } } }, el('i', {}, '„' + b.satz + '“'), el('small', {}, b.werk)));
+    box.append(bel);
+  }
+  if (tippen) { const w = antwort.text.split(' '); let i = 0; const tick = () => { if (!text.isConnected) { if (i === 0) { setTimeout(tick, 120); } return; } text.textContent = w.slice(0, ++i).join(' '); if (i < w.length) setTimeout(tick, 22 + Math.random() * 30); }; setTimeout(tick, 40); }
+  else text.textContent = antwort.text;
+  return box;
+}
+
 /* ----- Der Raum, Stufe drei: die Wand als gemaltes Zimmer, darunter die Konsole ----- */
 RENDER.salon = function (haupt) {
   const alle = salonAlle();
   const heute = tagKey();
   const info = typeof schreibtischTageszeitInfo === 'function' ? schreibtischTageszeitInfo() : { licht: 1 };
   const wand = el('div', { class: 'salon', 'data-licht': info.licht > .5 ? 'tag' : info.licht > .15 ? 'abend' : 'nacht' });
-  const frage = el('input', { type: 'text', placeholder: 'Frag die Wand — „Mein Anfang ist langweilig", „Wie bleibe ich dran?" …', 'aria-label': 'Frage an die Wand' });
-  const fragen = () => { const f = frage.value.trim(); if (!f) { frage.focus(); return; } salonRunde(f); };
-  frage.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); fragen(); } });
+  const frageFeld = el('input', { type: 'text', placeholder: 'Frag die Wand — „Wer ist …?", „Mein Anfang ist langweilig", „Wie bleibe ich dran?" …', 'aria-label': 'Frage an die Wand' });
+  const fragen = () => { const f = frageFeld.value.trim(); if (!f) { frageFeld.focus(); return; } salonRunde(f); };
+  frageFeld.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); fragen(); } });
   const kopf = el('div', { class: 'kopf' },
     el('h1', {}, 'Der Salon', el('div', { class: 'unter' }, 'Die Lieblingswand. Sie wissen, wie es geht — und sie reden, wenn man anklopft.')),
     el('button', { class: 'rundknopf zart', html: ik('brief'), title: 'Einen Brief an die Wand schreiben', onclick: () => salonBriefSchreiben() }),
     el('button', { class: 'rundknopf zart', html: ik('plus'), title: 'Jemanden an die Wand hängen', onclick: () => salonEigenenAnlegen() }),
-    el('button', { class: 'rundknopf zart', html: ik('klang'), title: 'Salon am Abend: Kaminknistern und die Uhr (Klang)', onclick: () => salonKlang() }),
+    el('button', { class: 'rundknopf zart salon-tonknopf' + (salonTonAn() ? ' an' : ''), html: ik('klang'), title: salonTonAn() ? 'Salonklang ist an: Kamin und Uhr. Tippen schaltet aus.' : 'Salonklang ist aus. Tippen: Kaminknistern und die Uhr.', 'aria-pressed': salonTonAn() ? 'true' : 'false', onclick: (ev) => { salonKlang().then(() => { const an = salonTonAn(); ev.target.closest('button').classList.toggle('an', an); ev.target.closest('button').setAttribute('aria-pressed', an ? 'true' : 'false'); }); } }),
+    el('button', { class: 'rundknopf zart', html: ik('stift'), title: 'Wie die Wand dich nennt', onclick: async () => { const n = await eingabe({ titel: 'Wie soll die Wand dich nennen?', wert: D.einst.salonAnrede || '', platzhalter: 'dein Name oder Spitzname' }); if (n === null) return; D.einst.salonAnrede = String(n).trim().slice(0, 40); speichereEinst(); toast(D.einst.salonAnrede ? 'Die Wand nennt dich jetzt ' + D.einst.salonAnrede + '.' : 'Die Wand nennt dich beim Profilnamen.'); zeichne(); } }),
     el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Über die Bilder', onclick: () => salonUeberBilder() }));
   const haus = alle.filter((a) => !a.gast && !a.eigen), gaeste = alle.filter((a) => a.gast), eigene = alle.filter((a) => a.eigen);
   /* Die Wand: nur die Rahmen — oben die Hausherren, darunter kleiner die Gäste und die eigenen */
@@ -644,13 +712,221 @@ RENDER.salon = function (haupt) {
   const aufgabenkarte = aufgabeHeute ? el('button', { class: 'salon-aufgabe-heute', onclick: () => salonAufgabeAnnehmen(aufgabeHeute.a, aufgabeHeute.aufgabe) },
     el('span', { class: 'sa-foto' }, salonPortraet(aufgabeHeute.a)), el('span', { class: 'sa-text' }, el('b', {}, 'Schreibaufgabe des Tages · ' + aufgabeHeute.a.name), el('i', {}, aufgabeHeute.aufgabe.t), el('small', {}, (aufgabeHeute.aufgabe.min ? aufgabeHeute.aufgabe.min + ' Minuten' : 'ohne Uhr') + (aufgabeHeute.aufgabe.ziel ? ' · etwa ' + aufgabeHeute.aufgabe.ziel + ' Wörter' : '') + ' · tippen nimmt sie an'))) : null;
   const briefe = salonBriefeKarte();
-  const frageZeile = el('div', { class: 'salon-fragezeile' }, el('span', { html: ik('suche'), style: 'display:flex;color:var(--blass)' }), frage, el('button', { class: 'knopf voll', onclick: fragen }, 'Die Runde fragen'));
-  wand.append(galerie, frageZeile, karten, aufgabenkarte, briefe,
+  const frageZeile = el('div', { class: 'salon-fragezeile' }, el('span', { html: ik('suche'), style: 'display:flex;color:var(--blass)' }), frageFeld, el('button', { class: 'knopf voll', onclick: fragen }, 'Die Runde fragen'));
+  anfuegen(wand, galerie, frageZeile, karten, aufgabenkarte, briefe,
     el('div', { class: 'salon-fuss' }, 'Die Zitate sind echt und tragen ihre Quelle. Die Ratschläge sind erfunden, in ihrem Geist — zusammen ' + alle.reduce((n, a) => n + salonVorrat(a), 0).toLocaleString('de-DE') + ' mögliche, jeden Tag andere.'));
   haupt.append(kopf, wand);
+  if (typeof einlesungBereit === 'function') einlesungBereit().catch(() => {});
   if (maler) maler.start();
+  /* Die Tippflächen genau auf das gemalte Möbel legen — der Maler weiß, wo es steht */
+  if (maler && maler.flaechen) {
+    const legeFlaechen = () => {
+      const f = maler.flaechen(); if (!f) return;
+      const setz = (elm, r) => {
+        if (!elm) return;
+        if (!r) { elm.style.display = 'none'; return; }
+        elm.style.display = ''; elm.style.left = r.x + 'px'; elm.style.top = r.y + 'px';
+        elm.style.right = 'auto'; elm.style.bottom = 'auto'; elm.style.width = r.w + 'px'; elm.style.height = r.h + 'px';
+      };
+      setz(sessel, f.sessel); setz(kamin, f.kamin);
+    };
+    requestAnimationFrame(legeFlaechen);
+    if (typeof ResizeObserver !== 'undefined') { const ro = new ResizeObserver(() => { if (!galerie.isConnected) { ro.disconnect(); return; } legeFlaechen(); }); ro.observe(galerie); }
+  }
   salonBriefeNachsehen();
 };
+
+/* ----- Der Umschlag: die Einlesung einmal entsiegeln ----- */
+async function salonUmschlagOeffnen() {
+  const u = typeof einlesungUmschlag === 'function' ? (einlesungUmschlag() || await einlesungUmschlagHolen()) : null;
+  if (!u) { toast('Neben dieser App liegt keine versiegelte Einlesung.'); return false; }
+  const pass = await passwortFragen('Der versiegelte Umschlag', 'Die Wand hat deine Sammlung gelesen und alles darüber verschlossen weggelegt. Mit dem Passwort liest sie es einmal ein und merkt es sich auf diesem Gerät — es geht nie wieder hinaus.');
+  if (!pass) return false;
+  const warte = toast('Wird geöffnet …', 60000);
+  try {
+    await einlesungEntsiegeln(pass);
+    toast('Der Umschlag ist offen. Die Wand weiß wieder, was sie gelesen hat.', 4000);
+    zeichne();
+    return true;
+  } catch (e) {
+    toast('Das Passwort passt nicht — oder die Datei ist beschädigt.', 4000);
+    return false;
+  }
+}
+
+/* ----- Deine Welten: eine Seite im Sprechfenster, auf der die Stimme über die eigenen Texte redet ----- */
+function salonWeltenSeite(a) {
+  const seite = el('div', { class: 'salon-seite salon-welten' });
+  const anrede = salonAnrede();
+  const du = anrede || 'du';
+  const ein = typeof salonEinlesung === 'function' ? salonEinlesung() : null;
+  const stimme = ein && ein.stimmen ? ein.stimmen[a.id] : null;
+  const fuell = (t) => String(t || '').replace(/\{anrede\}/g, du);
+  let gestartet = false;
+  seite._starten = async () => {
+    if (gestartet) return; gestartet = true;
+    if (typeof einlesungBereit === 'function') { try { await einlesungBereit(); } catch (e) {} }
+    if (!ein && typeof einlesungDa === 'function' && !einlesungDa()) {
+      /* Versiegelt: nur der Umschlag ist zu sehen */
+      const u = typeof einlesungUmschlag === 'function' ? einlesungUmschlag() : null;
+      const datum = u && u.stand ? new Date(u.stand + 'T12:00:00').toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' }) : null;
+      seite.append(el('div', { class: 'sw-umschlag' },
+        el('span', { class: 'sw-belege-titel' }, 'Versiegelt'),
+        el('i', {}, u ? (a.anrede || a.name) + ' hat deine Sammlung gelesen' + (datum ? ' — am ' + datum : '') + (u.werke ? ', ' + u.werke + ' Werke' : '') + '. Alles darüber liegt verschlossen neben der App.' : 'Neben dieser App liegt keine versiegelte Einlesung.'),
+        u ? el('button', { class: 'knopf voll', onclick: () => salonUmschlagOeffnen() }, 'Umschlag öffnen') : null,
+        el('small', {}, 'Einmal das Passwort, dann bleibt es auf diesem Gerät. Im Repo steht nur Rauschen.')));
+    }
+    const k = salonKenntnis();
+    /* --- Kopf: der Stand der Einlesung --- */
+    if (ein && stimme) {
+      const datum = new Date(ein.stand + 'T12:00:00');
+      const dazu = k && !k.leer && k.woerter > ein.woerter ? k.woerter - ein.woerter : 0;
+      seite.append(el('div', { class: 'sw-stand' },
+        (a.anrede || a.name) + ' hat „' + ein.titel + '" am ' + datum.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' }) + ' gelesen — damals ' + ein.woerter.toLocaleString('de-DE') + ' Wörter in ' + ein.werke.length + ' Werken.' + (dazu ? ' Seitdem sind ' + dazu.toLocaleString('de-DE') + ' Wörter dazugekommen; die kennt ' + (a.anrede || a.name) + ' aus dem, was gerade auf dem Gerät liegt.' : '')));
+      const gruss = el('div', { class: 'salon-rat' + (a.en ? ' en' : '') }, fuell(stimme.gruss));
+      seite.append(gruss);
+      if (a.en && stimme.grussDe) { const ueb = el('div', { class: 'salon-rat-de', hidden: 'hidden' }, fuell(stimme.grussDe)); seite.append(ueb, el('button', { class: 'knopf zart salon-rat-knopf', onclick: (ev) => { ueb.hidden = !ueb.hidden; ev.currentTarget.textContent = ueb.hidden ? 'Übersetzung' : 'Übersetzung verbergen'; } }, 'Übersetzung')); }
+    }
+    /* --- Reiter innerhalb der Seite --- */
+    const felder = {};
+    const reiter = el('div', { class: 'sw-reiter' });
+    const zeigeFeld = (id) => { for (const key of Object.keys(felder)) felder[key].classList.toggle('an', key === id); $$('button', reiter).forEach((b) => b.classList.toggle('an', b.dataset.feld === id)); };
+    const reiterKnopf = (id, name) => el('button', { class: 'sw-reiterknopf', 'data-feld': id, onclick: () => zeigeFeld(id) }, name);
+
+    /* 1. Was aufgefallen ist */
+    const auf = el('div', { class: 'sw-feld' });
+    if (stimme) {
+      const saetze = a.en && stimme.saetzeDe ? stimme.saetze.map((t, n) => [t, stimme.saetzeDe[n]]) : (stimme.saetze || []).map((t) => [t, '']);
+      for (const [t, de] of saetze) {
+        const p = el('div', { class: 'sw-notiz' }, el('i', { class: a.en ? 'en' : '' }, fuell(t)));
+        if (de) { const u = el('small', { hidden: 'hidden' }, fuell(de)); p.append(u, el('button', { class: 'sw-mini', onclick: (ev) => { u.hidden = !u.hidden; ev.currentTarget.textContent = u.hidden ? 'Übersetzung' : 'verbergen'; } }, 'Übersetzung')); }
+        auf.append(p);
+      }
+      if (stimme.stelle) auf.append(el('div', { class: 'sw-lieblingsstelle' },
+        el('span', { class: 'sw-belege-titel' }, 'Der Satz, den ' + (a.anrede || a.name) + ' behalten hat'),
+        el('i', {}, '„' + stimme.stelle.s + '"'), el('small', {}, stimme.stelle.w),
+        el('em', {}, a.en && stimme.stelle.warumDe ? stimme.stelle.warum + ' — ' + stimme.stelle.warumDe : stimme.stelle.warum)));
+    }
+    if (stimme) felder.auf = auf;
+
+    /* 2. Deine Werke */
+    const werke = el('div', { class: 'sw-feld' });
+    if (ein) for (const w of ein.werke) werke.append(el('div', { class: 'sw-werk' },
+      el('b', {}, w.titel), el('small', {}, w.form + ' · ' + w.woerter.toLocaleString('de-DE') + ' Wörter · ' + w.ton),
+      el('i', {}, w.kurz)));
+    if (ein) felder.werke = werke;
+
+    /* 3. Deine Leute — Figuren aus der Einlesung, die diese Stimme kommentiert hat */
+    const leute = el('div', { class: 'sw-feld' });
+    if (ein && stimme && stimme.figuren) {
+      const namen = Object.keys(stimme.figuren);
+      const box = el('div', { class: 'sw-antwortbox' });
+      const chips = el('div', { class: 'sw-chips' });
+      const zeigeFigur = (name) => {
+        const f = einlesungFigur(name), n = stimme.figuren[name];
+        box.innerHTML = '';
+        box.append(el('div', { class: 'sw-einlesungkarte' }, el('span', { class: 'sw-belege-titel' }, 'Aus der Einlesung' + (f && f.werk ? ' · ' + f.werk : '')), el('b', {}, name), f ? el('i', {}, f.kurz) : null, f && f.mehr ? el('small', {}, f.mehr) : null));
+        const t = el('div', { class: 'salon-rat' + (a.en ? ' en' : '') }, n.t);
+        box.append(t);
+        if (n.de) { const u = el('div', { class: 'salon-rat-de', hidden: 'hidden' }, n.de); box.append(u, el('button', { class: 'knopf zart salon-rat-knopf', onclick: (ev) => { u.hidden = !u.hidden; ev.currentTarget.textContent = u.hidden ? 'Übersetzung' : 'Übersetzung verbergen'; } }, 'Übersetzung')); }
+        /* Was die Wand sonst noch aus deinen Texten dazu weiß */
+        if (k && !k.leer) { const lebt = (k.figuren || []).find((x) => x.name === name || x.name === (name.split(' ')[0])); if (lebt) box.append(el('div', { class: 'sw-hinweis' }, 'In deinen Texten auf diesem Gerät kommt ' + name + ' ' + lebt.n + '-mal vor' + (lebt.werke && lebt.werke[0] ? ', vor allem in ' + lebt.werke[0].name : '') + '.')); }
+        const andere = typeof einlesungStimmenZu === 'function' ? einlesungStimmenZu(name).filter((id) => id !== a.id) : [];
+        if (andere.length) box.append(el('div', { class: 'sw-hinweis' }, 'Dazu haben auch ' + andere.map((id) => (salonFinde(id) || { name: id }).name).join(', ') + ' etwas gesagt.'));
+      };
+      for (const name of namen) chips.append(el('button', { class: 'suchchip figur', onclick: (ev) => { $$('button', chips).forEach((c) => c.classList.remove('an')); ev.currentTarget.classList.add('an'); zeigeFigur(name); } }, name));
+      leute.append(chips, box);
+      if (namen.length) zeigeFigur(namen[0]);
+    }
+    if (ein && stimme && stimme.figuren) felder.leute = leute;
+
+    /* 4. Fragen an dich */
+    const fragen = el('div', { class: 'sw-feld' });
+    if (stimme && (stimme.fragen || []).length) {
+      fragen.append(el('div', { class: 'sw-hinweis' }, (a.anrede || a.name) + ' hat sich das beim Lesen aufgeschrieben. Tippen legt ein Blatt damit an.'));
+      (stimme.fragen || []).forEach((f, n) => {
+        const de = a.en && stimme.fragenDe ? stimme.fragenDe[n] : '';
+        fragen.append(el('button', { class: 'sw-frage', onclick: () => { const b = blattAusText('Frage von ' + a.name, (a.en && de ? de + '\n(' + f + ')' : f) + '\n\n'); zu(); oeffneSchreibraum(b.id); } },
+          el('i', { class: a.en ? 'en' : '' }, fuell(f)), de ? el('small', {}, fuell(de)) : null, el('small', { class: 'sw-frage-fuss' }, 'tippen: damit ein Blatt beginnen')));
+      });
+    }
+    if (stimme && (stimme.fragen || []).length) felder.fragen = fragen;
+
+    /* 5. Jetzt gerade — die lebendige Kenntnis */
+    const live = el('div', { class: 'sw-feld' });
+    const antwortBox = el('div', { class: 'sw-antwortbox' });
+    const zeige = (antwort) => { antwortBox.innerHTML = ''; if (antwort) antwortBox.append(salonAntwortElement(a, antwort, { tippen: true })); };
+    if (!k || k.leer) live.append(el('div', { class: 'sw-hinweis' }, 'Auf diesem Gerät liegen noch keine Texte. Sobald du schreibst, liest die Wand mit.'), antwortBox), zeige(gespraechAntwort(a, null, k, { anrede }));
+    else {
+      const chips = el('div', { class: 'sw-chips' });
+      const chip = (text, klasse, tun) => chips.append(el('button', { class: 'suchchip ' + (klasse || ''), onclick: (ev) => { $$('button', chips).forEach((c) => c.classList.remove('an')); ev.currentTarget.classList.add('an'); tun(); } }, text));
+      const frageMit = (absicht, wesen) => ({ absicht, wesen, belege: wesen ? (wesen.beispiele || []).slice(0, 4) : [], frage: '' });
+      for (const f of k.figuren.slice(0, 14)) chip(f.name, 'figur', () => zeige(gespraechAntwort(a, frageMit('wer', Object.assign({ art: 'figur' }, f)), k, { anrede, saat: salonHash(f.name + ':' + a.id) })));
+      for (const o of k.orte.slice(0, 6)) chip(o.name, 'ort', () => zeige(gespraechAntwort(a, frageMit('wo', Object.assign({ art: 'ort' }, o)), k, { anrede, saat: salonHash(o.name + ':' + a.id) })));
+      for (const b of k.begriffe.slice(0, 8)) chip(b.name, 'begriff', () => zeige(gespraechAntwort(a, frageMit('wer', Object.assign({ art: 'begriff' }, b)), k, { anrede, saat: salonHash(b.name + ':' + a.id) })));
+      chip('Meine Werke', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'werke' }, k, { anrede })));
+      chip('Zahlen', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'zahl' }, k, { anrede })));
+      chip('Ein Satz von mir', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'stelle' }, k, { anrede, saat: Math.floor(Math.random() * 1e9) })));
+      chip('Wo war ich zuletzt?', 'sw-meta', () => zeige(gespraechAntwort(a, { absicht: 'wann' }, k, { anrede })));
+      const feld = el('input', { type: 'text', class: 'sw-feldfrage', placeholder: 'Frag ' + (a.anrede || a.name) + ' — „Wer ist …?", „Zeig mir eine Stelle mit …", „Wo spielt das?"', 'aria-label': 'Frage zu deinen Texten' });
+      const fragenJetzt = () => {
+        const f = feld.value.trim(); if (!f) return;
+        let ant = salonFrageAntwort(a, f);
+        if (!ant) {
+          const thema = salonThemaAusFrage(f);
+          const r = (typeof salonRatZweisprachig === 'function' ? salonRatZweisprachig : salonRat)(a, salonHash(f + ':' + a.id), thema);
+          ant = r ? { art: 'rat', text: r.text, de: r.de || '', belege: [] } : gespraechAntwort(a, { absicht: 'unbekannt' }, k, { anrede });
+        }
+        zeige(ant);
+      };
+      feld.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); fragenJetzt(); } });
+      live.append(chips, el('div', { class: 'sw-fragezeile' }, feld, el('button', { class: 'knopf voll', onclick: fragenJetzt }, 'Fragen')), antwortBox,
+        el('div', { class: 'sw-hinweis' }, 'Das kommt aus deinen Blättern, Heften, Szenen und Schnipseln auf diesem Gerät: ' + (k.woerter || 0).toLocaleString('de-DE') + ' Wörter, ' + k.figuren.length + ' Figuren, ' + k.orte.length + ' Schauplätze, ' + k.begriffe.length + ' Begriffe. Nichts davon verlässt das Gerät.'));
+      zeige(gespraechAntwort(a, { absicht: 'gruss' }, k, { anrede, saat: salonHash(tagKey() + ':' + a.id) }));
+    }
+    felder.live = live;
+
+    /* 6. Chronik — was seit der Einlesung dazugekommen ist */
+    const chronik = el('div', { class: 'sw-feld' });
+    const baueChronik = () => {
+      chronik.innerHTML = '';
+      const v = typeof salonUnterschied === 'function' ? salonUnterschied() : null;
+      const lesungen = typeof salonLesungen === 'function' ? salonLesungen() : [];
+      if (ein) chronik.append(el('div', { class: 'sw-chronikzeile' }, el('b', {}, 'Die große Lesung'),
+        el('small', {}, new Date(ein.stand + 'T12:00:00').toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' }) + ' · ' + ein.woerter.toLocaleString('de-DE') + ' Wörter · ' + ein.werke.length + ' Werke'),
+        el('i', {}, (a.anrede || a.name) + ' hat alles gelesen, was damals dalag.')));
+      for (const l of lesungen) {
+        let notiz = '';
+        try { const n = typeof l.notizen === 'string' ? JSON.parse(l.notizen) : l.notizen; notiz = (n && n[a.id]) || ''; } catch (e) {}
+        chronik.append(el('div', { class: 'sw-chronikzeile' }, el('b', {}, 'Nachgelesen'), el('small', {}, fmtDatum(l.angelegt || 0)), notiz ? el('i', {}, notiz) : null));
+      }
+      if (v && v.etwasNeu) {
+        const zahl = (n) => Number(n || 0).toLocaleString('de-DE');
+        chronik.append(el('div', { class: 'sw-chronikzeile offen' }, el('b', {}, 'Seitdem'),
+          el('small', {}, (v.woerterPlus > 0 ? '+' + zahl(v.woerterPlus) + ' Wörter' + (v.tage ? ' in ' + v.tage + (v.tage === 1 ? ' Tag' : ' Tagen') : '') : 'auf diesem Gerät: ' + zahl((salonKenntnis() || {}).woerter || 0) + ' Wörter')),
+          el('i', {}, [v.neueWerke.length ? v.neueWerke.length + (v.neueWerke.length === 1 ? ' neuer Text' : ' neue Texte') : '', v.neueFiguren.length ? v.neueFiguren.length + (v.neueFiguren.length === 1 ? ' neuer Name' : ' neue Namen') + ' (' + v.neueFiguren.slice(0, 5).join(', ') + ')' : '', v.gewachsen.length ? 'gewachsen: ' + v.gewachsen.slice(0, 3).map((g) => g.name).join(', ') : ''].filter(Boolean).join(' · ') || 'nur ein paar Wörter mehr.'),
+          el('button', { class: 'knopf voll', onclick: () => {
+            const erg = salonNachlesen();
+            if (!erg) return;
+            toast((a.anrede || a.name) + ' hat nachgelesen.', 3000);
+            baueChronik();
+          } }, 'Jetzt nachlesen lassen')));
+      } else if (!lesungen.length) chronik.append(el('div', { class: 'sw-hinweis' }, 'Seit der großen Lesung ist noch nichts Neues dazugekommen. Sobald du schreibst, kann die Wand nachlesen.'));
+    };
+    baueChronik();
+    felder.chronik = chronik;
+
+    anfuegen(reiter,
+      felder.auf ? reiterKnopf('auf', 'Was mir auffiel') : null,
+      felder.leute ? reiterKnopf('leute', 'Deine Leute') : null,
+      felder.werke ? reiterKnopf('werke', 'Deine Werke') : null,
+      felder.fragen ? reiterKnopf('fragen', 'Fragen an dich') : null,
+      reiterKnopf('live', 'Jetzt gerade'), reiterKnopf('chronik', 'Chronik'));
+    anfuegen(seite, reiter, felder.auf, felder.leute, felder.werke, felder.fragen, felder.live, felder.chronik);
+    zeigeFeld(felder.auf ? 'auf' : 'live');
+  };
+  return seite;
+}
 
 /* ----- Briefe an die Wand: man schreibt, und nach drei Tagen antwortet die Person ----- */
 function saubereSalonBriefe(roh) {
@@ -727,17 +1003,25 @@ function salonSprechen(a, { thema = null, saat = null, reiterStart = 'rat' } = {
     if (!r) { sprech.append(el('div', { class: 'salon-leer' }, a.eigen ? 'Noch kein Rat hinterlegt — beim Bearbeiten kannst du Sätze in ' + a.name + 's Stimme eintragen.' : 'Dazu fällt mir gerade nichts ein.')); return; }
     const text = el('div', { class: 'salon-rat' + (a.en ? ' en' : '') });
     const ueb = r.de ? el('div', { class: 'salon-rat-de', hidden: 'hidden' }, r.de) : null;
-    sprech.append(text, ueb, el('div', { class: 'salon-ratfuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden, in ' + (a.anrede || a.name) + 's Geist' + (r.thema ? ' · ' + (SALON_THEMEN.find((t) => t[0] === r.thema) || [])[1] : ''),
+    anfuegen(sprech, text, ueb, el('div', { class: 'salon-ratfuss' }, a.eigen ? 'aus deinen Notizen' : 'erfunden, in ' + (a.anrede || a.name) + 's Geist' + (r.thema ? ' · ' + (SALON_THEMEN.find((t) => t[0] === r.thema) || [])[1] : ''),
       ueb ? el('button', { class: 'knopf zart salon-rat-knopf', onclick: (ev) => { ueb.hidden = !ueb.hidden; ev.currentTarget.textContent = ueb.hidden ? 'Übersetzung' : 'Übersetzung verbergen'; } }, 'Übersetzung') : null));
     tippe(text, r.text);
   };
+  /* Neunzehn Themen sind viel für eine Zeile: die ersten acht stehen da, der Rest klappt auf. */
+  let themenOffen = false;
   const baueChips = () => {
     chips.innerHTML = '';
     chips.append(el('button', { class: 'suchchip' + (themaJetzt ? '' : ' an'), onclick: () => { themaJetzt = null; zaehler++; baueChips(); zeigeRat(); } }, 'Egal was'));
-    if (!a.eigen) for (const [id, name] of SALON_THEMEN) {
-      if (!(a.kern || []).some((k) => k[0] === id)) continue;
-      chips.append(el('button', { class: 'suchchip' + (themaJetzt === id ? ' an' : ''), onclick: () => { themaJetzt = id; zaehler++; baueChips(); zeigeRat(); } }, name));
+    if (a.eigen) return;
+    const meine = SALON_THEMEN.filter(([id]) => (a.kern || []).some((k) => k[0] === id));
+    const sichtbar = themenOffen ? meine : meine.slice(0, 7);
+    for (const [id, name] of sichtbar) chips.append(el('button', { class: 'suchchip' + (themaJetzt === id ? ' an' : ''), onclick: () => { themaJetzt = id; zaehler++; baueChips(); zeigeRat(); } }, name));
+    /* Ein gewähltes Thema bleibt sichtbar, auch wenn es weiter hinten steht */
+    if (themaJetzt && !sichtbar.some(([id]) => id === themaJetzt)) {
+      const t = meine.find(([id]) => id === themaJetzt);
+      if (t) chips.append(el('button', { class: 'suchchip an', onclick: () => { themenOffen = true; baueChips(); } }, t[1]));
     }
+    if (meine.length > sichtbar.length || themenOffen) chips.append(el('button', { class: 'suchchip still', onclick: () => { themenOffen = !themenOffen; baueChips(); } }, themenOffen ? 'weniger' : '+ ' + (meine.length - sichtbar.length) + ' Themen'));
   };
   baueChips();
   const zitate = el('div', { class: 'salon-zitate' });
@@ -745,7 +1029,16 @@ function salonSprechen(a, { thema = null, saat = null, reiterStart = 'rat' } = {
   else { if (a.en) zitate.append(el('div', { class: 'salon-hinweis' }, 'Im Original. „Übersetzung" zeigt die deutsche Fassung.')); for (const z of a.zitate) zitate.append(salonZitatElement(a, z, true)); }
   const aufgaben = el('div', { class: 'salon-aufgaben' });
   if (!(a.aufgaben || []).length) aufgaben.append(el('div', { class: 'salon-leer' }, a.eigen ? 'Eigene Leute stellen (noch) keine Aufgaben.' : 'Keine Aufgaben.'));
-  else for (const au of a.aufgaben) aufgaben.append(el('button', { class: 'salon-aufgabe', onclick: () => { zu(); salonAufgabeAnnehmen(a, au); } }, el('i', {}, au.t), el('small', {}, (au.min ? au.min + ' Minuten' : 'ohne Uhr') + (au.ziel ? ' · etwa ' + au.ziel + ' Wörter' : '') + ' · annehmen')));
+  else {
+    const kats = typeof SALON_AUFGABEN_KATEGORIEN !== 'undefined' ? SALON_AUFGABEN_KATEGORIEN : [];
+    const gruppen = new Map();
+    for (const au of a.aufgaben) { const kat = au.kat || 'Spiel'; if (!gruppen.has(kat)) gruppen.set(kat, []); gruppen.get(kat).push(au); }
+    const reihenfolge = [...kats.filter((k) => gruppen.has(k)), ...[...gruppen.keys()].filter((k) => !kats.includes(k))];
+    for (const kat of reihenfolge) {
+      aufgaben.append(el('div', { class: 'salon-abschnitt' }, kat + ' · ' + gruppen.get(kat).length));
+      for (const au of gruppen.get(kat)) aufgaben.append(el('button', { class: 'salon-aufgabe', onclick: () => { zu(); salonAufgabeAnnehmen(a, au); } }, el('i', {}, au.t), el('small', {}, (au.min ? au.min + ' Minuten' : 'ohne Uhr') + (au.ziel ? ' · etwa ' + au.ziel + ' Wörter' : '') + ' · annehmen')));
+    }
+  }
   const werke = el('div', { class: 'salon-regal' });
   const baueWerke = () => {
     werke.innerHTML = '';
@@ -766,15 +1059,18 @@ function salonSprechen(a, { thema = null, saat = null, reiterStart = 'rat' } = {
     zitate: el('div', { class: 'salon-seite' }, zitate),
     aufgaben: el('div', { class: 'salon-seite' }, el('div', { class: 'salon-hinweis' }, 'Erfundene Übungen in dieser Stimme. Annehmen legt ein Blatt an und startet die Uhr.'), aufgaben),
     werke: el('div', { class: 'salon-seite' }, werke),
-    ueber: el('div', { class: 'salon-seite' }, el('div', { class: 'salon-ueber' }, el('p', {}, a.kurz || ''), a.foto ? el('p', { class: 'salon-lizenz' }, 'Foto: ' + a.foto.urheber + ', ' + a.foto.lizenz + ' (Wikimedia Commons).') : null,
+    ueber: el('div', { class: 'salon-seite' }, el('div', { class: 'salon-ueber' }, el('p', { class: 'salon-ueber-kurz' }, a.kurz || ''), ...((a.ueber || []).map((abs) => el('p', { class: 'salon-ueber-abs' }, abs))), a.foto ? el('p', { class: 'salon-lizenz' }, 'Foto: ' + a.foto.urheber + ', ' + a.foto.lizenz + ' (Wikimedia Commons).') : null,
       a.eigen ? el('div', { class: 'reihe', style: 'justify-content:flex-start' }, el('button', { class: 'knopf', onclick: () => { zu(); salonEigenenBearbeiten(a.doc); } }, 'Bearbeiten'), el('button', { class: 'knopf zart', onclick: async () => { if (await frage(a.name + ' von der Wand nehmen?', { ja: 'Abnehmen', gefahr: true })) { await loesche(a.doc.id); zu(); zeichne(); } } }, 'Abnehmen')) : null))
   };
-  const reiterKnopf = (id, name) => el('button', { class: 'salon-reiterknopf' + (id === reiterStart ? ' an' : ''), onclick: (ev) => { for (const k of Object.keys(seiten)) seiten[k].classList.toggle('an', k === id); $$('.salon-reiterknopf', reiter).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); } }, name);
+  /* Deine Welten: die Stimme spricht über die eigenen Texte — Einlesung (56d) und lebendige Kenntnis (56e/56f) */
+  if (!a.eigen && typeof gespraechAntwort === 'function') seiten.welten = salonWeltenSeite(a);
+  const reiterKnopf = (id, name) => el('button', { class: 'salon-reiterknopf' + (id === reiterStart ? ' an' : ''), onclick: (ev) => { for (const k of Object.keys(seiten)) seiten[k].classList.toggle('an', k === id); $$('.salon-reiterknopf', reiter).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); if (id === 'welten' && seiten.welten && seiten.welten._starten) { seiten.welten._starten(); } } }, name);
   seiten[reiterStart].classList.add('an');
-  reiter.append(reiterKnopf('rat', 'Rat'), reiterKnopf('zitate', 'Zitate (' + (a.zitate || []).length + ')'), reiterKnopf('aufgaben', 'Aufgaben'), reiterKnopf('werke', 'Werke'), reiterKnopf('ueber', 'Über'));
+  anfuegen(reiter, reiterKnopf('rat', 'Rat'), seiten.welten ? reiterKnopf('welten', 'Deine Welten') : null, reiterKnopf('zitate', 'Zitate (' + (a.zitate || []).length + ')'), reiterKnopf('aufgaben', 'Aufgaben'), reiterKnopf('werke', 'Werke'), reiterKnopf('ueber', 'Über'));
   const kasten = el('div', { class: 'modal salon-fenster ' + (a.rahmen || 'nuss') },
     el('div', { class: 'salon-fenster-kopf' }, el('div', { class: 'salon-fenster-foto' }, salonPortraet(a)), el('div', {}, el('h2', {}, a.name), el('div', { class: 'salon-fenster-unter' }, [a.jahre, a.woher].filter(Boolean).join(' · '))), el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Schließen', onclick: () => zu() })),
-    reiter, seiten.rat, seiten.zitate, seiten.aufgaben, seiten.werke, seiten.ueber);
+    reiter, seiten.rat, seiten.welten || null, seiten.zitate, seiten.aufgaben, seiten.werke, seiten.ueber);
+  if (reiterStart === 'welten' && seiten.welten) setTimeout(() => seiten.welten._starten && seiten.welten._starten(), 50);
   const zu = zeigeDeck(kasten);
   if (reiterStart === 'rat') zeigeRat();
 }
@@ -791,10 +1087,14 @@ function salonAufgabeAnnehmen(a, au) {
 /* Die Runde: alle antworten nacheinander, jede in ihrer Stimme. */
 function salonRunde(frageText) {
   const thema = salonThemaAusFrage(frageText);
+  /* Berührt die Frage die eigenen Texte, antwortet die Runde aus der Kenntnis — sonst mit Rat zum Handwerk */
+  let materialAntwort = typeof kenntnisFrage === 'function' && salonKenntnis() ? kenntnisFrage(salonKenntnis(), frageText) : null;
+  if ((!materialAntwort || !materialAntwort.wesen) && typeof einlesungFrage === 'function') { const e = einlesungFrage(frageText); if (e && e.wesen) materialAntwort = e; }
+  const material = !!materialAntwort && (materialAntwort.wesen || ['zahl', 'werke', 'wann', 'figuren', 'erster', 'wo', 'begriffe', 'stelle', 'saetze'].includes(materialAntwort.absicht));
   const stimmen = SALON_FEST.filter((a) => (a.kern || []).length);
-  const liste = el('div', { class: 'salon-runde' });
+  const liste = el('div', { class: 'salon-runde' + (material ? ' material' : '') });
   const kasten = el('div', { class: 'modal salon-rundenfenster' },
-    el('div', { class: 'salon-runde-kopf' }, el('div', {}, el('h2', {}, 'Die Runde'), el('div', { class: 'salon-fenster-unter' }, '„' + frageText.slice(0, 120) + '“' + (thema ? ' · Thema: ' + (SALON_THEMEN.find((t) => t[0] === thema) || [])[1] : ''))), el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Schließen', onclick: () => zu() })),
+    el('div', { class: 'salon-runde-kopf' }, el('div', {}, el('h2', {}, material ? 'Die Runde — über deine Texte' : 'Die Runde'), el('div', { class: 'salon-fenster-unter' }, '„' + frageText.slice(0, 120) + '“' + (material && materialAntwort.wesen ? ' · ' + (materialAntwort.wesen.art === 'figur' ? 'Figur' : materialAntwort.wesen.art === 'ort' ? 'Schauplatz' : 'Begriff') + ': ' + materialAntwort.wesen.name : thema ? ' · Thema: ' + (SALON_THEMEN.find((t) => t[0] === thema) || [])[1] : ''))), el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Schließen', onclick: () => zu() })),
     liste,
     el('div', { class: 'reihe' }, el('button', { class: 'knopf', onclick: () => { liste.innerHTML = ''; runde(Math.floor(Math.random() * 1e9)); } }, 'Noch eine Runde'), el('button', { class: 'knopf voll', onclick: () => zu() }, 'Danke')));
   const zu = zeigeDeck(kasten);
@@ -803,6 +1103,13 @@ function salonRunde(frageText) {
     const naechste = () => {
       if (!liste.isConnected || i >= stimmen.length) return;
       const a = stimmen[i++];
+      if (material) {
+        const ant = gespraechAntwort(a, materialAntwort, salonKenntnis(), { anrede: salonAnrede(), saat: salonHash(frageText + ':' + a.id + ':' + saat) });
+        const blase = el('div', { class: 'salon-blase ' + (a.rahmen || 'nuss') }, el('div', { class: 'salon-blase-foto' }, salonPortraet(a)), el('div', { class: 'salon-blase-inhalt' }, el('b', {}, a.name), salonAntwortElement(a, ant, { tippen: true }), el('small', {}, 'aus deinen Texten, in ' + (a.anrede || a.name) + 's Stimme')));
+        liste.append(blase); blase.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        setTimeout(naechste, 520 + Math.min(2400, ant.text.length * 14));
+        return;
+      }
       const zw = typeof salonRatZweisprachig === 'function' ? salonRatZweisprachig : salonRat;
       const r = zw(a, salonHash(frageText + ':' + a.id + ':' + saat), thema) || zw(a, saat + i);
       const text = el('div', { class: 'sr-text' });
@@ -859,11 +1166,21 @@ function salonEigenenBearbeiten(doc) {
 }
 
 /* Der Klang des Salons: Kamin und Uhr — an oder aus. */
+/* Salonklang: Standard aus. Ist er an, spielen Kamin und Uhr; der Schalter oben merkt sich den Zustand. */
+function salonTonAn() { const m = (D.einst && D.einst.ambience) || {}; return D.einst.salonTon === true && (m.kamin || 0) > 0; }
 async function salonKlang() {
   if (typeof ambienceMischungAnwenden !== 'function') { location.hash = '#/klang'; return; }
   const m = { ...(D.einst.ambience || {}) };
-  const an = (m.kamin || 0) > 0 && (m.uhr || 0) > 0;
-  if (an) { delete m.kamin; delete m.uhr; toast('Der Salon wird still.'); }
-  else { m.kamin = .28; m.uhr = .14; toast('Salon am Abend: das Feuer knistert, die Uhr geht.', 3200); }
+  const an = salonTonAn();
+  if (an) { delete m.kamin; delete m.uhr; D.einst.salonTon = false; toast('Der Salon wird still.'); }
+  else { m.kamin = .28; m.uhr = .14; D.einst.salonTon = true; toast('Salon am Abend: das Feuer knistert, die Uhr geht.', 3200); }
+  speichereEinst();
   try { await audioFreigeben(); await ambienceMischungAnwenden(m); } catch (e) {}
+}
+/* Wie die Wand die Schreiberin anspricht: eingestellter Name, sonst der Profilname, sonst nichts. */
+function salonAnrede() {
+  const e = (D.einst && typeof D.einst.salonAnrede === 'string') ? D.einst.salonAnrede.trim() : '';
+  if (e) return e;
+  try { if (typeof AKTIVES_PROFIL !== 'undefined' && AKTIVES_PROFIL && AKTIVES_PROFIL.name) return String(AKTIVES_PROFIL.name).trim().slice(0, 40); } catch (x) {}
+  return '';
 }

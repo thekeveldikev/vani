@@ -96,8 +96,7 @@ function sitzungBeginnen(vorgabe = {}) {
         D.einst.sitzung = { minuten: e.minuten, ziel: e.ziel, klang: e.klang, rat: e.rat, kerze: e.kerze, woran: 'neu', atmen: e.atmen }; speichereEinst();
         zu();
         const ratText = ratVorschau.querySelector('i') ? ratVorschau.querySelector('i').textContent : '';
-        if (e.atmen) await sitzungAtmen();
-        await sitzungStarten(e, ratText);
+        try { if (e.atmen) await sitzungAtmen(); await sitzungStarten(e, ratText); } catch (x) { toast('Die Sitzung konnte nicht starten — noch einmal versuchen.'); }
       } }, 'Los')));
   const zu = zeigeDeck(kasten);
 }

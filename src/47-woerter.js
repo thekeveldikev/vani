@@ -385,7 +385,7 @@ RENDER.woerter = function (haupt) {
 
   function baueAlles() { baueSchrank(); baueArbeitskarte(); baueSchuetteln(); }
   baueAlles();
-  inhalt.append(kopf, schrank, arbeitskarte, klangkarte);
+  anfuegen(inhalt, kopf, schrank, arbeitskarte, klangkarte);
 
   /* Funken */
   let funke = neuerFunke(false);

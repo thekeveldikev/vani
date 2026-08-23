@@ -88,7 +88,7 @@ function salonMaler(canvas) {
   }
   function bild(jetzt) {
     if (!laeuft) return;
-    if (document.visibilityState === 'hidden' || (typeof _sr !== 'undefined' && _sr) || (typeof _leser !== 'undefined' && _leser)) { letzte = jetzt; setTimeout(() => requestAnimationFrame(bild), 500); return; }
+    if (document.visibilityState === 'hidden' || (typeof _sr !== 'undefined' && _sr) || (typeof _leser !== 'undefined' && _leser) || (typeof _smOffen !== 'undefined' && _smOffen)) { letzte = jetzt; setTimeout(() => requestAnimationFrame(bild), 500); return; }
     const dt = Math.min(.05, (jetzt - letzte) / 1000 || .016); letzte = jetzt; t += dt;
     if (messen() || !statisch) statisch = maleStatisch();
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(statisch, 0, 0); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -148,8 +148,21 @@ function salonMaler(canvas) {
     if (l > .5) { ctx.fillStyle = 'rgba(235,240,250,' + (.08 * (l - .5) * 2).toFixed(3) + ')'; ctx.fillRect(0, 0, W, H * .6); }
     requestAnimationFrame(bild);
   }
+  /* Wo Kamin und Sessel wirklich liegen — in CSS-Pixeln, damit die Tippflächen darauf passen. */
+  function flaechen() {
+    messen();   /* immer frisch messen, sonst liegen die Flächen auf einem alten Stand */
+    if (!W || !H) return null;
+    const vt = H * .72;
+    const kx = W / 2, kb = Math.min(260, W * .36), kh = Math.min(150, (H - vt) * 1.1), ky = H - kh;
+    const sx = kx - kb / 2 - 110, sy = H - 96;
+    return {
+      kamin: { x: Math.round(kx - kb / 2 - 14), y: Math.round(ky - 10), w: Math.round(kb + 28), h: Math.round(kh + 10) },
+      sessel: sx > 20 ? { x: Math.round(sx), y: Math.round(sy - 34), w: 84, h: 104 } : null
+    };
+  }
   return {
     start() { if (laeuft) return; laeuft = true; letzte = performance.now(); requestAnimationFrame(bild); },
-    stopp() { laeuft = false; }
+    stopp() { laeuft = false; },
+    flaechen
   };
 }

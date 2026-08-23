@@ -15,6 +15,7 @@ try { cpSync(join(wurzel, 'vendor'), join(publicDir, 'vendor'), { recursive: tru
 /* Mitgebrachte Sticker ebenso — der Rettungsraum soll sie auch kennen. */
 try { cpSync(join(wurzel, 'sticker'), join(publicDir, 'sticker'), { recursive: true }); } catch (e) {}
 try { cpSync(join(wurzel, 'autoren'), join(publicDir, 'autoren'), { recursive: true }); } catch (e) {}
+try { cpSync(join(wurzel, 'einlesung'), join(publicDir, 'einlesung'), { recursive: true, filter: (q) => !/einlesung\.json$/.test(q) }); } catch (e) {}
 /* Der frühere Sites-Origin bleibt für die verschlüsselten Pakete erhalten, ist
    aber keine zweite installierbare App mehr. Die echte App liegt als bewusst
    aufrufbarer Rettungsraum am selben Origin, damit alte IndexedDB-Inhalte nicht

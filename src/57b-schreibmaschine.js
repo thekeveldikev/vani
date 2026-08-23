@@ -8,7 +8,7 @@
    (Räume als Orte) und im Spotlight. */
 
 const SM_BREITE = 60;      /* Zeichen je Zeile, dann springt der Wagen */
-const SM_GLOCKE = 8;       /* so viele Zeichen vor dem Rand klingelt es */
+const SM_GLOCKE = 4;       /* so viele Zeichen vor dem Rand klingelt es */
 const SM_BAENDER = [['schwarz', '#1d1d1f'], ['rot', '#9c2a22'], ['blau', '#27406e'], ['gruen', '#2f5a3c']];
 const SM_PAPIERE = [['weiss', 'Weiß'], ['creme', 'Creme'], ['gelb', 'Gelb'], ['kariert', 'Kariert']];
 
@@ -86,11 +86,11 @@ function schreibmaschineKlang(art, einst) {
 /* ----- Die Bühne ----- */
 let _smOffen = null;
 function schreibmaschineOeffnen(startText) {
-  if (_smOffen) return;
+  if (_smOffen && _smOffen.isConnected) return; _smOffen = null;
   const einst = saubereSchreibmaschine(D.einst.schreibmaschine);
   const speichernEinst = () => { D.einst.schreibmaschine = einst; speichereEinst(); };
   let text = typeof startText === 'string' ? startText : '';
-  let abgelegt = false, docId = null, geschriebenSeitAblage = 0;
+  let abgelegt = false, docId = null, geschriebenSeitAblage = 0, warte = [], tickTimer = 0;
   const buehne = el('div', { class: 'sm-buehne', role: 'dialog', 'aria-label': 'Schreibmaschine', 'data-papier': einst.papier, style: '--sm-tinte:' + (SM_BAENDER.find((b) => b[0] === einst.band) || SM_BAENDER[0])[1] });
   const eingabe = el('textarea', { class: 'sm-eingabe', autocapitalize: 'off', autocorrect: 'off', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'Hier tippen' });
   eingabe.value = text;
@@ -108,7 +108,7 @@ function schreibmaschineOeffnen(startText) {
     '<path d="M70 60h460l30 120H40z" fill="url(#smk)"/><path d="M70 60h460" stroke="rgba(255,255,255,.12)" stroke-width="2"/>' +
     '<rect x="120" y="70" width="360" height="28" rx="4" fill="#0f1113"/><text x="300" y="88" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-style="italic" font-size="12" fill="#c9a25a" letter-spacing=".2">VANI · Reiseschreibmaschine</text>' +
     SM_REIHEN.map((reihe, r) => [...reihe].map((c, i) => { const x = 120 + r * 16 + i * 36, y = 112 + r * 18; return '<g class="sm-taste" data-reihe="' + r + '" data-stelle="' + i + '" style="transform-origin:' + x + 'px ' + y + 'px"><circle cx="' + x + '" cy="' + (y + 2) + '" r="8.5" fill="#0b0c0e"/><circle cx="' + x + '" cy="' + y + '" r="8" fill="#e9e2d2" stroke="#1a1d21" stroke-width="1"/><text x="' + x + '" y="' + (y + 3.2) + '" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="8" fill="#1a1d21">' + c + '</text></g>'; }).join('')).join('') +
-    '<g class="sm-taste leer" style="transform-origin:300px 182px"><rect x="190" y="174" width="220" height="10" rx="5" fill="#0b0c0e"/><rect x="190" y="172" width="220" height="10" rx="5" fill="#e9e2d2" stroke="#1a1d21"/></g>' +
+    '<g class="sm-taste leer" style="transform-origin:300px 180px"><rect x="200" y="174" width="200" height="9" rx="4.5" fill="#0b0c0e"/><rect x="200" y="171" width="200" height="9" rx="4.5" fill="#cfc7b6" stroke="#1a1d21"/><rect x="210" y="173" width="180" height="2" rx="1" fill="rgba(255,255,255,.35)"/></g>' +
     '<g class="sm-glocke" style="transform-origin:560px 60px"><path d="M548 60c0-10 6-16 12-16s12 6 12 16z" fill="#e8c27a"/><circle cx="560" cy="62" r="2.5" fill="#e8c27a"/></g>' +
     '</svg>';
   /* Kopfzeile */
@@ -118,25 +118,34 @@ function schreibmaschineOeffnen(startText) {
   const strengKnopf = el('button', { class: 'knopf zart sm-knopf' + (einst.streng ? ' an' : ''), title: 'Wie früher: keine Rücktaste — Fehler bleiben stehen', onclick: (ev) => { einst.streng = !einst.streng; ev.currentTarget.classList.toggle('an', einst.streng); speichernEinst(); toast(einst.streng ? 'Wie früher: Was getippt ist, bleibt. Übertippen mit x.' : 'Die Rücktaste darf wieder.', 2200); } }, 'Wie früher');
   const tonKnopf = el('button', { class: 'knopf zart sm-knopf' + (einst.ton ? ' an' : ''), title: 'Geräusche', onclick: (ev) => { einst.ton = !einst.ton; ev.currentTarget.classList.toggle('an', einst.ton); speichernEinst(); } }, 'Ton');
   const ablegen = () => {
-    const t = text.replace(/\s+$/, '');
-    if (!t.trim()) { toast('Noch nichts getippt.'); return false; }
-    if (docId && D.docs.get(docId)) { const d = D.docs.get(docId); d.text = t; speichere(d); }
-    else { const b = blattAusText('Getippt · ' + fmtDatum(Date.now()), t); docId = b.id; }
-    abgelegt = true; geschriebenSeitAblage = 0; toast('Liegt bei den Blättern.', 1800); return true;
+    try {
+      const t = text.replace(/\s+$/, '');
+      if (!t.trim()) { toast('Noch nichts getippt.'); return false; }
+      if (docId && D.docs.get(docId)) { const d = D.docs.get(docId); d.text = t; speichere(d); }
+      else { const b = blattAusText('Getippt · ' + fmtDatum(Date.now()), t); docId = b.id; }
+      abgelegt = true; geschriebenSeitAblage = 0; toast('Liegt bei den Blättern.', 1800); return true;
+    } catch (e) { toast('Ablegen ging gerade nicht — der Text bleibt hier stehen.'); return false; }
   };
+  const wegraeumen = () => { try { clearTimeout(tickTimer); } catch (e) {} tickTimer = 0; warte = []; try { buehne.remove(); } catch (e) {} _smOffen = null; document.removeEventListener('keydown', escHoerer, true); };
+  let schliesst = false;
   const schliessen = async () => {
-    if (text.trim() && geschriebenSeitAblage > 0) { const ja = await frage('Das Getippte als Blatt ablegen?', { ja: 'Ablegen', nein: 'Verwerfen' }); if (ja) ablegen(); }
-    buehne.remove(); _smOffen = null; document.removeEventListener('keydown', escHoerer, true);
+    if (schliesst) return; schliesst = true;
+    try {
+      if (text.trim() && geschriebenSeitAblage > 0) { const ja = await frage('Das Getippte als Blatt ablegen?', { ja: 'Ablegen', nein: 'Verwerfen' }); if (ja) ablegen(); }
+    } catch (e) {} finally { if (_smOffen === buehne) schliesst = false; }
+    wegraeumen();
   };
   const escHoerer = (ev) => { if (ev.key === 'Escape') { ev.preventDefault(); schliessen(); } };
   const kopf = el('div', { class: 'sm-kopf' },
     el('b', {}, 'Schreibmaschine'), zaehler,
     el('span', { class: 'sm-knoepfe' }, bandKnopf, papierKnopf, strengKnopf, tonKnopf,
-      el('button', { class: 'knopf voll sm-knopf', onclick: () => { if (ablegen() && typeof oeffneSchreibraum === 'function') { /* bleibt offen */ } } }, 'Als Blatt ablegen'),
-      el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Schließen', onclick: schliessen })));
+      el('button', { class: 'knopf voll sm-knopf', onclick: () => { ablegen(); } }, 'Als Blatt ablegen'),
+      el('button', { class: 'knopf zart sm-knopf', onclick: () => { if (ablegen()) { const id = docId; wegraeumen(); if (id && typeof oeffneSchreibraum === 'function') setTimeout(() => oeffneSchreibraum(id), 60); } } }, 'Ablegen & öffnen'),
+      el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Schließen', onclick: () => { schliessen(); } })));
   buehne.append(kopf, halter, maschine, eingabe);
   document.body.append(buehne);
   _smOffen = buehne;
+  try { eingabe.focus({ preventScroll: true }); } catch (e) {}
   document.addEventListener('keydown', escHoerer, true);
 
   /* Zeichnen: Zeilen aus dem Text, die letzte Zeile mit Schreibstelle; Papier fährt so, dass die Stelle unter dem Typenhebel liegt */
@@ -172,38 +181,45 @@ function schreibmaschineOeffnen(startText) {
   const wagenRuecklauf = () => { const w = maschine.querySelector('.sm-wagen'); if (w) { w.classList.remove('faehrt'); void w.getBoundingClientRect(); w.classList.add('faehrt'); setTimeout(() => w.classList.remove('faehrt'), 400); } papier.classList.add('ruecklauf'); setTimeout(() => papier.classList.remove('ruecklauf'), 380); schreibmaschineKlang('wagen', einst); };
   const glocke = () => { const g = maschine.querySelector('.sm-glocke'); if (g) { g.classList.remove('klingelt'); void g.getBoundingClientRect(); g.classList.add('klingelt'); setTimeout(() => g.classList.remove('klingelt'), 600); } schreibmaschineKlang('glocke', einst); };
   /* Eingabe: wir lesen, was dazukam — die Maschine kennt nur Anhängen (und, wenn erlaubt, eine Rücktaste) */
+  /* Eingabe: eine Warteschlange — jedes neue Zeichen wird der Reihe nach „getippt"; `vorher` folgt sofort,
+     damit schnelles Tippen, Einfügen oder Autokorrektur nie doppelt anhängen. */
   let vorher = text;
+  const tick = () => {
+    tickTimer = 0;
+    if (_smOffen !== buehne || !warte.length) return;
+    const c = warte.shift(); text += c; geschriebenSeitAblage++;
+    const zs = schreibmaschineZeilen(text); const spalte = zs[zs.length - 1].length;
+    if (c === '\n') wagenRuecklauf();
+    else { tasteDruecken(c); schreibmaschineKlang(c === ' ' ? 'leer' : 'taste', einst); if (schreibmaschineGlocke(spalte)) glocke(); if (spalte === 0 && zs.length > 1 && c !== ' ') wagenRuecklauf(); }
+    male(true);
+    if (warte.length) tickTimer = setTimeout(tick, 34);
+  };
   eingabe.addEventListener('input', () => {
     const jetzt = eingabe.value;
     if (jetzt.length < vorher.length) {
       if (einst.streng) { eingabe.value = vorher; schreibmaschineKlang('falsch', einst); maschine.classList.add('nein'); setTimeout(() => maschine.classList.remove('nein'), 300); }
-      else { text = jetzt; vorher = jetzt; male(false); }
-      eingabe.setSelectionRange(eingabe.value.length, eingabe.value.length); return;
-    }
-    const neu = jetzt.slice(vorher.length);
-    if (jetzt.slice(0, vorher.length) !== vorher) { /* mitten drin geändert (Autokorrektur o. ä.): wir nehmen den neuen Stand, ohne Theater */ text = jetzt; vorher = jetzt; male(false); eingabe.setSelectionRange(jetzt.length, jetzt.length); return; }
-    let i = 0;
-    const tick = () => {
-      if (i >= neu.length) { vorher = jetzt; return; }
-      const c = neu[i++]; text += c; geschriebenSeitAblage++;
-      const zs = schreibmaschineZeilen(text); const spalte = zs[zs.length - 1].length;
-      if (c === '\n') wagenRuecklauf();
-      else { tasteDruecken(c); schreibmaschineKlang(c === ' ' ? 'leer' : 'taste', einst); if (schreibmaschineGlocke(spalte)) glocke(); if (spalte === 0 && zs.length > 1 && c !== ' ') wagenRuecklauf(); }
-      male(true);
-      if (i < neu.length) setTimeout(tick, 34);
-      else vorher = jetzt;
-    };
-    tick();
-    eingabe.setSelectionRange(jetzt.length, jetzt.length);
+      else { warte = []; text = jetzt; vorher = jetzt; geschriebenSeitAblage++; male(false); schreibmaschineKlang('leer', einst); }
+    } else if (!jetzt.startsWith(vorher)) { warte = []; text = jetzt; vorher = jetzt; male(false); }
+    else { warte.push(...jetzt.slice(vorher.length)); vorher = jetzt; }
+    if (warte.length && !tickTimer) tickTimer = setTimeout(tick, 0);
+    try { eingabe.setSelectionRange(eingabe.value.length, eingabe.value.length); } catch (e) {}
   });
   eingabe.addEventListener('keydown', (ev) => {
     /* Pfeile und Cursorbewegung: die Maschine kennt nur eine Stelle */
     if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(ev.key)) { ev.preventDefault(); }
     if (ev.key === 'Backspace' && einst.streng) { ev.preventDefault(); schreibmaschineKlang('falsch', einst); maschine.classList.add('nein'); setTimeout(() => maschine.classList.remove('nein'), 300); }
   });
-  eingabe.addEventListener('blur', () => { if (_smOffen === buehne) setTimeout(() => { if (_smOffen === buehne && !document.querySelector('.schleier')) eingabe.focus({ preventScroll: true }); }, 120); });
-  halter.addEventListener('click', () => eingabe.focus({ preventScroll: true }));
-  maschine.addEventListener('click', () => eingabe.focus({ preventScroll: true }));
+  /* Kein Fokus-Diebstahl: Knöpfe im Kopf lassen den Fokus im Textfeld (pointerdown ohne Default), sonst verschiebt
+     das iPad beim Einklappen der Tastatur die Fläche unter dem Finger und der Tipp geht verloren. Aufs Papier oder die
+     Maschine tippen holt den Fokus zurück; ohne Fokus zeigt ein Hinweis, wo man tippen muss. */
+  kopf.querySelectorAll('button').forEach((b) => b.addEventListener('pointerdown', (ev) => { if (document.activeElement === eingabe) ev.preventDefault(); }));
+  const fokusHolen = () => { try { eingabe.focus({ preventScroll: true }); eingabe.setSelectionRange(eingabe.value.length, eingabe.value.length); } catch (e) {} };
+  halter.addEventListener('pointerdown', (ev) => { ev.preventDefault(); fokusHolen(); });
+  maschine.addEventListener('pointerdown', (ev) => { ev.preventDefault(); fokusHolen(); });
+  halter.addEventListener('click', fokusHolen); maschine.addEventListener('click', fokusHolen);
+  eingabe.addEventListener('focus', () => buehne.classList.remove('ohne-fokus'));
+  eingabe.addEventListener('blur', () => { if (_smOffen === buehne && !schliesst) buehne.classList.add('ohne-fokus'); });
+  halter.append(el('div', { class: 'sm-fokushinweis' }, 'Tipp aufs Papier, um weiterzuschreiben'));
   male(false);
   setTimeout(() => { eingabe.focus({ preventScroll: true }); eingabe.setSelectionRange(eingabe.value.length, eingabe.value.length); }, 80);
   return buehne;

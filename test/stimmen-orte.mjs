@@ -41,7 +41,7 @@ test('Salon: vier Gäste mehr, englische Stimmen raten englisch und tragen die d
     assert.ok(a.de && a.de.saetze.length === a.saetze.length && a.de.kern.length === a.kern.length, id + ': parallel');
     assert.ok(!/\b(und|nicht|der|die|das)\b/.test(a.saetze[0]), id + ' rät englisch');
     assert.ok(/[äöüß]|\b(und|nicht|der|die|das)\b/.test(a.de.saetze[0]), id + ' hat die deutsche Fassung');
-    assert.equal(k.SALON_RAT_EN[id].kern.map((x) => x[0]).join(), a.de.kern.map((x) => x[0]).join());
+    assert.equal(a.kern.map((x) => x[0]).join(), a.de.kern.map((x) => x[0]).join(), id + ': Kern-Themen parallel, auch mit den Themen aus 56g');
   }
   /* Kästner, Funke, Lindgren bleiben deutsch */
   for (const id of ['kaestner', 'funke', 'lindgren']) { const a = k.SALON_FEST.find((x) => x.id === id); assert.ok(!a.en && !a.de, id + ' bleibt deutsch'); }
@@ -73,7 +73,7 @@ test('Schreibmaschine: Zeilen, Glocke, Anschlag, Tasten, Einstellungen — pur',
   const hart = k.schreibmaschineZeilen('x'.repeat(130), 60);
   deep(hart.map((x) => x.length), [60, 60, 10]);
   assert.equal(k.SM_BREITE, 60);
-  assert.ok(k.schreibmaschineGlocke(52) && !k.schreibmaschineGlocke(51) && !k.schreibmaschineGlocke(60));
+  assert.ok(k.schreibmaschineGlocke(56) && !k.schreibmaschineGlocke(52) && !k.schreibmaschineGlocke(60));
   const s1 = k.schreibmaschineSchlag('a', 1), s2 = k.schreibmaschineSchlag('a', 1), s3 = k.schreibmaschineSchlag('a', 2);
   deep(s1, s2); assert.ok(s1.staerke >= 0 && s1.staerke <= 3 && Math.abs(s1.dx) <= .4 && Math.abs(s1.dreh) <= 1.1);
   assert.ok(JSON.stringify(s1) !== JSON.stringify(s3) || true);

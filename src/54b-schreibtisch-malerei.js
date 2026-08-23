@@ -522,7 +522,7 @@ function schreibtischMaler(canvas, optionen = {}) {
   function bild(jetzt) {
     if (!laeuft) return;
     /* Verdeckt (Schreibraum, Leser) oder Tab im Hintergrund: nicht malen, nur gelegentlich nachsehen */
-    if ((typeof _sr !== 'undefined' && _sr) || (typeof _leser !== 'undefined' && _leser) || (typeof _epub !== 'undefined' && _epub) || document.visibilityState === 'hidden') { letzte = jetzt; setTimeout(() => requestAnimationFrame(bild), 500); return; }
+    if ((typeof _sr !== 'undefined' && _sr) || (typeof _leser !== 'undefined' && _leser) || (typeof _smOffen !== 'undefined' && _smOffen) || (typeof _epub !== 'undefined' && _epub) || document.visibilityState === 'hidden') { letzte = jetzt; setTimeout(() => requestAnimationFrame(bild), 500); return; }
     const dt = Math.min(.05, (jetzt - letzte) / 1000 || .016); letzte = jetzt; t += dt;
     if (messen() || !statisch) statisch = maleStatisch();
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(statisch, 0, 0);

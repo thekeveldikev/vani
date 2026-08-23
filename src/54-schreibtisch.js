@@ -289,7 +289,7 @@ function baueLeuchter(einst, woche) {
   const zeichne_ = () => {
     if (!c.isConnected) { laeuft = false; return; }
     /* Unter Schreibraum oder Leser sieht niemand die Flammen: sparsam weiterlaufen */
-    if ((typeof _sr !== 'undefined' && _sr) || (typeof _leser !== 'undefined' && _leser) || (typeof _epub !== 'undefined' && _epub) || document.visibilityState === 'hidden') { setTimeout(() => requestAnimationFrame(zeichne_), 500); return; }
+    if ((typeof _sr !== 'undefined' && _sr) || (typeof _leser !== 'undefined' && _leser) || (typeof _smOffen !== 'undefined' && _smOffen) || (typeof _epub !== 'undefined' && _epub) || document.visibilityState === 'hidden') { setTimeout(() => requestAnimationFrame(zeichne_), 500); return; }
     phase += .016;
     ctx.clearRect(0, 0, W, H);
     const fuss = 118;

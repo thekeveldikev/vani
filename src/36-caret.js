@@ -111,7 +111,7 @@ function caretImBlick(feld, sanft) {
   feld = feld || document.activeElement;
   if (!feld || !feld.closest) return false;
   /* Der Schreibraum zentriert selbst (Schreibmaschine), der Lesemodus liest nur. */
-  if (feld.closest('.schreibraum')) return false;
+  if (feld.closest('.schreibraum, .sm-buehne')) return false;
   const kasten = caretKasten(feld);
   if (!kasten) return false;
   const halter = caretHalter(feld);

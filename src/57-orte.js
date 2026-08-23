@@ -19,8 +19,9 @@ const ORTE_SPIEGELZEILE = 'Heute: ein Satz reicht.';
    spiegelKamera (die Innenkamera zeigt ein nebliges Spiegelbild, Standard aus), je Raum. Pur. */
 function saubereOrte(roh) {
   const q = roh && typeof roh === 'object' && !Array.isArray(roh) ? roh : {};
-  const o = { an: q.an === true, tueren: q.tueren !== false, geraeusche: q.geraeusche === true, raumklang: q.raumklang === true, bewegung: q.bewegung !== false, spiegelKamera: q.spiegelKamera === true };
+  const o = { an: q.an === true, tueren: q.tueren !== false, geraeusche: q.geraeusche === true, raumklang: q.raumklang === true, bewegung: q.bewegung !== false, spiegelKamera: q.spiegelKamera === true, katzeTon: q.katzeTon !== false };
   o.spiegelZeile = typeof q.spiegelZeile === 'string' ? q.spiegelZeile.replace(/[\r\n]+/g, ' ').slice(0, 60) : ORTE_SPIEGELZEILE;
+  o.katzeName = typeof q.katzeName === 'string' && q.katzeName.trim() ? q.katzeName.replace(/[\r\n]+/g, ' ').trim().slice(0, 24) : (typeof KATZE_STANDARD_NAME !== 'undefined' ? KATZE_STANDARD_NAME : 'Die Katze');
   for (const [id] of ORTE_RAEUME) o[id] = q[id] !== false;
   return o;
 }
@@ -71,18 +72,26 @@ function orteKulisse(raum, haupt) {
       '<rect x="40" y="26" width="300" height="10" rx="3" fill="#c9a25a"/><rect x="40" y="36" width="300" height="3" fill="rgba(0,0,0,.25)"/><g fill="#8a6a2e">' + [70, 130, 190, 250, 310].map((x) => '<circle cx="' + x + '" cy="42" r="4"/><rect x="' + (x - 2) + '" y="42" width="4" height="10"/>').join('') + '</g>' +
       /* Hut */
       '<g ' + T('hut', 'Der Hut nickt. Guten Tag.') + ' style="transform-origin:70px 44px"><path d="M70 50c-18 0-26 14-26 26h52c0-12-8-26-26-26z" fill="#2c2218"/><rect x="36" y="74" width="68" height="6" rx="3" fill="#2c2218"/><path d="M52 68h36" stroke="#8a1c12" stroke-width="3"/></g>' +
-      /* Der blaue Mantel, Detektivschnitt: Kragen, Schulterklappen, Gürtel, zwei Knopfreihen */
-      '<g ' + T('mantel', 'Der Mantel schwingt. Draußen riecht es nach Regen — und nach einem Fall.') + ' style="transform-origin:160px 46px">' +
-      '<path d="M160 52l-26 6-8 54 4 6h60l4-6-8-54z" fill="url(#ortmantel)"/><path d="M134 58l-6 44 2 6 30-4 30 4 2-6-6-44" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1"/>' +
-      '<path d="M148 54l12 14 12-14 6 4-18 18-18-18z" fill="#2a4266"/><path d="M150 55l10 11 10-11" fill="none" stroke="#1a2a44" stroke-width="1.5"/>' +
-      '<rect x="130" y="84" width="60" height="6" fill="#1a2a44"/><rect x="152" y="82" width="14" height="10" rx="2" fill="none" stroke="#c9a25a" stroke-width="1.6"/>' +
-      '<g fill="#c9a25a">' + [70, 78, 96, 104].map((y) => '<circle cx="152" cy="' + y + '" r="1.8"/><circle cx="168" cy="' + y + '" r="1.8"/>').join('') + '</g>' +
-      '<path d="M134 58h12M174 58h12" stroke="#1a2a44" stroke-width="3" stroke-linecap="round"/><path d="M130 116h60" stroke="rgba(0,0,0,.3)" stroke-width="1"/></g>' +
+      /* Der blaue Mantel, Detektivschnitt: langer Trenchcoat am Haken — Revers, Schulterklappen, Sturmpatte, Ärmel, Gürtel mit Schnalle, Taschenpatten, Falten, Saum */
+      '<g ' + T('mantel', 'Der Mantel schwingt. Draußen riecht es nach Regen — und nach einem Fall.') + ' style="transform-origin:130px 44px">' +
+      '<path d="M96 118 L102 60 C106 54 114 52 120 52 L140 52 C146 52 154 54 158 60 L164 118 Z" fill="url(#ortmantel)"/>' +
+      '<path d="M104 64 L100 116 M156 64 L160 116 M118 88 L116 116 M142 88 L144 116 M130 90 V116" stroke="rgba(0,0,0,.22)" stroke-width="1"/>' +
+      '<path d="M120 52 L98 66 L92 112 L102 116 L108 68 Z" fill="#34507a"/><path d="M140 52 L162 66 L168 112 L158 116 L152 68 Z" fill="#34507a"/>' +
+      '<path d="M100 66 L106 64 M160 66 L154 64" stroke="#22365a" stroke-width="1.4"/>' +
+      '<path d="M130 52 L118 72 L122 86 L130 76 L138 86 L142 72 Z" fill="#2a4266"/><path d="M130 52 L118 72 M130 52 L142 72" stroke="#1a2a44" stroke-width="1.2" fill="none"/>' +
+      '<path d="M110 56 L122 52 L130 60 L118 66 Z" fill="#3f5f8e"/><path d="M150 56 L138 52 L130 60 L142 66 Z" fill="#3f5f8e"/>' +
+      '<path d="M104 58 L118 54 M156 58 L142 54" stroke="#1a2a44" stroke-width="2.2" stroke-linecap="round"/><circle cx="118" cy="55" r="1.2" fill="#c9a25a"/><circle cx="142" cy="55" r="1.2" fill="#c9a25a"/>' +
+      '<path d="M140 56 L158 62 L156 74 L140 70 Z" fill="rgba(0,0,0,.12)"/>' +
+      '<rect x="100" y="84" width="60" height="5.5" fill="#1a2a44"/><rect x="125" y="82" width="10" height="9.5" rx="1.5" fill="none" stroke="#c9a25a" stroke-width="1.5"/><path d="M130 82 V91.5" stroke="#c9a25a" stroke-width="1"/>' +
+      '<g fill="#c9a25a"><circle cx="125" cy="70" r="1.6"/><circle cx="135" cy="70" r="1.6"/><circle cx="125" cy="77" r="1.6"/><circle cx="135" cy="77" r="1.6"/><circle cx="125" cy="96" r="1.6"/><circle cx="135" cy="96" r="1.6"/></g>' +
+      '<path d="M104 98 L114 96 L115 101 L105 103 Z M156 98 L146 96 L145 101 L155 103 Z" fill="#2a4266"/>' +
+      '<path d="M96 118 L164 118" stroke="#1a2a44" stroke-width="1.4"/><path d="M98 114 Q130 110 162 114" stroke="rgba(255,255,255,.08)" stroke-width="1" fill="none"/>' +
+      '<path d="M130 52 L130 44" stroke="#1a2a44" stroke-width="1.4"/></g>' +
       /* Schal (bewegt sich) und Jahreszeit am Haken */
       '<path class="ort-schal" d="M244 48c-6 20-2 40 4 60M256 48c6 20 2 40-4 60" stroke="#b0552f" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M240 104l8 6M256 104l-8 6" stroke="#b0552f" stroke-width="2"/>' +
       (jz === 'winter' ? '<g ' + T('zweig', 'Tannenzweig. Es duftet nach Dezember.') + ' style="transform-origin:310px 48px"><path d="M310 48l0 44M310 60l-10-8M310 60l10-8M310 74l-10-8M310 74l10-8M310 86l-8-6M310 86l8-6" stroke="#4a7a46" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="310" cy="52" r="4" fill="#c0392b"/></g>' : jz === 'fruehling' ? '<g ' + T('bluete', 'Die Blüte nickt. Frühling in der Diele.') + ' style="transform-origin:310px 50px"><g fill="#e9a9b8"><circle cx="305" cy="56" r="5"/><circle cx="315" cy="56" r="5"/><circle cx="310" cy="50" r="5"/><circle cx="310" cy="62" r="5"/><circle cx="310" cy="56" r="3" fill="#f2d98a"/></g><path d="M310 64v28" stroke="#4a7a46" stroke-width="2.5"/></g>' : jz === 'sommer' ? '<g ' + T('strohhut', 'Der Strohhut. Riecht nach Heu und Meer.') + ' style="transform-origin:310px 50px"><ellipse cx="310" cy="62" rx="26" ry="7" fill="#d9b463"/><path d="M296 62c0-12 6-18 14-18s14 6 14 18" fill="#e8c878"/><path d="M296 60h28" stroke="#b0352b" stroke-width="3"/></g>' : '<g ' + T('blatt', 'Ein Herbstblatt. Es knistert.') + ' style="transform-origin:310px 50px"><path d="M310 50c-14 6-16 22-4 30 12-8 10-24 4-30z" fill="#c8873a"/><path d="M308 54l-2 26" stroke="#8a4a22" stroke-width="1.2"/></g>') +
       /* Schuhe und Schirmständer */
-      '<g ' + T('schuhe', 'Die Schuhe stehen ordentlich. Fast.') + ' style="transform-origin:150px 118px"><path d="M126 112c0-4 4-6 10-6h10c6 0 8 4 10 6h-30z" fill="#2c2218"/><path d="M150 112c0-4 4-6 10-6h10c6 0 8 4 10 6h-30z" fill="#2c2218" transform="rotate(-6 165 112)"/></g>' +
+      '<g ' + T('schuhe', 'Die Schuhe stehen ordentlich. Fast.') + ' style="transform-origin:200px 118px"><path d="M176 120c0-4 4-6 10-6h10c6 0 8 4 10 6h-30z" fill="#2c2218"/><path d="M200 120c0-4 4-6 10-6h10c6 0 8 4 10 6h-30z" fill="#2c2218" transform="rotate(-6 215 120)"/></g>' +
       '<g ' + T('schirm', 'Der Schirm tropft nicht mehr. Fast.') + ' style="transform-origin:22px 118px"><rect x="10" y="84" width="24" height="34" rx="3" fill="#8a6a3e"/><path d="M22 86v-30" stroke="#2c2218" stroke-width="2.5"/><path d="M12 58c2-8 6-12 10-12s8 4 10 12z" fill="#3b5a86"/><path d="M22 46v-4" stroke="#2c2218" stroke-width="2"/></g>' +
       /* Schlüsselbrett: drei Haken — Haustür, Fahrrad, der Busschlüssel mit Bus-Anhänger */
       '<g ' + T('schluessel', 'Der Busschlüssel klimpert. Wohin fahren wir?') + ' style="transform-origin:410px 30px"><rect x="364" y="28" width="96" height="46" rx="4" fill="#a3783f"/><rect x="368" y="32" width="88" height="38" rx="3" fill="#7a5a2e"/><text x="412" y="41" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-size="6.5" letter-spacing=".2" fill="#f3e7c9">SCHLÜSSEL</text>' +
@@ -93,17 +102,18 @@ function orteKulisse(raum, haupt) {
       /* der Anhänger: ein kleiner Bus */
       '<g transform="translate(433 70)"><rect x="0" y="0" width="15" height="9" rx="2.5" fill="#e8e4da"/><rect x="0" y="0" width="15" height="4.5" rx="2.5" fill="#3b5a86"/><rect x="2" y="1" width="3.5" height="3" rx=".6" fill="#dfe8ee"/><rect x="6.5" y="1" width="3" height="3" rx=".6" fill="#dfe8ee"/><rect x="10.5" y="1" width="3" height="3" rx=".6" fill="#dfe8ee"/><circle cx="7.5" cy="4.8" r="1.6" fill="#e8e4da" stroke="#3b5a86" stroke-width=".6"/><circle cx="3.5" cy="9" r="1.5" fill="#2c2218"/><circle cx="11.5" cy="9" r="1.5" fill="#2c2218"/></g></g></g>' +
       /* Spiegel mit Goldrahmen und einer Zeile, als hätte jemand mit Edding drübergeschrieben */
-      '<g ' + T('spiegel', o.spiegelKamera ? 'Du wischst über den Spiegel. Der Nebel bleibt.' : 'Im Spiegel: jemand, der gleich schreibt.', 'spiegel') + '>' +
+      '<g ' + T('spiegel', null, 'spiegel') + ' style="transform-origin:540px 72px">' +
       '<ellipse cx="540" cy="72" rx="48" ry="58" fill="#d9e0e4"/><ellipse cx="540" cy="72" rx="44" ry="54" fill="url(#ortspiegel)"/>' +
       '<path d="M512 40c8-14 24-20 38-16" stroke="rgba(255,255,255,.7)" stroke-width="3" fill="none" stroke-linecap="round"/>' +
       '<ellipse cx="540" cy="72" rx="48" ry="58" fill="none" stroke="#c9a25a" stroke-width="5"/><ellipse cx="540" cy="72" rx="48" ry="58" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1"/>' +
       '<g fill="#c9a25a"><circle cx="540" cy="12" r="4"/><path d="M532 14c4-6 12-6 16 0" fill="none" stroke="#c9a25a" stroke-width="2"/></g>' +
-      '<text class="ort-edding" x="540" y="66" text-anchor="middle" transform="rotate(-7 540 70)" font-family="\'Marker Felt\', \'Chalkboard SE\', \'Bradley Hand\', \'Segoe Print\', \'Comic Sans MS\', cursive" font-weight="700" font-size="' + (o.spiegelZeile.length > 26 ? 10 : o.spiegelZeile.length > 16 ? 12.5 : 15) + '" fill="#16181a" opacity=".88">' + orteUmbruch(o.spiegelZeile, 18, 3).map((z, i) => '<tspan x="540" dy="' + (i ? 14 : 0) + '">' + orteText(z) + '</tspan>').join('') + '</text>' +
+      (() => { const zl = orteUmbruch(o.spiegelZeile, o.spiegelZeile.length > 30 ? 13 : 11, 4); const fs = zl.length >= 4 ? 9 : zl.length === 3 ? 10.5 : 12; const y0 = 72 - (zl.length - 1) * (fs + 2) / 2 + fs * .35; return '<text class="ort-edding" x="540" y="' + y0.toFixed(1) + '" text-anchor="middle" transform="rotate(-7 540 72)" font-family="\'Marker Felt\', \'Chalkboard SE\', \'Bradley Hand\', \'Segoe Print\', \'Comic Sans MS\', cursive" font-weight="700" font-size="' + fs + '" fill="#16181a" opacity=".88">' + zl.map((z, i) => '<tspan x="540" dy="' + (i ? fs + 2 : 0) + '">' + orteText(z) + '</tspan>').join('') + '</text>'; })() +
+      '<g class="ort-hauch" opacity="0"><ellipse cx="540" cy="100" rx="30" ry="11" fill="rgba(255,255,255,.55)"/><text class="ort-hauch-text" x="540" y="103" text-anchor="middle" font-family="\'Bradley Hand\', \'Segoe Print\', \'Chalkboard SE\', cursive" font-size="8.5" fill="#3a3a44"></text></g>' +
       '</g>' +
       /* Konsole mit Briefen und der Katze darunter */
       '<rect x="620" y="78" width="160" height="8" rx="2" fill="#c9a25a"/><rect x="628" y="86" width="6" height="34" fill="#8a6a2e"/><rect x="766" y="86" width="6" height="34" fill="#8a6a2e"/>' +
       '<g ' + T('briefe', 'Zwei Briefe. Einer davon riecht nach Lavendel.') + ' style="transform-origin:700px 70px"><g transform="rotate(-6 680 64)"><rect x="650" y="58" width="60" height="22" fill="#f1e4c8"/><path d="M650 58l30 14 30-14" fill="none" stroke="#c9a25a" stroke-width="1.5"/></g><g transform="rotate(5 700 66)"><rect x="672" y="62" width="60" height="22" fill="#f6ecd6"/><circle cx="702" cy="73" r="4" fill="#b0552f"/></g></g>' +
-      '<g ' + T('katze', 'Die Katze blinzelt. Und schläft weiter.') + ' style="transform-origin:700px 112px"><ellipse cx="700" cy="112" rx="26" ry="10" fill="#55493f"/><circle cx="722" cy="106" r="8" fill="#55493f"/><path d="M716 100l-2-6 6 3zM728 100l2-6-6 3z" fill="#55493f"/><path class="ort-schwanz" d="M676 112c-10 0-14-8-8-14" fill="none" stroke="#55493f" stroke-width="4" stroke-linecap="round" style="transform-origin:676px 112px"/><path d="M718 108l3 1M726 108l-3 1" stroke="#2c2218" stroke-width="1" stroke-linecap="round"/></g>' +
+      (typeof katzeSVG === 'function' ? katzeSVG(722, 119, katzeZustand(heute.getHours(), (D.stats && D.stats.tage && D.stats.tage[tagKey()]) || 0), o.katzeName) : '') +
       /* Eine kleine Uhr über der Konsole: die Zeiger stimmen */
       '<g ' + T('uhr', 'Tick. Die Uhr geht richtig — ' + heute.getHours() + ':' + String(heute.getMinutes()).padStart(2, '0') + '.') + ' style="transform-origin:700px 30px"><circle cx="700" cy="30" r="17" fill="#f3e7c9" stroke="#8a6a2e" stroke-width="3"/>' + [0, 1, 2, 3].map((i) => '<line x1="' + (700 + 13 * Math.sin(i * Math.PI / 2)) + '" y1="' + (30 - 13 * Math.cos(i * Math.PI / 2)) + '" x2="' + (700 + 10 * Math.sin(i * Math.PI / 2)) + '" y2="' + (30 - 10 * Math.cos(i * Math.PI / 2)) + '" stroke="#2c2218" stroke-width="1.5"/>').join('') +
       '<line x1="700" y1="30" x2="' + (700 + 7 * Math.sin((heute.getHours() % 12 + heute.getMinutes() / 60) * Math.PI / 6)) + '" y2="' + (30 - 7 * Math.cos((heute.getHours() % 12 + heute.getMinutes() / 60) * Math.PI / 6)) + '" stroke="#2c2218" stroke-width="2.2" stroke-linecap="round"/>' +
@@ -122,6 +132,7 @@ function orteKulisse(raum, haupt) {
       chips.append(el('span', { class: 'ort-chip still' }, heuteW ? heuteW + ' Wörter heute' : 'Heute noch kein Wort — die Tasse wartet'));
     } catch (e) {}
     wrap.append(chips);
+    if (typeof katzeBeleben === 'function') katzeBeleben(wrap, o, typeof salonAnrede === 'function' ? salonAnrede() : '');
     if (o.spiegelKamera) orteSpiegelKamera(wrap);
   } else if (r === 'schnipsel') {
     /* Zettelkasten: ein Holzkasten mit sieben Karteireitern — ein Reiter je Tag der letzten Woche */
@@ -344,7 +355,18 @@ function orteKulisse(raum, haupt) {
 const ORTE_TUN = {
   schreibmaschine() { if (typeof schreibmaschineOeffnen === 'function') schreibmaschineOeffnen(); },
   lampe(elm, wrap) { wrap.classList.toggle('licht-aus'); toast(wrap.classList.contains('licht-aus') ? 'Klick. Die Lampe ist aus.' : 'Klick. Die Lampe ist an.', 1400); },
-  spiegel(elm, wrap) { const v = wrap.querySelector('.ort-spiegelbild'); if (v) { v.classList.add('gewischt'); setTimeout(() => v.classList.remove('gewischt'), 2600); } },
+  spiegel(elm, wrap) {
+    const v = wrap.querySelector('.ort-spiegelbild'); if (v) { v.classList.add('gewischt'); setTimeout(() => v.classList.remove('gewischt'), 2600); }
+    /* Ein Hauch auf dem Glas: mit dem Finger geschrieben, verschwindet wieder */
+    const hauch = elm.querySelector('.ort-hauch'), text = elm.querySelector('.ort-hauch-text'); if (!hauch || !text) return;
+    const n = (D.stats && D.stats.tage && D.stats.tage[tagKey()]) || 0;
+    const anrede = typeof salonAnrede === 'function' ? salonAnrede() : '';
+    const zeilen = [anrede ? 'Hallo, ' + anrede + '.' : 'Hallo, du.', n ? n + (n === 1 ? ' Wort' : ' Wörter') + ' heute' : 'noch kein Wort heute', 'Du schaffst das.', 'Schreib’s auf.', 'Nur ein Satz.', new Date().toLocaleDateString('de-DE', { weekday: 'long' }) + '.', 'Ich seh dich.', 'Ganz leise jetzt.'];
+    wrap._hauchI = ((wrap._hauchI || 0) + 1) % zeilen.length;
+    text.textContent = zeilen[wrap._hauchI];
+    hauch.classList.remove('zeigt'); void hauch.getBoundingClientRect(); hauch.classList.add('zeigt');
+    setTimeout(() => hauch.classList.remove('zeigt'), 3600);
+  },
   oben() { const b = vomTyp('blatt').sort((a, b) => (b.geaendert || 0) - (a.geaendert || 0))[0]; if (b) oeffneSchreibraum(b.id); },
   neu() { if (typeof blattAusText === 'function') { const b = blattAusText('', ''); oeffneSchreibraum(b.id); } },
   letzter() { const s = vomTyp('schnipsel').filter((x) => (x.text || '').trim()).sort((a, b) => (b.angelegt || 0) - (a.angelegt || 0))[0]; if (s) oeffneDoc(s); },
@@ -386,8 +408,8 @@ function orteSpiegelKamera(wrap) {
   if (typeof ResizeObserver !== 'undefined') { const ro = new ResizeObserver(() => { if (!wrap.isConnected) { ro.disconnect(); return; } legen(); }); ro.observe(wrap); }
   navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 320 }, height: { ideal: 320 } }, audio: false }).then((strom) => {
     if (!wrap.isConnected) { strom.getTracks().forEach((t) => t.stop()); return; }
-    orteKameraStopp(); _orteStrom = strom; wrap.append(bild); video.srcObject = strom; video.play().catch(() => {}); bild.classList.add('an'); wrap.classList.add('kamera');
-  }).catch(() => { _orteKameraVerweigert = true; bild.remove(); toast('Die Kamera bleibt aus — der Spiegel zeigt dann eben den Nebel.', 3200); });
+    orteKameraStopp(); _orteStrom = strom; if (!bild.isConnected) wrap.append(bild); video.srcObject = strom; video.play().catch(() => {}); bild.classList.add('an'); wrap.classList.add('kamera');
+  }).catch((e) => { if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) _orteKameraVerweigert = true; bild.remove(); toast('Die Kamera bleibt aus — der Spiegel zeigt dann eben den Nebel.', 3200); });
 }
 
 /* Drei Zettel aus dem Kasten — zufällig, nebeneinander. */
@@ -449,6 +471,8 @@ function orteKarte() {
   for (const [id, name] of ORTE_RAEUME) liste.append(zeile(name, null, schalter(() => o[id], (v) => { o[id] = v; })));
   const spiegel = el('input', { type: 'text', maxlength: '60', value: o.spiegelZeile, placeholder: ORTE_SPIEGELZEILE, 'aria-label': 'Zeile auf dem Spiegel' });
   spiegel.addEventListener('change', () => { o.spiegelZeile = spiegel.value.trim() || ORTE_SPIEGELZEILE; speichern(); toast('Steht jetzt auf dem Spiegel.', 1600); });
+  const katzeName = el('input', { type: 'text', maxlength: '24', value: o.katzeName, placeholder: 'Die Katze', 'aria-label': 'Name der Katze' });
+  katzeName.addEventListener('change', () => { o.katzeName = katzeName.value.trim().slice(0, 24) || (typeof KATZE_STANDARD_NAME !== 'undefined' ? KATZE_STANDARD_NAME : 'Die Katze'); speichern(); toast(o.katzeName + ' hört jetzt darauf. Vielleicht.', 1800); });
   return el('div', { class: 'karte' },
     zeile('Räume als Orte', 'Jeder Raum bekommt eine Kulisse und eine Haut: Diele, Zettelkasten, Papierstapel, Lesetisch mit Schreibmaschine, Korkwand, Küchentisch, Setzkasten, Musikzimmer, Telefonbank, Werkzeugkasten. Alles bleibt bedienbar wie vorher — nur schöner. Vieles darin reagiert, wenn man es antippt.', schalter(() => o.an, (v) => { o.an = v; liste.classList.toggle('aus', !v); })),
     zeile('Kleine Bewegungen', 'Dampf steigt, der Schal wiegt, die Katze zuckt mit dem Schwanz. Aus, wenn es ruhig sein soll.', schalter(() => o.bewegung, (v) => { o.bewegung = v; })),
@@ -456,6 +480,8 @@ function orteKarte() {
     zeile('Ein leises Geräusch dazu', 'Ein Klick wie ein Türgriff — und ein Tick, wenn man etwas antippt.', schalter(() => o.geraeusche, (v) => { o.geraeusche = v; })),
     zeile('Raumklang', 'Je Ort ein leiser Grundton (Diele: die Uhr, Zettelkasten: Café, Korkwand: Kamin …). Laute eigene Mischungen bleiben unangetastet.', schalter(() => o.raumklang, (v) => { o.raumklang = v; })),
     el('div', { class: 'einstellzeile orte-spiegelzeile' }, el('span', { class: 'ename' }, 'Mit Edding auf dem Spiegel', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Die Zeile, die in der Diele über den Spiegel gekritzelt ist. Schreib deine eigene.')), spiegel),
+    el('div', { class: 'einstellzeile orte-spiegelzeile' }, el('span', { class: 'ename' }, 'Wie die Katze heißt', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Sie liegt unter der Konsole in der Diele. Antippen, halten, streicheln.')), katzeName),
+    zeile('Die Katze macht Geräusche', 'Echtes Miauen und Schnurren, leise.', schalter(() => o.katzeTon, (v) => { o.katzeTon = v; })),
     zeile('Der Spiegel zeigt dich', 'Die Innenkamera malt ein nebliges, weich umrandetes Spiegelbild in den Dielenspiegel. Nur auf diesem Gerät, nur während du in der Diele bist — nichts wird gespeichert oder gesendet. Einmal erlauben, dann bleibt es.', schalter(() => o.spiegelKamera, (v) => { o.spiegelKamera = v; _orteKameraVerweigert = false; if (!v) orteKameraStopp(); })),
     liste,
     el('div', { style: 'font-size:12px;color:var(--blass);margin-top:8px' }, 'Schreibtisch und Salon sind immer Orte — sie sind dafür gebaut.'));

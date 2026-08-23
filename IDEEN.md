@@ -467,3 +467,17 @@ Vorhandenem auf; danach B (Hefte) und der Rest.
 - Korkwand: Fotos aus der Mediathek als Polaroids, Kalender zeigt Schreibtage als kleine Kreuze.
 - Setzkasten: Andruck als echtes Druckbild (Blatt „Andruck vom …" ablegen).
 - Salon: Rat vorlesen in der Originalsprache (Stimme je Sprache), „Briefwechsel" als fortlaufendes Heft.
+
+## Umgesetzt in 5.27 (23. August 2026)
+- Die Autoren haben „splitternd" gelesen (Stand 22.08.2026) und sprechen darüber: Werke, Figuren, Orte,
+  Begriffe, Lieblingssätze, Fragen an die Autorin — je Stimme eigene Notizen, englische auf Englisch.
+- Dazu die lebendige Kenntnis: Was gerade auf dem Gerät liegt, wird selbst ausgewertet (Figuren, Orte,
+  Begriffe, Sätze) und beantwortet Fragen mit Belegstellen zum Antippen.
+- Katze in der Diele mit echten Geräuschen, Trenchcoat, Spiegel-Hauch; Schreibmaschine repariert.
+
+## Runde 5 (nach 5.27) — was noch käme
+- Die Einlesung auffrischen: „Neu einlesen" liest den aktuellen Stand und schreibt eine neue Notiz je Stimme.
+- Figurenkarten aus der Kenntnis: eine Person antippen → alle Stellen, alle Begleiter, ein Zeitstrahl.
+- Briefwechsel mit einer Stimme über ein bestimmtes Werk („Schreib mir über DREAMER") als fortlaufendes Heft.
+- Der Salon merkt sich, worüber schon gesprochen wurde, und knüpft daran an („Letztes Mal ging es um Kay …").
+- Zwei Stimmen streiten über eine Figur — Runde mit Widerspruch statt Reihum.

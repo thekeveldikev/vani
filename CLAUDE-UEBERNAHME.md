@@ -1984,3 +1984,131 @@ Browser: alle zehn Kulissen gerendert (Overlay-Probe), Tippen auf Mantel → Toa
 aus, Schreibmaschine tippt vier Zeilen mit Glocke, Twain rät englisch mit Übersetzung, „Setz dich"
 über dem gemalten Sessel, Blätter als liniertes Papier, Küchentisch mit Zetteln, Kistenformular
 mit Randwahl.
+
+## 35. Die Wand liest mit: Einlesung, Kenntnis, Gespräch (23. August 2026, VANI 5.27.0)
+
+### Die Kenntnis (`src/56e-salon-kenntnis.js`)
+- `kenntnisSammeln(docs, {statsTage})` gewinnt aus den eigenen Texten auf dem Gerät (Blätter,
+  Heftseiten, Szenen, Schnipsel) **Figuren, Schauplätze, Begriffe, Sätze, Werke, Zahlen** —
+  ohne Wörterbuch, rein aus Stellung im Satz: Figuren stehen groß, ohne Artikel davor, neben
+  Verben („sagte", „nickte" und alles auf -te), begleiten andere Namen, tragen Genitive
+  („Vals" zählt zu „Val"); Schauplätze folgen zweimal einem artikellosen „nach/in/aus/durch/
+  bei"; Begriffe sind oft, groß und ungewöhnlich. Kleinschreibung an anderer Stelle im Text
+  schließt einen Namen aus (`hast/Hast`). Auf 118.776 Wörtern echtem Material dauert das
+  ~300 ms und findet die richtigen Leute.
+- `kenntnisFrage(k, frage)` liest eine Frage: Absicht (wer/wo/zahl/stelle/erster/werke/wann/
+  figuren/begriffe/saetze) und das Wesen, um das es geht; `kenntnisSaetze` trennt Sätze,
+  `kenntnisSignatur` merkt den Stand (Cache in `salonKenntnis()`).
+- **Nichts davon verlässt das Gerät.**
+
+### Das Gespräch (`src/56f-salon-gespraech.js`)
+- `GESPRAECH_STIMMEN` / `GESPRAECH_DE`: je Stimme zwölf Mustergruppen (gruss, figur, figurFrage,
+  ort, begriff, satz, zahl, werke, wann, liste, unbekannt, leer, ausEinlesung) — englische
+  Stimmen englisch, deutsche Fassung Muster für Muster parallel (gleicher Index).
+- `gespraechAntwort(autor, antwort, k, {anrede, saat})` baut daraus die Antwort: Muster + Fakten
+  aus den eigenen Texten (Zahl der Nennungen, Werk, erste Nennung, Begleiter, häufigstes Verb)
+  + ein Handwerkshinweis aus den Zahlen (redet viel/kaum, immer allein, immer dasselbe Verb,
+  wandert durch mehrere Werke) + eine Frage der Stimme + **Belegstellen** aus dem eigenen Text,
+  die man antippen kann. Gleiche Saat → gleiche Antwort, in beiden Sprachen dasselbe Muster.
+
+### Die Einlesung (`src/56d-salon-einlesung.js`)
+- Festgehalten: **Stand 22. August 2026, „splitternd", 118.776 Wörter, zehn Werke.** Die Wand
+  hat gelesen: `EINLESUNG_WERKE` (Form, Ton, Inhalt je Werk), `EINLESUNG_FIGUREN` (≈40 Leute mit
+  Kurzporträt und Details), `EINLESUNG_ORTE`, `EINLESUNG_BEGRIFFE`, `EINLESUNG_STELLEN`.
+- `EINLESUNG_STIMMEN`: je Stimme **Gruß, sechs bis sieben Beobachtungen, fünf Fragen an die
+  Autorin, der Satz, den sie behalten hat (mit Begründung), und acht Figurennotizen** — in ihrer
+  Sprache, mit deutscher Fassung bei den englischen Stimmen. Beispiel: King über die Schnürsenkel,
+  Kästner über Herrn Reum, Funke über Hope, Rothfuss über Jemmys Handschuhe, Pratchett über
+  Bobby Ferran, Lindgren über Theos Schuhe, Tolkien über Reysvard, Blyton über Clark, Paolini
+  über Jakes Prämisse, Twain über Mr. Humble.
+- `einlesungFigur/Notiz/Ort/Begriff/StimmenZu` und `einlesungFrage(text)` — damit beantwortet die
+  Wand auch Fragen zu Figuren, die (noch) nicht auf dem Gerät liegen, ohne Zahlen zu erfinden
+  (`ausEinlesung`-Muster je Stimme).
+
+### Im Salon
+- Neuer Reiter **„Deine Welten"** im Sprechfenster (`salonWeltenSeite`): Stand der Einlesung,
+  Gruß, und fünf Unterreiter — *Was mir auffiel* (Beobachtungen + Lieblingssatz), *Deine Leute*
+  (Figurenchips → Einlesungskarte + Notiz der Stimme + „so oft kommt sie in deinen Texten vor" +
+  „dazu haben auch … etwas gesagt"), *Deine Werke*, *Fragen an dich* (tippen legt ein Blatt an),
+  *Jetzt gerade* (lebendige Kenntnis: Chips für Figuren/Orte/Begriffe/Zahlen/Werke + freies
+  Fragefeld).
+- Die **Runde** (Frage an die ganze Wand) antwortet aus dem Material, sobald die Frage es berührt.
+- Salonklang ist jetzt **standardmäßig aus** und hat einen Schalter im Kopf (`salonTonAn`,
+  `D.einst.salonTon`); neuer Knopf „Wie die Wand dich nennt" (`D.einst.salonAnrede`,
+  `salonAnrede()` fällt auf den Profilnamen zurück).
+- `SALON_UEBER` (56g) hat je Stimme einen vierten Absatz: worauf sie beim Lesen deiner Seiten achtet.
+
+### Die Katze (`src/57c-katze.js`)
+- Rotgetigert, gezeichnet mit Ohren, Schnurrhaaren, Pfoten, Schwanz; Zustand aus Uhrzeit und
+  Tagespensum (`katzeZustand`). Antippen führt durch blinzeln → schnurren → strecken → putzen →
+  miauen → einrollen (`katzeNaechsteTat`, `katzeSatz`), Halten streichelt sie (Herzen, Schnurren,
+  Dauer wird gemeldet), wache Augen folgen dem Zeiger, Ohren zucken, Schlaf-z steigen auf.
+  **Echte Geräusche**: `klang/katze-miau.wav` (CC0, freemaster2) und `klang/katze-schnurr.wav`
+  (CC BY-SA 4.0, Pangea1962), gekürzt und mono gewandelt, Quellen in `klang/quellen.json`;
+  abschaltbar (`orte.katzeTon`), Name einstellbar (`orte.katzeName`).
+
+### Diele, Spiegel, Schreibmaschine, Fehler
+- **Mantel**: aus dem Uniform-Rechteck ist ein Trenchcoat geworden (Revers, Schulterklappen,
+  Sturmpatte, Ärmel, Gürtel mit Schnalle, Taschenpatten, Falten, Saum).
+- **Spiegel**: die Edding-Zeile bricht jetzt in bis zu vier Zeilen und wird nie abgeschnitten;
+  der Tipp bewegt Rahmen **und** Glas (die Gruppe hat einen eigenen Ursprung) und haucht das Glas
+  an — mit wechselnden Zeilen, die aus Anrede, Wörtern des Tages und Wochentag entstehen.
+- **Schreibmaschine**: Bühne von z-index 320 auf **90** (Rückfrage und Toasts lagen darunter und
+  waren unsichtbar — das war der „Aufhänger"); Eingabe läuft über eine **Warteschlange** statt
+  einer Timerkette je Ereignis (kein doppelter Text mehr, Timer wird beim Schließen gelöscht);
+  Löschen ist wieder erlaubt (außer „wie früher"); Glocke erst vier Zeichen vor dem Rand; die
+  weiße Leiste unten war die Leertaste — jetzt Teil der Maschine; Fokus wird nicht mehr gestohlen
+  (kein blur→focus-Kreis), Hinweis „Tipp aufs Papier"; neuer Knopf **„Ablegen & öffnen"**;
+  `schliesst`-Sperre wird zurückgesetzt, `_smOffen` heilt sich, wenn die Bühne verschwand.
+- Weitere Funde aus dem Audit behoben: Katzenschnurren wurde nie gestoppt; Kerzen-, Tisch- und
+  Salonmaler laufen unter der Schreibmaschine nicht weiter; `36-caret.js` misst die unsichtbare
+  Maschinen-Textarea nicht mehr; `zeigeDeck` gibt den Fokus zurück; „Los" in der Sitzung hat ein
+  Fangnetz; die Dielen-Kamera sperrt nur noch bei echter Verweigerung; `frage` im Salon war von
+  einem Eingabefeld verdeckt (umbenannt).
+- **Hefte, Projekte, Cluster, Kisten und Bücher öffnen nicht mehr als leeres Blatt** im
+  Schreibraum, sondern in ihrem Raum (`oeffneSchreibraum` leitet weiter) — der Text war da,
+  nur nicht sichtbar.
+
+Tests 173/173 (neu `test/kenntnis.mjs`: Kenntnis pur, Gespräch je Stimme in beiden Sprachen,
+Über-Texte/Themen/Aufgabenkategorien). Browser geprüft: Einlesung in allen Reitern, Fragen zu
+Theo/Victorio/Hope/Reysvard/ES IST RICHTIG/splitternd/DREAMER, Schreibmaschine tippen → schließen
+→ ablegen → wieder öffnen, Katze mit Ton, Lautsprecher oben links, Spiegelzeile vollständig.
+
+### Nachtrag zu §35: versiegelt, lernfähig, entklemmt
+
+**Die Einlesung liegt nicht im Quelltext.** `src/56d-salon-einlesung.js` enthält nur noch Code:
+Umschlag holen (`einlesung/umschlag.json` — Datum und Zahl der Werke, sonst nichts), entsiegeln
+(`einlesungEntsiegeln`), im `kv`-Speicher dieses Geräts merken (`einlesungAusSpeicher`,
+`einlesungBereit`), vergessen (`einlesungVergessen`) und nachschlagen (`einlesungFigur`,
+`einlesungNotiz`, `einlesungOrt`, `einlesungBegriff`, `einlesungStimmenZu`, `einlesungFrage`).
+Der Inhalt steht verschlüsselt in `einlesung/einlesung.enc` (AES-256-GCM, PBKDF2-SHA-256,
+200 000 Runden, Format `VANIEINL1` + Salz + IV + Chiffrat) — im öffentlichen Repo also Rauschen.
+Erzeugt mit `node werkzeug/einlesung-versiegeln.mjs [Passwort]` aus `einlesung/einlesung.json`,
+das per `.gitignore` **lokal bleibt**. Im Salon zeigt „Deine Welten" ohne Passwort nur den
+Umschlag mit dem Knopf „Umschlag öffnen"; danach ist alles da, auch nach dem Neuladen.
+
+**Dazulernen** (`src/56h-salon-lernen.js`): `lesungStand(k)` macht aus der Kenntnis einen
+zählbaren Stand (Wörter, Texte, Werke, Figuren mit Häufigkeit, Orte, Begriffe — kein Text),
+`lesungVergleich(alt, neu)` findet neue Werke, neue Namen, neue Orte, neue Begriffe, gewachsene
+Texte und Figuren, die lauter geworden sind; `lesungFaellig` sagt, ab wann sich Nachlesen lohnt
+(1500 Wörter, ein neues Werk oder zwei neue Namen). `salonNachlesen()` hält den Unterschied als
+Dokument vom Typ `lesung` fest (Sanitizer in 30-core) und lässt jede Stimme zwei Sätze dazu sagen
+(`lesungNotiz`, englische Stimmen englisch). Im Reiter **Chronik** stehen die große Lesung, alle
+Nachlesungen mit dem, was diese Stimme damals gesagt hat, und — wenn etwas dazugekommen ist —
+„Jetzt nachlesen lassen". Die Lesungen reisen mit Sicherung und Kopplung mit.
+
+**Behoben:** `.append(null)` schrieb das Wort „null" in die Seite (Rat mit fehlender Übersetzung,
+Reiterzeile, Salonwand ohne offene Briefe, Wörterraum). Dafür gibt es jetzt `anfuegen(ziel, …)`
+neben `el()` in 30-core, das null und false überspringt. Die Tippflächen für **Sessel und Kamin**
+kommen jetzt vom Maler selbst (`salonMaler().flaechen()` rechnet aus, wo die Möbel wirklich
+stehen) und werden per ResizeObserver nachgeführt — kein Raten mehr in CSS. Die **19 Themen**
+im Rat-Reiter stehen in einer Zeile mit „+ n Themen" zum Aufklappen.
+
+**Nachrecherchiert** (56g): Rothfuss (sieben Jahre schreiben, zwei Jahre Absagen, Wettbewerb),
+King (die geretteten Seiten, 2.500 Dollar Vorschuss), Blyton (zwei Zeigefinger, „Kinoleinwand im
+Kopf", roter Schal, ein Buch in fünf Tagen), Tolkien (die leere Seite in den Prüfungsarbeiten),
+Pratchett (achtzig Kilo Erz, Lehmofen, Donnerkeil-Eisen), Paolini (Abschluss mit fünfzehn, drei
+Jahre bis zum Selbstverlag, Hiaasen, Guinness-Rekord).
+
+Tests 177/177 (neu `test/lernen.mjs`: Stand/Vergleich/Fälligkeit, Notizen je Stimme, versiegelte
+Einlesung bleibt leer und bricht nichts, `anfuegen` überspringt null).

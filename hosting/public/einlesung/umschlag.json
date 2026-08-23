@@ -1,0 +1,9 @@
+{
+ "fassung": 1,
+ "datei": "einlesung/einlesung.enc",
+ "runden": 200000,
+ "stand": "2026-08-22",
+ "werke": 10,
+ "stimmen": 10,
+ "hinweis": "Versiegelt. Die App fragt einmal nach dem Passwort und merkt sich den Inhalt dann auf dem Gerät."
+}
