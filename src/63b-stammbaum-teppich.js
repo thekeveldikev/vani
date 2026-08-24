@@ -1252,6 +1252,9 @@ function teppichBand(k, x, y, baum, treffer, i, neu) {
     if (!zug) return;
     const s = zug; zug = null;
     g.classList.remove('zieht', 'spinnt');
+    /* Der Zugfaden MUSS weg, bevor gesucht wird, wo der Finger liegt — sonst
+       findet elementFromPoint ihn selbst und nicht den Namen darunter. Genau
+       daran brach das Fadenspinnen ab. */
     teppichZugfadenWeg();
     try { g.releasePointerCapture(ev.pointerId); } catch (e) {}
     if (s.faden && s.gezogen) {

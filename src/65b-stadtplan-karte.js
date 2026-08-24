@@ -367,10 +367,10 @@ function planSVG(plan, g, neu) {
     gUmland.append(kv('path', { d: kpfad(w.ecken, true), class: 'kt-waldgrund', fill: welt.gruendunkel }));
     /* Bäume als kleine Kronen darauf */
     const mitte = [(w.ecken[0][0] + w.ecken[2][0]) / 2, (w.ecken[0][1] + w.ecken[2][1]) / 2];
-    for (let t = 0; t < 7; t++) {
+    for (let t = 0; t < 9; t++) {
       const u = planZufall(plan.saat, 'wtu' + w.n + t), v = planZufall(plan.saat, 'wtv' + w.n + t);
-      const p = bilinear(w.ecken, 0.12 + u * 0.76, 0.12 + v * 0.76);
-      gUmland.append(kv('circle', { cx: kz(p[0]), cy: kz(p[1]), r: kz(3.4 + planZufall(plan.saat, 'wtr' + w.n + t) * 2.2), class: 'kt-baum' }));
+      const p = bilinear(w.ecken, 0.1 + u * 0.8, 0.1 + v * 0.8);
+      gUmland.append(planBaum(p[0], p[1], 3.2 + planZufall(plan.saat, 'wtr' + w.n + t) * 2.4, welt));
     }
   }
   for (const h of g.umland.hoefe) {
@@ -405,18 +405,17 @@ function planSVG(plan, g, neu) {
       planUferstriche(gWasser, g.wasser.polygone[0], true, welt, 1);
     }
   }
-  /* Wellenstriche im offenen Wasser — kurze, versetzte Striche, wie sie
-     jeder Kupferstecher gesetzt hat, damit Wasser nach Wasser aussieht. */
+  /* Punktierung in der Tiefe: wo die Uferstriche schon ausgelaufen sind,
+     bleibt kein leeres Blau, sondern ein feines Korn. */
   if (g.wasser.art !== 'keins') {
-    let wellen = '';
-    for (let i = 0; i < 260; i++) {
-      const x = planZufall(plan.saat, 'wex' + i) * G;
-      const y = planZufall(plan.saat, 'wey' + i) * G;
+    let korn = '';
+    for (let i = 0; i < 900; i++) {
+      const x = planZufall(plan.saat, 'kx' + i) * G;
+      const y = planZufall(plan.saat, 'ky' + i) * G;
       if (!g.wasser.drin(x, y)) continue;
-      const b = 7 + planZufall(plan.saat, 'web' + i) * 9;
-      wellen += ' M ' + kz(x - b) + ' ' + kz(y) + ' q ' + kz(b / 2) + ' -2.2 ' + kz(b) + ' 0 q ' + kz(b / 2) + ' 2.2 ' + kz(b) + ' 0';
+      korn += ' M ' + kz(x) + ' ' + kz(y) + ' h .01';
     }
-    gWasser.append(kv('path', { d: wellen.trim(), class: 'kt-welle' }));
+    gWasser.append(kv('path', { d: korn.trim(), class: 'kt-wasserkorn' }));
   }
   svg.append(gWasser);
 
@@ -459,7 +458,7 @@ function planSVG(plan, g, neu) {
     if (h.sonder === 'kirche') { gHaeuser.append(planKirche(h, welt)); continue; }
     const toene = welt.daecher || [welt.dach];
     gHaeuser.append(kv('path', {
-      d: kpfad(h.ecken, true),
+      d: kpfad(h.umriss || h.ecken, true),
       class: 'kt-haus' + (h.gross ? ' gross' : ''),
       fill: h.gross ? welt.dachdunkel : toene[h.ton % toene.length]
     }));
@@ -472,7 +471,7 @@ function planSVG(plan, g, neu) {
     if (b.sonder === 'garten') {
       for (let t = 0; t < 9; t++) {
         const p = bilinear(b.ecken, 0.16 + planZufall(plan.saat, 'gu' + b.i + b.j + t) * 0.68, 0.16 + planZufall(plan.saat, 'gv' + b.i + b.j + t) * 0.68);
-        gGruen.append(kv('circle', { cx: kz(p[0]), cy: kz(p[1]), r: kz(3 + planZufall(plan.saat, 'gr' + b.i + b.j + t) * 2), class: 'kt-baum' }));
+        gGruen.append(planBaum(p[0], p[1], 3 + planZufall(plan.saat, 'gr' + b.i + b.j + t) * 2.2, welt));
       }
     } else if (b.sonder === 'friedhof') {
       for (let t = 0; t < 12; t++) {
@@ -585,20 +584,32 @@ function planPunktAus(svg, ev) {
 
 /* Uferstriche: Linien, die dem Ufer folgen und nach außen blasser werden.
    Das älteste Mittel der Kartografie, um Wasser als Wasser zu zeigen. */
+/* Uferstriche — das älteste und schönste Mittel der Kartografie.
+   Nicht drei Linien in großem Abstand, sondern ZWÖLF: dicht am Ufer eng
+   beieinander, nach außen immer weiter auseinander und immer blasser. Sie
+   füllen die Wasserfläche, ohne sie zuzudecken — und erst dadurch sieht
+   Wasser nach Wasser aus statt nach blauem Papier. */
 function planUferstriche(g, linie, geschlossen, welt, richtung) {
   const n = linie.length;
-  for (let s = 1; s <= 3; s++) {
-    const abstand = s * 7 * richtung;
+  let abstand = 0;
+  for (let s = 1; s <= 12; s++) {
+    /* Der Abstand wächst — wie bei einem Stein, der ins Wasser fällt. */
+    abstand += 3.2 + s * 1.15;
     const versetzt = [];
     for (let i = 0; i < n; i++) {
       const vor = linie[(i - 1 + n) % n], nach = linie[(i + 1) % n];
       const dx = nach[0] - vor[0], dy = nach[1] - vor[1];
       const len = Math.sqrt(dx * dx + dy * dy) || 1;
-      versetzt.push([linie[i][0] - (dy / len) * abstand, linie[i][1] + (dx / len) * abstand]);
+      /* Die Striche werden nach außen unruhiger — die Hand wird lockerer. */
+      const zittern = Math.sin(i * 0.7 + s * 1.3) * s * 0.34;
+      const weit = (abstand + zittern) * richtung;
+      versetzt.push([linie[i][0] - (dy / len) * weit, linie[i][1] + (dx / len) * weit]);
     }
     g.append(kv('path', {
       d: kweich(versetzt, geschlossen), class: 'kt-uferstrich',
-      stroke: welt.wasserrand, 'stroke-opacity': (0.42 - s * 0.1).toFixed(2)
+      stroke: welt.wasserrand,
+      'stroke-width': (1.4 - s * 0.05).toFixed(2),
+      'stroke-opacity': (0.92 * Math.pow(1 - s / 14, 1.15)).toFixed(3)
     }));
   }
 }
@@ -809,6 +820,24 @@ function planRandwerk(welt, zuschnitt) {
   return g;
 }
 
+/* Ein Baum, wie ihn ein Stecher setzt: eine Krone aus drei Bögen und ein
+   Stämmchen. Ein Kreis ist ein Kreis; das hier ist ein Baum. */
+function planBaum(x, y, r, welt) {
+  const g = kv('g', { class: 'kt-baumzeichen', transform: 'translate(' + kz(x) + ' ' + kz(y) + ')' });
+  g.append(kv('path', {
+    d: 'M 0 ' + kz(r * 1.1) + ' V ' + kz(r * 0.35),
+    class: 'kt-baumstamm'
+  }));
+  g.append(kv('path', {
+    d: 'M ' + kz(-r) + ' ' + kz(r * 0.3) +
+      ' q ' + kz(-r * 0.3) + ' ' + kz(-r * 0.9) + ' ' + kz(r * 0.45) + ' ' + kz(-r * 1.05) +
+      ' q ' + kz(r * 0.4) + ' ' + kz(-r * 0.7) + ' ' + kz(r * 1.1) + ' 0' +
+      ' q ' + kz(r * 0.75) + ' ' + kz(r * 0.15) + ' ' + kz(r * 0.45) + ' ' + kz(r * 1.05) + ' Z',
+    class: 'kt-baumkrone', fill: welt.gruendunkel
+  }));
+  return g;
+}
+
 /* ----- Hügel -----
    Eine Kuppe, dazu Schraffurstriche, die vom Kamm nach unten laufen. Wo die
    Stadt ist, wächst kein Hügel; wo Wasser ist, auch nicht. */
@@ -940,7 +969,7 @@ function planDefs(plan, welt, papier) {
   /* Das Wasser wird nach außen tiefer. */
   const tiefe = kv('linearGradient', { id: 'kt-tiefe', x1: '0', y1: '0', x2: '.7', y2: '1' });
   tiefe.append(kv('stop', { offset: '0%', 'stop-color': welt.wasser }));
-  tiefe.append(kv('stop', { offset: '100%', 'stop-color': welt.wasserrand }));
+  tiefe.append(kv('stop', { offset: '100%', 'stop-color': welt.wasser, 'stop-opacity': .78 }));
   defs.append(tiefe);
   /* Die Vignette: zu den Ecken hin wird das Papier dunkler, als hätte es
      Jahre in einer Mappe gelegen. */

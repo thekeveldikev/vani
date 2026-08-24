@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.40.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.41.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -146,6 +146,11 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   das erzeugt die ungleichen Blockgrößen einer gewachsenen Stadt. Gespeichert wird nur die Saat plus
   Marken und eigene Namen. Karte hängt an `flaeche.dataset.sig` (planSignatur); Marken liegen in einer
   eigenen Ebene und werden für sich aufgetragen.
+- **5.41** Der Kartentisch visuell überarbeitet: helles Wasser mit ZWÖLF ausklingenden Uferstrichen
+  (statt drei) plus Punktierung — die Fläche entsteht aus Linien, nicht aus Blau. Häuser mit Handstrich
+  (zitternde Ecken, abgeschnittene Ecken, Winkelbauten), Bäume als Zeichen statt Kreise, Strichstärken
+  gestaffelt wie in einem Kupferstich. Behoben: das Fadenspinnen im Wandteppich brach immer ab, weil der
+  Zugfaden selbst unter dem Finger lag und der Treffertest ihn statt des Namens darunter fand.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

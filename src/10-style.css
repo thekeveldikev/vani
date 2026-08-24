@@ -6321,3 +6321,52 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 .kt-torname { font-size: 12.5px; letter-spacing: .12em; }
 .kt-markenname { font-size: 13px; letter-spacing: .05em; }
 .kt-marke.wichtig .kt-markenname { font-size: 15.5px; letter-spacing: .09em; }
+
+/* ===================== DIE KARTE ALS STICH =====================
+   Ein Kupferstich hat eine Ordnung der Strichstärken: die Küste und die
+   Mauer tragen das Bild und sind schwer, die Blöcke stehen dazwischen, und
+   alles Texturhafte ist Haarstrich. Vorher war alles gleich dick — deshalb
+   sah nichts wichtig aus. */
+.kt-ufer { stroke-width: 3.2; }
+.kt-uferstrich { stroke-linecap: round; }
+.kt-wasserkorn {
+  fill: none; stroke: var(--kpapier); stroke-width: 1.4; stroke-opacity: .28;
+  stroke-linecap: round;
+}
+.kt-welle { display: none; }
+
+.kt-block { stroke-width: 1; stroke-opacity: .22; }
+.kt-haus { stroke-width: 1.15; stroke-opacity: .85; }
+.kt-haus.gross { stroke-width: 1.35; }
+.kt-haeuser { filter: drop-shadow(1.4px 1.9px 0 rgba(50,36,20,.32)); }
+
+.kt-mauer { stroke-width: 8.5; }
+.kt-mauerzinnen { stroke-width: 3; stroke-dasharray: 3.5 5.5; }
+.kt-turm { stroke-width: 2.4; }
+.kt-tor { stroke-width: 2.4; }
+
+.kt-feld, .kt-waldgrund { stroke-width: .8; stroke-opacity: .26; }
+.kt-baumstamm { stroke: var(--ktinte); stroke-width: 1; stroke-opacity: .7; fill: none; stroke-linecap: round; }
+.kt-baumkrone { stroke: var(--ktinte); stroke-width: .9; stroke-opacity: .72; stroke-linejoin: round; }
+.kt-baum { display: none; }
+
+/* Die Straßen: das Netz trägt, also darf die Kontur kräftig sein. */
+.kt-strassekante { stroke-opacity: .9; }
+
+/* Der Rahmen ist der Abschluss — er darf der schwerste Strich sein. */
+.kt-randlinie { stroke-width: 3.2; stroke-opacity: .85; }
+.kt-randlinie.innen { stroke-width: 1.1; stroke-opacity: .55; }
+
+/* Das Wasser ist hell, die Uferstriche tragen es. Vorher war es ein blauer
+   Block, auf dem die feinen Striche verschwanden — jetzt ist es eine Fläche
+   aus Linien, wie in einem Kupferstich. */
+.kt-wasserkorn { stroke: var(--ktinte); stroke-opacity: .2; stroke-width: 1.2; }
+.kt-uferstrich { stroke-linecap: round; }
+.kt-ufer { stroke-width: 2.6; stroke-opacity: .9; }
+
+/* Der Zugfaden darf den Treffertest nicht abfangen: er liegt genau unter dem
+   Finger, und elementFromPoint fand ihn statt des Namens darunter. Genau
+   daran brach das Fadenspinnen jedes Mal ab. */
+.tep-zugfaden { pointer-events: none; }
+/* Dasselbe für alles andere, was nur Zierrat ist. */
+.tep-grate, .tep-striche, .tep-laub, .tep-grundsaum, .tep-holzrand { pointer-events: none; }

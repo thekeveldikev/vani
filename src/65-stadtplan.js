@@ -40,42 +40,42 @@ function planPapier(id) { return PLAN_PAPIERE.find((p) => p[0] === id) || PLAN_P
 const PLAN_FARBWELTEN = [
   {
     id: 'tinte', name: 'Tinte und Bütten', papier: 'buetten',
-    wasser: '#9fb6bd', wasserrand: '#6f8b95', gruen: '#b9c4a0', gruendunkel: '#93a37b',
+    wasser: '#dfe8e7', wasserrand: '#5b7a84', gruen: '#b9c4a0', gruendunkel: '#93a37b',
     dach: '#c98a63', dachdunkel: '#a86a48', mauer: '#e4d9c0', strasse: '#efe7d4',
     daecher: ['#cf9068', '#c1815c', '#b87553', '#a86a48', '#d69a72'],
     tinte: '#3a3428', tintezart: 'rgba(58,52,40,.42)', gold: '#a8843c'
   },
   {
     id: 'moos', name: 'Moos und Kupfer', papier: 'leinen',
-    wasser: '#8fa9a6', wasserrand: '#5f7d7a', gruen: '#a6b48c', gruendunkel: '#7f8f66',
+    wasser: '#dce5e2', wasserrand: '#4e6d6a', gruen: '#a6b48c', gruendunkel: '#7f8f66',
     dach: '#7d9184', dachdunkel: '#5e7166', mauer: '#ded9c6', strasse: '#eeeadb',
     daecher: ['#849889', '#77897c', '#6b7d71', '#5e7166', '#8fa294'],
     tinte: '#2f382f', tintezart: 'rgba(47,56,47,.4)', gold: '#8f7a3e'
   },
   {
     id: 'rost', name: 'Rost und Sand', papier: 'pergament',
-    wasser: '#a3b0a6', wasserrand: '#75857a', gruen: '#bfbb8a', gruendunkel: '#9a9668',
+    wasser: '#e3e6d9', wasserrand: '#64766b', gruen: '#bfbb8a', gruendunkel: '#9a9668',
     dach: '#b5563c', dachdunkel: '#8f3f2c', mauer: '#e6d5ac', strasse: '#f0e4c4',
     daecher: ['#bd6044', '#b5563c', '#a94e35', '#9a452e', '#c76d4c'],
     tinte: '#40301f', tintezart: 'rgba(64,48,31,.42)', gold: '#b08334'
   },
   {
     id: 'see', name: 'Seekarte', papier: 'seekarte',
-    wasser: '#a8bcc4', wasserrand: '#77939e', gruen: '#c2c3a2', gruendunkel: '#9ba07d',
+    wasser: '#dee7ea', wasserrand: '#5f7f8b', gruen: '#c2c3a2', gruendunkel: '#9ba07d',
     dach: '#9a8468', dachdunkel: '#77644c', mauer: '#e0dcc2', strasse: '#eeead2',
     daecher: ['#a38d70', '#9a8468', '#8e7a5f', '#816d54', '#ab967a'],
     tinte: '#334049', tintezart: 'rgba(51,64,73,.4)', gold: '#96702f'
   },
   {
     id: 'nacht', name: 'Nacht und Laternen', papier: 'nacht',
-    wasser: '#1b3040', wasserrand: '#2b4a5e', gruen: '#26372c', gruendunkel: '#1a2820',
+    wasser: '#22323e', wasserrand: '#7ea3b4', gruen: '#26372c', gruendunkel: '#1a2820',
     dach: '#5d4a3c', dachdunkel: '#42342a', mauer: '#3a4150', strasse: '#39414e',
     daecher: ['#66523f', '#5d4a3c', '#544235', '#4a392e', '#6f5a45'],
     tinte: '#d9cfae', tintezart: 'rgba(217,207,174,.34)', gold: '#e0b46a'
   },
   {
     id: 'winter', name: 'Winter', papier: 'leinen',
-    wasser: '#c3ced4', wasserrand: '#93a4ad', gruen: '#c8cec2', gruendunkel: '#a4ada0',
+    wasser: '#e8eef1', wasserrand: '#7f939e', gruen: '#c8cec2', gruendunkel: '#a4ada0',
     dach: '#8d8f97', dachdunkel: '#6e7078', mauer: '#eceadf', strasse: '#f6f3e8',
     daecher: ['#95979f', '#8d8f97', '#84868e', '#7a7c84', '#9da0a8'],
     tinte: '#3b414a', tintezart: 'rgba(59,65,74,.36)', gold: '#8a7c56'
@@ -551,6 +551,12 @@ function planStadt(plan, wasser) {
         if (wasser.drin(ecken[0][0], ecken[0][1]) || wasser.drin(ecken[2][0], ecken[2][1])) continue;
         haeuser.push({
           ecken,
+          /* Der Umriss ist NICHT das Viereck: er ist von Hand nachgezogen,
+             mit zitternden Ecken, und manchmal fehlt eine Ecke oder es ist
+             ein Winkelbau. Ein Kartenblatt aus lauter exakten Rechtecken
+             sieht aus wie ein Diagramm; erst die Ungenauigkeit macht daraus
+             eine Zeichnung. */
+          umriss: planHausUmriss(ecken, saat, k),
           /* Jedes Dach einen eigenen Ton. Alle gleich rot sah aus wie ein
              Diagramm; fünf Abstufungen machen daraus ein Dachmeer. */
           ton: planHash(saat, 'dt' + k) % 5,
@@ -659,6 +665,56 @@ function planTrockeneWege(punkte, wasser, geschlossen) {
   }
   if (jetzt.length > 1) stuecke.push({ punkte: jetzt, geschlossen: false });
   return stuecke;
+}
+
+/* ----- Der Umriss eines Hauses -----
+   Vier Ecken sind ein Rechteck. Ein Haus auf einer gestochenen Karte hat
+   aber einen Rücksprung, eine abgeschnittene Ecke, einen Hof — und keine
+   Kante ist ganz gerade. Genau das wird hier gebaut, gerechnet aus der Saat,
+   damit dasselbe Haus immer dieselbe Schiefe hat. */
+function planHausUmriss(ecken, saat, k) {
+  const zittern = (p, i) => [
+    p[0] + planStreu(saat, 'hz' + k + '_' + i) * 0.9,
+    p[1] + planStreu(saat, 'hy' + k + '_' + i) * 0.9
+  ];
+  const wuerfel = planZufall(saat, 'hf' + k);
+  const [a, b, c, d] = ecken;
+
+  /* Ein Winkelbau: hinten fehlt ein Viertel — dort liegt der Hof. */
+  if (wuerfel > 0.82) {
+    const ecke = planHash(saat, 'hw' + k) % 4;
+    const t = 0.42 + planZufall(saat, 'ht' + k) * 0.16;
+    const ring = [a, b, c, d];
+    const raus = [];
+    for (let i = 0; i < 4; i++) {
+      if (i !== ecke) { raus.push(ring[i]); continue; }
+      const vor = ring[(i + 3) % 4], nach = ring[(i + 1) % 4];
+      raus.push([vor[0] + (ring[i][0] - vor[0]) * (1 - t), vor[1] + (ring[i][1] - vor[1]) * (1 - t)]);
+      raus.push([
+        ring[i][0] - (ring[i][0] - vor[0]) * t - (ring[i][0] - nach[0]) * t,
+        ring[i][1] - (ring[i][1] - vor[1]) * t - (ring[i][1] - nach[1]) * t
+      ]);
+      raus.push([ring[i][0] + (nach[0] - ring[i][0]) * t, ring[i][1] + (nach[1] - ring[i][1]) * t]);
+    }
+    return raus.map(zittern);
+  }
+
+  /* Eine abgeschnittene Ecke — das Haus steht schräg an der Gasse. */
+  if (wuerfel > 0.66) {
+    const ecke = planHash(saat, 'he' + k) % 4;
+    const t = 0.24 + planZufall(saat, 'hs' + k) * 0.16;
+    const ring = [a, b, c, d];
+    const raus = [];
+    for (let i = 0; i < 4; i++) {
+      if (i !== ecke) { raus.push(ring[i]); continue; }
+      const vor = ring[(i + 3) % 4], nach = ring[(i + 1) % 4];
+      raus.push([vor[0] + (ring[i][0] - vor[0]) * (1 - t), vor[1] + (ring[i][1] - vor[1]) * (1 - t)]);
+      raus.push([ring[i][0] + (nach[0] - ring[i][0]) * t, ring[i][1] + (nach[1] - ring[i][1]) * t]);
+    }
+    return raus.map(zittern);
+  }
+
+  return ecken.map(zittern);
 }
 
 /* ===================== DAS UMLAND =====================
