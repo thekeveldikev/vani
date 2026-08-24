@@ -71,7 +71,9 @@ function tischzitatStoert(element, szene) {
   const flaeche = zr.width * zr.height;
   /* Auch die anderen Saetze zaehlen: zwei Kerben uebereinander sind
      unleserlich - und im Holz gibt es kein Uebereinander. */
-  for (const d of szene.querySelectorAll('.desk-ding, .desk-ding-halter, .desk-korb, .desk-schublade, .desk-zitat, .desk-ritzen')) {
+  /* Auch die Kleinigkeiten der Jahreszeit zaehlen dazu: sie liegen im
+     selben Holz und duerfen einander so wenig ueberdecken wie die Saetze. */
+  for (const d of szene.querySelectorAll('.desk-ding, .desk-ding-halter, .desk-korb, .desk-schublade, .desk-zitat, .desk-ritzen, .desk-jzlose')) {
     if (d === element) continue;
     const dr = d.getBoundingClientRect();
     if (!dr.width || !dr.height) continue;
@@ -163,7 +165,7 @@ function tischzitatHindernisse(szene, ausser) {
   const sr = szene.getBoundingClientRect();
   if (!sr.width || !sr.height) return [];
   const raus = [];
-  for (const d of szene.querySelectorAll('.desk-ding, .desk-ding-halter, .desk-korb, .desk-schublade, .desk-fensterknopf, .desk-zitat')) {
+  for (const d of szene.querySelectorAll('.desk-ding, .desk-ding-halter, .desk-korb, .desk-schublade, .desk-fensterknopf, .desk-zitat, .desk-jzlose')) {
     if (d === ausser) continue;
     const r = d.getBoundingClientRect();
     if (!r.width || !r.height) continue;

@@ -6547,3 +6547,38 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 .tep-zugfaden { pointer-events: none; }
 /* Dasselbe für alles andere, was nur Zierrat ist. */
 .tep-grate, .tep-striche, .tep-laub, .tep-grundsaum, .tep-holzrand { pointer-events: none; }
+
+/* ============================================================
+   WAS ZUR JAHRESZEIT GEHÖRT (54f)
+   Das Stück steht auf der Fensterbank, zwischen Teelichtern und
+   Wetterglas. Die Kleinigkeiten liegen IM Holz — unter allem,
+   wie die geritzten Sätze.
+   ============================================================ */
+.desk-ding.jahreszeit {
+  left: 38%; top: calc(44% - 88px); width: 64px; height: 88px; z-index: 3;
+  filter: drop-shadow(0 5px 7px rgba(0,0,0,.55));
+  transition: transform .3s cubic-bezier(.2,.9,.3,1), filter .3s;
+}
+.desk-ding.jahreszeit .jz-bild { position: absolute; inset: 0; display: block; }
+.desk-ding.jahreszeit .jz-bild svg { display: block; }
+.desk-jzlose {
+  position: absolute; z-index: 1; width: 26px; height: 26px; pointer-events: none;
+  left: calc(5% + var(--jx, .5) * 82%); top: calc(47% + var(--jy, .5) * 44%);
+  transform: translate(-50%, 0) rotate(var(--jd, 0deg));
+  opacity: .82; filter: drop-shadow(0 2px 3px rgba(0,0,0,.5));
+}
+.desk-jzlose .jz-bild { display: block; width: 100%; height: 100%; }
+.desk-szene .desk-ding.jahreszeit.tritt-auf { animation-delay: calc(var(--n, 0) * .05s + .1s); }
+@media (hover: hover) and (pointer: fine) {
+  .desk-ding.jahreszeit:hover { transform: translateY(-3px) scale(1.05); filter: drop-shadow(0 8px 12px rgba(0,0,0,.6)) brightness(1.06); }
+}
+@media (max-width: 760px) {
+  .desk-ding.jahreszeit { left: 34%; width: 50px; height: 70px; top: calc(44% - 70px); }
+  .desk-jzlose { width: 20px; height: 20px; }
+}
+.jz-vorschau { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+.jz-vorschaubild { width: 46px; height: 62px; flex: none; display: block; opacity: .9; }
+.jz-vorschaubild svg { display: block; }
+.jz-vorschau b { display: block; font-size: 14px; }
+.jz-vorschau small { color: var(--blass); font-size: 12.5px; }
+@media (prefers-reduced-motion: reduce) { .desk-ding.jahreszeit { transition: none; } }

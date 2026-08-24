@@ -99,3 +99,30 @@ test('Ein Bildverweis ist eine Kennung — auch wenn ein Objekt hineingeriet', a
   /* Dasselbe gilt fuer die anderen Verweise */
   assert.equal(k.sauberesDokument({ id: 'b4', typ: 'seite', skizze: { id: 'm-9' }, angelegt: 1, geaendert: 1 }).skizze, 'm-9');
 });
+
+test('Jahreszeiten: zwölf Monate, jeder mit einem eigenen Stück', async () => {
+  const k = await frisch();
+  /* Alle zwölf sind da und vollständig — keiner fällt in ein Loch. */
+  for (let m = 1; m <= 12; m++) {
+    const d = k.JAHRESZEIT_DEKO[m];
+    assert.ok(d, 'Monat ' + m + ' fehlt');
+    assert.ok(d.name && d.was && d.satz, 'Monat ' + m + ': Name, Sache und Satz');
+    assert.ok(d.stueck.startsWith('<svg') && d.stueck.includes('</svg>'), 'Monat ' + m + ': ein ganzes Bild');
+    assert.ok(Array.isArray(d.lose) && d.lose.length >= 1, 'Monat ' + m + ': mindestens eine Kleinigkeit');
+    for (const l of d.lose) assert.ok(l.startsWith('<svg'), 'Monat ' + m + ': Kleinigkeit ist ein Bild');
+  }
+  /* Der echte Monat entscheidet — nicht die Jahreszeit. */
+  assert.equal(k.jahreszeitMonat({}, Date.UTC(2026, 9, 14)), 10, 'Oktober');
+  assert.equal(k.jahreszeitDeko({}, Date.UTC(2026, 9, 14)).name, 'Oktober');
+  assert.equal(k.jahreszeitDeko({}, Date.UTC(2026, 3, 2)).name, 'April');
+  assert.equal(k.jahreszeitDeko({}, Date.UTC(2026, 11, 24)).name, 'Dezember');
+  /* Wer eine feste Jahreszeit gewählt hat, bekommt deren Mitte — sonst
+     hätte die Wahl am Schreibtisch hier keine Wirkung. */
+  assert.equal(k.jahreszeitMonat({ jahreszeit: 'winter' }, Date.UTC(2026, 6, 1)), 1);
+  assert.equal(k.jahreszeitMonat({ jahreszeit: 'herbst' }, Date.UTC(2026, 6, 1)), 10);
+  assert.equal(k.jahreszeitMonat({ jahreszeit: 'echt' }, Date.UTC(2026, 6, 1)), 7, 'echt heißt: der echte Monat');
+  /* Standardmäßig an, abschaltbar */
+  assert.equal(k.jahreszeitAn(undefined), true);
+  assert.equal(k.jahreszeitAn({ jahreszeitDeko: false }), false);
+  assert.equal(k.jahreszeitAn({ jahreszeitDeko: true }), true);
+});

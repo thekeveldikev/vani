@@ -316,17 +316,26 @@ test('Jede Farbwelt ist vollständig', async () => {
 test('Ein großer Plan wird schnell genug gebaut', async () => {
   const k = await frisch();
   const p = plan(k, { stadt: { groesse: 'metropole', alter: 'uralt', wasser: 'fluss', dichte: 1.6 } });
-  /* Zweimal bauen und das schnellere nehmen: der erste Lauf zahlt das
-     Aufwärmen mit, und wenn die Maschine nebenher etwas anderes tut,
-     kippte der Test — einmal 644 ms, einmal 957. Eine Zeitmessung, die
-     mal grün und mal rot ist, sagt nichts; sie kostet nur Vertrauen. */
-  let dauer = Infinity, g = null;
-  for (let lauf = 0; lauf < 2; lauf++) {
-    const start = Date.now();
-    g = k.planBauen(p);
-    dauer = Math.min(dauer, Date.now() - start);
-  }
-  assert.ok(dauer < 900, 'unter einer Sekunde: ' + dauer + ' ms für ' + g.stadt.haeuser.length + ' Häuser');
+  /* Eine feste Millisekundenzahl misst die Maschine, nicht den Bau. In einer
+     parallel laufenden Prüfreihe ist sie deshalb wertlos: derselbe Rechner ist
+     mal frei und mal voll, und der Test war mal grün und mal rot.
+
+     Gemessen wird stattdessen das VERHÄLTNIS zu einem kleinen Plan im selben
+     Lauf. Das sagt, worum es wirklich geht: ob der Bau mit der Größe aus dem
+     Ruder läuft. Fünfundvierzigmal so viele Häuser kosten etwa siebzehnmal so
+     viel Zeit — der Bau skaliert also besser als linear. Wird daraus je ein
+     quadratisches Verhalten, schlägt das hier an, egal wie schnell die
+     Maschine gerade ist. */
+  const messe = (was) => { let t = Infinity; for (let i = 0; i < 2; i++) { const s = Date.now(); k.planBauen(was); t = Math.min(t, Date.now() - s); } return t; };
+  const klein = plan(k, { stadt: { groesse: 'dorf', alter: 'jung', wasser: 'keins', dichte: 1 } });
+  const tk = Math.max(1, messe(klein));
+  const tg = messe(p);
+  const g = k.planBauen(p);
+  const gk = k.planBauen(klein);
+  const haeuserMehr = g.stadt.haeuser.length / Math.max(1, gk.stadt.haeuser.length);
+  assert.ok(tg < tk * 40, 'der Bau läuft nicht aus dem Ruder: ' + (tg / tk).toFixed(1) + '× die Zeit für ' + haeuserMehr.toFixed(1) + '× die Häuser');
+  /* Und ein grober Deckel, der eine Endlosschleife trotzdem fängt. */
+  assert.ok(tg < 4000, 'und bleibt in jedem Fall im Rahmen: ' + tg + ' ms');
   assert.ok(g.stadt.haeuser.length > 200, 'und es ist wirklich viel: ' + g.stadt.haeuser.length);
 });
 

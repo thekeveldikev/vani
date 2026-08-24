@@ -32,6 +32,7 @@ function saubererSchreibtisch(roh) {
     unordnung: begrenze(q.unordnung, 0, 1, .7),
     verse: q.verse !== false,
     zitatModus: TISCHZITAT_MODI.some(([id]) => id === q.zitatModus) ? q.zitatModus : (q.verse === false ? 'nichts' : 'gefunden'),
+    jahreszeitDeko: q.jahreszeitDeko !== false,
     blaetterModus: TISCHBLATT_MODI.some(([id]) => id === q.blaetterModus) ? q.blaetterModus : 'vani',
     blaetter: saubereTischblattWahl(q.blaetter),
     uhrTickt: q.uhrTickt === true,
@@ -500,7 +501,8 @@ function schreibtischSignatur() {
   const tag = schreibtischTag();
   const fund = schreibtischFundfoto();
   return JSON.stringify([
-    e.holz, e.kerzen, e.wetterFolgtKlang, e.unordnung, e.verse, e.zitatModus, e.blaetterModus, (e.blaetter || []).join(','), e.uhrTickt, e.kerzenGewechselt, e.federKratzt, e.offenesBuch, e.tageszeit, e.jahreszeit,
+    e.holz, e.kerzen, e.wetterFolgtKlang, e.unordnung, e.verse, e.zitatModus, e.blaetterModus, (e.blaetter || []).join(','),
+    e.jahreszeitDeko !== false, typeof jahreszeitMonat === 'function' ? jahreszeitMonat(e) : 0, e.uhrTickt, e.kerzenGewechselt, e.federKratzt, e.offenesBuch, e.tageszeit, e.jahreszeit,
     e.wetterFolgtKlang ? schreibtischWetter() : 'still', D.einst.tagesziel, tag.heute, tag.serie,
     /* Ohne die geritzten Saetze bliebe der Tisch stehen, wenn einer dazukommt
        oder verschwindet — und die Klinge liefe nie. */
@@ -670,6 +672,9 @@ RENDER.schreibtisch = function (haupt) {
   /* Der Kalender: was in den Geschichten geschieht, mit Datum */
   if (typeof baueTischkalender === 'function') { try { dinge.append(baueTischkalender()); } catch (x) {} }
 
+  /* Was zur Jahreszeit gehoert: auf der Fensterbank und im Holz */
+  if (typeof jahreszeitenBauen === 'function') { try { jahreszeitenBauen(dinge, e); } catch (x) {} }
+
   /* Zitate auf der Platte: gefundene, geritzte oder beides */
   if (typeof tischzitateBauen === 'function') { try { tischzitateBauen(dinge, e, () => zeichne()); } catch (x) {} }
 
@@ -733,6 +738,7 @@ function schreibtischEinrichten(danach) {
     /* Diese beiden Abschnitte legen sofort fest, statt nur vorzuschauen —
        deshalb wandert das Ergebnis auch in `alt`. Sonst nimmt das Schliessen
        des Kastens die Wahl wieder zurueck. */
+    typeof jahreszeitEinstellung === 'function' ? jahreszeitEinstellung(e, () => { Object.assign(alt, e); if (danach) danach(); }) : null,
     typeof tischblattEinstellung === 'function' ? tischblattEinstellung(e, () => { Object.assign(alt, e); if (danach) danach(); }) : null,
     typeof tischzitatEinstellung === 'function' ? tischzitatEinstellung(e, () => { Object.assign(alt, e); if (danach) danach(); }, () => zu()) : null,
     zeile('Die Feder kratzt', 'Ein leises Kratzen beim Tippen auf dem eingespannten Blatt.', schalter(() => e.federKratzt, (v) => { e.federKratzt = v; })),
