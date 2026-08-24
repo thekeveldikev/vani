@@ -601,3 +601,169 @@ zusammenhält. Danach sortiert:
 3. **Der Landkartentisch** — die Stadtpläne bekommen ein Land.
 4. **Das Wappenbuch** — die Heraldik liegt fertig da und wartet.
 5. **Der Sprachenschmied** — er macht alle anderen Werkzeuge besser.
+
+---
+
+## Werkzeuge, nicht Verwaltung — Brainstorm (nach 5.45)
+
+Der Kartentisch und der Wandteppich sind zwei verschiedene **Instrumente**,
+keine zwei Karteikästen. Was sie gemeinsam haben, lohnt sich auszusprechen,
+weil daran alles Weitere hängt:
+
+- Man gibt wenig hinein und bekommt viel heraus.
+- Was herauskommt, ist ein **Gegenstand**, kein Formular — etwas, das man
+  anschauen mag, ausdrucken könnte, verschenken würde.
+- Es ist ein Stück **aus** der Geschichte, keine Notiz **über** sie.
+- Man findet darin etwas, das man nicht hineingelegt hat.
+- Es ist gerechnet, nicht gewürfelt: dieselbe Saat, dasselbe Ding.
+
+Danach sortiert gibt es **fünf Arten von Instrument**. Der Kartentisch und
+der Wandteppich sind beide von der ersten Art — die anderen vier sind noch
+gar nicht besetzt.
+
+---
+
+### I. Instrumente, die eine WELT sichtbar machen
+
+*(Kartentisch und Wandteppich stehen hier.)*
+
+**Die Sternwarte.** Ein gerechneter Himmel — Sterne nach Helligkeit, die
+Ekliptik als Band, alles gestochen wie eine alte Himmelskarte. Und dann
+zieht man selbst die Linien: ein Sternbild entsteht dadurch, dass ein
+Mensch beschließt, dass zwischen diesen sieben Punkten ein Reiher ist.
+Jedes bekommt einen Namen und eine Sage, die man dazuschreibt.
+
+Der eigentliche Trick kommt danach: der Himmel **dreht sich übers Jahr**.
+Damit lässt sich fragen, welches Zeichen zur Wintersonnenwende über der
+Stadt steht — und wer darunter geboren ist. Das hängt am Kalender, den es
+schon gibt, und es macht aus einem Bild ein Werkzeug.
+
+**Das Herbarium.** Erfundene Pflanzen und Tiere, gestochen wie in einem
+Naturalienwerk: Umriss, Blatt, Same, Maßstabsleiste. Zu jedem ein Name,
+ein Nutzen und ein Aberglaube. Welten leben an solchen Kleinigkeiten —
+„das Kraut, das man kaut, wenn man lügt“ ist mehr Weltenbau als drei
+Seiten Geschichte eines Königreichs.
+
+**Die Wunderkammer.** Ein Schrank im Schrank: Gegenstände auf Borden,
+jeder mit seiner Karte — was es ist, woher es kam, wer es haben will.
+Nicht als Liste, sondern als Regal, das man ansieht.
+
+**Das Stundenbuch.** Wie in dieser Welt ein Tag geteilt wird und ein Jahr:
+Stunden mit eigenen Namen, Feiertage, Namenstage, wann der Fluss zufriert.
+Ein Blatt, aus dem jede Szene ihre Tageszeit und ihren Himmel bekommt.
+
+---
+
+### II. Instrumente, die die FORM einer Geschichte sichtbar machen
+
+Hier ist nichts. Und hier läge das Nützlichste.
+
+**Der Webstuhl.** Die Handlungsstränge als das, was sie heißen: Fäden.
+Jeder Nebenstrang eine Farbe, waagerecht über die Kapitel gespannt. Wo
+zwei Fäden sich **kreuzen**, ist eine Szene, in der beide Stränge
+aufeinandertreffen. Wo ein Faden acht Kapitel lang schlaff hängt, sieht
+man es sofort — und genau das sieht man in einem Manuskript sonst nie.
+
+Und weil VANI den Text selbst hat, kann es die Kreuzungen **finden**: wo
+zwei Figuren in derselben Szene vorkommen, kreuzen sich ihre Fäden von
+allein. Man webt nicht von Hand, man sieht zu, wie das Gewebe entsteht,
+und greift ein, wo es dünn wird. Dasselbe Bild wie beim Wandteppich,
+angewandt auf die Handlung statt auf die Familie.
+
+**Der Spannungsbogen.** Man zeichnet mit dem Finger die Kurve, die man
+sich vorstellt — hier zieht es an, hier atmet es. Darunter legt VANI, was
+es am Text wirklich misst: Szenenlänge, Satzlänge, wie viel Rede, wie viel
+Beschreibung. **Der Abstand zwischen der gewollten und der gemessenen
+Kurve ist die ganze Auskunft.** So etwas gibt es sonst nirgends.
+
+**Die Märchenmaschine.** Propps einunddreißig Funktionen als Karten, die
+man in eine Reihe legt: Verbot, Übertretung, Schädigung, Aufbruch, die
+Prüfung, der falsche Held, die Entlarvung. Man wählt die Züge, VANI legt
+das Gerüst — strukturell tragfähig und vollkommen leer. Gefüllt wird von
+Hand. Für ein Märchen im Märchen, für eine Sage, die eine Figur erzählt,
+für den Fall, dass die Handlung klemmt.
+
+---
+
+### III. Instrumente, die DINGE aus der Geschichte herstellen
+
+**Die Druckerei.** Ein Steckbrief. Ein Anschlag am Rathaus. Ein
+Theaterzettel. Eine Zeitungsspalte. Ein Schiffsverzeichnis. Ein
+Ladenschild. Man schreibt den Text — VANI **setzt** ihn: Schriftgrad,
+Zierleisten, Holzschnitt-Initiale, das Papier vergilbt, die Falz. Was
+herauskommt, hängt man an die Wand, und plötzlich ist die Geschichte ein
+Ort, aus dem etwas herausgefallen ist.
+
+**Die Briefmappe.** Briefe in der Hand einer Figur — jede Figur ein
+eigenes Papier, eine eigene Tinte, eine eigene Schräge, ein eigenes
+Siegel. Und ein Briefwechsel als das, was er ist: zwei Stapel, die
+einander antworten, mit Zeit dazwischen.
+
+**Das Totenbuch.** Grabsteine. Zwei Zeilen für ein ganzes Leben — als
+Schreibübung so hart wie kaum etwas, als Gegenstand ein Friedhof, durch
+den man gehen kann. Der Wandteppich weiß schon, wer wann starb; es fehlt
+nur der Stein.
+
+**Das Notenblatt.** Eine Weise aus der Welt: eine Melodielinie in
+gestochener Notation, darunter der Text. Man muss dafür nichts von Musik
+verstehen — Tongeschlecht und Takt wählen genügt, den plausiblen Rest
+rechnet VANI. Balladen tragen Geschichten weiter, und eine Strophe, die
+eine Figur singt, ist mehr wert als ein Absatz Erklärung.
+
+---
+
+### IV. Instrumente, die zu Entscheidungen ZWINGEN
+
+**Das Orakel.** Ein Kartendeck, das man selbst baut: jede Karte ein Bild,
+ein Name, eine Bedeutung — und eine zweite Bedeutung, wenn sie verkehrt
+herum liegt. Dann legt man für eine Szene: *Was steht im Weg. Was hilft.
+Was niemand sieht.*
+
+Der Sinn ist nicht Wahrsagerei, sondern Zwang. Ein zufälliger Anstoß aus
+**deinen eigenen** Zeichen bricht eine Blockade besser als jeder fremde
+Vorschlag, weil er schon zur Geschichte gehört. Dass es dabei ein schöner
+Gegenstand ist, macht es erst zum Werkzeug.
+
+**Die Würfeltrommel.** Kein Zufallsgenerator mit fremden Wörtern, sondern
+eine Maschine, die man selbst füllt: Schlitze für *Wer? Wo? Was steht im
+Weg? Was macht es schlimmer?* — mit den eigenen Figuren, den eigenen
+Orten. Dann zieht man am Hebel.
+
+**Der Traumdeuter.** Bilder, die nicht logisch zusammenpassen, sondern
+gefühlsmäßig. Für Traumszenen, für das Unbewusste einer Figur, für die
+Stelle, an der eine Geschichte kippen muss und man nicht weiß, wohin.
+
+---
+
+### V. Instrumente, die dem eigenen TEXT zuhören
+
+**Die Stimmenprobe.** Denselben Satz drei Figuren in den Mund legen und
+nebeneinander sehen. Nicht generiert — **selbst geschrieben**, dreimal,
+untereinander. VANI misst danach den Unterschied: Satzlänge, Wortlänge,
+Fremdwörter, Füllwörter. Wenn sich die drei Zeilen kaum unterscheiden,
+weiß man etwas über sein Buch, das man vorher nicht wusste.
+
+**Das Wortwetter.** Was man in diesem Kapitel oft sagt, ohne es zu
+merken. Nicht als Häufigkeitsliste, sondern als Karte über den Text —
+wo ein Wort sich ballt, wo es verschwindet. „Nebel“ kommt in Kapitel
+drei elfmal vor und danach nie wieder: das ist entweder ein Motiv oder
+ein Versehen, und beides muss man wissen.
+
+**Die innere Landkarte.** Das Innenleben einer Figur als Gelände: der
+Sumpf der Scham, der Turm des Stolzes, die Furt, die sie nie überquert
+hat. Halb Spielerei, halb ernst — und der Kartentisch kann das Zeichnen
+längst.
+
+---
+
+### Wenn ich drei bauen dürfte
+
+1. **Der Webstuhl.** Weil er etwas zeigt, was man am Manuskript nicht
+   sehen kann, und weil er dasselbe Bild weiterspinnt, das der
+   Wandteppich schon trägt.
+2. **Die Sternwarte.** Weil sie das Schönste ist und weil das Selberziehen
+   der Linien genau die Bewegung ist, um die es bei VANI geht: die Punkte
+   rechnet die App, das Sternbild bestimmst du.
+3. **Die Druckerei.** Weil sie Dinge zum Anfassen herstellt — und weil ein
+   Steckbrief an der Wand mehr über eine Welt sagt als zehn Seiten
+   Beschreibung.
