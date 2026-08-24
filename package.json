@@ -1,6 +1,6 @@
 {
   "name": "vani",
-  "version": "5.41.0",
+  "version": "5.42.0",
   "private": true,
   "description": "VANI – ein privates Zuhause zum Schreiben, auf iPad und Desktop.",
   "main": "desktop/main.cjs",

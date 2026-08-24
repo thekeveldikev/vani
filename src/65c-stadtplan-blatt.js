@@ -56,7 +56,7 @@ function planNeu(danach) {
   const saat = planNeueSaat();
   const stand = {
     titel: planStadtname(saat), unterzeile: '', saat, welt: 'tinte', papier: '',
-    stadt: { groesse: 'stadt', alter: 'alt', wasser: 'fluss', mauer: true, burg: true, umland: true, dichte: 1 },
+    stadt: { groesse: 'stadt', alter: 'alt', anlage: 'gewachsen', wasser: 'fluss', mauer: true, burg: true, umland: true, dichte: 1 },
     marken: [], namen: {}, notiz: ''
   };
   planGrundrissFenster(stand, 'Eine Stadt gründen', 'Gründen', () => {
@@ -139,6 +139,8 @@ function planGrundrissFenster(stand, titel, okText, fertig, doc, danach) {
         reihe(PLAN_WASSER, () => stand.stadt.wasser, (v) => { stand.stadt.wasser = v; }, true),
         el('div', { class: 'ktg-abschnitt' }, 'Wie groß'),
         reihe(PLAN_GROESSEN.map((g) => [g[0], g[1]]), () => stand.stadt.groesse, (v) => { stand.stadt.groesse = v; }),
+        el('div', { class: 'ktg-abschnitt' }, 'Wie sie angelegt ist'),
+        reihe(PLAN_ANLAGEN, () => stand.stadt.anlage, (v) => { stand.stadt.anlage = v; }, true),
         el('div', { class: 'ktg-abschnitt' }, 'Wie alt'),
         reihe(PLAN_ALTER.map((a) => [a[0], a[1], a[2]]), () => stand.stadt.alter, (v) => { stand.stadt.alter = v; }, true),
         el('div', { class: 'ktg-abschnitt' }, 'Wie dicht'),

@@ -470,12 +470,12 @@ function planSVG(plan, g, neu) {
   for (const b of g.stadt.bloecke) {
     if (b.sonder === 'garten') {
       for (let t = 0; t < 9; t++) {
-        const p = bilinear(b.ecken, 0.16 + planZufall(plan.saat, 'gu' + b.i + b.j + t) * 0.68, 0.16 + planZufall(plan.saat, 'gv' + b.i + b.j + t) * 0.68);
+        const p = netzPunktDrin(b.ecken, plan.saat, 'g' + b.i + b.j + t);
         gGruen.append(planBaum(p[0], p[1], 3 + planZufall(plan.saat, 'gr' + b.i + b.j + t) * 2.2, welt));
       }
     } else if (b.sonder === 'friedhof') {
       for (let t = 0; t < 12; t++) {
-        const p = bilinear(b.ecken, 0.18 + (t % 4) * 0.21, 0.2 + Math.floor(t / 4) * 0.26);
+        const p = netzPunktDrin(b.ecken, plan.saat, 'f' + b.i + b.j + t);
         gGruen.append(kv('path', { d: 'M ' + kz(p[0]) + ' ' + kz(p[1] - 4) + ' v 7 M ' + kz(p[0] - 2.4) + ' ' + kz(p[1] - 1.4) + ' h 4.8', class: 'kt-grabkreuz' }));
       }
     }

@@ -95,6 +95,20 @@ const PLAN_ZUSCHNITTE = [
   ['achteck', 'Ein Achteck', 'Gestochen, mit abgeschnittenen Ecken.']
 ];
 
+/* ----- Die Anlage -----
+   Drei Arten, wie eine Stadt überhaupt angelegt sein kann. Das ist keine
+   Verzierung: es entscheidet, was für ein Ort das ist.
+
+   GEWACHSEN ist der Normalfall — niemand hat sie geplant, sie ist entstanden.
+   STRAHLEND ist eine Entscheidung: ein Fürst hat einen Punkt gesetzt und alles
+   darauf ausgerichtet (Karlsruhe, Palmanova). SCHACHBRETT ist Verwaltung:
+   ein Ingenieur, ein Lineal, ein Auftrag (jede Römerstadt, jede Kolonie). */
+const PLAN_ANLAGEN = [
+  ['gewachsen', 'Gewachsen', 'Niemand hat sie geplant. Krumme Gassen, ungleiche Blöcke, Sackgassen.'],
+  ['strahlend', 'Strahlend', 'Vom Markt gehen Straßen sternförmig fort, Ringe legen sich darum. Jemand hat das entschieden.'],
+  ['schachbrett', 'Schachbrett', 'Ein Ingenieur mit einem Lineal. Gerade Achsen, gleiche Blöcke, klare Ordnung.']
+];
+
 /* ----- Was für ein Wasser die Stadt hat ----- */
 const PLAN_WASSER = [
   ['keins', 'Trockenes Land', 'Kein Wasser weit und breit — die Stadt lebt vom Brunnen.'],
@@ -236,6 +250,7 @@ function saubererPlan(roh) {
     stadt: {
       groesse: PLAN_GROESSEN.some((g) => g[0] === st.groesse) ? st.groesse : 'stadt',
       alter: PLAN_ALTER.some((a) => a[0] === st.alter) ? st.alter : 'alt',
+      anlage: PLAN_ANLAGEN.some((a) => a[0] === st.anlage) ? st.anlage : 'gewachsen',
       wasser: PLAN_WASSER.some((w) => w[0] === st.wasser) ? st.wasser : 'fluss',
       mauer: st.mauer !== false,
       burg: st.burg !== false,
@@ -376,74 +391,27 @@ function planWasser(plan) {
    aneinander, ohne dass irgendwo etwas verschnitten werden müsste. */
 function planStadt(plan, wasser) {
   const saat = plan.saat;
-  const [, , speichen, ringe] = planGroesse(plan.stadt.groesse);
   const krumm = planAlterWert(plan.stadt.alter);
   const G = PLAN_GROESSE;
 
   /* Die Mitte liegt selten genau in der Mitte. Bei Wasser rückt sie ans Ufer. */
-  let mx = G / 2 + planStreu(saat, 'mx') * G * 0.06;
-  let my = G / 2 + planStreu(saat, 'my') * G * 0.05;
-  if (wasser.art === 'kueste' || wasser.art === 'see') {
-    /* Ein paar Schritte vom Wasser weg, aber in Sichtweite. */
-    for (let versuch = 0; versuch < 60 && wasser.drin(mx, my); versuch++) {
-      mx += (G / 2 - mx) * 0.12;
-      my += (G / 2 - my) * 0.12;
+  let mx = G / 2 + planStreu(saat, 'mx') * G * 0.07;
+  let my = G / 2 + planStreu(saat, 'my') * G * 0.06;
+  if (wasser.art !== 'keins') {
+    for (let versuch = 0; versuch < 80 && wasser.drin(mx, my); versuch++) {
+      mx += (G / 2 - mx) * 0.14 + 6;
+      my += (G / 2 - my) * 0.14 + 4;
     }
   }
-  const Rmax = G * (0.28 + speichen * 0.011);
-  const hoch = 0.9 + planZufall(saat, 'hh') * 0.16;   /* leicht oval */
+  const [, , speichen, ringeZahl] = planGroesse(plan.stadt.groesse);
+  const Rmax = G * (0.26 + speichen * 0.0115);
 
-  /* Jede Straße hat einen eigenen Drall und schwingt ein wenig.
-     Und — das ist der Unterschied zwischen einer Stadt und einem Spinnennetz —
-     nicht jede reicht durch die ganze Stadt: manche fangen erst weiter außen
-     an (sie wurden später angelegt), andere hören vor dem Rand auf. Wo eine
-     Straße fehlt, wachsen die beiden Blöcke daneben zu EINEM zusammen. Genau
-     daraus entstehen die unregelmäßigen Blockgrößen, die eine gewachsene
-     Stadt ausmachen. */
-  const speicheVon = [], speicheBis = [];
-  const drall = [], phase = [], ringPhase = [], ringPhase2 = [];
-  for (let i = 0; i < speichen; i++) {
-    drall.push(planStreu(saat, 'sd' + i) * 9 * krumm);
-    phase.push(planZufall(saat, 'sp' + i) * 6.3);
-    /* Jede zweite bleibt durchgehend — sonst zerfiele die Stadt. */
-    const wuerfel = planZufall(saat, 'sr' + i);
-    const durchgehend = i % 2 === 0 || wuerfel > 0.62 || krumm < 0.2;
-    speicheVon.push(durchgehend ? 0 : (wuerfel < 0.3 ? 2 : 1));
-    speicheBis.push(durchgehend || wuerfel > 0.5 ? ringe : ringe - 1);
-  }
-  const speicheDa = (i, j) => {
-    const ii = ((i % speichen) + speichen) % speichen;
-    return j >= speicheVon[ii] && j <= speicheBis[ii];
-  };
-  /* Welche Straßen kreuzen Ring j — der Reihe nach? */
-  const speichenAmRing = (j) => {
-    const raus = [];
-    for (let i = 0; i < speichen; i++) if (speicheDa(i, j)) raus.push(i);
-    return raus.length >= 3 ? raus : [0, Math.floor(speichen / 3), Math.floor(speichen * 2 / 3)];
-  };
-  for (let j = 0; j <= ringe; j++) {
-    ringPhase.push(planZufall(saat, 'rp' + j) * 6.3);
-    ringPhase2.push(planZufall(saat, 'rq' + j) * 6.3);
-  }
-
-  const ringR = [];
-  for (let j = 0; j <= ringe; j++) ringR.push(Rmax * (0.085 + 0.915 * Math.pow(j / ringe, 1.32)));
-
-  const winkelVon = (i, j) => {
-    const basis = (i / speichen) * 360 + drall[i];
-    return basis + Math.sin(j * 0.85 + phase[i]) * 8.5 * krumm + planStreu(saat, 'w' + i + '_' + j) * 3.4 * krumm;
-  };
-  const P = (i, j) => {
-    const ii = ((i % speichen) + speichen) % speichen;
-    const w = winkelVon(ii, j) * Math.PI / 180;
-    /* Drei Wellen ueberlagert: der Ring ist nirgends rund, ohne dass es
-       zackig wird. Bei zu wenig Unruhe sah die Stadt aus wie ein Spinnennetz. */
-    const wobble = 1 + (Math.sin(w * 2 + ringPhase[j]) * 0.075 + Math.sin(w * 3.7 + ringPhase2[j]) * 0.05
-      + Math.sin(w * 6.1 + ringPhase[j] * 2) * 0.025) * krumm
-      + planStreu(saat, 'r' + ii + '_' + j) * 0.05 * krumm;
-    const r = ringR[j] * wobble;
-    return [mx + Math.cos(w) * r, my + Math.sin(w) * r * hoch];
-  };
+  /* --- Das Netz wächst --- */
+  const anlage = plan.stadt.anlage;
+  const gewachsen = anlage === 'strahlend' ? planNetzStrahlend(plan, wasser, [mx, my], Rmax, krumm)
+    : anlage === 'schachbrett' ? planNetzSchachbrett(plan, wasser, [mx, my], Rmax, krumm)
+      : planNetzWachsen(plan, wasser, [mx, my], Rmax, krumm);
+  const flaechen = netzFlaechen(gewachsen.netz);
 
   /* --- Die Viertel: Sektoren mit Charakter --- */
   const viertelZahl = Math.max(3, Math.min(6, Math.round(speichen / 2.6)));
@@ -451,270 +419,116 @@ function planStadt(plan, wasser) {
   const viertel = [];
   for (let v = 0; v < viertelZahl; v++) {
     const art = wasser.art !== 'keins' && v === 0 ? 'hafen' : artenTopf[planHash(saat, 'va' + v) % artenTopf.length];
-    viertel.push({
-      nr: v, art,
-      vonSpeiche: Math.round((v / viertelZahl) * speichen),
-      bisSpeiche: Math.round(((v + 1) / viertelZahl) * speichen),
-      name: planViertelname(saat, v, art)
-    });
+    viertel.push({ nr: v, art, name: planViertelname(saat, v, art) });
   }
-  const viertelBei = (i, j) => {
-    if (j <= 1) return { nr: -1, art: 'altstadt', name: 'Die Altstadt' };
-    const ii = ((i % speichen) + speichen) % speichen;
-    for (const v of viertel) if (ii >= v.vonSpeiche && ii < v.bisSpeiche) return v;
-    return viertel[viertel.length - 1];
+  const mauerR = plan.stadt.mauer ? Rmax * 0.74 : Infinity;
+  const viertelBei = (p) => {
+    const d = strecke([mx, my], p);
+    if (d < Rmax * 0.2) return { nr: -1, art: 'altstadt', name: 'Die Altstadt' };
+    if (d > mauerR) return { nr: -2, art: 'vorstadt', name: 'Die Vorstadt' };
+    let w = Math.atan2(p[1] - my, p[0] - mx) / (Math.PI * 2);
+    if (w < 0) w += 1;
+    return viertel[Math.min(viertelZahl - 1, Math.floor(w * viertelZahl))];
   };
 
-  /* --- Die Mauer --- */
-  const mauerRing = plan.stadt.mauer ? Math.max(1, ringe - (ringe >= 5 ? 2 : 1)) : -1;
-
-  /* --- Die Blöcke --- */
+  /* --- Die Blöcke sind die Facetten des Netzes ---
+     Was zu groß geraten ist, wird mit neuen Gassen geteilt: eine Stadt
+     verdichtet sich, sie lässt keine Felder mitten im Häusermeer. */
+  const marktFlaeche = Math.abs(netzFlaeche(gewachsen.marktEcken));
+  const blockGrenze = 5600 / plan.stadt.dichte;
+  const geteilt = [], schnitte = [];
+  flaechen.forEach((f, i) => planBloeckeTeilen(f, blockGrenze, saat, 't' + i, 0, geteilt, schnitte));
+  schnitte.forEach((sch, i) => {
+    gewachsen.wege.push({ art: 'gasse', richtung: 'quer', i: 5000 + i, punkte: sch, name: planGassenname(saat, 'ts' + i, 'gasse') });
+  });
   const bloecke = [];
-  for (let j = 0; j < ringe; j++) {
-    /* In diesem Band zählen nur die Straßen, die es hier auch gibt. Zwischen
-       zweien davon liegt ein Block — manchmal schmal, manchmal doppelt so
-       breit wie der Nachbar. */
-    const aktiv = speichenAmRing(j).filter((i) => speicheDa(i, j + 1));
-    const reihe = aktiv.length >= 3 ? aktiv : speichenAmRing(j);
-    for (let k = 0; k < reihe.length; k++) {
-      const i = reihe[k];
-      const iNaechste = reihe[(k + 1) % reihe.length] + (k === reihe.length - 1 ? speichen : 0);
-      const ecken = [P(i, j), P(iNaechste, j), P(iNaechste, j + 1), P(i, j + 1)];
-      const mitte = [
-        (ecken[0][0] + ecken[1][0] + ecken[2][0] + ecken[3][0]) / 4,
-        (ecken[0][1] + ecken[1][1] + ecken[2][1] + ecken[3][1]) / 4
-      ];
-      if (wasser.drin(mitte[0], mitte[1])) continue;
-      const v = viertelBei(i, j);
-      const drausen = mauerRing >= 0 && j >= mauerRing;
-      const breit = strecke(ecken[0], ecken[1]);
-      /* Vor der Mauer wird lueckenhaft gebaut: jeder dritte Block bleibt
-         leer, sonst saehe die Vorstadt aus wie die Stadt. */
-      if (drausen && planZufall(saat, 'vs' + i + '_' + j) < 0.34) continue;
-      bloecke.push({
-        i, j, ecken, mitte, breit,
-        viertel: drausen ? { nr: -2, art: 'vorstadt', name: 'Die Vorstadt' } : v,
-        vorstadt: drausen
+  for (const f of geteilt) {
+    const m = netzMitte(f);
+    if (wasser.drin(m[0], m[1])) continue;
+    const fl = Math.abs(netzFlaeche(f));
+    /* Der Marktplatz selbst ist kein Block. */
+    if (fl <= marktFlaeche * 1.25 && strecke(m, [mx, my]) < Rmax * 0.16) continue;
+    if (fl > Rmax * Rmax * 0.55) continue;      /* eine Fläche, die alles umschließt */
+    const v = viertelBei(m);
+    const drausen = v.nr === -2;
+    if (drausen && planZufall(saat, 'vs' + Math.round(m[0]) + '_' + Math.round(m[1])) < 0.38) continue;
+    let breit = 0;
+    for (let i = 0; i < f.length; i++) breit = Math.max(breit, strecke(f[i], f[(i + 1) % f.length]));
+    bloecke.push({
+      i: Math.round(m[0]), j: Math.round(m[1]),
+      ecken: f, mitte: m, breit, flaeche: fl,
+      viertel: v, vorstadt: drausen, sonder: ''
+    });
+  }
+
+  /* --- Besondere Blöcke --- */
+  const drinnen = bloecke.filter((b) => !b.vorstadt && b.flaeche > 900);
+  const setze = (k, was) => { const b = drinnen[planHash(saat, k) % drinnen.length]; if (b && !b.sonder) b.sonder = was; };
+  if (drinnen.length) {
+    setze('kirche', 'kirche');
+    if (drinnen.length > 5) setze('friedhof', 'friedhof');
+    if (drinnen.length > 7) setze('garten', 'garten');
+    if (drinnen.length > 11) setze('garten2', 'garten');
+  }
+
+  /* --- Die Häuser stellen sich an die Straßen --- */
+  const haeuser = [];
+  for (const b of bloecke) {
+    if (b.sonder === 'garten' || b.sonder === 'friedhof') continue;
+    const va = planViertelart(b.viertel.art);
+    planBlockBebauen(b.ecken, saat, 'b' + b.i + '_' + b.j, va, plan.stadt.dichte, wasser, haeuser);
+    if (b.sonder === 'kirche' && haeuser.length) {
+      /* Die Kirche steht als eigener Bau in der Mitte des Blocks. */
+      const m = b.mitte;
+      const gr = Math.min(38, Math.sqrt(b.flaeche) * 0.3);
+      haeuser.push({
+        ecken: [[m[0] - gr, m[1] - gr * 0.5], [m[0] + gr, m[1] - gr * 0.5], [m[0] + gr, m[1] + gr * 0.5], [m[0] - gr, m[1] + gr * 0.5]],
+        umriss: null, ton: 0, gross: true, viertel: b.viertel.art, sonder: 'kirche', n: haeuser.length
       });
     }
   }
 
-  /* --- Besondere Blöcke: Kirche, Friedhof, Garten, Burg --- */
-  const besonders = new Map();
-  const setze = (schluessel, was) => { if (!besonders.has(schluessel)) besonders.set(schluessel, was); };
-  const drinnen = bloecke.filter((b) => !b.vorstadt && b.j >= 1);
-  if (drinnen.length) {
-    const wahl = (k) => drinnen[planHash(saat, k) % drinnen.length];
-    setze(schl(wahl('kirche')), 'kirche');
-    if (drinnen.length > 6) setze(schl(wahl('friedhof')), 'friedhof');
-    if (drinnen.length > 8) setze(schl(wahl('garten')), 'garten');
-    if (drinnen.length > 12) setze(schl(wahl('garten2')), 'garten');
-    if (drinnen.length > 10) setze(schl(wahl('speicher')), 'speicher');
-  }
-  function schl(b) { return b ? b.i + ':' + b.j : ''; }
-
-  /* --- Die Häuser --- */
-  const haeuser = [];
-  const dichteFaktor = plan.stadt.dichte;
-  for (const b of bloecke) {
-    const sonder = besonders.get(schl(b));
-    b.sonder = sonder || '';
-    if (sonder === 'garten' || sonder === 'friedhof') continue;
-    const va = planViertelart(b.viertel.art);
-    const breiteOben = strecke(b.ecken[0], b.ecken[1]);
-    const tiefe = strecke(b.ecken[0], b.ecken[3]);
-    /* Schmale Parzellen: ein Haus an einer Gasse ist selten breiter als
-       sechs, sieben Schritt. Vorher waren die Parzellen so breit, dass alle
-       Haeuser wie gleiche Ziegel aussahen. */
-    const plotBreite = 17 / (va.dichte * dichteFaktor) * va.haus;
-    const spalten = Math.max(1, Math.min(10, Math.round(breiteOben / plotBreite)));
-    const zeilen = tiefe > 54 ? 2 : 1;
-    for (let s = 0; s < spalten; s++) {
-      for (let z = 0; z < zeilen; z++) {
-        /* Ein Hof statt eines Hauses — Luft im Block. */
-        if (planZufall(saat, 'hof' + b.i + b.j + s + z) < va.hoefe * 0.34) continue;
-        /* Jedes Haus sitzt ein wenig anders in seiner Parzelle. Genau diese
-           Ungleichheit macht aus einer Reihe eine Gasse. */
-        const k = 'p' + b.i + '_' + b.j + '_' + s + '_' + z;
-        const randL = 0.06 + planZufall(saat, 'ra' + k) * 0.17;
-        const randR = 0.06 + planZufall(saat, 'rb' + k) * 0.17;
-        const tiefVorn = 0.10 + planZufall(saat, 'rv' + k) * 0.1;
-        const tiefHinten = 0.10 + planZufall(saat, 'rh' + k) * 0.22;
-        const u0 = (s + randL) / spalten, u1 = (s + 1 - randR) / spalten;
-        const v0 = (z + (z === 0 ? tiefVorn : 0.05)) / zeilen, v1 = (z + 1 - (z === zeilen - 1 ? tiefHinten : 0.05)) / zeilen;
-        const ecken = [
-          bilinear(b.ecken, u0, v0), bilinear(b.ecken, u1, v0),
-          bilinear(b.ecken, u1, v1), bilinear(b.ecken, u0, v1)
-        ];
-        const flaeche = vierecksFlaeche(ecken);
-        if (flaeche < 26) continue;
-        if (wasser.drin(ecken[0][0], ecken[0][1]) || wasser.drin(ecken[2][0], ecken[2][1])) continue;
-        haeuser.push({
-          ecken,
-          /* Der Umriss ist NICHT das Viereck: er ist von Hand nachgezogen,
-             mit zitternden Ecken, und manchmal fehlt eine Ecke oder es ist
-             ein Winkelbau. Ein Kartenblatt aus lauter exakten Rechtecken
-             sieht aus wie ein Diagramm; erst die Ungenauigkeit macht daraus
-             eine Zeichnung. */
-          umriss: planHausUmriss(ecken, saat, k),
-          /* Jedes Dach einen eigenen Ton. Alle gleich rot sah aus wie ein
-             Diagramm; fünf Abstufungen machen daraus ein Dachmeer. */
-          ton: planHash(saat, 'dt' + k) % 5,
-          gross: flaeche > 520,
-          viertel: b.viertel.art,
-          sonder: sonder === 'kirche' && s === Math.floor(spalten / 2) && z === 0 ? 'kirche' : '',
-          n: haeuser.length
-        });
-      }
-    }
-  }
-
   /* --- Die Straßen --- */
-  const strassen = [];
-  for (let i = 0; i < speichen; i++) {
-    const haupt = (i % 2 === 0 || speichen < 9) && speicheVon[i] === 0;
-    const punkte = [];
-    for (let j = speicheVon[i]; j <= speicheBis[i]; j++) punkte.push(P(i, j));
-    if (punkte.length < 2) continue;
-    /* Die Hauptstraßen laufen aus der Stadt hinaus — aber nicht ins Wasser. */
-    if (haupt && plan.stadt.umland && speicheBis[i] === ringe) {
-      const letzte = punkte[punkte.length - 1];
-      const w = winkelVon(i, ringe) * Math.PI / 180;
-      for (const weit of [0.1, 0.34]) {
-        const q = [letzte[0] + Math.cos(w) * G * weit, letzte[1] + Math.sin(w) * G * weit * hoch];
-        if (wasser.drin(q[0], q[1])) break;
-        punkte.push(q);
-      }
-    }
-    strassen.push({ art: haupt ? 'haupt' : 'gasse', richtung: 'speiche', i, punkte, name: planGassenname(saat, 'sp' + i, haupt ? 'haupt' : 'gasse') });
-  }
-  for (let j = 1; j <= ringe; j++) {
-    const reihe = speichenAmRing(j);
-    const punkte = reihe.map((i) => P(i, j));
-    punkte.push(P(reihe[0] + speichen, j));
-    strassen.push({ art: j === mauerRing ? 'mauerweg' : (j % 2 === 1 ? 'ring' : 'gasse'), richtung: 'ring', j, punkte, geschlossen: true, name: planGassenname(saat, 'ri' + j, 'ring') });
-  }
+  const strassen = gewachsen.wege;
 
-  /* --- Der Marktplatz in der Mitte --- */
-  const markt = speichenAmRing(0).map((i) => P(i, 0));
+  /* --- Der Marktplatz --- */
+  const markt = gewachsen.marktEcken;
 
-  /* --- Die Mauer mit Türmen und Toren --- */
+  /* --- Die Mauer: der äußerste Ring --- */
   let mauer = null;
-  if (mauerRing >= 0) {
-    const reihe = speichenAmRing(mauerRing);
-    const punkte = reihe.map((i) => P(i, mauerRing));
-    punkte.push(P(reihe[0] + speichen, mauerRing));
-    const tuerme = [], tore = [];
-    for (const i of reihe) {
-      const p = P(i, mauerRing);
-      if (wasser.drin(p[0], p[1])) continue;
-      const haupt = (i % 2 === 0 || speichen < 9) && speicheVon[i] === 0;
-      if (haupt) tore.push({ punkt: p, i, name: planTorname(saat, i) });
-      else tuerme.push({ punkt: p, i });
+  if (plan.stadt.mauer) {
+    const ring = gewachsen.wege.find((w) => w.art === 'mauerweg');
+    if (ring && ring.punkte.length > 3) {
+      const tuerme = [], tore = [];
+      ring.punkte.slice(0, -1).forEach((p, i) => {
+        if (wasser.drin(p[0], p[1])) return;
+        /* Wo eine Hauptstraße die Mauer trifft, liegt ein Tor. */
+        const ausfall = gewachsen.adern.some((a) => a.haupt && a.knoten.some((q) => strecke(q, p) < 34));
+        if (ausfall) tore.push({ punkt: p, i, name: planTorname(saat, i) });
+        else tuerme.push({ punkt: p, i });
+      });
+      if (!tore.length && ring.punkte.length > 2) tore.push({ punkt: ring.punkte[0], i: 0, name: planTorname(saat, 0) });
+      mauer = { punkte: ring.punkte, tuerme, tore, ring: 1 };
     }
-    mauer = { punkte, tuerme, tore, ring: mauerRing };
   }
 
   /* --- Die Burg --- */
   let burg = null;
   if (plan.stadt.burg) {
-    const i = planHash(saat, 'burg') % speichen;
-    const j = Math.max(1, ringe - 1);
-    const p = P(i, j);
-    if (!wasser.drin(p[0], p[1])) {
-      const w = winkelVon(i, j) * Math.PI / 180;
-      burg = { mitte: [p[0] + Math.cos(w) * 26, p[1] + Math.sin(w) * 26], winkel: w * 180 / Math.PI, groesse: 34 + planZufall(saat, 'bg') * 16 };
-    }
+    const kandidaten = bloecke.filter((b) => !b.vorstadt && strecke(b.mitte, [mx, my]) > Rmax * 0.34);
+    const b = kandidaten.length ? kandidaten[planHash(saat, 'burg') % kandidaten.length] : null;
+    if (b) burg = { mitte: b.mitte, winkel: Math.atan2(b.mitte[1] - my, b.mitte[0] - mx) * 180 / Math.PI, groesse: Math.min(46, Math.sqrt(b.flaeche) * 0.42) };
   }
 
-  /* --- Die Brücken --- */
-  const bruecken = [];
-  if (wasser.art === 'fluss') {
-    for (const s of strassen) {
-      if (s.richtung !== 'speiche') continue;
-      for (let k = 1; k < s.punkte.length; k++) {
-        const a = s.punkte[k - 1], b = s.punkte[k];
-        if (wasser.drin(a[0], a[1]) !== wasser.drin(b[0], b[1])) {
-          bruecken.push({ punkt: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], winkel: Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI });
-          break;
-        }
-      }
-    }
-  }
+  /* --- Die Brücken: sie entstehen beim Wachsen, wo eine Straße das Wasser
+     quert. Nachträglich gesucht würde man sie nie finden. --- */
+  const bruecken = gewachsen.bruecken || [];
 
   return {
-    mitte: [mx, my], speichen, ringe, ringR, Rmax, hoch, P, winkelVon,
-    bloecke, haeuser, strassen, markt, mauer, mauerRing, burg, bruecken, viertel, besonders
+    mitte: [mx, my], speichen, ringe: ringeZahl, Rmax, hoch: 1,
+    netz: gewachsen.netz, bloecke, haeuser, strassen, markt, mauer, mauerRing: 1,
+    burg, bruecken, viertel, besonders: new Map()
   };
-}
-
-/* Ein Weg, der ins Wasser läuft, hört dort auf. Zerfällt er dabei in
-   mehrere Stücke (eine Straße quert den Fluss), werden es mehrere Wege —
-   und an der Bruchstelle liegt später eine Brücke. */
-function planTrockeneWege(punkte, wasser, geschlossen) {
-  if (!wasser || wasser.art === 'keins') return [{ punkte, geschlossen }];
-  const nass = punkte.map((q) => wasser.drin(q[0], q[1]));
-  if (!nass.some(Boolean)) return [{ punkte, geschlossen }];
-  const stuecke = [];
-  let jetzt = [];
-  for (let i = 0; i < punkte.length; i++) {
-    if (nass[i]) {
-      if (jetzt.length > 1) stuecke.push({ punkte: jetzt, geschlossen: false });
-      jetzt = [];
-    } else jetzt.push(punkte[i]);
-  }
-  if (jetzt.length > 1) stuecke.push({ punkte: jetzt, geschlossen: false });
-  return stuecke;
-}
-
-/* ----- Der Umriss eines Hauses -----
-   Vier Ecken sind ein Rechteck. Ein Haus auf einer gestochenen Karte hat
-   aber einen Rücksprung, eine abgeschnittene Ecke, einen Hof — und keine
-   Kante ist ganz gerade. Genau das wird hier gebaut, gerechnet aus der Saat,
-   damit dasselbe Haus immer dieselbe Schiefe hat. */
-function planHausUmriss(ecken, saat, k) {
-  const zittern = (p, i) => [
-    p[0] + planStreu(saat, 'hz' + k + '_' + i) * 0.9,
-    p[1] + planStreu(saat, 'hy' + k + '_' + i) * 0.9
-  ];
-  const wuerfel = planZufall(saat, 'hf' + k);
-  const [a, b, c, d] = ecken;
-
-  /* Ein Winkelbau: hinten fehlt ein Viertel — dort liegt der Hof. */
-  if (wuerfel > 0.82) {
-    const ecke = planHash(saat, 'hw' + k) % 4;
-    const t = 0.42 + planZufall(saat, 'ht' + k) * 0.16;
-    const ring = [a, b, c, d];
-    const raus = [];
-    for (let i = 0; i < 4; i++) {
-      if (i !== ecke) { raus.push(ring[i]); continue; }
-      const vor = ring[(i + 3) % 4], nach = ring[(i + 1) % 4];
-      raus.push([vor[0] + (ring[i][0] - vor[0]) * (1 - t), vor[1] + (ring[i][1] - vor[1]) * (1 - t)]);
-      raus.push([
-        ring[i][0] - (ring[i][0] - vor[0]) * t - (ring[i][0] - nach[0]) * t,
-        ring[i][1] - (ring[i][1] - vor[1]) * t - (ring[i][1] - nach[1]) * t
-      ]);
-      raus.push([ring[i][0] + (nach[0] - ring[i][0]) * t, ring[i][1] + (nach[1] - ring[i][1]) * t]);
-    }
-    return raus.map(zittern);
-  }
-
-  /* Eine abgeschnittene Ecke — das Haus steht schräg an der Gasse. */
-  if (wuerfel > 0.66) {
-    const ecke = planHash(saat, 'he' + k) % 4;
-    const t = 0.24 + planZufall(saat, 'hs' + k) * 0.16;
-    const ring = [a, b, c, d];
-    const raus = [];
-    for (let i = 0; i < 4; i++) {
-      if (i !== ecke) { raus.push(ring[i]); continue; }
-      const vor = ring[(i + 3) % 4], nach = ring[(i + 1) % 4];
-      raus.push([vor[0] + (ring[i][0] - vor[0]) * (1 - t), vor[1] + (ring[i][1] - vor[1]) * (1 - t)]);
-      raus.push([ring[i][0] + (nach[0] - ring[i][0]) * t, ring[i][1] + (nach[1] - ring[i][1]) * t]);
-    }
-    return raus.map(zittern);
-  }
-
-  return ecken.map(zittern);
 }
 
 /* ===================== DAS UMLAND =====================
@@ -773,7 +587,7 @@ function planBauen(plan) {
 /* Woran man erkennt, ob neu gerechnet werden muss. */
 function planSignatur(plan) {
   const s = plan.stadt;
-  return [plan.saat, s.groesse, s.alter, s.wasser, s.mauer, s.burg, s.umland, s.dichte].join('|');
+  return [plan.saat, s.groesse, s.alter, s.anlage, s.wasser, s.mauer, s.burg, s.umland, s.dichte].join('|');
 }
 
 /* ===================== KLEINE RECHNUNGEN ===================== */

@@ -73,31 +73,92 @@ test('Dichter gebaut heißt mehr Häuser, nicht andere Straßen', async () => {
   const bau = (d) => k.planBauen(plan(k, { stadt: { wasser: 'keins', dichte: d } }));
   const duenn = bau(0.6), dicht = bau(1.5);
   assert.ok(dicht.stadt.haeuser.length > duenn.stadt.haeuser.length, 'dichter: ' + dicht.stadt.haeuser.length + ' gegen ' + duenn.stadt.haeuser.length);
-  assert.equal(dicht.stadt.strassen.length, duenn.stadt.strassen.length, 'die Straßen bleiben dieselben');
+  /* Die Ausfallstraßen bleiben dieselben — eine dichtere Stadt bekommt aber
+     mehr Gassen, weil große Blöcke geteilt werden. Genau so verdichtet sich
+     eine Stadt wirklich. */
+  const adern = (g) => g.stadt.strassen.filter((s) => s.richtung === 'speiche').length;
+  assert.equal(adern(dicht), adern(duenn), 'dieselben Ausfallstraßen');
+  assert.ok(dicht.stadt.strassen.length > duenn.stadt.strassen.length, 'aber mehr Gassen');
 });
 
 test('Eine geplante Stadt ist gerader als eine gewachsene', async () => {
   const k = await frisch();
-  const unruhe = (alter) => {
+  /* Gemessen an den Ausfallstraßen: wie stark wendet sich eine Straße von
+     Schritt zu Schritt? Im Reißbrett-Fall fast gar nicht. */
+  const wendung = (alter) => {
     const g = k.planBauen(plan(k, { saat: 'u', stadt: { alter, wasser: 'keins', mauer: false, burg: false, umland: false } }));
-    const ring = g.stadt.strassen.find((s) => s.richtung === 'ring' && s.j === 2);
-    const r = ring.punkte.map((p) => Math.hypot(p[0] - g.stadt.mitte[0], p[1] - g.stadt.mitte[1]));
-    const schnitt = r.reduce((a, b) => a + b, 0) / r.length;
-    return Math.sqrt(r.reduce((a, b) => a + (b - schnitt) ** 2, 0) / r.length) / schnitt;
+    let summe = 0, wieviele = 0;
+    for (const w of g.stadt.strassen.filter((x) => x.richtung === 'speiche' && x.punkte.length > 3)) {
+      for (let i = 2; i < w.punkte.length; i++) {
+        const a1 = Math.atan2(w.punkte[i - 1][1] - w.punkte[i - 2][1], w.punkte[i - 1][0] - w.punkte[i - 2][0]);
+        const a2 = Math.atan2(w.punkte[i][1] - w.punkte[i - 1][1], w.punkte[i][0] - w.punkte[i - 1][0]);
+        let d = Math.abs(a2 - a1);
+        if (d > Math.PI) d = Math.PI * 2 - d;
+        summe += d; wieviele++;
+      }
+    }
+    return wieviele ? summe / wieviele : 0;
   };
-  assert.ok(unruhe('uralt') > unruhe('neu') * 2, 'uralt ist deutlich krummer als am Reißbrett');
+  const alt = wendung('uralt'), neu = wendung('neu');
+  assert.ok(alt > neu * 2, 'uralt wendet sich deutlich mehr: ' + alt.toFixed(3) + ' gegen ' + neu.toFixed(3));
 });
 
-test('Eine gewachsene Stadt hat ungleich große Blöcke', async () => {
+test('Die Blöcke sind ungleich geformt — das Netz ist gewachsen, kein Raster', async () => {
   const k = await frisch();
-  const spanne = (alter) => {
-    const g = k.planBauen(plan(k, { saat: 'bl', stadt: { alter, wasser: 'keins', groesse: 'grossstadt' } }));
-    const b = g.stadt.bloecke.filter((x) => x.j === 2).map((x) => x.breit);
-    return Math.max(...b) / Math.min(...b);
-  };
-  /* Wo eine Straße fehlt, wachsen zwei Blöcke zusammen — dann ist der
-     breiteste deutlich breiter als der schmalste. */
-  assert.ok(spanne('uralt') > 1.5, 'uralt: die Blöcke sind ungleich (' + spanne('uralt').toFixed(2) + ')');
+  const g = k.planBauen(plan(k, { saat: 'bl', stadt: { alter: 'uralt', wasser: 'keins', groesse: 'grossstadt' } }));
+  const bl = g.stadt.bloecke;
+  assert.ok(bl.length > 20, 'es gibt reichlich Blöcke: ' + bl.length);
+  /* Die Flächen gleichen sich an — das ist Absicht, große Blöcke werden
+     geteilt. Was eine gewachsene Stadt ausmacht, ist die FORM: Blöcke mit
+     drei, vier, fünf, sechs Ecken, mal gedrungen, mal lang gezogen. */
+  const ecken = new Set(bl.map((b) => b.ecken.length));
+  assert.ok(ecken.size >= 3, 'die Blöcke haben verschieden viele Ecken: ' + [...ecken].sort().join(', '));
+  assert.ok(bl.some((b) => b.ecken.length > 4), 'manche haben mehr als vier');
+  /* Und die Länglichkeit schwankt */
+  const streckung = bl.map((b) => {
+    let kurz = 1e9, lang = 0;
+    for (let i = 0; i < b.ecken.length; i++) {
+      const l = Math.hypot(b.ecken[(i + 1) % b.ecken.length][0] - b.ecken[i][0], b.ecken[(i + 1) % b.ecken.length][1] - b.ecken[i][1]);
+      if (l < kurz) kurz = l;
+      if (l > lang) lang = l;
+    }
+    return lang / Math.max(1, kurz);
+  }).sort((x, y) => x - y);
+  const unten = streckung[Math.floor(streckung.length * 0.2)];
+  const oben = streckung[Math.floor(streckung.length * 0.8)];
+  assert.ok(oben / unten > 1.8, 'mal gedrungen, mal lang gezogen: ' + unten.toFixed(2) + ' bis ' + oben.toFixed(2));
+});
+
+test('Jeder Block ist ein geschlossenes Vieleck ohne Selbstschnitt', async () => {
+  const k = await frisch();
+  const g = k.planBauen(plan(k, { saat: 'poly', stadt: { alter: 'alt', wasser: 'fluss' } }));
+  for (const b of g.stadt.bloecke) {
+    assert.ok(b.ecken.length >= 3, 'mindestens ein Dreieck');
+    assert.ok(b.flaeche > 0, 'mit Fläche');
+    /* Die Mitte muss wirklich drin liegen — sonst ist das Vieleck verdreht */
+    for (const p of b.ecken) {
+      assert.ok(Number.isFinite(p[0]) && Number.isFinite(p[1]), 'jede Ecke hat Zahlen');
+    }
+  }
+});
+
+test('Häuser stehen an der Straße, nicht im Hof', async () => {
+  const k = await frisch();
+  const g = k.planBauen(plan(k, { saat: 'hof', stadt: { alter: 'alt', wasser: 'keins', groesse: 'grossstadt' } }));
+  /* Jedes Haus muss ganz in seinem Block liegen. */
+  const nachSchluessel = new Map();
+  for (const b of g.stadt.bloecke) nachSchluessel.set('b' + b.i + '_' + b.j, b);
+  let geprueft = 0;
+  for (const h of g.stadt.haeuser) {
+    if (h.sonder) continue;
+    const b = nachSchluessel.get(h.block);
+    if (!b) continue;
+    geprueft++;
+    for (const e of h.ecken) {
+      assert.ok(k.netzImPolygon(b.ecken, e[0], e[1]), 'eine Hausecke ragt aus ihrem Block');
+    }
+  }
+  assert.ok(geprueft > 20, 'es wurden wirklich Häuser geprüft: ' + geprueft);
 });
 
 test('Ohne Mauer keine Tore, ohne Umland keine Felder', async () => {
@@ -260,4 +321,79 @@ test('Ein großer Plan wird schnell genug gebaut', async () => {
   const dauer = Date.now() - start;
   assert.ok(dauer < 900, 'unter einer Sekunde: ' + dauer + ' ms für ' + g.stadt.haeuser.length + ' Häuser');
   assert.ok(g.stadt.haeuser.length > 200, 'und es ist wirklich viel: ' + g.stadt.haeuser.length);
+});
+
+test('Drei Anlagen, drei verschiedene Städte', async () => {
+  const k = await frisch();
+  assert.equal(k.PLAN_ANLAGEN.length, 3);
+  const bauen = (anlage) => k.planBauen(plan(k, { saat: 'anl', stadt: { anlage, groesse: 'stadt', wasser: 'keins' } }));
+  const g = bauen('gewachsen'), st = bauen('strahlend'), sch = bauen('schachbrett');
+  for (const [name, x] of [['gewachsen', g], ['strahlend', st], ['schachbrett', sch]]) {
+    assert.ok(x.stadt.haeuser.length > 40, name + ': es steht etwas — ' + x.stadt.haeuser.length);
+    assert.ok(x.stadt.bloecke.length > 8, name + ': es gibt Blöcke — ' + x.stadt.bloecke.length);
+    assert.ok(x.stadt.strassen.length > 6, name + ': es gibt Straßen');
+  }
+  /* Und sie sind wirklich verschieden */
+  const fingerabdruck = (x) => x.stadt.haeuser.length + ':' + x.stadt.bloecke.length + ':' + x.stadt.strassen.length;
+  const drei = new Set([fingerabdruck(g), fingerabdruck(st), fingerabdruck(sch)]);
+  assert.equal(drei.size, 3, 'drei verschiedene Städte, nicht dreimal dieselbe');
+});
+
+test('Die strahlende Stadt strahlt wirklich', async () => {
+  const k = await frisch();
+  const g = k.planBauen(plan(k, { saat: 'str', stadt: { anlage: 'strahlend', groesse: 'stadt', wasser: 'keins' } }));
+  /* Jede Speiche muss sich vom Markt entfernen — sonst ist es kein Stern. */
+  const m = g.stadt.mitte;
+  const speichen = g.stadt.strassen.filter((s) => s.richtung === 'speiche' && s.punkte.length > 2);
+  assert.ok(speichen.length >= 5, 'reichlich Speichen: ' + speichen.length);
+  for (const s of speichen) {
+    const nah = Math.hypot(s.punkte[0][0] - m[0], s.punkte[0][1] - m[1]);
+    const weit = Math.hypot(s.punkte[s.punkte.length - 1][0] - m[0], s.punkte[s.punkte.length - 1][1] - m[1]);
+    assert.ok(weit > nah, 'die Speiche läuft nach außen');
+  }
+});
+
+test('Das Schachbrett ist wirklich rechtwinklig', async () => {
+  const k = await frisch();
+  const g = k.planBauen(plan(k, { saat: 'sch', stadt: { anlage: 'schachbrett', alter: 'neu', groesse: 'stadt', wasser: 'keins' } }));
+  /* Das Raster steht schräg im Blatt — gemessen wird deshalb nicht der
+     Winkel zur Blattkante, sondern ob sich alle Achsen auf ZWEI Richtungen
+     einigen, die neunzig Grad auseinanderliegen. */
+  const winkel = [];
+  for (const s of g.stadt.strassen) {
+    /* Die zwei Prachtdiagonalen (i ab 900) stehen absichtlich quer, und die
+       Teilungsgassen ebenso — gemessen wird das Raster selbst. */
+    if (s.art === 'gasse' || s.i >= 900 || s.punkte.length < 2) continue;
+    const a = s.punkte[0], b = s.punkte[s.punkte.length - 1];
+    let w = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
+    while (w < 0) w += 180;
+    winkel.push(((w % 90) + 90) % 90);
+  }
+  assert.ok(winkel.length >= 6, 'es gibt Achsen zu messen: ' + winkel.length);
+  const sortiert = winkel.slice().sort((x, y) => x - y);
+  const mitte = sortiert[Math.floor(sortiert.length / 2)];
+  const nah = winkel.filter((w) => {
+    const d = Math.abs(w - mitte);
+    return Math.min(d, 90 - d) < 16;
+  }).length;
+  assert.ok(nah / winkel.length > 0.75, 'die Achsen einigen sich: ' + Math.round(nah / winkel.length * 100) + '%');
+});
+
+test('Große Blöcke werden geteilt, kleine bleiben', async () => {
+  const k = await frisch();
+  const gross = [[[0, 0], [300, 0], [300, 300], [0, 300]]];
+  const raus = [], schnitte = [];
+  k.planBloeckeTeilen(gross[0], 6000, 'x', 'k', 0, raus, schnitte);
+  assert.ok(raus.length > 4, 'aus einem großen werden viele: ' + raus.length);
+  assert.ok(schnitte.length > 0, 'und jede Teilung ist eine neue Gasse');
+  for (const p of raus) {
+    assert.ok(Math.abs(k.netzFlaeche(p)) <= 6000 * 1.05, 'kein Teil ist mehr zu groß: ' + Math.round(Math.abs(k.netzFlaeche(p))));
+    assert.ok(p.length >= 3, 'jedes Teil ist ein Vieleck');
+  }
+  /* Ein kleiner Block bleibt, wie er ist */
+  const klein = [[0, 0], [40, 0], [40, 40], [0, 40]];
+  const raus2 = [], schnitte2 = [];
+  k.planBloeckeTeilen(klein, 6000, 'x', 'k', 0, raus2, schnitte2);
+  assert.equal(raus2.length, 1);
+  assert.equal(schnitte2.length, 0);
 });

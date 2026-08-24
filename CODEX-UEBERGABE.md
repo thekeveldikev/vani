@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.41.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.42.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -151,6 +151,12 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   (zitternde Ecken, abgeschnittene Ecken, Winkelbauten), Bäume als Zeichen statt Kreise, Strichstärken
   gestaffelt wie in einem Kupferstich. Behoben: das Fadenspinnen im Wandteppich brach immer ab, weil der
   Zugfaden selbst unter dem Finger lag und der Treffertest ihn statt des Namens darunter fand.
+- **5.42** Der Kartentisch bekommt ein echtes Straßennetz (src/65d-stadtplan-netz.js). Statt eines
+  Polarrasters wächst ein ebener Graph: Ausfallstraßen vom Markt, Querverbindungen, Gassen; die Blöcke
+  sind seine FACETTEN, gefunden über die Nächste-Kante-im-Uhrzeigersinn-Umrundung. Zu große Blöcke werden
+  rekursiv geteilt (der Schnitt wird aus allen Kantenpaaren so gewählt, dass er am besten halbiert).
+  Häuser stehen an der Blockkante, der Hof bleibt frei. Drei Anlagen teilen sich alles danach:
+  gewachsen, strahlend (das alte Radialmodell, jetzt als eigener Modus), schachbrett.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 
