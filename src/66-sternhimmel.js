@@ -32,31 +32,31 @@ const STERN_R = STERN_MITTE - STERN_RAND;
    braun auf altem Papier, grün über dem Meer. */
 const STERN_WELTEN = [
   {
-    id: 'tinte', name: 'Tinte und Silber',
+    id: 'tinte', kalt: '#b6c8ff', kuehl: '#dde6ff', warm: '#ffe6bf', rot: '#ffbd9a', name: 'Tinte und Silber',
     grund: '#0e1626', grund2: '#182741', milch: '#7f93c4',
     stern: '#f4f1e4', hell: '#ffffff', linie: '#c8a85c',
     schrift: '#dfd7bd', rand: '#c8a85c', ekliptik: '#8fa2cc'
   },
   {
-    id: 'kupfer', name: 'Kupferstich',
+    id: 'kupfer', kalt: '#4a5570', kuehl: '#3a3f52', warm: '#5c4526', rot: '#6b3a20', name: 'Kupferstich',
     grund: '#efe6cf', grund2: '#e2d5b6', milch: '#b6a27a',
     stern: '#2c2418', hell: '#0e0b06', linie: '#8a5a2a',
     schrift: '#3a3020', rand: '#8a5a2a', ekliptik: '#8a7a52'
   },
   {
-    id: 'mitternacht', name: 'Mitternacht',
+    id: 'mitternacht', kalt: '#a8b6dd', kuehl: '#d4d8e6', warm: '#ecd9b4', rot: '#e5ac8b', name: 'Mitternacht',
     grund: '#07080f', grund2: '#0e1020', milch: '#5f6a94',
     stern: '#e8e6df', hell: '#ffffff', linie: '#9c8f6a',
     schrift: '#b9b3a0', rand: '#7d7a68', ekliptik: '#6d78a0'
   },
   {
-    id: 'moos', name: 'Über dem Moor',
+    id: 'moos', kalt: '#b3d0d8', kuehl: '#dcecdf', warm: '#f0e2b6', rot: '#eeb894', name: 'Über dem Moor',
     grund: '#0d1a16', grund2: '#152a22', milch: '#6f9184',
     stern: '#eef0e6', hell: '#ffffff', linie: '#c0a457',
     schrift: '#cfd6c2', rand: '#c0a457', ekliptik: '#7fa08e'
   },
   {
-    id: 'wein', name: 'Weinroter Abend',
+    id: 'wein', kalt: '#c3b2d8', kuehl: '#eadde4', warm: '#f6dcb6', rot: '#f5b193', name: 'Weinroter Abend',
     grund: '#1a0f16', grund2: '#2a1622', milch: '#9b7488',
     stern: '#f2e9e6', hell: '#ffffff', linie: '#c98a58',
     schrift: '#dcc9c4', rand: '#c98a58', ekliptik: '#a3809a'
@@ -144,6 +144,13 @@ function saubererHimmel(roh) {
     milchstrasse: r.milchstrasse !== false,
     ekliptik: r.ekliptik !== false,
     horizont: r.horizont !== false,
+    /* Was sonst noch am Himmel steht. Alles einzeln abschaltbar: nicht
+       jede Welt hat einen Mond, und nicht jeder Himmel einen Kometen. */
+    wandler: r.wandler !== false,
+    mond: r.mond !== false,
+    nebel: r.nebel !== false,
+    haufen: r.haufen !== false,
+    komet: r.komet !== false,
     sternbilder: sichtbar,
     notiz: String(r.notiz || '').trim().slice(0, 6000)
   };
@@ -220,6 +227,37 @@ function sternFeld(himmel) {
       ton: sternZufall(saat, 'st' + i)
     });
   }
+
+  /* Die Sternhaufen kommen ZULETZT — und das ist kein Schönheitsgrund.
+     Ein Sternbild speichert die NUMMERN seiner Sterne. Wer neue Sterne
+     vorne in die Liste legt, verschiebt jede Nummer dahinter, und alle
+     bestehenden Sternbilder zeigen danach auf fremde Sterne: die Linien
+     liefen quer über den Himmel. Was hinten angehängt wird, kann das
+     nicht anrichten.
+
+     Ein Knoten aus vielen kleinen Sternen dicht beieinander — am Himmel
+     das, woran das Auge hängenbleibt; eine gleichmäßige Streuung hat so
+     etwas nie. */
+  for (const h of sternHaufen(himmel)) {
+    const mx = Math.cos(h.w) * h.r, my = Math.sin(h.w) * h.r;
+    for (let k = 0; k < h.wieViele; k++) {
+      /* Zur Mitte dichter: zwei Würfe gemittelt reichen dafür. */
+      const a = sternZufall(saat, 'hk' + h.n + '_' + k) * Math.PI * 2;
+      const d = (sternZufall(saat, 'hd' + h.n + '_' + k) + sternZufall(saat, 'he' + h.n + '_' + k)) / 2 * h.weite;
+      const x = mx + Math.cos(a) * d, y = my + Math.sin(a) * d;
+      const rr = Math.hypot(x, y);
+      if (rr > STERN_R) continue;
+      const roh = sternZufall(saat, 'hh' + h.n + '_' + k);
+      sterne.push({
+        n: sterne.length,
+        w: Math.atan2(y, x), r: rr,
+        gr: 0.45 + roh * (roh > 0.9 ? 1.6 : 0.55),
+        ton: sternZufall(saat, 'ht' + h.n + '_' + k),
+        haufen: h.n
+      });
+    }
+  }
+
   return sterne;
 }
 
@@ -240,7 +278,22 @@ function sternHimmelBauen(himmel) {
     const [x, y] = sternStelle(s, himmel.tag);
     return Object.assign({}, s, { x, y });
   });
-  return { sterne: stellen, feld };
+  /* Alles, was sich anders bewegt als die Fixsterne, wird hier für den
+     gewählten Tag ausgerechnet — damit das Zeichnen nichts mehr rechnen
+     muss und der Tageslauf flüssig bleibt. */
+  const wandler = sternWandler(himmel).map((w) => {
+    const [x, y] = sternWandlerStelle(w, himmel.tag);
+    return Object.assign({}, w, { x, y });
+  });
+  const nebel = sternNebel(himmel).map((n) => {
+    const [x, y] = sternNebelStelle(n, himmel.tag);
+    return Object.assign({}, n, { x, y });
+  });
+  return {
+    sterne: stellen, feld, wandler, nebel,
+    mond: sternMond(himmel),
+    komet: sternKomet(himmel)
+  };
 }
 
 /* ===================== DIE SICHT AUF EIN STERNBILD ===================== */
@@ -327,6 +380,201 @@ function sternGeburtssatz(himmel, datum) {
   return 'An diesem Tag stand am höchsten: ' + z.bild.name + '.';
 }
 
+/* ===================== DIE WANDELSTERNE =====================
+   Der Unterschied zwischen einem Bild und einem Himmel ist, dass sich
+   etwas darin BEWEGT — und zwar anders als der Rest.
+
+   Die Fixsterne drehen sich alle gemeinsam einmal im Jahr; sie stehen
+   zueinander immer gleich. Ein Wandelstern nicht: er zieht auf der
+   Ekliptik seine eigene Bahn, mit eigener Umlaufzeit, und steht darum an
+   jedem Tag woanders zwischen den Sternbildern. Genau das haben Menschen
+   vor viertausend Jahren bemerkt, und genau deshalb haben sie ihnen
+   Namen gegeben. */
+const STERN_WANDLER_NAMEN = [
+  ['Der Rote', 'ein zorniger Stern; man sagt, er bringt Streit'],
+  ['Die Weiße', 'der Abendstern; sie steht für das, was man nicht sagt'],
+  ['Der Träge', 'er braucht Jahre für eine Runde; Bauern richten sich nach ihm'],
+  ['Der Bote', 'er ist selten zu sehen und immer in Eile'],
+  ['Die Blaue', 'kalt und weit; Seeleute schwören auf sie'],
+  ['Der Späte', 'er kommt zuletzt und geht zuerst'],
+  ['Der Wächter', 'er steht dem Nordstern am nächsten']
+];
+
+/* Wie viele Wandelsterne dieser Himmel hat und wie sie laufen. */
+function sternWandler(himmel) {
+  if (himmel.wandler === false) return [];
+  const saat = himmel.saat;
+  const wieViele = 3 + (sternHash(saat, 'wz') % 4);
+  const raus = [];
+  for (let i = 0; i < wieViele; i++) {
+    const [name, sage] = STERN_WANDLER_NAMEN[(sternHash(saat, 'wn' + i) + i) % STERN_WANDLER_NAMEN.length];
+    if (raus.some((w) => w.name === name)) continue;
+    raus.push({
+      n: raus.length,
+      name, sage,
+      /* Die Umlaufzeit in Tagen: von einem knappen Jahr bis zu zwölf.
+         Kurze Umläufe wandern sichtbar, lange stehen fast still — und
+         genau dieser Unterschied macht sie zu Persönlichkeiten. */
+      umlauf: Math.round(140 + sternZufall(saat, 'wu' + i) * 4200),
+      /* Wo er am ersten Tag steht. */
+      anfang: sternZufall(saat, 'wa' + i) * Math.PI * 2,
+      gr: 2.2 + sternZufall(saat, 'wg' + i) * 1.9,
+      /* Der Farbton macht sie unterscheidbar, ohne bunt zu werden. */
+      ton: sternZufall(saat, 'wt' + i)
+    });
+  }
+  return raus;
+}
+
+/* Wo steht ein Wandelstern an diesem Tag?
+   Er läuft auf der Ekliptik — dem Band, auf dem auch Sonne und Mond
+   ziehen —, und die Ekliptik dreht sich mit dem Himmel mit. */
+function sternWandlerStelle(wandler, tag) {
+  const eigen = wandler.anfang + ((tag - 1) / wandler.umlauf) * Math.PI * 2;
+  const himmelsdrehung = ((tag - 1) / 365) * Math.PI * 2;
+  const w = eigen + himmelsdrehung;
+  /* Dieselbe Bahn wie die gezeichnete Ekliptik. */
+  const r = STERN_R * (0.62 + Math.sin(eigen * 2) * 0.06);
+  return [
+    STERN_MITTE + Math.cos(w) * r,
+    STERN_MITTE + Math.sin(w) * r * 0.86
+  ];
+}
+
+/* ===================== DER MOND =====================
+   Er läuft schneller als alles andere und wechselt dabei sein Gesicht.
+   Beides zusammen — Stellung und Phase — macht ihn zur Uhr, an der man
+   ohne Kalender ablesen kann, welcher Tag ist. */
+const STERN_MONDLAUF = 27.3;      /* Tage für eine Runde am Himmel */
+const STERN_MONDPHASE = 29.53;    /* Tage von Neumond zu Neumond */
+
+function sternMond(himmel) {
+  if (himmel.mond === false) return null;
+  const tag = himmel.tag;
+  const versatz = sternZufall(himmel.saat, 'mo') * STERN_MONDPHASE;
+  /* Die Phase: 0 ist Neumond, 0.5 Vollmond. */
+  const phase = (((tag - 1 + versatz) % STERN_MONDPHASE) / STERN_MONDPHASE + 1) % 1;
+  const eigen = sternZufall(himmel.saat, 'ml') * Math.PI * 2 + ((tag - 1) / STERN_MONDLAUF) * Math.PI * 2;
+  const himmelsdrehung = ((tag - 1) / 365) * Math.PI * 2;
+  const w = eigen + himmelsdrehung;
+  const r = STERN_R * 0.68;
+  return {
+    x: STERN_MITTE + Math.cos(w) * r,
+    y: STERN_MITTE + Math.sin(w) * r * 0.86,
+    phase,
+    /* Wie weit die Sichel gefüllt ist — für das Zeichnen. */
+    voll: 1 - Math.abs(phase - 0.5) * 2,
+    name: sternMondphaseName(phase)
+  };
+}
+
+function sternMondphaseName(phase) {
+  if (phase < 0.03 || phase > 0.97) return 'Neumond';
+  if (phase < 0.22) return 'zunehmende Sichel';
+  if (phase < 0.28) return 'Halbmond, zunehmend';
+  if (phase < 0.47) return 'zunehmender Mond';
+  if (phase < 0.53) return 'Vollmond';
+  if (phase < 0.72) return 'abnehmender Mond';
+  if (phase < 0.78) return 'Halbmond, abnehmend';
+  return 'abnehmende Sichel';
+}
+
+/* ===================== NEBEL UND HAUFEN =====================
+   Was am Himmel weder Stern noch Leere ist. Beides gibt es wirklich, und
+   beides macht den Unterschied zwischen einer Punktwolke und einem
+   Himmel, den man ansehen mag. */
+function sternNebel(himmel) {
+  if (himmel.nebel === false) return [];
+  const saat = himmel.saat;
+  const wieViele = 2 + (sternHash(saat, 'nz') % 3);
+  const raus = [];
+  for (let i = 0; i < wieViele; i++) {
+    const w = sternZufall(saat, 'nw' + i) * Math.PI * 2;
+    const r = Math.sqrt(sternZufall(saat, 'nr' + i)) * STERN_R * 0.82;
+    const gross = STERN_R * (0.06 + sternZufall(saat, 'ng' + i) * 0.09);
+    /* Ein Nebel ist keine Scheibe: sein Umriss ist ausgefranst. */
+    const ecken = [];
+    const seiten = 9 + (sternHash(saat, 'ns' + i) % 4);
+    for (let k = 0; k < seiten; k++) {
+      const a = (k / seiten) * Math.PI * 2;
+      const rr = gross * (0.55 + sternZufall(saat, 'np' + i + '_' + k) * 0.75);
+      ecken.push([Math.cos(a) * rr, Math.sin(a) * rr * 0.78]);
+    }
+    raus.push({ n: i, w, r, ecken, ton: sternZufall(saat, 'nt' + i) });
+  }
+  return raus;
+}
+
+/* Wo steht ein Nebel an diesem Tag? Er dreht mit dem Himmel. */
+function sternNebelStelle(nebel, tag) {
+  const dreh = ((tag - 1) / 365) * Math.PI * 2;
+  const w = nebel.w + dreh;
+  return [STERN_MITTE + Math.cos(w) * nebel.r, STERN_MITTE + Math.sin(w) * nebel.r];
+}
+
+/* Sternhaufen: ein Knoten aus vielen kleinen Sternen dicht beieinander.
+   Sie werden nicht extra gezeichnet — sie sind Teil des Sternfelds und
+   entstehen dort, wo sich die Streuung ballt. Diese Liste sagt nur, WO
+   die Ballungen liegen, damit das Feld sie berücksichtigen kann. */
+function sternHaufen(himmel) {
+  if (himmel.haufen === false) return [];
+  const saat = himmel.saat;
+  const wieViele = 2 + (sternHash(saat, 'hz') % 4);
+  const raus = [];
+  for (let i = 0; i < wieViele; i++) {
+    const w = sternZufall(saat, 'hw' + i) * Math.PI * 2;
+    const r = Math.sqrt(sternZufall(saat, 'hr' + i)) * STERN_R * 0.85;
+    raus.push({
+      n: i, w, r,
+      weite: STERN_R * (0.028 + sternZufall(saat, 'hg' + i) * 0.045),
+      wieViele: 18 + (sternHash(saat, 'hn' + i) % 40)
+    });
+  }
+  return raus;
+}
+
+/* ===================== EIN KOMET =====================
+   Nicht jeder Himmel hat einen. Wenn doch, ist er das, worüber man
+   spricht — und in einer Geschichte fast immer ein Vorzeichen. */
+function sternKomet(himmel) {
+  if (himmel.komet === false) return null;
+  /* Nur etwa jeder dritte Himmel trägt einen. Ein Komet, den es immer
+     gibt, ist kein Komet mehr. */
+  if (sternZufall(himmel.saat, 'kd') > 0.34) return null;
+  const saat = himmel.saat;
+  const w = sternZufall(saat, 'kw') * Math.PI * 2 + ((himmel.tag - 1) / 365) * Math.PI * 2;
+  const r = STERN_R * (0.3 + sternZufall(saat, 'kr') * 0.5);
+  /* Der Schweif zeigt IMMER von der Sonne weg — und die steht, von hier
+     aus gesehen, in der Mitte des Blattes. Das ist die eine Regel, an der
+     man einen falsch gezeichneten Kometen sofort erkennt. */
+  const x = STERN_MITTE + Math.cos(w) * r;
+  const y = STERN_MITTE + Math.sin(w) * r;
+  return {
+    x, y,
+    schweif: Math.atan2(y - STERN_MITTE, x - STERN_MITTE),
+    laenge: STERN_R * (0.16 + sternZufall(saat, 'kl') * 0.2),
+    name: sternKometname(saat)
+  };
+}
+const STERN_KOMET_WORTE = ['Der Besenstern', 'Der Haarstern', 'Das Zeichen', 'Der Schleppende',
+  'Die Rute', 'Der Gast', 'Das lange Licht'];
+function sternKometname(saat) {
+  return STERN_KOMET_WORTE[sternHash(saat, 'kn') % STERN_KOMET_WORTE.length];
+}
+
+/* ===================== DIE FARBE EINES STERNS =====================
+   Sterne sind wirklich farbig, nur sehr zurückhaltend: von bläulichweiß
+   über weiß und gelb bis rötlich. Wer das übertreibt, bekommt eine
+   Kirmes; wer es weglässt, bekommt Salz auf Papier. */
+function sternFarbe(ton, welt) {
+  const w = welt || sternWelt('tinte');
+  if (ton < 0.10) return w.kalt || '#b8ccff';
+  if (ton < 0.28) return w.kuehl || '#dbe6ff';
+  if (ton > 0.94) return w.rot || '#ffb591';
+  if (ton > 0.80) return w.warm || '#ffe0b8';
+  return w.stern;
+}
+
 /* ===================== NAMEN =====================
    Vorschläge, keine Vorschriften. Ein Sternbild heißt, wie du es nennst —
    aber vor einem leeren Feld fällt einem nichts ein. */
@@ -374,9 +622,15 @@ function sternZahlen(himmel) {
   const h = himmel && himmel.sternbilder ? himmel : saubererHimmel(himmel);
   const sterne = h.sternbilder.reduce((s, b) => s + b.sterne.length, 0);
   const linien = h.sternbilder.reduce((s, b) => s + b.linien.length, 0);
+  const gebaut = sternHimmelBauen(h);
   return {
     bilder: h.sternbilder.length,
     sterne, linien,
+    himmelssterne: gebaut.sterne.length,
+    wandler: gebaut.wandler.length,
+    nebel: gebaut.nebel.length,
+    mond: gebaut.mond ? gebaut.mond.name : '',
+    komet: gebaut.komet ? gebaut.komet.name : '',
     mitSage: h.sternbilder.filter((b) => b.sage).length,
     ohneNamen: h.sternbilder.filter((b) => !b.name).length
   };

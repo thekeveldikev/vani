@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.51.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.52.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -378,6 +378,43 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   - Fünf Farbwelten, vier Dichten, ein graduierter Rand mit Himmelsrichtungen, Ekliptik,
     Höhenkreise. Zwei-Finger-Zoom und Rückgängig wie bei Karte und Teppich.
   - „Wann am höchsten?“ rechnet alle 365 Stellungen durch und nennt den Tag.
+- **5.52** Die Sternwarte bekommt Licht und alles, was sich bewegt.
+
+  **Das Licht.** Der erste Wurf hatte harte Kanten: Kreise auf einer flachen Fläche — es sah
+  billig aus. Ein Nachthimmel besteht aber fast nur aus WEICHEM Licht; nichts daran hat einen
+  Rand. Jetzt gibt es vier SVG-Filter, und alles Leuchtende geht hindurch: die Nebel sehr weich,
+  Milchstraßenband und Kometenschweif halbweich, die hellen Sterne durch einen Glimmfilter
+  (Kern plus Schein statt eines gemalten Kreises). **Geblurrt wird sparsam** — die dreißig hellen
+  Sterne als Gruppe, nicht tausend einzeln; das wäre unbezahlbar und unnötig.
+  Dazu: ein dreistufiger Himmelsgrund, drei sehr große sehr schwache Luftleuchten-Schwaden
+  (man sieht sie nicht, man merkt nur, dass die Fläche lebt), und ein **Saum**, der zum Horizont
+  hin dunkler wird — das ist der Grund, warum die Scheibe gewölbt aussieht statt aufgeklebt.
+
+  **Die Sternfarben kommen aus der Temperatur**, nicht mehr aus einem CSS-Filter: ein Filter
+  drehte den Farbton der ganzen Form, und bei einem weißen Stern auf dunklem Grund war davon
+  nichts zu sehen. Jede Farbwelt bringt jetzt vier Sternfarben mit (kalt, kühl, warm, rot).
+
+  **Die Wandelsterne.** Drei bis sechs, jeder mit Namen, Sage und eigener Umlaufzeit
+  (140–4400 Tage). Fixsterne stehen zueinander immer gleich; ein Wandelstern zieht seine eigene
+  Bahn auf der Ekliptik und steht an jedem Tag woanders zwischen den Sternbildern. Genau das haben
+  Menschen vor viertausend Jahren bemerkt — und genau deshalb haben sie ihnen Namen gegeben.
+  Gezeichnet als Scheibe mit Ring, nicht mit Strahlen: sie funkeln nicht.
+
+  **Der Mond mit echten Phasen.** Der erste Versuch legte bei Vollmond einen Schattenkreis genau
+  auf den Mond und löschte ihn damit aus — eine graue Münze. Richtig geht es über `k`, den
+  Kosinus der Phase: der Terminator ist von hier aus eine ELLIPSE der halben Breite r·|k|, und
+  je nachdem ob weniger oder mehr als die Hälfte leuchtet, schneidet sie heraus oder legt dazu.
+  Diese eine Fallunterscheidung ist der ganze Trick.
+
+  **Nebel, Sternhaufen, ein Komet.** Der Kometenschweif zeigt IMMER von der Sonne weg (die steht
+  von hier aus in der Blattmitte) — die eine Regel, an der man einen falsch gezeichneten Kometen
+  erkennt. Nur etwa jeder dritte Himmel hat einen; einer, den es immer gibt, ist keiner mehr.
+
+  **Repariert:** Die Sternhaufen lagen zuerst VORNE in der Sternliste — und ein Sternbild
+  speichert die NUMMERN seiner Sterne. Damit verschob sich jede Nummer dahinter, und alle
+  bestehenden Sternbilder zeigten auf fremde Sterne: die Linien liefen quer über den Himmel.
+  Jetzt werden sie hinten angehängt, und ein Test hält fest, dass die ersten N Sterne mit und
+  ohne Haufen identisch sind.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

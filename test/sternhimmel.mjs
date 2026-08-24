@@ -212,3 +212,132 @@ test('Ein großer Himmel wird schnell genug gerechnet', async () => {
   assert.ok(dauer < 400, dauer + ' ms für ' + g.sterne.length + ' Sterne');
   assert.ok(g.sterne.length > 2000, 'und es sind wirklich viele: ' + g.sterne.length);
 });
+
+/* --- Was sich bewegt: Wandelsterne, Mond, Nebel, Komet --- */
+
+test('Die Wandelsterne wandern — und zwar jeder anders', async () => {
+  const k = await frisch();
+  /* Der Unterschied zwischen einem Bild und einem Himmel ist, dass sich
+     etwas darin bewegt, und zwar ANDERS als der Rest. Fixsterne stehen
+     zueinander immer gleich; ein Wandelstern zieht seine eigene Bahn. */
+  const h = himmel(k, { saat: 'wandel' });
+  const w = k.sternWandler(h);
+  assert.ok(w.length >= 2 && w.length <= 7, w.length + ' Wandelsterne');
+  for (const p of w) {
+    assert.ok(p.name && p.sage, 'jeder hat Namen und Sage');
+    assert.ok(p.umlauf >= 140 && p.umlauf <= 4400, 'eine Umlaufzeit, die man erleben kann: ' + p.umlauf);
+  }
+  assert.equal(new Set(w.map((p) => p.name)).size, w.length, 'keiner heißt wie ein anderer');
+
+  /* Über ein halbes Jahr steht er woanders — und zwar woanders als ein
+     Fixstern, der nur mitgedreht wurde. */
+  const einer = w[0];
+  const [x1, y1] = k.sternWandlerStelle(einer, 1);
+  const [x2, y2] = k.sternWandlerStelle(einer, 183);
+  assert.ok(Math.hypot(x2 - x1, y2 - y1) > 40, 'er ist wirklich gewandert');
+
+  /* Und er bleibt auf dem Blatt. */
+  for (let t = 1; t <= 365; t += 17) {
+    const [x, y] = k.sternWandlerStelle(einer, t);
+    assert.ok(Math.hypot(x - k.STERN_MITTE, y - k.STERN_MITTE) <= k.STERN_R + 1, 'Tag ' + t + ': von der Scheibe gelaufen');
+  }
+});
+
+test('Der Mond läuft durch alle Phasen', async () => {
+  const k = await frisch();
+  /* Der erste Versuch legte bei Vollmond einen Schattenkreis genau auf den
+     Mond — und löschte ihn damit aus. Es sah aus wie eine graue Münze.
+     Der Wert `voll` sagt, wie viel leuchtet: 0 ist Neumond, 1 Vollmond. */
+  const h = himmel(k, { saat: 'mond' });
+  const gesehen = new Set();
+  let hoechst = 0, niedrigst = 1;
+  for (let t = 1; t <= 40; t++) {
+    const m = k.sternMond(Object.assign({}, h, { tag: t }));
+    assert.ok(m, 'es gibt einen Mond');
+    assert.ok(m.voll >= 0 && m.voll <= 1, 'die Phase liegt zwischen 0 und 1: ' + m.voll);
+    assert.ok(m.name, 'sie hat einen deutschen Namen');
+    hoechst = Math.max(hoechst, m.voll);
+    niedrigst = Math.min(niedrigst, m.voll);
+    gesehen.add(m.name);
+  }
+  assert.ok(hoechst > 0.9, 'innerhalb eines Monats gibt es einen Vollmond: ' + hoechst.toFixed(2));
+  assert.ok(niedrigst < 0.1, 'und einen Neumond: ' + niedrigst.toFixed(2));
+  assert.ok(gesehen.size >= 5, 'er läuft durch mehrere Phasen: ' + [...gesehen].join(', '));
+
+  /* Die Namen sind deutsch und sagen, was sie meinen. */
+  assert.equal(k.sternMondphaseName(0), 'Neumond');
+  assert.equal(k.sternMondphaseName(0.5), 'Vollmond');
+  assert.match(k.sternMondphaseName(0.15), /zunehmend/);
+  assert.match(k.sternMondphaseName(0.85), /abnehmend/);
+
+  /* Ohne Haken kein Mond. */
+  assert.equal(k.sternMond(himmel(k, { mond: false })), null);
+});
+
+test('Nebel, Haufen und Komet bleiben auf dem Blatt', async () => {
+  const k = await frisch();
+  for (const saat of ['a', 'b', 'c', 'd']) {
+    const h = himmel(k, { saat });
+    for (const n of k.sternNebel(h)) {
+      for (const tag of [1, 120, 300]) {
+        const [x, y] = k.sternNebelStelle(n, tag);
+        assert.ok(Math.hypot(x - k.STERN_MITTE, y - k.STERN_MITTE) <= k.STERN_R + 1, saat + ': ein Nebel ist von der Scheibe gelaufen');
+      }
+      assert.ok(n.ecken.length >= 9, 'ein Nebel hat einen ausgefransten Umriss');
+    }
+    const komet = k.sternKomet(h);
+    if (komet) {
+      assert.ok(komet.name, 'der Komet hat einen Namen');
+      /* Der Schweif zeigt IMMER von der Sonne weg — und die steht, von
+         hier aus gesehen, in der Mitte des Blattes. Das ist die eine
+         Regel, an der man einen falsch gezeichneten Kometen erkennt. */
+      const zurMitte = Math.atan2(k.STERN_MITTE - komet.y, k.STERN_MITTE - komet.x);
+      let d = Math.abs(komet.schweif - zurMitte);
+      while (d > Math.PI) d = Math.PI * 2 - d;
+      assert.ok(Math.abs(d - Math.PI) < 0.01, 'der Schweif zeigt von der Mitte weg');
+    }
+  }
+  /* Nicht jeder Himmel hat einen Kometen — einer, den es immer gibt, ist
+     keiner mehr. */
+  const mitKomet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].filter((s) => k.sternKomet(himmel(k, { saat: s })));
+  assert.ok(mitKomet.length > 0 && mitKomet.length < 8, 'manche haben einen, manche nicht: ' + mitKomet.length + ' von 8');
+});
+
+test('Die Sternhaufen ändern keine Sternnummer', async () => {
+  const k = await frisch();
+  /* Ein Sternbild speichert die NUMMERN seiner Sterne. Wer neue Sterne
+     vorne in die Liste legt, verschiebt jede Nummer dahinter — und alle
+     bestehenden Sternbilder zeigen danach auf fremde Sterne: die Linien
+     liefen quer über den Himmel. Genau das ist passiert. */
+  const ohne = k.sternFeld(himmel(k, { saat: 'h', haufen: false }));
+  const mit = k.sternFeld(himmel(k, { saat: 'h', haufen: true }));
+  assert.ok(mit.length > ohne.length, 'die Haufen bringen wirklich Sterne mit');
+  for (let i = 0; i < ohne.length; i++) {
+    assert.equal(mit[i].w, ohne[i].w, 'Stern ' + i + ' ist verrutscht');
+    assert.equal(mit[i].r, ohne[i].r, 'Stern ' + i + ' ist verrutscht');
+  }
+  /* Und die Haufen liegen wirklich als Knoten beieinander. */
+  const haufen = k.sternHaufen(himmel(k, { saat: 'h' }));
+  assert.ok(haufen.length >= 2);
+  const drin = mit.filter((s) => s.haufen === 0);
+  assert.ok(drin.length > 10, 'im ersten Haufen stehen viele: ' + drin.length);
+});
+
+test('Sternfarben sind Farben, keine Filter', async () => {
+  const k = await frisch();
+  /* Vorher drehte ein CSS-Filter den Farbton der ganzen Form — bei einem
+     weißen Stern auf dunklem Grund war davon nichts zu sehen. */
+  const w = k.sternWelt('tinte');
+  const kalt = k.sternFarbe(0.02, w);
+  const warm = k.sternFarbe(0.99, w);
+  const mitte = k.sternFarbe(0.5, w);
+  for (const f of [kalt, warm, mitte]) assert.match(f, /^#[0-9a-f]{3,8}$/i, 'eine echte Farbe: ' + f);
+  assert.notEqual(kalt, warm, 'kalt und warm sind verschieden');
+  assert.equal(mitte, w.stern, 'die Mitte ist die Grundfarbe');
+  /* Jede Welt bringt ihre eigenen mit. */
+  for (const welt of k.STERN_WELTEN) {
+    for (const feld of ['kalt', 'kuehl', 'warm', 'rot']) {
+      assert.match(welt[feld], /^#[0-9a-f]{3,8}$/i, welt.id + '/' + feld);
+    }
+  }
+});
