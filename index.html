@@ -5272,6 +5272,15 @@ html[data-thema="tinte"] .knopf.gefahr, html[data-thema="kerze"] .knopf.gefahr {
 .tep-tierlinie { fill: none; stroke: #ded6bd; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .72; }
 .tep-tierauge { fill: #ded6bd; opacity: .72; }
 .tep-fusstier { pointer-events: none; }
+/* Der Hinweis, dass gerade etwas ausgeblendet ist — er soll auffallen. */
+.tep-lgalle.wichtig { display: inline-flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
+.tep-lgalle.wichtig b { color: #e0b26a; font-weight: 600; }
+.tep-lgalle.wichtig span { opacity: .72; text-decoration: underline; text-underline-offset: 2px; }
+
+/* Der Rueckgaengig-Knopf: blass, wenn es nichts zurueckzunehmen gibt. */
+.zugknopf { font-variant-numeric: tabular-nums; }
+.zugknopf[disabled] { opacity: .38; cursor: default; }
+
 /* Die Ausrichthilfen: eine feine Linie zeigt, woran der Name einrastet. */
 .tep-hilfslinien { pointer-events: none; }
 .tep-hilfslinie { fill: none; stroke: #e0b26a; stroke-width: 1.4; stroke-opacity: .55; stroke-dasharray: 7 6; }
@@ -6584,7 +6593,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.46.0';
+const APP_VERSION = '5.47.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -7275,6 +7284,10 @@ async function loesche(id, still, kinderDerWurzelBehalten = false) {
   const wurzel = D.docs.get(id);
   if (!wurzel) return;
   const opfer = _nachfahren(id, kinderDerWurzelBehalten);
+  /* Auch das Löschen kommt auf den Stapel — damit Strg+Z dasselbe tut wie
+     überall sonst. Der Papierkorb bleibt daneben bestehen: er hält länger,
+     das Zurücknehmen ist schneller. */
+  schrittMerken('„' + ((wurzel.titel || wurzel.typ || 'Etwas')) + '“ weggenommen', opfer);
   const opferSet = new Set(opfer);
   const buendel = { id: uid(), wann: Date.now(), name: wurzel.titel || (wurzel.text || '').slice(0, 40) || wurzel.typ, typ: wurzel.typ, docs: [], referenzen: [] };
   /* Lose Zuordnungen überleben das Löschen ihres Ziels, dürfen danach aber
@@ -7536,6 +7549,182 @@ function toastMitAktion(text, aktion, tu, ms = 5200) {
   const t = el('div', { class: 'toast anfassbar' }, text, knopf);
   buehne.append(t);
   setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 450); }, ms);
+}
+
+/* ===================== RÜCKGÄNGIG =====================
+   Ein Knopf, den man vielleicht nie drückt — und der den Unterschied
+   macht, ob man sich traut, etwas auszuprobieren.
+
+   Wie es arbeitet: VANI hält seine Sachen als Dokumente. Bevor etwas
+   verändert wird, legt der Schritt eine ABSCHRIFT der betroffenen
+   Dokumente beiseite. Zurücknehmen heißt: die Abschrift wieder einsetzen.
+   Kein Umkehren einzelner Handgriffe, keine Liste von Gegenoperationen,
+   die man für jede neue Funktion nachpflegen müsste — und deshalb gilt es
+   für alles gleich, auch für das, was es noch gar nicht gibt.
+
+   Wer eine neue Änderung baut, schreibt eine Zeile davor:
+       await schrittMerken('Faden zerschnitten', [doc]);
+   Mehr ist es nicht.
+
+   Zwei Dinge, die man leicht falsch macht und die hier absichtlich anders
+   sind:
+
+   — Abgeschrieben wird mit `structuredClone`, nicht über JSON. In VANI
+     stecken Blobs in den Dokumenten (Sticker, Tonnotizen, Bilder); durch
+     JSON gehen die verloren, und das Zurücknehmen hätte sie stillschweigend
+     gelöscht. Genau die Sorte Fehler, die man erst Wochen später merkt.
+
+   — Ein zurückgenommener Schritt wird nicht weggeworfen, sondern auf den
+     Vorstapel gelegt. Wer versehentlich zurücknimmt, kommt wieder hin. */
+
+const ZUG_GRENZE = 80;          /* so viele Schritte hält VANI vor */
+const _zug = { zurueck: [], vor: [], laeuft: false };
+
+/* Eine tiefe Abschrift, die auch Blobs übersteht. */
+function _zugAbschrift(wert) {
+  try { return structuredClone(wert); } catch (e) {}
+  try { return JSON.parse(JSON.stringify(wert)); } catch (e) {}
+  return null;
+}
+
+/* Den Stand der genannten Dokumente festhalten. `null` heißt: gab es
+   noch nicht — beim Zurücknehmen wird es dann wieder entfernt. */
+function _zugStand(ids) {
+  const raus = [];
+  for (const id of ids) {
+    const doc = D.docs.get(id);
+    raus.push({ id, doc: doc ? _zugAbschrift(doc) : null });
+  }
+  return raus;
+}
+
+/* Der eine Aufruf, den es braucht. `docs` sind Dokumente oder ihre
+   Kennungen; wer mehrere angibt, nimmt sie später gemeinsam zurück. */
+function schrittMerken(was, docs) {
+  if (_zug.laeuft) return;      /* das Zurücknehmen selbst wird nicht gemerkt */
+  const liste = (Array.isArray(docs) ? docs : [docs])
+    .map((d) => (typeof d === 'string' ? d : (d && d.id)))
+    .filter(Boolean);
+  if (!liste.length) return;
+  _zug.zurueck.push({ was: String(was || 'Änderung'), wann: Date.now(), ids: liste, vorher: _zugStand(liste) });
+  while (_zug.zurueck.length > ZUG_GRENZE) _zug.zurueck.shift();
+  /* Eine neue Änderung macht den Vorstapel ungültig — sonst käme man in
+     eine Zukunft zurück, die es nicht mehr gibt. */
+  _zug.vor.length = 0;
+  zugStandMelden();
+}
+
+/* Merken UND gleich einen Hinweis mit Knopf zeigen. Für alles, was groß
+   genug ist, dass man es bemerken soll. */
+function schrittMerkenMitHinweis(was, docs, text) {
+  schrittMerken(was, docs);
+  toastMitAktion(text || (was + '.'), 'Rückgängig', () => { schrittZurueck(); }, 6500);
+}
+
+async function _zugEinsetzen(stand) {
+  for (const eintrag of stand) {
+    if (eintrag.doc) {
+      const abschrift = _zugAbschrift(eintrag.doc);
+      D.docs.set(eintrag.id, abschrift);
+      markiereAenderung(abschrift, false);
+      await sicherSpeichern('docs', abschrift);
+    } else {
+      /* Es gab das Dokument vorher nicht — dann muss es wieder weg. */
+      D.docs.delete(eintrag.id);
+      try { await dbDel('docs', eintrag.id); } catch (e) {}
+    }
+  }
+}
+
+/* Nach dem Zurücknehmen muss das, was offen ist, neu zeichnen. Statt hier
+   jedes Werkzeug zu kennen, wird ein Ereignis geworfen — wer offen ist,
+   hört zu. So braucht ein neues Werkzeug nichts zu ändern. */
+function _zugMelden() {
+  try { document.dispatchEvent(new CustomEvent('vani-zug')); } catch (e) {}
+}
+function zugStandMelden() {
+  try { document.dispatchEvent(new CustomEvent('vani-zugstand')); } catch (e) {}
+}
+function zugStand() {
+  const l = _zug.zurueck[_zug.zurueck.length - 1];
+  const v = _zug.vor[_zug.vor.length - 1];
+  return { zurueck: _zug.zurueck.length, vor: _zug.vor.length, was: l ? l.was : '', wasVor: v ? v.was : '' };
+}
+
+async function schrittZurueck() {
+  const schritt = _zug.zurueck.pop();
+  if (!schritt) { toast('Es gibt nichts zurückzunehmen.', 2600); return false; }
+  _zug.laeuft = true;
+  try {
+    /* Den jetzigen Stand für den Weg nach vorn aufheben. */
+    schritt.nachher = _zugStand(schritt.ids);
+    await _zugEinsetzen(schritt.vorher);
+    _zug.vor.push(schritt);
+    while (_zug.vor.length > ZUG_GRENZE) _zug.vor.shift();
+  } finally { _zug.laeuft = false; }
+  _zugMelden();
+  zugStandMelden();
+  toastMitAktion('Zurückgenommen: ' + schritt.was, 'Doch wieder', () => { schrittVor(); }, 6500);
+  return true;
+}
+
+async function schrittVor() {
+  const schritt = _zug.vor.pop();
+  if (!schritt) { toast('Es gibt nichts wiederherzustellen.', 2600); return false; }
+  _zug.laeuft = true;
+  try {
+    await _zugEinsetzen(schritt.nachher || []);
+    _zug.zurueck.push(schritt);
+  } finally { _zug.laeuft = false; }
+  _zugMelden();
+  zugStandMelden();
+  toast('Wieder da: ' + schritt.was, 3400);
+  return true;
+}
+
+/* Wer den Stapel leeren will — beim Profilwechsel etwa, damit fremde
+   Abschriften nicht im Speicher liegen bleiben. */
+function schritteVergessen() {
+  _zug.zurueck.length = 0;
+  _zug.vor.length = 0;
+  zugStandMelden();
+}
+
+/* Ein Knopf zum Zurücknehmen, den ein Werkzeug in seine Leiste hängt.
+   Er meldet sich selbst am Stapel an und wieder ab, wenn er aus dem
+   Dokument verschwindet — auf einem iPad gibt es kein Strg+Z, und ein
+   Rückgängig, das man nur mit Tastatur erreicht, ist für dieses Gerät
+   keins. */
+function zugKnopf(danach) {
+  const knopf = el('button', {
+    class: 'knopf zart klein zugknopf', title: 'Das Letzte zurücknehmen (Strg+Z)',
+    onclick: async () => { await schrittZurueck(); if (danach) danach(); }
+  }, '↶ Zurück');
+  const auffrischen = () => {
+    if (!knopf.isConnected) { document.removeEventListener('vani-zugstand', auffrischen); return; }
+    const st = zugStand();
+    knopf.disabled = st.zurueck === 0;
+    knopf.title = st.zurueck ? 'Zurücknehmen: ' + st.was + ' (Strg+Z)' : 'Nichts zurückzunehmen';
+  };
+  document.addEventListener('vani-zugstand', auffrischen);
+  setTimeout(auffrischen, 0);
+  return knopf;
+}
+
+/* Strg+Z und Strg+Umschalt+Z (beziehungsweise Strg+Y) — überall in VANI,
+   solange nicht gerade in ein Textfeld geschrieben wird. Dort gehört das
+   Zurücknehmen dem Feld selbst; ihm den Griff wegzunehmen wäre schlimmer
+   als gar kein Rückgängig. */
+function zugTastenAnmelden() {
+  document.addEventListener('keydown', (ev) => {
+    const z = ev.key === 'z' || ev.key === 'Z' || ev.key === 'y' || ev.key === 'Y';
+    if (!z || !(ev.ctrlKey || ev.metaKey)) return;
+    const ziel = ev.target;
+    if (ziel && (ziel.tagName === 'INPUT' || ziel.tagName === 'TEXTAREA' || ziel.isContentEditable)) return;
+    ev.preventDefault();
+    const vor = ev.shiftKey || ev.key === 'y' || ev.key === 'Y';
+    if (vor) schrittVor(); else schrittZurueck();
+  }, true);
 }
 
 /* ===================== MIT ZWEI FINGERN ZOOMEN =====================
@@ -31813,6 +32002,11 @@ function teppichLeerBild() {
 function teppichOeffnen(id) {
   const doc = D.docs.get(id);
   if (!doc || doc.typ !== 'stammbaum' || doc.geloescht) { toast('Der Wandteppich ist nicht mehr da.'); return; }
+  /* Ausgeblendete Fadenarten gehören zu EINEM Teppich. Vorher standen sie
+     im Modulzustand und wanderten mit: wer in einem Stammbaum „nur Blut“
+     eingestellt hatte, öffnete den nächsten und fand dort die Hälfte seiner
+     Fäden nicht wieder — ohne dass irgendwo stand, warum. */
+  if (_tep.id !== id) { _tep.stumm = []; _tep.suche = ''; _tep.nurPerson = ''; }
   _tep.id = id;
   if (!_tep.zoom || !Number.isFinite(_tep.zoom)) _tep.zoom = 1;
 
@@ -31830,6 +32024,13 @@ function teppichOeffnen(id) {
   const zu = zeigeDeck(kasten, () => { document.removeEventListener('keydown', taste); teppichAnimationenAus(); });
 
   const neu = () => teppichZeichne(kasten, flaeche, rahmen, neu, zu);
+
+  /* Wird irgendwo etwas zurückgenommen, zeichnet der offene Teppich neu.
+     Über ein Ereignis statt über einen Rückruf: dann muss das Zurücknehmen
+     nichts über die Werkzeuge wissen, und ein neues Werkzeug muss dort
+     nichts eintragen. */
+  const beiZug = () => { if (kasten.isConnected) { flaeche.dataset.sig = ''; neu(); } else document.removeEventListener('vani-zug', beiZug); };
+  document.addEventListener('vani-zug', beiZug);
 
   /* Mit zwei Fingern heran und wieder weg.
      Beim Kneifen wird nur das Tuch größer gemacht — nicht neu gewebt.
@@ -31952,7 +32153,7 @@ function teppichZeichne(kasten, flaeche, rahmen, neu, schliessen) {
     svg.setAttribute('width', Math.round(Number(svg.dataset.breite) * _tep.zoom));
     svg.setAttribute('height', Math.round(Number(svg.dataset.hoehe) * _tep.zoom));
   }
-  teppichBlickAuftragen(flaeche);
+  teppichBlickAuftragen(flaeche, baum);
   /* Ist eine Person im Blick, liegt unten eine Karte mit allem, was an ihr
      hängt — ohne dass dafür ein Fenster aufgehen muss. */
   const alteKarte = kasten.querySelector('.tep-personenkarte');
@@ -32007,6 +32208,7 @@ function teppichLeisteInhalt(doc, baum, ordnung, flaeche, neu, schliessen) {
             }
           }, '↺') : null,
         el('span', { class: 'tep-ltrenner' }),
+        zugKnopf(neu),
         el('button', { class: 'knopf zart klein', title: 'Alle Namen und Fäden (v)', onclick: () => teppichVerzeichnis(doc, neu) }, 'Verzeichnis'),
         el('button', { class: 'knopf zart klein', title: 'Tuch, Spruch, Titel', onclick: () => teppichEinstellungen(doc, neu) }, 'Der Rahmen'),
         el('button', { class: 'knopf voll klein', title: 'Einen Namen aufhängen (n)', onclick: () => teppichPersonNeu(doc, '', neu) }, '+ Name'),
@@ -32056,7 +32258,20 @@ function teppichLegende(arten, baum, neu) {
       }, el('i', { class: 'strich-' + a.strich }), a.name, el('small', {}, String(a.anzahl))))));
   }
   if (_tep.stumm.length || _tep.nurPerson) {
-    kasten.append(el('button', { class: 'tep-lgalle', onclick: () => { _tep.stumm = []; _tep.nurPerson = ''; neu(); } }, 'alles wieder zeigen'));
+    /* Es genügt nicht, dass man alles wieder zeigen KANN — es muss
+       dastehen, DASS gerade etwas fehlt. Ein Knopf mit „alles wieder
+       zeigen“ beantwortet eine Frage, die man erst stellt, wenn man weiß,
+       dass sie sich stellt. Wer eine Art vor zehn Minuten ausgeblendet hat
+       und jetzt einen Faden dieser Art spinnt, sucht den Fehler überall —
+       nur nicht in der Legende. */
+    const wieViele = _tep.stumm.length;
+    const text = wieViele
+      ? (wieViele === 1 ? 'Eine Fadenart ist ausgeblendet' : wieViele + ' Fadenarten sind ausgeblendet')
+      : 'Ein Name ist im Blick';
+    kasten.append(el('button', {
+      class: 'tep-lgalle wichtig', title: 'Wieder alles zeigen',
+      onclick: () => { _tep.stumm = []; _tep.nurPerson = ''; neu(); }
+    }, el('b', {}, text), el('span', {}, 'alles wieder zeigen')));
   }
   return kasten;
 }
@@ -32139,13 +32354,6 @@ function teppichPersonenkarte(doc, baum, personId, neu) {
   }
   karte.append(el('div', { class: 'tep-pkfuss' },
     el('button', { class: 'knopf zart klein', onclick: () => teppichFadenSpinnen(doc, personId, neu) }, '+ Faden'),
-    /* Eine ganze Generation auf einen Schlag in eine Reihe. Von Hand ist
-       das die m\u00fchsamste Arbeit am Teppich \u2014 und die, die man am
-       h\u00e4ufigsten machen will. */
-    el('button', {
-      class: 'knopf zart klein', title: 'Alle aus derselben Generation auf diese H\u00f6he bringen',
-      onclick: () => teppichReiheAusrichten(doc, personId, neu)
-    }, 'Generation ausrichten'),
     el('button', { class: 'knopf zart klein', onclick: () => teppichKartusche(doc, personId, neu) }, '\u00c4ndern')));
   return karte;
 }
@@ -32155,9 +32363,16 @@ function teppichPersonenkarte(doc, baum, personId, neu) {
    Klassen auf den fertigen Fäden. Dadurch muss der Teppich beim Tippen in
    der Legende oder auf einen Namen nicht neu gewebt werden — er steht, und
    nur seine Sichtbarkeit ändert sich. */
-function teppichBlickAuftragen(wurzel) {
+/* Was am fertigen Tuch nur eine Klasse ist, darf keinen Neubau kosten.
+   Genau daran hing die Suche: die Rendersignatur ist `id|geaendert`, und
+   das Suchwort steht dort zu Recht nicht drin — nur wurde `blass` beim
+   BAUEN eingebacken. Wer suchte, änderte damit gar nichts. Seit der
+   Signatur (5.39) war das Suchfeld im Teppich tot. */
+function teppichBlickAuftragen(wurzel, baum) {
   if (!wurzel) return;
   const nurWer = _tep.nurPerson;
+  const suche = (_tep.suche || '').trim();
+  const treffer = suche && baum ? new Set(teppichSuche(baum, suche).map((p) => p.id)) : null;
   for (const r of wurzel.querySelectorAll('.tep-ranke')) {
     const art = r.getAttribute('data-art');
     r.classList.toggle('stumm', _tep.stumm.includes(art));
@@ -32170,9 +32385,15 @@ function teppichBlickAuftragen(wurzel) {
     }
   }
   for (const q of wurzel.querySelectorAll('.tep-person')) {
-    q.classList.toggle('imblick', !!nurWer && q.getAttribute('data-person') === nurWer);
+    const id = q.getAttribute('data-person');
+    q.classList.toggle('imblick', !!nurWer && id === nurWer);
+    q.classList.toggle('hervor', !!nurWer && id === nurWer);
+    /* Kein Treffer heißt blass — und wenn gar nichts passt, wird alles
+       blass. Das ist die Antwort „hier ist niemand mit dem Namen“. */
+    q.classList.toggle('blass', !!treffer && !treffer.has(id));
   }
   wurzel.classList.toggle('einer-im-blick', !!nurWer);
+  wurzel.classList.toggle('suche-laeuft', !!treffer);
 }
 
 /* ================= DAS TUCH ZEICHNEN ================= */
@@ -32346,9 +32567,8 @@ function teppichSVG(doc, baum, ordnung, neu) {
   });
 
   /* --- Die Namensbänder --- */
-  const treffer = _tep.suche.trim() ? new Set(teppichSuche(baum, _tep.suche).map((p) => p.id)) : null;
   knoten.forEach((k, i) => {
-    gBaender.append(teppichBand(k, px(k), py(k), baum, treffer, i, neu));
+    gBaender.append(teppichBand(k, px(k), py(k), baum, i, neu));
   });
 
   /* --- Das Wappen des Hauses, unten am Stamm --- */
@@ -32904,16 +33124,16 @@ function teppichRanke(x1, y1, x2, y2, art, faden, baum, neu, versatz) {
 /* Ein Namensband: ein Streifen mit eingeschlagenen Enden, der Name darauf
    in Versalien, darunter die Jahre. Ist die Person ausgebrannt, liegt statt
    des Zeichens ein Loch im Tuch — der Name bleibt trotzdem stehen. */
-function teppichBand(k, x, y, baum, treffer, i, neu) {
+function teppichBand(k, x, y, baum, i, neu) {
   const p = k.person;
   const name = (teppichName(p) || 'ohne Namen').toUpperCase();
   const jahre = teppichJahre(p);
   const dreh = teppichDreh(p.id, 'band', 2.4);
-  const blass = treffer && !treffer.has(p.id);
-  const hell = _tep.nurPerson && _tep.nurPerson === p.id;
-
+  /* `blass` und `hervor` werden NICHT hier gesetzt: beides ist Ansicht,
+     kein Bau. teppichBlickAuftragen legt sie nach jedem Zeichnen an — und
+     nur so wirkt die Suche, ohne dass der Baum neu wächst. */
   const g = sv('g', {
-    class: 'tep-person' + (blass ? ' blass' : '') + (hell ? ' hervor' : '') + (p.gebrannt ? ' gebrannt' : ''),
+    class: 'tep-person' + (p.gebrannt ? ' gebrannt' : ''),
     transform: 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') rotate(' + dreh + ')',
     style: '--n:' + Math.min(i, 40) + ';--gen:' + Math.min(k.gen, 12),
     'data-person': p.id, tabindex: '0', role: 'button'
@@ -33076,33 +33296,6 @@ function teppichPersonSchubsen(doc, personId, dx, dy, neu) {
     return b;
   }).then(() => { if (neu) neu(); });
 }
-
-function teppichReiheAusrichten(doc, personId, neu) {
-  const baum = saubererStammbaum(doc);
-  const ordnung = teppichOrdnung(baum);
-  const ich = ordnung.knoten.find((k) => k.id === personId);
-  if (!ich) return;
-  const gen = teppichGenerationen(baum);
-  const meine = gen.get(personId);
-  if (meine == null) return;
-
-  const zusammen = ordnung.knoten.filter((k) => gen.get(k.id) === meine);
-  if (zusammen.length < 2) { toast('Auf dieser Stufe hängt sonst niemand.', 3800); return; }
-
-  teppichSchreiben(doc, (b) => {
-    for (const k of zusammen) {
-      const person = b.leute.find((x) => x.id === k.id);
-      if (!person) continue;
-      person.festX = Math.round(ich.x * 100) / 100;
-      person.festY = Math.round(k.y * 100) / 100;
-    }
-    return b;
-  }).then(() => {
-    if (neu) neu();
-    toast(zusammen.length + ' Namen stehen jetzt in einer Flucht.', 4200);
-  });
-}
-
 /* ----- Ausrichten beim Ziehen -----
    Sucht unter allen anderen Namen einen, der fast auf gleicher Höhe oder
    in gleicher Spalte steht, und rastet dort ein. Gelesen wird direkt aus
@@ -34055,8 +34248,12 @@ function teppichUmkreis(baum, id, schritte) {
 /* ----- Schreiben -----
    Immer über eine geputzte Fassung: was hier hineingeht, ist gültig, oder es
    geht gar nicht erst hinein. */
-async function teppichSchreiben(doc, aenderung) {
+async function teppichSchreiben(doc, aenderung, was) {
   if (!doc) return false;
+  /* Vor JEDER Änderung am Teppich eine Abschrift beiseitelegen. Eine Zeile
+     — und alles am Stammbaum lässt sich zurücknehmen: ein zerschnittener
+     Faden, ein abgenommener Name, ein verschobenes Band. */
+  schrittMerken(was || 'Am Stammbaum geändert', [doc]);
   const baum = saubererStammbaum(doc);
   const neu = aenderung(baum);
   const sauber = saubererStammbaum(neu || baum);
@@ -34550,7 +34747,19 @@ function teppichFadenFenster(doc, vorhandener, vonId, danach, vorgabeArt, zielId
           b.faeden = b.faeden.concat([{ id: uid(), art: stand.art, von: stand.von, zu: stand.zu, wort: stand.wort, still: false }]);
         }
         return b;
-      });
+      }, vorhandener ? 'Faden geändert' : 'Faden gesponnen');
+
+      /* Wer einen Faden spinnt, will ihn SEHEN.
+         Die Legende kann Fadenarten ausblenden („nur“ schaltet alle anderen
+         stumm), und diese Ausblendung hält still. Wer sie vor zehn Minuten
+         gesetzt hat und jetzt einen Faden dieser Art spinnt, bekommt einen
+         Faden, den es laut Dokument gibt, der aber mit Deckkraft null im
+         Tuch hängt — und beim zweiten Versuch heißt es „gibt es schon“.
+         Genau dieser Fall. Also: was man spinnt, wird sichtbar. */
+      if (Array.isArray(_tep.stumm) && _tep.stumm.includes(stand.art)) {
+        _tep.stumm = _tep.stumm.filter((a) => a !== stand.art);
+        toast('Diese Fadenart war ausgeblendet — ich zeige sie wieder.', 5200);
+      }
       zu(); if (danach) danach();
     }
   }, vorhandener ? 'Übernehmen' : 'Faden spinnen');
@@ -38093,6 +38302,10 @@ function planOeffnen(id) {
 
   const neu = () => planZeichne(tafel, flaeche, rahmen, neu, zu);
 
+  /* Wird irgendwo etwas zurückgenommen, zeichnet die offene Karte neu. */
+  const beiZug = () => { if (tafel.isConnected) { flaeche.dataset.sig = ''; neu(); } else document.removeEventListener('vani-zug', beiZug); };
+  document.addEventListener('vani-zug', beiZug);
+
   /* Mit zwei Fingern heran und wieder weg. Ein SVG lässt sich über seine
      Größe verlustfrei skalieren — deshalb kostet das Kneifen nichts, und
      die Karte wird erst neu gebaut, wenn die Finger wieder weg sind. */
@@ -38281,6 +38494,7 @@ function planLeisteInhalt(doc, plan, flaeche, neu, schliessen) {
         el('button', { class: 'kt-wk', title: 'Ganz einpassen', onclick: () => planEinpassen(flaeche, neu) }, '⤢'),
         el('button', { class: 'kt-werkzeugknopf' + (_kt.zeigeNamen ? ' an' : ''), title: 'Namen zeigen oder ausblenden (n)', onclick: () => { _kt.zeigeNamen = !_kt.zeigeNamen; neu(); } }, 'Namen'),
         el('button', { class: 'kt-werkzeugknopf', title: 'Welche Ebenen liegen auf dem Blatt? (e)', onclick: () => planEbenenwahl(neu) }, 'Ebenen'),
+        zugKnopf(neu),
         el('button', { class: 'kt-werkzeugknopf', title: 'Alle Marken und Gassen (v)', onclick: () => planVerzeichnis(doc, neu) }, 'Verzeichnis'),
         el('button', { class: 'kt-werkzeugknopf', title: 'Aussehen, Lage, Größe', onclick: () => planEinrichten(doc, neu) }, 'Der Grundriss'),
         el('button', { class: 'kt-zuknopf', title: 'Die Karte einrollen', onclick: () => schliessen() }, '×'))),
@@ -39887,7 +40101,9 @@ function planMarkenSymbol(art, groesse) {
 }
 
 /* ===================== ANLEGEN UND SCHREIBEN ===================== */
-async function planSchreiben(doc, aendern) {
+async function planSchreiben(doc, aendern, was) {
+  /* Wie beim Teppich: erst die Abschrift, dann die Änderung. */
+  schrittMerken(was || 'An der Karte geändert', [doc]);
   if (!doc) return null;
   const plan = saubererPlan(doc);
   const neu = aendern(plan) || plan;
@@ -41993,6 +42209,8 @@ async function sucheAppUpdate(neuLaden = false) {
 
   /* Die Tastatur soll den Dialog nicht aus dem Bild schieben. */
   if (typeof tastaturZaehmen === 'function') tastaturZaehmen();
+  /* Strg+Z überall — einmal angemeldet, gilt für jeden Raum. */
+  if (typeof zugTastenAnmelden === 'function') zugTastenAnmelden();
 
   /* Umzüge von früheren Fassungen */
   if (typeof D.einst.klang === 'string' && D.einst.klang !== 'aus' && !Object.keys(D.einst.mischung || {}).length) {

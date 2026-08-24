@@ -13,8 +13,12 @@
 /* ----- Schreiben -----
    Immer über eine geputzte Fassung: was hier hineingeht, ist gültig, oder es
    geht gar nicht erst hinein. */
-async function teppichSchreiben(doc, aenderung) {
+async function teppichSchreiben(doc, aenderung, was) {
   if (!doc) return false;
+  /* Vor JEDER Änderung am Teppich eine Abschrift beiseitelegen. Eine Zeile
+     — und alles am Stammbaum lässt sich zurücknehmen: ein zerschnittener
+     Faden, ein abgenommener Name, ein verschobenes Band. */
+  schrittMerken(was || 'Am Stammbaum geändert', [doc]);
   const baum = saubererStammbaum(doc);
   const neu = aenderung(baum);
   const sauber = saubererStammbaum(neu || baum);
@@ -508,7 +512,19 @@ function teppichFadenFenster(doc, vorhandener, vonId, danach, vorgabeArt, zielId
           b.faeden = b.faeden.concat([{ id: uid(), art: stand.art, von: stand.von, zu: stand.zu, wort: stand.wort, still: false }]);
         }
         return b;
-      });
+      }, vorhandener ? 'Faden geändert' : 'Faden gesponnen');
+
+      /* Wer einen Faden spinnt, will ihn SEHEN.
+         Die Legende kann Fadenarten ausblenden („nur“ schaltet alle anderen
+         stumm), und diese Ausblendung hält still. Wer sie vor zehn Minuten
+         gesetzt hat und jetzt einen Faden dieser Art spinnt, bekommt einen
+         Faden, den es laut Dokument gibt, der aber mit Deckkraft null im
+         Tuch hängt — und beim zweiten Versuch heißt es „gibt es schon“.
+         Genau dieser Fall. Also: was man spinnt, wird sichtbar. */
+      if (Array.isArray(_tep.stumm) && _tep.stumm.includes(stand.art)) {
+        _tep.stumm = _tep.stumm.filter((a) => a !== stand.art);
+        toast('Diese Fadenart war ausgeblendet — ich zeige sie wieder.', 5200);
+      }
       zu(); if (danach) danach();
     }
   }, vorhandener ? 'Übernehmen' : 'Faden spinnen');

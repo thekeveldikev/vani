@@ -66,6 +66,8 @@ async function sucheAppUpdate(neuLaden = false) {
 
   /* Die Tastatur soll den Dialog nicht aus dem Bild schieben. */
   if (typeof tastaturZaehmen === 'function') tastaturZaehmen();
+  /* Strg+Z überall — einmal angemeldet, gilt für jeden Raum. */
+  if (typeof zugTastenAnmelden === 'function') zugTastenAnmelden();
 
   /* Umzüge von früheren Fassungen */
   if (typeof D.einst.klang === 'string' && D.einst.klang !== 'aus' && !Object.keys(D.einst.mischung || {}).length) {

@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.46.0';
+const APP_VERSION = '5.47.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -694,6 +694,10 @@ async function loesche(id, still, kinderDerWurzelBehalten = false) {
   const wurzel = D.docs.get(id);
   if (!wurzel) return;
   const opfer = _nachfahren(id, kinderDerWurzelBehalten);
+  /* Auch das Löschen kommt auf den Stapel — damit Strg+Z dasselbe tut wie
+     überall sonst. Der Papierkorb bleibt daneben bestehen: er hält länger,
+     das Zurücknehmen ist schneller. */
+  schrittMerken('„' + ((wurzel.titel || wurzel.typ || 'Etwas')) + '“ weggenommen', opfer);
   const opferSet = new Set(opfer);
   const buendel = { id: uid(), wann: Date.now(), name: wurzel.titel || (wurzel.text || '').slice(0, 40) || wurzel.typ, typ: wurzel.typ, docs: [], referenzen: [] };
   /* Lose Zuordnungen überleben das Löschen ihres Ziels, dürfen danach aber
@@ -955,6 +959,182 @@ function toastMitAktion(text, aktion, tu, ms = 5200) {
   const t = el('div', { class: 'toast anfassbar' }, text, knopf);
   buehne.append(t);
   setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 450); }, ms);
+}
+
+/* ===================== RÜCKGÄNGIG =====================
+   Ein Knopf, den man vielleicht nie drückt — und der den Unterschied
+   macht, ob man sich traut, etwas auszuprobieren.
+
+   Wie es arbeitet: VANI hält seine Sachen als Dokumente. Bevor etwas
+   verändert wird, legt der Schritt eine ABSCHRIFT der betroffenen
+   Dokumente beiseite. Zurücknehmen heißt: die Abschrift wieder einsetzen.
+   Kein Umkehren einzelner Handgriffe, keine Liste von Gegenoperationen,
+   die man für jede neue Funktion nachpflegen müsste — und deshalb gilt es
+   für alles gleich, auch für das, was es noch gar nicht gibt.
+
+   Wer eine neue Änderung baut, schreibt eine Zeile davor:
+       await schrittMerken('Faden zerschnitten', [doc]);
+   Mehr ist es nicht.
+
+   Zwei Dinge, die man leicht falsch macht und die hier absichtlich anders
+   sind:
+
+   — Abgeschrieben wird mit `structuredClone`, nicht über JSON. In VANI
+     stecken Blobs in den Dokumenten (Sticker, Tonnotizen, Bilder); durch
+     JSON gehen die verloren, und das Zurücknehmen hätte sie stillschweigend
+     gelöscht. Genau die Sorte Fehler, die man erst Wochen später merkt.
+
+   — Ein zurückgenommener Schritt wird nicht weggeworfen, sondern auf den
+     Vorstapel gelegt. Wer versehentlich zurücknimmt, kommt wieder hin. */
+
+const ZUG_GRENZE = 80;          /* so viele Schritte hält VANI vor */
+const _zug = { zurueck: [], vor: [], laeuft: false };
+
+/* Eine tiefe Abschrift, die auch Blobs übersteht. */
+function _zugAbschrift(wert) {
+  try { return structuredClone(wert); } catch (e) {}
+  try { return JSON.parse(JSON.stringify(wert)); } catch (e) {}
+  return null;
+}
+
+/* Den Stand der genannten Dokumente festhalten. `null` heißt: gab es
+   noch nicht — beim Zurücknehmen wird es dann wieder entfernt. */
+function _zugStand(ids) {
+  const raus = [];
+  for (const id of ids) {
+    const doc = D.docs.get(id);
+    raus.push({ id, doc: doc ? _zugAbschrift(doc) : null });
+  }
+  return raus;
+}
+
+/* Der eine Aufruf, den es braucht. `docs` sind Dokumente oder ihre
+   Kennungen; wer mehrere angibt, nimmt sie später gemeinsam zurück. */
+function schrittMerken(was, docs) {
+  if (_zug.laeuft) return;      /* das Zurücknehmen selbst wird nicht gemerkt */
+  const liste = (Array.isArray(docs) ? docs : [docs])
+    .map((d) => (typeof d === 'string' ? d : (d && d.id)))
+    .filter(Boolean);
+  if (!liste.length) return;
+  _zug.zurueck.push({ was: String(was || 'Änderung'), wann: Date.now(), ids: liste, vorher: _zugStand(liste) });
+  while (_zug.zurueck.length > ZUG_GRENZE) _zug.zurueck.shift();
+  /* Eine neue Änderung macht den Vorstapel ungültig — sonst käme man in
+     eine Zukunft zurück, die es nicht mehr gibt. */
+  _zug.vor.length = 0;
+  zugStandMelden();
+}
+
+/* Merken UND gleich einen Hinweis mit Knopf zeigen. Für alles, was groß
+   genug ist, dass man es bemerken soll. */
+function schrittMerkenMitHinweis(was, docs, text) {
+  schrittMerken(was, docs);
+  toastMitAktion(text || (was + '.'), 'Rückgängig', () => { schrittZurueck(); }, 6500);
+}
+
+async function _zugEinsetzen(stand) {
+  for (const eintrag of stand) {
+    if (eintrag.doc) {
+      const abschrift = _zugAbschrift(eintrag.doc);
+      D.docs.set(eintrag.id, abschrift);
+      markiereAenderung(abschrift, false);
+      await sicherSpeichern('docs', abschrift);
+    } else {
+      /* Es gab das Dokument vorher nicht — dann muss es wieder weg. */
+      D.docs.delete(eintrag.id);
+      try { await dbDel('docs', eintrag.id); } catch (e) {}
+    }
+  }
+}
+
+/* Nach dem Zurücknehmen muss das, was offen ist, neu zeichnen. Statt hier
+   jedes Werkzeug zu kennen, wird ein Ereignis geworfen — wer offen ist,
+   hört zu. So braucht ein neues Werkzeug nichts zu ändern. */
+function _zugMelden() {
+  try { document.dispatchEvent(new CustomEvent('vani-zug')); } catch (e) {}
+}
+function zugStandMelden() {
+  try { document.dispatchEvent(new CustomEvent('vani-zugstand')); } catch (e) {}
+}
+function zugStand() {
+  const l = _zug.zurueck[_zug.zurueck.length - 1];
+  const v = _zug.vor[_zug.vor.length - 1];
+  return { zurueck: _zug.zurueck.length, vor: _zug.vor.length, was: l ? l.was : '', wasVor: v ? v.was : '' };
+}
+
+async function schrittZurueck() {
+  const schritt = _zug.zurueck.pop();
+  if (!schritt) { toast('Es gibt nichts zurückzunehmen.', 2600); return false; }
+  _zug.laeuft = true;
+  try {
+    /* Den jetzigen Stand für den Weg nach vorn aufheben. */
+    schritt.nachher = _zugStand(schritt.ids);
+    await _zugEinsetzen(schritt.vorher);
+    _zug.vor.push(schritt);
+    while (_zug.vor.length > ZUG_GRENZE) _zug.vor.shift();
+  } finally { _zug.laeuft = false; }
+  _zugMelden();
+  zugStandMelden();
+  toastMitAktion('Zurückgenommen: ' + schritt.was, 'Doch wieder', () => { schrittVor(); }, 6500);
+  return true;
+}
+
+async function schrittVor() {
+  const schritt = _zug.vor.pop();
+  if (!schritt) { toast('Es gibt nichts wiederherzustellen.', 2600); return false; }
+  _zug.laeuft = true;
+  try {
+    await _zugEinsetzen(schritt.nachher || []);
+    _zug.zurueck.push(schritt);
+  } finally { _zug.laeuft = false; }
+  _zugMelden();
+  zugStandMelden();
+  toast('Wieder da: ' + schritt.was, 3400);
+  return true;
+}
+
+/* Wer den Stapel leeren will — beim Profilwechsel etwa, damit fremde
+   Abschriften nicht im Speicher liegen bleiben. */
+function schritteVergessen() {
+  _zug.zurueck.length = 0;
+  _zug.vor.length = 0;
+  zugStandMelden();
+}
+
+/* Ein Knopf zum Zurücknehmen, den ein Werkzeug in seine Leiste hängt.
+   Er meldet sich selbst am Stapel an und wieder ab, wenn er aus dem
+   Dokument verschwindet — auf einem iPad gibt es kein Strg+Z, und ein
+   Rückgängig, das man nur mit Tastatur erreicht, ist für dieses Gerät
+   keins. */
+function zugKnopf(danach) {
+  const knopf = el('button', {
+    class: 'knopf zart klein zugknopf', title: 'Das Letzte zurücknehmen (Strg+Z)',
+    onclick: async () => { await schrittZurueck(); if (danach) danach(); }
+  }, '↶ Zurück');
+  const auffrischen = () => {
+    if (!knopf.isConnected) { document.removeEventListener('vani-zugstand', auffrischen); return; }
+    const st = zugStand();
+    knopf.disabled = st.zurueck === 0;
+    knopf.title = st.zurueck ? 'Zurücknehmen: ' + st.was + ' (Strg+Z)' : 'Nichts zurückzunehmen';
+  };
+  document.addEventListener('vani-zugstand', auffrischen);
+  setTimeout(auffrischen, 0);
+  return knopf;
+}
+
+/* Strg+Z und Strg+Umschalt+Z (beziehungsweise Strg+Y) — überall in VANI,
+   solange nicht gerade in ein Textfeld geschrieben wird. Dort gehört das
+   Zurücknehmen dem Feld selbst; ihm den Griff wegzunehmen wäre schlimmer
+   als gar kein Rückgängig. */
+function zugTastenAnmelden() {
+  document.addEventListener('keydown', (ev) => {
+    const z = ev.key === 'z' || ev.key === 'Z' || ev.key === 'y' || ev.key === 'Y';
+    if (!z || !(ev.ctrlKey || ev.metaKey)) return;
+    const ziel = ev.target;
+    if (ziel && (ziel.tagName === 'INPUT' || ziel.tagName === 'TEXTAREA' || ziel.isContentEditable)) return;
+    ev.preventDefault();
+    const vor = ev.shiftKey || ev.key === 'y' || ev.key === 'Y';
+    if (vor) schrittVor(); else schrittZurueck();
+  }, true);
 }
 
 /* ===================== MIT ZWEI FINGERN ZOOMEN =====================

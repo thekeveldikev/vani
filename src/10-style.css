@@ -5253,6 +5253,15 @@ html[data-thema="tinte"] .knopf.gefahr, html[data-thema="kerze"] .knopf.gefahr {
 .tep-tierlinie { fill: none; stroke: #ded6bd; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .72; }
 .tep-tierauge { fill: #ded6bd; opacity: .72; }
 .tep-fusstier { pointer-events: none; }
+/* Der Hinweis, dass gerade etwas ausgeblendet ist — er soll auffallen. */
+.tep-lgalle.wichtig { display: inline-flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
+.tep-lgalle.wichtig b { color: #e0b26a; font-weight: 600; }
+.tep-lgalle.wichtig span { opacity: .72; text-decoration: underline; text-underline-offset: 2px; }
+
+/* Der Rueckgaengig-Knopf: blass, wenn es nichts zurueckzunehmen gibt. */
+.zugknopf { font-variant-numeric: tabular-nums; }
+.zugknopf[disabled] { opacity: .38; cursor: default; }
+
 /* Die Ausrichthilfen: eine feine Linie zeigt, woran der Name einrastet. */
 .tep-hilfslinien { pointer-events: none; }
 .tep-hilfslinie { fill: none; stroke: #e0b26a; stroke-width: 1.4; stroke-opacity: .55; stroke-dasharray: 7 6; }

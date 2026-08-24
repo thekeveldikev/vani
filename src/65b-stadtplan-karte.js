@@ -162,6 +162,10 @@ function planOeffnen(id) {
 
   const neu = () => planZeichne(tafel, flaeche, rahmen, neu, zu);
 
+  /* Wird irgendwo etwas zurückgenommen, zeichnet die offene Karte neu. */
+  const beiZug = () => { if (tafel.isConnected) { flaeche.dataset.sig = ''; neu(); } else document.removeEventListener('vani-zug', beiZug); };
+  document.addEventListener('vani-zug', beiZug);
+
   /* Mit zwei Fingern heran und wieder weg. Ein SVG lässt sich über seine
      Größe verlustfrei skalieren — deshalb kostet das Kneifen nichts, und
      die Karte wird erst neu gebaut, wenn die Finger wieder weg sind. */
@@ -350,6 +354,7 @@ function planLeisteInhalt(doc, plan, flaeche, neu, schliessen) {
         el('button', { class: 'kt-wk', title: 'Ganz einpassen', onclick: () => planEinpassen(flaeche, neu) }, '⤢'),
         el('button', { class: 'kt-werkzeugknopf' + (_kt.zeigeNamen ? ' an' : ''), title: 'Namen zeigen oder ausblenden (n)', onclick: () => { _kt.zeigeNamen = !_kt.zeigeNamen; neu(); } }, 'Namen'),
         el('button', { class: 'kt-werkzeugknopf', title: 'Welche Ebenen liegen auf dem Blatt? (e)', onclick: () => planEbenenwahl(neu) }, 'Ebenen'),
+        zugKnopf(neu),
         el('button', { class: 'kt-werkzeugknopf', title: 'Alle Marken und Gassen (v)', onclick: () => planVerzeichnis(doc, neu) }, 'Verzeichnis'),
         el('button', { class: 'kt-werkzeugknopf', title: 'Aussehen, Lage, Größe', onclick: () => planEinrichten(doc, neu) }, 'Der Grundriss'),
         el('button', { class: 'kt-zuknopf', title: 'Die Karte einrollen', onclick: () => schliessen() }, '×'))),

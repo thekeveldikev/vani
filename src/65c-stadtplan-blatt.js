@@ -42,7 +42,9 @@ function planMarkenSymbol(art, groesse) {
 }
 
 /* ===================== ANLEGEN UND SCHREIBEN ===================== */
-async function planSchreiben(doc, aendern) {
+async function planSchreiben(doc, aendern, was) {
+  /* Wie beim Teppich: erst die Abschrift, dann die Änderung. */
+  schrittMerken(was || 'An der Karte geändert', [doc]);
   if (!doc) return null;
   const plan = saubererPlan(doc);
   const neu = aendern(plan) || plan;

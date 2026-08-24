@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.46.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.47.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -294,6 +294,41 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
     Blick (mit Umschalt in großen Schritten).
     Achtung: In diesem Teppich läuft die Zeit von LINKS NACH RECHTS — eine Generation ist eine
     SPALTE. Der erste Versuch setzte alle auf dieselbe Höhe und stapelte sie damit aufeinander.
+- **5.47** **Rückgängig — überall.** Der Kern hält einen Stapel von Abschriften: bevor etwas
+  verändert wird, legt `schrittMerken(was, [doc])` eine tiefe Kopie der betroffenen Dokumente
+  beiseite; Zurücknehmen setzt sie wieder ein. Kein Umkehren einzelner Handgriffe, keine Liste von
+  Gegenoperationen, die man für jede neue Funktion nachpflegen müsste — **eine Zeile vor der
+  Änderung, und es gilt.**
+  - Abgeschrieben wird mit `structuredClone`, **nicht** über JSON: in VANI stecken Blobs in den
+    Dokumenten (Sticker, Tonnotizen, Bilder), und durch JSON gingen die verloren. Das
+    Zurücknehmen hätte sie stillschweigend gelöscht.
+  - Angeschlossen sind `teppichSchreiben`, `planSchreiben` und `loesche` — damit ist alles am
+    Stammbaum und an der Karte umkehrbar, samt gelöschter Dokumente. Ein zurückgenommener Schritt
+    landet auf dem Vorstapel („Doch wieder“).
+  - **Strg+Z / Strg+Umschalt+Z** global — außer in Textfeldern, dort gehört das Zurücknehmen dem
+    Feld selbst. Dazu `zugKnopf(neu)` in den Leisten von Teppich und Karte: **auf einem iPad gibt
+    es kein Strg+Z, und ein Rückgängig, das nur mit Tastatur geht, ist für dieses Gerät keins.**
+  - Offene Werkzeuge zeichnen nach dem Zurücknehmen neu — über das Ereignis `vani-zug`, nicht über
+    einen Rückruf: dann muss der Kern nichts über die Werkzeuge wissen.
+- **„Generation ausrichten“ ist wieder draußen.** Es hat Namen verschwinden lassen. Nachstellen
+  ließ es sich nicht (18 Namen hinein, 18 heraus, keine Überlagerung) — was bleibt, ist der
+  Befund, dass ein Knopf, der auf einen Schlag ein Dutzend Plätze umschreibt, ohne Rückgängig
+  nichts zu suchen hat.
+- **Die Suche im Teppich hat seit 5.39 nie funktioniert.** Die Rendersignatur ist `id|geaendert`,
+  und das Suchwort steht dort zu Recht nicht drin — nur wurde `blass` beim BAUEN eingebacken.
+  Wer suchte, änderte damit gar nichts. Jetzt setzt `teppichBlickAuftragen` die Klasse nach jedem
+  Zeichnen, ohne Neubau. Eine Suche ohne Treffer macht alles blass: das ist die Antwort.
+- **Ein gesponnener Faden war unsichtbar.** Die Legende kann Fadenarten ausblenden („nur“ schaltet
+  alle anderen stumm), und ausgeblendete Fäden werden trotzdem gewebt — nur mit Deckkraft null.
+  Wer die Ausblendung vor zehn Minuten gesetzt hat und jetzt einen Faden dieser Art spinnt,
+  bekommt einen Faden, den es laut Dokument gibt und den man nicht sieht; beim zweiten Versuch
+  heißt es „gibt es schon“. Drei Änderungen: (1) was man spinnt, blendet seine Art wieder ein,
+  mit Ansage; (2) die Ausblendung gehört zu EINEM Teppich und wandert nicht mehr mit (`_tep.stumm`
+  stand im Modulzustand); (3) die Legende sagt jetzt, DASS etwas fehlt — „2 Fadenarten sind
+  ausgeblendet“ statt nur eines Knopfes, den man erst sucht, wenn man weiß, dass man ihn braucht.
+- Der Zeittest „Ein großer Plan wird schnell genug gebaut“ baut zweimal und nimmt das schnellere
+  Ergebnis — er kippte unter Last (644 ms gegen 957 ms), und eine Zeitmessung, die mal grün und
+  mal rot ist, kostet nur Vertrauen.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

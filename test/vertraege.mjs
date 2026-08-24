@@ -909,16 +909,82 @@ test('Teppichvertrag: Namen lassen sich frei setzen und ausrichten', () => {
   assert.match(tep, /function teppichHilfslinien\(/, 'und eine sichtbare Hilfslinie');
   assert.match(tep, /teppichHilfslinienWeg\(\)/, 'die auch wieder verschwindet');
 
-  /* In diesem Teppich laeuft die Zeit von links nach rechts: eine
-     Generation ist eine SPALTE. Wer alle auf dieselbe HOEHE setzt, stapelt
-     sie aufeinander — genau das war der erste Versuch. */
-  const anfang = tep.indexOf('function teppichReiheAusrichten(');
-  assert.ok(anfang > 0, 'es gibt das Begradigen');
-  const stueck = tep.slice(anfang, tep.indexOf('\n}\n', anfang));
-  assert.match(stueck, /person\.festX = Math\.round\(ich\.x/, 'alle in dieselbe Spalte');
-  assert.match(stueck, /person\.festY = Math\.round\(k\.y/, 'jeder behaelt seine Zeile');
+  /* „Generation ausrichten“ ist wieder draussen: es hat Namen verschwinden
+     lassen. Nachstellen liess sich das nicht — was bleibt, ist der Befund,
+     dass ein Knopf, der auf einen Schlag ein Dutzend Plaetze umschreibt,
+     ohne Rueckgaengig nichts zu suchen hat. Das Rueckgaengig gibt es jetzt;
+     der Knopf kommt erst zurueck, wenn klar ist, was damals geschah. */
+  assert.ok(!/teppichReiheAusrichten/.test(tep), 'der Knopf ist draussen und bleibt es');
 
   /* Mit dem Finger trifft man keinen halben Bildpunkt. */
   assert.match(tep, /function teppichPersonSchubsen\(/, 'die Pfeiltasten setzen genau');
   assert.match(tep, /Arrow\(Up\|Down\|Left\|Right\)/, 'und sind angeschlossen');
+});
+
+test('Rueckgaengigvertrag: jede Aenderung laesst sich zuruecknehmen', () => {
+  const kern = lies('src/30-core.js');
+
+  /* Abgeschrieben wird mit structuredClone, nicht ueber JSON: in VANI
+     stecken Blobs in den Dokumenten (Sticker, Tonnotizen, Bilder), und
+     durch JSON gehen die verloren. Das Zuruecknehmen haette sie still
+     geloescht — die Sorte Fehler, die man erst Wochen spaeter merkt. */
+  assert.match(kern, /structuredClone/, 'Abschriften ueberstehen Blobs');
+  assert.match(kern, /function schrittMerken\(/, 'es gibt den einen Aufruf');
+  assert.match(kern, /function schrittZurueck\(/, 'und den Weg zurueck');
+  assert.match(kern, /function schrittVor\(/, 'und wieder vor');
+
+  /* In einem Textfeld gehoert das Zuruecknehmen dem Feld selbst. Ihm den
+     Griff wegzunehmen waere schlimmer als gar kein Rueckgaengig. */
+  const tasten = kern.slice(kern.indexOf('function zugTastenAnmelden('));
+  assert.match(tasten, /isContentEditable/, 'Textfelder behalten ihr eigenes Strg­Z');
+
+  /* Auf einem iPad gibt es kein Strg+Z. Ein Rueckgaengig, das man nur mit
+     Tastatur erreicht, ist fuer dieses Geraet keins. */
+  assert.match(kern, /function zugKnopf\(/, 'es gibt einen Knopf');
+  for (const datei of ['src/63b-stammbaum-teppich.js', 'src/65b-stadtplan-karte.js']) {
+    assert.match(lies(datei), /zugKnopf\(neu\)/, datei + ' hat den Knopf in der Leiste');
+    assert.match(lies(datei), /'vani-zug'/, datei + ' zeichnet nach dem Zuruecknehmen neu');
+  }
+
+  /* Die Schreibwege der Werkzeuge merken von sich aus. */
+  assert.match(lies('src/63c-stammbaum-blatt.js'), /schrittMerken\(was \|\|/, 'der Teppich merkt');
+  assert.match(lies('src/65c-stadtplan-blatt.js'), /schrittMerken\(was \|\|/, 'die Karte merkt');
+  assert.match(kern, /schritt Merken|schrittMerken\('„'/, 'auch das Loeschen merkt');
+});
+
+test('Teppichvertrag: die Suche wirkt ueber Klassen, nicht ueber Neubau', () => {
+  /* Die Rendersignatur ist `id|geaendert` — das Suchwort steht dort zu
+     Recht nicht drin. Nur wurde `blass` beim BAUEN eingebacken, und damit
+     aenderte Suchen gar nichts: seit der Signatur (5.39) war das Suchfeld
+     im Teppich tot. */
+  const tep = lies('src/63b-stammbaum-teppich.js');
+  const anfang = tep.indexOf('function teppichBand(');
+  const band = tep.slice(anfang, tep.indexOf('\n}\n', anfang));
+  assert.ok(!/const blass = /.test(band), 'beim Bauen wird nichts eingebacken');
+
+  const blick = tep.slice(tep.indexOf('function teppichBlickAuftragen('));
+  assert.match(blick, /teppichSuche\(baum, suche\)/, 'die Suche laeuft beim Auftragen');
+  assert.match(blick, /classList\.toggle\('blass'/, 'und setzt nur eine Klasse');
+  assert.match(tep, /teppichBlickAuftragen\(flaeche, baum\)/, 'der Baum wird mitgegeben');
+});
+
+test('Teppichvertrag: was man spinnt, sieht man auch', () => {
+  /* Die Legende kann Fadenarten ausblenden („nur“ schaltet alle anderen
+     stumm). Wer das vor zehn Minuten getan hat und jetzt einen Faden
+     dieser Art spinnt, bekommt einen Faden, den es laut Dokument gibt, der
+     aber mit Deckkraft null im Tuch haengt — und beim zweiten Versuch
+     heisst es „gibt es schon“. Genau so ist es passiert. */
+  const blatt = lies('src/63c-stammbaum-blatt.js');
+  assert.match(blatt, /_tep\.stumm\.includes\(stand\.art\)/, 'beim Spinnen wird die Ausblendung geprueft');
+  assert.match(blatt, /war ausgeblendet/, 'und aufgehoben, mit Ansage');
+
+  const tep = lies('src/63b-stammbaum-teppich.js');
+  /* Die Ausblendung gehoert zu EINEM Teppich. Vorher wanderte sie mit: wer
+     in einem Stammbaum „nur Blut“ eingestellt hatte, oeffnete den naechsten
+     und fand dort die Haelfte seiner Faeden nicht wieder. */
+  assert.match(tep, /if \(_tep\.id !== id\) \{ _tep\.stumm = \[\]/, 'ein anderer Teppich faengt frei an');
+
+  /* Und es muss DASTEHEN, dass gerade etwas fehlt — nicht nur einen Knopf
+     geben, mit dem man es aufheben koennte. */
+  assert.match(tep, /Fadenarten sind ausgeblendet/, 'die Ausblendung sagt sich an');
 });

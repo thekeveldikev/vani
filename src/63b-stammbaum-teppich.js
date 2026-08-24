@@ -95,6 +95,11 @@ function teppichLeerBild() {
 function teppichOeffnen(id) {
   const doc = D.docs.get(id);
   if (!doc || doc.typ !== 'stammbaum' || doc.geloescht) { toast('Der Wandteppich ist nicht mehr da.'); return; }
+  /* Ausgeblendete Fadenarten gehören zu EINEM Teppich. Vorher standen sie
+     im Modulzustand und wanderten mit: wer in einem Stammbaum „nur Blut“
+     eingestellt hatte, öffnete den nächsten und fand dort die Hälfte seiner
+     Fäden nicht wieder — ohne dass irgendwo stand, warum. */
+  if (_tep.id !== id) { _tep.stumm = []; _tep.suche = ''; _tep.nurPerson = ''; }
   _tep.id = id;
   if (!_tep.zoom || !Number.isFinite(_tep.zoom)) _tep.zoom = 1;
 
@@ -112,6 +117,13 @@ function teppichOeffnen(id) {
   const zu = zeigeDeck(kasten, () => { document.removeEventListener('keydown', taste); teppichAnimationenAus(); });
 
   const neu = () => teppichZeichne(kasten, flaeche, rahmen, neu, zu);
+
+  /* Wird irgendwo etwas zurückgenommen, zeichnet der offene Teppich neu.
+     Über ein Ereignis statt über einen Rückruf: dann muss das Zurücknehmen
+     nichts über die Werkzeuge wissen, und ein neues Werkzeug muss dort
+     nichts eintragen. */
+  const beiZug = () => { if (kasten.isConnected) { flaeche.dataset.sig = ''; neu(); } else document.removeEventListener('vani-zug', beiZug); };
+  document.addEventListener('vani-zug', beiZug);
 
   /* Mit zwei Fingern heran und wieder weg.
      Beim Kneifen wird nur das Tuch größer gemacht — nicht neu gewebt.
@@ -234,7 +246,7 @@ function teppichZeichne(kasten, flaeche, rahmen, neu, schliessen) {
     svg.setAttribute('width', Math.round(Number(svg.dataset.breite) * _tep.zoom));
     svg.setAttribute('height', Math.round(Number(svg.dataset.hoehe) * _tep.zoom));
   }
-  teppichBlickAuftragen(flaeche);
+  teppichBlickAuftragen(flaeche, baum);
   /* Ist eine Person im Blick, liegt unten eine Karte mit allem, was an ihr
      hängt — ohne dass dafür ein Fenster aufgehen muss. */
   const alteKarte = kasten.querySelector('.tep-personenkarte');
@@ -289,6 +301,7 @@ function teppichLeisteInhalt(doc, baum, ordnung, flaeche, neu, schliessen) {
             }
           }, '↺') : null,
         el('span', { class: 'tep-ltrenner' }),
+        zugKnopf(neu),
         el('button', { class: 'knopf zart klein', title: 'Alle Namen und Fäden (v)', onclick: () => teppichVerzeichnis(doc, neu) }, 'Verzeichnis'),
         el('button', { class: 'knopf zart klein', title: 'Tuch, Spruch, Titel', onclick: () => teppichEinstellungen(doc, neu) }, 'Der Rahmen'),
         el('button', { class: 'knopf voll klein', title: 'Einen Namen aufhängen (n)', onclick: () => teppichPersonNeu(doc, '', neu) }, '+ Name'),
@@ -338,7 +351,20 @@ function teppichLegende(arten, baum, neu) {
       }, el('i', { class: 'strich-' + a.strich }), a.name, el('small', {}, String(a.anzahl))))));
   }
   if (_tep.stumm.length || _tep.nurPerson) {
-    kasten.append(el('button', { class: 'tep-lgalle', onclick: () => { _tep.stumm = []; _tep.nurPerson = ''; neu(); } }, 'alles wieder zeigen'));
+    /* Es genügt nicht, dass man alles wieder zeigen KANN — es muss
+       dastehen, DASS gerade etwas fehlt. Ein Knopf mit „alles wieder
+       zeigen“ beantwortet eine Frage, die man erst stellt, wenn man weiß,
+       dass sie sich stellt. Wer eine Art vor zehn Minuten ausgeblendet hat
+       und jetzt einen Faden dieser Art spinnt, sucht den Fehler überall —
+       nur nicht in der Legende. */
+    const wieViele = _tep.stumm.length;
+    const text = wieViele
+      ? (wieViele === 1 ? 'Eine Fadenart ist ausgeblendet' : wieViele + ' Fadenarten sind ausgeblendet')
+      : 'Ein Name ist im Blick';
+    kasten.append(el('button', {
+      class: 'tep-lgalle wichtig', title: 'Wieder alles zeigen',
+      onclick: () => { _tep.stumm = []; _tep.nurPerson = ''; neu(); }
+    }, el('b', {}, text), el('span', {}, 'alles wieder zeigen')));
   }
   return kasten;
 }
@@ -421,13 +447,6 @@ function teppichPersonenkarte(doc, baum, personId, neu) {
   }
   karte.append(el('div', { class: 'tep-pkfuss' },
     el('button', { class: 'knopf zart klein', onclick: () => teppichFadenSpinnen(doc, personId, neu) }, '+ Faden'),
-    /* Eine ganze Generation auf einen Schlag in eine Reihe. Von Hand ist
-       das die m\u00fchsamste Arbeit am Teppich \u2014 und die, die man am
-       h\u00e4ufigsten machen will. */
-    el('button', {
-      class: 'knopf zart klein', title: 'Alle aus derselben Generation auf diese H\u00f6he bringen',
-      onclick: () => teppichReiheAusrichten(doc, personId, neu)
-    }, 'Generation ausrichten'),
     el('button', { class: 'knopf zart klein', onclick: () => teppichKartusche(doc, personId, neu) }, '\u00c4ndern')));
   return karte;
 }
@@ -437,9 +456,16 @@ function teppichPersonenkarte(doc, baum, personId, neu) {
    Klassen auf den fertigen Fäden. Dadurch muss der Teppich beim Tippen in
    der Legende oder auf einen Namen nicht neu gewebt werden — er steht, und
    nur seine Sichtbarkeit ändert sich. */
-function teppichBlickAuftragen(wurzel) {
+/* Was am fertigen Tuch nur eine Klasse ist, darf keinen Neubau kosten.
+   Genau daran hing die Suche: die Rendersignatur ist `id|geaendert`, und
+   das Suchwort steht dort zu Recht nicht drin — nur wurde `blass` beim
+   BAUEN eingebacken. Wer suchte, änderte damit gar nichts. Seit der
+   Signatur (5.39) war das Suchfeld im Teppich tot. */
+function teppichBlickAuftragen(wurzel, baum) {
   if (!wurzel) return;
   const nurWer = _tep.nurPerson;
+  const suche = (_tep.suche || '').trim();
+  const treffer = suche && baum ? new Set(teppichSuche(baum, suche).map((p) => p.id)) : null;
   for (const r of wurzel.querySelectorAll('.tep-ranke')) {
     const art = r.getAttribute('data-art');
     r.classList.toggle('stumm', _tep.stumm.includes(art));
@@ -452,9 +478,15 @@ function teppichBlickAuftragen(wurzel) {
     }
   }
   for (const q of wurzel.querySelectorAll('.tep-person')) {
-    q.classList.toggle('imblick', !!nurWer && q.getAttribute('data-person') === nurWer);
+    const id = q.getAttribute('data-person');
+    q.classList.toggle('imblick', !!nurWer && id === nurWer);
+    q.classList.toggle('hervor', !!nurWer && id === nurWer);
+    /* Kein Treffer heißt blass — und wenn gar nichts passt, wird alles
+       blass. Das ist die Antwort „hier ist niemand mit dem Namen“. */
+    q.classList.toggle('blass', !!treffer && !treffer.has(id));
   }
   wurzel.classList.toggle('einer-im-blick', !!nurWer);
+  wurzel.classList.toggle('suche-laeuft', !!treffer);
 }
 
 /* ================= DAS TUCH ZEICHNEN ================= */
@@ -628,9 +660,8 @@ function teppichSVG(doc, baum, ordnung, neu) {
   });
 
   /* --- Die Namensbänder --- */
-  const treffer = _tep.suche.trim() ? new Set(teppichSuche(baum, _tep.suche).map((p) => p.id)) : null;
   knoten.forEach((k, i) => {
-    gBaender.append(teppichBand(k, px(k), py(k), baum, treffer, i, neu));
+    gBaender.append(teppichBand(k, px(k), py(k), baum, i, neu));
   });
 
   /* --- Das Wappen des Hauses, unten am Stamm --- */
@@ -1186,16 +1217,16 @@ function teppichRanke(x1, y1, x2, y2, art, faden, baum, neu, versatz) {
 /* Ein Namensband: ein Streifen mit eingeschlagenen Enden, der Name darauf
    in Versalien, darunter die Jahre. Ist die Person ausgebrannt, liegt statt
    des Zeichens ein Loch im Tuch — der Name bleibt trotzdem stehen. */
-function teppichBand(k, x, y, baum, treffer, i, neu) {
+function teppichBand(k, x, y, baum, i, neu) {
   const p = k.person;
   const name = (teppichName(p) || 'ohne Namen').toUpperCase();
   const jahre = teppichJahre(p);
   const dreh = teppichDreh(p.id, 'band', 2.4);
-  const blass = treffer && !treffer.has(p.id);
-  const hell = _tep.nurPerson && _tep.nurPerson === p.id;
-
+  /* `blass` und `hervor` werden NICHT hier gesetzt: beides ist Ansicht,
+     kein Bau. teppichBlickAuftragen legt sie nach jedem Zeichnen an — und
+     nur so wirkt die Suche, ohne dass der Baum neu wächst. */
   const g = sv('g', {
-    class: 'tep-person' + (blass ? ' blass' : '') + (hell ? ' hervor' : '') + (p.gebrannt ? ' gebrannt' : ''),
+    class: 'tep-person' + (p.gebrannt ? ' gebrannt' : ''),
     transform: 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') rotate(' + dreh + ')',
     style: '--n:' + Math.min(i, 40) + ';--gen:' + Math.min(k.gen, 12),
     'data-person': p.id, tabindex: '0', role: 'button'
@@ -1358,33 +1389,6 @@ function teppichPersonSchubsen(doc, personId, dx, dy, neu) {
     return b;
   }).then(() => { if (neu) neu(); });
 }
-
-function teppichReiheAusrichten(doc, personId, neu) {
-  const baum = saubererStammbaum(doc);
-  const ordnung = teppichOrdnung(baum);
-  const ich = ordnung.knoten.find((k) => k.id === personId);
-  if (!ich) return;
-  const gen = teppichGenerationen(baum);
-  const meine = gen.get(personId);
-  if (meine == null) return;
-
-  const zusammen = ordnung.knoten.filter((k) => gen.get(k.id) === meine);
-  if (zusammen.length < 2) { toast('Auf dieser Stufe hängt sonst niemand.', 3800); return; }
-
-  teppichSchreiben(doc, (b) => {
-    for (const k of zusammen) {
-      const person = b.leute.find((x) => x.id === k.id);
-      if (!person) continue;
-      person.festX = Math.round(ich.x * 100) / 100;
-      person.festY = Math.round(k.y * 100) / 100;
-    }
-    return b;
-  }).then(() => {
-    if (neu) neu();
-    toast(zusammen.length + ' Namen stehen jetzt in einer Flucht.', 4200);
-  });
-}
-
 /* ----- Ausrichten beim Ziehen -----
    Sucht unter allen anderen Namen einen, der fast auf gleicher Höhe oder
    in gleicher Spalte steht, und rastet dort ein. Gelesen wird direkt aus
