@@ -370,3 +370,160 @@ test('Die Bibliothek nimmt nicht unbegrenzt viel', async () => {
   assert.equal(k.fadenBibliothekHinzu({ id: 'eins', name: 'Nochmal' }), false);
   assert.equal(k.fadenBibliothek().length, 1);
 });
+
+/* --- Die Sippe: Verwandtschaft, Wege, Häuser --- */
+
+/* Ein Baum, an dem sich alles ablesen lässt:
+     Alma
+     ├── Rosa ── Lene ── Nora
+     └── Karl ── Jonas
+   dazu Piet (mit Lene verheiratet) und Mats (von Karl aufgezogen). */
+function sippenbaum(k) {
+  return baum(k, [
+    P('ug', 'Alma Wiek', { geschlecht: 'w' }),
+    P('g1', 'Rosa Wiek', { geschlecht: 'w' }),
+    P('g2', 'Karl Wiek', { geschlecht: 'm' }),
+    P('m1', 'Lene Wiek', { geschlecht: 'w' }),
+    P('k1', 'Nora Wiek', { geschlecht: 'w' }),
+    P('c1', 'Jonas Wiek', { geschlecht: 'm' }),
+    P('e1', 'Piet Halm', { geschlecht: 'm' }),
+    P('x1', 'Mats', { geschlecht: '' })
+  ], [
+    F('kind', 'g1', 'ug'), F('kind', 'g2', 'ug'),
+    F('kind', 'm1', 'g1'), F('kind', 'k1', 'm1'),
+    F('kind', 'c1', 'g2'),
+    F('heirat', 'm1', 'e1'),
+    F('ziehkind', 'x1', 'g2')
+  ]);
+}
+
+test('Verwandtschaft: die Wörter stimmen', async () => {
+  const k = await frisch();
+  const b = sippenbaum(k);
+  const satz = (a, c) => k.teppichVerwandtschaft(b, a, c).satz;
+
+  /* Gerade Linie nach oben und unten. */
+  assert.equal(satz('k1', 'm1'), 'Lene Wiek ist Nora Wieks Mutter.');
+  assert.equal(satz('k1', 'g1'), 'Rosa Wiek ist Nora Wieks Großmutter.');
+  assert.equal(satz('k1', 'ug'), 'Alma Wiek ist Nora Wieks Urgroßmutter.');
+  assert.equal(satz('ug', 'k1'), 'Nora Wiek ist Alma Wieks Urenkelin.');
+  assert.equal(satz('m1', 'k1'), 'Nora Wiek ist Lene Wieks Tochter.');
+
+  /* Zur Seite. */
+  assert.equal(satz('g1', 'g2'), 'Karl Wiek ist Rosa Wieks Bruder.');
+  assert.equal(satz('m1', 'c1'), 'Jonas Wiek ist Lene Wieks Cousin ersten Grades.');
+  assert.equal(satz('k1', 'g2'), 'Karl Wiek ist Nora Wieks Großonkel.');
+  assert.equal(satz('g2', 'k1'), 'Nora Wiek ist Karl Wieks Großnichte.');
+  assert.equal(satz('m1', 'g2'), 'Karl Wiek ist Lene Wieks Onkel.');
+  assert.equal(satz('g2', 'm1'), 'Lene Wiek ist Karl Wieks Nichte.');
+
+  /* Versetzt: der Fall, an dem die meisten Rechner scheitern. */
+  assert.equal(satz('k1', 'c1'), 'Jonas Wiek ist Nora Wieks Cousin ersten Grades, einmal entfernt.');
+
+  /* Angeheiratet und aufgezogen. */
+  assert.equal(satz('k1', 'e1'), 'Piet Halm ist Nora Wieks Stiefvater.');
+  assert.equal(satz('m1', 'e1'), 'Piet Halm ist Lene Wieks Ehemann.');
+  assert.equal(satz('g2', 'x1'), 'Mats ist Karl Wieks Ziehkind.');
+  assert.equal(satz('x1', 'g2'), 'Karl Wiek ist Mats’ Ziehvater.');
+
+  /* Der Genitiv beachtet Namen auf -s: kein „Mats’s“. */
+  assert.ok(satz('x1', 'c1').startsWith('Jonas Wiek ist Mats’ '), satz('x1', 'c1'));
+});
+
+test('Verwandtschaft: ohne Geschlecht wird nichts geraten', async () => {
+  const k = await frisch();
+  /* Ein Name sagt nichts über das Geschlecht. Wer nichts angibt, bekommt
+     beide Formen — nicht die wahrscheinlichere. */
+  const b = baum(k, [
+    P('a', 'Toni'), P('b', 'Kim'), P('c', 'Robin')
+  ], [F('kind', 'b', 'a'), F('kind', 'c', 'b')]);
+  assert.equal(k.teppichVerwandtschaft(b, 'b', 'a').wort, 'Elternteil');
+  assert.equal(k.teppichVerwandtschaft(b, 'c', 'a').wort, 'Großelternteil');
+  assert.equal(k.teppichVerwandtschaft(b, 'a', 'c').wort, 'Enkelkind');
+  /* Wo es keine neutrale Form gibt, stehen beide da. */
+  const d = baum(k, [P('a', 'Toni'), P('b', 'Kim'), P('c', 'Robin'), P('e', 'Sam')],
+    [F('kind', 'b', 'a'), F('kind', 'c', 'a'), F('kind', 'e', 'c')]);
+  assert.equal(k.teppichVerwandtschaft(d, 'e', 'b').wort, 'Tante oder Onkel');
+});
+
+test('Verwandtschaft: sich selbst, Fremde und Kreise halten sie nicht an', async () => {
+  const k = await frisch();
+  const b = sippenbaum(k);
+  assert.equal(k.teppichVerwandtschaft(b, 'k1', 'k1'), null, 'sich selbst gegenüber ist niemand verwandt');
+  assert.equal(k.teppichVerwandtschaft(b, 'k1', 'gibtsnicht'), null);
+
+  /* Zwei ohne jede Verbindung. */
+  const fremd = baum(k, [P('a', 'Ada'), P('b', 'Bo')], []);
+  const v = k.teppichVerwandtschaft(fremd, 'a', 'b');
+  assert.equal(v.art, 'nichts');
+  assert.ok(v.satz.includes('noch nicht'), v.satz);
+
+  /* Ein Kreis in der Abstammung darf die Rechnung nicht aufhängen. */
+  const kreis = baum(k, [P('a', 'Ada'), P('b', 'Bo'), P('c', 'Cil')],
+    [F('kind', 'a', 'b'), F('kind', 'b', 'c'), F('kind', 'c', 'a')]);
+  const w = k.teppichVerwandtschaft(kreis, 'a', 'c');
+  assert.ok(w && w.satz, 'auch im Kreis kommt eine Antwort heraus');
+});
+
+test('Verwandtschaft: nicht verwandt, aber verbunden', async () => {
+  const k = await frisch();
+  /* Für eine Geschichte ist oft wichtiger, DASS zwei verbunden sind, als
+     ob sie blutsverwandt sind. */
+  const b = baum(k, [P('a', 'Ada'), P('b', 'Bo'), P('c', 'Cil')],
+    [F('hasst', 'a', 'b'), F('kennt', 'b', 'c')]);
+  const v = k.teppichVerwandtschaft(b, 'a', 'c');
+  assert.equal(v.art, 'weg');
+  assert.equal(v.schritte.length, 2);
+  assert.ok(v.satz.includes('nicht verwandt'), v.satz);
+
+  const weg = k.teppichWegZwischen(b, 'a', 'c');
+  assert.equal(weg.laenge, 2);
+  const satz = k.teppichWegSatz(b, weg);
+  assert.ok(satz.startsWith('Ada') && satz.endsWith('Cil'), satz);
+});
+
+test('Die Häuser fallen von selbst auseinander', async () => {
+  const k = await frisch();
+  const b = baum(k, [
+    P('w1', 'Alma Wiek'), P('w2', 'Rosa Wiek'), P('w3', 'Nora Wiek'),
+    P('v1', 'Ilse Voss'), P('v2', 'Ove Voss'),
+    P('allein', 'Thies')
+  ], [
+    F('kind', 'w2', 'w1'), F('kind', 'w3', 'w2'),
+    F('kind', 'v2', 'v1')
+  ]);
+  const h = k.teppichHaeuser(b);
+  assert.equal(h.length, 2, 'zwei Häuser, der Einzelne zählt nicht als Haus');
+  assert.equal(h[0].name, 'Wiek');
+  assert.equal(h[0].wieViele, 3);
+  assert.equal(h[1].name, 'Voss');
+  assert.equal(h[1].wieViele, 2);
+  assert.ok(!k.teppichHausVon(h, 'allein'), 'wer allein hängt, gehört zu keinem Haus');
+  assert.equal(k.teppichHausVon(h, 'w3').name, 'Wiek');
+
+  /* Das Wappen hängt am Namen, nicht an der Reihenfolge: dasselbe Haus
+     bekommt in jedem Teppich dasselbe Zeichen. */
+  const b2 = baum(k, [P('x1', 'Jonas Wiek'), P('x2', 'Karl Wiek')], [F('kind', 'x1', 'x2')]);
+  const h2 = k.teppichHaeuser(b2);
+  assert.deepEqual(
+    [h2[0].wappen.grund, h2[0].wappen.figur, h2[0].wappen.bild],
+    [h[0].wappen.grund, h[0].wappen.figur, h[0].wappen.bild],
+    'Haus Wiek führt überall dasselbe Wappen');
+  /* Und es ist heraldisch sauber. */
+  assert.notEqual(h[0].wappen.figur, h[0].wappen.grund);
+  assert.notEqual(h[0].wappen.figur, h[0].wappen.zweit);
+});
+
+test('Der Umkreis zeigt nur, was nah ist', async () => {
+  const k = await frisch();
+  const b = baum(k, [P('a', 'A'), P('b', 'B'), P('c', 'C'), P('d', 'D'), P('e', 'E')],
+    [F('kind', 'b', 'a'), F('kind', 'c', 'b'), F('kind', 'd', 'c'), F('kind', 'e', 'd')]);
+  const eins = k.teppichUmkreis(b, 'a', 1);
+  assert.equal(eins.size, 2, 'A und B');
+  const zwei = k.teppichUmkreis(b, 'a', 2);
+  assert.equal(zwei.size, 3);
+  assert.equal(zwei.get('a'), 0);
+  assert.equal(zwei.get('c'), 2);
+  const weit = k.teppichUmkreis(b, 'a', 6);
+  assert.equal(weit.size, 5, 'bei genug Schritten alle');
+});

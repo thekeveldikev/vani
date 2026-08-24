@@ -42,7 +42,7 @@ function teppichPersonNeu(doc, name, neu) {
   if (!doc) return;
   const person = {
     id: uid(), name: String(name || '').trim().slice(0, 120), albumId: '',
-    von: '', bis: '', notiz: '', zeichen: 'keins', gebrannt: false
+    von: '', bis: '', notiz: '', zeichen: 'keins', geschlecht: '', gebrannt: false
   };
   if (saubererStammbaum(doc).leute.length >= TEPPICH_MAX_LEUTE) {
     toast('Vierhundert Namen sind das Äußerste, was auf ein Tuch passt. Web einen zweiten Teppich.', 8000);
@@ -89,7 +89,7 @@ function teppichAusAlbum(doc, neu) {
         b.leute = b.leute.concat(wirklich.map((f) => ({
           id: uid(), name: f.name || '', albumId: f.id,
           von: (f.felder || {}).geboren || '', bis: (f.felder || {}).gestorben || '',
-          notiz: '', zeichen: 'keins', gebrannt: false
+          notiz: '', zeichen: 'keins', geschlecht: '', gebrannt: false
         })));
         return b;
       });
@@ -166,6 +166,61 @@ function teppichKartusche(doc, personId, neu, frisch) {
 
   const notizfeld = el('textarea', { class: 'stb-notiz', rows: '3', placeholder: 'Was man über sie oder ihn wissen muss — in einem Satz.', maxlength: '600' }, person.notiz);
   notizfeld.addEventListener('input', () => { hinein((p) => { p.notiz = notizfeld.value; }); sichern(); });
+
+  /* --- Das Geschlecht ---
+     Nicht, um jemanden einzusortieren, sondern damit die Wörter stimmen:
+     „Noras Großmutter“ oder „Noras Großvater“, „Tante“ oder „Onkel“.
+     Wer nichts sagt, bekommt beide Formen — geraten wird nichts. */
+  const gschlechtreihe = el('div', { class: 'stb-geschlecht' });
+  const geschlechtZeichnen = () => {
+    gschlechtreihe.innerHTML = '';
+    const jetzt = (lebend() || person).geschlecht || '';
+    for (const [id, name] of TEPPICH_GESCHLECHTER) {
+      gschlechtreihe.append(el('button', {
+        class: 'stb-gs' + (jetzt === id ? ' an' : ''),
+        onclick: () => { hinein((p2) => { p2.geschlecht = id; }); geschlechtZeichnen(); sichern(); }
+      }, name));
+    }
+  };
+
+  /* --- Wie hängt diese Person mit den anderen zusammen? --- */
+  const sippenkasten = el('div', { class: 'stb-sippe' });
+  const sippeZeichnen = () => {
+    sippenkasten.innerHTML = '';
+    const b = saubererStammbaum(doc);
+    const andere = b.leute.filter((x) => x.id !== personId);
+    if (!andere.length) {
+      sippenkasten.append(el('div', { class: 'leer klein' }, 'Erst wenn ein zweiter Name hängt, gibt es etwas auszurechnen.'));
+      return;
+    }
+    const wahl = el('select', { class: 'stb-sippewahl' },
+      el('option', { value: '' }, 'Mit wem vergleichen?'),
+      ...andere.map((x) => el('option', { value: x.id }, teppichName(x))));
+    const antwort = el('div', { class: 'stb-sippeantwort' });
+    wahl.addEventListener('change', () => {
+      antwort.innerHTML = '';
+      if (!wahl.value) return;
+      const v = teppichVerwandtschaft(b, personId, wahl.value);
+      if (!v) return;
+      antwort.append(el('b', { class: 'stb-sippesatz' }, v.satz));
+      if (v.ueber && v.art !== 'weg') {
+        antwort.append(el('small', {}, v.art === 'bund'
+          ? 'Über ' + v.ueber + '.'
+          : 'Gemeinsam bis zu ' + v.ueber + ' — ' + v.auf + ' nach oben, ' + v.ab + ' zurück.'));
+      }
+      if (v.art === 'weg' && v.schritte) {
+        const kette = el('div', { class: 'stb-sippeweg' });
+        for (const sch of v.schritte) {
+          const von = b.leute.find((x) => x.id === sch.von);
+          kette.append(el('span', {}, teppichName(von)), el('i', {}, ' — ' + sch.wort.toLowerCase() + ' → '));
+        }
+        const letzte = b.leute.find((x) => x.id === v.schritte[v.schritte.length - 1].zu);
+        kette.append(el('span', {}, teppichName(letzte)));
+        antwort.append(kette);
+      }
+    });
+    sippenkasten.append(wahl, antwort);
+  };
 
   /* --- Das Zeichen --- */
   const zeichenreihe = el('div', { class: 'stb-zeichen' });
@@ -256,10 +311,14 @@ function teppichKartusche(doc, personId, neu, frisch) {
       el('div', { class: 'stb-jahre' }, vonFeld, el('i', {}, '–'), bisFeld)),
     albumFigur ? el('small', { class: 'stb-albumhinweis' }, 'Der Name kommt aus dem Album und wird dort geändert.') : null,
     kopfzeile,
+    el('div', { class: 'stb-abschnitt' }, 'Wie man von ihr oder ihm spricht'),
+    gschlechtreihe,
     el('div', { class: 'stb-abschnitt' }, 'Zeichen'),
     zeichenreihe,
     el('div', { class: 'stb-abschnitt' }, 'Notiz'),
     notizfeld,
+    el('div', { class: 'stb-abschnitt' }, 'Verwandtschaft'),
+    sippenkasten,
     el('div', { class: 'stb-abschnitt' }, 'Fäden'),
     fadenkasten,
     el('div', { class: 'reihe stb-kfuss' },
@@ -283,7 +342,7 @@ function teppichKartusche(doc, personId, neu, frisch) {
       el('button', { class: 'knopf voll', onclick: () => { sichern.sofort(); zu(); if (neu) neu(); } }, 'Fertig')));
 
   const zu = zeigeDeck(kasten, () => { sichern.sofort(); if (neu) neu(); });
-  kopfAuffrischen(); zeichenZeichnen(); faedenZeichnen();
+  kopfAuffrischen(); zeichenZeichnen(); geschlechtZeichnen(); sippeZeichnen(); faedenZeichnen();
   setTimeout(() => { if (frisch && !namensfeld.disabled) namensfeld.focus(); }, 60);
 }
 
@@ -395,7 +454,7 @@ function teppichFadenFenster(doc, vorhandener, vonId, danach, vorgabeArt, zielId
       zielliste.append(el('button', {
         class: 'stb-fziel neu',
         onclick: async () => {
-          const person = { id: uid(), name: q.slice(0, 120), albumId: '', von: '', bis: '', notiz: '', zeichen: 'keins', gebrannt: false };
+          const person = { id: uid(), name: q.slice(0, 120), albumId: '', von: '', bis: '', notiz: '', zeichen: 'keins', geschlecht: '', gebrannt: false };
           await teppichSchreiben(doc, (b) => { b.leute = b.leute.concat([person]); return b; });
           const frisch = saubererStammbaum(doc);
           baum.leute = frisch.leute;
@@ -660,7 +719,9 @@ function teppichVerzeichnis(doc, neu) {
     const b = saubererStammbaum(doc);
     koepfe.innerHTML = '';
     const auff = teppichAuffaelligkeiten(b);
-    for (const [id, name, zahl] of [['namen', 'Namen', b.leute.length], ['faeden', 'Fäden', b.faeden.length], ['auff', 'Was auffällt', auff.length]]) {
+    const haeuser = teppichHaeuser(b);
+    for (const [id, name, zahl] of [['namen', 'Namen', b.leute.length], ['faeden', 'Fäden', b.faeden.length],
+      ['haeuser', 'Häuser', haeuser.length], ['auff', 'Was auffällt', auff.length]]) {
       koepfe.append(el('button', { class: 'stb-vr' + (reiter === id ? ' an' : ''), onclick: () => { reiter = id; zeichne(); } }, name, zahl ? el('i', {}, String(zahl)) : null));
     }
     inhalt.innerHTML = '';
@@ -695,6 +756,45 @@ function teppichVerzeichnis(doc, neu) {
         for (const { f, satz } of liste) {
           inhalt.append(el('button', { class: 'stb-vzeile faden', style: '--fadenfarbe:' + art.farbe, onclick: () => { zu(); teppichFadenBearbeiten(doc, f, neu); } },
             el('b', {}, satz)));
+        }
+      }
+    } else if (reiter === 'haeuser') {
+      /* Ein Stammbaum zerfällt von selbst in Sippen: Gruppen, die über Blut
+         und Bund zusammenhängen. Jede bekommt den häufigsten Nachnamen als
+         Namen und ein Wappen, gerechnet aus eben diesem Namen — dieselbe
+         Heraldik wie auf dem Kartentisch. Ein Haus, zwei Werkzeuge. */
+      if (!haeuser.length) {
+        inhalt.append(el('div', { class: 'leer klein' }, 'Noch hängt niemand mit jemandem zusammen. Ein Haus entsteht, sobald zwei Namen ein Band haben.'));
+      }
+      for (const h of haeuser) {
+        const kopf = el('div', { class: 'stb-haus' });
+        if (h.wappen && typeof planWappenSVG === 'function') {
+          const schild = el('span', { class: 'stb-hauswappen' });
+          const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          /* Der Ausschnitt muss zum Schild passen: es ist 0,84-mal so
+             breit wie hoch. Zu klein gezeichnet verschwindet die Schraffur,
+             und dann ist das Wappen ein grauer Fleck. */
+          const hoch = 48, breit = hoch * 0.84;
+          svg.setAttribute('viewBox', (-breit / 2 - 3) + ' ' + (-hoch / 2 - 3) + ' ' + (breit + 6) + ' ' + (hoch + 6));
+          svg.setAttribute('width', String(Math.round(breit + 6)));
+          svg.setAttribute('height', String(Math.round(hoch + 6)));
+          svg.append(planWappenSVG(h.wappen, hoch));
+          schild.append(svg);
+          kopf.append(schild);
+        }
+        kopf.append(el('div', { class: 'stb-haustext' },
+          el('b', {}, h.name ? 'Haus ' + h.name : 'Ein Haus ohne Namen'),
+          el('small', {}, h.wieViele + (h.wieViele === 1 ? ' Name' : ' Namen') +
+            (h.wappen && typeof planBlason === 'function' ? '  ·  ' + planBlason(h.wappen) : ''))));
+        inhalt.append(kopf);
+        for (const id of h.leute) {
+          const person = b.leute.find((x) => x.id === id);
+          if (!person) continue;
+          if (q && !teppichName(person).toLowerCase().includes(q.toLowerCase())) continue;
+          inhalt.append(el('button', {
+            class: 'stb-vzeile' + (person.gebrannt ? ' gebrannt' : ''),
+            onclick: () => { zu(); teppichKartusche(doc, person.id, neu); }
+          }, el('b', {}, teppichName(person) || 'ohne Namen'), el('span', {}, teppichJahre(person))));
         }
       }
     } else {

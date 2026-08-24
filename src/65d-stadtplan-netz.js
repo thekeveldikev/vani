@@ -926,6 +926,13 @@ function planBlockBebauen(poly, saat, schluessel, va, dichte, wasser, haeuser) {
         if (!netzImPolygon(poly, p0[0], p0[1]) || !netzImPolygon(poly, p1[0], p1[1]) ||
             !netzImPolygon(poly, p2[0], p2[1]) || !netzImPolygon(poly, p3[0], p3[1])) continue;
         if (wasser.drin(p0[0], p0[1]) || wasser.drin(p2[0], p2[1])) continue;
+        /* Kein Haus neben dem Papier. Bei der strahlenden Anlage können
+           Ringknoten über den Blattrand hinausrutschen; der Zuschnitt
+           schneidet das zwar weg, aber gerechnet und gespeichert wurde es
+           trotzdem — Häuser bei x = −59. */
+        const drausen = [p0, p1, p2, p3].some((q) =>
+          q[0] < 4 || q[0] > PLAN_GROESSE - 4 || q[1] < 4 || q[1] > PLAN_GROESSE - 4);
+        if (drausen) continue;
         const kandidat = [p0, p1, p2, p3];
         const f = Math.abs(netzFlaeche(kandidat));
         if (f < 22) continue;
@@ -994,6 +1001,7 @@ function planStrassendorf(wege, saat, va, dichte, wasser, haeuser, mitte, Rmax) 
             [m[0] - dx * br + nx * tf * seite, m[1] - dy * br + ny * tf * seite]
           ];
           if (ecken.some((p) => wasser.drin(p[0], p[1]))) continue;
+          if (ecken.some((p) => p[0] < 4 || p[0] > PLAN_GROESSE - 4 || p[1] < 4 || p[1] > PLAN_GROESSE - 4)) continue;
           haeuser.push({
             ecken,
             umriss: planHausUmriss(ecken, saat, k),

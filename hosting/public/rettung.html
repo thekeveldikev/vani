@@ -5001,6 +5001,44 @@ html[data-thema="tinte"] .knopf.gefahr, html[data-thema="kerze"] .knopf.gefahr {
 .stb-vor { font-size: 12.5px; color: var(--blass); line-height: 1.55; margin: 0 0 10px; }
 .stb-hilfe { display: block; color: var(--blass); font-size: 11.5px; margin-top: 4px; line-height: 1.5; }
 
+/* Die Haeuser im Verzeichnis: Wappen links, Name und Blasonierung rechts. */
+.stb-haus {
+  display: flex; align-items: center; gap: 12px; padding: 12px 4px 8px;
+  border-top: 1px solid var(--rand); margin-top: 10px;
+}
+.stb-haus:first-child { border-top: none; margin-top: 0; }
+.stb-hauswappen {
+  --kpapier: var(--karte); --ktinte: var(--tinte);
+  flex: none; display: grid; place-items: center;
+}
+.stb-haustext { display: grid; gap: 2px; min-width: 0; }
+.stb-haustext b { font-family: ui-serif, "New York", Georgia, serif; font-size: 16px; }
+.stb-haustext small { color: var(--matt); line-height: 1.4; }
+
+/* Das Geschlecht: nur fuer die Woerter, darum schlicht als Reihe. */
+.stb-geschlecht { display: flex; flex-wrap: wrap; gap: 6px; }
+.stb-gs {
+  padding: 6px 12px; border: 1px solid var(--rand); background: var(--karte); color: var(--tinte);
+  border-radius: 999px; cursor: pointer; font-size: 13px; transition: border-color .18s, background .18s;
+}
+.stb-gs.an { border-color: var(--akzent); background: color-mix(in srgb, var(--akzent) 14%, var(--karte)); }
+
+/* Die Verwandtschaft: eine Auswahl und ein Satz darunter. */
+.stb-sippe { display: grid; gap: 9px; }
+.stb-sippewahl {
+  width: 100%; padding: 9px 11px; border: 1px solid var(--rand); border-radius: 10px;
+  background: var(--karte); color: var(--tinte); font-size: 14px; font-family: inherit;
+}
+.stb-sippeantwort { display: grid; gap: 5px; }
+.stb-sippesatz {
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; line-height: 1.45;
+  color: var(--tinte);
+}
+.stb-sippeantwort small { color: var(--matt); }
+.stb-sippeweg { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 4px; margin-top: 4px; }
+.stb-sippeweg span { font-weight: 600; }
+.stb-sippeweg i { color: var(--matt); font-style: normal; font-size: 12.5px; }
+
 .stb-zeichen { display: flex; flex-wrap: wrap; gap: 5px; }
 .stb-z {
   width: 36px; height: 36px; border: 1px solid var(--rand); background: var(--karte); color: var(--tinte);
@@ -6073,6 +6111,16 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 .kt-randraute { fill: var(--ktinte); fill-opacity: .72; }
 .kt-randlinie.innen { stroke-width: 1; stroke-opacity: .5; }
 .kt-gradstrich { stroke: var(--ktinte); stroke-width: 1.2; stroke-opacity: .55; }
+/* Die Planquadrate im Randband. */
+.kt-feldname { fill: var(--ktinte); fill-opacity: .5; font-size: 9.4px; font-weight: 600; letter-spacing: .04em;
+  font-family: ui-serif, "New York", Georgia, serif; }
+/* Die Wegweiser an den Blattraendern. */
+.kt-nachbarpfeil { fill: none; stroke: var(--ktinte); stroke-width: 1.2; stroke-opacity: .72; stroke-linecap: round; }
+.kt-nachbarname { fill: var(--ktinte); fill-opacity: .82; font-size: 10.5px; letter-spacing: .05em;
+  font-family: ui-serif, "New York", Georgia, serif; }
+.kt-nachbarzeit { fill: var(--ktinte); fill-opacity: .5; font-size: 8.4px; font-style: italic;
+  font-family: ui-serif, "New York", Georgia, serif; }
+.kt-blatt.ohne-namen .kt-nachbarn { display: none; }
 
 /* ----- Die Marken ----- */
 .kt-marke { cursor: pointer; color: var(--ktinte); }
@@ -6521,7 +6569,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.44.0';
+const APP_VERSION = '5.45.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -30983,6 +31031,10 @@ function saubererStammbaum(roh) {
       bis: String(p.bis || '').trim().slice(0, 24),
       notiz: String(p.notiz || '').trim().slice(0, 600),
       zeichen: TEPPICH_ZEICHEN_IDS.includes(p.zeichen) ? p.zeichen : 'keins',
+      /* Nur für die Wörter: „Tante“ oder „Onkel“, „ihre Großmutter“ oder
+         „sein Großvater“. Wer nichts angibt, bekommt beide Formen —
+         geraten wird nichts, auch nicht am Namen. */
+      geschlecht: TEPPICH_GESCHLECHT_IDS.includes(p.geschlecht) ? p.geschlecht : '',
       /* Ausgebrannt: der Name bleibt, das Feld darüber ist versengt. Genau
          so, wie man jemanden aus einem Wandteppich entfernt, ohne dass die
          Lücke verschwindet. */
@@ -33227,6 +33279,476 @@ function teppichBlattFallen(scheibe) {
   setTimeout(() => b.remove(), 15000);
 }
 
+/* ===================================================================
+   DIE SIPPE: VERWANDTSCHAFT, WEGE, HÄUSER
+   -------------------------------------------------------------------
+   Ein Stammbaum weiß bisher, WER mit wem verbunden ist. Er weiß nicht,
+   WIE. Das ist der Unterschied zwischen einem Netz und einer Familie:
+   „Alma und Nora sind über drei Fäden verbunden“ hilft niemandem —
+   „Alma ist Noras Urgroßmutter“ schon.
+
+   Deutsch ist darin genauer als die meisten Sprachen: Großtante, Neffe
+   zweiten Grades, Schwippschwägerin. Das alles ist ausrechenbar, wenn
+   man den Weg über den nächsten gemeinsamen Vorfahren kennt.
+   =================================================================== */
+
+/* ----- Das Geschlecht -----
+   Nur für die Wörter. Wer es nicht angibt, bekommt beide Formen
+   („Tante oder Onkel“) — geraten wird nichts, auch nicht am Namen. */
+const TEPPICH_GESCHLECHTER = [
+  ['', 'Nicht gesagt'],
+  ['w', 'Weiblich'],
+  ['m', 'Männlich'],
+  ['d', 'Anders oder beides']
+];
+const TEPPICH_GESCHLECHT_IDS = TEPPICH_GESCHLECHTER.map((g) => g[0]);
+
+/* Ein Wortpaar nach Geschlecht auflösen.
+   Wer nichts angibt, bekommt die NEUTRALE Form, wo das Deutsche eine
+   hergibt — „Elternteil“, „Enkelkind“, „Geschwisterteil“. Das ist keine
+   Vermutung, sondern die richtige Auskunft: mehr weiß der Teppich nicht.
+   Wo es keine neutrale Form gibt („Tante“, „Onkel“), stehen beide da;
+   „Kim ist Tonis Mutter oder Vater“ wäre sonst der Satz gewesen, obwohl
+   „Elternteil“ danebensteht und passt. */
+function sippeWort(geschlecht, weiblich, maennlich, neutral) {
+  if (geschlecht === 'w') return weiblich;
+  if (geschlecht === 'm') return maennlich;
+  if (geschlecht === 'd' && neutral) return neutral;
+  if (neutral) return neutral;
+  return weiblich + ' oder ' + maennlich;
+}
+
+const SIPPE_ORDNUNGSZAHL = ['nullten', 'ersten', 'zweiten', 'dritten', 'vierten', 'fünften',
+  'sechsten', 'siebten', 'achten', 'neunten', 'zehnten'];
+function sippeOrdnung(n) { return SIPPE_ORDNUNGSZAHL[n] || (n + '.'); }
+
+const SIPPE_MALE = ['', 'einmal', 'zweimal', 'dreimal', 'viermal', 'fünfmal', 'sechsmal'];
+function sippeMale(n) { return SIPPE_MALE[n] || (n + '-mal'); }
+
+/* „Ur“, „Urur“, „Ururur“ … */
+function sippeUr(wieOft) { return 'Ur'.repeat(Math.max(0, wieOft)); }
+
+/* ----- Die Blutsverwandtschaft -----
+   Der Weg nach oben: alle Vorfahren mit ihrem Abstand. Über die
+   LÄNGSTE Kette zu rechnen wäre falsch — gesucht ist der kürzeste Weg
+   zum gemeinsamen Vorfahren, denn der bestimmt den Grad. */
+function sippeVorfahren(baum, id, eltern) {
+  const karte = eltern || teppichEltern(baum);
+  const weit = new Map([[id, 0]]);
+  const ziehWeg = new Set();
+  let rand = [id];
+  let tiefe = 0;
+  while (rand.length && tiefe < 40) {
+    tiefe++;
+    const naechste = [];
+    for (const p of rand) {
+      for (const e of karte.get(p) || []) {
+        if (weit.has(e)) continue;
+        weit.set(e, tiefe);
+        naechste.push(e);
+      }
+    }
+    rand = naechste;
+  }
+  return { weit, ziehWeg };
+}
+
+/* Läuft der Weg von `id` nach oben über eine Ziehelternschaft?
+   Dann ist es eine Zieh- oder Stiefverwandtschaft, kein Blut. */
+function sippeUeberZieh(baum, von, nach) {
+  /* Wer selbst der gemeinsame Vorfahre ist, hat keinen Weg dorthin — und
+     schon gar keinen über eine Ziehelternschaft. Ohne diese Zeile stand
+     hinter JEDER Verwandtschaft „(über eine Ziehelternschaft)“. */
+  if (von === nach) return false;
+  const nurBlut = new Map();
+  for (const p of baum.leute) nurBlut.set(p.id, []);
+  for (const f of baum.faeden) {
+    if (f.art !== 'kind') continue;
+    const l = nurBlut.get(f.von);
+    if (l && !l.includes(f.zu)) l.push(f.zu);
+  }
+  /* Erreicht man `nach` auch ohne Ziehfäden? */
+  const gesehen = new Set([von]);
+  let rand = [von], tiefe = 0;
+  while (rand.length && tiefe++ < 40) {
+    const naechste = [];
+    for (const p of rand) {
+      for (const e of nurBlut.get(p) || []) {
+        if (e === nach) return false;
+        if (gesehen.has(e)) continue;
+        gesehen.add(e);
+        naechste.push(e);
+      }
+    }
+    rand = naechste;
+  }
+  return true;
+}
+
+/* Der nächste gemeinsame Vorfahre und die beiden Abstände dorthin. */
+function sippeGemeinsam(baum, aId, bId, eltern) {
+  const a = sippeVorfahren(baum, aId, eltern).weit;
+  const b = sippeVorfahren(baum, bId, eltern).weit;
+  let beste = null, summe = Infinity;
+  for (const [p, auf] of a) {
+    const ab = b.get(p);
+    if (ab == null) continue;
+    /* Der nächste gemeinsame Vorfahre: die kleinste Summe, bei Gleichstand
+       der mit dem kleineren größeren Abstand. */
+    const s = auf + ab;
+    if (s < summe || (s === summe && beste && Math.max(auf, ab) < Math.max(beste.auf, beste.ab))) {
+      summe = s;
+      beste = { id: p, auf, ab };
+    }
+  }
+  return beste;
+}
+
+/* ----- Das Wort für die Blutsverwandtschaft -----
+   `auf` = Schritte von A hinauf zum gemeinsamen Vorfahren,
+   `ab`  = Schritte von B hinauf zum selben Vorfahren.
+   Gefragt ist immer: Was ist B für A? */
+function sippeBlutwort(auf, ab, geschlechtB) {
+  const g = geschlechtB;
+
+  /* B ist ein Vorfahre von A. */
+  if (ab === 0) {
+    if (auf === 1) return sippeWort(g, 'Mutter', 'Vater', 'Elternteil');
+    if (auf === 2) return sippeWort(g, 'Großmutter', 'Großvater', 'Großelternteil');
+    if (auf <= 6) {
+      const ur = sippeUr(auf - 2);
+      return sippeWort(g, ur + 'großmutter', ur + 'großvater', ur + 'großelternteil');
+    }
+    return sippeWort(g, 'Vorfahrin', 'Vorfahr', 'Vorfahre') + ' in der ' + sippeOrdnung(auf) + ' Generation';
+  }
+
+  /* B ist ein Nachfahre von A. */
+  if (auf === 0) {
+    if (ab === 1) return sippeWort(g, 'Tochter', 'Sohn', 'Kind');
+    if (ab === 2) return sippeWort(g, 'Enkelin', 'Enkel', 'Enkelkind');
+    if (ab <= 6) {
+      const ur = sippeUr(ab - 2);
+      return sippeWort(g, ur + 'enkelin', ur + 'enkel', ur + 'enkelkind');
+    }
+    return sippeWort(g, 'Nachfahrin', 'Nachfahre', 'Nachfahre') + ' in der ' + sippeOrdnung(ab) + ' Generation';
+  }
+
+  /* Geschwister. */
+  if (auf === 1 && ab === 1) return sippeWort(g, 'Schwester', 'Bruder', 'Geschwisterteil');
+
+  /* B steht eine Ebene über A: Tante, Großtante, Urgroßtante … */
+  if (ab === 1) {
+    const ur = auf >= 3 ? sippeUr(auf - 3) + 'groß' : '';
+    if (auf === 2) return sippeWort(g, 'Tante', 'Onkel');
+    return sippeWort(g, ur + 'tante', ur + 'onkel').replace(/^([a-zäöü])/, (m) => m.toUpperCase());
+  }
+
+  /* B steht eine Ebene unter A: Nichte, Großnichte … */
+  if (auf === 1) {
+    if (ab === 2) return sippeWort(g, 'Nichte', 'Neffe');
+    const ur = sippeUr(ab - 3) + 'groß';
+    return (sippeWort(g, ur + 'nichte', ur + 'neffe')).replace(/^([a-zäöü])/, (m) => m.toUpperCase());
+  }
+
+  /* Sonst: Cousine und Cousin, mit Grad und Versatz. */
+  const grad = Math.min(auf, ab) - 1;
+  const versatz = Math.abs(auf - ab);
+  const wort = sippeWort(g, 'Cousine', 'Cousin', null);
+  const kern = wort + ' ' + sippeOrdnung(grad) + ' Grades';
+  return versatz ? kern + ', ' + sippeMale(versatz) + ' entfernt' : kern;
+}
+
+/* ----- Angeheiratet -----
+   Was nicht über Blut geht, geht oft über einen Bund. Dafür braucht es
+   keine eigene Rechnung, sondern nur den Umweg über die Partner. */
+function sippeAngeheiratet(baum, aId, bId, eltern, paare) {
+  const P = paare || teppichPaare(baum);
+  const partnerA = P.get(aId) || [];
+  const partnerB = P.get(bId) || [];
+  const holen = (id) => baum.leute.find((p) => p.id === id);
+  const gB = (holen(bId) || {}).geschlecht || '';
+
+  /* B ist mit A zusammen. */
+  if (partnerA.includes(bId)) {
+    const faden = baum.faeden.find((f) =>
+      ((f.von === aId && f.zu === bId) || (f.von === bId && f.zu === aId)) &&
+      fadenArt(f.art, baum).paar);
+    const art = faden ? faden.art : 'paar';
+    if (art === 'heirat') return { wort: sippeWort(gB, 'Ehefrau', 'Ehemann', null), ueber: null, blut: false };
+    if (art === 'verlobt') return { wort: sippeWort(gB, 'Verlobte', 'Verlobter', 'verlobt mit'), ueber: null, blut: false };
+    return { wort: sippeWort(gB, 'Gefährtin', 'Gefährte', 'zusammen mit'), ueber: null, blut: false };
+  }
+
+  /* B ist mit einem Blutsverwandten von A zusammen. */
+  for (const partner of partnerB) {
+    const g = sippeGemeinsam(baum, aId, partner, eltern);
+    if (!g) continue;
+    const wort = sippeBlutwort(g.auf, g.ab, (holen(partner) || {}).geschlecht || '');
+    /* Die geläufigen Fälle bekommen ihr eigenes Wort. */
+    if (g.auf === 1 && g.ab === 1) return { wort: sippeWort(gB, 'Schwägerin', 'Schwager'), ueber: partner, blut: false };
+    if (g.auf === 0 && g.ab === 1) return { wort: sippeWort(gB, 'Schwiegertochter', 'Schwiegersohn', 'Schwiegerkind'), ueber: partner, blut: false };
+    /* Der Partner ist ein Elternteil von A: dann ist B der Stiefvater
+       beziehungsweise die Stiefmutter. Diese Richtung fehlte, und heraus
+       kam „angeheiratet — mutter von von“. */
+    if (g.auf === 1 && g.ab === 0) {
+      return { wort: sippeWort(gB, 'Stiefmutter', 'Stiefvater', 'Stiefelternteil'), ueber: partner, blut: false };
+    }
+    return { wort, ueber: partner, blut: false, umweg: true };
+  }
+
+  /* B ist blutsverwandt mit einem Partner von A. */
+  for (const partner of partnerA) {
+    const g = sippeGemeinsam(baum, partner, bId, eltern);
+    if (!g) continue;
+    void g;
+    if (g.auf === 1 && g.ab === 0) return { wort: sippeWort(gB, 'Schwiegermutter', 'Schwiegervater', 'Schwiegerelternteil'), ueber: partner, blut: false };
+    if (g.auf === 1 && g.ab === 1) return { wort: sippeWort(gB, 'Schwägerin', 'Schwager'), ueber: partner, blut: false };
+    if (g.auf === 0 && g.ab === 1) return { wort: sippeWort(gB, 'Stieftochter', 'Stiefsohn', 'Stiefkind'), ueber: partner, blut: false };
+    const wort = sippeBlutwort(g.auf, g.ab, gB);
+    return { wort: wort + ' — über ' + (teppichName(holen(partner)) || 'die Ehe'), ueber: partner, blut: false };
+  }
+  return null;
+}
+
+/* ----- Die Antwort -----
+   Ein Satz, den man vorlesen kann. Das ist der ganze Zweck. */
+function teppichVerwandtschaft(baum, aId, bId) {
+  if (!baum || aId === bId) return null;
+  const holen = (id) => baum.leute.find((p) => p.id === id);
+  const A = holen(aId), B = holen(bId);
+  if (!A || !B) return null;
+  const nameA = teppichName(A), nameB = teppichName(B);
+
+  const eltern = teppichEltern(baum);
+  const gemeinsam = sippeGemeinsam(baum, aId, bId, eltern);
+
+  if (gemeinsam) {
+    const { auf, ab } = gemeinsam;
+    const zieh = sippeUeberZieh(baum, aId, gemeinsam.id) || sippeUeberZieh(baum, bId, gemeinsam.id);
+    let wort = sippeBlutwort(auf, ab, B.geschlecht || '');
+    let nachsatz = '';
+    if (zieh) {
+      if (auf === 1 && ab === 1) wort = sippeWort(B.geschlecht || '', 'Ziehschwester', 'Ziehbruder', 'Ziehgeschwister');
+      else if (ab === 0 && auf === 1) wort = sippeWort(B.geschlecht || '', 'Ziehmutter', 'Ziehvater', 'Ziehelternteil');
+      else if (auf === 0 && ab === 1) wort = sippeWort(B.geschlecht || '', 'Ziehtochter', 'Ziehsohn', 'Ziehkind');
+      else nachsatz = ' — über eine Ziehelternschaft';
+    }
+    return {
+      art: zieh ? 'zieh' : 'blut',
+      wort, nachsatz,
+      ueberId: gemeinsam.id,
+      ueber: teppichName(holen(gemeinsam.id)),
+      auf, ab,
+      /* Der Genitiv liest sich besser als „ist die Großmutter von“ — und
+         er ist die Form, in der man so etwas ausspricht. */
+      satz: nameB + ' ist ' + genitiv(nameA) + ' ' + wort + nachsatz + '.'
+    };
+  }
+
+  const ange = sippeAngeheiratet(baum, aId, bId, eltern);
+  if (ange) {
+    const ueberName = ange.ueber ? teppichName(holen(ange.ueber)) : '';
+    return {
+      art: 'bund',
+      wort: ange.wort,
+      ueberId: ange.ueber,
+      ueber: ueberName,
+      satz: ange.umweg
+        ? nameB + ' ist ' + genitiv(ueberName) + ' ' + ange.wort + ' — und damit ' + genitiv(nameA) + ' angeheiratete Verwandtschaft.'
+        : nameB + ' ist ' + genitiv(nameA) + ' ' + ange.wort + '.'
+    };
+  }
+
+  /* Kein Blut, kein Bund — aber vielleicht ein Weg über andere Fäden. */
+  const weg = teppichWegZwischen(baum, aId, bId);
+  if (weg && weg.schritte.length) {
+    return {
+      art: 'weg',
+      wort: 'nicht verwandt',
+      schritte: weg.schritte,
+      satz: nameA + ' und ' + nameB + ' sind nicht verwandt, aber über ' +
+        (weg.schritte.length === 1 ? 'einen Faden' : weg.schritte.length + ' Fäden') + ' verbunden.'
+    };
+  }
+
+  return {
+    art: 'nichts',
+    wort: '',
+    satz: nameA + ' und ' + nameB + ' haben nichts miteinander zu tun — noch nicht.'
+  };
+}
+
+/* „die Großmutter“, „der Onkel“, „das Enkelkind“ — der Artikel gehört
+   zum Wort, sonst liest sich der Satz falsch. Bei doppelten Formen
+   („Tante oder Onkel“) bleibt er weg. */
+function sippeArtikel(wort) {
+  if (!wort) return '';
+  if (/ oder |^angeheiratet|^nicht |^verheiratet|^verlobt|^zusammen/.test(wort)) return '';
+  const w = wort.split(/[ ,]/)[0];
+  if (/^(Vater|Bruder|Sohn|Enkel|Ururenkel|Urenkel|Onkel|Neffe|Cousin|Vorfahr|Nachfahre|Großvater|Schwager|Schwiegervater|Stiefsohn|Ziehvater|Ziehsohn|Ziehbruder|Ehemann|Gefährte|Verlobter)$/.test(w) ||
+      /(vater|sohn|onkel|neffe|enkel)$/i.test(w)) return 'der ';
+  if (/(kind|elternteil|geschwister)$/i.test(w)) return 'das ';
+  return 'die ';
+}
+
+/* ----- Der Weg zwischen zweien -----
+   Nicht nur Verwandtschaft: JEDER Faden zählt. „Nora → ist Kind von →
+   Alma → hasst → Bodo“ ist für eine Geschichte oft wichtiger als die
+   Frage, ob die drei blutsverwandt sind. */
+function teppichWegZwischen(baum, aId, bId, hoechstens) {
+  if (!baum || aId === bId) return null;
+  const grenze = hoechstens || 8;
+  const nachbarn = new Map();
+  for (const p of baum.leute) nachbarn.set(p.id, []);
+  for (const f of baum.faeden) {
+    const a = nachbarn.get(f.von), b = nachbarn.get(f.zu);
+    if (a) a.push({ zu: f.zu, faden: f, vorwaerts: true });
+    if (b) b.push({ zu: f.von, faden: f, vorwaerts: false });
+  }
+
+  /* Breitensuche: der kürzeste Weg ist der, den man erzählen kann. */
+  const woher = new Map([[aId, null]]);
+  let rand = [aId], tiefe = 0;
+  while (rand.length && tiefe++ < grenze) {
+    const naechste = [];
+    for (const p of rand) {
+      for (const n of nachbarn.get(p) || []) {
+        if (woher.has(n.zu)) continue;
+        woher.set(n.zu, { von: p, faden: n.faden, vorwaerts: n.vorwaerts });
+        if (n.zu === bId) { rand = []; naechste.length = 0; break; }
+        naechste.push(n.zu);
+      }
+      if (!rand.length) break;
+    }
+    if (!rand.length) break;
+    rand = naechste;
+  }
+  if (!woher.has(bId)) return null;
+
+  const schritte = [];
+  let hier = bId;
+  while (hier !== aId) {
+    const w = woher.get(hier);
+    if (!w) return null;
+    const art = fadenArt(w.faden.art, baum);
+    schritte.unshift({
+      von: w.von, zu: hier, faden: w.faden,
+      wort: w.vorwaerts ? art.name : (art.gegen || art.name),
+      vorwaerts: w.vorwaerts
+    });
+    hier = w.von;
+  }
+  return { schritte, laenge: schritte.length };
+}
+
+/* Den Weg als Satzkette — vorlesbar, nicht als Datenstruktur. */
+function teppichWegSatz(baum, weg) {
+  if (!weg || !weg.schritte.length) return '';
+  const holen = (id) => baum.leute.find((p) => p.id === id);
+  const teile = [];
+  for (const s of weg.schritte) {
+    teile.push(teppichName(holen(s.von)) + ' — ' + s.wort.toLowerCase() + ' — ');
+  }
+  return teile.join('') + teppichName(holen(weg.schritte[weg.schritte.length - 1].zu));
+}
+
+/* ===================== DIE HÄUSER =====================
+   Ein Stammbaum zerfällt von selbst in Sippen: Gruppen, die über Blut
+   zusammenhängen und mit keiner anderen Gruppe durch Blut verbunden
+   sind. Jede bekommt einen Namen — den häufigsten Nachnamen darin —
+   und ein Wappen, gerechnet aus diesem Namen.
+
+   Das Wappen kommt vom Kartentisch: dieselbe Heraldik, dieselbe
+   Schraffur. Zwei Werkzeuge, ein Haus. */
+function teppichHaeuser(baum) {
+  const eltern = teppichEltern(baum);
+  const kinder = teppichKinder(baum);
+  const paare = teppichPaare(baum);
+
+  const gesehen = new Set();
+  const haeuser = [];
+  for (const p of baum.leute) {
+    if (gesehen.has(p.id)) continue;
+    /* Alles einsammeln, was über Blut UND Bund zusammenhängt. */
+    const drin = [];
+    let rand = [p.id];
+    gesehen.add(p.id);
+    while (rand.length) {
+      const naechste = [];
+      for (const id of rand) {
+        drin.push(id);
+        for (const n of (eltern.get(id) || []).concat(kinder.get(id) || [], paare.get(id) || [])) {
+          if (gesehen.has(n)) continue;
+          gesehen.add(n);
+          naechste.push(n);
+        }
+      }
+      rand = naechste;
+    }
+    if (drin.length < 2) continue;
+
+    /* Der Name des Hauses: der häufigste letzte Namensteil. */
+    const zaehler = new Map();
+    for (const id of drin) {
+      const person = baum.leute.find((x) => x.id === id);
+      const teile = String((person && person.name) || '').trim().split(/\s+/);
+      const nach = teile.length > 1 ? teile[teile.length - 1] : '';
+      if (!nach) continue;
+      zaehler.set(nach, (zaehler.get(nach) || 0) + 1);
+    }
+    let name = '', beste = 0;
+    for (const [n, z] of zaehler) if (z > beste) { beste = z; name = n; }
+
+    haeuser.push({
+      id: 'h' + haeuser.length,
+      name: name || '',
+      leute: drin,
+      wieViele: drin.length,
+      /* Das Wappen hängt am Namen, nicht an der Reihenfolge: dasselbe
+         Haus bekommt in jedem Teppich dasselbe Zeichen. */
+      wappen: typeof planWappen === 'function'
+        ? planWappen({ saat: 'haus-' + (name || drin.slice().sort()[0]) }, null)
+        : null
+    });
+  }
+  haeuser.sort((a, b) => b.wieViele - a.wieViele);
+  return haeuser;
+}
+
+/* Zu welchem Haus gehört jemand? */
+function teppichHausVon(haeuser, id) {
+  return (haeuser || []).find((h) => h.leute.includes(id)) || null;
+}
+
+/* ===================== DER UMKREIS =====================
+   „Zeig mir nur, was um Nora herum passiert.“ Bei vierhundert Leuten
+   ist das der Unterschied zwischen einem Teppich und einem Knäuel. */
+function teppichUmkreis(baum, id, schritte) {
+  const grenze = Math.max(1, Math.min(6, schritte || 2));
+  const nachbarn = new Map();
+  for (const p of baum.leute) nachbarn.set(p.id, new Set());
+  for (const f of baum.faeden) {
+    const a = nachbarn.get(f.von), b = nachbarn.get(f.zu);
+    if (a) a.add(f.zu);
+    if (b) b.add(f.von);
+  }
+  const weit = new Map([[id, 0]]);
+  let rand = [id];
+  for (let t = 1; t <= grenze; t++) {
+    const naechste = [];
+    for (const p of rand) {
+      for (const n of nachbarn.get(p) || []) {
+        if (weit.has(n)) continue;
+        weit.set(n, t);
+        naechste.push(n);
+      }
+    }
+    rand = naechste;
+    if (!rand.length) break;
+  }
+  return weit;
+}
+
 /* ===================== 63c — DIE KARTUSCHE =====================
    Hier wird eingetragen. Ein Tippen auf ein Namensband öffnet die Kartusche:
    Name, Jahre, Zeichen, eine Notiz — und darunter alle Fäden, die von dieser
@@ -33271,7 +33793,7 @@ function teppichPersonNeu(doc, name, neu) {
   if (!doc) return;
   const person = {
     id: uid(), name: String(name || '').trim().slice(0, 120), albumId: '',
-    von: '', bis: '', notiz: '', zeichen: 'keins', gebrannt: false
+    von: '', bis: '', notiz: '', zeichen: 'keins', geschlecht: '', gebrannt: false
   };
   if (saubererStammbaum(doc).leute.length >= TEPPICH_MAX_LEUTE) {
     toast('Vierhundert Namen sind das Äußerste, was auf ein Tuch passt. Web einen zweiten Teppich.', 8000);
@@ -33318,7 +33840,7 @@ function teppichAusAlbum(doc, neu) {
         b.leute = b.leute.concat(wirklich.map((f) => ({
           id: uid(), name: f.name || '', albumId: f.id,
           von: (f.felder || {}).geboren || '', bis: (f.felder || {}).gestorben || '',
-          notiz: '', zeichen: 'keins', gebrannt: false
+          notiz: '', zeichen: 'keins', geschlecht: '', gebrannt: false
         })));
         return b;
       });
@@ -33395,6 +33917,61 @@ function teppichKartusche(doc, personId, neu, frisch) {
 
   const notizfeld = el('textarea', { class: 'stb-notiz', rows: '3', placeholder: 'Was man über sie oder ihn wissen muss — in einem Satz.', maxlength: '600' }, person.notiz);
   notizfeld.addEventListener('input', () => { hinein((p) => { p.notiz = notizfeld.value; }); sichern(); });
+
+  /* --- Das Geschlecht ---
+     Nicht, um jemanden einzusortieren, sondern damit die Wörter stimmen:
+     „Noras Großmutter“ oder „Noras Großvater“, „Tante“ oder „Onkel“.
+     Wer nichts sagt, bekommt beide Formen — geraten wird nichts. */
+  const gschlechtreihe = el('div', { class: 'stb-geschlecht' });
+  const geschlechtZeichnen = () => {
+    gschlechtreihe.innerHTML = '';
+    const jetzt = (lebend() || person).geschlecht || '';
+    for (const [id, name] of TEPPICH_GESCHLECHTER) {
+      gschlechtreihe.append(el('button', {
+        class: 'stb-gs' + (jetzt === id ? ' an' : ''),
+        onclick: () => { hinein((p2) => { p2.geschlecht = id; }); geschlechtZeichnen(); sichern(); }
+      }, name));
+    }
+  };
+
+  /* --- Wie hängt diese Person mit den anderen zusammen? --- */
+  const sippenkasten = el('div', { class: 'stb-sippe' });
+  const sippeZeichnen = () => {
+    sippenkasten.innerHTML = '';
+    const b = saubererStammbaum(doc);
+    const andere = b.leute.filter((x) => x.id !== personId);
+    if (!andere.length) {
+      sippenkasten.append(el('div', { class: 'leer klein' }, 'Erst wenn ein zweiter Name hängt, gibt es etwas auszurechnen.'));
+      return;
+    }
+    const wahl = el('select', { class: 'stb-sippewahl' },
+      el('option', { value: '' }, 'Mit wem vergleichen?'),
+      ...andere.map((x) => el('option', { value: x.id }, teppichName(x))));
+    const antwort = el('div', { class: 'stb-sippeantwort' });
+    wahl.addEventListener('change', () => {
+      antwort.innerHTML = '';
+      if (!wahl.value) return;
+      const v = teppichVerwandtschaft(b, personId, wahl.value);
+      if (!v) return;
+      antwort.append(el('b', { class: 'stb-sippesatz' }, v.satz));
+      if (v.ueber && v.art !== 'weg') {
+        antwort.append(el('small', {}, v.art === 'bund'
+          ? 'Über ' + v.ueber + '.'
+          : 'Gemeinsam bis zu ' + v.ueber + ' — ' + v.auf + ' nach oben, ' + v.ab + ' zurück.'));
+      }
+      if (v.art === 'weg' && v.schritte) {
+        const kette = el('div', { class: 'stb-sippeweg' });
+        for (const sch of v.schritte) {
+          const von = b.leute.find((x) => x.id === sch.von);
+          kette.append(el('span', {}, teppichName(von)), el('i', {}, ' — ' + sch.wort.toLowerCase() + ' → '));
+        }
+        const letzte = b.leute.find((x) => x.id === v.schritte[v.schritte.length - 1].zu);
+        kette.append(el('span', {}, teppichName(letzte)));
+        antwort.append(kette);
+      }
+    });
+    sippenkasten.append(wahl, antwort);
+  };
 
   /* --- Das Zeichen --- */
   const zeichenreihe = el('div', { class: 'stb-zeichen' });
@@ -33485,10 +34062,14 @@ function teppichKartusche(doc, personId, neu, frisch) {
       el('div', { class: 'stb-jahre' }, vonFeld, el('i', {}, '–'), bisFeld)),
     albumFigur ? el('small', { class: 'stb-albumhinweis' }, 'Der Name kommt aus dem Album und wird dort geändert.') : null,
     kopfzeile,
+    el('div', { class: 'stb-abschnitt' }, 'Wie man von ihr oder ihm spricht'),
+    gschlechtreihe,
     el('div', { class: 'stb-abschnitt' }, 'Zeichen'),
     zeichenreihe,
     el('div', { class: 'stb-abschnitt' }, 'Notiz'),
     notizfeld,
+    el('div', { class: 'stb-abschnitt' }, 'Verwandtschaft'),
+    sippenkasten,
     el('div', { class: 'stb-abschnitt' }, 'Fäden'),
     fadenkasten,
     el('div', { class: 'reihe stb-kfuss' },
@@ -33512,7 +34093,7 @@ function teppichKartusche(doc, personId, neu, frisch) {
       el('button', { class: 'knopf voll', onclick: () => { sichern.sofort(); zu(); if (neu) neu(); } }, 'Fertig')));
 
   const zu = zeigeDeck(kasten, () => { sichern.sofort(); if (neu) neu(); });
-  kopfAuffrischen(); zeichenZeichnen(); faedenZeichnen();
+  kopfAuffrischen(); zeichenZeichnen(); geschlechtZeichnen(); sippeZeichnen(); faedenZeichnen();
   setTimeout(() => { if (frisch && !namensfeld.disabled) namensfeld.focus(); }, 60);
 }
 
@@ -33624,7 +34205,7 @@ function teppichFadenFenster(doc, vorhandener, vonId, danach, vorgabeArt, zielId
       zielliste.append(el('button', {
         class: 'stb-fziel neu',
         onclick: async () => {
-          const person = { id: uid(), name: q.slice(0, 120), albumId: '', von: '', bis: '', notiz: '', zeichen: 'keins', gebrannt: false };
+          const person = { id: uid(), name: q.slice(0, 120), albumId: '', von: '', bis: '', notiz: '', zeichen: 'keins', geschlecht: '', gebrannt: false };
           await teppichSchreiben(doc, (b) => { b.leute = b.leute.concat([person]); return b; });
           const frisch = saubererStammbaum(doc);
           baum.leute = frisch.leute;
@@ -33889,7 +34470,9 @@ function teppichVerzeichnis(doc, neu) {
     const b = saubererStammbaum(doc);
     koepfe.innerHTML = '';
     const auff = teppichAuffaelligkeiten(b);
-    for (const [id, name, zahl] of [['namen', 'Namen', b.leute.length], ['faeden', 'Fäden', b.faeden.length], ['auff', 'Was auffällt', auff.length]]) {
+    const haeuser = teppichHaeuser(b);
+    for (const [id, name, zahl] of [['namen', 'Namen', b.leute.length], ['faeden', 'Fäden', b.faeden.length],
+      ['haeuser', 'Häuser', haeuser.length], ['auff', 'Was auffällt', auff.length]]) {
       koepfe.append(el('button', { class: 'stb-vr' + (reiter === id ? ' an' : ''), onclick: () => { reiter = id; zeichne(); } }, name, zahl ? el('i', {}, String(zahl)) : null));
     }
     inhalt.innerHTML = '';
@@ -33924,6 +34507,45 @@ function teppichVerzeichnis(doc, neu) {
         for (const { f, satz } of liste) {
           inhalt.append(el('button', { class: 'stb-vzeile faden', style: '--fadenfarbe:' + art.farbe, onclick: () => { zu(); teppichFadenBearbeiten(doc, f, neu); } },
             el('b', {}, satz)));
+        }
+      }
+    } else if (reiter === 'haeuser') {
+      /* Ein Stammbaum zerfällt von selbst in Sippen: Gruppen, die über Blut
+         und Bund zusammenhängen. Jede bekommt den häufigsten Nachnamen als
+         Namen und ein Wappen, gerechnet aus eben diesem Namen — dieselbe
+         Heraldik wie auf dem Kartentisch. Ein Haus, zwei Werkzeuge. */
+      if (!haeuser.length) {
+        inhalt.append(el('div', { class: 'leer klein' }, 'Noch hängt niemand mit jemandem zusammen. Ein Haus entsteht, sobald zwei Namen ein Band haben.'));
+      }
+      for (const h of haeuser) {
+        const kopf = el('div', { class: 'stb-haus' });
+        if (h.wappen && typeof planWappenSVG === 'function') {
+          const schild = el('span', { class: 'stb-hauswappen' });
+          const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          /* Der Ausschnitt muss zum Schild passen: es ist 0,84-mal so
+             breit wie hoch. Zu klein gezeichnet verschwindet die Schraffur,
+             und dann ist das Wappen ein grauer Fleck. */
+          const hoch = 48, breit = hoch * 0.84;
+          svg.setAttribute('viewBox', (-breit / 2 - 3) + ' ' + (-hoch / 2 - 3) + ' ' + (breit + 6) + ' ' + (hoch + 6));
+          svg.setAttribute('width', String(Math.round(breit + 6)));
+          svg.setAttribute('height', String(Math.round(hoch + 6)));
+          svg.append(planWappenSVG(h.wappen, hoch));
+          schild.append(svg);
+          kopf.append(schild);
+        }
+        kopf.append(el('div', { class: 'stb-haustext' },
+          el('b', {}, h.name ? 'Haus ' + h.name : 'Ein Haus ohne Namen'),
+          el('small', {}, h.wieViele + (h.wieViele === 1 ? ' Name' : ' Namen') +
+            (h.wappen && typeof planBlason === 'function' ? '  ·  ' + planBlason(h.wappen) : ''))));
+        inhalt.append(kopf);
+        for (const id of h.leute) {
+          const person = b.leute.find((x) => x.id === id);
+          if (!person) continue;
+          if (q && !teppichName(person).toLowerCase().includes(q.toLowerCase())) continue;
+          inhalt.append(el('button', {
+            class: 'stb-vzeile' + (person.gebrannt ? ' gebrannt' : ''),
+            onclick: () => { zu(); teppichKartusche(doc, person.id, neu); }
+          }, el('b', {}, teppichName(person) || 'ohne Namen'), el('span', {}, teppichJahre(person))));
         }
       }
     } else {
@@ -34883,6 +35505,13 @@ function planBauen(plan) {
   const muehle = planMuehle(plan, stadt, wasser);
   const inseln = planInseln(plan, wasser);
   const gebaut = { plan, wasser, stadt, umland, hafen, muehle, inseln, marktplatz: planMarktplatz(plan, stadt) };
+  /* Die Landstraßen laufen vom Blatt — und an ihren Enden stehen die
+     Wegweiser. Erst dadurch bekommt die Stadt ein Dahinter. */
+  if (plan.stadt.umland) {
+    const land = planLandstrassen(stadt, wasser, plan);
+    for (const l of land) stadt.strassen.push(l);
+  }
+  gebaut.nachbarn = planNachbarorte(plan, stadt, wasser);
   /* Das Wappen darf wissen, was in der Stadt steht — eine Hafenstadt
      führt einen Anker, eine Mühlenstadt ein Rad. Darum zuletzt. */
   gebaut.wappen = planWappen(plan, gebaut);
@@ -35125,6 +35754,12 @@ function planSuche(plan, frage, gebaut) {
   return raus.slice(0, 40);
 }
 /* Eigene Namen schlagen die gerechneten. */
+/* Die Fundstelle einer Straße oder Marke — „C4“ oder „C4–D5“. */
+function planFundstelle(punkte) {
+  if (!punkte || !punkte.length) return '';
+  return planFelderText(planFelderVon(punkte));
+}
+
 function planStrassenname(plan, s) {
   const k = 'gasse:' + s.richtung + ':' + (s.richtung === 'speiche' ? s.i : s.j);
   return plan.namen[k] || s.name;
@@ -36131,6 +36766,13 @@ function planBlockBebauen(poly, saat, schluessel, va, dichte, wasser, haeuser) {
         if (!netzImPolygon(poly, p0[0], p0[1]) || !netzImPolygon(poly, p1[0], p1[1]) ||
             !netzImPolygon(poly, p2[0], p2[1]) || !netzImPolygon(poly, p3[0], p3[1])) continue;
         if (wasser.drin(p0[0], p0[1]) || wasser.drin(p2[0], p2[1])) continue;
+        /* Kein Haus neben dem Papier. Bei der strahlenden Anlage können
+           Ringknoten über den Blattrand hinausrutschen; der Zuschnitt
+           schneidet das zwar weg, aber gerechnet und gespeichert wurde es
+           trotzdem — Häuser bei x = −59. */
+        const drausen = [p0, p1, p2, p3].some((q) =>
+          q[0] < 4 || q[0] > PLAN_GROESSE - 4 || q[1] < 4 || q[1] > PLAN_GROESSE - 4);
+        if (drausen) continue;
         const kandidat = [p0, p1, p2, p3];
         const f = Math.abs(netzFlaeche(kandidat));
         if (f < 22) continue;
@@ -36199,6 +36841,7 @@ function planStrassendorf(wege, saat, va, dichte, wasser, haeuser, mitte, Rmax) 
             [m[0] - dx * br + nx * tf * seite, m[1] - dy * br + ny * tf * seite]
           ];
           if (ecken.some((p) => wasser.drin(p[0], p[1]))) continue;
+          if (ecken.some((p) => p[0] < 4 || p[0] > PLAN_GROESSE - 4 || p[1] < 4 || p[1] > PLAN_GROESSE - 4)) continue;
           haeuser.push({
             ecken,
             umriss: planHausUmriss(ecken, saat, k),
@@ -36840,6 +37483,161 @@ function planMarktplatz(plan, stadt) {
   return { mitte, rathaus, brunnen, pranger, staende, weite };
 }
 
+/* ===================== DIE PLANQUADRATE =====================
+   Ein Straßenverzeichnis ohne Fundstellen ist eine Namensliste. Erst
+   „Am Salztor — C4“ macht daraus ein Verzeichnis: man kann nachschlagen
+   UND finden. Dafür bekommt das Blatt ein Netz aus acht mal acht
+   Feldern, Buchstaben quer, Zahlen längs — so wie es jeder Stadtplan
+   seit zweihundert Jahren macht.
+
+   Acht mal acht und nicht vierundzwanzig: ein Feld muss groß genug
+   sein, dass man das Gesuchte darin auch sieht. */
+const PLAN_FELDER = 8;
+const PLAN_FELD_BUCHSTABEN = 'ABCDEFGH';
+/* Der bespielte Bereich liegt innerhalb des Randbands. */
+const PLAN_FELD_RAND = 42;
+
+function planFeldGroesse() {
+  return (PLAN_GROESSE - PLAN_FELD_RAND * 2) / PLAN_FELDER;
+}
+
+/* Welches Planquadrat liegt an dieser Stelle? „C4“ — oder leer, wenn
+   die Stelle außerhalb des bespielten Bereichs liegt. */
+function planFeldVon(x, y) {
+  const g = planFeldGroesse();
+  const sx = Math.floor((x - PLAN_FELD_RAND) / g);
+  const sy = Math.floor((y - PLAN_FELD_RAND) / g);
+  if (sx < 0 || sx >= PLAN_FELDER || sy < 0 || sy >= PLAN_FELDER) return '';
+  return PLAN_FELD_BUCHSTABEN[sx] + (sy + 1);
+}
+
+/* Über welche Planquadrate läuft eine Straße? „C4–D5“, höchstens drei,
+   danach nur noch das erste und das letzte. */
+function planFelderVon(punkte) {
+  const gesehen = [];
+  for (const p of punkte || []) {
+    const f = planFeldVon(p[0], p[1]);
+    if (f && !gesehen.includes(f)) gesehen.push(f);
+  }
+  return gesehen;
+}
+function planFelderText(felder) {
+  if (!felder || !felder.length) return '';
+  if (felder.length <= 3) return felder.join(', ');
+  return felder[0] + '–' + felder[felder.length - 1];
+}
+
+/* ===================== DIE NACHBARORTE =====================
+   Wo eine Ausfallstraße das Blatt verlässt, steht auf jeder alten Karte,
+   wohin sie führt: „Nach Ellerbruch — 3 Stunden“. Das ist der billigste
+   Trick der Kartografie, um eine Stadt in eine WELT zu setzen: plötzlich
+   gibt es ein Dahinter. */
+const PLAN_NACHBAR_VORN = ['Eller', 'Moor', 'Hain', 'Rehen', 'Stein', 'Wester', 'Oster', 'Nord',
+  'Sand', 'Birken', 'Erlen', 'Kalten', 'Grün', 'Alten', 'Hohen', 'Nieder', 'Rothen', 'Salz'];
+const PLAN_NACHBAR_HINTEN = ['bruch', 'stedt', 'feld', 'bach', 'horst', 'wedel', 'büttel', 'rode',
+  'hausen', 'kamp', 'siel', 'warf', 'moor', 'brück', 'furt', 'heim'];
+
+function planNachbarname(saat, i) {
+  return PLAN_NACHBAR_VORN[planHash(saat, 'nbv' + i) % PLAN_NACHBAR_VORN.length] +
+    PLAN_NACHBAR_HINTEN[planHash(saat, 'nbh' + i) % PLAN_NACHBAR_HINTEN.length];
+}
+
+/* Welche Straßen laufen vom Blatt, und wohin führen sie?
+   Genommen werden nur Hauptstraßen, die wirklich bis an den Rand
+   reichen — ein Weg, der im Feld endet, führt nirgendwohin. */
+function planNachbarorte(plan, stadt, wasser) {
+  const saat = plan.saat;
+  const G = PLAN_GROESSE;
+  const rand = PLAN_FELD_RAND + 16;
+  const orte = [];
+
+  for (const w of stadt.strassen) {
+    if ((w.art !== 'haupt' && w.art !== 'land') || !w.punkte || w.punkte.length < 2) continue;
+    /* Das äußerste Ende der Straße. */
+    const enden = [w.punkte[0], w.punkte[w.punkte.length - 1]];
+    for (const e of enden) {
+      const amRand = e[0] < rand || e[0] > G - rand || e[1] < rand || e[1] > G - rand;
+      if (!amRand) continue;
+      if (wasser.drin(e[0], e[1])) continue;
+      /* Nicht zweimal dieselbe Ecke beschriften. */
+      if (orte.some((o) => strecke(o.punkt, e) < G * 0.13)) continue;
+
+      const richtung = Math.atan2(e[1] - stadt.mitte[1], e[0] - stadt.mitte[0]);
+      /* Die Entfernung ist erfunden, aber nicht beliebig: sie hängt an der
+         Saat und an der Himmelsrichtung, also bleibt sie gleich. */
+      const stunden = 2 + (planHash(saat, 'nbs' + orte.length + '_' + Math.round(richtung * 10)) % 9);
+      orte.push({
+        punkt: e,
+        richtung,
+        name: planNachbarname(saat, orte.length + Math.round(Math.abs(richtung) * 7)),
+        stunden,
+        himmel: planHimmelsrichtung(richtung)
+      });
+    }
+  }
+  return orte.slice(0, 8);
+}
+
+/* Aus einem Winkel wird eine Himmelsrichtung. In SVG zeigt y nach unten,
+   darum ist oben Norden und der Winkel läuft andersherum, als man denkt. */
+const PLAN_HIMMEL = ['Osten', 'Südosten', 'Süden', 'Südwesten', 'Westen', 'Nordwesten', 'Norden', 'Nordosten'];
+function planHimmelsrichtung(winkel) {
+  let w = winkel;
+  while (w < 0) w += Math.PI * 2;
+  const i = Math.round(w / (Math.PI / 4)) % 8;
+  return PLAN_HIMMEL[i];
+}
+
+/* ----- Die Landstraßen -----
+   Die Ausfallstraßen enden am Rand der Stadt — im Netz muss das so sein,
+   denn nur dort gibt es Blöcke. Auf dem BLATT soll eine Landstraße aber
+   weiterlaufen, bis sie vom Papier geht: das ist der Unterschied zwischen
+   einer Stadt und einer Stadt in einer Gegend.
+
+   Gezeichnet, nicht vernetzt: diese Stücke tragen keine Häuser. */
+function planLandstrassen(stadt, wasser, plan) {
+  const G = PLAN_GROESSE;
+  const saat = plan.saat;
+  const raus = [];
+  const rand = PLAN_FELD_RAND + 4;
+  const [mx, my] = stadt.mitte;
+
+  for (const w of stadt.strassen) {
+    if (w.art !== 'haupt' || !w.punkte || w.punkte.length < 2) continue;
+    /* Welches Ende zeigt nach draußen? */
+    const a = w.punkte[0], b = w.punkte[w.punkte.length - 1];
+    const ende = strecke(a, [mx, my]) > strecke(b, [mx, my]) ? a : b;
+    const vorletzte = ende === a ? w.punkte[1] : w.punkte[w.punkte.length - 2];
+    if (strecke(ende, [mx, my]) < stadt.Rmax * 0.7) continue;
+    /* Zu nah am Rand? Dann ist sie schon draußen. */
+    if (ende[0] < rand || ende[0] > G - rand || ende[1] < rand || ende[1] > G - rand) continue;
+    /* Nicht zwei Landstraßen dicht nebeneinander. */
+    if (raus.some((r) => strecke(r.punkte[0], ende) < stadt.Rmax * 0.42)) continue;
+
+    let winkel = Math.atan2(ende[1] - vorletzte[1], ende[0] - vorletzte[0]);
+    const spur = [ende];
+    let x = ende[0], y = ende[1];
+    const schritt = 34;
+    for (let s = 0; s < 40; s++) {
+      winkel += planStreu(saat, 'ls' + w.i + '_' + s) * 0.16;
+      const nx = x + Math.cos(winkel) * schritt, ny = y + Math.sin(winkel) * schritt;
+      if (wasser.drin(nx, ny)) break;
+      if (nx < rand || nx > G - rand || ny < rand || ny > G - rand) {
+        spur.push([nx, ny]);
+        break;
+      }
+      x = nx; y = ny;
+      spur.push([x, y]);
+    }
+    if (spur.length < 3) continue;
+    raus.push({
+      art: 'land', richtung: 'speiche', i: 8000 + raus.length,
+      punkte: spur, name: '', geschlossen: false
+    });
+  }
+  return raus;
+}
+
 /* ===================== 65b — DIE KARTE =====================
    Ein Stadtplan, wie ihn ein Kupferstecher gemacht hätte: flach, ohne
    Schatten, mit klaren Kanten und einer Handvoll Töne. Alles Wichtige
@@ -37356,7 +38154,9 @@ function planSVG(plan, g, neu) {
   /* --- Die Straßen: zweimal, damit sie zu einem Netz verschmelzen --- */
   const gStrassenRand = kv('g', { class: 'kt-strassenrand' });
   const gStrassen = kv('g', { class: 'kt-strassen' });
-  const breiteVon = (s) => s.art === 'haupt' ? 13 : s.art === 'ring' ? 10 : s.art === 'mauerweg' ? 11 : 7;
+  /* Eine Landstraße ist schmaler als eine Hauptstraße in der Stadt —
+     draußen wird nicht gepflastert. */
+  const breiteVon = (s) => s.art === 'haupt' ? 13 : s.art === 'ring' ? 10 : s.art === 'mauerweg' ? 11 : s.art === 'land' ? 9 : 7;
   for (const s of g.stadt.strassen) {
     /* Was im Wasser laege, wird gar nicht erst gezeichnet — vorher liefen die
        Ausfallstrassen ungeruehrt ins Meer hinaus. */
@@ -37466,6 +38266,12 @@ function planSVG(plan, g, neu) {
     svg.append(planLegendeSVG(g.legende, G - 62 - breite, G - 58 - hoehe, welt));
   }
 
+  /* --- Wohin die Straßen führen ---
+     Auf jeder alten Karte steht am Blattrand, wohin eine Ausfallstraße
+     geht. Das ist der billigste Trick der Kartografie, um eine Stadt in
+     eine Welt zu setzen: plötzlich gibt es ein Dahinter. */
+  if (g.nachbarn && g.nachbarn.length) svg.append(planNachbarnZeichnen(g.nachbarn, welt));
+
   /* --- Das Gradnetz ---
      Die Striche am Randband deuten es an; hier laufen sie wirklich über
      das Blatt. Ganz blass: ein Gradnetz soll man finden, wenn man es
@@ -37509,6 +38315,39 @@ function planSVG(plan, g, neu) {
 /* Die Form, in die die Karte geschnitten ist. */
 /* Das Gradnetz — dieselbe Teilung wie am Randband, damit die Striche
    dort aufhören, wo die Felder anfangen. */
+/* Ein Wegweiser am Blattrand: eine Hand, ein Name, eine Gehzeit. */
+function planNachbarnZeichnen(orte, welt) {
+  const g = kv('g', { class: 'kt-nachbarn' });
+  const G = PLAN_GROESSE;
+  for (const o of orte) {
+    /* Die Beschriftung rückt vom Rand weg ins Blatt hinein, sonst liegt
+       sie im Randband. */
+    /* Weit genug herein, dass Pfeil UND Schrift auf dem Papier stehen —
+       am Rand verschwand die Beschriftung unter dem Randband. */
+    const ein = 74;
+    const x = Math.max(PLAN_FELD_RAND + ein, Math.min(G - PLAN_FELD_RAND - ein, o.punkt[0]));
+    const y = Math.max(PLAN_FELD_RAND + ein, Math.min(G - PLAN_FELD_RAND - ein, o.punkt[1]));
+    const grad = Math.round(o.richtung * 180 / Math.PI);
+    /* Kopfüber liest sich nichts: über neunzig Grad wird umgedreht. */
+    const gedreht = grad > 90 || grad < -90;
+    const gr = kv('g', { class: 'kt-nachbar', transform: 'translate(' + kz(x) + ' ' + kz(y) + ') rotate(' + (gedreht ? grad + 180 : grad) + ')' });
+    const seite = gedreht ? -1 : 1;
+    /* Der Pfeil zeigt IMMER nach draußen, auch wenn die Schrift gedreht ist. */
+    gr.append(kv('path', {
+      d: 'M ' + kz(seite * 4) + ' 0 H ' + kz(seite * 15) + ' M ' + kz(seite * 15) + ' 0 l ' + kz(-seite * 4) + ' -2.8 M ' + kz(seite * 15) + ' 0 l ' + kz(-seite * 4) + ' 2.8',
+      class: 'kt-nachbarpfeil'
+    }));
+    const t = kv('text', { x: kz(seite * 19), y: -2, class: 'kt-nachbarname', 'text-anchor': gedreht ? 'end' : 'start' });
+    t.textContent = 'Nach ' + o.name;
+    gr.append(t);
+    const u = kv('text', { x: kz(seite * 19), y: 8, class: 'kt-nachbarzeit', 'text-anchor': gedreht ? 'end' : 'start' });
+    u.textContent = o.stunden + (o.stunden === 1 ? ' Stunde' : ' Stunden') + ' zu Fuß';
+    gr.append(u);
+    g.append(gr);
+  }
+  return g;
+}
+
 function planGradnetz() {
   const G = PLAN_GROESSE;
   const g = kv('g', { class: 'kt-gradnetz', 'aria-hidden': 'true' });
@@ -37895,6 +38734,29 @@ function planRandwerk(welt, zuschnitt) {
          ' L ' + kz(ex + m) + ' ' + kz(ey + BAND - 2.6) + ' L ' + kz(ex + 2.6) + ' ' + kz(ey + m) + ' Z',
       class: 'kt-randraute'
     }));
+  }
+
+  /* Die Planquadrate: Buchstaben quer, Zahlen längs — damit das
+     Verzeichnis nicht nur Namen nennt, sondern Fundstellen. */
+  const feldG = planFeldGroesse();
+  for (let i = 0; i < PLAN_FELDER; i++) {
+    const mitteFeld = PLAN_FELD_RAND + (i + 0.5) * feldG;
+    const buchstabe = PLAN_FELD_BUCHSTABEN[i];
+    const zahl = String(i + 1);
+    /* Die Bezeichner stehen INNEN neben dem Band, nicht darin.
+       Im Band wechseln gefüllte und leere Felder — und eine helle Schrift
+       auf einem leeren Feld ist unsichtbar. Innen liegen sie auf Papier
+       und sind immer zu lesen. */
+    for (const [x, y, text] of [
+      [mitteFeld, innen + 11, buchstabe],
+      [mitteFeld, G - innen - 4.5, buchstabe],
+      [innen + 7.5, mitteFeld + 3.6, zahl],
+      [G - innen - 7.5, mitteFeld + 3.6, zahl]
+    ]) {
+      const t2 = kv('text', { x: kz(x), y: kz(y), class: 'kt-feldname', 'text-anchor': 'middle' });
+      t2.textContent = text;
+      g.append(t2);
+    }
   }
 
   /* Feinere Teilstriche innerhalb jedes Feldes. */
@@ -39004,7 +39866,9 @@ function planVerzeichnis(doc, danach) {
       markenListe.append(el('button', { class: 'ktv-zeile', onclick: () => springe(m.x, m.y, m.id) },
         el('i', { html: planMarkenSymbol(m.art, 15) }),
         el('b', {}, m.name || el('span', { class: 'blass' }, 'ohne Namen')),
-        el('small', {}, planMarke(m.art).name)));
+        /* Die Fundstelle: ein Verzeichnis ohne Planquadrat ist eine
+           Namensliste. Erst „C4“ macht daraus etwas zum Nachschlagen. */
+        el('small', {}, [planMarke(m.art).name, planFeldVon(m.x, m.y)].filter(Boolean).join('  ·  '))));
     }
   }
 
@@ -39016,7 +39880,10 @@ function planVerzeichnis(doc, danach) {
     const p = s.punkte[Math.floor(s.punkte.length / 2)];
     gassenListe.append(el('div', { class: 'ktv-gasse' },
       el('button', { class: 'ktv-gassename', onclick: () => springe(p[0], p[1]) }, name),
-      el('small', {}, s.art === 'haupt' ? 'Hauptstraße' : s.art === 'mauerweg' ? 'am Wall' : 'Ring'),
+      el('small', {}, [
+        s.art === 'haupt' ? 'Hauptstraße' : s.art === 'mauerweg' ? 'am Wall' : 'Ring',
+        planFundstelle(s.punkte)
+      ].filter(Boolean).join('  ·  ')),
       el('button', {
         class: 'ktv-umbenennen', title: 'Anders nennen',
         onclick: async () => {

@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.44.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.45.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -241,6 +241,34 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
     gerechnet, wenn seine Ebene an ist — er steht dafür mit in der Signatur.
   - Die ganze Farbwelt wird als CSS-Variablen durchgereicht (vorher nur fünf Werte), damit Hafen,
     Legende und Wappen der gewählten Welt folgen.
+- **5.45** Der Wandteppich lernt Verwandtschaft, der Kartentisch bekommt Planquadrate und ein
+  Dahinter. Neue Datei: `src/63d-stammbaum-sippe.js` (in `build.sh`, `werkzeug/build-web.mjs`
+  und `test/sandkasten.mjs` eingetragen).
+  - **Der Verwandtschaftsrechner.** Bisher wusste ein Stammbaum, WER mit wem verbunden ist, nicht
+    WIE. Jetzt sagt er es: „Alma Wiek ist Nora Wieks Urgroßmutter“, „Karl Wiek ist Nora Wieks
+    Großonkel“, „Jonas Wiek ist Nora Wieks Cousin ersten Grades, einmal entfernt“. Gerechnet über
+    den nächsten gemeinsamen Vorfahren; Deutsch ist darin genauer als die meisten Sprachen, und
+    alles davon ist ausrechenbar. Angeheiratetes (Schwager, Schwiegermutter, Stiefvater) läuft
+    über die Partner; Ziehelternschaft ergibt Zieh- statt Blutsverwandtschaft. Wer nicht verwandt
+    ist, bekommt trotzdem den kürzesten Weg über die Fäden.
+  - **Neues Feld am Personenmodell: `geschlecht`** (`''`/`w`/`m`/`d`) — nur für die Wörter.
+    Wer nichts angibt, bekommt die neutrale Form, wo das Deutsche eine hergibt („Elternteil“,
+    „Enkelkind“), sonst beide („Tante oder Onkel“). Geraten wird nichts, auch nicht am Namen.
+  - **Die Häuser**: ein Stammbaum zerfällt von selbst in Sippen. Jede bekommt den häufigsten
+    Nachnamen und ein Wappen — gerechnet mit derselben Heraldik wie auf dem Kartentisch.
+    Neuer Reiter im Verzeichnis.
+  - **Der Umkreis** (`teppichUmkreis`) für später: nur zeigen, was N Schritte um jemanden liegt.
+  - **Planquadrate** A1–H8 auf der Karte, im Verzeichnis als Fundstelle hinter jeder Marke und
+    jeder Straße („Am Salztor · C4“). Die Bezeichner stehen INNEN neben dem Randband — im Band
+    wechseln gefüllte und leere Felder, und helle Schrift auf leerem Feld ist unsichtbar.
+  - **Landstraßen und Wegweiser**: die Ausfallstraßen laufen jetzt vom Blatt, und am Rand steht,
+    wohin — „Nach Moorstedt · 8 Stunden zu Fuß“. Ortsnamen und Gehzeiten hängen an der Saat.
+
+  Repariert:
+  - Häuser standen neben dem Papier (bei der strahlenden Anlage rutschen Ringknoten über den
+    Blattrand; der Zuschnitt schnitt es weg, gerechnet wurde es trotzdem — Häuser bei x = −59).
+  - Rundumläufe: 720 Karten und 2094 Verwandtschaften durchgerechnet, ohne Absturz, ohne NaN,
+    ohne kaputten deutschen Satz.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

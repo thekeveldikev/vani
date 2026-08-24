@@ -706,3 +706,106 @@ test('Keine Groesse, kein Gewaesser und keine Anlage stuerzt ab', async () => {
   /* Und keine davon bleibt leer — ein Blatt mit einer Legende und ohne
      Stadt ist kein Stadtplan. */
 });
+
+/* --- Planquadrate, Wegweiser, Landstraßen --- */
+
+test('Die Planquadrate decken das Blatt und nur das Blatt', async () => {
+  const k = await frisch();
+  /* Acht mal acht Felder, A1 oben links, H8 unten rechts — und daneben
+     nichts. Ein Verzeichnis, das auf ein Feld verweist, das es nicht
+     gibt, schickt einen ins Leere. */
+  assert.equal(k.planFeldVon(k.PLAN_FELD_RAND + 1, k.PLAN_FELD_RAND + 1), 'A1');
+  assert.equal(k.planFeldVon(k.PLAN_GROESSE - k.PLAN_FELD_RAND - 1, k.PLAN_GROESSE - k.PLAN_FELD_RAND - 1), 'H8');
+  assert.equal(k.planFeldVon(k.PLAN_GROESSE / 2, k.PLAN_GROESSE / 2), 'E5');
+  assert.equal(k.planFeldVon(k.PLAN_FELD_RAND - 2, 600), '', 'links daneben');
+  assert.equal(k.planFeldVon(600, k.PLAN_GROESSE - k.PLAN_FELD_RAND + 2), '', 'unten daneben');
+
+  /* Jedes Feld kommt genau einmal vor. */
+  const gesehen = new Set();
+  const g = k.planFeldGroesse();
+  for (let sy = 0; sy < k.PLAN_FELDER; sy++) {
+    for (let sx = 0; sx < k.PLAN_FELDER; sx++) {
+      const f = k.planFeldVon(k.PLAN_FELD_RAND + (sx + 0.5) * g, k.PLAN_FELD_RAND + (sy + 0.5) * g);
+      assert.ok(f, 'jedes Feld hat einen Namen');
+      assert.ok(!gesehen.has(f), 'kein Feld doppelt: ' + f);
+      gesehen.add(f);
+    }
+  }
+  assert.equal(gesehen.size, 64);
+
+  /* Eine Straße nennt ihre Felder, aber nicht endlos viele. */
+  const quer = [];
+  for (let i = 0; i <= 20; i++) quer.push([60 + i * 54, 600]);
+  const text = k.planFundstelle(quer);
+  assert.ok(/^[A-H]\d–[A-H]\d$/.test(text), 'eine lange Straße wird zusammengefasst: ' + text);
+  assert.equal(k.planFundstelle([[600, 600], [610, 610]]), 'E5');
+  assert.equal(k.planFundstelle([]), '');
+});
+
+test('Die Wegweiser stehen am Rand und sagen, wohin', async () => {
+  const k = await frisch();
+  for (const anlage of ['gewachsen', 'strahlend', 'schachbrett']) {
+    const doc = k.saubererPlan({ saat: 'wegweiser', stadt: { groesse: 'grossstadt', anlage, wasser: 'kueste', mauer: true, umland: true } });
+    const g = k.planBauen(doc);
+    assert.ok(g.nachbarn.length >= 1, anlage + ': kein einziger Wegweiser');
+    assert.ok(g.nachbarn.length <= 8, anlage + ': zu viele Wegweiser');
+    for (const n of g.nachbarn) {
+      assert.ok(n.name && /^[A-ZÄÖÜ]/.test(n.name), 'der Ort hat einen deutschen Namen: ' + n.name);
+      assert.ok(n.stunden >= 1 && n.stunden <= 12, 'eine Gehzeit, die man gehen kann: ' + n.stunden);
+      assert.ok(k.PLAN_HIMMEL.includes(n.himmel), 'eine Himmelsrichtung: ' + n.himmel);
+      assert.ok(!g.wasser.drin(n.punkt[0], n.punkt[1]), 'kein Wegweiser im Wasser');
+    }
+    /* Dieselbe Saat, dieselben Nachbarn. */
+    const nochmal = k.planBauen(k.saubererPlan({ saat: 'wegweiser', stadt: { groesse: 'grossstadt', anlage, wasser: 'kueste', mauer: true, umland: true } }));
+    assert.deepEqual(nochmal.nachbarn.map((n) => n.name), g.nachbarn.map((n) => n.name), anlage + ': dieselbe Saat, andere Nachbarn');
+  }
+  /* Oben ist Norden — in SVG zeigt y nach unten, das geht leicht schief. */
+  assert.equal(k.planHimmelsrichtung(-Math.PI / 2), 'Norden');
+  assert.equal(k.planHimmelsrichtung(Math.PI / 2), 'Süden');
+  assert.equal(k.planHimmelsrichtung(0), 'Osten');
+  assert.equal(k.planHimmelsrichtung(Math.PI), 'Westen');
+});
+
+test('Die Landstraßen laufen vom Blatt, aber nicht ins Wasser', async () => {
+  const k = await frisch();
+  const G = k.PLAN_GROESSE;
+  for (const wasser of ['keins', 'fluss', 'kueste']) {
+    const doc = k.saubererPlan({ saat: 'land', stadt: { groesse: 'stadt', wasser, mauer: true, umland: true } });
+    const g = k.planBauen(doc);
+    const land = g.stadt.strassen.filter((s) => s.art === 'land');
+    assert.ok(land.length >= 1, wasser + ': keine einzige Landstraße');
+    for (const l of land) {
+      assert.ok(l.punkte.length >= 3, 'eine Landstraße ist mehr als ein Strich');
+      for (const p of l.punkte) {
+        assert.ok(Number.isFinite(p[0]) && Number.isFinite(p[1]), 'Zahlen');
+        assert.ok(!g.wasser.drin(p[0], p[1]), wasser + ': eine Landstraße läuft ins Wasser');
+        assert.ok(p[0] > -20 && p[0] < G + 20 && p[1] > -20 && p[1] < G + 20, 'und nicht weit neben das Blatt');
+      }
+    }
+  }
+  /* Ohne Umland keine Landstraßen — dann endet die Welt an der Mauer. */
+  const ohne = k.planBauen(k.saubererPlan({ saat: 'land', stadt: { groesse: 'stadt', wasser: 'keins', umland: false } }));
+  assert.equal(ohne.stadt.strassen.filter((s) => s.art === 'land').length, 0);
+});
+
+test('Kein Haus steht neben dem Papier', async () => {
+  const k = await frisch();
+  /* Bei der strahlenden Anlage können Ringknoten über den Blattrand
+     rutschen. Der Zuschnitt schneidet das weg — gerechnet und gespeichert
+     wurde es trotzdem: Häuser bei x = −59. */
+  const G = k.PLAN_GROESSE;
+  let geprueft = 0;
+  for (const anlage of ['gewachsen', 'strahlend', 'schachbrett']) {
+    for (const groesse of ['stadt', 'metropole']) {
+      const g = k.planBauen(k.saubererPlan({ saat: 'rand', stadt: { groesse, anlage, wasser: 'keins', mauer: true, umland: true } }));
+      for (const h of g.stadt.haeuser) {
+        for (const p of h.ecken) {
+          assert.ok(p[0] >= 0 && p[0] <= G && p[1] >= 0 && p[1] <= G,
+            anlage + '/' + groesse + ': ein Haus steht bei ' + Math.round(p[0]) + ',' + Math.round(p[1]));
+        }
+        geprueft++;
+      }
+    }
+  }
+  assert.ok(geprueft > 500, 'es wurden wirklich viele Häuser geprüft: ' + geprueft);
+});

@@ -620,3 +620,158 @@ function planMarktplatz(plan, stadt) {
 
   return { mitte, rathaus, brunnen, pranger, staende, weite };
 }
+
+/* ===================== DIE PLANQUADRATE =====================
+   Ein Straßenverzeichnis ohne Fundstellen ist eine Namensliste. Erst
+   „Am Salztor — C4“ macht daraus ein Verzeichnis: man kann nachschlagen
+   UND finden. Dafür bekommt das Blatt ein Netz aus acht mal acht
+   Feldern, Buchstaben quer, Zahlen längs — so wie es jeder Stadtplan
+   seit zweihundert Jahren macht.
+
+   Acht mal acht und nicht vierundzwanzig: ein Feld muss groß genug
+   sein, dass man das Gesuchte darin auch sieht. */
+const PLAN_FELDER = 8;
+const PLAN_FELD_BUCHSTABEN = 'ABCDEFGH';
+/* Der bespielte Bereich liegt innerhalb des Randbands. */
+const PLAN_FELD_RAND = 42;
+
+function planFeldGroesse() {
+  return (PLAN_GROESSE - PLAN_FELD_RAND * 2) / PLAN_FELDER;
+}
+
+/* Welches Planquadrat liegt an dieser Stelle? „C4“ — oder leer, wenn
+   die Stelle außerhalb des bespielten Bereichs liegt. */
+function planFeldVon(x, y) {
+  const g = planFeldGroesse();
+  const sx = Math.floor((x - PLAN_FELD_RAND) / g);
+  const sy = Math.floor((y - PLAN_FELD_RAND) / g);
+  if (sx < 0 || sx >= PLAN_FELDER || sy < 0 || sy >= PLAN_FELDER) return '';
+  return PLAN_FELD_BUCHSTABEN[sx] + (sy + 1);
+}
+
+/* Über welche Planquadrate läuft eine Straße? „C4–D5“, höchstens drei,
+   danach nur noch das erste und das letzte. */
+function planFelderVon(punkte) {
+  const gesehen = [];
+  for (const p of punkte || []) {
+    const f = planFeldVon(p[0], p[1]);
+    if (f && !gesehen.includes(f)) gesehen.push(f);
+  }
+  return gesehen;
+}
+function planFelderText(felder) {
+  if (!felder || !felder.length) return '';
+  if (felder.length <= 3) return felder.join(', ');
+  return felder[0] + '–' + felder[felder.length - 1];
+}
+
+/* ===================== DIE NACHBARORTE =====================
+   Wo eine Ausfallstraße das Blatt verlässt, steht auf jeder alten Karte,
+   wohin sie führt: „Nach Ellerbruch — 3 Stunden“. Das ist der billigste
+   Trick der Kartografie, um eine Stadt in eine WELT zu setzen: plötzlich
+   gibt es ein Dahinter. */
+const PLAN_NACHBAR_VORN = ['Eller', 'Moor', 'Hain', 'Rehen', 'Stein', 'Wester', 'Oster', 'Nord',
+  'Sand', 'Birken', 'Erlen', 'Kalten', 'Grün', 'Alten', 'Hohen', 'Nieder', 'Rothen', 'Salz'];
+const PLAN_NACHBAR_HINTEN = ['bruch', 'stedt', 'feld', 'bach', 'horst', 'wedel', 'büttel', 'rode',
+  'hausen', 'kamp', 'siel', 'warf', 'moor', 'brück', 'furt', 'heim'];
+
+function planNachbarname(saat, i) {
+  return PLAN_NACHBAR_VORN[planHash(saat, 'nbv' + i) % PLAN_NACHBAR_VORN.length] +
+    PLAN_NACHBAR_HINTEN[planHash(saat, 'nbh' + i) % PLAN_NACHBAR_HINTEN.length];
+}
+
+/* Welche Straßen laufen vom Blatt, und wohin führen sie?
+   Genommen werden nur Hauptstraßen, die wirklich bis an den Rand
+   reichen — ein Weg, der im Feld endet, führt nirgendwohin. */
+function planNachbarorte(plan, stadt, wasser) {
+  const saat = plan.saat;
+  const G = PLAN_GROESSE;
+  const rand = PLAN_FELD_RAND + 16;
+  const orte = [];
+
+  for (const w of stadt.strassen) {
+    if ((w.art !== 'haupt' && w.art !== 'land') || !w.punkte || w.punkte.length < 2) continue;
+    /* Das äußerste Ende der Straße. */
+    const enden = [w.punkte[0], w.punkte[w.punkte.length - 1]];
+    for (const e of enden) {
+      const amRand = e[0] < rand || e[0] > G - rand || e[1] < rand || e[1] > G - rand;
+      if (!amRand) continue;
+      if (wasser.drin(e[0], e[1])) continue;
+      /* Nicht zweimal dieselbe Ecke beschriften. */
+      if (orte.some((o) => strecke(o.punkt, e) < G * 0.13)) continue;
+
+      const richtung = Math.atan2(e[1] - stadt.mitte[1], e[0] - stadt.mitte[0]);
+      /* Die Entfernung ist erfunden, aber nicht beliebig: sie hängt an der
+         Saat und an der Himmelsrichtung, also bleibt sie gleich. */
+      const stunden = 2 + (planHash(saat, 'nbs' + orte.length + '_' + Math.round(richtung * 10)) % 9);
+      orte.push({
+        punkt: e,
+        richtung,
+        name: planNachbarname(saat, orte.length + Math.round(Math.abs(richtung) * 7)),
+        stunden,
+        himmel: planHimmelsrichtung(richtung)
+      });
+    }
+  }
+  return orte.slice(0, 8);
+}
+
+/* Aus einem Winkel wird eine Himmelsrichtung. In SVG zeigt y nach unten,
+   darum ist oben Norden und der Winkel läuft andersherum, als man denkt. */
+const PLAN_HIMMEL = ['Osten', 'Südosten', 'Süden', 'Südwesten', 'Westen', 'Nordwesten', 'Norden', 'Nordosten'];
+function planHimmelsrichtung(winkel) {
+  let w = winkel;
+  while (w < 0) w += Math.PI * 2;
+  const i = Math.round(w / (Math.PI / 4)) % 8;
+  return PLAN_HIMMEL[i];
+}
+
+/* ----- Die Landstraßen -----
+   Die Ausfallstraßen enden am Rand der Stadt — im Netz muss das so sein,
+   denn nur dort gibt es Blöcke. Auf dem BLATT soll eine Landstraße aber
+   weiterlaufen, bis sie vom Papier geht: das ist der Unterschied zwischen
+   einer Stadt und einer Stadt in einer Gegend.
+
+   Gezeichnet, nicht vernetzt: diese Stücke tragen keine Häuser. */
+function planLandstrassen(stadt, wasser, plan) {
+  const G = PLAN_GROESSE;
+  const saat = plan.saat;
+  const raus = [];
+  const rand = PLAN_FELD_RAND + 4;
+  const [mx, my] = stadt.mitte;
+
+  for (const w of stadt.strassen) {
+    if (w.art !== 'haupt' || !w.punkte || w.punkte.length < 2) continue;
+    /* Welches Ende zeigt nach draußen? */
+    const a = w.punkte[0], b = w.punkte[w.punkte.length - 1];
+    const ende = strecke(a, [mx, my]) > strecke(b, [mx, my]) ? a : b;
+    const vorletzte = ende === a ? w.punkte[1] : w.punkte[w.punkte.length - 2];
+    if (strecke(ende, [mx, my]) < stadt.Rmax * 0.7) continue;
+    /* Zu nah am Rand? Dann ist sie schon draußen. */
+    if (ende[0] < rand || ende[0] > G - rand || ende[1] < rand || ende[1] > G - rand) continue;
+    /* Nicht zwei Landstraßen dicht nebeneinander. */
+    if (raus.some((r) => strecke(r.punkte[0], ende) < stadt.Rmax * 0.42)) continue;
+
+    let winkel = Math.atan2(ende[1] - vorletzte[1], ende[0] - vorletzte[0]);
+    const spur = [ende];
+    let x = ende[0], y = ende[1];
+    const schritt = 34;
+    for (let s = 0; s < 40; s++) {
+      winkel += planStreu(saat, 'ls' + w.i + '_' + s) * 0.16;
+      const nx = x + Math.cos(winkel) * schritt, ny = y + Math.sin(winkel) * schritt;
+      if (wasser.drin(nx, ny)) break;
+      if (nx < rand || nx > G - rand || ny < rand || ny > G - rand) {
+        spur.push([nx, ny]);
+        break;
+      }
+      x = nx; y = ny;
+      spur.push([x, y]);
+    }
+    if (spur.length < 3) continue;
+    raus.push({
+      art: 'land', richtung: 'speiche', i: 8000 + raus.length,
+      punkte: spur, name: '', geschlossen: false
+    });
+  }
+  return raus;
+}

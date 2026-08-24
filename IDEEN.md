@@ -481,3 +481,123 @@ Vorhandenem auf; danach B (Hefte) und der Rest.
 - Briefwechsel mit einer Stimme über ein bestimmtes Werk („Schreib mir über DREAMER") als fortlaufendes Heft.
 - Der Salon merkt sich, worüber schon gesprochen wurde, und knüpft daran an („Letztes Mal ging es um Kay …").
 - Zwei Stimmen streiten über eine Figur — Runde mit Widerspruch statt Reihum.
+
+---
+
+## Das Kabinett — was noch in den Schrank könnte (Brainstorm nach 5.45)
+
+Im Kabinett liegen bisher **Der Wandteppich** (Stammbäume) und **Der
+Kartentisch** (Stadtpläne). Beide folgen derselben Idee: eine Handvoll
+Angaben hineingeben, und VANI rechnet daraus etwas, das aussieht, als
+hätte es jemand gestochen. Beide sind Werkzeuge zum *Weltenbau* — nicht
+zum Schreiben, sondern zu dem, was neben dem Schreiben liegt.
+
+Das Kabinett ist also der Schrank für alles, was eine erfundene Welt
+zusammenhält. Danach sortiert:
+
+### Was aus dem Bestehenden von selbst herausfällt
+
+- **Die Chronik.** Eine Zeitleiste, in die Kalender, Album, Stammbaum und
+  Karte alles einliefern, was ein Datum hat: Geburten, Tode, Schlachten,
+  „der Brand“, die Gründung der Stadt. Ein Band von links nach rechts, in
+  Bahnen — eine je Figur, je Ort, je Haus. Der Wandteppich weiß schon,
+  wer wann lebte; die Karte weiß, wie alt die Stadt ist. Was fehlt, ist
+  die Achse, auf der beides zusammenkommt. **Das ist der naheliegendste
+  nächste Bewohner des Schranks.**
+
+- **Das Wappenbuch.** Die Heraldik steht seit 5.44 im Code — Schraffur,
+  Teilungen, vierzehn Bilder, Blasonierung. Bisher rechnet sie Wappen
+  aus; ein Wappenbuch ließe sie **entwerfen**: Feld wählen, Teilung,
+  Figur, und der Blason schreibt sich mit. Wappen für Häuser, Städte,
+  Zünfte, Orden. Ein Bogen mit allen nebeneinander wäre für sich schon
+  ein Bild.
+
+- **Der Sprachenschmied.** Erfundene Namen sind in VANI überall gerechnet
+  (Gassen, Nachbarorte, Stadtnamen, Häuser) — aber jedes Werkzeug hat
+  seine eigenen Silbenlisten. Ein eigenes Fach daraus: Laute festlegen,
+  Silbenbau, Endungen für Orte/Personen/Gewässer — und dann liefern die
+  anderen Werkzeuge daraus. **Eine Welt klingt erst wie eine Welt, wenn
+  alle Namen darin nach derselben Sprache klingen.** Dazu ein kleines
+  Wörterbuch, das man selbst füllt.
+
+### Karten, die keine Stadtpläne sind
+
+- **Der Landkartentisch.** Eine Stufe über dem Stadtplan: Küsten,
+  Gebirge, Flusssysteme, Wälder, Reiche mit Grenzen, Städte als Punkte.
+  Der Kartentisch kann Wasser, Höhenlinien und Randwerk schon — was
+  fehlt, ist der Maßstab und die Frage, wie ein Flusslauf entsteht
+  (bergab, und er sammelt Nebenflüsse ein). **Die Stadtpläne würden
+  darin liegen: auf die Stadt tippen, und der Plan geht auf.**
+
+- **Der Grundriss.** Noch eine Stufe darunter: ein Haus, eine Burg, ein
+  Kloster, ein Schiff. Räume, Türen, Treppen, Namen — für die Szene, in
+  der jemand durch ein Gebäude läuft und man wissen muss, was wo liegt.
+  Räume statt Blöcke, Türen statt Straßen: dieselbe Rechnung, anderer
+  Maßstab.
+
+- **Der Sternhimmel.** Sternbilder erfinden, benennen, mit Sagen
+  hinterlegen — und ein Kalender, der daran hängt. Für jede Welt, in der
+  jemand nach oben schaut.
+
+### Ordnung und Übersicht
+
+- **Der Zeitenlauf einer Figur.** Nicht die ganze Chronik, sondern eine
+  Spalte: was diese eine Figur wann tat, wo sie war, wen sie traf.
+  Album, Stammbaum und Kalender haben die Bruchstücke bereits.
+
+- **Die Werkstatt der Dinge.** Gegenstände mit Geschichte: das Schwert,
+  der Ring, der Brief. Wer hatte es wann, wer gab es weiter, wo liegt es
+  jetzt. Im Grunde ein Stammbaum — aber für Sachen statt für Leute, und
+  die Fäden heißen anders („ging über an“, „wurde gestohlen von“).
+  **Der Wandteppich kann das fast schon; es fehlt nur die eigene Tür.**
+
+- **Der Sprechzettel.** Wer redet wie: Lieblingswörter, Satzlängen,
+  Füllwörter, was jemand nie sagt. Beim Schreiben nachschlagbar, damit
+  eine Figur über dreihundert Seiten dieselbe Stimme behält.
+
+- **Das Ständebuch.** Wer steht in dieser Welt über wem: Ämter, Zünfte,
+  Orden, Titel — und was ein Titel wert ist. Für Geschichten, in denen
+  Rang eine Rolle spielt, ist das oft wichtiger als der Stammbaum.
+
+### Was VANI kann, was andere Werkzeuge nicht können
+
+- **Der Widerspruchsprüfer.** VANI hat Album, Kalender, Stammbaum, Karte
+  und Text im selben Haus. Ein Fach, das quer über alles nachsieht:
+  Jemand ist 1912 gestorben und redet in Kapitel 9 — im Jahr 1915. Die
+  Figur ist in zwei Städten gleichzeitig. Ein Kind ist älter als seine
+  Mutter. Eine Straße heißt im Text anders als auf der Karte.
+  **Das kann kein Schreibprogramm und keine Karten-App: es geht nur,
+  wenn alles im selben Haus liegt.** Der Stammbaum hat mit
+  „Was auffällt“ den Anfang schon gemacht.
+
+- **Das Fundbuch.** Alles, was man erfunden und wieder vergessen hat:
+  Namen, Begriffe, Redensarten, Maße, Feiertage. Nicht als Liste,
+  sondern durchsuchbar aus dem Schreibraum heraus — „wie hieß noch mal
+  die Münze?“
+
+- **Der Weltenbogen.** Ein einzelnes Blatt, auf dem alles zusammen steht:
+  Karte klein, Wappen, die drei wichtigsten Häuser, die Zeitleiste als
+  Streifen, ein Spruch. Zum Ausdrucken und an die Wand hängen.
+  **Als Geschenk gedacht: das, was man jemandem in die Hand gibt.**
+
+### Kleine Fächer, große Wirkung
+
+- **Der Namenstopf** — Namen auf Vorrat würfeln und beiseitelegen, bis
+  eine Figur dazu auftaucht.
+- **Die Maße und Münzen** einer Welt: Elle, Meile, Taler, Stunde. Der
+  Kartentisch rechnet schon in Schritten; er könnte in *deinen* Maßen
+  rechnen.
+- **Das Wetterbuch**: Jahreszeiten, Winde, wann der Fluss zufriert.
+  Der Schreibtisch kennt Jahreszeit und Tageslicht bereits.
+- **Die Fahnen** — wie das Wappenbuch, aber für Banner und Flaggen.
+- **Der Reiseplaner**: von hier nach dort, wie lange, worüber. Die Karte
+  kann Wegzeiten; über mehrere Karten hinweg wäre es eine Reise.
+
+### Die Reihenfolge, die ich vorschlagen würde
+
+1. **Die Chronik** — sie bindet zusammen, was schon da ist, und wird
+   sofort gebraucht.
+2. **Der Widerspruchsprüfer** — das, was VANI kann und sonst niemand.
+3. **Der Landkartentisch** — die Stadtpläne bekommen ein Land.
+4. **Das Wappenbuch** — die Heraldik liegt fertig da und wartet.
+5. **Der Sprachenschmied** — er macht alle anderen Werkzeuge besser.

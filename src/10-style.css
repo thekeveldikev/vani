@@ -4982,6 +4982,44 @@ html[data-thema="tinte"] .knopf.gefahr, html[data-thema="kerze"] .knopf.gefahr {
 .stb-vor { font-size: 12.5px; color: var(--blass); line-height: 1.55; margin: 0 0 10px; }
 .stb-hilfe { display: block; color: var(--blass); font-size: 11.5px; margin-top: 4px; line-height: 1.5; }
 
+/* Die Haeuser im Verzeichnis: Wappen links, Name und Blasonierung rechts. */
+.stb-haus {
+  display: flex; align-items: center; gap: 12px; padding: 12px 4px 8px;
+  border-top: 1px solid var(--rand); margin-top: 10px;
+}
+.stb-haus:first-child { border-top: none; margin-top: 0; }
+.stb-hauswappen {
+  --kpapier: var(--karte); --ktinte: var(--tinte);
+  flex: none; display: grid; place-items: center;
+}
+.stb-haustext { display: grid; gap: 2px; min-width: 0; }
+.stb-haustext b { font-family: ui-serif, "New York", Georgia, serif; font-size: 16px; }
+.stb-haustext small { color: var(--matt); line-height: 1.4; }
+
+/* Das Geschlecht: nur fuer die Woerter, darum schlicht als Reihe. */
+.stb-geschlecht { display: flex; flex-wrap: wrap; gap: 6px; }
+.stb-gs {
+  padding: 6px 12px; border: 1px solid var(--rand); background: var(--karte); color: var(--tinte);
+  border-radius: 999px; cursor: pointer; font-size: 13px; transition: border-color .18s, background .18s;
+}
+.stb-gs.an { border-color: var(--akzent); background: color-mix(in srgb, var(--akzent) 14%, var(--karte)); }
+
+/* Die Verwandtschaft: eine Auswahl und ein Satz darunter. */
+.stb-sippe { display: grid; gap: 9px; }
+.stb-sippewahl {
+  width: 100%; padding: 9px 11px; border: 1px solid var(--rand); border-radius: 10px;
+  background: var(--karte); color: var(--tinte); font-size: 14px; font-family: inherit;
+}
+.stb-sippeantwort { display: grid; gap: 5px; }
+.stb-sippesatz {
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; line-height: 1.45;
+  color: var(--tinte);
+}
+.stb-sippeantwort small { color: var(--matt); }
+.stb-sippeweg { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 4px; margin-top: 4px; }
+.stb-sippeweg span { font-weight: 600; }
+.stb-sippeweg i { color: var(--matt); font-style: normal; font-size: 12.5px; }
+
 .stb-zeichen { display: flex; flex-wrap: wrap; gap: 5px; }
 .stb-z {
   width: 36px; height: 36px; border: 1px solid var(--rand); background: var(--karte); color: var(--tinte);
@@ -6054,6 +6092,16 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 .kt-randraute { fill: var(--ktinte); fill-opacity: .72; }
 .kt-randlinie.innen { stroke-width: 1; stroke-opacity: .5; }
 .kt-gradstrich { stroke: var(--ktinte); stroke-width: 1.2; stroke-opacity: .55; }
+/* Die Planquadrate im Randband. */
+.kt-feldname { fill: var(--ktinte); fill-opacity: .5; font-size: 9.4px; font-weight: 600; letter-spacing: .04em;
+  font-family: ui-serif, "New York", Georgia, serif; }
+/* Die Wegweiser an den Blattraendern. */
+.kt-nachbarpfeil { fill: none; stroke: var(--ktinte); stroke-width: 1.2; stroke-opacity: .72; stroke-linecap: round; }
+.kt-nachbarname { fill: var(--ktinte); fill-opacity: .82; font-size: 10.5px; letter-spacing: .05em;
+  font-family: ui-serif, "New York", Georgia, serif; }
+.kt-nachbarzeit { fill: var(--ktinte); fill-opacity: .5; font-size: 8.4px; font-style: italic;
+  font-family: ui-serif, "New York", Georgia, serif; }
+.kt-blatt.ohne-namen .kt-nachbarn { display: none; }
 
 /* ----- Die Marken ----- */
 .kt-marke { cursor: pointer; color: var(--ktinte); }

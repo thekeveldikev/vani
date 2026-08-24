@@ -305,6 +305,10 @@ function saubererStammbaum(roh) {
       bis: String(p.bis || '').trim().slice(0, 24),
       notiz: String(p.notiz || '').trim().slice(0, 600),
       zeichen: TEPPICH_ZEICHEN_IDS.includes(p.zeichen) ? p.zeichen : 'keins',
+      /* Nur für die Wörter: „Tante“ oder „Onkel“, „ihre Großmutter“ oder
+         „sein Großvater“. Wer nichts angibt, bekommt beide Formen —
+         geraten wird nichts, auch nicht am Namen. */
+      geschlecht: TEPPICH_GESCHLECHT_IDS.includes(p.geschlecht) ? p.geschlecht : '',
       /* Ausgebrannt: der Name bleibt, das Feld darüber ist versengt. Genau
          so, wie man jemanden aus einem Wandteppich entfernt, ohne dass die
          Lücke verschwindet. */

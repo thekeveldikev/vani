@@ -834,6 +834,13 @@ function planBauen(plan) {
   const muehle = planMuehle(plan, stadt, wasser);
   const inseln = planInseln(plan, wasser);
   const gebaut = { plan, wasser, stadt, umland, hafen, muehle, inseln, marktplatz: planMarktplatz(plan, stadt) };
+  /* Die Landstraßen laufen vom Blatt — und an ihren Enden stehen die
+     Wegweiser. Erst dadurch bekommt die Stadt ein Dahinter. */
+  if (plan.stadt.umland) {
+    const land = planLandstrassen(stadt, wasser, plan);
+    for (const l of land) stadt.strassen.push(l);
+  }
+  gebaut.nachbarn = planNachbarorte(plan, stadt, wasser);
   /* Das Wappen darf wissen, was in der Stadt steht — eine Hafenstadt
      führt einen Anker, eine Mühlenstadt ein Rad. Darum zuletzt. */
   gebaut.wappen = planWappen(plan, gebaut);
@@ -1076,6 +1083,12 @@ function planSuche(plan, frage, gebaut) {
   return raus.slice(0, 40);
 }
 /* Eigene Namen schlagen die gerechneten. */
+/* Die Fundstelle einer Straße oder Marke — „C4“ oder „C4–D5“. */
+function planFundstelle(punkte) {
+  if (!punkte || !punkte.length) return '';
+  return planFelderText(planFelderVon(punkte));
+}
+
 function planStrassenname(plan, s) {
   const k = 'gasse:' + s.richtung + ':' + (s.richtung === 'speiche' ? s.i : s.j);
   return plan.namen[k] || s.name;

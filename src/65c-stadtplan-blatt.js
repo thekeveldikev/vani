@@ -334,7 +334,9 @@ function planVerzeichnis(doc, danach) {
       markenListe.append(el('button', { class: 'ktv-zeile', onclick: () => springe(m.x, m.y, m.id) },
         el('i', { html: planMarkenSymbol(m.art, 15) }),
         el('b', {}, m.name || el('span', { class: 'blass' }, 'ohne Namen')),
-        el('small', {}, planMarke(m.art).name)));
+        /* Die Fundstelle: ein Verzeichnis ohne Planquadrat ist eine
+           Namensliste. Erst „C4“ macht daraus etwas zum Nachschlagen. */
+        el('small', {}, [planMarke(m.art).name, planFeldVon(m.x, m.y)].filter(Boolean).join('  ·  '))));
     }
   }
 
@@ -346,7 +348,10 @@ function planVerzeichnis(doc, danach) {
     const p = s.punkte[Math.floor(s.punkte.length / 2)];
     gassenListe.append(el('div', { class: 'ktv-gasse' },
       el('button', { class: 'ktv-gassename', onclick: () => springe(p[0], p[1]) }, name),
-      el('small', {}, s.art === 'haupt' ? 'Hauptstraße' : s.art === 'mauerweg' ? 'am Wall' : 'Ring'),
+      el('small', {}, [
+        s.art === 'haupt' ? 'Hauptstraße' : s.art === 'mauerweg' ? 'am Wall' : 'Ring',
+        planFundstelle(s.punkte)
+      ].filter(Boolean).join('  ·  ')),
       el('button', {
         class: 'ktv-umbenennen', title: 'Anders nennen',
         onclick: async () => {

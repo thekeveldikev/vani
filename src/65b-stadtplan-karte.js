@@ -514,7 +514,9 @@ function planSVG(plan, g, neu) {
   /* --- Die Straßen: zweimal, damit sie zu einem Netz verschmelzen --- */
   const gStrassenRand = kv('g', { class: 'kt-strassenrand' });
   const gStrassen = kv('g', { class: 'kt-strassen' });
-  const breiteVon = (s) => s.art === 'haupt' ? 13 : s.art === 'ring' ? 10 : s.art === 'mauerweg' ? 11 : 7;
+  /* Eine Landstraße ist schmaler als eine Hauptstraße in der Stadt —
+     draußen wird nicht gepflastert. */
+  const breiteVon = (s) => s.art === 'haupt' ? 13 : s.art === 'ring' ? 10 : s.art === 'mauerweg' ? 11 : s.art === 'land' ? 9 : 7;
   for (const s of g.stadt.strassen) {
     /* Was im Wasser laege, wird gar nicht erst gezeichnet — vorher liefen die
        Ausfallstrassen ungeruehrt ins Meer hinaus. */
@@ -624,6 +626,12 @@ function planSVG(plan, g, neu) {
     svg.append(planLegendeSVG(g.legende, G - 62 - breite, G - 58 - hoehe, welt));
   }
 
+  /* --- Wohin die Straßen führen ---
+     Auf jeder alten Karte steht am Blattrand, wohin eine Ausfallstraße
+     geht. Das ist der billigste Trick der Kartografie, um eine Stadt in
+     eine Welt zu setzen: plötzlich gibt es ein Dahinter. */
+  if (g.nachbarn && g.nachbarn.length) svg.append(planNachbarnZeichnen(g.nachbarn, welt));
+
   /* --- Das Gradnetz ---
      Die Striche am Randband deuten es an; hier laufen sie wirklich über
      das Blatt. Ganz blass: ein Gradnetz soll man finden, wenn man es
@@ -667,6 +675,39 @@ function planSVG(plan, g, neu) {
 /* Die Form, in die die Karte geschnitten ist. */
 /* Das Gradnetz — dieselbe Teilung wie am Randband, damit die Striche
    dort aufhören, wo die Felder anfangen. */
+/* Ein Wegweiser am Blattrand: eine Hand, ein Name, eine Gehzeit. */
+function planNachbarnZeichnen(orte, welt) {
+  const g = kv('g', { class: 'kt-nachbarn' });
+  const G = PLAN_GROESSE;
+  for (const o of orte) {
+    /* Die Beschriftung rückt vom Rand weg ins Blatt hinein, sonst liegt
+       sie im Randband. */
+    /* Weit genug herein, dass Pfeil UND Schrift auf dem Papier stehen —
+       am Rand verschwand die Beschriftung unter dem Randband. */
+    const ein = 74;
+    const x = Math.max(PLAN_FELD_RAND + ein, Math.min(G - PLAN_FELD_RAND - ein, o.punkt[0]));
+    const y = Math.max(PLAN_FELD_RAND + ein, Math.min(G - PLAN_FELD_RAND - ein, o.punkt[1]));
+    const grad = Math.round(o.richtung * 180 / Math.PI);
+    /* Kopfüber liest sich nichts: über neunzig Grad wird umgedreht. */
+    const gedreht = grad > 90 || grad < -90;
+    const gr = kv('g', { class: 'kt-nachbar', transform: 'translate(' + kz(x) + ' ' + kz(y) + ') rotate(' + (gedreht ? grad + 180 : grad) + ')' });
+    const seite = gedreht ? -1 : 1;
+    /* Der Pfeil zeigt IMMER nach draußen, auch wenn die Schrift gedreht ist. */
+    gr.append(kv('path', {
+      d: 'M ' + kz(seite * 4) + ' 0 H ' + kz(seite * 15) + ' M ' + kz(seite * 15) + ' 0 l ' + kz(-seite * 4) + ' -2.8 M ' + kz(seite * 15) + ' 0 l ' + kz(-seite * 4) + ' 2.8',
+      class: 'kt-nachbarpfeil'
+    }));
+    const t = kv('text', { x: kz(seite * 19), y: -2, class: 'kt-nachbarname', 'text-anchor': gedreht ? 'end' : 'start' });
+    t.textContent = 'Nach ' + o.name;
+    gr.append(t);
+    const u = kv('text', { x: kz(seite * 19), y: 8, class: 'kt-nachbarzeit', 'text-anchor': gedreht ? 'end' : 'start' });
+    u.textContent = o.stunden + (o.stunden === 1 ? ' Stunde' : ' Stunden') + ' zu Fuß';
+    gr.append(u);
+    g.append(gr);
+  }
+  return g;
+}
+
 function planGradnetz() {
   const G = PLAN_GROESSE;
   const g = kv('g', { class: 'kt-gradnetz', 'aria-hidden': 'true' });
@@ -1053,6 +1094,29 @@ function planRandwerk(welt, zuschnitt) {
          ' L ' + kz(ex + m) + ' ' + kz(ey + BAND - 2.6) + ' L ' + kz(ex + 2.6) + ' ' + kz(ey + m) + ' Z',
       class: 'kt-randraute'
     }));
+  }
+
+  /* Die Planquadrate: Buchstaben quer, Zahlen längs — damit das
+     Verzeichnis nicht nur Namen nennt, sondern Fundstellen. */
+  const feldG = planFeldGroesse();
+  for (let i = 0; i < PLAN_FELDER; i++) {
+    const mitteFeld = PLAN_FELD_RAND + (i + 0.5) * feldG;
+    const buchstabe = PLAN_FELD_BUCHSTABEN[i];
+    const zahl = String(i + 1);
+    /* Die Bezeichner stehen INNEN neben dem Band, nicht darin.
+       Im Band wechseln gefüllte und leere Felder — und eine helle Schrift
+       auf einem leeren Feld ist unsichtbar. Innen liegen sie auf Papier
+       und sind immer zu lesen. */
+    for (const [x, y, text] of [
+      [mitteFeld, innen + 11, buchstabe],
+      [mitteFeld, G - innen - 4.5, buchstabe],
+      [innen + 7.5, mitteFeld + 3.6, zahl],
+      [G - innen - 7.5, mitteFeld + 3.6, zahl]
+    ]) {
+      const t2 = kv('text', { x: kz(x), y: kz(y), class: 'kt-feldname', 'text-anchor': 'middle' });
+      t2.textContent = text;
+      g.append(t2);
+    }
   }
 
   /* Feinere Teilstriche innerhalb jedes Feldes. */
