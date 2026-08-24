@@ -82,3 +82,20 @@ test('Diktat: gesprochene Satzzeichen werden Zeichen', async () => {
   assert.equal(k.diktatSaeubern(''), '');
   assert.equal(k.diktatSaeubern(null), '');
 });
+
+test('Ein Bildverweis ist eine Kennung — auch wenn ein Objekt hineingeriet', async () => {
+  const k = await frisch();
+  /* Genau der Fehler aus dem Album: waehleBild liefert { id, breite, hoehe },
+     und das ganze Objekt landete als Bild am Dokument. Danach sucht die
+     Medienablage nach einem Objekt und findet nie etwas. */
+  const d = k.sauberesDokument({ id: 'b1', typ: 'albumfigur', bild: { id: 'm-42', breite: 800, hoehe: 600 }, angelegt: 1, geaendert: 1 });
+  assert.equal(d.bild, 'm-42', 'die Kennung wird herausgeholt');
+  /* Und was schon als Text verdorben gespeichert wurde, faellt weg —
+     dann steht wieder das Monogramm da statt einer leeren Platte. */
+  const kaputt = k.sauberesDokument({ id: 'b2', typ: 'albumfigur', bild: '[object Object]', angelegt: 1, geaendert: 1 });
+  assert.equal(kaputt.bild, undefined, 'ein verdorbener Verweis wird weggeraeumt');
+  /* Eine echte Kennung bleibt unangetastet */
+  assert.equal(k.sauberesDokument({ id: 'b3', typ: 'foto', bild: 'm-7', angelegt: 1, geaendert: 1 }).bild, 'm-7');
+  /* Dasselbe gilt fuer die anderen Verweise */
+  assert.equal(k.sauberesDokument({ id: 'b4', typ: 'seite', skizze: { id: 'm-9' }, angelegt: 1, geaendert: 1 }).skizze, 'm-9');
+});

@@ -2624,3 +2624,28 @@ haengte sich an `destination`, **am Hauptregler vorbei** — es war also auch
 dann zu hoeren, wenn alles stumm sein sollte. Jetzt ist es ein echter
 Anschlag (kurzes Rauschen durch ein schmales Band, darunter ein tiefer
 Holzkoerper) und haengt wie jeder andere Klang an `holeAudio().master`.
+
+## 5.49.0 — Das Bildnis blieb leer
+
+`waehleBild()` liefert **`{ id, breite, hoehe }`**, nicht die Kennung allein.
+Alle Stellen im Haus nehmen `bild.id` — nur `albumBildWaehlen` in
+`62c-album-blatt.js` trug das **ganze Objekt** als `figur.bild` ein. Danach
+suchte die Medienablage nach einem Objekt statt nach einer Kennung und fand
+nie etwas: das Bildnis blieb leer, obwohl das Foto ordentlich gespeichert war.
+Beim naechsten Laden machte `sauberesDokument` daraus `"[object Object]"` —
+und damit war der Verweis endgueltig verloren.
+
+Zwei Aenderungen:
+
+1. Der Aufruf nimmt jetzt `.id` (und nur eine Zeichenkette).
+2. `sauberesDokument` **heilt** solche Verweise beim Laden: ist in `bild`,
+   `skizze`, `datei`, `parent` … ein Objekt mit `id` gelandet, wird die
+   Kennung herausgeholt; steht dort bereits `"[object Object]"`, faellt der
+   Verweis weg — dann steht wieder das Monogramm da statt einer leeren Platte.
+
+**Merksatz:** `waehleBild` gibt ein Objekt zurueck. Wer es als Kennung
+einsetzt, baut sich einen Fehler, der erst beim Anschauen auffaellt.
+
+Beim Suchen kam heraus, dass sich der Fehler mit einem gestellten Waehler
+NICHT zeigt — nur wenn der Ersatz sich verhaelt wie das Original (also ein
+Objekt liefert). Das gehoert zu jeder Nachstellung dazu.

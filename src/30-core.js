@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.48.0';
+const APP_VERSION = '5.49.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -487,7 +487,14 @@ function sauberesDokument(quelle) {
     if (d[k] != null) d[k] = String(d[k]).slice(0, k === 'text' || k === 'rich' || k === 'notiz' ? 10000000 : 1000);
   }
   for (const k of ['parent', 'projekt', 'projektRef', 'von', 'zu', 'bild', 'skizze', 'datei', 'quelle', 'fingerabdruck', '_geraet']) {
-    if (d[k] != null) d[k] = String(d[k]).slice(0, 500);
+    if (d[k] == null) continue;
+    /* Verweise sind Kennungen. Ist versehentlich ein ganzes Objekt
+       hineingeraten ({ id, breite, hoehe } aus waehleBild), wird die Kennung
+       daraus geholt — sonst stuende hier fuer immer "[object Object]", und
+       das Bild waere nicht mehr zu finden. */
+    if (typeof d[k] === 'object' && typeof d[k].id === 'string') d[k] = d[k].id;
+    d[k] = String(d[k]).slice(0, 500);
+    if (d[k] === '[object Object]') delete d[k];
   }
   if (d.farbe && !/^(#[0-9a-f]{3,8}|[a-z0-9_-]{1,30})$/i.test(d.farbe)) d.farbe = '';
   if (d.farbe2 && !/^#[0-9a-f]{6}$/i.test(d.farbe2)) d.farbe2 = '';

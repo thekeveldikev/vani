@@ -482,8 +482,13 @@ function albumBildWaehlen(figur, danach) {
     el('div', { class: 'albbild-wahl' },
       el('button', { class: 'albbild-knopf', onclick: async () => {
         zu();
-        const id = typeof waehleBild === 'function' ? await waehleBild() : null;
-        if (!id) return;
+        /* waehleBild liefert { id, breite, hoehe } — nicht die Kennung allein.
+           Wer das ganze Objekt als Bild einträgt, sucht in der Medienablage
+           nach einem Objekt statt nach einer Kennung und findet nie etwas:
+           das Bildnis blieb leer. Alle anderen Stellen nehmen `.id`. */
+        const wahl = typeof waehleBild === 'function' ? await waehleBild() : null;
+        const id = wahl && typeof wahl === 'object' ? wahl.id : wahl;
+        if (!id || typeof id !== 'string') return;
         figur.bild = id;
         delete figur.striche;
         speichere(figur);
@@ -493,7 +498,14 @@ function albumBildWaehlen(figur, danach) {
       el('button', { class: 'albbild-knopf', onclick: () => { zu(); albumBildnisMalen(figur, danach); } },
         el('b', {}, 'Selbst zeichnen'), el('small', {}, 'ein paar Striche genügen'))),
     hat ? el('div', { class: 'reihe' },
-      el('button', { class: 'knopf zart gefahr', onclick: () => { delete figur.bild; delete figur.striche; speichere(figur); zu(); toast('Wieder die Anfangsbuchstaben.'); if (danach) danach(); } }, 'Bildnis abnehmen'),
+      /* Ein Bildnis abzunehmen ist die eine Handlung hier, die etwas
+         wegwirft, das man nicht wieder hinzeichnen kann. Also merken. */
+      el('button', { class: 'knopf zart gefahr', onclick: () => {
+        schrittMerken('Bildnis von ' + (figur.name || 'einer Figur') + ' abgenommen', [figur]);
+        delete figur.bild; delete figur.striche; speichere(figur); zu();
+        toastMitAktion('Wieder die Anfangsbuchstaben.', 'Rückgängig', () => { schrittZurueck(); }, 7000);
+        if (danach) danach();
+      } }, 'Bildnis abnehmen'),
       el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'))
       : el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen')));
   const zu = zeigeDeck(kasten);
