@@ -6593,7 +6593,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.47.0';
+const APP_VERSION = '5.48.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -7751,75 +7751,100 @@ function zweiFingerZoom(flaeche, opts) {
   const min = opts.min || 0.3;
   const max = opts.max || 3;
   const zeiger = new Map();
-  let griff = null;
 
   const abstand = (a, b) => Math.hypot(b.x - a.x, b.y - a.y);
   const zwei = () => { const l = [...zeiger.values()]; return l.length >= 2 ? [l[0], l[1]] : null; };
 
-  /* Die Stelle unter den Fingern festhalten: gemessen, nicht gerechnet. */
-  const nachfuehren = (mx, my) => {
-    const el2 = opts.bild();
-    if (!el2 || !griff) return;
-    const r = el2.getBoundingClientRect();
-    if (!r.width || !r.height) return;
-    flaeche.scrollLeft += r.left - (mx - griff.fx * r.width);
-    flaeche.scrollTop += r.top - (my - griff.fy * r.height);
+  /* ----- Die laufende Bewegung -----
+     Waehrend gezoomt wird, wird NICHTS neu gebaut. Das Bild bekommt nur ein
+     `transform` — das rechnet die Grafikkarte, ohne Umbruch und ohne die
+     Grafik neu zu rastern. Vorher stand hier `width`/`height` am SVG: das
+     sieht harmlos aus, zwingt den Browser aber bei jedem einzelnen Bild dazu,
+     den ganzen Baum neu zu setzen und neu zu zeichnen. Genau davon wurde das
+     Zoomen stufig. */
+  let sicht = null, ruhe = 0;
+
+  const sichtAnfangen = (bild, klientX, klientY) => {
+    if (!bild) return false;
+    const r = bild.getBoundingClientRect();
+    if (!r.width || !r.height) return false;
+    const zoom0 = opts.hole() || 1;
+    sicht = {
+      bild, zoom0, zoom: zoom0,
+      ox: klientX - r.left, oy: klientY - r.top,
+      fx: (klientX - r.left) / r.width, fy: (klientY - r.top) / r.height,
+      mx0: klientX, my0: klientY
+    };
+    bild.style.transformOrigin = sicht.ox.toFixed(1) + 'px ' + sicht.oy.toFixed(1) + 'px';
+    bild.style.willChange = 'transform';
+    flaeche.classList.add('kneift');
+    return true;
   };
 
+  const sichtZeigen = (zoom, klientX, klientY) => {
+    if (!sicht) return;
+    sicht.zoom = Math.max(min, Math.min(max, zoom));
+    const k = sicht.zoom / sicht.zoom0;
+    const dx = klientX == null ? 0 : klientX - sicht.mx0;
+    const dy = klientY == null ? 0 : klientY - sicht.my0;
+    sicht.bild.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(' + k.toFixed(4) + ')';
+  };
+
+  const sichtBeenden = () => {
+    if (!sicht) return;
+    const g = sicht; sicht = null;
+    clearTimeout(ruhe);
+    flaeche.classList.remove('kneift');
+    /* Wo liegt der festgehaltene Punkt gerade wirklich auf dem Schirm?
+       Gemessen, nicht gerechnet — dann stimmt es auch, wenn der Browser
+       nebenher selbst mitgerollt ist. */
+    const vorher = g.bild.getBoundingClientRect();
+    const zielX = vorher.left + g.fx * vorher.width;
+    const zielY = vorher.top + g.fy * vorher.height;
+    g.bild.style.transform = '';
+    g.bild.style.transformOrigin = '';
+    g.bild.style.willChange = '';
+    if (opts.fertig) opts.fertig(g.zoom);
+    /* Nach dem Neuzeichnen dieselbe Stelle wieder dorthin holen. */
+    const nach = opts.bild();
+    if (nach) {
+      const r = nach.getBoundingClientRect();
+      if (r.width && r.height) {
+        flaeche.scrollLeft += (r.left + g.fx * r.width) - zielX;
+        flaeche.scrollTop += (r.top + g.fy * r.height) - zielY;
+      }
+    }
+  };
+
+  /* ----- Zwei Finger ----- */
+  let d0 = 1;
   const anfangen = () => {
     const p = zwei();
-    const el2 = opts.bild();
-    if (!p || !el2) return;
-    const r = el2.getBoundingClientRect();
-    if (!r.width || !r.height) return;
+    if (!p) return;
     const mx = (p[0].x + p[1].x) / 2, my = (p[0].y + p[1].y) / 2;
-    griff = {
-      d0: Math.max(1, abstand(p[0], p[1])),
-      zoom0: opts.hole(),
-      fx: (mx - r.left) / r.width,
-      fy: (my - r.top) / r.height,
-      zoom: opts.hole()
-    };
-    flaeche.classList.add('kneift');
+    if (!sichtAnfangen(opts.bild(), mx, my)) return;
+    d0 = Math.max(1, abstand(p[0], p[1]));
   };
-
   const bewegen = () => {
     const p = zwei();
-    if (!griff || !p) return;
-    const d = abstand(p[0], p[1]);
-    const roh = griff.zoom0 * (d / griff.d0);
-    const zoom = Math.max(min, Math.min(max, roh));
+    if (!sicht || !p) return;
     const mx = (p[0].x + p[1].x) / 2, my = (p[0].y + p[1].y) / 2;
-    if (Math.abs(zoom - griff.zoom) > 0.0005) {
-      griff.zoom = zoom;
-      opts.zeige(zoom);
-    }
-    nachfuehren(mx, my);
-  };
-
-  const aufhoeren = () => {
-    if (!griff) return;
-    const z = griff.zoom;
-    griff = null;
-    flaeche.classList.remove('kneift');
-    /* Erst jetzt wird gespeichert und neu gezeichnet — einmal, nicht
-       sechzigmal in der Sekunde. */
-    if (opts.fertig) opts.fertig(z);
+    sichtZeigen(sicht.zoom0 * (abstand(p[0], p[1]) / d0), mx, my);
   };
 
   const runter = (ev) => {
     if (ev.pointerType === 'mouse') return;
     zeiger.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
-    if (zeiger.size === 2 && !griff) anfangen();
+    if (zeiger.size === 2 && !sicht) anfangen();
   };
   const bewegt = (ev) => {
     if (!zeiger.has(ev.pointerId)) return;
     zeiger.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
-    if (griff) bewegen();
+    if (sicht) bewegen();
   };
   const hoch = (ev) => {
     zeiger.delete(ev.pointerId);
-    if (griff && zeiger.size < 2) aufhoeren();
+    if (sicht && zeiger.size < 2) sichtBeenden();
   };
 
   flaeche.addEventListener('pointerdown', runter, { passive: true });
@@ -7828,30 +7853,23 @@ function zweiFingerZoom(flaeche, opts) {
   flaeche.addEventListener('pointercancel', hoch, { passive: true });
   flaeche.addEventListener('pointerleave', hoch, { passive: true });
 
-  /* Am Rechner: Strg + Rad ist dieselbe Bewegung auf dem Trackpad.
-     Ohne `passive: false` lässt sich das Zoomen der ganzen Seite nicht
-     verhindern, und dann springt statt der Karte das Fenster. */
+  /* ----- Am Rechner: Strg + Rad, also die Kneifgeste auf dem Trackpad -----
+     Auch hier wird waehrend der Bewegung nur verzerrt. Erst wenn das Rad
+     einen Moment stillsteht, wird einmal richtig gezeichnet. Frueher lief bei
+     JEDEM Radereignis ein voller Neuaufbau — daher das Hakeln. */
   const rad = (ev) => {
     if (!ev.ctrlKey && !ev.metaKey) return;
     ev.preventDefault();
-    const el2 = opts.bild();
-    if (!el2) return;
-    const r = el2.getBoundingClientRect();
-    if (!r.width || !r.height) return;
-    const jetzt = opts.hole();
-    const zoom = Math.max(min, Math.min(max, jetzt * Math.exp(-ev.deltaY * 0.0022)));
-    if (Math.abs(zoom - jetzt) < 0.0005) return;
-    const fx = (ev.clientX - r.left) / r.width;
-    const fy = (ev.clientY - r.top) / r.height;
-    opts.zeige(zoom);
-    const r2 = el2.getBoundingClientRect();
-    flaeche.scrollLeft += r2.left - (ev.clientX - fx * r2.width);
-    flaeche.scrollTop += r2.top - (ev.clientY - fy * r2.height);
-    if (opts.fertig) opts.fertig(zoom);
+    if (!sicht && !sichtAnfangen(opts.bild(), ev.clientX, ev.clientY)) return;
+    sichtZeigen(sicht.zoom * Math.exp(-ev.deltaY * 0.0022), null, null);
+    clearTimeout(ruhe);
+    ruhe = setTimeout(sichtBeenden, 170);
   };
   flaeche.addEventListener('wheel', rad, { passive: false });
 
   return () => {
+    clearTimeout(ruhe);
+    if (sicht) sichtBeenden();
     flaeche.removeEventListener('pointerdown', runter);
     flaeche.removeEventListener('pointermove', bewegt);
     flaeche.removeEventListener('pointerup', hoch);
@@ -7859,6 +7877,47 @@ function zweiFingerZoom(flaeche, opts) {
     flaeche.removeEventListener('pointerleave', hoch);
     flaeche.removeEventListener('wheel', rad);
   };
+}
+
+/* Ein Zoomschritt, der sich bewegt statt zu springen: erst weich hinskalieren,
+   dann einmal richtig zeichnen. Fuer die Plus-/Minus-Knoepfe und die Tasten.
+   `holeBild` muss das Element liefern, das gezoomt wird. */
+function zoomSanft(flaeche, holeBild, von, nach, fertig) {
+  const bild = holeBild && holeBild();
+  const k = von > 0 ? nach / von : 1;
+  if (!bild || !flaeche || Math.abs(k - 1) < 0.001 || (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+    if (fertig) fertig(nach);
+    return;
+  }
+  const r = bild.getBoundingClientRect();
+  const fr = flaeche.getBoundingClientRect();
+  /* Die Mitte des Blicks bleibt die Mitte. */
+  const mx = fr.left + fr.width / 2, my = fr.top + fr.height / 2;
+  const fx = r.width ? (mx - r.left) / r.width : .5;
+  const fy = r.height ? (my - r.top) / r.height : .5;
+  bild.style.transformOrigin = (mx - r.left).toFixed(1) + 'px ' + (my - r.top).toFixed(1) + 'px';
+  bild.style.willChange = 'transform';
+  bild.style.transition = 'transform .16s cubic-bezier(.22,.8,.3,1)';
+  bild.style.transform = 'scale(' + k.toFixed(4) + ')';
+  const abschluss = () => {
+    const vorher = bild.getBoundingClientRect();
+    const zielX = vorher.left + fx * vorher.width;
+    const zielY = vorher.top + fy * vorher.height;
+    bild.style.transition = ''; bild.style.transform = '';
+    bild.style.transformOrigin = ''; bild.style.willChange = '';
+    if (fertig) fertig(nach);
+    const neuBild = holeBild();
+    if (neuBild) {
+      const r2 = neuBild.getBoundingClientRect();
+      if (r2.width && r2.height) {
+        flaeche.scrollLeft += (r2.left + fx * r2.width) - zielX;
+        flaeche.scrollTop += (r2.top + fy * r2.height) - zielY;
+      }
+    }
+  };
+  /* Zeitgeber statt `transitionend`: der kommt nicht, wenn das Fenster
+     verdeckt ist — dann bliebe die Karte fuer immer verzerrt stehen. */
+  setTimeout(abschluss, 170);
 }
 
 function zeigeDeck(inhalt, beiZu) {
@@ -22308,18 +22367,41 @@ async function nachtgartenKlang() {
 }
 
 /* Ein leiser Klick (Lampenzug) und ein Ticken (Uhr), beides synthetisch. */
+/* Ein Ticken ist kein Ton, sondern ein Anschlag: kurzes Rauschen, gefiltert,
+   und darunter ein winziger Holzkoerper. Frueher stand hier ein Rechteckton
+   bei 1900 Hz — das klang wie ein Piepsen und ging ausserdem am Regler vorbei
+   direkt an den Ausgang, also auch dann, wenn alles stumm sein sollte.
+   Jetzt haengt es wie jeder andere Klang am Hauptregler. */
 function schreibtischKlick(art) {
   try {
-    const ctx = typeof audioCtxHolen === 'function' ? audioCtxHolen() : (window.__vaniKlick || (window.__vaniKlick = new (window.AudioContext || window.webkitAudioContext)()));
-    if (!ctx) return;
-    if (ctx.state === 'suspended') { try { ctx.resume().catch(() => {}); } catch (e) {} }
-    const t0 = ctx.currentTime;
-    const o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = art === 'tick' ? 'square' : 'triangle';
-    o.frequency.setValueAtTime(art === 'tick' ? 1900 : 420, t0);
-    o.frequency.exponentialRampToValueAtTime(art === 'tick' ? 900 : 180, t0 + .04);
-    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(art === 'tick' ? .035 : .12, t0 + .004); g.gain.exponentialRampToValueAtTime(.0001, t0 + (art === 'tick' ? .05 : .12));
-    o.connect(g); g.connect(ctx.destination); o.start(t0); o.stop(t0 + .14);
+    if (typeof holeAudio !== 'function' || typeof _rauschpuffer !== 'function') return;
+    /* Ist alles leise gestellt, bleibt es leise. */
+    if (begrenze(D.einst.lautstaerke, 0, 1, .5) <= 0) return;
+    const a = holeAudio();
+    if (!a || !a.ctx || !a.master) return;
+    const t0 = a.ctx.currentTime;
+    const tick = art === 'tick';
+
+    /* Der Anschlag: ein Hauch Rauschen durch ein schmales Band. */
+    const b = a.ctx.createBufferSource();
+    b.buffer = _rauschpuffer(a, 'weiss'); b.loop = true;
+    const f = a.ctx.createBiquadFilter();
+    f.type = 'bandpass'; f.frequency.value = tick ? 1700 : 900; f.Q.value = tick ? 1.1 : .8;
+    const g = a.ctx.createGain();
+    g.gain.setValueAtTime(tick ? .05 : .09, t0);
+    g.gain.exponentialRampToValueAtTime(.0001, t0 + (tick ? .012 : .03));
+    b.connect(f); f.connect(g); g.connect(a.master);
+    b.start(t0); b.stop(t0 + .05);
+
+    /* Und darunter das Holz, in dem es steckt — sehr kurz, sehr tief. */
+    const o = a.ctx.createOscillator(), og = a.ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(tick ? 240 : 170, t0);
+    o.frequency.exponentialRampToValueAtTime(tick ? 150 : 110, t0 + .04);
+    og.gain.setValueAtTime(tick ? .035 : .07, t0);
+    og.gain.exponentialRampToValueAtTime(.0001, t0 + (tick ? .045 : .08));
+    o.connect(og); og.connect(a.master);
+    o.start(t0); o.stop(t0 + .1);
   } catch (e) {}
 }
 
@@ -32039,12 +32121,6 @@ function teppichOeffnen(id) {
     min: 0.3, max: 2.4,
     hole: () => _tep.zoom || 1,
     bild: () => flaeche.querySelector('.tep-tuch'),
-    zeige: (z) => {
-      const svg = flaeche.querySelector('.tep-tuch');
-      if (!svg || !svg.dataset.breite) return;
-      svg.setAttribute('width', Math.round(Number(svg.dataset.breite) * z));
-      svg.setAttribute('height', Math.round(Number(svg.dataset.hoehe) * z));
-    },
     fertig: (z) => { _tep.zoom = Math.round(z * 100) / 100; neu(); }
   });
   const taste = (ev) => {
@@ -32075,19 +32151,27 @@ function teppichOeffnen(id) {
   neu();
 }
 
+/* Ein Schritt naeher oder weiter weg. Multiplikativ, nicht additiv: von 30 %
+   aus sind 0,2 ein Sprung, von 240 % aus ein Nichts. `zoomSanft` skaliert
+   erst weich hin und laesst dann einmal richtig weben — die Mitte des Blicks
+   bleibt dabei die Mitte. */
 function teppichZoom(delta, flaeche, neu) {
   const alt = _tep.zoom;
-  _tep.zoom = Math.max(0.3, Math.min(2.4, Math.round((alt + delta) * 20) / 20));
-  if (_tep.zoom === alt) return;
-  /* Die Mitte des Blicks soll die Mitte bleiben, sonst rutscht der Teppich
-     bei jedem Zoomen unter dem Finger weg. */
-  const mx = flaeche ? (flaeche.scrollLeft + flaeche.clientWidth / 2) / alt : 0;
-  const my = flaeche ? (flaeche.scrollTop + flaeche.clientHeight / 2) / alt : 0;
-  neu();
-  if (flaeche) {
-    flaeche.scrollLeft = mx * _tep.zoom - flaeche.clientWidth / 2;
-    flaeche.scrollTop = my * _tep.zoom - flaeche.clientHeight / 2;
-  }
+  const ziel = Math.max(0.3, Math.min(2.4, Math.round(alt * (delta > 0 ? 1.25 : 1 / 1.25) * 100) / 100));
+  if (Math.abs(ziel - alt) < 0.005) return;
+  const fertig = () => {
+    _tep.zoom = ziel;
+    const mx = flaeche ? (flaeche.scrollLeft + flaeche.clientWidth / 2) / alt : 0;
+    const my = flaeche ? (flaeche.scrollTop + flaeche.clientHeight / 2) / alt : 0;
+    neu();
+    if (flaeche) {
+      flaeche.scrollLeft = mx * _tep.zoom - flaeche.clientWidth / 2;
+      flaeche.scrollTop = my * _tep.zoom - flaeche.clientHeight / 2;
+    }
+  };
+  if (typeof zoomSanft === 'function' && flaeche) {
+    zoomSanft(flaeche, () => flaeche.querySelector('.tep-tuch'), alt, ziel, () => { _tep.zoom = ziel; neu(); });
+  } else fertig();
 }
 
 function teppichZeichne(kasten, flaeche, rahmen, neu, schliessen) {
@@ -38313,12 +38397,6 @@ function planOeffnen(id) {
     min: 0.25, max: 4,
     hole: () => _kt.zoom || 1,
     bild: () => flaeche.querySelector('.kt-blatt'),
-    zeige: (z) => {
-      const svg = flaeche.querySelector('.kt-blatt');
-      if (!svg) return;
-      svg.setAttribute('width', Math.round(PLAN_GROESSE * z));
-      svg.setAttribute('height', Math.round(PLAN_GROESSE * z));
-    },
     fertig: (z) => { _kt.zoom = Math.round(z * 100) / 100; neu(); }
   });
   const taste = (ev) => {
@@ -38345,17 +38423,27 @@ function planOeffnen(id) {
   setTimeout(() => planEinpassen(flaeche, neu), 60);
 }
 
+/* Ein Schritt naeher oder weiter weg. Multiplikativ, nicht additiv: von 30 %
+   aus sind 0,2 ein Sprung, von 300 % aus ein Nichts. Und die Bewegung wird
+   gezeigt, statt gesprungen — `zoomSanft` skaliert erst weich hin und laesst
+   dann einmal richtig zeichnen. */
 function planZoom(delta, flaeche, neu) {
   const alt = _kt.zoom;
-  _kt.zoom = Math.max(0.3, Math.min(3.2, Math.round((alt + delta) * 20) / 20));
-  if (_kt.zoom === alt) return;
-  const mx = flaeche ? (flaeche.scrollLeft + flaeche.clientWidth / 2) / alt : 0;
-  const my = flaeche ? (flaeche.scrollTop + flaeche.clientHeight / 2) / alt : 0;
-  neu();
-  if (flaeche) {
-    flaeche.scrollLeft = mx * _kt.zoom - flaeche.clientWidth / 2;
-    flaeche.scrollTop = my * _kt.zoom - flaeche.clientHeight / 2;
-  }
+  const ziel = Math.max(0.3, Math.min(3.2, Math.round(alt * (delta > 0 ? 1.25 : 1 / 1.25) * 100) / 100));
+  if (Math.abs(ziel - alt) < 0.005) return;
+  const fertig = (z) => {
+    _kt.zoom = z;
+    const mx = flaeche ? (flaeche.scrollLeft + flaeche.clientWidth / 2) / alt : 0;
+    const my = flaeche ? (flaeche.scrollTop + flaeche.clientHeight / 2) / alt : 0;
+    neu();
+    if (flaeche) {
+      flaeche.scrollLeft = mx * _kt.zoom - flaeche.clientWidth / 2;
+      flaeche.scrollTop = my * _kt.zoom - flaeche.clientHeight / 2;
+    }
+  };
+  if (typeof zoomSanft === 'function' && flaeche) {
+    zoomSanft(flaeche, () => flaeche.querySelector('.kt-blatt'), alt, ziel, () => { _kt.zoom = ziel; neu(); });
+  } else fertig(ziel);
 }
 function planEinpassen(flaeche, neu) {
   if (!flaeche || !flaeche.clientWidth) return;

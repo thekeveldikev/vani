@@ -132,12 +132,6 @@ function teppichOeffnen(id) {
     min: 0.3, max: 2.4,
     hole: () => _tep.zoom || 1,
     bild: () => flaeche.querySelector('.tep-tuch'),
-    zeige: (z) => {
-      const svg = flaeche.querySelector('.tep-tuch');
-      if (!svg || !svg.dataset.breite) return;
-      svg.setAttribute('width', Math.round(Number(svg.dataset.breite) * z));
-      svg.setAttribute('height', Math.round(Number(svg.dataset.hoehe) * z));
-    },
     fertig: (z) => { _tep.zoom = Math.round(z * 100) / 100; neu(); }
   });
   const taste = (ev) => {
@@ -168,19 +162,27 @@ function teppichOeffnen(id) {
   neu();
 }
 
+/* Ein Schritt naeher oder weiter weg. Multiplikativ, nicht additiv: von 30 %
+   aus sind 0,2 ein Sprung, von 240 % aus ein Nichts. `zoomSanft` skaliert
+   erst weich hin und laesst dann einmal richtig weben — die Mitte des Blicks
+   bleibt dabei die Mitte. */
 function teppichZoom(delta, flaeche, neu) {
   const alt = _tep.zoom;
-  _tep.zoom = Math.max(0.3, Math.min(2.4, Math.round((alt + delta) * 20) / 20));
-  if (_tep.zoom === alt) return;
-  /* Die Mitte des Blicks soll die Mitte bleiben, sonst rutscht der Teppich
-     bei jedem Zoomen unter dem Finger weg. */
-  const mx = flaeche ? (flaeche.scrollLeft + flaeche.clientWidth / 2) / alt : 0;
-  const my = flaeche ? (flaeche.scrollTop + flaeche.clientHeight / 2) / alt : 0;
-  neu();
-  if (flaeche) {
-    flaeche.scrollLeft = mx * _tep.zoom - flaeche.clientWidth / 2;
-    flaeche.scrollTop = my * _tep.zoom - flaeche.clientHeight / 2;
-  }
+  const ziel = Math.max(0.3, Math.min(2.4, Math.round(alt * (delta > 0 ? 1.25 : 1 / 1.25) * 100) / 100));
+  if (Math.abs(ziel - alt) < 0.005) return;
+  const fertig = () => {
+    _tep.zoom = ziel;
+    const mx = flaeche ? (flaeche.scrollLeft + flaeche.clientWidth / 2) / alt : 0;
+    const my = flaeche ? (flaeche.scrollTop + flaeche.clientHeight / 2) / alt : 0;
+    neu();
+    if (flaeche) {
+      flaeche.scrollLeft = mx * _tep.zoom - flaeche.clientWidth / 2;
+      flaeche.scrollTop = my * _tep.zoom - flaeche.clientHeight / 2;
+    }
+  };
+  if (typeof zoomSanft === 'function' && flaeche) {
+    zoomSanft(flaeche, () => flaeche.querySelector('.tep-tuch'), alt, ziel, () => { _tep.zoom = ziel; neu(); });
+  } else fertig();
 }
 
 function teppichZeichne(kasten, flaeche, rahmen, neu, schliessen) {

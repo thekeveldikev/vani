@@ -2587,3 +2587,40 @@ sich gestaffelt wie Tinte (`.setzt-sich`, `--n`); beim Blaettern wandert ein
 Glanz ueber das Blatt. Alles haengt an `setTimeout`, nicht an
 `requestAnimationFrame` — sonst laege das Blatt bei verstecktem Fenster fuer
 immer quer im Buch.
+
+## 5.48.0 — Zoom, der sich ziehen laesst; und das Piepsen
+
+**Das Zoomen war stufig, weil eine Annahme falsch war.** Im Helfer
+`zweiFingerZoom` (30-core.js) stand: „Ein SVG laesst sich ueber `width` und
+`height` verlustfrei groesser machen — der Browser skaliert es selbst." Das
+stimmt fuer das Ergebnis, nicht fuer den Weg dorthin: eine Aenderung an
+`width`/`height` aendert die Layoutbox und zwingt den Browser, **den ganzen
+SVG-Baum neu zu setzen und neu zu rastern** — bei jedem einzelnen Bild. Bei
+einem Stadtplan oder einem Wandteppich sind das drei Bilder in der Sekunde.
+
+Neu: waehrend der Bewegung wird **nur `transform`** gesetzt (`translate` +
+`scale`, `transform-origin` auf den Punkt unter den Fingern, `will-change:
+transform`). Das ist eine reine Sache der Grafikkarte — kein Umbruch, keine
+Neurasterung. Erst wenn die Finger weg sind, wird einmal richtig gezeichnet;
+danach wird die festgehaltene Stelle **gemessen** wieder unter die Finger
+geholt, statt sie auszurechnen.
+
+Dasselbe fuer **Strg + Rad** (Trackpad): frueher lief bei jedem einzelnen
+Radereignis ein voller Neuaufbau. Jetzt wird verzerrt und erst 170 ms nach dem
+letzten Ereignis gezeichnet.
+
+**`zoomSanft(flaeche, holeBild, von, nach, fertig)`** ist neu dazu: ein
+Zoomschritt, der sich bewegt statt zu springen — fuer die Plus-/Minus-Knoepfe
+und die Tasten. Die Schritte sind ausserdem **multiplikativ** (×1,25) statt
+additiv: von 30 % aus waren 0,2 ein Sprung, von 300 % aus ein Nichts.
+Abgeschlossen wird ueber einen Zeitgeber, nicht ueber `transitionend` — der
+bleibt aus, wenn das Fenster verdeckt ist, und die Karte stuende fuer immer
+verzerrt da.
+
+**Das Piepsen am Schreibtisch.** `schreibtischKlick('tick')` war ein
+Rechteckton bei 1900 Hz — das ist kein Ticken, das ist ein Piepsen, und es
+kam jede Sekunde. Schlimmer: es baute sich einen eigenen AudioContext und
+haengte sich an `destination`, **am Hauptregler vorbei** — es war also auch
+dann zu hoeren, wenn alles stumm sein sollte. Jetzt ist es ein echter
+Anschlag (kurzes Rauschen durch ein schmales Band, darunter ein tiefer
+Holzkoerper) und haengt wie jeder andere Klang an `holeAudio().master`.

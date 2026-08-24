@@ -260,18 +260,41 @@ async function nachtgartenKlang() {
 }
 
 /* Ein leiser Klick (Lampenzug) und ein Ticken (Uhr), beides synthetisch. */
+/* Ein Ticken ist kein Ton, sondern ein Anschlag: kurzes Rauschen, gefiltert,
+   und darunter ein winziger Holzkoerper. Frueher stand hier ein Rechteckton
+   bei 1900 Hz — das klang wie ein Piepsen und ging ausserdem am Regler vorbei
+   direkt an den Ausgang, also auch dann, wenn alles stumm sein sollte.
+   Jetzt haengt es wie jeder andere Klang am Hauptregler. */
 function schreibtischKlick(art) {
   try {
-    const ctx = typeof audioCtxHolen === 'function' ? audioCtxHolen() : (window.__vaniKlick || (window.__vaniKlick = new (window.AudioContext || window.webkitAudioContext)()));
-    if (!ctx) return;
-    if (ctx.state === 'suspended') { try { ctx.resume().catch(() => {}); } catch (e) {} }
-    const t0 = ctx.currentTime;
-    const o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = art === 'tick' ? 'square' : 'triangle';
-    o.frequency.setValueAtTime(art === 'tick' ? 1900 : 420, t0);
-    o.frequency.exponentialRampToValueAtTime(art === 'tick' ? 900 : 180, t0 + .04);
-    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(art === 'tick' ? .035 : .12, t0 + .004); g.gain.exponentialRampToValueAtTime(.0001, t0 + (art === 'tick' ? .05 : .12));
-    o.connect(g); g.connect(ctx.destination); o.start(t0); o.stop(t0 + .14);
+    if (typeof holeAudio !== 'function' || typeof _rauschpuffer !== 'function') return;
+    /* Ist alles leise gestellt, bleibt es leise. */
+    if (begrenze(D.einst.lautstaerke, 0, 1, .5) <= 0) return;
+    const a = holeAudio();
+    if (!a || !a.ctx || !a.master) return;
+    const t0 = a.ctx.currentTime;
+    const tick = art === 'tick';
+
+    /* Der Anschlag: ein Hauch Rauschen durch ein schmales Band. */
+    const b = a.ctx.createBufferSource();
+    b.buffer = _rauschpuffer(a, 'weiss'); b.loop = true;
+    const f = a.ctx.createBiquadFilter();
+    f.type = 'bandpass'; f.frequency.value = tick ? 1700 : 900; f.Q.value = tick ? 1.1 : .8;
+    const g = a.ctx.createGain();
+    g.gain.setValueAtTime(tick ? .05 : .09, t0);
+    g.gain.exponentialRampToValueAtTime(.0001, t0 + (tick ? .012 : .03));
+    b.connect(f); f.connect(g); g.connect(a.master);
+    b.start(t0); b.stop(t0 + .05);
+
+    /* Und darunter das Holz, in dem es steckt — sehr kurz, sehr tief. */
+    const o = a.ctx.createOscillator(), og = a.ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(tick ? 240 : 170, t0);
+    o.frequency.exponentialRampToValueAtTime(tick ? 150 : 110, t0 + .04);
+    og.gain.setValueAtTime(tick ? .035 : .07, t0);
+    og.gain.exponentialRampToValueAtTime(.0001, t0 + (tick ? .045 : .08));
+    o.connect(og); og.connect(a.master);
+    o.start(t0); o.stop(t0 + .1);
   } catch (e) {}
 }
 

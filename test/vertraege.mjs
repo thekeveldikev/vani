@@ -860,27 +860,39 @@ test('Zoomvertrag: ein Finger rollt, zwei Finger zoomen', () => {
 });
 
 test('Zoomvertrag: beim Kneifen wird nicht neu gezeichnet', () => {
-  /* Ein SVG laesst sich ueber `width`/`height` verlustfrei skalieren. Wer
-     stattdessen bei jedem Bild die ganze Karte neu baut, bekommt drei
-     Bilder in der Sekunde statt sechzig. */
+  /* Waehrend der Bewegung wird NUR `transform` gesetzt — das rechnet die
+     Grafikkarte, ohne Umbruch und ohne Neurasterung. Frueher standen hier
+     `width`/`height` am SVG: das sieht harmlos aus, zwingt den Browser aber
+     bei jedem Bild dazu, den ganzen Baum neu zu setzen und neu zu rastern.
+     Genau davon wurde das Zoomen stufig. */
   const kern = lies('src/30-core.js');
   const anfang = kern.indexOf('function zweiFingerZoom(');
   assert.ok(anfang > 0, 'den Helfer gibt es');
-  const stueck = kern.slice(anfang, kern.indexOf('\n}', anfang));
+  const stueck = kern.slice(anfang, kern.indexOf('\nfunction zoomSanft(', anfang));
 
-  assert.match(stueck, /opts\.zeige\(/, 'waehrend des Kneifens wird nur die Groesse gesetzt');
+  assert.match(stueck, /style\.transform = 'translate\(/, 'waehrend des Kneifens wird nur verzerrt');
+  assert.ok(!/setAttribute\('width'/.test(stueck), 'und niemals die Groesse gesetzt');
+  assert.match(stueck, /willChange = 'transform'/, 'der Grafikkarte wird angesagt, was kommt');
   assert.match(stueck, /opts\.fertig/, 'erst am Ende wird festgeschrieben');
   assert.match(stueck, /getBoundingClientRect/, 'die Stelle unter den Fingern wird gemessen, nicht gerechnet');
   assert.match(stueck, /scrollLeft \+=/, 'und die Flaeche wird nachgefuehrt');
   /* Strg + Rad ist dieselbe Bewegung auf dem Trackpad — und ohne
-     preventDefault zoomt das Fenster statt der Karte. */
+     preventDefault zoomt das Fenster statt der Karte. Auch dort wird erst
+     gezeichnet, wenn das Rad einen Moment stillsteht. */
   assert.match(stueck, /passive: false/, 'das Rad wird nicht passiv behandelt');
   assert.match(stueck, /preventDefault/, 'und der Seitenzoom unterbunden');
+  assert.match(stueck, /setTimeout\(sichtBeenden/, 'das Rad zeichnet erst nach der Ruhe neu');
 
-  /* Beide Werkzeuge haengen daran. */
+  /* Beide Werkzeuge haengen daran — und beide zoomen auch in Schritten weich. */
   for (const datei of ['src/63b-stammbaum-teppich.js', 'src/65b-stadtplan-karte.js']) {
     assert.match(lies(datei), /zweiFingerZoom\(/, datei + ' kennt das Kneifen');
+    assert.match(lies(datei), /zoomSanft\(/, datei + ' springt beim Schrittzoom nicht');
   }
+  /* Ein Zeitgeber statt `transitionend`: der bleibt aus, wenn das Fenster
+     verdeckt ist — dann stuende die Karte fuer immer verzerrt da. */
+  const sanft = kern.slice(kern.indexOf('function zoomSanft('));
+  assert.ok(!/addEventListener\('transitionend'/.test(sanft.slice(0, 2000)), 'kein transitionend, das ausbleiben kann');
+  assert.match(sanft.slice(0, 2000), /setTimeout\(abschluss/, 'sondern ein Zeitgeber, der immer kommt');
 });
 
 test('Kartenvertrag: eine neue Marke reisst kein Fenster auf', () => {

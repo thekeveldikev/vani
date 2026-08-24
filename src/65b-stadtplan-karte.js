@@ -173,12 +173,6 @@ function planOeffnen(id) {
     min: 0.25, max: 4,
     hole: () => _kt.zoom || 1,
     bild: () => flaeche.querySelector('.kt-blatt'),
-    zeige: (z) => {
-      const svg = flaeche.querySelector('.kt-blatt');
-      if (!svg) return;
-      svg.setAttribute('width', Math.round(PLAN_GROESSE * z));
-      svg.setAttribute('height', Math.round(PLAN_GROESSE * z));
-    },
     fertig: (z) => { _kt.zoom = Math.round(z * 100) / 100; neu(); }
   });
   const taste = (ev) => {
@@ -205,17 +199,27 @@ function planOeffnen(id) {
   setTimeout(() => planEinpassen(flaeche, neu), 60);
 }
 
+/* Ein Schritt naeher oder weiter weg. Multiplikativ, nicht additiv: von 30 %
+   aus sind 0,2 ein Sprung, von 300 % aus ein Nichts. Und die Bewegung wird
+   gezeigt, statt gesprungen — `zoomSanft` skaliert erst weich hin und laesst
+   dann einmal richtig zeichnen. */
 function planZoom(delta, flaeche, neu) {
   const alt = _kt.zoom;
-  _kt.zoom = Math.max(0.3, Math.min(3.2, Math.round((alt + delta) * 20) / 20));
-  if (_kt.zoom === alt) return;
-  const mx = flaeche ? (flaeche.scrollLeft + flaeche.clientWidth / 2) / alt : 0;
-  const my = flaeche ? (flaeche.scrollTop + flaeche.clientHeight / 2) / alt : 0;
-  neu();
-  if (flaeche) {
-    flaeche.scrollLeft = mx * _kt.zoom - flaeche.clientWidth / 2;
-    flaeche.scrollTop = my * _kt.zoom - flaeche.clientHeight / 2;
-  }
+  const ziel = Math.max(0.3, Math.min(3.2, Math.round(alt * (delta > 0 ? 1.25 : 1 / 1.25) * 100) / 100));
+  if (Math.abs(ziel - alt) < 0.005) return;
+  const fertig = (z) => {
+    _kt.zoom = z;
+    const mx = flaeche ? (flaeche.scrollLeft + flaeche.clientWidth / 2) / alt : 0;
+    const my = flaeche ? (flaeche.scrollTop + flaeche.clientHeight / 2) / alt : 0;
+    neu();
+    if (flaeche) {
+      flaeche.scrollLeft = mx * _kt.zoom - flaeche.clientWidth / 2;
+      flaeche.scrollTop = my * _kt.zoom - flaeche.clientHeight / 2;
+    }
+  };
+  if (typeof zoomSanft === 'function' && flaeche) {
+    zoomSanft(flaeche, () => flaeche.querySelector('.kt-blatt'), alt, ziel, () => { _kt.zoom = ziel; neu(); });
+  } else fertig(ziel);
 }
 function planEinpassen(flaeche, neu) {
   if (!flaeche || !flaeche.clientWidth) return;
