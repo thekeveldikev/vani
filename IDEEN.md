@@ -767,3 +767,145 @@ längst.
 3. **Die Druckerei.** Weil sie Dinge zum Anfassen herstellt — und weil ein
    Steckbrief an der Wand mehr über eine Welt sagt als zehn Seiten
    Beschreibung.
+
+---
+
+## Runde 6 (nach 5.50) — die blinden Flecken
+
+Das bisherige Brainstormen war nach **Räumen** und nach **Werkzeugen** sortiert.
+Beides ist gut abgegrast. Was hier steht, ist anders sortiert: nach dem, was in
+VANI noch gar nicht vorkommt. Nicht „welcher Raum fehlt", sondern „welcher Teil
+vom Schreiben fehlt".
+
+Sieben blinde Flecken, und was in jedem davon liegen könnte.
+
+---
+
+### 1. Das Aufhören
+
+VANI kann anfangen und weitermachen. Es kann nicht **fertig werden**. Jedes
+Dokument ist ewig offen; nichts wird je abgeschlossen. Das ist eine Lücke, denn
+das Schwerste am Schreiben ist nicht der Anfang.
+
+- **Fertig sagen dürfen.** Ein Text bekommt ein Datum „abgeschlossen" und wandert
+  in ein eigenes Regal. Nicht gelöscht, nicht archiviert — *fertig*. Mit einem
+  Satz dazu: was er geworden ist. Der Unterschied zwischen „liegt herum" und
+  „ist zu Ende gebracht" ist der ganze Unterschied.
+- **Der Friedhof.** Alles, was aus einem Text herausgestrichen wurde, an einem
+  Ort — nach Herkunftstext sortiert. „Kill your darlings" tut weniger weh, wenn
+  die Darlings irgendwo liegen. Und man holt erstaunlich oft etwas zurück.
+- **Aufgeben ist auch ein Ende.** Ein Text darf „liegengelassen" werden, mit
+  Datum und einem Satz warum. Ohne Schuldgefühl, aber sichtbar. Nach einem Jahr
+  fragt VANI einmal leise nach — und akzeptiert jede Antwort.
+- **Die letzte Fassung.** Ein Text, der fertig ist, wird eingefroren: was danach
+  kommt, ist eine neue Fassung, nicht dieselbe. Damit „fertig" etwas bedeutet.
+
+### 2. Der Zustand der Schreibenden
+
+VANI zählt Wörter, Tage, Strähnen. Es weiß nichts darüber, **wie es war**. Und
+das ist die Zahl, die zählt: nicht wie viel, sondern wie es sich angefühlt hat.
+
+- **Ein Wort am Ende der Sitzung.** Kein Formular, kein Smiley — ein einziges
+  Wort, freiwillig. „zäh". „geflogen". „daneben". Nach drei Monaten hat man eine
+  Karte seines Schreibens, die keine Statistik hergibt.
+- **Der Widerstand.** Wenn VANI merkt, dass ein Text dreimal geöffnet und ohne
+  ein Wort verlassen wurde, fragt es einmal: *„Woran hakt es hier?"* — und legt
+  die Antwort als Notiz an den Text. Das ist oft schon die Lösung.
+- **Die gute Stunde.** Aus den Zeiten, zu denen wirklich geschrieben wurde,
+  errechnet VANI die eigene beste Stunde — und sagt sie einmal. Nicht als
+  Ermahnung, als Beobachtung.
+- **Was vorher half.** Bei einem festgefahrenen Text: „Beim letzten Mal, als es
+  hier stockte, hat dich ein Spaziergang / die Schreibmaschine / ein Sprint
+  weitergebracht." VANI weiß das, weil es dabei war.
+
+### 3. Die Leserin
+
+VANI ist vollständig privat — richtig so. Aber geschrieben wird **für jemanden**,
+und dieser Jemand kommt im Haus nicht vor.
+
+- **Der leere Stuhl.** Man legt fest, für wen dieser Text ist. Nicht öffentlich,
+  nur für sich. Beim Öffnen steht es klein da. Es verändert Sätze.
+- **Laut vorlesen.** Ein Modus, der den Text in Vorlesegröße setzt, Zeile für
+  Zeile hebt und ein Tempo hält. Nichts liest einen Text so gnadenlos Korrektur
+  wie die eigene Stimme.
+- **Eine Seite verschenken.** Eine einzelne Seite als schönes Blatt ausgeben —
+  gesetzt, mit Rand, mit Datum. Nicht „exportieren": *verschenken*.
+- **Die Erstleserin.** Ein Text kann als Abschrift weitergegeben werden, die
+  Rückmeldungen als Randnotizen zurücknimmt — ohne Netz, über eine Datei. Für
+  genau einen Menschen, dem man vertraut.
+
+### 4. Der Körper
+
+Schreiben ist Handwerk mit einem Körper daran. VANI hat Kerze und Klang — also
+Atmosphäre. Aber nichts, was den Menschen davor meint.
+
+- **Die Pause, die wirklich eine ist.** Nicht ein Hinweis, sondern ein Zustand:
+  der Bildschirm wird ruhig, ein Satz steht da, sechzig Sekunden laufen. Danach
+  kommt man zurück und weiß wieder, wo man war.
+- **Die Hand.** Nach langem Tippen ein kurzes Bild: die Hand lockern. Einmal.
+  Nicht jeden Tag.
+- **Atem als Takt.** Im Sprint kann statt einer Uhr ein sehr langsamer Puls
+  laufen — nichts Sichtbares, nur das Licht der Kerze, das mitgeht. Wer im Takt
+  bleibt, schreibt ruhiger.
+- **Das Aufstehen.** VANI merkt sich, wann zuletzt aufgestanden wurde, und sagt
+  es genau einmal pro Sitzung — mit einer Zahl, nicht mit einem Rat.
+
+### 5. Die Sprache selbst
+
+Wörter und Wortkisten gibt es. Aber VANI hört dem Text nicht **zu**.
+
+- **Die Satzlängen als Kurve.** Ein Absatz als Balken: kurz, kurz, kurz, lang.
+  Man sieht Monotonie sofort, ohne dass jemand „Stil" sagen muss.
+- **Das Lieblingswort.** Welches Wort steht in diesem Text auffällig öfter als in
+  allen anderen? Nicht „vermeiden!" — nur: *hier ist es*.
+- **Der Klang eines Absatzes.** Vokale als Farbe, Konsonantenhäufungen als
+  Rauheit. Ein Absatz bekommt ein kleines Klangbild. Unwissenschaftlich und
+  erstaunlich brauchbar.
+- **Wiederholte Anfänge.** Fünf Sätze hintereinander, die mit „Sie" anfangen,
+  werden still markiert. Nur markiert.
+- **Der eigene Wortschatz, wachsend.** Wie viele verschiedene Wörter hat man
+  dieses Jahr benutzt, die man letztes Jahr nicht benutzt hat? Das ist eine
+  schöne Zahl.
+
+### 6. Das Unfertige, an einem Ort
+
+Alles Angefangene liegt verstreut in Heften, Blättern, Schnipseln, Projekten.
+Es gibt keinen Ort, an dem man sieht, **was offen ist**.
+
+- **Die Werkbank.** Eine einzige Ansicht: alles, was angefangen und nicht fertig
+  ist, nach „wie nah dran" sortiert. Drei Sätze fehlen? Ganz oben.
+- **Der letzte Satz.** Jeder unfertige Text zeigt seinen letzten geschriebenen
+  Satz. Das ist der einzige Wiedereinstieg, der wirklich funktioniert.
+- **Die offene Frage.** Man darf an jeden Text eine Frage heften: „Warum geht sie
+  zurück?" Alle Fragen zusammen sind eine Landkarte des Ungelösten.
+- **Was fast fertig ist.** Ein sanfter Hinweis, wenn ein Text seit Monaten bei
+  95 % liegt. Einmal. Mit einem Knopf: „heute zu Ende bringen".
+
+### 7. Die Zeit, größer gedacht
+
+Der Kalender kennt die Figuren. Die Jahresringe kennen die Wörter. Aber das
+**Schreibleben** kommt nicht vor.
+
+- **Die Chronik des Hauses.** Wann wurde jedes Heft angelegt, jedes Projekt
+  begonnen, jede Figur geboren? Eine einzige lange Linie durch alles.
+- **Dieses Jahr, ein Blatt.** Am 31. Dezember baut VANI ein einziges schönes
+  Blatt: was entstanden ist, was fertig wurde, das häufigste Wort, der beste
+  Monat, drei Sätze, die es sich gemerkt hat.
+- **Das Wiederlesen.** Ein Text, den man ein Jahr nicht angefasst hat, wird
+  einmal vorgeschlagen — nicht zum Weiterschreiben, nur zum Lesen. Man ist ein
+  anderer Mensch als beim Schreiben.
+- **Die Saat.** Am Anfang eines Jahres ein Satz, was man vorhat. Am Ende steht er
+  daneben. Kein Ziel, keine Zahl — ein Satz.
+
+---
+
+### Wenn ich drei bauen dürfte
+
+1. **Der Friedhof** (§1). Er kostet wenig, wirkt sofort, und er nimmt dem
+   Streichen die Angst — das ist die häufigste Schreibblockade überhaupt.
+2. **Die Werkbank** (§6) mit dem letzten Satz. Das löst das Problem „wo war
+   ich?", das jeden Tag neu auftritt.
+3. **Ein Wort am Ende der Sitzung** (§2). Eine Zeile Code, ein Feld — und nach
+   einem halben Jahr das Interessanteste, was in VANI steht.
+
+Alle drei sind klein. Keins davon braucht einen neuen Raum.
