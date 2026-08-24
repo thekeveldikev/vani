@@ -627,7 +627,7 @@ gar nicht besetzt.
 
 *(Kartentisch und Wandteppich stehen hier.)*
 
-**Die Sternwarte.** Ein gerechneter Himmel — Sterne nach Helligkeit, die
+**Die Sternwarte.** — GEBAUT in 5.51. Ein gerechneter Himmel — Sterne nach Helligkeit, die
 Ekliptik als Band, alles gestochen wie eine alte Himmelskarte. Und dann
 zieht man selbst die Linien: ein Sternbild entsteht dadurch, dass ein
 Mensch beschließt, dass zwischen diesen sieben Punkten ein Reiher ist.

@@ -31,6 +31,16 @@ const KABINETT_FAECHER = [
     zaehlen: () => (typeof stadtplaene === 'function' ? stadtplaene().length : 0),
     wort: (n) => n === 1 ? 'eine Stadt' : n + ' Städte',
     oeffnen: (zurueck) => (typeof stadtplanWerkzeug === 'function' ? stadtplanWerkzeug(zurueck) : null)
+  },
+  {
+    id: 'sternhimmel',
+    name: 'Die Sternwarte',
+    unter: 'Ein Himmel wird gerechnet — die Sternbilder ziehst du selbst',
+    text: 'Sterne stehen zufällig da und sind Lichtjahre voneinander entfernt. Ein Sternbild entsteht erst, weil jemand beschließt, dass zwischen diesen sieben Punkten ein Reiher ist — und die Geschichte dazu weitererzählt.',
+    emblem: 'stern',
+    zaehlen: () => (typeof sternhimmel === 'function' ? sternhimmel().length : 0),
+    wort: (n) => n === 1 ? 'ein Himmel' : n + ' Himmel',
+    oeffnen: (zurueck) => (typeof sternwarteWerkzeug === 'function' ? sternwarteWerkzeug(zurueck) : null)
   }
 ];
 
@@ -97,6 +107,17 @@ function kabinettOeffnen(fach) {
 
 /* Die Embleme auf den Fächern: geritzt, nicht gemalt. */
 const KABINETT_EMBLEME = {
+  /* Ein Sternbild als Emblem: sieben Punkte und die Linien dazwischen —
+     genau das, worum es in dem Fach geht. */
+  stern: '<svg viewBox="0 0 48 48" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M9 33 L17 21 L26 26 L33 12 L40 19" stroke-opacity=".7"/>' +
+    '<g fill="currentColor" stroke="none">' +
+    '<circle cx="9" cy="33" r="2.1"/><circle cx="17" cy="21" r="2.8"/><circle cx="26" cy="26" r="1.8"/>' +
+    '<circle cx="33" cy="12" r="2.4"/><circle cx="40" cy="19" r="1.7"/>' +
+    '<circle cx="14" cy="40" r="1"/><circle cx="36" cy="35" r="1.2"/><circle cx="43" cy="30" r=".9"/>' +
+    '<circle cx="21" cy="9" r="1"/><circle cx="6" cy="16" r="1.1"/>' +
+    '</g>' +
+    '<path d="M33 6 v-3 M33 18 v3 M27 12 h-3 M39 12 h3" stroke-opacity=".45"/></svg>',
   baum: '<svg viewBox="0 0 48 48" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">' +
     '<path d="M10 42 C 13 34 16 28 22 23 C 27 19 32 15 40 11"/>' +
     '<path d="M22 23 C 26 18 31 16 38 17"/>' +

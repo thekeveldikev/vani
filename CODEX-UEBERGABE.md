@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.50.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.51.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -351,6 +351,33 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
     sich nie begegnet sein können. 400 Leute / 589 Fäden in 63 ms.
   - **Rückgängig reicht ins Album**: das Abnehmen eines Bildnisses ist umkehrbar, und das Album
     schlägt nach einem Zurücknehmen neu auf.
+- **5.51** **Die Sternwarte** — das dritte Fach im Kabinett. Drei neue Dateien:
+  `src/66-sternhimmel.js` (rechnet), `src/66b-sternhimmel-karte.js` (zeichnet),
+  `src/66c-sternhimmel-blatt.js` (bedient), dazu `test/sternhimmel.mjs`. Alle drei sind in
+  `build.sh`, `werkzeug/build-web.mjs` **und** `test/sandkasten.mjs` eingetragen.
+
+  Der Gedanke dahinter ist wörtlich der Vorgang, um den es geht: Sterne stehen zufällig da und
+  sind Lichtjahre voneinander entfernt. Ein Sternbild entsteht erst, weil ein Mensch beschließt,
+  dass zwischen diesen sieben Punkten ein Reiher ist. **VANI rechnet die Punkte; das Bild
+  bestimmst du.** Einen Stern antippen, den nächsten antippen — dazwischen entsteht eine Linie;
+  denselben noch einmal, und es ist fertig. Der halbfertige Zug wird gestrichelt mitgezeichnet,
+  sonst zieht man blind.
+
+  - **Der Himmel dreht sich einmal im Jahr.** Ein Schieber in der Leiste stellt den Tag, und
+    damit lässt sich fragen, was zur Wintersonnenwende oben steht — und wer darunter geboren ist
+    (`sternGeburtssatz`, `sternZeichenAmTag`, `sternTagAusDatum`). Erst dadurch wird aus einem
+    schönen Blatt ein Werkzeug. Die Sternbilder hängen an SternNUMMERN, nicht an Koordinaten;
+    sonst stünden sie nach jeder Drehung woanders.
+  - **Die Helligkeit ist gestuft, nicht gekurvt.** Der erste Versuch nahm die vierte Potenz einer
+    Gleichverteilung — und machte jeden fünften Stern zu einem hellen: 278 Sterne mit Hof und
+    Strahlen auf einem Blatt, das sah aus wie Schneetreiben. Am echten Himmel wächst die Zahl mit
+    jeder Größenklasse stark an; jetzt werden Stufen gewürfelt, und das Verhältnis stimmt.
+  - **Die Milchstraße ist ein Schein UND ein Korn.** Nur gestreute Punkte reichen nicht: das Band
+    war da, aber man sah es erst, wenn man die Sterne zählte. Am Himmel erkennt man es als
+    Helligkeit, bevor man einen einzigen Stern darin unterscheidet.
+  - Fünf Farbwelten, vier Dichten, ein graduierter Rand mit Himmelsrichtungen, Ekliptik,
+    Höhenkreise. Zwei-Finger-Zoom und Rückgängig wie bei Karte und Teppich.
+  - „Wann am höchsten?“ rechnet alle 365 Stellungen durch und nennt den Tag.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

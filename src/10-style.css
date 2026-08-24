@@ -6582,3 +6582,194 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 .jz-vorschau b { display: block; font-size: 14px; }
 .jz-vorschau small { color: var(--blass); font-size: 12.5px; }
 @media (prefers-reduced-motion: reduce) { .desk-ding.jahreszeit { transition: none; } }
+
+/* ===================== 66 — DIE STERNWARTE =====================
+   Ein Himmel ist dunkel, und alles darauf ist Licht. Deshalb steht hier
+   fast nichts an Farbe: die Farbwelt liefert sie ueber Variablen, die am
+   Blatt haengen. */
+
+.sh-werkzeug { display: flex; flex-direction: column; gap: 18px; height: 100%; overflow: auto; padding: 4px; }
+.sh-wkopf { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.sh-zurueck { color: var(--matt); font-size: 14px; }
+.sh-wtitel { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.sh-wtitel b { font-family: ui-serif, "New York", Georgia, serif; font-size: 21px; }
+.sh-wtitel small { color: var(--matt); }
+
+.sh-regal { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
+.sh-kachel {
+  display: grid; gap: 0; text-align: left; border-radius: 14px; overflow: hidden;
+  background: var(--karte); box-shadow: 0 3px 12px rgba(0,0,0,.22); cursor: pointer;
+  animation: sh-kommt .45s cubic-bezier(.2,.9,.3,1) backwards; animation-delay: calc(var(--n,0) * 45ms);
+  transition: transform .2s, box-shadow .2s;
+}
+@keyframes sh-kommt { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+@media (hover: hover) and (pointer: fine) {
+  .sh-kachel:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,.3); }
+}
+.sh-vorschau { display: block; aspect-ratio: 1; background: var(--grund); }
+.sh-kschild { display: grid; gap: 3px; padding: 11px 13px 13px; }
+.sh-kschild b { font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; }
+.sh-kschild small, .sh-kschild i { color: var(--matt); font-size: 12.5px; font-style: normal; }
+
+.sh-leer { display: grid; gap: 12px; justify-items: center; text-align: center; padding: 40px 20px; max-width: 560px; margin: 0 auto; }
+.sh-leerbild { color: var(--blass); }
+.sh-leer b { font-family: ui-serif, "New York", Georgia, serif; font-size: 20px; }
+.sh-leer p { color: var(--matt); line-height: 1.6; }
+
+/* ----- Das aufgeschlagene Blatt ----- */
+.sh-huelle { position: fixed; inset: 0; display: flex; }
+.sh-tafel { flex: 1; display: flex; flex-direction: column; min-width: 0; background: #0a0c14; }
+.sh-leiste { flex: none; padding: 10px 14px; background: rgba(0,0,0,.42); border-bottom: 1px solid rgba(255,255,255,.07); }
+.sh-lzeile { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.sh-ltitel { display: grid; gap: 1px; min-width: 0; }
+.sh-ltitel b { font-family: ui-serif, "New York", Georgia, serif; font-size: 19px; color: var(--shschrift, #dfd7bd); }
+.sh-ltitel small { color: rgba(255,255,255,.42); font-size: 12px; }
+
+/* Der Tageslauf — der Himmel dreht sich einmal im Jahr. */
+.sh-ltag { display: grid; gap: 2px; min-width: 200px; flex: 1; max-width: 340px; }
+.sh-tagregler { width: 100%; accent-color: var(--shlinie, #c8a85c); }
+.sh-tagtext { color: var(--shschrift, #dfd7bd); font-size: 12px; text-align: center; opacity: .8; }
+
+.sh-lknoepfe { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-left: auto; }
+.sh-werkzeuge { display: flex; gap: 3px; padding: 3px; border-radius: 999px; background: rgba(255,255,255,.06); }
+.sh-wz {
+  padding: 6px 13px; border-radius: 999px; font-size: 13px; color: rgba(255,255,255,.62);
+  transition: background .18s, color .18s;
+}
+.sh-wz.an { background: var(--shlinie, #c8a85c); color: #14161f; font-weight: 600; }
+.sh-wk, .sh-werkzeugknopf, .sh-zuknopf {
+  padding: 6px 11px; border-radius: 9px; font-size: 13px; color: rgba(255,255,255,.7);
+  background: rgba(255,255,255,.06); transition: background .18s, color .18s;
+}
+.sh-wk.zahl { min-width: 56px; font-variant-numeric: tabular-nums; }
+.sh-werkzeugknopf.an { background: var(--shlinie, #c8a85c); color: #14161f; }
+@media (hover: hover) and (pointer: fine) {
+  .sh-wk:hover, .sh-werkzeugknopf:hover, .sh-zuknopf:hover { background: rgba(255,255,255,.14); color: #fff; }
+}
+.sh-zuknopf { font-size: 17px; line-height: 1; }
+
+.sh-rahmen { flex: 1; min-height: 0; position: relative; }
+/* Ein Finger rollt, zwei Finger zoomen. */
+.sh-flaeche {
+  position: absolute; inset: 0; overflow: auto; overscroll-behavior: contain;
+  touch-action: pan-x pan-y; background: #06070c;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.18) transparent;
+}
+.sh-flaeche::-webkit-scrollbar { width: 9px; height: 9px; }
+.sh-flaeche::-webkit-scrollbar-track { background: transparent; }
+.sh-flaeche::-webkit-scrollbar-thumb { background: rgba(255,255,255,.16); border-radius: 5px; }
+.sh-innen { min-width: 100%; min-height: 100%; display: grid; place-items: center; padding: 22px; }
+.sh-blattkasten { position: relative; filter: drop-shadow(0 12px 40px rgba(0,0,0,.65)); }
+.sh-blatt { display: block; max-width: none; max-height: none; border-radius: 50%; }
+
+/* ----- Was auf dem Blatt liegt ----- */
+.sh-milchschein { stroke: none; }
+.sh-milchkorn { fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-opacity: .46; }
+.sh-sternkorn { fill: none; stroke-width: 1.15; stroke-linecap: round; stroke-opacity: .48; }
+.sh-stern { stroke: none; }
+.sh-stern.kalt { filter: hue-rotate(200deg) saturate(1.4); }
+.sh-stern.warm { filter: sepia(.55) saturate(1.3); }
+.sh-sternstrahl { fill: none; stroke-width: .85; stroke-linecap: round; stroke-opacity: .55; }
+.sh-sternhof { stroke: none; }
+.sh-hoehenkreis { fill: none; stroke-width: .7; stroke-opacity: .1; }
+.sh-richtstrich { fill: none; stroke-width: .6; stroke-opacity: .07; }
+.sh-ekliptiklinie { fill: none; stroke-width: 1.3; stroke-opacity: .28; stroke-dasharray: 9 7; }
+.sh-horizont { fill: none; stroke-width: 1.6; stroke-opacity: .5; }
+.sh-randring { fill: none; stroke-width: 1; stroke-opacity: .4; }
+.sh-randring.aussen { stroke-width: 2.2; stroke-opacity: .6; }
+.sh-gradstrich { fill: none; stroke-width: 1; stroke-opacity: .45; }
+.sh-gradzahl { font-size: 9px; fill-opacity: .5; font-family: ui-serif, "New York", Georgia, serif; }
+.sh-richtung { font-size: 13px; letter-spacing: .22em; fill-opacity: .72; font-family: ui-serif, "New York", Georgia, serif; }
+.sh-titel { font-size: 27px; letter-spacing: .07em; font-family: ui-serif, "New York", Georgia, serif; }
+.sh-unterzeile { font-size: 12px; fill-opacity: .55; font-style: italic; font-family: ui-serif, "New York", Georgia, serif; }
+
+/* ----- Die Sternbilder ----- */
+.sh-bild { cursor: pointer; }
+.sh-bildlinie { fill: none; stroke-width: 1.5; stroke-opacity: .62; stroke-linecap: round; }
+.sh-bildstern { fill: none; stroke-width: 1.1; stroke-opacity: .45; }
+.sh-bildname { font-size: 13px; letter-spacing: .18em; fill-opacity: .78; font-family: ui-serif, "New York", Georgia, serif; }
+.sh-bildsage { font-size: 10px; fill-opacity: .45; font-style: italic; font-family: ui-serif, "New York", Georgia, serif; }
+.sh-blatt .sh-bild.imblick .sh-bildlinie { stroke-opacity: 1; stroke-width: 2.2; }
+.sh-blatt .sh-bild.imblick .sh-bildstern { stroke-opacity: .9; stroke-width: 1.6; }
+.sh-blatt .sh-bild.imblick .sh-bildname { fill-opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .sh-bild:hover .sh-bildlinie { stroke-opacity: .95; }
+}
+
+/* Was gerade gezogen wird: gestrichelt, damit man sieht, dass es noch
+   nicht fest ist. */
+.sh-zuglinie { fill: none; stroke-width: 2; stroke-opacity: .9; stroke-dasharray: 7 5; stroke-linecap: round; }
+.sh-zugstern { fill: none; stroke-width: 1.8; stroke-opacity: .85; }
+.sh-zugstern.zuletzt { stroke-width: 2.4; stroke-opacity: 1; }
+.sh-blatt .sh-zug { animation: sh-pocht 1.8s ease-in-out infinite; }
+@keyframes sh-pocht { 0%, 100% { opacity: 1; } 50% { opacity: .68; } }
+
+/* ----- Der Hinweis beim Ziehen ----- */
+.sh-zughinweis {
+  position: absolute; left: 50%; transform: translateX(-50%); bottom: 18px; z-index: 6;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+  padding: 10px 16px; border-radius: 999px; background: rgba(12,14,22,.92);
+  box-shadow: 0 6px 22px rgba(0,0,0,.5); color: rgba(255,255,255,.82); font-size: 13.5px;
+  max-width: min(94%, 620px);
+}
+.sh-zughinweis b { color: var(--shlinie, #c8a85c); }
+
+/* ----- Die Karte eines Sternbilds ----- */
+.sh-bildkarte {
+  position: absolute; right: 18px; bottom: 18px; z-index: 6; width: min(320px, 88vw);
+  display: grid; gap: 7px; padding: 14px 16px 12px; border-radius: 14px;
+  background: rgba(12,14,22,.94); box-shadow: 0 8px 28px rgba(0,0,0,.55);
+  color: rgba(255,255,255,.85);
+}
+.sh-bkkopf { display: flex; align-items: baseline; gap: 10px; }
+.sh-bkkopf b { flex: 1; font-family: ui-serif, "New York", Georgia, serif; font-size: 18px; color: var(--shschrift, #dfd7bd); }
+.sh-bkzu { color: rgba(255,255,255,.5); font-size: 17px; line-height: 1; }
+.sh-bkstand { font-size: 13.5px; color: var(--shlinie, #c8a85c); }
+.sh-bkzahlen { font-size: 12px; color: rgba(255,255,255,.42); }
+.sh-bksage { font-size: 13.5px; line-height: 1.55; color: rgba(255,255,255,.72); font-family: ui-serif, "New York", Georgia, serif; }
+.sh-bkfuss { margin-top: 3px; }
+
+/* ----- Die Fenster ----- */
+.sh-abschnitt { font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--matt); margin-top: 10px; }
+.sh-name, .sh-gname, .sh-gunter, .sh-gsaat, .sh-vsuche {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--rand); border-radius: 10px;
+  background: var(--karte); color: var(--tinte); font-size: 15px; font-family: inherit;
+}
+.sh-gname { font-family: ui-serif, "New York", Georgia, serif; font-size: 19px; }
+.sh-sage {
+  width: 100%; padding: 11px 13px; border: 1px solid var(--rand); border-radius: 10px;
+  background: var(--karte); color: var(--tinte); font-size: 15px; line-height: 1.55;
+  font-family: ui-serif, "New York", Georgia, serif; resize: vertical;
+}
+.sh-zeichenwahl, .sh-greihe { display: flex; flex-wrap: wrap; gap: 6px; }
+.sh-zw, .sh-gk {
+  padding: 6px 12px; border: 1px solid var(--rand); border-radius: 999px;
+  background: var(--karte); color: var(--tinte); font-size: 13px; cursor: pointer;
+  transition: border-color .18s, background .18s;
+}
+.sh-zw.an, .sh-gk.an { border-color: var(--akzent); background: color-mix(in srgb, var(--akzent) 14%, var(--karte)); }
+.sh-bildfenster, .sh-gfenster { max-width: 640px; }
+.sh-gzwei { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 720px) { .sh-gzwei { grid-template-columns: 1.25fr .9fr; } }
+.sh-glinks { display: grid; gap: 8px; align-content: start; }
+.sh-grechts { display: grid; gap: 8px; align-content: start; }
+.sh-gvorschau { aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: var(--grund, #0e1626); box-shadow: inset 0 0 30px rgba(0,0,0,.5); }
+.sh-gvorschautext { color: var(--matt); text-align: center; line-height: 1.5; }
+.sh-hochsatz { font-size: 17px; line-height: 1.55; font-family: ui-serif, "New York", Georgia, serif; }
+
+.sh-verzeichnis { max-width: 640px; }
+.sh-vreiter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.sh-vr { padding: 6px 13px; border-radius: 999px; background: var(--hg2, rgba(0,0,0,.05)); font-size: 13.5px; cursor: pointer; }
+.sh-vr.an { background: var(--akzent); color: #fff; }
+.sh-vr i { font-style: normal; opacity: .7; margin-left: 5px; font-size: 12px; }
+.sh-vinhalt { display: grid; gap: 4px; max-height: 52vh; overflow: auto; margin: 10px 0; }
+.sh-vzeile {
+  display: grid; gap: 2px; text-align: left; padding: 9px 11px; border-radius: 9px;
+  background: var(--karte); cursor: pointer; transition: background .16s;
+}
+.sh-vzeile b { font-size: 15px; }
+.sh-vzeile span, .sh-vzeile small { color: var(--matt); font-size: 12.5px; }
+@media (hover: hover) and (pointer: fine) {
+  .sh-vzeile:hover { background: color-mix(in srgb, var(--akzent) 9%, var(--karte)); }
+}
+.sh-vzeile.auff b { font-weight: 500; }
