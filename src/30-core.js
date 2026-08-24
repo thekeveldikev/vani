@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.45.0';
+const APP_VERSION = '5.46.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -955,6 +955,140 @@ function toastMitAktion(text, aktion, tu, ms = 5200) {
   const t = el('div', { class: 'toast anfassbar' }, text, knopf);
   buehne.append(t);
   setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 450); }, ms);
+}
+
+/* ===================== MIT ZWEI FINGERN ZOOMEN =====================
+   Der Wandteppich und der Kartentisch hängen beide in einer rollenden
+   Fläche und werden beide über die Größe ihres SVG gezoomt. Deshalb
+   steht das hier einmal und nicht zweimal.
+
+   Zwei Dinge machen den Unterschied zwischen „geht“ und „fühlt sich gut
+   an“:
+
+   1. Beim Kneifen wird NICHT neu gezeichnet. Ein SVG lässt sich über
+      `width` und `height` verlustfrei größer machen — der Browser
+      skaliert es selbst, gestochen scharf und in einem Rutsch. Wer
+      stattdessen bei jedem Bild die ganze Karte neu baut, bekommt drei
+      Bilder in der Sekunde.
+
+   2. Die Stelle unter den Fingern bleibt liegen. Dafür wird jedes Bild
+      neu GEMESSEN, statt die Verschiebung auszurechnen: dann stimmt es
+      auch dann noch, wenn der Browser nebenher selbst mitrollt (was er
+      bei zwei Fingern tut). Beides zusammen addiert sich, statt sich zu
+      bekämpfen. */
+function zweiFingerZoom(flaeche, opts) {
+  if (!flaeche || !opts) return () => {};
+  const min = opts.min || 0.3;
+  const max = opts.max || 3;
+  const zeiger = new Map();
+  let griff = null;
+
+  const abstand = (a, b) => Math.hypot(b.x - a.x, b.y - a.y);
+  const zwei = () => { const l = [...zeiger.values()]; return l.length >= 2 ? [l[0], l[1]] : null; };
+
+  /* Die Stelle unter den Fingern festhalten: gemessen, nicht gerechnet. */
+  const nachfuehren = (mx, my) => {
+    const el2 = opts.bild();
+    if (!el2 || !griff) return;
+    const r = el2.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    flaeche.scrollLeft += r.left - (mx - griff.fx * r.width);
+    flaeche.scrollTop += r.top - (my - griff.fy * r.height);
+  };
+
+  const anfangen = () => {
+    const p = zwei();
+    const el2 = opts.bild();
+    if (!p || !el2) return;
+    const r = el2.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    const mx = (p[0].x + p[1].x) / 2, my = (p[0].y + p[1].y) / 2;
+    griff = {
+      d0: Math.max(1, abstand(p[0], p[1])),
+      zoom0: opts.hole(),
+      fx: (mx - r.left) / r.width,
+      fy: (my - r.top) / r.height,
+      zoom: opts.hole()
+    };
+    flaeche.classList.add('kneift');
+  };
+
+  const bewegen = () => {
+    const p = zwei();
+    if (!griff || !p) return;
+    const d = abstand(p[0], p[1]);
+    const roh = griff.zoom0 * (d / griff.d0);
+    const zoom = Math.max(min, Math.min(max, roh));
+    const mx = (p[0].x + p[1].x) / 2, my = (p[0].y + p[1].y) / 2;
+    if (Math.abs(zoom - griff.zoom) > 0.0005) {
+      griff.zoom = zoom;
+      opts.zeige(zoom);
+    }
+    nachfuehren(mx, my);
+  };
+
+  const aufhoeren = () => {
+    if (!griff) return;
+    const z = griff.zoom;
+    griff = null;
+    flaeche.classList.remove('kneift');
+    /* Erst jetzt wird gespeichert und neu gezeichnet — einmal, nicht
+       sechzigmal in der Sekunde. */
+    if (opts.fertig) opts.fertig(z);
+  };
+
+  const runter = (ev) => {
+    if (ev.pointerType === 'mouse') return;
+    zeiger.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    if (zeiger.size === 2 && !griff) anfangen();
+  };
+  const bewegt = (ev) => {
+    if (!zeiger.has(ev.pointerId)) return;
+    zeiger.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    if (griff) bewegen();
+  };
+  const hoch = (ev) => {
+    zeiger.delete(ev.pointerId);
+    if (griff && zeiger.size < 2) aufhoeren();
+  };
+
+  flaeche.addEventListener('pointerdown', runter, { passive: true });
+  flaeche.addEventListener('pointermove', bewegt, { passive: true });
+  flaeche.addEventListener('pointerup', hoch, { passive: true });
+  flaeche.addEventListener('pointercancel', hoch, { passive: true });
+  flaeche.addEventListener('pointerleave', hoch, { passive: true });
+
+  /* Am Rechner: Strg + Rad ist dieselbe Bewegung auf dem Trackpad.
+     Ohne `passive: false` lässt sich das Zoomen der ganzen Seite nicht
+     verhindern, und dann springt statt der Karte das Fenster. */
+  const rad = (ev) => {
+    if (!ev.ctrlKey && !ev.metaKey) return;
+    ev.preventDefault();
+    const el2 = opts.bild();
+    if (!el2) return;
+    const r = el2.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    const jetzt = opts.hole();
+    const zoom = Math.max(min, Math.min(max, jetzt * Math.exp(-ev.deltaY * 0.0022)));
+    if (Math.abs(zoom - jetzt) < 0.0005) return;
+    const fx = (ev.clientX - r.left) / r.width;
+    const fy = (ev.clientY - r.top) / r.height;
+    opts.zeige(zoom);
+    const r2 = el2.getBoundingClientRect();
+    flaeche.scrollLeft += r2.left - (ev.clientX - fx * r2.width);
+    flaeche.scrollTop += r2.top - (ev.clientY - fy * r2.height);
+    if (opts.fertig) opts.fertig(zoom);
+  };
+  flaeche.addEventListener('wheel', rad, { passive: false });
+
+  return () => {
+    flaeche.removeEventListener('pointerdown', runter);
+    flaeche.removeEventListener('pointermove', bewegt);
+    flaeche.removeEventListener('pointerup', hoch);
+    flaeche.removeEventListener('pointercancel', hoch);
+    flaeche.removeEventListener('pointerleave', hoch);
+    flaeche.removeEventListener('wheel', rad);
+  };
 }
 
 function zeigeDeck(inhalt, beiZu) {

@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.45.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.46.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -269,6 +269,31 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
     Blattrand; der Zuschnitt schnitt es weg, gerechnet wurde es trotzdem — Häuser bei x = −59).
   - Rundumläufe: 720 Karten und 2094 Verwandtschaften durchgerechnet, ohne Absturz, ohne NaN,
     ohne kaputten deutschen Satz.
+- **5.46** Bedienung an Wandteppich und Kartentisch — alles davon ist Anfassen, nichts davon
+  ist neue Rechnung.
+  - **Mit zwei Fingern zoomen** (`zweiFingerZoom` in `src/30-core.js`, von beiden Werkzeugen
+    benutzt). Zwei Dinge machen den Unterschied: Beim Kneifen wird NICHT neu gezeichnet — ein SVG
+    lässt sich über `width`/`height` verlustfrei skalieren, der Browser macht den Rest. Und die
+    Stelle unter den Fingern bleibt liegen, weil sie in jedem Bild neu GEMESSEN statt gerechnet
+    wird; dadurch addiert sich das native Mitrollen des Browsers, statt dagegen zu arbeiten.
+    Gemessen: die Stelle bleibt auf 0,0001 des Blattes genau liegen. Dazu Strg + Rad fürs Trackpad.
+  - **`touch-action`**: die rollenden Flächen bekommen `pan-x pan-y` (ein Finger rollt nativ mit
+    Schwung, der Seitenzoom bleibt aus), `.tep-person` und `.kt-marke` bekommen `none` — wer auf
+    einem Namen oder einer Marke anfängt, zieht das Ding und rollt nicht die Fläche darunter.
+    **Das allein war die Hälfte des „fummelig“.**
+  - **Eine neue Marke reißt kein Fenster mehr auf.** Sie wird gesetzt, kommt in den Blick, die
+    Karte unten zeigt sie — und das Werkzeug geht zurück auf die Hand. Vorher musste man erst ein
+    Änderungsfenster wegklicken, um zu sehen, wo die Marke gelandet ist, und der nächste Tipp
+    legte gleich die nächste an.
+  - **Der Griff einer Marke wächst mit dem Zoom**: 15 Karteneinheiten sind bei halbem Zoom nur
+    sieben Bildpunkte. Jetzt immer rund 48 Bildpunkte breit. Und die Zugschwelle unterscheidet
+    Finger (9) von Maus (4) — ein Finger zittert mehr.
+  - **Namen im Teppich lassen sich frei setzen** (statt im Viertelraster) und rasten dabei an den
+    Nachbarn ein, mit einer feinen Hilfslinie. **Damit bekommt man eine Generation überhaupt erst
+    in eine Flucht.** Dazu ein Knopf „Generation ausrichten“ und die Pfeiltasten für den Namen im
+    Blick (mit Umschalt in großen Schritten).
+    Achtung: In diesem Teppich läuft die Zeit von LINKS NACH RECHTS — eine Generation ist eine
+    SPALTE. Der erste Versuch setzte alle auf dieselbe Höhe und stapelte sie damit aufeinander.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

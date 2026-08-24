@@ -112,6 +112,22 @@ function teppichOeffnen(id) {
   const zu = zeigeDeck(kasten, () => { document.removeEventListener('keydown', taste); teppichAnimationenAus(); });
 
   const neu = () => teppichZeichne(kasten, flaeche, rahmen, neu, zu);
+
+  /* Mit zwei Fingern heran und wieder weg.
+     Beim Kneifen wird nur das Tuch größer gemacht — nicht neu gewebt.
+     Erst wenn die Finger weg sind, zeichnet sich alles einmal neu. */
+  zweiFingerZoom(flaeche, {
+    min: 0.3, max: 2.4,
+    hole: () => _tep.zoom || 1,
+    bild: () => flaeche.querySelector('.tep-tuch'),
+    zeige: (z) => {
+      const svg = flaeche.querySelector('.tep-tuch');
+      if (!svg || !svg.dataset.breite) return;
+      svg.setAttribute('width', Math.round(Number(svg.dataset.breite) * z));
+      svg.setAttribute('height', Math.round(Number(svg.dataset.hoehe) * z));
+    },
+    fertig: (z) => { _tep.zoom = Math.round(z * 100) / 100; neu(); }
+  });
   const taste = (ev) => {
     if (!kasten.isConnected) { document.removeEventListener('keydown', taste); return; }
     const z = ev.target;
@@ -120,6 +136,16 @@ function teppichOeffnen(id) {
     if (ev.key === '+' || ev.key === '=') { ev.preventDefault(); teppichZoom(0.2, flaeche, neu); }
     else if (ev.key === '-' || ev.key === '_') { ev.preventDefault(); teppichZoom(-0.2, flaeche, neu); }
     else if (ev.key === '0') { ev.preventDefault(); _tep.zoom = 1; neu(); }
+    /* Mit den Pfeiltasten lässt sich der Name im Blick genau setzen —
+       mit dem Finger trifft man keinen halben Bildpunkt. Mit Umschalt
+       geht es in großen Schritten. */
+    else if (_tep.nurPerson && /^Arrow(Up|Down|Left|Right)$/.test(ev.key)) {
+      ev.preventDefault();
+      const weit = ev.shiftKey ? 0.5 : 0.06;
+      const dx = ev.key === 'ArrowLeft' ? -weit : ev.key === 'ArrowRight' ? weit : 0;
+      const dy = ev.key === 'ArrowUp' ? -weit : ev.key === 'ArrowDown' ? weit : 0;
+      teppichPersonSchubsen(D.docs.get(_tep.id), _tep.nurPerson, dx, dy, neu);
+    }
     else if (ev.key === 'n' || ev.key === 'N') { ev.preventDefault(); teppichPersonNeu(D.docs.get(_tep.id), '', neu); }
     else if (ev.key === 'v' || ev.key === 'V') { ev.preventDefault(); teppichVerzeichnis(D.docs.get(_tep.id), neu); }
     else if (ev.key === '1') { ev.preventDefault(); _tep.werkzeug = 'zeigen'; neu(); }
@@ -395,6 +421,13 @@ function teppichPersonenkarte(doc, baum, personId, neu) {
   }
   karte.append(el('div', { class: 'tep-pkfuss' },
     el('button', { class: 'knopf zart klein', onclick: () => teppichFadenSpinnen(doc, personId, neu) }, '+ Faden'),
+    /* Eine ganze Generation auf einen Schlag in eine Reihe. Von Hand ist
+       das die m\u00fchsamste Arbeit am Teppich \u2014 und die, die man am
+       h\u00e4ufigsten machen will. */
+    el('button', {
+      class: 'knopf zart klein', title: 'Alle aus derselben Generation auf diese H\u00f6he bringen',
+      onclick: () => teppichReiheAusrichten(doc, personId, neu)
+    }, 'Generation ausrichten'),
     el('button', { class: 'knopf zart klein', onclick: () => teppichKartusche(doc, personId, neu) }, '\u00c4ndern')));
   return karte;
 }
@@ -1246,6 +1279,14 @@ function teppichBand(k, x, y, baum, treffer, i, neu) {
       teppichZugfadenZeichnen(g, x, y, zug.neuX, zug.neuY);
       return;
     }
+    /* An den anderen Namen ausrichten.
+       Ohne das kann man eine Generation nur mit dem Auge in eine Reihe
+       schieben, und das wird nie eine Reihe. Kommt der Name einem anderen
+       auf gleicher Höhe nahe, rastet er ein und eine feine Linie zeigt,
+       woran. Genau die Bewegung, die man machen will. */
+    const hilfe = teppichAusrichten(g, zug.neuX, zug.neuY);
+    zug.neuX = hilfe.x; zug.neuY = hilfe.y;
+    teppichHilfslinien(g, hilfe);
     g.setAttribute('transform', 'translate(' + zug.neuX.toFixed(1) + ' ' + zug.neuY.toFixed(1) + ') rotate(' + dreh + ')');
   });
   const loslassen = (ev) => {
@@ -1256,6 +1297,7 @@ function teppichBand(k, x, y, baum, treffer, i, neu) {
        findet elementFromPoint ihn selbst und nicht den Namen darunter. Genau
        daran brach das Fadenspinnen ab. */
     teppichZugfadenWeg();
+    teppichHilfslinienWeg();
     try { g.releasePointerCapture(ev.pointerId); } catch (e) {}
     if (s.faden && s.gezogen) {
       /* Wo ist der Finger gelandet? */
@@ -1272,16 +1314,116 @@ function teppichBand(k, x, y, baum, treffer, i, neu) {
       inBlick(ev);
       return;
     }
-    /* In Rasterschritten ablegen: so bleibt die Wand geordnet, auch wenn
-       man von Hand nachhilft. */
+    /* Frei ablegen, nicht in Viertelschritten.
+       Das grobe Raster war als Ordnungshilfe gedacht, stand dem freien
+       Verschieben aber im Weg: man konnte einen Namen nicht dorthin legen,
+       wo man ihn haben wollte. Geordnet wird jetzt über das Einrasten an
+       den Nachbarn — das trifft genau, ohne einzusperren. */
     const rasterX = (s.neuX - TEP_RAND_X) / TEP_SPALTE;
     const rasterY = (s.neuY - TEP_RAND_Y) / TEP_REIHE;
     teppichPersonSetzen(D.docs.get(_tep.id), p.id,
-      Math.round(rasterX * 4) / 4, Math.round(rasterY * 4) / 4, neu);
+      Math.round(rasterX * 100) / 100, Math.round(rasterY * 100) / 100, neu);
   };
   g.addEventListener('pointerup', loslassen);
   g.addEventListener('pointercancel', () => { if (zug) { zug = null; g.classList.remove('zieht', 'spinnt'); teppichZugfadenWeg(); if (neu) neu(); } });
   return g;
+}
+
+/* ----- Eine Generation begradigen -----
+   In diesem Teppich läuft die Zeit von links nach rechts: eine Generation
+   ist eine SPALTE, keine Zeile. Ausrichten heißt also, alle auf dieselbe
+   Spalte zu bringen und jedem seine Zeile zu lassen.
+
+   (Beim ersten Versuch war es umgekehrt — dieselbe Höhe für alle. Danach
+   lagen die drei Namen einer Generation exakt aufeinander.)
+
+   Gerechnet wird auf der gerechneten Ordnung, nicht auf dem, was gerade
+   im Tuch steht: sonst hängt das Ergebnis davon ab, wer vorher schon von
+   Hand geschoben wurde. */
+/* Einen Namen um ein Stück versetzen — auch dann, wenn er bisher noch
+   gar keinen festen Platz hatte. Dann wird der gerechnete zum festen. */
+function teppichPersonSchubsen(doc, personId, dx, dy, neu) {
+  if (!doc) return;
+  const baum = saubererStammbaum(doc);
+  const ordnung = teppichOrdnung(baum);
+  const k = ordnung.knoten.find((x) => x.id === personId);
+  if (!k) return;
+  teppichSchreiben(doc, (b) => {
+    const person = b.leute.find((x) => x.id === personId);
+    if (!person) return b;
+    const x0 = person.festX != null ? person.festX : k.x;
+    const y0 = person.festY != null ? person.festY : k.y;
+    person.festX = Math.round((x0 + dx) * 100) / 100;
+    person.festY = Math.round((y0 + dy) * 100) / 100;
+    return b;
+  }).then(() => { if (neu) neu(); });
+}
+
+function teppichReiheAusrichten(doc, personId, neu) {
+  const baum = saubererStammbaum(doc);
+  const ordnung = teppichOrdnung(baum);
+  const ich = ordnung.knoten.find((k) => k.id === personId);
+  if (!ich) return;
+  const gen = teppichGenerationen(baum);
+  const meine = gen.get(personId);
+  if (meine == null) return;
+
+  const zusammen = ordnung.knoten.filter((k) => gen.get(k.id) === meine);
+  if (zusammen.length < 2) { toast('Auf dieser Stufe hängt sonst niemand.', 3800); return; }
+
+  teppichSchreiben(doc, (b) => {
+    for (const k of zusammen) {
+      const person = b.leute.find((x) => x.id === k.id);
+      if (!person) continue;
+      person.festX = Math.round(ich.x * 100) / 100;
+      person.festY = Math.round(k.y * 100) / 100;
+    }
+    return b;
+  }).then(() => {
+    if (neu) neu();
+    toast(zusammen.length + ' Namen stehen jetzt in einer Flucht.', 4200);
+  });
+}
+
+/* ----- Ausrichten beim Ziehen -----
+   Sucht unter allen anderen Namen einen, der fast auf gleicher Höhe oder
+   in gleicher Spalte steht, und rastet dort ein. Gelesen wird direkt aus
+   dem Tuch — dann stimmt es auch, während man zieht. */
+/* Wie nah muss ein Name einem anderen kommen, damit er einrastet —
+   gemessen in Bildpunkten auf dem Schirm, nicht in Tuchkoordinaten. */
+const TEP_RASTWEITE = 15;
+function teppichAusrichten(g, nx, ny) {
+  const wurzel = g.ownerSVGElement;
+  if (!wurzel) return { x: nx, y: ny, aufX: null, aufY: null };
+  const weite = TEP_RASTWEITE / Math.max(0.35, _tep.zoom || 1);
+  let x = nx, y = ny, aufX = null, aufY = null;
+  let nahX = weite, nahY = weite;
+  for (const anderer of wurzel.querySelectorAll('.tep-person')) {
+    if (anderer === g) continue;
+    const t = anderer.getAttribute('transform') || '';
+    const m = /translate\(\s*(-?[\d.]+)\s+(-?[\d.]+)/.exec(t);
+    if (!m) continue;
+    const ox = Number(m[1]), oy = Number(m[2]);
+    if (Math.abs(oy - ny) < nahY) { nahY = Math.abs(oy - ny); y = oy; aufY = oy; }
+    if (Math.abs(ox - nx) < nahX) { nahX = Math.abs(ox - nx); x = ox; aufX = ox; }
+  }
+  return { x, y, aufX, aufY };
+}
+
+function teppichHilfslinien(g, hilfe) {
+  const wurzel = g.ownerSVGElement;
+  if (!wurzel) return;
+  teppichHilfslinienWeg();
+  if (hilfe.aufX == null && hilfe.aufY == null) return;
+  const b = Number(wurzel.dataset.breite) || 2000;
+  const h = Number(wurzel.dataset.hoehe) || 2000;
+  const gr = sv('g', { class: 'tep-hilfslinien', 'aria-hidden': 'true' });
+  if (hilfe.aufY != null) gr.append(sv('path', { d: 'M 0 ' + hilfe.aufY + ' H ' + b, class: 'tep-hilfslinie' }));
+  if (hilfe.aufX != null) gr.append(sv('path', { d: 'M ' + hilfe.aufX + ' 0 V ' + h, class: 'tep-hilfslinie' }));
+  wurzel.append(gr);
+}
+function teppichHilfslinienWeg() {
+  for (const alt of document.querySelectorAll('.tep-hilfslinien')) alt.remove();
 }
 
 /* ----- Das Namensband -----

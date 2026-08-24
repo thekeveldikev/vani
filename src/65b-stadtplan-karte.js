@@ -161,6 +161,22 @@ function planOeffnen(id) {
   _kt.offen = true;
 
   const neu = () => planZeichne(tafel, flaeche, rahmen, neu, zu);
+
+  /* Mit zwei Fingern heran und wieder weg. Ein SVG lässt sich über seine
+     Größe verlustfrei skalieren — deshalb kostet das Kneifen nichts, und
+     die Karte wird erst neu gebaut, wenn die Finger wieder weg sind. */
+  zweiFingerZoom(flaeche, {
+    min: 0.25, max: 4,
+    hole: () => _kt.zoom || 1,
+    bild: () => flaeche.querySelector('.kt-blatt'),
+    zeige: (z) => {
+      const svg = flaeche.querySelector('.kt-blatt');
+      if (!svg) return;
+      svg.setAttribute('width', Math.round(PLAN_GROESSE * z));
+      svg.setAttribute('height', Math.round(PLAN_GROESSE * z));
+    },
+    fertig: (z) => { _kt.zoom = Math.round(z * 100) / 100; neu(); }
+  });
   const taste = (ev) => {
     if (!tafel.isConnected) { document.removeEventListener('keydown', taste); return; }
     const z = ev.target;
@@ -1306,7 +1322,10 @@ function planMarkenAuftragen(svg, plan, g, neu) {
       transform: 'translate(' + kz(m.x) + ' ' + kz(m.y) + ')',
       tabindex: '0', role: 'button'
     });
-    gr.append(kv('circle', { r: 15, class: 'kt-markenfang' }));
+    /* Der Griff wächst, wenn die Karte klein ist: fünfzehn Einheiten sind
+       bei halbem Zoom nur sieben Bildpunkte, und danach trifft kein Finger
+       mehr. Gemessen wird in Bildpunkten, nicht in Karteneinheiten. */
+    gr.append(kv('circle', { r: kz(Math.max(15, 24 / (_kt.zoom || 1))), class: 'kt-markenfang' }));
     const zeichen = kv('g', { class: 'kt-markenzeichen' });
     zeichen.innerHTML = planMarkenSymbol(m.art, 22);
     gr.append(zeichen);
@@ -1326,13 +1345,16 @@ function planMarkenAuftragen(svg, plan, g, neu) {
     gr.addEventListener('pointerdown', (ev) => {
       if (ev.button != null && ev.button !== 0) return;
       ev.stopPropagation();
-      zug = { x: ev.clientX, y: ev.clientY, x0: m.x, y0: m.y, gezogen: false };
+      zug = { x: ev.clientX, y: ev.clientY, x0: m.x, y0: m.y, gezogen: false, schwelle: ev.pointerType === 'mouse' ? 4 : 9 };
       try { gr.setPointerCapture(ev.pointerId); } catch (e) {}
     });
     gr.addEventListener('pointermove', (ev) => {
       if (!zug) return;
       const dx = ev.clientX - zug.x, dy = ev.clientY - zug.y;
-      if (!zug.gezogen && Math.abs(dx) + Math.abs(dy) < 5) return;
+      /* Ein Finger zittert mehr als eine Maus. Fünf Bildpunkte sind für
+         eine Maus richtig und für einen Finger zu wenig — jeder Tipp wurde
+         zum Zug. */
+      if (!zug.gezogen && Math.abs(dx) + Math.abs(dy) < zug.schwelle) return;
       zug.gezogen = true;
       gr.classList.add('zieht');
       const r = svg.getBoundingClientRect();

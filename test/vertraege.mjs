@@ -837,3 +837,88 @@ test('Kartenvertrag: jede Anlage kann eine Mauer bekommen', () => {
   assert.match(stueck, /if \(!ring\)/, 'fehlt der Mauerweg, wird ein Kranz gerechnet');
   assert.match(stueck, /sektoren/, 'und zwar über Winkelsektoren um die Stadt');
 });
+
+test('Zoomvertrag: ein Finger rollt, zwei Finger zoomen', () => {
+  const css = lies('src/10-style.css');
+
+  /* `pan-x pan-y` ist die Ansage an den Browser: rollen darfst du, den
+     Seitenzoom lass mir. Ohne sie zoomt bei zwei Fingern die ganze Seite
+     statt der Karte. */
+  const flaechen = [
+    (css.match(/\.tep-flaeche \{[\s\S]*?\}/) || [''])[0],
+    (css.match(/\.kt-flaeche \{[\s\S]*?\}/) || [''])[0]
+  ];
+  for (const f of flaechen) {
+    assert.match(f, /touch-action: pan-x pan-y/, 'die rollende Flaeche gibt den Zoom nicht ab');
+  }
+
+  /* Wer auf einem Namen oder einer Marke anfaengt, zieht das Ding — und
+     rollt nicht die Flaeche darunter. Ohne `touch-action: none` kaempfen
+     Zug und Rollen gegeneinander, und beides fuehlt sich kaputt an. */
+  assert.match(css, /\.tep-person \{[^}]*touch-action: none/, 'ein Name laesst sich ziehen');
+  assert.match(css, /\.kt-marke \{[^}]*touch-action: none/, 'eine Marke laesst sich ziehen');
+});
+
+test('Zoomvertrag: beim Kneifen wird nicht neu gezeichnet', () => {
+  /* Ein SVG laesst sich ueber `width`/`height` verlustfrei skalieren. Wer
+     stattdessen bei jedem Bild die ganze Karte neu baut, bekommt drei
+     Bilder in der Sekunde statt sechzig. */
+  const kern = lies('src/30-core.js');
+  const anfang = kern.indexOf('function zweiFingerZoom(');
+  assert.ok(anfang > 0, 'den Helfer gibt es');
+  const stueck = kern.slice(anfang, kern.indexOf('\n}', anfang));
+
+  assert.match(stueck, /opts\.zeige\(/, 'waehrend des Kneifens wird nur die Groesse gesetzt');
+  assert.match(stueck, /opts\.fertig/, 'erst am Ende wird festgeschrieben');
+  assert.match(stueck, /getBoundingClientRect/, 'die Stelle unter den Fingern wird gemessen, nicht gerechnet');
+  assert.match(stueck, /scrollLeft \+=/, 'und die Flaeche wird nachgefuehrt');
+  /* Strg + Rad ist dieselbe Bewegung auf dem Trackpad — und ohne
+     preventDefault zoomt das Fenster statt der Karte. */
+  assert.match(stueck, /passive: false/, 'das Rad wird nicht passiv behandelt');
+  assert.match(stueck, /preventDefault/, 'und der Seitenzoom unterbunden');
+
+  /* Beide Werkzeuge haengen daran. */
+  for (const datei of ['src/63b-stammbaum-teppich.js', 'src/65b-stadtplan-karte.js']) {
+    assert.match(lies(datei), /zweiFingerZoom\(/, datei + ' kennt das Kneifen');
+  }
+});
+
+test('Kartenvertrag: eine neue Marke reisst kein Fenster auf', () => {
+  /* Vorher sprang beim Setzen sofort ein Aenderungsfenster auf: man musste
+     es wegklicken, bevor man sehen konnte, WO die Marke gelandet ist — und
+     der naechste Tipp legte gleich die naechste an. */
+  const blatt = lies('src/65c-stadtplan-blatt.js');
+  const anfang = blatt.indexOf('function planMarkeAnlegen(');
+  assert.ok(anfang > 0);
+  const stueck = blatt.slice(anfang, blatt.indexOf('\n}', anfang));
+  assert.ok(!/planMarkeBearbeiten/.test(stueck), 'kein Fenster beim Setzen');
+  assert.match(stueck, /_kt\.nurMarke = marke\.id/, 'die neue Marke kommt in den Blick');
+  assert.match(stueck, /_kt\.werkzeug = 'hand'/, 'und das Werkzeug geht zurueck auf die Hand');
+});
+
+test('Teppichvertrag: Namen lassen sich frei setzen und ausrichten', () => {
+  const tep = lies('src/63b-stammbaum-teppich.js');
+
+  /* Das grobe Viertelraster stand dem freien Verschieben im Weg. */
+  assert.ok(!/Math\.round\(rasterX \* 4\) \/ 4/.test(tep), 'kein Viertelraster mehr');
+  assert.match(tep, /Math\.round\(rasterX \* 100\) \/ 100/, 'frei abgelegt');
+
+  /* Geordnet wird ueber das Einrasten an den Nachbarn — sonst bekommt man
+     eine Generation nie in eine Flucht. */
+  assert.match(tep, /function teppichAusrichten\(/, 'es gibt ein Einrasten');
+  assert.match(tep, /function teppichHilfslinien\(/, 'und eine sichtbare Hilfslinie');
+  assert.match(tep, /teppichHilfslinienWeg\(\)/, 'die auch wieder verschwindet');
+
+  /* In diesem Teppich laeuft die Zeit von links nach rechts: eine
+     Generation ist eine SPALTE. Wer alle auf dieselbe HOEHE setzt, stapelt
+     sie aufeinander — genau das war der erste Versuch. */
+  const anfang = tep.indexOf('function teppichReiheAusrichten(');
+  assert.ok(anfang > 0, 'es gibt das Begradigen');
+  const stueck = tep.slice(anfang, tep.indexOf('\n}\n', anfang));
+  assert.match(stueck, /person\.festX = Math\.round\(ich\.x/, 'alle in dieselbe Spalte');
+  assert.match(stueck, /person\.festY = Math\.round\(k\.y/, 'jeder behaelt seine Zeile');
+
+  /* Mit dem Finger trifft man keinen halben Bildpunkt. */
+  assert.match(tep, /function teppichPersonSchubsen\(/, 'die Pfeiltasten setzen genau');
+  assert.match(tep, /Arrow\(Up\|Down\|Left\|Right\)/, 'und sind angeschlossen');
+});

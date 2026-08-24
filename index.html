@@ -4883,7 +4883,12 @@ html[data-thema="tinte"] .knopf.gefahr, html[data-thema="kerze"] .knopf.gefahr {
   white-space: nowrap; font-family: ui-serif, "New York", Georgia, serif;
   font-size: 15px; letter-spacing: .16em; color: #1c1710; padding-left: 8px;
 }
-.tep-flaeche { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; position: relative; background: #12180f; }
+/* Ein Finger rollt (nativ, mit Schwung), zwei Finger zoomen (wir selbst).
+    ist genau die Ansage dafuer: rollen ja, Seitenzoom nein. */
+.tep-flaeche { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; position: relative; background: #12180f; touch-action: pan-x pan-y; }
+/* Wer auf einem Namen anfaengt, zieht den Namen — und rollt nicht die Wand. */
+.tep-person { touch-action: none; }
+.tep-flaeche.kneift { scroll-behavior: auto; }
 .tep-flaeche { scrollbar-width: thin; scrollbar-color: rgba(220,210,180,.28) transparent; }
 .tep-flaeche::-webkit-scrollbar { width: 9px; height: 9px; }
 .tep-flaeche::-webkit-scrollbar-track { background: transparent; }
@@ -5267,6 +5272,10 @@ html[data-thema="tinte"] .knopf.gefahr, html[data-thema="kerze"] .knopf.gefahr {
 .tep-tierlinie { fill: none; stroke: #ded6bd; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .72; }
 .tep-tierauge { fill: #ded6bd; opacity: .72; }
 .tep-fusstier { pointer-events: none; }
+/* Die Ausrichthilfen: eine feine Linie zeigt, woran der Name einrastet. */
+.tep-hilfslinien { pointer-events: none; }
+.tep-hilfslinie { fill: none; stroke: #e0b26a; stroke-width: 1.4; stroke-opacity: .55; stroke-dasharray: 7 6; }
+
 .tep-person.zieht { cursor: grabbing; }
 .tep-person.zieht .tep-bandgrund { fill: #d3d8c0; stroke: #e0b26a; stroke-width: 2; }
 .tep-person.zieht { filter: drop-shadow(0 6px 10px rgba(0,0,0,.55)); }
@@ -5915,8 +5924,11 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 
 /* ----- Die Fläche mit dem Papier ----- */
 .kt-rahmen { flex: 1; min-height: 0; position: relative; }
+/* Ein Finger rollt (nativ, mit Schwung), zwei Finger zoomen (wir selbst).
+   `pan-x pan-y` ist genau die Ansage dafuer: rollen ja, Seitenzoom nein. */
 .kt-flaeche {
   position: absolute; inset: 0; overflow: auto; overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
   background:
     repeating-linear-gradient(96deg, rgba(255,255,255,.014) 0 2px, transparent 2px 7px),
     radial-gradient(90% 70% at 50% 30%, rgba(0,0,0,.14), rgba(0,0,0,.4));
@@ -6123,7 +6135,10 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 .kt-blatt.ohne-namen .kt-nachbarn { display: none; }
 
 /* ----- Die Marken ----- */
-.kt-marke { cursor: pointer; color: var(--ktinte); }
+/* Wer auf einer Marke anfaengt, zieht die Marke — und rollt nicht die
+   Karte. Ohne das war jedes Verschieben ein Kampf mit der Flaeche. */
+.kt-marke { cursor: pointer; color: var(--ktinte); touch-action: none; }
+.kt-flaeche.kneift { scroll-behavior: auto; }
 .kt-markenfang { fill: transparent; }
 .kt-markenzeichen { color: var(--ktinte); }
 .kt-marke .kt-markenzeichen svg { overflow: visible; }
@@ -6569,7 +6584,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.45.0';
+const APP_VERSION = '5.46.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -7521,6 +7536,140 @@ function toastMitAktion(text, aktion, tu, ms = 5200) {
   const t = el('div', { class: 'toast anfassbar' }, text, knopf);
   buehne.append(t);
   setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 450); }, ms);
+}
+
+/* ===================== MIT ZWEI FINGERN ZOOMEN =====================
+   Der Wandteppich und der Kartentisch hängen beide in einer rollenden
+   Fläche und werden beide über die Größe ihres SVG gezoomt. Deshalb
+   steht das hier einmal und nicht zweimal.
+
+   Zwei Dinge machen den Unterschied zwischen „geht“ und „fühlt sich gut
+   an“:
+
+   1. Beim Kneifen wird NICHT neu gezeichnet. Ein SVG lässt sich über
+      `width` und `height` verlustfrei größer machen — der Browser
+      skaliert es selbst, gestochen scharf und in einem Rutsch. Wer
+      stattdessen bei jedem Bild die ganze Karte neu baut, bekommt drei
+      Bilder in der Sekunde.
+
+   2. Die Stelle unter den Fingern bleibt liegen. Dafür wird jedes Bild
+      neu GEMESSEN, statt die Verschiebung auszurechnen: dann stimmt es
+      auch dann noch, wenn der Browser nebenher selbst mitrollt (was er
+      bei zwei Fingern tut). Beides zusammen addiert sich, statt sich zu
+      bekämpfen. */
+function zweiFingerZoom(flaeche, opts) {
+  if (!flaeche || !opts) return () => {};
+  const min = opts.min || 0.3;
+  const max = opts.max || 3;
+  const zeiger = new Map();
+  let griff = null;
+
+  const abstand = (a, b) => Math.hypot(b.x - a.x, b.y - a.y);
+  const zwei = () => { const l = [...zeiger.values()]; return l.length >= 2 ? [l[0], l[1]] : null; };
+
+  /* Die Stelle unter den Fingern festhalten: gemessen, nicht gerechnet. */
+  const nachfuehren = (mx, my) => {
+    const el2 = opts.bild();
+    if (!el2 || !griff) return;
+    const r = el2.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    flaeche.scrollLeft += r.left - (mx - griff.fx * r.width);
+    flaeche.scrollTop += r.top - (my - griff.fy * r.height);
+  };
+
+  const anfangen = () => {
+    const p = zwei();
+    const el2 = opts.bild();
+    if (!p || !el2) return;
+    const r = el2.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    const mx = (p[0].x + p[1].x) / 2, my = (p[0].y + p[1].y) / 2;
+    griff = {
+      d0: Math.max(1, abstand(p[0], p[1])),
+      zoom0: opts.hole(),
+      fx: (mx - r.left) / r.width,
+      fy: (my - r.top) / r.height,
+      zoom: opts.hole()
+    };
+    flaeche.classList.add('kneift');
+  };
+
+  const bewegen = () => {
+    const p = zwei();
+    if (!griff || !p) return;
+    const d = abstand(p[0], p[1]);
+    const roh = griff.zoom0 * (d / griff.d0);
+    const zoom = Math.max(min, Math.min(max, roh));
+    const mx = (p[0].x + p[1].x) / 2, my = (p[0].y + p[1].y) / 2;
+    if (Math.abs(zoom - griff.zoom) > 0.0005) {
+      griff.zoom = zoom;
+      opts.zeige(zoom);
+    }
+    nachfuehren(mx, my);
+  };
+
+  const aufhoeren = () => {
+    if (!griff) return;
+    const z = griff.zoom;
+    griff = null;
+    flaeche.classList.remove('kneift');
+    /* Erst jetzt wird gespeichert und neu gezeichnet — einmal, nicht
+       sechzigmal in der Sekunde. */
+    if (opts.fertig) opts.fertig(z);
+  };
+
+  const runter = (ev) => {
+    if (ev.pointerType === 'mouse') return;
+    zeiger.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    if (zeiger.size === 2 && !griff) anfangen();
+  };
+  const bewegt = (ev) => {
+    if (!zeiger.has(ev.pointerId)) return;
+    zeiger.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    if (griff) bewegen();
+  };
+  const hoch = (ev) => {
+    zeiger.delete(ev.pointerId);
+    if (griff && zeiger.size < 2) aufhoeren();
+  };
+
+  flaeche.addEventListener('pointerdown', runter, { passive: true });
+  flaeche.addEventListener('pointermove', bewegt, { passive: true });
+  flaeche.addEventListener('pointerup', hoch, { passive: true });
+  flaeche.addEventListener('pointercancel', hoch, { passive: true });
+  flaeche.addEventListener('pointerleave', hoch, { passive: true });
+
+  /* Am Rechner: Strg + Rad ist dieselbe Bewegung auf dem Trackpad.
+     Ohne `passive: false` lässt sich das Zoomen der ganzen Seite nicht
+     verhindern, und dann springt statt der Karte das Fenster. */
+  const rad = (ev) => {
+    if (!ev.ctrlKey && !ev.metaKey) return;
+    ev.preventDefault();
+    const el2 = opts.bild();
+    if (!el2) return;
+    const r = el2.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    const jetzt = opts.hole();
+    const zoom = Math.max(min, Math.min(max, jetzt * Math.exp(-ev.deltaY * 0.0022)));
+    if (Math.abs(zoom - jetzt) < 0.0005) return;
+    const fx = (ev.clientX - r.left) / r.width;
+    const fy = (ev.clientY - r.top) / r.height;
+    opts.zeige(zoom);
+    const r2 = el2.getBoundingClientRect();
+    flaeche.scrollLeft += r2.left - (ev.clientX - fx * r2.width);
+    flaeche.scrollTop += r2.top - (ev.clientY - fy * r2.height);
+    if (opts.fertig) opts.fertig(zoom);
+  };
+  flaeche.addEventListener('wheel', rad, { passive: false });
+
+  return () => {
+    flaeche.removeEventListener('pointerdown', runter);
+    flaeche.removeEventListener('pointermove', bewegt);
+    flaeche.removeEventListener('pointerup', hoch);
+    flaeche.removeEventListener('pointercancel', hoch);
+    flaeche.removeEventListener('pointerleave', hoch);
+    flaeche.removeEventListener('wheel', rad);
+  };
 }
 
 function zeigeDeck(inhalt, beiZu) {
@@ -31681,6 +31830,22 @@ function teppichOeffnen(id) {
   const zu = zeigeDeck(kasten, () => { document.removeEventListener('keydown', taste); teppichAnimationenAus(); });
 
   const neu = () => teppichZeichne(kasten, flaeche, rahmen, neu, zu);
+
+  /* Mit zwei Fingern heran und wieder weg.
+     Beim Kneifen wird nur das Tuch größer gemacht — nicht neu gewebt.
+     Erst wenn die Finger weg sind, zeichnet sich alles einmal neu. */
+  zweiFingerZoom(flaeche, {
+    min: 0.3, max: 2.4,
+    hole: () => _tep.zoom || 1,
+    bild: () => flaeche.querySelector('.tep-tuch'),
+    zeige: (z) => {
+      const svg = flaeche.querySelector('.tep-tuch');
+      if (!svg || !svg.dataset.breite) return;
+      svg.setAttribute('width', Math.round(Number(svg.dataset.breite) * z));
+      svg.setAttribute('height', Math.round(Number(svg.dataset.hoehe) * z));
+    },
+    fertig: (z) => { _tep.zoom = Math.round(z * 100) / 100; neu(); }
+  });
   const taste = (ev) => {
     if (!kasten.isConnected) { document.removeEventListener('keydown', taste); return; }
     const z = ev.target;
@@ -31689,6 +31854,16 @@ function teppichOeffnen(id) {
     if (ev.key === '+' || ev.key === '=') { ev.preventDefault(); teppichZoom(0.2, flaeche, neu); }
     else if (ev.key === '-' || ev.key === '_') { ev.preventDefault(); teppichZoom(-0.2, flaeche, neu); }
     else if (ev.key === '0') { ev.preventDefault(); _tep.zoom = 1; neu(); }
+    /* Mit den Pfeiltasten lässt sich der Name im Blick genau setzen —
+       mit dem Finger trifft man keinen halben Bildpunkt. Mit Umschalt
+       geht es in großen Schritten. */
+    else if (_tep.nurPerson && /^Arrow(Up|Down|Left|Right)$/.test(ev.key)) {
+      ev.preventDefault();
+      const weit = ev.shiftKey ? 0.5 : 0.06;
+      const dx = ev.key === 'ArrowLeft' ? -weit : ev.key === 'ArrowRight' ? weit : 0;
+      const dy = ev.key === 'ArrowUp' ? -weit : ev.key === 'ArrowDown' ? weit : 0;
+      teppichPersonSchubsen(D.docs.get(_tep.id), _tep.nurPerson, dx, dy, neu);
+    }
     else if (ev.key === 'n' || ev.key === 'N') { ev.preventDefault(); teppichPersonNeu(D.docs.get(_tep.id), '', neu); }
     else if (ev.key === 'v' || ev.key === 'V') { ev.preventDefault(); teppichVerzeichnis(D.docs.get(_tep.id), neu); }
     else if (ev.key === '1') { ev.preventDefault(); _tep.werkzeug = 'zeigen'; neu(); }
@@ -31964,6 +32139,13 @@ function teppichPersonenkarte(doc, baum, personId, neu) {
   }
   karte.append(el('div', { class: 'tep-pkfuss' },
     el('button', { class: 'knopf zart klein', onclick: () => teppichFadenSpinnen(doc, personId, neu) }, '+ Faden'),
+    /* Eine ganze Generation auf einen Schlag in eine Reihe. Von Hand ist
+       das die m\u00fchsamste Arbeit am Teppich \u2014 und die, die man am
+       h\u00e4ufigsten machen will. */
+    el('button', {
+      class: 'knopf zart klein', title: 'Alle aus derselben Generation auf diese H\u00f6he bringen',
+      onclick: () => teppichReiheAusrichten(doc, personId, neu)
+    }, 'Generation ausrichten'),
     el('button', { class: 'knopf zart klein', onclick: () => teppichKartusche(doc, personId, neu) }, '\u00c4ndern')));
   return karte;
 }
@@ -32815,6 +32997,14 @@ function teppichBand(k, x, y, baum, treffer, i, neu) {
       teppichZugfadenZeichnen(g, x, y, zug.neuX, zug.neuY);
       return;
     }
+    /* An den anderen Namen ausrichten.
+       Ohne das kann man eine Generation nur mit dem Auge in eine Reihe
+       schieben, und das wird nie eine Reihe. Kommt der Name einem anderen
+       auf gleicher Höhe nahe, rastet er ein und eine feine Linie zeigt,
+       woran. Genau die Bewegung, die man machen will. */
+    const hilfe = teppichAusrichten(g, zug.neuX, zug.neuY);
+    zug.neuX = hilfe.x; zug.neuY = hilfe.y;
+    teppichHilfslinien(g, hilfe);
     g.setAttribute('transform', 'translate(' + zug.neuX.toFixed(1) + ' ' + zug.neuY.toFixed(1) + ') rotate(' + dreh + ')');
   });
   const loslassen = (ev) => {
@@ -32825,6 +33015,7 @@ function teppichBand(k, x, y, baum, treffer, i, neu) {
        findet elementFromPoint ihn selbst und nicht den Namen darunter. Genau
        daran brach das Fadenspinnen ab. */
     teppichZugfadenWeg();
+    teppichHilfslinienWeg();
     try { g.releasePointerCapture(ev.pointerId); } catch (e) {}
     if (s.faden && s.gezogen) {
       /* Wo ist der Finger gelandet? */
@@ -32841,16 +33032,116 @@ function teppichBand(k, x, y, baum, treffer, i, neu) {
       inBlick(ev);
       return;
     }
-    /* In Rasterschritten ablegen: so bleibt die Wand geordnet, auch wenn
-       man von Hand nachhilft. */
+    /* Frei ablegen, nicht in Viertelschritten.
+       Das grobe Raster war als Ordnungshilfe gedacht, stand dem freien
+       Verschieben aber im Weg: man konnte einen Namen nicht dorthin legen,
+       wo man ihn haben wollte. Geordnet wird jetzt über das Einrasten an
+       den Nachbarn — das trifft genau, ohne einzusperren. */
     const rasterX = (s.neuX - TEP_RAND_X) / TEP_SPALTE;
     const rasterY = (s.neuY - TEP_RAND_Y) / TEP_REIHE;
     teppichPersonSetzen(D.docs.get(_tep.id), p.id,
-      Math.round(rasterX * 4) / 4, Math.round(rasterY * 4) / 4, neu);
+      Math.round(rasterX * 100) / 100, Math.round(rasterY * 100) / 100, neu);
   };
   g.addEventListener('pointerup', loslassen);
   g.addEventListener('pointercancel', () => { if (zug) { zug = null; g.classList.remove('zieht', 'spinnt'); teppichZugfadenWeg(); if (neu) neu(); } });
   return g;
+}
+
+/* ----- Eine Generation begradigen -----
+   In diesem Teppich läuft die Zeit von links nach rechts: eine Generation
+   ist eine SPALTE, keine Zeile. Ausrichten heißt also, alle auf dieselbe
+   Spalte zu bringen und jedem seine Zeile zu lassen.
+
+   (Beim ersten Versuch war es umgekehrt — dieselbe Höhe für alle. Danach
+   lagen die drei Namen einer Generation exakt aufeinander.)
+
+   Gerechnet wird auf der gerechneten Ordnung, nicht auf dem, was gerade
+   im Tuch steht: sonst hängt das Ergebnis davon ab, wer vorher schon von
+   Hand geschoben wurde. */
+/* Einen Namen um ein Stück versetzen — auch dann, wenn er bisher noch
+   gar keinen festen Platz hatte. Dann wird der gerechnete zum festen. */
+function teppichPersonSchubsen(doc, personId, dx, dy, neu) {
+  if (!doc) return;
+  const baum = saubererStammbaum(doc);
+  const ordnung = teppichOrdnung(baum);
+  const k = ordnung.knoten.find((x) => x.id === personId);
+  if (!k) return;
+  teppichSchreiben(doc, (b) => {
+    const person = b.leute.find((x) => x.id === personId);
+    if (!person) return b;
+    const x0 = person.festX != null ? person.festX : k.x;
+    const y0 = person.festY != null ? person.festY : k.y;
+    person.festX = Math.round((x0 + dx) * 100) / 100;
+    person.festY = Math.round((y0 + dy) * 100) / 100;
+    return b;
+  }).then(() => { if (neu) neu(); });
+}
+
+function teppichReiheAusrichten(doc, personId, neu) {
+  const baum = saubererStammbaum(doc);
+  const ordnung = teppichOrdnung(baum);
+  const ich = ordnung.knoten.find((k) => k.id === personId);
+  if (!ich) return;
+  const gen = teppichGenerationen(baum);
+  const meine = gen.get(personId);
+  if (meine == null) return;
+
+  const zusammen = ordnung.knoten.filter((k) => gen.get(k.id) === meine);
+  if (zusammen.length < 2) { toast('Auf dieser Stufe hängt sonst niemand.', 3800); return; }
+
+  teppichSchreiben(doc, (b) => {
+    for (const k of zusammen) {
+      const person = b.leute.find((x) => x.id === k.id);
+      if (!person) continue;
+      person.festX = Math.round(ich.x * 100) / 100;
+      person.festY = Math.round(k.y * 100) / 100;
+    }
+    return b;
+  }).then(() => {
+    if (neu) neu();
+    toast(zusammen.length + ' Namen stehen jetzt in einer Flucht.', 4200);
+  });
+}
+
+/* ----- Ausrichten beim Ziehen -----
+   Sucht unter allen anderen Namen einen, der fast auf gleicher Höhe oder
+   in gleicher Spalte steht, und rastet dort ein. Gelesen wird direkt aus
+   dem Tuch — dann stimmt es auch, während man zieht. */
+/* Wie nah muss ein Name einem anderen kommen, damit er einrastet —
+   gemessen in Bildpunkten auf dem Schirm, nicht in Tuchkoordinaten. */
+const TEP_RASTWEITE = 15;
+function teppichAusrichten(g, nx, ny) {
+  const wurzel = g.ownerSVGElement;
+  if (!wurzel) return { x: nx, y: ny, aufX: null, aufY: null };
+  const weite = TEP_RASTWEITE / Math.max(0.35, _tep.zoom || 1);
+  let x = nx, y = ny, aufX = null, aufY = null;
+  let nahX = weite, nahY = weite;
+  for (const anderer of wurzel.querySelectorAll('.tep-person')) {
+    if (anderer === g) continue;
+    const t = anderer.getAttribute('transform') || '';
+    const m = /translate\(\s*(-?[\d.]+)\s+(-?[\d.]+)/.exec(t);
+    if (!m) continue;
+    const ox = Number(m[1]), oy = Number(m[2]);
+    if (Math.abs(oy - ny) < nahY) { nahY = Math.abs(oy - ny); y = oy; aufY = oy; }
+    if (Math.abs(ox - nx) < nahX) { nahX = Math.abs(ox - nx); x = ox; aufX = ox; }
+  }
+  return { x, y, aufX, aufY };
+}
+
+function teppichHilfslinien(g, hilfe) {
+  const wurzel = g.ownerSVGElement;
+  if (!wurzel) return;
+  teppichHilfslinienWeg();
+  if (hilfe.aufX == null && hilfe.aufY == null) return;
+  const b = Number(wurzel.dataset.breite) || 2000;
+  const h = Number(wurzel.dataset.hoehe) || 2000;
+  const gr = sv('g', { class: 'tep-hilfslinien', 'aria-hidden': 'true' });
+  if (hilfe.aufY != null) gr.append(sv('path', { d: 'M 0 ' + hilfe.aufY + ' H ' + b, class: 'tep-hilfslinie' }));
+  if (hilfe.aufX != null) gr.append(sv('path', { d: 'M ' + hilfe.aufX + ' 0 V ' + h, class: 'tep-hilfslinie' }));
+  wurzel.append(gr);
+}
+function teppichHilfslinienWeg() {
+  for (const alt of document.querySelectorAll('.tep-hilfslinien')) alt.remove();
 }
 
 /* ----- Das Namensband -----
@@ -37801,6 +38092,22 @@ function planOeffnen(id) {
   _kt.offen = true;
 
   const neu = () => planZeichne(tafel, flaeche, rahmen, neu, zu);
+
+  /* Mit zwei Fingern heran und wieder weg. Ein SVG lässt sich über seine
+     Größe verlustfrei skalieren — deshalb kostet das Kneifen nichts, und
+     die Karte wird erst neu gebaut, wenn die Finger wieder weg sind. */
+  zweiFingerZoom(flaeche, {
+    min: 0.25, max: 4,
+    hole: () => _kt.zoom || 1,
+    bild: () => flaeche.querySelector('.kt-blatt'),
+    zeige: (z) => {
+      const svg = flaeche.querySelector('.kt-blatt');
+      if (!svg) return;
+      svg.setAttribute('width', Math.round(PLAN_GROESSE * z));
+      svg.setAttribute('height', Math.round(PLAN_GROESSE * z));
+    },
+    fertig: (z) => { _kt.zoom = Math.round(z * 100) / 100; neu(); }
+  });
   const taste = (ev) => {
     if (!tafel.isConnected) { document.removeEventListener('keydown', taste); return; }
     const z = ev.target;
@@ -38946,7 +39253,10 @@ function planMarkenAuftragen(svg, plan, g, neu) {
       transform: 'translate(' + kz(m.x) + ' ' + kz(m.y) + ')',
       tabindex: '0', role: 'button'
     });
-    gr.append(kv('circle', { r: 15, class: 'kt-markenfang' }));
+    /* Der Griff wächst, wenn die Karte klein ist: fünfzehn Einheiten sind
+       bei halbem Zoom nur sieben Bildpunkte, und danach trifft kein Finger
+       mehr. Gemessen wird in Bildpunkten, nicht in Karteneinheiten. */
+    gr.append(kv('circle', { r: kz(Math.max(15, 24 / (_kt.zoom || 1))), class: 'kt-markenfang' }));
     const zeichen = kv('g', { class: 'kt-markenzeichen' });
     zeichen.innerHTML = planMarkenSymbol(m.art, 22);
     gr.append(zeichen);
@@ -38966,13 +39276,16 @@ function planMarkenAuftragen(svg, plan, g, neu) {
     gr.addEventListener('pointerdown', (ev) => {
       if (ev.button != null && ev.button !== 0) return;
       ev.stopPropagation();
-      zug = { x: ev.clientX, y: ev.clientY, x0: m.x, y0: m.y, gezogen: false };
+      zug = { x: ev.clientX, y: ev.clientY, x0: m.x, y0: m.y, gezogen: false, schwelle: ev.pointerType === 'mouse' ? 4 : 9 };
       try { gr.setPointerCapture(ev.pointerId); } catch (e) {}
     });
     gr.addEventListener('pointermove', (ev) => {
       if (!zug) return;
       const dx = ev.clientX - zug.x, dy = ev.clientY - zug.y;
-      if (!zug.gezogen && Math.abs(dx) + Math.abs(dy) < 5) return;
+      /* Ein Finger zittert mehr als eine Maus. Fünf Bildpunkte sind für
+         eine Maus richtig und für einen Finger zu wenig — jeder Tipp wurde
+         zum Zug. */
+      if (!zug.gezogen && Math.abs(dx) + Math.abs(dy) < zug.schwelle) return;
       zug.gezogen = true;
       gr.classList.add('zieht');
       const r = svg.getBoundingClientRect();
@@ -39727,7 +40040,20 @@ function planMarkeAnlegen(doc, x, y, danach) {
     x: Math.round(x), y: Math.round(y), wichtig: false
   };
   planSchreiben(doc, (p) => { p.marken.push(marke); return p; })
-    .then(() => { if (danach) danach(); planMarkeBearbeiten(D.docs.get(_kt.id), marke, danach, true); });
+    .then(() => {
+      /* Kein Fenster. Die Marke wird gesetzt, in den Blick genommen — und
+         das Werkzeug geht zurück auf die Hand.
+
+         Vorher sprang sofort ein Änderungsfenster auf: man musste es
+         wegklicken, bevor man sehen konnte, WO die Marke gelandet ist, und
+         der nächste Tipp legte gleich die nächste an. Jetzt liegt sie da,
+         die Karte unten zeigt sie, und man kann sie in Ruhe an die richtige
+         Stelle ziehen und danach benennen. */
+      _kt.nurMarke = marke.id;
+      _kt.werkzeug = 'hand';
+      if (danach) danach();
+      toast('Gesetzt. Zieh sie zurecht — unten kannst du sie benennen.', 4600);
+    });
 }
 
 function planMarkeBearbeiten(doc, marke, danach, frisch) {

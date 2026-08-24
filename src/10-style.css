@@ -4864,7 +4864,12 @@ html[data-thema="tinte"] .knopf.gefahr, html[data-thema="kerze"] .knopf.gefahr {
   white-space: nowrap; font-family: ui-serif, "New York", Georgia, serif;
   font-size: 15px; letter-spacing: .16em; color: #1c1710; padding-left: 8px;
 }
-.tep-flaeche { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; position: relative; background: #12180f; }
+/* Ein Finger rollt (nativ, mit Schwung), zwei Finger zoomen (wir selbst).
+    ist genau die Ansage dafuer: rollen ja, Seitenzoom nein. */
+.tep-flaeche { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; position: relative; background: #12180f; touch-action: pan-x pan-y; }
+/* Wer auf einem Namen anfaengt, zieht den Namen — und rollt nicht die Wand. */
+.tep-person { touch-action: none; }
+.tep-flaeche.kneift { scroll-behavior: auto; }
 .tep-flaeche { scrollbar-width: thin; scrollbar-color: rgba(220,210,180,.28) transparent; }
 .tep-flaeche::-webkit-scrollbar { width: 9px; height: 9px; }
 .tep-flaeche::-webkit-scrollbar-track { background: transparent; }
@@ -5248,6 +5253,10 @@ html[data-thema="tinte"] .knopf.gefahr, html[data-thema="kerze"] .knopf.gefahr {
 .tep-tierlinie { fill: none; stroke: #ded6bd; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .72; }
 .tep-tierauge { fill: #ded6bd; opacity: .72; }
 .tep-fusstier { pointer-events: none; }
+/* Die Ausrichthilfen: eine feine Linie zeigt, woran der Name einrastet. */
+.tep-hilfslinien { pointer-events: none; }
+.tep-hilfslinie { fill: none; stroke: #e0b26a; stroke-width: 1.4; stroke-opacity: .55; stroke-dasharray: 7 6; }
+
 .tep-person.zieht { cursor: grabbing; }
 .tep-person.zieht .tep-bandgrund { fill: #d3d8c0; stroke: #e0b26a; stroke-width: 2; }
 .tep-person.zieht { filter: drop-shadow(0 6px 10px rgba(0,0,0,.55)); }
@@ -5896,8 +5905,11 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 
 /* ----- Die Fläche mit dem Papier ----- */
 .kt-rahmen { flex: 1; min-height: 0; position: relative; }
+/* Ein Finger rollt (nativ, mit Schwung), zwei Finger zoomen (wir selbst).
+   `pan-x pan-y` ist genau die Ansage dafuer: rollen ja, Seitenzoom nein. */
 .kt-flaeche {
   position: absolute; inset: 0; overflow: auto; overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
   background:
     repeating-linear-gradient(96deg, rgba(255,255,255,.014) 0 2px, transparent 2px 7px),
     radial-gradient(90% 70% at 50% 30%, rgba(0,0,0,.14), rgba(0,0,0,.4));
@@ -6104,7 +6116,10 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 .kt-blatt.ohne-namen .kt-nachbarn { display: none; }
 
 /* ----- Die Marken ----- */
-.kt-marke { cursor: pointer; color: var(--ktinte); }
+/* Wer auf einer Marke anfaengt, zieht die Marke — und rollt nicht die
+   Karte. Ohne das war jedes Verschieben ein Kampf mit der Flaeche. */
+.kt-marke { cursor: pointer; color: var(--ktinte); touch-action: none; }
+.kt-flaeche.kneift { scroll-behavior: auto; }
 .kt-markenfang { fill: transparent; }
 .kt-markenzeichen { color: var(--ktinte); }
 .kt-marke .kt-markenzeichen svg { overflow: visible; }

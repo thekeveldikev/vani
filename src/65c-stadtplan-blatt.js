@@ -195,7 +195,20 @@ function planMarkeAnlegen(doc, x, y, danach) {
     x: Math.round(x), y: Math.round(y), wichtig: false
   };
   planSchreiben(doc, (p) => { p.marken.push(marke); return p; })
-    .then(() => { if (danach) danach(); planMarkeBearbeiten(D.docs.get(_kt.id), marke, danach, true); });
+    .then(() => {
+      /* Kein Fenster. Die Marke wird gesetzt, in den Blick genommen — und
+         das Werkzeug geht zurück auf die Hand.
+
+         Vorher sprang sofort ein Änderungsfenster auf: man musste es
+         wegklicken, bevor man sehen konnte, WO die Marke gelandet ist, und
+         der nächste Tipp legte gleich die nächste an. Jetzt liegt sie da,
+         die Karte unten zeigt sie, und man kann sie in Ruhe an die richtige
+         Stelle ziehen und danach benennen. */
+      _kt.nurMarke = marke.id;
+      _kt.werkzeug = 'hand';
+      if (danach) danach();
+      toast('Gesetzt. Zieh sie zurecht — unten kannst du sie benennen.', 4600);
+    });
 }
 
 function planMarkeBearbeiten(doc, marke, danach, frisch) {
