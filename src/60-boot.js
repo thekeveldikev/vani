@@ -64,6 +64,9 @@ async function sucheAppUpdate(neuLaden = false) {
     return;
   }
 
+  /* Die Tastatur soll den Dialog nicht aus dem Bild schieben. */
+  if (typeof tastaturZaehmen === 'function') tastaturZaehmen();
+
   /* Umzüge von früheren Fassungen */
   if (typeof D.einst.klang === 'string' && D.einst.klang !== 'aus' && !Object.keys(D.einst.mischung || {}).length) {
     const alt = { regen: 'regenfenster', kamin: 'kamin', wind: 'wind', grillen: 'grillen' }[D.einst.klang];

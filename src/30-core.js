@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.38.0';
+const APP_VERSION = '5.39.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -1083,6 +1083,71 @@ function autogrow(ta) {
   anpassen();
   setTimeout(anpassen, 0);
   return anpassen;
+}
+
+/* ===================== DIE TASTATUR =====================
+   Auf dem iPad schiebt Safari beim Öffnen der Tastatur die ganze Seite nach
+   oben, damit das Feld sichtbar wird. Bei einem Dialog, der ohnehin schon
+   mittig steht, ist das genau falsch: der Dialog rutscht halb aus dem Bild,
+   und was man gerade bearbeitet, sieht man nicht mehr.
+
+   Richtig ist: der Dialog bleibt, wo er ist, und die Tastatur schiebt sich
+   von unten darüber. Ist das Feld dann verdeckt, wird NUR der scrollende
+   Bereich im Dialog ein Stück weitergeschoben — nicht die Seite. */
+function tastaturFeld(e) {
+  return !!e && (e.tagName === 'INPUT' || e.tagName === 'TEXTAREA' || e.isContentEditable);
+}
+/* Der nächste Vorfahr, der wirklich scrollt. */
+function tastaturScroller(feld) {
+  let p = feld && feld.parentElement;
+  while (p && p !== document.body) {
+    const st = getComputedStyle(p);
+    if ((st.overflowY === 'auto' || st.overflowY === 'scroll') && p.scrollHeight > p.clientHeight + 2) return p;
+    p = p.parentElement;
+  }
+  return null;
+}
+/* Das Feld in Sicht bringen — so wenig wie nötig. */
+function tastaturInSicht(feld) {
+  if (!feld || !feld.isConnected) return;
+  const scroller = tastaturScroller(feld);
+  if (!scroller) return;
+  const sicht = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+  const sr = scroller.getBoundingClientRect(), fr = feld.getBoundingClientRect();
+  const untenGrenze = Math.min(sr.bottom, sicht) - 14;
+  const obenGrenze = Math.max(sr.top, 0) + 10;
+  if (fr.bottom > untenGrenze) scroller.scrollTop += fr.bottom - untenGrenze;
+  else if (fr.top < obenGrenze) scroller.scrollTop -= obenGrenze - fr.top;
+}
+function tastaturZaehmen() {
+  if (typeof document === 'undefined') return;
+  /* Safari hat die Seite verschoben? Zurück damit. */
+  const zurueck = () => { if (window.scrollY || window.scrollX) window.scrollTo(0, 0); };
+
+  document.addEventListener('focusin', (ev) => {
+    if (!tastaturFeld(ev.target)) return;
+    if (!ev.target.closest || !ev.target.closest('.schleier')) return;
+    /* Mehrfach, weil Safari erst beim Einfahren der Tastatur scrollt — kein
+       requestAnimationFrame: der steht still, sobald das Fenster verdeckt ist. */
+    for (const ms of [0, 80, 200, 380]) setTimeout(zurueck, ms);
+    setTimeout(() => tastaturInSicht(ev.target), 300);
+  });
+
+  if (window.visualViewport) {
+    const messen = () => {
+      const vv = window.visualViewport;
+      const wurzel = document.documentElement;
+      wurzel.style.setProperty('--sichthoehe', Math.round(vv.height) + 'px');
+      /* Mehr als 120 Pixel Unterschied: das ist eine Tastatur, kein Balken. */
+      const offen = window.innerHeight - vv.height > 120;
+      wurzel.classList.toggle('tastatur-offen', offen);
+      zurueck();
+      if (offen && tastaturFeld(document.activeElement)) tastaturInSicht(document.activeElement);
+    };
+    window.visualViewport.addEventListener('resize', messen);
+    window.visualViewport.addEventListener('scroll', zurueck);
+    messen();
+  }
 }
 
 /* ----- Verweise ([[...]]) und Schlagworte ----- */

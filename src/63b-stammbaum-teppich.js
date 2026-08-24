@@ -172,21 +172,43 @@ function teppichZeichne(kasten, flaeche, rahmen, neu, schliessen) {
     b.append(el('span', {}, bandText));
   }
 
-  /* --- Das Tuch --- */
-  const scrollL = flaeche.scrollLeft, scrollT = flaeche.scrollTop, warSchon = flaeche.dataset.gemalt === _tep.id;
-  flaeche.innerHTML = '';
-  flaeche.dataset.gemalt = _tep.id;
-  const svg = teppichSVG(doc, baum, ordnung, neu);
-  /* Das Tuch liegt in einem Innenkasten. Zentrierte man es direkt in der
-     scrollenden Flaeche, waere der Ueberhang nach LINKS nicht mehr
-     erreichbar — bei starkem Zoom kaeme man nie wieder an den Stamm. */
-  flaeche.append(el('div', { class: 'tep-innen' }, svg));
+  /* --- Das Tuch ---
+     Ein Wandteppich wird nicht bei jedem Hinsehen neu gewebt. Er hängt, bis
+     sich wirklich etwas ändert: ein Name, ein Faden, der Stoff. Alles andere
+     — stummschalten, jemanden in den Blick nehmen, zoomen — läuft über
+     Klassen und Transformationen auf dem Tuch, das schon da ist.
 
-  if (warSchon) { flaeche.scrollLeft = scrollL; flaeche.scrollTop = scrollT; }
-  else {
-    /* Beim ersten Aufschlagen auf den Stamm blicken — unten links. */
-    setTimeout(() => { flaeche.scrollLeft = 0; flaeche.scrollTop = Math.max(0, flaeche.scrollHeight - flaeche.clientHeight); }, 0);
+     Vorher wurde bei jedem Klick alles neu berechnet und aufgebaut. Das war
+     nicht nur langsam, es sah auch aus, als würde der Baum jedes Mal wieder
+     wachsen. */
+  const signatur = _tep.id + '|' + (doc.geaendert || 0);
+  const schonDa = flaeche.querySelector('.tep-innen');
+  let svg = schonDa ? schonDa.querySelector('svg') : null;
+  const warSchon = flaeche.dataset.gemalt === _tep.id;
+
+  if (!schonDa || flaeche.dataset.sig !== signatur) {
+    const scrollL = flaeche.scrollLeft, scrollT = flaeche.scrollTop;
+    flaeche.innerHTML = '';
+    flaeche.dataset.gemalt = _tep.id;
+    flaeche.dataset.sig = signatur;
+    svg = teppichSVG(doc, baum, ordnung, neu);
+    /* Das Tuch liegt in einem Innenkasten. Zentrierte man es direkt in der
+       scrollenden Flaeche, waere der Ueberhang nach LINKS nicht mehr
+       erreichbar — bei starkem Zoom kaeme man nie wieder an den Stamm. */
+    flaeche.append(el('div', { class: 'tep-innen' }, svg));
+    if (warSchon) { flaeche.scrollLeft = scrollL; flaeche.scrollTop = scrollT; }
+    else {
+      /* Beim ersten Aufschlagen auf den Stamm blicken — unten links. */
+      setTimeout(() => { flaeche.scrollLeft = 0; flaeche.scrollTop = Math.max(0, flaeche.scrollHeight - flaeche.clientHeight); }, 0);
+    }
+    teppichAnimationenAn(flaeche, svg, baum);
   }
+  /* Der Zoom ist eine Groessenangabe am Tuch, kein Grund zum Neuweben. */
+  if (svg && svg.dataset.breite) {
+    svg.setAttribute('width', Math.round(Number(svg.dataset.breite) * _tep.zoom));
+    svg.setAttribute('height', Math.round(Number(svg.dataset.hoehe) * _tep.zoom));
+  }
+  teppichBlickAuftragen(flaeche);
   /* Ist eine Person im Blick, liegt unten eine Karte mit allem, was an ihr
      hängt — ohne dass dafür ein Fenster aufgehen muss. */
   const alteKarte = kasten.querySelector('.tep-personenkarte');
@@ -195,7 +217,6 @@ function teppichZeichne(kasten, flaeche, rahmen, neu, schliessen) {
     const karte = teppichPersonenkarte(doc, baum, _tep.nurPerson, neu);
     if (karte) rahmen.append(karte);
   }
-  teppichAnimationenAn(flaeche, svg, baum);
 }
 
 /* ----- Die Leiste ----- */
@@ -378,6 +399,31 @@ function teppichPersonenkarte(doc, baum, personId, neu) {
   return karte;
 }
 
+/* ----- Der Blick -----
+   Was stumm ist und wer im Blick steht, wird NACHTRÄGLICH aufgetragen: als
+   Klassen auf den fertigen Fäden. Dadurch muss der Teppich beim Tippen in
+   der Legende oder auf einen Namen nicht neu gewebt werden — er steht, und
+   nur seine Sichtbarkeit ändert sich. */
+function teppichBlickAuftragen(wurzel) {
+  if (!wurzel) return;
+  const nurWer = _tep.nurPerson;
+  for (const r of wurzel.querySelectorAll('.tep-ranke')) {
+    const art = r.getAttribute('data-art');
+    r.classList.toggle('stumm', _tep.stumm.includes(art));
+    if (nurWer) {
+      const dabei = r.getAttribute('data-von') === nurWer || r.getAttribute('data-zu') === nurWer;
+      r.classList.toggle('imblick', dabei);
+      r.classList.toggle('zurueck', !dabei);
+    } else {
+      r.classList.remove('imblick', 'zurueck');
+    }
+  }
+  for (const q of wurzel.querySelectorAll('.tep-person')) {
+    q.classList.toggle('imblick', !!nurWer && q.getAttribute('data-person') === nurWer);
+  }
+  wurzel.classList.toggle('einer-im-blick', !!nurWer);
+}
+
 /* ================= DAS TUCH ZEICHNEN ================= */
 const SVGNS = 'http://www.w3.org/2000/svg';
 function sv(art, attrs, ...kinder) {
@@ -402,7 +448,10 @@ function teppichSVG(doc, baum, ordnung, neu) {
   const svg = sv('svg', {
     viewBox: '0 0 ' + Math.round(breite) + ' ' + Math.round(hoehe),
     width: Math.round(breite * _tep.zoom), height: Math.round(hoehe * _tep.zoom),
-    class: 'tep-tuch', 'shape-rendering': 'geometricPrecision'
+    class: 'tep-tuch', 'shape-rendering': 'geometricPrecision',
+    /* Die rohen Masse bleiben am Tuch stehen: dann laesst sich zoomen, ohne
+       neu zu weben. */
+    'data-breite': Math.round(breite), 'data-hoehe': Math.round(hoehe)
   });
 
   svg.append(teppichDefs());
@@ -520,7 +569,6 @@ function teppichSVG(doc, baum, ordnung, neu) {
   }
 
   /* --- Die Ranken: alles, was kein Gerüst ist --- */
-  const nurWer = _tep.nurPerson;
   /* Laufen mehrere Fäden zwischen denselben zwei Leuten, bekommt jeder einen
      anderen Bauch — sonst lägen sie exakt übereinander und man sähe nur
      einen. */
@@ -528,7 +576,11 @@ function teppichSVG(doc, baum, ordnung, neu) {
   const sichtbareFaeden = baum.faeden.filter((f) => {
     const art = fadenArt(f.art, baum);
     if (art.geruest || art.paar) return false;
-    if (_tep.stumm.includes(f.art) || f.still) return false;
+    if (f.still) return false;
+    /* Stummgeschaltete Fäden werden trotzdem gewebt und nur ausgeblendet.
+       Hätten wir sie weggelassen, müsste bei jedem Tippen in der Legende der
+       ganze Teppich neu gewebt werden — und die übrigen Fäden bekämen einen
+       anderen Bauch, weil der Versatz neu gezählt wird. */
     return wo.get(f.von) && wo.get(f.zu);
   });
   sichtbareFaeden.forEach((f, i) => {
@@ -539,8 +591,6 @@ function teppichSVG(doc, baum, ordnung, neu) {
     const a = wo.get(f.von), b = wo.get(f.zu);
     const r = teppichRanke(px(a), py(a), px(b), py(b), art, f, baum, neu, versatz);
     r.style.setProperty('--n', String(Math.min(i, 40)));
-    /* Ist eine Person im Blick, treten die anderen Fäden zurück. */
-    if (nurWer) r.classList.add(f.von === nurWer || f.zu === nurWer ? 'imblick' : 'zurueck');
     gRanken.append(r);
   });
 

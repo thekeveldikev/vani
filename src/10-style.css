@@ -5678,3 +5678,45 @@ html[data-thema="tinte"] .knopf.gefahr, html[data-thema="kerze"] .knopf.gefahr {
   animation: tep-laubkommt .7s ease backwards;
   animation-delay: calc(var(--gen, 0) * 130ms + 200ms);
 }
+
+/* Stummgeschaltete Fäden bleiben gewebt und werden nur ausgeblendet — so
+   muss der Teppich beim Tippen in der Legende nicht neu entstehen. */
+.tep-ranke.stumm { display: none; }
+.tep-person.imblick .tep-bandgrund { stroke: var(--akzent); stroke-width: 2; }
+.tep-tuch.einer-im-blick .tep-person:not(.imblick) { opacity: .72; }
+
+/* ===================== RUHE IN DER BEDIENUNG =====================
+
+   1. Gewählte Chips gehören NICHT in den Scrollbereich.
+   Eine Zeile mit umbrechenden Chips ist ein Flex-Kind wie jedes andere —
+   und schrumpft, sobald der Dialog an seine Höhe stößt. Ihr Inhalt bleibt
+   dabei stehen und ragt in die Liste darunter: dann scrollt man beim
+   Weitersuchen mitten durch die schon gewählten Wörter. Sie darf nicht
+   schrumpfen und bekommt bei Bedarf ihr eigenes kleines Scrollfeld. */
+.albw-gewaehlt, .albb-gewaehlt {
+  flex: none; max-height: 21vh; overflow-y: auto; overscroll-behavior: contain;
+  align-content: flex-start; scrollbar-width: thin;
+}
+.albw-gewaehlt {
+  padding: 8px 10px; border-radius: 10px;
+  background: color-mix(in srgb, var(--akzent) 6%, var(--hg2));
+  border: 1px solid var(--rand);
+}
+/* Dasselbe für jede andere Liste, die als Flex-Kind umbricht. */
+.stb-fwahl, .albv-wahl, .kal-leutewahl, .albr-leiste { flex: none; align-content: flex-start; }
+
+/* 2. Die Tastatur schiebt den Dialog nicht mehr weg.
+   Der Dialog behält seine Höhe; ist die Tastatur offen, rückt er nur so
+   weit nach oben, dass er nicht darunter verschwindet. */
+html.tastatur-offen .schleier { align-items: flex-start; padding-top: 12px; }
+html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); }
+
+/* 3. Der Raum baut sich nicht mehr sichtbar auf.
+   Statt dass jede Karte einzeln hereinfliegt, blendet der ganze Raum einmal
+   kurz auf. Das liest sich als „er ist da" statt als „er entsteht gerade". */
+#raum > * { animation: raum-da .16s ease-out; }
+@keyframes raum-da { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  #raum > * { animation: none; }
+}

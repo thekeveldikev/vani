@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.38.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.39.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -132,6 +132,13 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   bis fast zur ersten Generation), ist knorrig (fünf Knoten, drei Wellenlängen Unruhe, links und rechts
   verschieden) und läuft oben in die ersten Äste hinein. Äste bekommen Ellbogen (`_knorrigeMitte`) mit
   einem Knoten an jedem Knick. Das Rautengitter ist wieder raus.
+- **5.39** Ruhe in der Bedienung. Der Wandteppich wird nur neu gewebt, wenn sich der Beleg wirklich
+  geändert hat (`flaeche.dataset.sig = id|geaendert`); Stummschalten, Jemanden-in-den-Blick-nehmen und
+  Zoomen laufen über Klassen bzw. die Breitenangabe am schon vorhandenen Tuch. `tastaturZaehmen()`
+  (30-core, beim Start gerufen) hält Safari davon ab, beim Öffnen der Tastatur die ganze Seite zu
+  verschieben — stattdessen wird nur der scrollende Bereich im Dialog nachgeführt; `--sichthoehe` und
+  `html.tastatur-offen` kommen aus der visualViewport-API. Chip-Reihen sind `flex: none` mit eigenem
+  Scrollfeld: als schrumpfbares Flex-Kind ragten sie in die Liste darunter.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 
