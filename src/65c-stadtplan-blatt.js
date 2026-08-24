@@ -56,7 +56,7 @@ function planNeu(danach) {
   const saat = planNeueSaat();
   const stand = {
     titel: planStadtname(saat), unterzeile: '', saat, welt: 'tinte', papier: '',
-    stadt: { groesse: 'stadt', alter: 'alt', anlage: 'gewachsen', wasser: 'fluss', mauer: true, burg: true, umland: true, dichte: 1 },
+    stadt: { groesse: 'stadt', alter: 'alt', anlage: 'gewachsen', wasser: 'fluss', mauer: true, burg: true, umland: true, hafen: true, muehle: true, inseln: true, dichte: 1 },
     marken: [], namen: {}, notiz: ''
   };
   planGrundrissFenster(stand, 'Eine Stadt gründen', 'Gründen', () => {
@@ -149,7 +149,14 @@ function planGrundrissFenster(stand, titel, okText, fertig, doc, danach) {
         el('div', { class: 'ktg-schalter-reihe' },
           schalter('Eine Stadtmauer', () => stand.stadt.mauer, (v) => { stand.stadt.mauer = v; }, 'Mit Türmen und Toren — und einer Vorstadt davor'),
           schalter('Eine Burg', () => stand.stadt.burg, (v) => { stand.stadt.burg = v; }, 'Wer über der Stadt sitzt'),
-          schalter('Das Umland', () => stand.stadt.umland, (v) => { stand.stadt.umland = v; }, 'Felder, Wälder, einzelne Höfe')),
+          schalter('Das Umland', () => stand.stadt.umland, (v) => { stand.stadt.umland = v; }, 'Felder in Fluren, Wälder, einzelne Höfe'),
+          /* Am Wasser: was eine Stadt zur Hafenstadt macht. Ohne Wasser
+             bleiben die Schalter sichtbar, aber blass — sie sollen nicht
+             wegspringen, sobald man den Fluss wegnimmt, und wieder da sein,
+             wenn man ihn zurückholt. */
+          schalter('Ein Hafen', () => stand.stadt.hafen, (v) => { stand.stadt.hafen = v; }, 'Kai, Molen, Schiffe, Kräne — am Meer dazu ein Wellenbrecher und ein Leuchtfeuer'),
+          schalter('Eine Mühle', () => stand.stadt.muehle, (v) => { stand.stadt.muehle = v; }, 'Ein Rad im Fluss, das Haus am Ufer'),
+          schalter('Werder im Wasser', () => stand.stadt.inseln, (v) => { stand.stadt.inseln = v; }, 'Kleine bewachsene Inseln')),
         el('div', { class: 'ktg-abschnitt' }, 'Wie sie aussieht'),
         reihe(PLAN_FARBWELTEN.map((f) => [f.id, f.name]), () => stand.welt, (v) => { stand.welt = v; }),
         reihe([['', 'Zur Farbwelt passend']].concat(PLAN_PAPIERE.map((p) => [p[0], p[1]])), () => stand.papier, (v) => { stand.papier = v; }),

@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.42.0';
+const APP_VERSION = '5.44.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -968,8 +968,26 @@ function zeigeDeck(inhalt, beiZu) {
     e.stopPropagation(); e.preventDefault();
     zu();
   };
-  const zu = () => { document.removeEventListener('keydown', beiTaste, true); schleier.remove(); if (beiZu) beiZu(); if (fokusVorher && fokusVorher !== document.body && fokusVorher.isConnected && typeof fokusVorher.focus === 'function' && !$('#deck').querySelector('.schleier')) { try { fokusVorher.focus({ preventScroll: true }); } catch (e) {} } };
+  /* Ein Deck überlebt keinen Ortswechsel.
+     Vorher blieb es liegen: wer aus einem offenen Kabinettfach heraus die
+     Adresse wechselte — Zurück-Taste, ein Verweis, ein Sprung ins Zuhause —,
+     ließ Schleier und Inhalt im Dokument stehen. Beim nächsten Öffnen lag
+     das nächste darüber, und mit ihm eine zweite vollständige Stadtkarte.
+     Nach sieben Besuchen waren es sieben.
+
+     Die Adresse wird beim Aufziehen gemerkt, damit ein Deck, das GERADE
+     durch eine Navigation entsteht, sich nicht selbst wieder zumacht. */
+  const adresseBeimOeffnen = location.hash;
+  const beiOrtswechsel = () => { if (location.hash !== adresseBeimOeffnen) zu(); };
+  const zu = () => {
+    document.removeEventListener('keydown', beiTaste, true);
+    window.removeEventListener('hashchange', beiOrtswechsel);
+    schleier.remove();
+    if (beiZu) beiZu();
+    if (fokusVorher && fokusVorher !== document.body && fokusVorher.isConnected && typeof fokusVorher.focus === 'function' && !$('#deck').querySelector('.schleier')) { try { fokusVorher.focus({ preventScroll: true }); } catch (e) {} }
+  };
   document.addEventListener('keydown', beiTaste, true);
+  window.addEventListener('hashchange', beiOrtswechsel);
   $('#deck').append(schleier);
   return zu;
 }

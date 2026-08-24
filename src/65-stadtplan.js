@@ -129,29 +129,40 @@ const PLAN_ALTER = [
 ];
 function planAlterWert(id) { const a = PLAN_ALTER.find((x) => x[0] === id); return a ? a[3] : 0.66; }
 
+/* [Kennung, Name, Ausfallstraßen, Ringe, Radius als Anteil des Blattes]
+   Der Radius ist das Entscheidende: vorher wuchs er kaum mit, und deshalb
+   hatte ein Weiler fast so viele Häuser wie eine Metropole. Eine Stadt ist
+   nicht dichter gebaut als ein Dorf — sie ist GRÖSSER. */
 const PLAN_GROESSEN = [
-  ['weiler', 'Ein Weiler', 5, 3],
-  ['dorf', 'Ein Dorf', 7, 3],
-  ['flecken', 'Ein Marktflecken', 9, 4],
-  ['stadt', 'Eine Stadt', 11, 5],
-  ['grossstadt', 'Eine große Stadt', 14, 6],
-  ['metropole', 'Eine Metropole', 17, 7]
+  ['weiler', 'Ein Weiler', 4, 2, 0.085],
+  ['dorf', 'Ein Dorf', 5, 2, 0.125],
+  ['flecken', 'Ein Marktflecken', 7, 3, 0.185],
+  ['stadt', 'Eine Stadt', 10, 4, 0.27],
+  ['grossstadt', 'Eine große Stadt', 13, 5, 0.36],
+  ['metropole', 'Eine Metropole', 16, 6, 0.46]
 ];
 function planGroesse(id) { return PLAN_GROESSEN.find((g) => g[0] === id) || PLAN_GROESSEN[3]; }
 
 /* ----- Die Viertel -----
    Ein Viertel ist kein Gebiet auf einer Verwaltungskarte, sondern ein
    Charakter: wie eng steht es, wie groß sind die Häuser, was riecht man. */
+/* Die Viertel und ihr Charakter.
+   `dichte` teilt die Parzellenbreite: 0,18 hieß vierundsechzig Einheiten
+   Straßenfront für EIN Haus — das Gartenviertel war danach kein Viertel mehr,
+   sondern ein weißes Loch mit fünfundfünfzig Häusern neben vierhundert im
+   Handwerksviertel. Der Unterschied soll man SEHEN, aber lesen können muss
+   man ihn auch. Darum liegt der Boden jetzt bei gut der Hälfte — und was
+   locker bebaut ist, wird über `gruen` wirklich grün, statt leer zu bleiben. */
 const PLAN_VIERTELARTEN = [
-  { id: 'altstadt', name: 'Altstadt', dichte: 1.0, haus: 0.8, gruen: 0.02, hoefe: 0.15 },
-  { id: 'handwerk', name: 'Handwerk', dichte: 0.92, haus: 0.9, gruen: 0.05, hoefe: 0.3 },
-  { id: 'reich', name: 'Wohlhabend', dichte: 0.5, haus: 1.7, gruen: 0.3, hoefe: 0.6 },
+  { id: 'altstadt', name: 'Altstadt', dichte: 1.0, haus: 0.8, gruen: 0.03, hoefe: 0.15 },
+  { id: 'handwerk', name: 'Handwerk', dichte: 0.94, haus: 0.9, gruen: 0.05, hoefe: 0.3 },
+  { id: 'reich', name: 'Wohlhabend', dichte: 0.7, haus: 1.7, gruen: 0.26, hoefe: 0.5 },
   { id: 'arm', name: 'Arm', dichte: 1.0, haus: 0.6, gruen: 0.02, hoefe: 0.1 },
-  { id: 'geistlich', name: 'Geistlich', dichte: 0.42, haus: 1.5, gruen: 0.35, hoefe: 0.5 },
-  { id: 'hafen', name: 'Hafen', dichte: 0.8, haus: 1.2, gruen: 0.03, hoefe: 0.2 },
-  { id: 'markt', name: 'Markt', dichte: 0.78, haus: 1.0, gruen: 0.06, hoefe: 0.25 },
-  { id: 'vorstadt', name: 'Vorstadt', dichte: 0.42, haus: 0.9, gruen: 0.4, hoefe: 0.45 },
-  { id: 'garten', name: 'Gärten', dichte: 0.18, haus: 0.8, gruen: 0.8, hoefe: 0.7 }
+  { id: 'geistlich', name: 'Geistlich', dichte: 0.68, haus: 1.5, gruen: 0.3, hoefe: 0.42 },
+  { id: 'hafen', name: 'Hafen', dichte: 0.86, haus: 1.2, gruen: 0.04, hoefe: 0.2 },
+  { id: 'markt', name: 'Markt', dichte: 0.82, haus: 1.0, gruen: 0.07, hoefe: 0.25 },
+  { id: 'vorstadt', name: 'Vorstadt', dichte: 0.6, haus: 0.9, gruen: 0.34, hoefe: 0.4 },
+  { id: 'garten', name: 'Gärten', dichte: 0.55, haus: 0.85, gruen: 0.58, hoefe: 0.5 }
 ];
 function planViertelart(id) { return PLAN_VIERTELARTEN.find((v) => v.id === id) || PLAN_VIERTELARTEN[1]; }
 
@@ -202,6 +213,17 @@ function planHash(...teile) {
   let h = 2166136261;
   const s = teile.join('|');
   for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  /* Der Nachbrenner ist nicht Zierde, sondern Notwendigkeit.
+     FNV allein lässt das letzte Zeichen fast nur die unteren Bits erreichen —
+     `planZufall` teilt aber durch 2^32 und liest damit die OBEREN. Die Folge
+     war verheerend und lange unsichtbar: 'ww0', 'ww1', 'ww2' … ergaben
+     0.382, 0.379, 0.390 — praktisch derselbe Wert. Jede durchnummerierte
+     Reihe auf dieser Karte, jeder Wald, jedes Feld, jedes Zittern eines
+     Hauses, war damit gar nicht gestreut, sondern gleichgeschaltet.
+     Diese drei Zeilen verrühren die Bits, bis jedes Zeichen überall wirkt. */
+  h ^= h >>> 16; h = Math.imul(h, 2246822507);
+  h ^= h >>> 13; h = Math.imul(h, 3266489909);
+  h ^= h >>> 16;
   return (h >>> 0);
 }
 function planZufall(...teile) { return planHash(...teile) / 4294967296; }
@@ -255,8 +277,23 @@ function saubererPlan(roh) {
       mauer: st.mauer !== false,
       burg: st.burg !== false,
       umland: st.umland !== false,
+      /* Hafen, Mühle und Werder gibt es nur am Wasser — der Schalter darf
+         trotzdem stehen bleiben, damit er noch da ist, wenn jemand später
+         einen Fluss dazunimmt. */
+      hafen: st.hafen !== false,
+      muehle: st.muehle !== false,
+      inseln: st.inseln !== false,
       dichte: Math.max(0.5, Math.min(1.6, Number(st.dichte) || 1))
     },
+    wappen: r.wappen && typeof r.wappen === 'object' && r.wappen.eigen ? {
+      eigen: true,
+      grund: PLAN_TINKTUREN.some((t) => t.id === r.wappen.grund) ? r.wappen.grund : 'silber',
+      zweit: PLAN_TINKTUREN.some((t) => t.id === r.wappen.zweit) ? r.wappen.zweit : 'rot',
+      figur: PLAN_TINKTUREN.some((t) => t.id === r.wappen.figur) ? r.wappen.figur : 'rot',
+      teilung: PLAN_TEILUNGEN.some((t) => t.id === r.wappen.teilung) ? r.wappen.teilung : 'ganz',
+      bild: PLAN_WAPPENBILDER.some((b) => b.id === r.wappen.bild) ? r.wappen.bild : 'turm',
+      wieViele: Math.max(1, Math.min(3, Math.round(Number(r.wappen.wieViele) || 1)))
+    } : null,
     marken, namen,
     notiz: String(r.notiz || '').trim().slice(0, 6000)
   };
@@ -394,17 +431,50 @@ function planStadt(plan, wasser) {
   const krumm = planAlterWert(plan.stadt.alter);
   const G = PLAN_GROESSE;
 
-  /* Die Mitte liegt selten genau in der Mitte. Bei Wasser rückt sie ans Ufer. */
+  /* Die Mitte liegt selten genau in der Mitte. Bei Wasser rückt sie ans Ufer.
+
+     Der erste Versuch schob sie dafür in eine feste Richtung — zur
+     Blattmitte hin, plus ein wenig Drift. Deckt der See aber genau die
+     Blattmitte ab, führt jeder Schritt wieder ins Wasser: die Mitte blieb
+     nass, es entstand kein einziger Block, und die Karte war LEER. (Saat
+     „mauer“, Gewässer „see“ — ein weißes Blatt mit einer Legende darauf.)
+
+     Jetzt wird ringsum gesucht: in wachsenden Kreisen, und genommen wird
+     die erste Stelle, an der nicht nur der Punkt selbst trocken ist,
+     sondern auch ein Stück Land drumherum. Eine Stadt braucht Ufer, nicht
+     eine Sandbank. */
   let mx = G / 2 + planStreu(saat, 'mx') * G * 0.07;
   let my = G / 2 + planStreu(saat, 'my') * G * 0.06;
-  if (wasser.art !== 'keins') {
-    for (let versuch = 0; versuch < 80 && wasser.drin(mx, my); versuch++) {
-      mx += (G / 2 - mx) * 0.14 + 6;
-      my += (G / 2 - my) * 0.14 + 4;
+  if (wasser.art !== 'keins' && wasser.drin(mx, my)) {
+    const platzDa = (x, y, weit) => {
+      if (x < 90 || x > G - 90 || y < 90 || y > G - 90) return false;
+      if (wasser.drin(x, y)) return false;
+      let trocken = 0;
+      for (let i = 0; i < 12; i++) {
+        const w = (i / 12) * Math.PI * 2;
+        if (!wasser.drin(x + Math.cos(w) * weit, y + Math.sin(w) * weit)) trocken++;
+      }
+      return trocken >= 8;
+    };
+    const start = [mx, my];
+    let gefunden = null;
+    /* Erst nach richtig Platz suchen, dann mit weniger zufrieden sein. */
+    for (const weit of [110, 70, 40]) {
+      for (let r = 30; r <= G * 0.55 && !gefunden; r += 22) {
+        for (let i = 0; i < 24 && !gefunden; i++) {
+          /* Die Richtung wandert mit dem Radius, damit die Suche nicht
+             immer dieselbe Achse zuerst abtastet. */
+          const w = ((i / 24) + (r / 220)) * Math.PI * 2;
+          const x = start[0] + Math.cos(w) * r, y = start[1] + Math.sin(w) * r;
+          if (platzDa(x, y, weit)) gefunden = [x, y];
+        }
+      }
+      if (gefunden) break;
     }
+    if (gefunden) { mx = gefunden[0]; my = gefunden[1]; }
   }
-  const [, , speichen, ringeZahl] = planGroesse(plan.stadt.groesse);
-  const Rmax = G * (0.26 + speichen * 0.0115);
+  const [, , speichen, ringeZahl, radiusAnteil] = planGroesse(plan.stadt.groesse);
+  const Rmax = G * radiusAnteil;
 
   /* --- Das Netz wächst --- */
   const anlage = plan.stadt.anlage;
@@ -455,10 +525,29 @@ function planStadt(plan, wasser) {
     let breit = 0;
     for (let i = 0; i < f.length; i++) breit = Math.max(breit, strecke(f[i], f[(i + 1) % f.length]));
     bloecke.push({
+      /* Der Schlüssel war einmal die gerundete Mitte — 'b412_337'. Solange es
+         hundert Blöcke gab, ging das gut; bei zweihundertfünfzig fallen zwei
+         Blöcke auf dieselbe gerundete Mitte, und dann gehört ein Haus plötzlich
+         zum falschen Block. Eine laufende Nummer kann das nicht passieren. */
+      schluessel: 'b' + bloecke.length,
       i: Math.round(m[0]), j: Math.round(m[1]),
       ecken: f, mitte: m, breit, flaeche: fl,
       viertel: v, vorstadt: drausen, sonder: ''
     });
+  }
+
+  /* --- Wo ein Viertel grün ist, wird es grün ---
+     `gruen` stand bis hierher als totes Datenfeld in der Tabelle: notiert,
+     nie gelesen. Ein lockeres Viertel sah dadurch nicht nach Gärten aus,
+     sondern nach unbedrucktem Papier. */
+  for (const b of bloecke) {
+    if (b.sonder) continue;
+    const va = planViertelart(b.viertel.art);
+    /* Nur draußen darf es üppig sein. Hinter der Mauer war jeder Fußbreit
+       teuer — ein Drittel Gärten sah aus wie eine Gartenstadt, nicht wie eine
+       ummauerte Stadt. */
+    const anteil = va.gruen * (b.vorstadt ? 1 : 0.5);
+    if (planZufall(saat, 'gv' + b.schluessel) < anteil) b.sonder = 'garten';
   }
 
   /* --- Besondere Blöcke --- */
@@ -476,7 +565,7 @@ function planStadt(plan, wasser) {
   for (const b of bloecke) {
     if (b.sonder === 'garten' || b.sonder === 'friedhof') continue;
     const va = planViertelart(b.viertel.art);
-    planBlockBebauen(b.ecken, saat, 'b' + b.i + '_' + b.j, va, plan.stadt.dichte, wasser, haeuser);
+    planBlockBebauen(b.ecken, saat, b.schluessel, va, plan.stadt.dichte, wasser, haeuser);
     if (b.sonder === 'kirche' && haeuser.length) {
       /* Die Kirche steht als eigener Bau in der Mitte des Blocks. */
       const m = b.mitte;
@@ -488,8 +577,33 @@ function planStadt(plan, wasser) {
     }
   }
 
-  /* --- Die Straßen --- */
-  const strassen = gewachsen.wege;
+  /* --- Die Straßen ---
+     Die gewachsenen Züge sind benannt und beschriftet; alles, was beim
+     Verdichten dazukam, wird als schlichte Gasse mitgezeichnet — sonst
+     stünden Häuser an Straßen, die es gar nicht gibt. */
+  const gezeichnet = new Set();
+  for (const w of gewachsen.wege) {
+    for (let i = 1; i < w.punkte.length; i++) {
+      const a = w.punkte[i - 1], b = w.punkte[i];
+      gezeichnet.add(Math.round(a[0]) + ',' + Math.round(a[1]) + '|' + Math.round(b[0]) + ',' + Math.round(b[1]));
+      gezeichnet.add(Math.round(b[0]) + ',' + Math.round(b[1]) + '|' + Math.round(a[0]) + ',' + Math.round(a[1]));
+    }
+  }
+  const strassen = gewachsen.wege.slice();
+  gewachsen.netz.kanten.forEach((k, i) => {
+    const a = gewachsen.netz.knoten[k.a], b = gewachsen.netz.knoten[k.b];
+    const marke = Math.round(a.x) + ',' + Math.round(a.y) + '|' + Math.round(b.x) + ',' + Math.round(b.y);
+    if (gezeichnet.has(marke)) return;
+    strassen.push({ art: k.art === 'platz' ? 'ring' : k.art, richtung: 'quer', i: 7000 + i, punkte: [[a.x, a.y], [b.x, b.y]], name: '' });
+  });
+
+  /* --- Wenn sich kein Block geschlossen hat ---
+     Dann ist es kein Blockgefüge, sondern ein Straßendorf. Ohne diesen
+     Zweig blieb bei einem Weiler mit breitem Fluss ein LEERES Blatt übrig:
+     dreizehn Wege, null Blöcke, null Häuser. */
+  if (haeuser.length < 6) {
+    planStrassendorf(strassen, saat, planViertelart('handwerk'), plan.stadt.dichte, wasser, haeuser, [mx, my], Rmax);
+  }
 
   /* --- Der Marktplatz --- */
   const markt = gewachsen.marktEcken;
@@ -497,15 +611,72 @@ function planStadt(plan, wasser) {
   /* --- Die Mauer: der äußerste Ring --- */
   let mauer = null;
   if (plan.stadt.mauer) {
-    const ring = gewachsen.wege.find((w) => w.art === 'mauerweg');
+    /* Die gewachsene und die strahlende Anlage legen ihren äußersten Ring
+       selbst als 'mauerweg' an. Das Schachbrett hat gar keine Ringe — und
+       bekam deshalb überhaupt keine Mauer, obwohl der Haken gesetzt war.
+       Dann wird sie aus der Stadt selbst genommen: in jedem Winkelsektor der
+       äußerste Punkt des Netzes, und das ergibt einen Kranz, der wirklich um
+       das herumläuft, was gebaut wurde. */
+    let ring = gewachsen.wege.find((w) => w.art === 'mauerweg');
+    if (!ring) {
+      const sektoren = 40;
+      const weiteste = new Array(sektoren).fill(null);
+      for (const kn of gewachsen.netz.knoten) {
+        const d = strecke([kn.x, kn.y], [mx, my]);
+        if (d < Rmax * 0.3 || wasser.drin(kn.x, kn.y)) continue;
+        let w = Math.atan2(kn.y - my, kn.x - mx);
+        if (w < 0) w += Math.PI * 2;
+        const s2 = Math.floor((w / (Math.PI * 2)) * sektoren) % sektoren;
+        if (!weiteste[s2] || d > weiteste[s2].d) weiteste[s2] = { p: [kn.x, kn.y], d };
+      }
+      const punkte = [];
+      for (let i = 0; i < sektoren; i++) {
+        const t = weiteste[i];
+        if (!t) continue;
+        /* Ein Stück weiter hinaus als das letzte Haus — die Mauer schneidet
+           nicht durch die Vorstadt. */
+        const w = Math.atan2(t.p[1] - my, t.p[0] - mx);
+        const r = t.d + 16;
+        punkte.push([mx + Math.cos(w) * r, my + Math.sin(w) * r]);
+      }
+      if (punkte.length > 6) {
+        punkte.push(punkte[0]);
+        ring = { art: 'mauerweg', richtung: 'ring', j: 99, punkte, name: '' };
+        strassen.push(ring);
+      }
+    }
     if (ring && ring.punkte.length > 3) {
+      /* Der Kranz wird geglättet, bevor er zur Mauer wird.
+         Gemessen hatte er bei der gewachsenen Anlage Knicke von über
+         hundert Grad und einen Radius, der zwischen 167 und 311 sprang —
+         sechsundachtzig Prozent Schwankung. Unten stand dann eine Spitze
+         im Blatt. Eine Stadtmauer folgt aber dem Gelände, nicht den
+         Zufälligkeiten eines Ringwegs.
+
+         Erst nach dem Winkel ordnen (das behebt zugleich Schleifen, in
+         denen der Ring sich selbst kreuzt), dann den Abstand zur Mitte
+         zweimal über die Nachbarn mitteln. Die Ecken bleiben, die Spitzen
+         gehen. */
+      const kern = [];
+      for (const b of bloecke) {
+        if (b.vorstadt) continue;
+        for (const e of b.ecken) kern.push(e);
+      }
+      ring = { ...ring, punkte: planKranzGlaetten(ring.punkte, [mx, my], 3, kern, wasser) };
+
       const tuerme = [], tore = [];
+      /* Wie nah muss eine Hauptstraße sein, damit dort ein Tor steht?
+         Vierunddreißig Einheiten waren für eine Metropole richtig und für
+         einen Weiler viel zu viel: dort lag fast jeder Ringpunkt neben
+         einer Ausfallstraße, und das Dorf bekam elf Tore. */
+      const torNah = Math.max(16, Math.min(34, Rmax * 0.11));
       ring.punkte.slice(0, -1).forEach((p, i) => {
         if (wasser.drin(p[0], p[1])) return;
-        /* Wo eine Hauptstraße die Mauer trifft, liegt ein Tor. */
-        const ausfall = gewachsen.adern.some((a) => a.haupt && a.knoten.some((q) => strecke(q, p) < 34));
-        if (ausfall) tore.push({ punkt: p, i, name: planTorname(saat, i) });
-        else tuerme.push({ punkt: p, i });
+        const ausfall = gewachsen.adern.some((a) => a.haupt && a.knoten.some((q) => strecke(q, p) < torNah));
+        /* Zwei Tore nebeneinander in derselben Mauer gibt es nicht. */
+        if (ausfall && !tore.some((t) => strecke(t.punkt, p) < Rmax * 0.34)) {
+          tore.push({ punkt: p, i, name: planTorname(saat, i) });
+        } else tuerme.push({ punkt: p, i });
       });
       if (!tore.length && ring.punkte.length > 2) tore.push({ punkt: ring.punkte[0], i: 0, name: planTorname(saat, 0) });
       mauer = { punkte: ring.punkte, tuerme, tore, ring: 1 };
@@ -532,45 +703,122 @@ function planStadt(plan, wasser) {
 }
 
 /* ===================== DAS UMLAND =====================
-   Felder in Streifen, Wälder in Nestern, ein paar einzelne Höfe. Ohne
-   Umland schwebt die Stadt im Nichts. */
+   Der erste Versuch legte die Äcker als vollständigen Kranz um die Stadt —
+   und das war wieder ein Spinnennetz, nur aus Feldern. So sieht Land nicht
+   aus: es liegt in FLUREN. Eine Flur ist eine Handvoll paralleler Streifen
+   in einer Richtung; die nächste Flur daneben hat eine andere Richtung, weil
+   dort das Gelände anders fällt. Dazwischen bleibt Platz.
+
+   Genauso Wälder: keine Kreissegmente, sondern unregelmäßige Flächen. */
 function planUmland(plan, stadt, wasser) {
   if (!plan.stadt.umland) return { felder: [], waelder: [], hoefe: [] };
   const saat = plan.saat;
   const G = PLAN_GROESSE;
   const [mx, my] = stadt.mitte;
+  const R = stadt.Rmax;
   const felder = [], waelder = [], hoefe = [];
-  const aussen = stadt.Rmax * 1.06;
 
-  const gruppen = 12 + Math.round(planZufall(saat, 'fg') * 8);
-  for (let g = 0; g < gruppen; g++) {
-    const w = (g / gruppen) * Math.PI * 2 + planStreu(saat, 'fw' + g) * 0.18;
-    const r0 = aussen + planZufall(saat, 'fr' + g) * G * 0.08;
-    const tiefe = G * (0.05 + planZufall(saat, 'ft' + g) * 0.13);
-    const breite = (Math.PI * 2 / gruppen) * 0.86;
-    const streifen = 2 + Math.round(planZufall(saat, 'fs' + g) * 4);
-    const kind = planZufall(saat, 'fk' + g);
-    for (let s = 0; s < streifen; s++) {
-      const w0 = w - breite / 2 + (s / streifen) * breite;
-      const w1 = w - breite / 2 + ((s + 0.86) / streifen) * breite;
-      const ecken = [
-        [mx + Math.cos(w0) * r0, my + Math.sin(w0) * r0],
-        [mx + Math.cos(w1) * r0, my + Math.sin(w1) * r0],
-        [mx + Math.cos(w1) * (r0 + tiefe), my + Math.sin(w1) * (r0 + tiefe)],
-        [mx + Math.cos(w0) * (r0 + tiefe), my + Math.sin(w0) * (r0 + tiefe)]
-      ];
-      if (ecken.some((p) => p[0] < -40 || p[0] > G + 40 || p[1] < -40 || p[1] > G + 40)) continue;
-      if (wasser.drin(ecken[0][0], ecken[0][1]) || wasser.drin(ecken[2][0], ecken[2][1])) continue;
-      if (kind > 0.72) waelder.push({ ecken, n: waelder.length });
-      else felder.push({ ecken, gepfluegt: kind > 0.34, n: felder.length });
-    }
-    if (kind > 0.5 && kind < 0.72) {
-      const hr = r0 + tiefe * 0.4;
-      const hw = w + planStreu(saat, 'hw' + g) * 0.1;
-      const p = [mx + Math.cos(hw) * hr, my + Math.sin(hw) * hr];
-      if (!wasser.drin(p[0], p[1]) && p[0] > 20 && p[0] < G - 20 && p[1] > 20 && p[1] < G - 20) hoefe.push({ punkt: p, n: hoefe.length });
+  const passt = (p) => p[0] > 42 && p[0] < G - 42 && p[1] > 42 && p[1] < G - 42 && !wasser.drin(p[0], p[1]);
+  const frei = (p, weit) => {
+    if (strecke(p, [mx, my]) < R * 1.1 + 34) return false;
+    return !felder.concat(waelder).some((f) => strecke(f.mitte, p) < weit);
+  };
+
+  /* --- Die Wälder ---
+     Sie kommen ZUERST. Ein Wald stand schon da, bevor jemand pflügte; und
+     technisch gesehen würde er sonst keinen Platz mehr finden, weil die
+     Äcker das ganze Blatt belegen. */
+  const waldZahl = 9 + (planHash(saat, 'wz') % 5);
+  for (let i = 0; i < waldZahl; i++) {
+    const w = planZufall(saat, 'ww' + i) * Math.PI * 2;
+    const r = Math.max(R * 1.24, 190) + planZufall(saat, 'wr' + i) * 320;
+    const mitte = [mx + Math.cos(w) * r, my + Math.sin(w) * r * 0.94];
+    if (!passt(mitte) || !frei(mitte, 116)) continue;
+    const gross = 62 + planZufall(saat, 'wg' + i) * 82;
+    const seiten = 7 + (planHash(saat, 'ws' + i) % 4);
+    /* Passt der Wald nicht, wird er nicht verworfen, sondern kleiner
+       versucht. Vorher genügte ein einziger Eckpunkt im Fluss, um den ganzen
+       Wald zu streichen — und übrig blieb ein baumloses Land. */
+    for (const massstab of [1, 0.72, 0.5, 0.34]) {
+      const ecken = [];
+      let gut = true;
+      for (let k = 0; k < seiten; k++) {
+        const a2 = (k / seiten) * Math.PI * 2;
+        const rr = gross * massstab * (0.62 + planZufall(saat, 'wp' + i + '_' + k) * 0.6);
+        const p = [mitte[0] + Math.cos(a2) * rr, mitte[1] + Math.sin(a2) * rr * 0.8];
+        if (!passt(p) || strecke(p, [mx, my]) < R * 1.04 + 16) { gut = false; break; }
+        ecken.push(p);
+      }
+      if (gut && ecken.length > 4) {
+        waelder.push({ ecken, mitte, n: waelder.length, gross: massstab > 0.6 });
+        break;
+      }
     }
   }
+
+  /* --- Die Fluren ---
+     Die Plätze werden nicht auf einem Kranz um die Stadt gesucht, sondern
+     auf dem ganzen Blatt: ein grobes Raster mit Versatz, damit nichts in
+     Reih und Glied steht. Sonst hängt die Menge des Umlands an der Größe der
+     Stadt — und bei einer großen Stadt landete jeder Kranzpunkt außerhalb
+     des Papiers, weshalb überhaupt kein Feld übrig blieb. */
+  const plaetze = [];
+  const raster = 9;
+  for (let gy = 0; gy < raster; gy++) {
+    for (let gx = 0; gx < raster; gx++) {
+      const jx = planStreu(saat, 'pj' + gx + '_' + gy) * 0.42;
+      const jy = planStreu(saat, 'pk' + gx + '_' + gy) * 0.42;
+      plaetze.push([((gx + 0.5 + jx) / raster) * G, ((gy + 0.5 + jy) / raster) * G]);
+    }
+  }
+  plaetze.sort((a2, b2) => planZufall(saat, 'po' + a2[0].toFixed(1)) - planZufall(saat, 'po' + b2[0].toFixed(1)));
+
+  for (let i = 0; i < plaetze.length; i++) {
+    const mitte = plaetze[i];
+    /* Ein fester Mindestabstand, nicht an der Stadtgröße gemessen: sonst
+       wirft eine große Stadt fast alle Plätze weg und das Land bleibt kahl. */
+    const rand = 104;
+    if (!passt(mitte) || !frei(mitte, rand)) continue;
+
+    /* Die Richtung der Flur — nicht die Richtung zur Stadt. */
+    const richtung = planZufall(saat, 'fd' + i) * Math.PI;
+    const dx = Math.cos(richtung), dy = Math.sin(richtung);
+    const nx = -dy, ny = dx;
+    const streifen = 3 + (planHash(saat, 'fs' + i) % 5);
+    /* Ein Acker ist ein Acker — seine Größe hängt nicht daran, wie groß die
+       Stadt daneben ist. Darum feste Maße mit etwas Spiel. */
+    const breite = 16 + planZufall(saat, 'fb' + i) * 13;
+    const laenge = 74 + planZufall(saat, 'fl' + i) * 96;
+    /* Eine Flur ist Acker oder Wiese — niemals Wald: Wald wächst nicht in
+       parallelen Streifen. Die Wälder entstehen weiter unten als eigene,
+       unregelmäßige Flächen. */
+    const wiese = planZufall(saat, 'fk' + i) > 0.7;
+
+    for (let s2 = 0; s2 < streifen; s2++) {
+      const versatz = (s2 - (streifen - 1) / 2) * breite * 1.14;
+      const l = laenge * (0.72 + planZufall(saat, 'fx' + i + '_' + s2) * 0.5);
+      const mitteS = [mitte[0] + nx * versatz, mitte[1] + ny * versatz];
+      const ecken = [
+        [mitteS[0] - dx * l / 2 - nx * breite / 2, mitteS[1] - dy * l / 2 - ny * breite / 2],
+        [mitteS[0] + dx * l / 2 - nx * breite / 2, mitteS[1] + dy * l / 2 - ny * breite / 2],
+        [mitteS[0] + dx * l / 2 + nx * breite / 2, mitteS[1] + dy * l / 2 + ny * breite / 2],
+        [mitteS[0] - dx * l / 2 + nx * breite / 2, mitteS[1] - dy * l / 2 + ny * breite / 2]
+      ];
+      if (!ecken.every(passt)) continue;
+      if (ecken.some((p) => strecke(p, [mx, my]) < R * 1.04 + 20)) continue;
+      felder.push({
+        ecken, mitte: mitteS, n: felder.length,
+        gepfluegt: !wiese && planZufall(saat, 'fg' + i + s2) > 0.34
+      });
+    }
+
+    /* Zu jeder dritten Flur ein Hof am Rand. */
+    if (planZufall(saat, 'fh' + i) > 0.6) {
+      const hp = [mitte[0] + nx * breite * streifen * 0.7, mitte[1] + ny * breite * streifen * 0.7];
+      if (passt(hp) && strecke(hp, [mx, my]) > R * 1.06 + 20) hoefe.push({ punkt: hp, n: hoefe.length });
+    }
+  }
+
   return { felder, waelder, hoefe };
 }
 
@@ -582,12 +830,143 @@ function planBauen(plan) {
   const wasser = planWasser(plan);
   const stadt = planStadt(plan, wasser);
   const umland = planUmland(plan, stadt, wasser);
-  return { plan, wasser, stadt, umland };
+  const hafen = planHafen(plan, stadt, wasser);
+  const muehle = planMuehle(plan, stadt, wasser);
+  const inseln = planInseln(plan, wasser);
+  const gebaut = { plan, wasser, stadt, umland, hafen, muehle, inseln, marktplatz: planMarktplatz(plan, stadt) };
+  /* Das Wappen darf wissen, was in der Stadt steht — eine Hafenstadt
+     führt einen Anker, eine Mühlenstadt ein Rad. Darum zuletzt. */
+  gebaut.wappen = planWappen(plan, gebaut);
+  gebaut.legende = planLegende(plan, gebaut);
+  return gebaut;
 }
 /* Woran man erkennt, ob neu gerechnet werden muss. */
+/* Einen geschlossenen Kranz um einen Mittelpunkt glätten: nach dem Winkel
+   ordnen, dann den Abstand zur Mitte über die Nachbarn mitteln. Rein — und
+   damit prüfbar. */
+function planKranzGlaetten(punkte, mitte, runden, einschliessen, wasser) {
+  const roh = punkte.slice();
+  /* Ein geschlossener Zug wiederholt den ersten Punkt am Ende. */
+  if (roh.length > 1 && strecke(roh[0], roh[roh.length - 1]) < 0.5) roh.pop();
+  if (roh.length < 3) return punkte;
+
+  const [mx, my] = mitte;
+  const ZWEIPI = Math.PI * 2;
+  const SEKTOREN = 44;
+
+  /* Der Kranz wird auf feste Sektoren abgetastet.
+     Die erste Fassung hatte für jeden Sonderfall einen eigenen Zweig — und
+     stieg bei wenigen Punkten vorzeitig aus, und zwar genau VOR dem
+     Einschließen. Bei der strahlenden Anlage lagen deshalb im Dorf zweiund-
+     achtzig Prozent der Häuser außerhalb der Mauer. Ein festes Raster
+     kennt diese Sonderfälle nicht. */
+  const polar = roh.map((p) => {
+    let w = Math.atan2(p[1] - my, p[0] - mx);
+    if (w < 0) w += ZWEIPI;
+    return { w, r: strecke(p, mitte) };
+  }).sort((a2, b2) => a2.w - b2.w);
+
+  /* Für einen Winkel den Abstand aus den beiden Nachbarn überblenden.
+     In einer großen Lücke — am Wasser hört der Ringweg auf — wölbt sich
+     der Kranz nach außen, statt eine Sehne quer durch die Stadt zu ziehen. */
+  const abstandBei = (w) => {
+    let vor = polar[polar.length - 1], nach = polar[0];
+    for (let i = 0; i < polar.length; i++) {
+      if (polar[i].w <= w) vor = polar[i];
+      if (polar[i].w > w) { nach = polar[i]; break; }
+    }
+    let spanne = nach.w - vor.w;
+    if (spanne <= 0) spanne += ZWEIPI;
+    let hier = w - vor.w;
+    if (hier < 0) hier += ZWEIPI;
+    const t = spanne < 1e-6 ? 0 : Math.max(0, Math.min(1, hier / spanne));
+    const bauch = 1 + Math.sin(t * Math.PI) * Math.min(0.12, spanne * 0.08);
+    return (vor.r * (1 - t) + nach.r * t) * bauch;
+  };
+
+  const winkel = [], radien = [];
+  for (let i = 0; i < SEKTOREN; i++) {
+    const w = (i / SEKTOREN) * ZWEIPI;
+    winkel.push(w);
+    radien.push(abstandBei(w));
+  }
+
+  /* Die Mauer muss den Kern der Stadt einschließen — eine Mauer, die
+     mitten hindurchläuft, ist keine. */
+  if (einschliessen && einschliessen.length) {
+    for (const p of einschliessen) {
+      let w = Math.atan2(p[1] - my, p[0] - mx);
+      if (w < 0) w += ZWEIPI;
+      const i = Math.floor((w / ZWEIPI) * SEKTOREN) % SEKTOREN;
+      const r = strecke(p, mitte) + 9;
+      if (r > radien[i]) radien[i] = r;
+    }
+  }
+
+  const mitteln = (liste, wie) => {
+    let a2 = liste.slice();
+    for (let d = 0; d < wie; d++) {
+      const neu2 = a2.slice();
+      for (let i = 0; i < SEKTOREN; i++) {
+        neu2[i] = a2[(i - 1 + SEKTOREN) % SEKTOREN] * 0.27 + a2[i] * 0.46 + a2[(i + 1) % SEKTOREN] * 0.27;
+      }
+      a2 = neu2;
+    }
+    return a2;
+  };
+
+  let fertig = mitteln(radien, runden || 3);
+  /* Die Schranke misst sich am eigenen VERLAUF, nicht am Mittelwert des
+     ganzen Kranzes: gegen den Median gezwungen wurde jede Stadt rund, auch
+     die, die von Natur aus länglich am Fluss liegt. */
+  const verlauf = mitteln(fertig, 8);
+  fertig = fertig.map((r, i) => Math.max(verlauf[i] * 0.82, Math.min(verlauf[i] * 1.2, r)));
+  /* Geglättet werden darf die Mauer — aber nicht in die Stadt hinein.
+     Die Untergrenze wird dabei selbst geglättet: eine Mauer BAUSCHT sich um
+     ein einzelnes Haus herum, sie macht keine Zacke. Ohne das standen bei
+     kleinen Orten Knicke von hundertdreißig Grad im Kranz — je Sektor eine
+     Spitze bis zum entferntesten Blockeck. */
+  const untergrenze = mitteln(radien, 2);
+  fertig = fertig.map((r, i) => Math.max(r, untergrenze[i]));
+
+  /* Und zuletzt: KEIN Stück der Mauer liegt im Wasser.
+     Das Einschließen allein trieb den Kranz weit hinaus, um das
+     Hafenviertel mitzunehmen — und danach lief die Mauer in großem Bogen
+     durchs offene Meer. Eine Stadtmauer endet am Ufer. Also wird jeder
+     Sektor so weit hereingeholt, bis er trocken steht. */
+  if (wasser && typeof wasser.drin === 'function' && wasser.art !== 'keins') {
+    const trockenlegen = () => {
+      for (let i = 0; i < SEKTOREN; i++) {
+        const w = winkel[i];
+        let r = fertig[i];
+        let versuche = 0;
+        while (r > 20 && versuche++ < 80 && wasser.drin(mx + Math.cos(w) * r, my + Math.sin(w) * r)) {
+          r -= Math.max(2.5, fertig[i] * 0.025);
+        }
+        fertig[i] = Math.max(20, r);
+      }
+    };
+    trockenlegen();
+    /* Einmal glätten, damit aus dem Hereinholen keine Treppe wird — und
+       DANACH noch einmal trockenlegen. Beim ersten Versuch stand das
+       Glätten am Ende, und es schob die Mauer prompt wieder ins Wasser:
+       auf jedem Blatt lagen wieder drei bis dreizehn Punkte nass. */
+    fertig = mitteln(fertig, 1);
+    trockenlegen();
+  }
+
+  const raus = winkel.map((w, i) => [mx + Math.cos(w) * fertig[i], my + Math.sin(w) * fertig[i]]);
+  raus.push(raus[0]);
+  return raus;
+}
+
 function planSignatur(plan) {
   const s = plan.stadt;
-  return [plan.saat, s.groesse, s.alter, s.anlage, s.wasser, s.mauer, s.burg, s.umland, s.dichte].join('|');
+  /* Alles, was die Karte verändert, gehört hier hinein — sonst zeichnet
+     sie sich nicht neu, wenn man es umstellt. */
+  return [plan.saat, s.groesse, s.alter, s.anlage, s.wasser, s.mauer, s.burg, s.umland,
+    s.hafen, s.muehle, s.inseln, s.dichte,
+    plan.wappen ? JSON.stringify(plan.wappen) : ''].join('|');
 }
 
 /* ===================== KLEINE RECHNUNGEN ===================== */

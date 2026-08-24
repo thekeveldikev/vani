@@ -44,7 +44,27 @@ function kweich(punkte, zu) {
   return d + (zu ? ' Z' : '');
 }
 
-let _kt = { id: '', zoom: 1, werkzeug: 'hand', markeArt: 'stern', nurMarke: '', zeigeNamen: true, zeigeUmland: true, messenVon: null, offen: false };
+/* Was gerade auf dem Tisch liegt — und welche Ebenen davon sichtbar sind.
+   Die Ebenen sind Ansichtssache, kein Teil des Belegs: sie gehören zum
+   Schauen, nicht zur Stadt, und werden darum auch nicht gespeichert. */
+let _kt = {
+  id: '', zoom: 1, werkzeug: 'hand', markeArt: 'stern', nurMarke: '',
+  zeigeNamen: true, zeigeUmland: true, zeigeLegende: true, zeigeWappen: true,
+  zeigeGitter: true, zeigeAlterung: true, zeigeRundgang: false,
+  messenVon: null, offen: false
+};
+
+/* Die Ebenen als Liste — einmal beschrieben, überall verwendet: im
+   Knopf, im Tastenkürzel und in der Klasse am Blatt. */
+const KT_EBENEN = [
+  ['zeigeNamen', 'Namen', 'ohne-namen', 'Gassen, Viertel, Tore'],
+  ['zeigeUmland', 'Umland', 'ohne-umland', 'Felder, Wälder, Höfe, Hügel'],
+  ['zeigeLegende', 'Zeichenerklärung', 'ohne-legende', 'Das Feld unten rechts'],
+  ['zeigeWappen', 'Wappen', 'ohne-wappen', 'Schild und Blasonierung'],
+  ['zeigeGitter', 'Gradnetz', 'ohne-gitter', 'Die feinen Linien über dem Blatt'],
+  ['zeigeAlterung', 'Alterung', 'ohne-alterung', 'Stockflecken, Falten, Schatten'],
+  ['zeigeRundgang', 'Rundgang', 'mit-rundgang', 'Ein Weg durch alle Marken']
+];
 
 /* ===================== DAS WERKZEUG IM KABINETT ===================== */
 function stadtplanWerkzeug(zurueck) {
@@ -153,6 +173,7 @@ function planOeffnen(id) {
     else if (ev.key === '2') { ev.preventDefault(); _kt.werkzeug = 'marke'; neu(); }
     else if (ev.key === '3') { ev.preventDefault(); _kt.werkzeug = 'messen'; _kt.messenVon = null; neu(); }
     else if (ev.key === 'n' || ev.key === 'N') { ev.preventDefault(); _kt.zeigeNamen = !_kt.zeigeNamen; neu(); }
+    else if (ev.key === 'e' || ev.key === 'E') { ev.preventDefault(); planEbenenwahl(neu); }
     else if (ev.key === 'v' || ev.key === 'V') { ev.preventDefault(); planVerzeichnis(D.docs.get(_kt.id), neu); }
     else if (ev.key === 'Escape' && (_kt.nurMarke || _kt.messenVon)) { ev.preventDefault(); _kt.nurMarke = ''; _kt.messenVon = null; neu(); }
   };
@@ -195,7 +216,19 @@ function planZeichne(tafel, flaeche, rahmen, neu, schliessen) {
   const welt = planFarbwelt(plan.welt);
   const papier = planPapier(plan.papier || welt.papier);
 
-  for (const [k, v] of [['--kpapier', papier[2]], ['--kpapier2', papier[3]], ['--ktinte', welt.tinte], ['--kwasser', welt.wasser], ['--kgold', welt.gold]]) {
+  /* Die ganze Farbwelt wird durchgereicht, nicht nur fuenf Werte: Hafen,
+     Legende und Wappen sollen der Welt folgen, in der die Karte steht —
+     sonst haetten sie fest eingetragene Farben, die bei jeder anderen
+     Farbwelt daneben liegen. */
+  for (const [k, v] of [
+    ['--kpapier', papier[2]], ['--kpapier2', papier[3]],
+    ['--ktinte', welt.tinte], ['--ktintezart', welt.tintezart],
+    ['--kwasser', welt.wasser], ['--kwasserrand', welt.wasserrand],
+    ['--kgruen', welt.gruen], ['--kgruendunkel', welt.gruendunkel],
+    ['--kdach', welt.dach], ['--kdachdunkel', welt.dachdunkel],
+    ['--kmauer', welt.mauer], ['--kstrasse', welt.strasse],
+    ['--kgold', welt.gold]
+  ]) {
     tafel.style.setProperty(k, v);
     flaeche.style.setProperty(k, v);
   }
@@ -206,7 +239,13 @@ function planZeichne(tafel, flaeche, rahmen, neu, schliessen) {
 
   /* Die Karte hängt: neu gerechnet wird nur, wenn sich die Stadt selbst
      ändert. Marken, Namen und der Blick kommen obenauf. */
-  const signatur = _kt.id + '|' + planSignatur(plan) + '|' + plan.welt + '|' + (plan.papier || '');
+  /* Der Rundgang steht mit in der Signatur: er ist die einzige Ebene, die
+     wirklich etwas HINZUZEICHNET, statt nur etwas auszublenden — und wer
+     ihn nur über eine Klasse versteckte, ließ ihn bei vierhundert Marken
+     bei jedem Zeichnen mitrechnen. Über eine Sekunde für einen Weg, den
+     niemand sieht. */
+  const signatur = _kt.id + '|' + planSignatur(plan) + '|' + plan.welt + '|' + (plan.papier || '') +
+    '|' + (_kt.zeigeRundgang ? 'rund' : '');
   const markenSig = JSON.stringify(plan.marken) + '|' + JSON.stringify(plan.namen) + '|' + plan.titel + '|' + plan.unterzeile;
   let innen = flaeche.querySelector('.kt-innen');
   let svg = innen ? innen.querySelector('svg') : null;
@@ -232,8 +271,11 @@ function planZeichne(tafel, flaeche, rahmen, neu, schliessen) {
     svg.setAttribute('width', Math.round(PLAN_GROESSE * _kt.zoom));
     svg.setAttribute('height', Math.round(PLAN_GROESSE * _kt.zoom));
   }
-  svg.classList.toggle('ohne-namen', !_kt.zeigeNamen);
-  svg.classList.toggle('ohne-umland', !_kt.zeigeUmland);
+  for (const [feld, , klasse] of KT_EBENEN) {
+    /* „mit-…“ wird gesetzt, wenn AN; „ohne-…“, wenn AUS. */
+    const an = _kt[feld] !== false;
+    svg.classList.toggle(klasse, klasse.startsWith('mit-') ? an : !an);
+  }
   svg.classList.toggle('eine-im-blick', !!_kt.nurMarke);
   for (const m of svg.querySelectorAll('.kt-marke')) {
     m.classList.toggle('imblick', m.getAttribute('data-marke') === _kt.nurMarke);
@@ -291,12 +333,39 @@ function planLeisteInhalt(doc, plan, flaeche, neu, schliessen) {
         el('button', { class: 'kt-wk', title: 'Größer (+)', onclick: () => planZoom(0.2, flaeche, neu) }, '+'),
         el('button', { class: 'kt-wk', title: 'Ganz einpassen', onclick: () => planEinpassen(flaeche, neu) }, '⤢'),
         el('button', { class: 'kt-werkzeugknopf' + (_kt.zeigeNamen ? ' an' : ''), title: 'Namen zeigen oder ausblenden (n)', onclick: () => { _kt.zeigeNamen = !_kt.zeigeNamen; neu(); } }, 'Namen'),
+        el('button', { class: 'kt-werkzeugknopf', title: 'Welche Ebenen liegen auf dem Blatt? (e)', onclick: () => planEbenenwahl(neu) }, 'Ebenen'),
         el('button', { class: 'kt-werkzeugknopf', title: 'Alle Marken und Gassen (v)', onclick: () => planVerzeichnis(doc, neu) }, 'Verzeichnis'),
         el('button', { class: 'kt-werkzeugknopf', title: 'Aussehen, Lage, Größe', onclick: () => planEinrichten(doc, neu) }, 'Der Grundriss'),
         el('button', { class: 'kt-zuknopf', title: 'Die Karte einrollen', onclick: () => schliessen() }, '×'))),
     _kt.werkzeug === 'marke' ? planMarkenwahl(neu) : null,
     _kt.werkzeug === 'messen' ? el('div', { class: 'kt-hinweiszeile' }, 'Tipp zwei Stellen an — VANI sagt dir, wie lange man dazwischen geht.') : null
   ];
+}
+
+/* Die Ebenenwahl: ein kleines Fenster mit einem Schalter je Ebene.
+   Kein Speichern — wer die Karte wieder aufschlägt, sieht sie ganz. */
+function planEbenenwahl(neu) {
+  const liste = el('div', { class: 'kt-ebenenliste' });
+  const zu = zeigeDeck(el('div', { class: 'modal kt-ebenenfenster' },
+    el('div', { class: 'kartenkopf' }, 'EBENEN'),
+    el('small', { class: 'kt-ebenenhilfe' }, 'Was liegt auf dem Blatt? Nimm weg, was gerade stört — die Stadt bleibt, wie sie ist.'),
+    liste,
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => { for (const [f] of KT_EBENEN) _kt[f] = f !== 'zeigeRundgang'; zeichnen(); neu(); } }, 'Alles zeigen'),
+      el('button', { class: 'knopf voll', onclick: () => zu() }, 'Fertig'))));
+
+  const zeichnen = () => {
+    liste.innerHTML = '';
+    for (const [feld, name, , was] of KT_EBENEN) {
+      const an = _kt[feld] !== false;
+      liste.append(el('button', {
+        class: 'ktg-schalter' + (an ? ' an' : ''),
+        onclick: () => { _kt[feld] = !(_kt[feld] !== false); zeichnen(); neu(); }
+      }, el('i', {}), el('b', {}, name), el('small', {}, was)));
+    }
+  };
+  zeichnen();
+  return zu;
 }
 
 function planMarkenwahl(neu) {
@@ -364,13 +433,13 @@ function planSVG(plan, g, neu) {
     gUmland.append(kv('path', { d: kpfad(f.ecken, true), class: 'kt-feld' + (f.gepfluegt ? ' gepfluegt' : ''), fill: f.gepfluegt ? 'url(#kt-acker)' : 'url(#kt-wiese)' }));
   }
   for (const w of g.umland.waelder) {
-    gUmland.append(kv('path', { d: kpfad(w.ecken, true), class: 'kt-waldgrund', fill: welt.gruendunkel }));
-    /* Bäume als kleine Kronen darauf */
-    const mitte = [(w.ecken[0][0] + w.ecken[2][0]) / 2, (w.ecken[0][1] + w.ecken[2][1]) / 2];
-    for (let t = 0; t < 9; t++) {
-      const u = planZufall(plan.saat, 'wtu' + w.n + t), v = planZufall(plan.saat, 'wtv' + w.n + t);
-      const p = bilinear(w.ecken, 0.1 + u * 0.8, 0.1 + v * 0.8);
-      gUmland.append(planBaum(p[0], p[1], 3.2 + planZufall(plan.saat, 'wtr' + w.n + t) * 2.4, welt));
+    /* Ein Wald ist keine Kachel: sein Rand ist weich, und die Kronen stehen
+       unregelmaessig darin. */
+    gUmland.append(kv('path', { d: kweich(w.ecken, true), class: 'kt-waldgrund', fill: welt.gruendunkel }));
+    const wieViele = w.gross ? 22 : 7;
+    for (let t = 0; t < wieViele; t++) {
+      const p = netzPunktDrin(w.ecken, plan.saat, 'wt' + w.n + '_' + t);
+      gUmland.append(planBaum(p[0], p[1], 3.2 + planZufall(plan.saat, 'wtr' + w.n + t) * 2.6, welt));
     }
   }
   for (const h of g.umland.hoefe) {
@@ -418,6 +487,11 @@ function planSVG(plan, g, neu) {
     gWasser.append(kv('path', { d: korn.trim(), class: 'kt-wasserkorn' }));
   }
   svg.append(gWasser);
+
+  /* --- Die Werder ---
+     Sie liegen im Wasser und müssen deshalb darüber, aber unter allem,
+     was an Land steht. */
+  if (g.inseln && g.inseln.length) svg.append(planInselnZeichnen(g.inseln, welt, plan.saat, papier[2]));
 
   /* --- Die Blöcke: ein ruhiger Grund unter den Häusern --- */
   const gBloecke = kv('g', { class: 'kt-bloecke' });
@@ -508,6 +582,18 @@ function planSVG(plan, g, neu) {
     svg.append(gb);
   }
 
+  /* --- Was auf dem Markt steht ---
+     Brunnen, Rathaus, Pranger, Stände. Vorher lag genau in der Mitte der
+     Karte eine gepflasterte Leerstelle — dort, wo das Auge zuerst hinsieht. */
+  if (g.marktplatz) svg.append(planMarktZeichnen(g.marktplatz, welt, plan.saat));
+
+  /* --- Der Hafen ---
+     Er greift vom Land ins Wasser und gehört deshalb über beides. */
+  if (g.hafen && g.hafen.hat) svg.append(planHafenZeichnen(g.hafen, welt, plan.saat));
+
+  /* --- Die Mühle --- */
+  if (g.muehle) svg.append(planMuehleZeichnen(g.muehle, welt));
+
   /* --- Hügel im Umland ---
      Leeres Land ist totes Land. Hügel mit Schraffur auf der Schattenseite
      sind das älteste Mittel, einer Karte Gelände zu geben — und sie füllen
@@ -524,8 +610,29 @@ function planSVG(plan, g, neu) {
 
   /* --- Kompass, Maßstab, Kartusche --- */
   svg.append(planKompass(G - 128, 128, plan));
-  svg.append(planMassstab(96, G - 74));
+  /* Der Maßstab stand links unten — genau dort, wo jetzt die Blasonierung
+     unter der Kartusche steht; „400 Schritt“ lag mitten im Wappenspruch.
+     Er rückt in die Lücke zwischen Kartusche und Zeichenerklärung. */
+  svg.append(planMassstab(G / 2 - 38, G - 68));
   svg.append(planKartusche(plan, g));
+  /* Die Zeichenerklärung steht der Kartusche gegenüber — unten rechts,
+     wo auf jedem gestochenen Blatt die Legende steht. */
+  if (g.legende && g.legende.length) {
+    const spalten = g.legende.length > 8 ? 2 : 1;
+    const breite = 16 + spalten * 132;
+    const hoehe = 34 + Math.ceil(g.legende.length / spalten) * 15.5;
+    svg.append(planLegendeSVG(g.legende, G - 62 - breite, G - 58 - hoehe, welt));
+  }
+
+  /* --- Das Gradnetz ---
+     Die Striche am Randband deuten es an; hier laufen sie wirklich über
+     das Blatt. Ganz blass: ein Gradnetz soll man finden, wenn man es
+     sucht, und übersehen, wenn man die Stadt anschaut. */
+  svg.append(planGradnetz());
+
+  /* --- Der Rundgang ---
+     Marken sind einzelne Punkte. Der Rundgang macht daraus einen Weg. */
+  if (_kt.zeigeRundgang) svg.append(planRundgangZeichnen(plan));
 
   /* --- Das Papier altert -----
      Ohne das hier ist es eine Vektorgrafik. Mit Stockflecken, Faltlinien und
@@ -558,6 +665,42 @@ function planSVG(plan, g, neu) {
 }
 
 /* Die Form, in die die Karte geschnitten ist. */
+/* Das Gradnetz — dieselbe Teilung wie am Randband, damit die Striche
+   dort aufhören, wo die Felder anfangen. */
+function planGradnetz() {
+  const G = PLAN_GROESSE;
+  const g = kv('g', { class: 'kt-gradnetz', 'aria-hidden': 'true' });
+  const AUSSEN = 30, BAND = 12, ECKE = 26;
+  const innen = AUSSEN + BAND;
+  const felder = 24;
+  const feld = (G - (innen + ECKE) * 2) / felder;
+  let d = '';
+  for (let i = 0; i <= felder; i++) {
+    const a = innen + ECKE + i * feld;
+    d += ' M ' + kz(a) + ' ' + kz(innen) + ' V ' + kz(G - innen);
+    d += ' M ' + kz(innen) + ' ' + kz(a) + ' H ' + kz(G - innen);
+  }
+  g.append(kv('path', { d: d.trim(), class: 'kt-gradlinie' }));
+  return g;
+}
+
+/* Der Rundgang: der Weg selbst und an jeder Marke eine Nummer. */
+function planRundgangZeichnen(plan) {
+  const g = kv('g', { class: 'kt-rundgang' });
+  const rund = planRundgang(plan, plan.marken);
+  if (rund.punkte.length < 3) return g;
+  const d = kweich(rund.punkte);
+  g.append(kv('path', { d, class: 'kt-rundweg-rand' }));
+  g.append(kv('path', { d, class: 'kt-rundweg' }));
+  rund.marken.forEach((m, i) => {
+    g.append(kv('circle', { cx: kz(m.x), cy: kz(m.y - 17), r: 8, class: 'kt-rundnummer' }));
+    const t = kv('text', { x: kz(m.x), y: kz(m.y - 13.4), class: 'kt-rundziffer', 'text-anchor': 'middle' });
+    t.textContent = String(i + 1);
+    g.append(t);
+  });
+  return g;
+}
+
 function planZuschnittForm(art) {
   const G = PLAN_GROESSE, m = G / 2, r = G / 2 - 34;
   if (art === 'kreis') return kv('circle', { cx: m, cy: m, r });
@@ -589,29 +732,73 @@ function planPunktAus(svg, ev) {
    beieinander, nach außen immer weiter auseinander und immer blasser. Sie
    füllen die Wasserfläche, ohne sie zuzudecken — und erst dadurch sieht
    Wasser nach Wasser aus statt nach blauem Papier. */
+/* Die Geometrie der Uferstriche — ohne Zeichnen, damit sie sich prüfen
+   lässt. Gibt für eine Stufe die Stücke zurück, aus denen der Strich besteht. */
+function planUferlinien(linie, stufe, richtung) {
+  const n = linie.length;
+  if (n < 3) return [];
+  const richtungen = planUferNormalen(linie);
+  let abstand = 0;
+  for (let s = 1; s <= stufe; s++) abstand += 3.2 + s * 1.15;
+  const stuecke = [];
+  let lauf = [];
+  for (let i = 0; i < n; i++) {
+    const r = richtungen[i];
+    if (!r) { if (lauf.length > 2) stuecke.push(lauf); lauf = []; continue; }
+    const zittern = Math.sin(i * 0.7 + stufe * 1.3) * stufe * 0.34;
+    const weit = (abstand + zittern) * richtung;
+    lauf.push([linie[i][0] - r[1] * weit, linie[i][1] + r[0] * weit]);
+  }
+  if (lauf.length > 2) stuecke.push(lauf);
+  return stuecke;
+}
+
 function planUferstriche(g, linie, geschlossen, welt, richtung) {
   const n = linie.length;
-  let abstand = 0;
+  if (n < 3) return;
+  /* Die Richtung „nach außen“ steht senkrecht auf dem Ufer. Sie über den
+     übernächsten Nachbarn zu bestimmen ist bequem — aber an einer KEHRE geht
+     es schief: ein Flusspolygon läuft die eine Seite hinunter und die andere
+     wieder herauf, und am Umkehrpunkt zeigen Vorgänger und Nachfolger fast
+     genau aufeinander. Dann ist die Differenz beinahe null, die Normale kippt
+     ins Beliebige, und aus den Uferstrichen wird ein Fächer, der über das
+     halbe Blatt schießt. (Genau das war zu sehen.)
+
+     Also: die Normale aus den beiden ANLIEGENDEN Strecken mitteln, und an
+     einer echten Kehre den Punkt lieber auslassen. */
   for (let s = 1; s <= 12; s++) {
-    /* Der Abstand wächst — wie bei einem Stein, der ins Wasser fällt. */
-    abstand += 3.2 + s * 1.15;
-    const versetzt = [];
-    for (let i = 0; i < n; i++) {
-      const vor = linie[(i - 1 + n) % n], nach = linie[(i + 1) % n];
-      const dx = nach[0] - vor[0], dy = nach[1] - vor[1];
-      const len = Math.sqrt(dx * dx + dy * dy) || 1;
-      /* Die Striche werden nach außen unruhiger — die Hand wird lockerer. */
-      const zittern = Math.sin(i * 0.7 + s * 1.3) * s * 0.34;
-      const weit = (abstand + zittern) * richtung;
-      versetzt.push([linie[i][0] - (dy / len) * weit, linie[i][1] + (dx / len) * weit]);
+    /* Die Striche brechen an den Kehren ab, laufen also in Stücken. */
+    const stuecke = planUferlinien(linie, s, richtung);
+    const zu = geschlossen && stuecke.length === 1 && stuecke[0].length === n;
+    for (const st of stuecke) {
+      g.append(kv('path', {
+        d: kweich(st, zu), class: 'kt-uferstrich',
+        stroke: welt.wasserrand,
+        'stroke-width': (1.4 - s * 0.05).toFixed(2),
+        'stroke-opacity': (0.92 * Math.pow(1 - s / 14, 1.15)).toFixed(3)
+      }));
     }
-    g.append(kv('path', {
-      d: kweich(versetzt, geschlossen), class: 'kt-uferstrich',
-      stroke: welt.wasserrand,
-      'stroke-width': (1.4 - s * 0.05).toFixed(2),
-      'stroke-opacity': (0.92 * Math.pow(1 - s / 14, 1.15)).toFixed(3)
-    }));
   }
+}
+
+/* Für jeden Punkt die Richtung „nach außen“ — oder null an einer Kehre. */
+function planUferNormalen(linie) {
+  const n = linie.length;
+  const richtungen = [];
+  for (let i = 0; i < n; i++) {
+    const vor = linie[(i - 1 + n) % n], hier = linie[i], nach = linie[(i + 1) % n];
+    const e1 = [hier[0] - vor[0], hier[1] - vor[1]];
+    const e2 = [nach[0] - hier[0], nach[1] - hier[1]];
+    const l1 = Math.hypot(e1[0], e1[1]) || 1, l2 = Math.hypot(e2[0], e2[1]) || 1;
+    const u1 = [e1[0] / l1, e1[1] / l1], u2 = [e2[0] / l2, e2[1] / l2];
+    /* Kehre? Dann kein Strich an dieser Stelle. */
+    if (u1[0] * u2[0] + u1[1] * u2[1] < -0.55) { richtungen.push(null); continue; }
+    const mx = u1[0] + u2[0], my = u1[1] + u2[1];
+    const ml = Math.hypot(mx, my);
+    if (ml < 0.2) { richtungen.push(null); continue; }
+    richtungen.push([mx / ml, my / ml]);
+  }
+  return richtungen;
 }
 
 function planKirche(h, welt) {
@@ -747,9 +934,14 @@ function planMassstab(x, y) {
    gemacht, und aus gutem Grund: hier ruht das Auge. */
 function planKartusche(plan, g) {
   const G = PLAN_GROESSE;
-  const breite = Math.max(280, plan.titel.length * 17 + 96);
+  /* Links im Schild steht das Wappen; die Schrift rückt entsprechend nach
+     rechts und wird in dem Platz zentriert, der ihr bleibt. Ohne diese
+     Rechnung säße der Titel schief unter dem Schild. */
+  const wappenPlatz = g.wappen ? 78 : 0;
+  const breite = Math.max(280, plan.titel.length * 17 + 96) + wappenPlatz;
   const h = 92;
-  const gr = kv('g', { class: 'kt-kartusche', transform: 'translate(148 ' + (G - 196) + ')' });
+  const mitte = wappenPlatz + (breite - wappenPlatz) / 2;
+  const gr = kv('g', { class: 'kt-kartusche', transform: 'translate(148 ' + (G - 208) + ')' });
 
   /* Die Voluten: eingerollte Enden links und rechts. */
   for (const seite of [-1, 1]) {
@@ -775,22 +967,35 @@ function planKartusche(plan, g) {
   }));
 
   /* Ein Fleuron oben auf dem Schild */
-  const fl = kv('g', { class: 'kt-kfleuron', transform: 'translate(' + kz(breite / 2) + ' -3)' });
+  const fl = kv('g', { class: 'kt-kfleuron', transform: 'translate(' + kz(mitte) + ' -3)' });
   fl.append(kv('path', { d: 'M -22 0 Q -11 -9 0 -3 Q 11 -9 22 0' }));
   fl.append(kv('circle', { cx: 0, cy: -4.5, r: 2.6 }));
   fl.append(kv('path', { d: 'M -30 0 H -24 M 30 0 H 24' }));
   gr.append(fl);
 
-  const t = kv('text', { x: kz(breite / 2), y: 42, class: 'kt-kartuschentitel', 'text-anchor': 'middle' });
+  const t = kv('text', { x: kz(mitte), y: 42, class: 'kt-kartuschentitel', 'text-anchor': 'middle' });
   t.textContent = plan.titel;
   gr.append(t);
   /* Eine Zierlinie zwischen Titel und Zeile darunter */
-  gr.append(kv('path', { class: 'kt-kstrich', d: 'M ' + kz(breite / 2 - 46) + ' 52 H ' + kz(breite / 2 - 8) +
-    ' M ' + kz(breite / 2 + 8) + ' 52 H ' + kz(breite / 2 + 46) +
-    ' M ' + kz(breite / 2) + ' 48 l 4 4 l -4 4 l -4 -4 Z' }));
-  const u = kv('text', { x: kz(breite / 2), y: 70, class: 'kt-kartuschenunter', 'text-anchor': 'middle' });
+  gr.append(kv('path', { class: 'kt-kstrich', d: 'M ' + kz(mitte - 46) + ' 52 H ' + kz(mitte - 8) +
+    ' M ' + kz(mitte + 8) + ' 52 H ' + kz(mitte + 46) +
+    ' M ' + kz(mitte) + ' 48 l 4 4 l -4 4 l -4 -4 Z' }));
+  const u = kv('text', { x: kz(mitte), y: 70, class: 'kt-kartuschenunter', 'text-anchor': 'middle' });
   u.textContent = plan.unterzeile || (planGroesse(plan.stadt.groesse)[1] + ' — ' + g.stadt.haeuser.length + ' Häuser');
   gr.append(u);
+
+  /* Das Wappen steht links im Schild — und darunter, außerhalb, die
+     Blasonierung: klein, kursiv, in der Sprache, in der Wappen seit
+     siebenhundert Jahren beschrieben werden. Sie ist der Beweis, dass an
+     diesem Zeichen nichts zufällig ist. */
+  if (g.wappen) {
+    const gw = kv('g', { transform: 'translate(42 ' + kz(h / 2) + ')' });
+    gw.append(planWappenSVG(g.wappen, 58));
+    gr.append(gw);
+    const bl = kv('text', { x: kz(breite / 2), y: kz(h + 20), class: 'kt-blason', 'text-anchor': 'middle' });
+    bl.textContent = planBlason(g.wappen);
+    gr.append(bl);
+  }
   return gr;
 }
 
@@ -808,14 +1013,55 @@ function planRandwerk(welt, zuschnitt) {
     g.append(a, b);
     return g;
   }
-  g.append(kv('rect', { x: 14, y: 14, width: G - 28, height: G - 28, class: 'kt-randlinie aussen' }));
-  g.append(kv('rect', { x: 24, y: 24, width: G - 48, height: G - 48, class: 'kt-randlinie innen' }));
-  /* Gradmarken am Rand — die Karte tut so, als wüsste sie, wo sie liegt. */
-  for (let i = 1; i < 12; i++) {
-    const p = 24 + (i / 12) * (G - 48);
-    for (const [x1, y1, x2, y2] of [[p, 14, p, 24], [p, G - 24, p, G - 14], [14, p, 24, p], [G - 24, p, G - 14, p]]) {
-      g.append(kv('path', { d: 'M ' + kz(x1) + ' ' + kz(y1) + ' L ' + kz(x2) + ' ' + kz(y2), class: 'kt-gradstrich' }));
-    }
+  /* Das graduierte Randband — das Erkennungszeichen jeder gestochenen Karte.
+     Zwei Linien mit einem Band dazwischen, und das Band ist gefeldert:
+     abwechselnd voll und leer, wie ein Lineal. Vorher standen hier nur zwei
+     dünne Rechtecke und ein paar Striche; das Blatt hatte keinen Abschluss.
+
+     Die Felder sind nicht Zierde allein, sie zählen: jedes steht für hundert
+     Schritt, und der Maßstab unten sagt dasselbe noch einmal in Worten. */
+  /* Weit genug nach innen, dass die Bütten­kante des Papiers das Band nicht
+     anknabbert — an den Ecken verschwand es sonst im Ausriss. */
+  const AUSSEN = 30, BAND = 12, ECKE = 26;
+  const innen = AUSSEN + BAND;
+  g.append(kv('rect', { x: AUSSEN, y: AUSSEN, width: G - AUSSEN * 2, height: G - AUSSEN * 2, class: 'kt-randlinie aussen' }));
+  g.append(kv('rect', { x: innen, y: innen, width: G - innen * 2, height: G - innen * 2, class: 'kt-randlinie innen' }));
+
+  /* Die Felder laufen zwischen den Ecken, damit die Ecke frei für den
+     Zierrat bleibt. */
+  const laenge = G - (innen + ECKE) * 2;
+  const felder = 24;
+  const feld = laenge / felder;
+  for (let i = 0; i < felder; i++) {
+    if (i % 2) continue;
+    const a = innen + ECKE + i * feld;
+    for (const [x, y, w, h] of [
+      [a, AUSSEN, feld, BAND],                 /* oben */
+      [a, G - innen, feld, BAND],              /* unten */
+      [AUSSEN, a, BAND, feld],                 /* links */
+      [G - innen, a, BAND, feld]               /* rechts */
+    ]) g.append(kv('rect', { x: kz(x), y: kz(y), width: kz(w), height: kz(h), class: 'kt-randfeld' }));
+  }
+
+  /* In jeder Ecke ein kleines Quadrat mit Raute — der Punkt, an dem der
+     Stecher sein Werkzeug absetzt. */
+  for (const [ex, ey] of [[AUSSEN, AUSSEN], [G - innen, AUSSEN], [AUSSEN, G - innen], [G - innen, G - innen]]) {
+    g.append(kv('rect', { x: kz(ex), y: kz(ey), width: BAND, height: BAND, class: 'kt-randecke' }));
+    const m = BAND / 2;
+    g.append(kv('path', {
+      d: 'M ' + kz(ex + m) + ' ' + kz(ey + 2.6) + ' L ' + kz(ex + BAND - 2.6) + ' ' + kz(ey + m) +
+         ' L ' + kz(ex + m) + ' ' + kz(ey + BAND - 2.6) + ' L ' + kz(ex + 2.6) + ' ' + kz(ey + m) + ' Z',
+      class: 'kt-randraute'
+    }));
+  }
+
+  /* Feinere Teilstriche innerhalb jedes Feldes. */
+  for (let i = 0; i <= felder; i++) {
+    const a = innen + ECKE + i * feld;
+    for (const [x1, y1, x2, y2] of [
+      [a, innen - 3.4, a, innen], [a, G - innen, a, G - innen + 3.4],
+      [innen - 3.4, a, innen, a], [G - innen, a, G - innen + 3.4, a]
+    ]) g.append(kv('path', { d: 'M ' + kz(x1) + ' ' + kz(y1) + ' L ' + kz(x2) + ' ' + kz(y2), class: 'kt-gradstrich' }));
   }
   return g;
 }

@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.42.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.44.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -157,6 +157,90 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   rekursiv geteilt (der Schnitt wird aus allen Kantenpaaren so gewählt, dass er am besten halbiert).
   Häuser stehen an der Blockkante, der Hof bleibt frei. Drei Anlagen teilen sich alles danach:
   gewachsen, strahlend (das alte Radialmodell, jetzt als eigener Modus), schachbrett.
+- **5.43** Große Runde am Kartentisch — vor allem Reparaturen an Stellen, die man erst sieht,
+  wenn man nachmisst:
+  - **Der Zufall streute nicht.** `planZufall` teilt durch 2^32 und liest damit die OBEREN Bits;
+    FNV allein lässt das letzte Zeichen aber fast nur die unteren erreichen. `'ww0'`, `'ww1'`,
+    `'ww2'` ergaben 0.382, 0.379, 0.390 — praktisch derselbe Wert. Damit war JEDE durchnummerierte
+    Reihe auf der Karte gleichgeschaltet statt gestreut: Wälder standen übereinander, Felder in
+    Reihe, das Zittern der Häuser war überall dasselbe. Ein Abschlussmischer (fmix32) behebt das.
+    Achtung: dieselbe Saat ergibt darum eine andere Stadt als in 5.42.
+  - **Blöcke lagen übereinander.** Die Flächensuche verwarf nur die größte Runde als Außenwelt.
+    Hängt ein Straßenzug frei in der Landschaft, hat auch der seine eigene Außenrunde — und die
+    legt sich als Riesenblock über alles darin. Beim Marktflecken kamen 189 Blöcke mit einer
+    Million Flächeneinheiten auf einer Stadt von 155 000 zusammen. Jetzt entscheidet der
+    Umlaufsinn, nicht die Größe.
+  - **Der Blockschlüssel war nicht eindeutig** (gerundete Mitte) — bei 250 Blöcken gehörte ein
+    Haus zum falschen Block. Jetzt eine laufende Nummer.
+  - **Häuser waren Klötze:** `echteBreite = laenge / wieViele` verteilte den Rest der Kante auf die
+    Häuser, aus elf Einheiten Front wurden sechsundzwanzig. Jetzt behält ein Haus seine Breite,
+    die Reihe wird auf der Kante zentriert, und was nicht passt, wird flacher gebaut statt gestrichen.
+  - **Die Blockgröße wuchs mit der Stadt** — die Großstadt hatte weniger Blöcke als die Stadt.
+    Ein Häuserblock ist überall etwa gleich groß; eine Metropole hat mehr davon.
+  - **Die Nebenstraßen verklumpten:** Sie wählten ihre Startkante über den Index, geteilte Kanten
+    werden hinten angehängt — die Auswahl kehrte immer dorthin zurück, wo eben geteilt wurde. Eine
+    Stadthälfte war dicht, die andere leer. Jetzt: ein gleichverteilter Punkt, dazu die nächste Straße.
+  - **Tempo:** Kreuzungsprüfung über ein Kantengitter, und der Blockteiler probiert bei großen
+    Vielecken nicht mehr alle Kantenpaare. Metropole 4751 ms → rund 130 ms.
+  - **Das Umland lag im Kranz** um die Stadt — ein Spinnennetz aus Feldern, und bei einer großen
+    Stadt fiel der ganze Kranz vom Blatt. Jetzt liegt es in FLUREN: Bündel paralleler Streifen,
+    jedes mit eigener Richtung, über das ganze Blatt gestreut; Wälder zuerst und als unregelmäßige
+    Flächen, die kleiner werden statt zu verschwinden, wenn sie nicht passen.
+  - **`gruen` in `PLAN_VIERTELARTEN` war totes Datenfeld** — notiert, nie gelesen. Ein lockeres
+    Viertel sah nach unbedrucktem Papier aus statt nach Gärten. Außerdem lag `dichte` beim
+    Gartenviertel bei 0,18: vierundsechzig Einheiten Straßenfront für ein Haus.
+  - **Uferstriche:** die Normale kam aus dem übernächsten Nachbarn und kippte an scharfen Ecken;
+    jetzt aus den beiden anliegenden Strecken, mit Abbruch an einer Kehre.
+  - **Das Schachbrett bekam gar keine Mauer**, obwohl der Haken gesetzt war: es legt keine Ringe
+    an, und die Mauer wurde aus dem äußersten Ring genommen. Fehlt der, wird jetzt ein Kranz
+    aus den äußersten Netzpunkten je Winkelsektor gerechnet — mit Türmen und Toren wie sonst auch.
+  - **Kein Deck überlebt einen Ortswechsel** (`zeigeDeck`, src/30-core.js). Wer aus einem offenen
+    Kabinettfach heraus die Adresse wechselte, ließ Schleier und Inhalt stehen — samt vollständiger
+    Stadtkarte im DOM; beim nächsten Öffnen lag das nächste darüber. Nach sieben Besuchen waren es
+    sieben. Betraf jedes Deck, nicht nur den Kartentisch.
+  - **Neu sichtbar:** das graduierte Randband — zwei Linien, dazwischen gefelderte Kästen mit
+    Eckrauten und Teilstrichen, wie bei einem Kupferstich.
+- **5.44** Der Kartentisch bekommt, was eine Stadt zur Stadt macht — zwei neue Dateien:
+  `src/65e-stadtplan-hafen.js` (rechnet) und `src/65f-stadtplan-zierrat.js` (zeichnet).
+  Beide sind in `build.sh`, `werkzeug/build-web.mjs` **und** `test/sandkasten.mjs` eingetragen.
+  - **Der Hafen**: Kaimauer, drei bis fünf Molen, Schiffe längsseits, Poller, Tretkräne — am Meer
+    dazu ein Wellenbrecher mit Einfahrt und ein Leuchtfeuer. Jede Mole wird nur so weit
+    hinausgeschoben, wie sie nass bleibt.
+  - **Die Mühle** am Fluss: Haus am Ufer, Rad im Wasser, mit Speichen.
+  - **Werder** — kleine bewachsene Inseln. Ihre Größe richtet sich nach dem Platz: der erste
+    Versuch verlangte 26 Einheiten Wasser rundum, und ausgerechnet der Fluss bekam dadurch nie eine.
+  - **Das Wappen** mit heraldischer Schraffur nach Petra Sancta (1638): jede Tinktur hat ihre
+    Strichlage, deshalb ist ein einfarbiges Wappen trotzdem vollständig lesbar. Vierzehn
+    Wappenbilder, sechs Teilungen, die mittelalterliche Farbregel (Farbe auf Metall, nie Farbe auf
+    Farbe) — und darunter die **Blasonierung** im richtigen Fall: „belegt mit einer Brücke“,
+    „drei Ankern“, nicht „mit eine Brücke“.
+  - **Die Zeichenerklärung** unten rechts, die nur aufnimmt, was auf DIESEM Blatt vorkommt.
+  - **Der Marktplatz** war eine gepflasterte Leerstelle in der Bildmitte; jetzt stehen dort
+    Rathaus mit Stufengiebel, Brunnen, Pranger und Marktstände.
+  - **Ebenen** (Knopf „Ebenen“, Taste `e`): Namen, Umland, Zeichenerklärung, Wappen, Gradnetz,
+    Alterung, Rundgang. Der **Rundgang** verbindet alle Marken zum kürzesten Weg (Nächster
+    Nachbar + 2-opt), nummeriert die Stationen und kreuzt sich nicht selbst.
+  - Neue Schalter im Grundriss: Hafen, Mühle, Werder.
+
+  Repariert in derselben Runde:
+  - **Leere Karten.** Deckte ein See die Blattmitte ab, lief die Suche nach trockener Stadtmitte
+    immer wieder ins Wasser (sie schob in eine feste Richtung). Ergebnis: null Blöcke, null Häuser
+    — ein weißes Blatt mit einer Legende darauf. Jetzt wird ringsum in wachsenden Kreisen gesucht.
+  - **Straßendorf.** Schließt sich kein einziger Block — Weiler mit breitem Fluss —, stehen die
+    Höfe jetzt links und rechts am Weg, statt dass gar nichts entsteht.
+  - **Absturz** in `planNetzStrahlend`: bricht eine Speiche schon am innersten Ring ab, weil dort
+    Wasser liegt, war `spur` leer, und die nächste Zeile griff auf ein Nichts zu.
+  - **Die Mauer** umschließt die Stadt jetzt nachweislich (bei der strahlenden Anlage standen im
+    Dorf 82 % der Häuser draußen) und läuft dabei **nicht durchs offene Meer** (das Einschließen
+    hatte sie in großem Bogen hinausgetrieben). Sie wird auf 44 feste Sektoren abgetastet,
+    geglättet, an der Stadt entlang angehoben und zuletzt zweimal trockengelegt.
+  - **Tore**: der Abstandswert war fest (34 Einheiten) und für einen Weiler viel zu groß — das
+    Dorf bekam elf Tore. Jetzt an der Stadtgröße gemessen, und zwei Tore nebeneinander gibt es nicht.
+  - **2-opt** bewertete den kompletten Weg statt des Unterschieds: bei 400 Marken wären das
+    Milliarden Rechenschritte gewesen, bei jedem Zeichnen. Der Rundgang wird außerdem nur
+    gerechnet, wenn seine Ebene an ist — er steht dafür mit in der Signatur.
+  - Die ganze Farbwelt wird als CSS-Variablen durchgereicht (vorher nur fünf Werte), damit Hafen,
+    Legende und Wappen der gewählten Welt folgen.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

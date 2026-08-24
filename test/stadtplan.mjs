@@ -147,7 +147,7 @@ test('Häuser stehen an der Straße, nicht im Hof', async () => {
   const g = k.planBauen(plan(k, { saat: 'hof', stadt: { alter: 'alt', wasser: 'keins', groesse: 'grossstadt' } }));
   /* Jedes Haus muss ganz in seinem Block liegen. */
   const nachSchluessel = new Map();
-  for (const b of g.stadt.bloecke) nachSchluessel.set('b' + b.i + '_' + b.j, b);
+  for (const b of g.stadt.bloecke) nachSchluessel.set(b.schluessel, b);
   let geprueft = 0;
   for (const h of g.stadt.haeuser) {
     if (h.sonder) continue;
@@ -355,7 +355,7 @@ test('Die strahlende Stadt strahlt wirklich', async () => {
 
 test('Das Schachbrett ist wirklich rechtwinklig', async () => {
   const k = await frisch();
-  const g = k.planBauen(plan(k, { saat: 'sch', stadt: { anlage: 'schachbrett', alter: 'neu', groesse: 'stadt', wasser: 'keins' } }));
+  const g = k.planBauen(plan(k, { saat: 'sch', stadt: { anlage: 'schachbrett', alter: 'neu', groesse: 'metropole', wasser: 'keins' } }));
   /* Das Raster steht schräg im Blatt — gemessen wird deshalb nicht der
      Winkel zur Blattkante, sondern ob sich alle Achsen auf ZWEI Richtungen
      einigen, die neunzig Grad auseinanderliegen. */
@@ -396,4 +396,313 @@ test('Große Blöcke werden geteilt, kleine bleiben', async () => {
   k.planBloeckeTeilen(klein, 6000, 'x', 'k', 0, raus2, schnitte2);
   assert.equal(raus2.length, 1);
   assert.equal(schnitte2.length, 0);
+});
+
+/* --- Was in dieser Runde kaputt war und nicht wieder kaputtgehen darf --- */
+
+test('Die Blöcke liegen nebeneinander, nicht übereinander', async () => {
+  const k = await frisch();
+  /* Die Flächensuche verwarf früher nur die GRÖSSTE Runde als Außenwelt.
+     Hing irgendwo ein Straßenzug frei in der Landschaft, hatte auch der seine
+     eigene Außenrunde — und die legte sich als Riesenblock über alles, was
+     darin lag. Beim Marktflecken kamen so 189 Blöcke mit einer Million
+     Flächeneinheiten auf einer Stadt von 155 000 zusammen. */
+  for (const groesse of ['flecken', 'stadt', 'grossstadt', 'metropole']) {
+    for (const anlage of ['gewachsen', 'strahlend', 'schachbrett']) {
+      const g = k.planBauen(plan(k, { saat: 'uebereinander', stadt: { groesse, anlage, alter: 'alt', wasser: 'fluss', mauer: true } }));
+      const st = g.stadt;
+      const summe = st.bloecke.reduce((s, b) => s + Math.abs(k.netzFlaeche(b.ecken)), 0);
+      const kreis = Math.PI * st.Rmax * st.Rmax;
+      assert.ok(summe < kreis * 1.1,
+        groesse + '/' + anlage + ': die Blöcke belegen ' + (summe / kreis).toFixed(2) + '× die Stadtfläche');
+    }
+  }
+});
+
+test('Jeder Block hat seinen eigenen Schlüssel', async () => {
+  const k = await frisch();
+  /* Der Schlüssel war die gerundete Mitte. Bei zweihundertfünfzig Blöcken
+     fallen zwei auf dieselbe — und dann gehört ein Haus zum falschen Block. */
+  const g = k.planBauen(plan(k, { saat: 'schluessel', stadt: { groesse: 'metropole', anlage: 'gewachsen', alter: 'alt', wasser: 'keins', mauer: true } }));
+  const gesehen = new Set();
+  for (const b of g.stadt.bloecke) {
+    assert.ok(b.schluessel, 'jeder Block hat einen Schlüssel');
+    assert.ok(!gesehen.has(b.schluessel), 'kein Schlüssel doppelt: ' + b.schluessel);
+    gesehen.add(b.schluessel);
+  }
+  assert.ok(gesehen.size > 100, 'es waren wirklich viele Blöcke: ' + gesehen.size);
+});
+
+test('Der Zufall streut auch in einer durchnummerierten Reihe', async () => {
+  const k = await frisch();
+  /* FNV allein ließ das letzte Zeichen fast nur die unteren Bits erreichen,
+     planZufall liest aber die oberen: 'ww0', 'ww1', 'ww2' ergaben
+     0.382, 0.379, 0.390 — praktisch derselbe Wert. Damit war jede Reihe auf
+     der Karte gleichgeschaltet statt gestreut. */
+  for (const stamm of ['ww', 'feld', 'x']) {
+    const reihe = [];
+    for (let i = 0; i < 40; i++) reihe.push(k.planZufall('saat', stamm + i));
+    const faecher = new Array(10).fill(0);
+    reihe.forEach((r) => faecher[Math.min(9, Math.floor(r * 10))]++);
+    const belegt = faecher.filter((f) => f > 0).length;
+    assert.ok(belegt >= 7, stamm + ': vierzig Werte füllen mindestens sieben Zehntel, nicht ' + belegt);
+    const spanne = Math.max(...reihe) - Math.min(...reihe);
+    assert.ok(spanne > 0.85, stamm + ': die Spanne ist ' + spanne.toFixed(2));
+  }
+  /* Und trotzdem: derselbe Schlüssel gibt immer denselben Wert. */
+  assert.equal(k.planZufall('a', 'b'), k.planZufall('a', 'b'));
+});
+
+test('Die Uferstriche bleiben am Ufer', async () => {
+  const k = await frisch();
+  /* Die Richtung „nach außen“ wurde früher aus dem übernächsten Nachbarn
+     bestimmt. An einer scharfen Ecke ist diese Differenz beinahe null, die
+     Normale kippt ins Beliebige, und der Strich schießt davon — gemessen
+     rund 140 Einheiten weiter, als er dürfte. Jeder Punkt eines Strichs muss
+     nahe an SEINEM Ufer bleiben. */
+  const HOECHSTABSTAND = 136;   /* die zwölfte Stufe (128,1) plus Zittern (4,1) */
+  for (const wasser of ['fluss', 'kueste', 'see', 'muendung']) {
+    const doc = k.saubererPlan({ saat: 'ufer-' + wasser, stadt: { groesse: 'stadt', wasser } });
+    const linie = k.planWasser(doc).polygone[0];
+    for (const richtung of [1, -1]) {
+      for (const stufe of [1, 6, 12]) {
+        for (const stueck of k.planUferlinien(linie, stufe, richtung)) {
+          for (const p of stueck) {
+            let nah = Infinity;
+            for (const q of linie) nah = Math.min(nah, k.strecke(p, q));
+            assert.ok(nah <= HOECHSTABSTAND,
+              wasser + '/Stufe ' + stufe + ': ein Strich liegt ' + Math.round(nah) + ' vom Ufer entfernt');
+          }
+        }
+      }
+    }
+  }
+
+  /* Und an einer echten Kehre bricht der Strich ab, statt zu schleudern. */
+  /* Hin bis 700 und auf fast derselben Linie zurück: am Wendepunkt zeigen
+     Vorgänger und Nachfolger genau aufeinander. */
+  const kehre = [[100, 600], [400, 600], [700, 600], [400, 601], [100, 601]];
+  const normalen = k.planUferNormalen(kehre);
+  assert.ok(normalen.some((n) => n === null), 'die Kehre wird erkannt');
+  assert.ok(normalen.filter((n) => n === null).length < kehre.length - 2, 'aber nicht die ganze Linie verworfen');
+});
+
+/* --- Der Hafen, das Wappen, die Legende, der Rundgang --- */
+
+test('Molen greifen ins Wasser, nicht ins Land', async () => {
+  const k = await frisch();
+  /* Eine Mole, die auf halber Strecke an Land endet, ist keine Mole. */
+  for (const wasser of ['fluss', 'kueste', 'see', 'muendung']) {
+    const doc = k.saubererPlan({ saat: 'hafen-' + wasser, stadt: { groesse: 'grossstadt', wasser, mauer: true } });
+    const g = k.planBauen(doc);
+    if (!g.hafen.hat) continue;
+    for (const m of g.hafen.molen) {
+      assert.ok(g.wasser.drin(m.kopf[0], m.kopf[1]), wasser + ': der Molenkopf steht auf dem Trockenen');
+      assert.ok(k.strecke(m.wurzel, m.kopf) >= 20, wasser + ': die Mole ist ein Stummel');
+    }
+    for (const s of g.hafen.schiffe) {
+      assert.ok(g.wasser.drin(s.punkt[0], s.punkt[1]), wasser + ': ein Schiff liegt an Land');
+    }
+    /* Ein Leuchtfeuer weist den Weg von See herein — am Binnenfluss und am
+       See steht keins. */
+    if (wasser === 'fluss' || wasser === 'see') {
+      assert.ok(!g.hafen.leuchtturm, wasser + ': hier gehoert kein Leuchtfeuer hin');
+    }
+  }
+  /* Ohne Wasser kein Hafen, und ohne Haken auch nicht. */
+  assert.ok(!k.planBauen(k.saubererPlan({ saat: 'trocken', stadt: { wasser: 'keins' } })).hafen.hat);
+  assert.ok(!k.planBauen(k.saubererPlan({ saat: 'ohne', stadt: { wasser: 'kueste', hafen: false } })).hafen.hat);
+});
+
+test('Die Muehle steht trocken, ihr Rad im Wasser', async () => {
+  const k = await frisch();
+  for (const wasser of ['fluss', 'muendung']) {
+    const doc = k.saubererPlan({ saat: 'muehle-' + wasser, stadt: { groesse: 'stadt', wasser } });
+    const g = k.planBauen(doc);
+    if (!g.muehle) continue;
+    assert.ok(!g.wasser.drin(g.muehle.punkt[0], g.muehle.punkt[1]), 'das Muehlenhaus steht im Fluss');
+    assert.ok(g.wasser.drin(g.muehle.rad[0], g.muehle.rad[1]), 'das Rad haengt in der Luft');
+  }
+  /* Am Meer und am See gibt es keine Wassermuehle. */
+  for (const wasser of ['kueste', 'see', 'keins']) {
+    assert.equal(k.planBauen(k.saubererPlan({ saat: 'm', stadt: { wasser } })).muehle, null, wasser + ': hier mahlt nichts');
+  }
+});
+
+test('Die Mauer umschliesst die Stadt und bleibt am Ufer', async () => {
+  const k = await frisch();
+  /* Zwei Fehler auf einmal: erst lag der aeusserste Ring der strahlenden
+     Anlage INNERHALB der Bebauung — im Dorf standen zweiundachtzig Prozent
+     der Haeuser draussen. Dann trieb das Einschliessen den Kranz so weit
+     hinaus, dass die Mauer in grossem Bogen durchs offene Meer lief. */
+  for (const anlage of ['gewachsen', 'strahlend', 'schachbrett']) {
+    for (const groesse of ['weiler', 'dorf', 'stadt', 'metropole']) {
+      for (const wasser of ['kueste', 'see', 'keins']) {
+        const doc = k.saubererPlan({ saat: 'mauer', stadt: { groesse, anlage, wasser, mauer: true, umland: true } });
+        const g = k.planBauen(doc);
+        const M = g.stadt.mauer;
+        const wo = anlage + '/' + groesse + '/' + wasser;
+        assert.ok(M, wo + ': gar keine Mauer');
+
+        /* Kein Stueck im Wasser. (Ein Fluss quer durch die Stadt ist die
+           Ausnahme — den muss die Mauer queren, und darum steht er hier
+           nicht in der Liste.) */
+        const nass = M.punkte.filter((p) => g.wasser.drin(p[0], p[1])).length;
+        assert.equal(nass, 0, wo + ': ' + nass + ' Mauerpunkte liegen im Wasser');
+
+        /* Der Kern liegt drinnen. */
+        const vorstadt = new Set(g.stadt.bloecke.filter((b) => b.vorstadt).map((b) => b.schluessel));
+        const kern = g.stadt.haeuser.filter((h) => !vorstadt.has(h.block));
+        if (kern.length > 20) {
+          const drin = kern.filter((h) => h.ecken.every((p) => k.netzImPolygon(M.punkte, p[0], p[1]))).length / kern.length;
+          assert.ok(drin > 0.94, wo + ': nur ' + Math.round(drin * 100) + '% des Kerns liegen in der Mauer');
+        }
+        /* Und eine uebersichtliche Zahl Tore. */
+        assert.ok(M.tore.length >= 1 && M.tore.length <= 9, wo + ': ' + M.tore.length + ' Tore');
+      }
+    }
+  }
+});
+
+test('Ohne Haken keine Mauer, kein Hafen, keine Werder', async () => {
+  const k = await frisch();
+  const g = k.planBauen(k.saubererPlan({
+    saat: 'nackt',
+    stadt: { groesse: 'stadt', wasser: 'kueste', mauer: false, burg: false, umland: false, hafen: false, muehle: false, inseln: false }
+  }));
+  assert.equal(g.stadt.mauer, null);
+  assert.equal(g.stadt.burg, null);
+  assert.equal(g.hafen.hat, false);
+  assert.equal(g.muehle, null);
+  /* Nicht deepEqual: der Sandkasten legt seine Felder in einem eigenen
+     Bereich an, und dann sind zwei leere Listen zwar gleich aufgebaut, aber
+     nicht dasselbe Array. */
+  assert.equal(g.inseln.length, 0);
+  assert.equal(g.umland.felder.length, 0);
+});
+
+test('Das Wappen folgt der heraldischen Farbregel', async () => {
+  const k = await frisch();
+  /* Farbe auf Metall oder Metall auf Farbe — und ueber einer Teilung muss
+     sich die Figur von BEIDEN Haelften abheben. "Schraeggeteilt von Schwarz
+     und Gold, darin drei Anker in Gold" war auf der goldenen Haelfte
+     unsichtbar. */
+  const metalle = ['gold', 'silber'];
+  for (let i = 0; i < 80; i++) {
+    const w = k.planBauen(k.saubererPlan({ saat: 'w' + i, stadt: { wasser: i % 2 ? 'fluss' : 'kueste' } })).wappen;
+    assert.notEqual(w.figur, w.grund, 'Figur wie Grund: ' + k.planBlason(w));
+    assert.notEqual(w.figur, w.zweit, 'Figur wie zweites Feld: ' + k.planBlason(w));
+    const grundMetall = metalle.includes(w.grund);
+    assert.notEqual(grundMetall, metalle.includes(w.figur), 'Farbe auf Farbe: ' + k.planBlason(w));
+    assert.ok(w.wieViele >= 1 && w.wieViele <= 3);
+  }
+});
+
+test('Die Blasonierung geht im Deutschen auf', async () => {
+  const k = await frisch();
+  /* "belegt mit" verlangt den Wemfall — und der sieht bei "ein Turm",
+     "eine Bruecke" und "drei Anker" jedes Mal anders aus. Zusammengeklebt
+     kam "belegt mit eine Bruecke" heraus. */
+  assert.equal(k.planBildWerfall('bruecke', 1), 'eine Brücke');
+  assert.equal(k.planBildWemfall('bruecke', 1), 'einer Brücke');
+  assert.equal(k.planBildWerfall('turm', 1), 'ein Turm');
+  assert.equal(k.planBildWemfall('turm', 1), 'einem Turm');
+  assert.equal(k.planBildWerfall('eichenblatt', 1), 'ein Eichenblatt');
+  assert.equal(k.planBildWemfall('eichenblatt', 1), 'einem Eichenblatt');
+  assert.equal(k.planBildWerfall('anker', 3), 'drei Anker');
+  assert.equal(k.planBildWemfall('anker', 3), 'drei Ankern');
+  assert.equal(k.planBildWemfall('bruecke', 2), 'zwei Brücken');   /* endet schon auf -n */
+  assert.equal(k.planBildWemfall('schluessel', 2), 'zwei Schlüsseln');
+
+  /* Und in ganzen Saetzen: kein falscher Fall, kein doppelter Punkt. */
+  for (let i = 0; i < 120; i++) {
+    const satz = k.planBlason(k.planBauen(k.saubererPlan({ saat: 'b' + i })).wappen);
+    assert.ok(/^[A-ZÄÖÜ]/.test(satz), 'beginnt gross: ' + satz);
+    assert.ok(satz.endsWith('.') && !satz.endsWith('..'), 'endet mit genau einem Punkt: ' + satz);
+    assert.ok(!/ mit eine /.test(satz), 'falscher Fall: ' + satz);
+    assert.ok(!/ mit ein [A-ZÄÖÜ]/.test(satz), 'falscher Fall: ' + satz);
+    assert.ok(!/\s\s/.test(satz), 'doppelte Leerzeichen: ' + satz);
+  }
+});
+
+test('Die Legende erklaert nur, was auch da ist', async () => {
+  const k = await frisch();
+  /* Eine Legende, die Dinge erklaert, die es nicht gibt, ist eine Luege auf
+     Papier. */
+  const trocken = k.planBauen(k.saubererPlan({ saat: 'leg1', stadt: { groesse: 'stadt', wasser: 'keins', mauer: false, umland: false } }));
+  const worte = trocken.legende.map((e) => e.zeichen);
+  assert.ok(!worte.includes('wasser'), 'kein Wasser, kein Wasserzeichen');
+  assert.ok(!worte.includes('hafen'), 'kein Hafen ohne Wasser');
+  assert.ok(!worte.includes('mauer'), 'keine Mauer, kein Mauerzeichen');
+  assert.ok(!worte.includes('acker') && !worte.includes('wald'), 'kein Umland, keine Felder');
+  assert.ok(worte.includes('haus'), 'Haeuser gibt es immer');
+
+  const voll = k.planBauen(k.saubererPlan({ saat: 'leg2', stadt: { groesse: 'grossstadt', wasser: 'kueste', mauer: true, burg: true, umland: true } }));
+  const w2 = voll.legende.map((e) => e.zeichen);
+  for (const muss of ['haus', 'mauer', 'tor', 'wasser', 'hafen', 'burg']) {
+    assert.ok(w2.includes(muss), 'die Legende vergisst: ' + muss);
+  }
+  /* Jeder Eintrag hat einen deutschen Text und kommt nur einmal vor. */
+  const gesehen = new Set();
+  for (const e of voll.legende) {
+    assert.ok(e.text && e.text.length > 2, 'jeder Eintrag hat einen Text');
+    assert.ok(/^[A-ZÄÖÜ]/.test(e.text), 'und der beginnt gross: ' + e.text);
+    assert.ok(!gesehen.has(e.zeichen), 'kein Zeichen doppelt: ' + e.zeichen);
+    gesehen.add(e.zeichen);
+  }
+});
+
+test('Der Rundgang kreuzt sich nicht selbst', async () => {
+  const k = await frisch();
+  /* Ein Rundgang, der sich kreuzt, sieht nach Irrweg aus. */
+  for (const wieViele of [2, 3, 8, 25]) {
+    const marken = [];
+    for (let i = 0; i < wieViele; i++) {
+      marken.push({ id: 'm' + i, x: k.planZufall('rg', 'x' + i) * 1100 + 50, y: k.planZufall('rg', 'y' + i) * 1100 + 50 });
+    }
+    const r = k.planRundgang({ saat: 'rg' }, marken);
+    assert.equal(r.marken.length, wieViele, 'jede Marke kommt genau einmal vor');
+    assert.equal(new Set(r.marken.map((m) => m.id)).size, wieViele, 'und keine doppelt');
+    assert.equal(r.punkte.length, wieViele + 1, 'der Weg ist geschlossen');
+
+    const P = r.punkte;
+    let kreuz = 0;
+    for (let i = 0; i < P.length - 1; i++) {
+      for (let j = i + 2; j < P.length - 1; j++) {
+        if (i === 0 && j === P.length - 2) continue;
+        if (k.netzSchneidet(P[i], P[i + 1], P[j], P[j + 1])) kreuz++;
+      }
+    }
+    assert.equal(kreuz, 0, wieViele + ' Marken: der Weg kreuzt sich ' + kreuz + '-mal');
+  }
+  /* Zu wenige Marken: kein Weg, aber auch kein Absturz. */
+  assert.equal(k.planRundgang({ saat: 'x' }, []).punkte.length, 0);
+  assert.equal(k.planRundgang({ saat: 'x' }, [{ id: 'a', x: 1, y: 1 }]).punkte.length, 0);
+});
+
+test('Keine Groesse, kein Gewaesser und keine Anlage stuerzt ab', async () => {
+  const k = await frisch();
+  /* Bricht eine Speiche schon am innersten Ring ab, weil dort Wasser
+     liegt, war `spur` leer — und die naechste Zeile griff auf ein Nichts zu.
+     Die ganze Karte stuerzte ab. Gefunden hat das erst ein Rundumlauf. */
+  let gebaut = 0;
+  for (const anlage of k.PLAN_ANLAGEN.map((a) => a[0])) {
+    for (const groesse of k.PLAN_GROESSEN.map((g) => g[0])) {
+      for (const wasser of k.PLAN_WASSER.map((w) => w[0])) {
+        const doc = k.saubererPlan({ saat: 'rundum', stadt: { groesse, anlage, wasser, mauer: true, burg: true, umland: true } });
+        const g = k.planBauen(doc);
+        const wo = anlage + '/' + groesse + '/' + wasser;
+        assert.ok(g.stadt.haeuser.length >= 5, wo + ': nur ' + g.stadt.haeuser.length + ' Haeuser — das Blatt bleibt leer');
+        for (const h of g.stadt.haeuser) {
+          for (const p of h.ecken) {
+            assert.ok(Number.isFinite(p[0]) && Number.isFinite(p[1]), wo + ': ein Haus ohne Zahlen');
+          }
+        }
+        gebaut++;
+      }
+    }
+  }
+  assert.ok(gebaut >= 90, 'es wurden wirklich viele Staedte gebaut: ' + gebaut);
+  /* Und keine davon bleibt leer — ein Blatt mit einer Legende und ohne
+     Stadt ist kein Stadtplan. */
 });

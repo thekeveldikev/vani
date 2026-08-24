@@ -5940,7 +5940,40 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
   font-family: ui-serif, "New York", Georgia, serif; pointer-events: none;
 }
 .kt-blatt.ohne-namen .kt-namen { display: none; }
-.kt-blatt.ohne-umland .kt-umland { display: none; }
+.kt-blatt.ohne-umland .kt-umland,
+.kt-blatt.ohne-umland .kt-huegel,
+.kt-blatt.ohne-umland .kt-werder { display: none; }
+.kt-blatt.ohne-legende .kt-legende { display: none; }
+.kt-blatt.ohne-wappen .kt-wappen,
+.kt-blatt.ohne-wappen .kt-blason { display: none; }
+.kt-blatt.ohne-gitter .kt-gradnetz { display: none; }
+.kt-gradlinie { fill: none; stroke: var(--ktinte); stroke-width: .5; stroke-opacity: .13; }
+.kt-blatt.ohne-alterung .kt-alterung { display: none; }
+.kt-blatt:not(.mit-rundgang) .kt-rundgang { display: none; }
+
+/* Der Rundgang: ein gestrichelter Weg durch alle Marken, mit Nummern. */
+.kt-rundweg { fill: none; stroke: var(--kgold, #a8843a); stroke-width: 3.4; stroke-opacity: .8;
+  stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 9 6.5; }
+.kt-rundweg-rand { fill: none; stroke: var(--kpapier); stroke-width: 6.4; stroke-opacity: .8; stroke-linecap: round; stroke-linejoin: round; }
+.kt-rundnummer { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 1.4; }
+.kt-rundziffer { fill: var(--ktinte); font-size: 10px; font-weight: 600; font-family: ui-serif, "New York", Georgia, serif; }
+
+/* ----- Was auf dem Markt steht ----- */
+.kt-rathausleib { fill: var(--kdachdunkel, #8d3f2c); stroke: var(--ktinte); stroke-width: 1.6; }
+.kt-rathausfirst { fill: none; stroke: var(--ktinte); stroke-width: .9; stroke-opacity: .55; }
+.kt-rathausgiebel { fill: var(--kdachdunkel, #8d3f2c); stroke: var(--ktinte); stroke-width: 1.2; stroke-linejoin: round; }
+.kt-rathausturm { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 1.2; }
+.kt-brunnenring { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 1.5; }
+.kt-brunnenloch { fill: var(--ktinte); fill-opacity: .3; }
+.kt-brunnengalgen { fill: none; stroke: var(--ktinte); stroke-width: 1; stroke-opacity: .75; }
+.kt-pranger { fill: none; stroke: var(--ktinte); stroke-width: 1.3; stroke-linecap: round; }
+.kt-standdach { fill: var(--kdach, #b4553a); fill-opacity: .78; stroke: var(--ktinte); stroke-width: .9; }
+.kt-standstrich { fill: none; stroke: var(--ktinte); stroke-width: .7; stroke-opacity: .5; }
+
+/* Das Fenster fuer die Ebenen. */
+.kt-ebenenfenster { max-width: 460px; }
+.kt-ebenenhilfe { display: block; color: var(--matt); margin: -4px 0 12px; line-height: 1.5; }
+.kt-ebenenliste { display: grid; gap: 8px; }
 
 /* ----- Kompass, Maßstab, Kartusche ----- */
 .kt-kompassring { fill: none; stroke: var(--ktinte); stroke-width: 1.4; stroke-opacity: .55; }
@@ -5965,7 +5998,79 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 }
 .kt-kartuschenunter { fill: var(--ktinte); fill-opacity: .62; font-size: 11.5px; font-style: italic; font-family: ui-serif, "New York", Georgia, serif; }
 
+.kt-blason { fill: var(--ktinte); fill-opacity: .5; font-size: 10px; font-style: italic; font-family: ui-serif, "New York", Georgia, serif; }
+
+/* ----- Der Hafen -----
+   Kai und Molen werden zweimal gezeichnet: erst dunkel und breit, dann
+   hell und schmal. So verschmelzen sie zu EINEM Umriss, statt als lauter
+   einzelne Streifen uebereinanderzuliegen. */
+.kt-kai-rand { fill: none; stroke: var(--ktinte); stroke-width: 17; stroke-linejoin: round; stroke-linecap: round; stroke-opacity: .88; }
+.kt-kai { fill: none; stroke: var(--kstrasse, var(--kpapier)); stroke-width: 13.6; stroke-linejoin: round; stroke-linecap: round; }
+.kt-mole-rand { fill: none; stroke: var(--ktinte); stroke-linecap: round; stroke-opacity: .88; }
+.kt-mole { fill: none; stroke: var(--kstrasse, var(--kpapier)); stroke-linecap: round; }
+.kt-poller { fill: var(--ktinte); fill-opacity: .78; }
+.kt-wellenbrecher-rand { fill: none; stroke: var(--ktinte); stroke-width: 9.6; stroke-linecap: round; stroke-opacity: .72; }
+.kt-wellenbrecher { fill: none; stroke: var(--kpapier); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 5 3.4; }
+.kt-schiffleib { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 1.3; stroke-linejoin: round; }
+.kt-schiffdeck { fill: none; stroke: var(--ktinte); stroke-width: .8; stroke-opacity: .6; }
+.kt-schiffrah { fill: none; stroke: var(--ktinte); stroke-width: .9; stroke-opacity: .78; }
+.kt-kranhaus { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 1.3; }
+.kt-kranarm { fill: none; stroke: var(--ktinte); stroke-width: 1.6; stroke-linecap: round; }
+.kt-kranseil { fill: none; stroke: var(--ktinte); stroke-width: .8; stroke-opacity: .7; }
+.kt-leuchtkoerper { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 1.4; stroke-linejoin: round; }
+.kt-leuchtlaterne { fill: var(--ktinte); fill-opacity: .82; stroke: var(--ktinte); stroke-width: .9; stroke-linejoin: round; }
+.kt-leuchtstrich { stroke: var(--ktinte); stroke-width: 1; stroke-opacity: .62; }
+.kt-leuchtstrahl { stroke: var(--ktinte); stroke-width: .9; stroke-opacity: .5; stroke-linecap: round; }
+
+/* ----- Die Muehle ----- */
+.kt-muehlenhaus { fill: var(--kdach, var(--kpapier)); stroke: var(--ktinte); stroke-width: 1.4; }
+.kt-muehlenfirst { stroke: var(--ktinte); stroke-width: .9; stroke-opacity: .6; }
+.kt-muehlrad { fill: var(--kpapier); fill-opacity: .8; stroke: var(--ktinte); stroke-width: 1.4; }
+.kt-muehlnabe { fill: var(--ktinte); fill-opacity: .8; }
+.kt-muehlspeiche { stroke: var(--ktinte); stroke-width: .8; stroke-opacity: .8; }
+
+/* ----- Die Werder ----- */
+.kt-werdergrund { stroke: none; }
+.kt-werderrand { fill: none; stroke: var(--ktinte); stroke-width: 1.4; stroke-opacity: .78; }
+
+/* ----- Das Wappen -----
+   Die heraldische Schraffur: jede Tinktur hat ihre Strichlage, und
+   deshalb ist ein einfarbiges Wappen trotzdem vollstaendig lesbar. */
+.kt-schildgrund { fill: var(--kpapier); }
+.kt-schildrand { fill: none; stroke: var(--ktinte); stroke-width: 2; stroke-linejoin: round; }
+.kt-tinktur { fill: none; stroke: var(--ktinte); stroke-width: .75; stroke-opacity: .85; }
+.kt-tinktur.korn { stroke-width: 1.1; stroke-linecap: round; stroke-opacity: .8; }
+.kt-wappenbild { color: var(--ktinte); }
+.kt-wbleib { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 1.5; stroke-linejoin: round; }
+.kt-wappenbild.dunkel .kt-wbleib { fill: var(--kpapier); }
+.kt-wbring { fill: none; stroke: var(--ktinte); stroke-width: 1.5; }
+.kt-wbstrich { fill: none; stroke: var(--ktinte); stroke-width: 1.1; stroke-linecap: round; }
+.kt-wbdick { fill: none; stroke: var(--ktinte); stroke-width: 1.8; stroke-linecap: round; }
+
+/* ----- Die Zeichenerklaerung ----- */
+.kt-legendegrund { fill: var(--kpapier); fill-opacity: .93; stroke: var(--ktinte); stroke-width: 1.8; }
+.kt-legenderahmen { fill: none; stroke: var(--ktinte); stroke-width: .8; stroke-opacity: .5; }
+.kt-legendetitel { fill: var(--ktinte); font-size: 13px; letter-spacing: .07em; font-family: ui-serif, "New York", Georgia, serif; }
+.kt-legendetext { fill: var(--ktinte); fill-opacity: .82; font-size: 10.5px; font-family: ui-serif, "New York", Georgia, serif; }
+.kt-legendestrich { stroke: var(--ktinte); stroke-width: .8; stroke-opacity: .45; }
+.kt-lz-haus { fill: var(--kdach, #b4553a); stroke: var(--ktinte); stroke-width: .9; }
+.kt-lz-grosshaus { fill: var(--kdachdunkel, #8d3f2c); stroke: var(--ktinte); stroke-width: .9; }
+.kt-lz-tor { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 1.1; }
+.kt-lz-markt { fill: var(--kstrasse, var(--kpapier)); stroke: var(--ktinte); stroke-width: .9; }
+.kt-lz-gruen { fill: var(--kgruen, #cfd8b8); stroke: var(--ktinte); stroke-width: .8; }
+.kt-lz-feld { fill: var(--kgruen, #cfd8b8); stroke: var(--ktinte); stroke-width: .8; stroke-opacity: .7; }
+.kt-lz-wald { fill: var(--kgruendunkel, #a9b98f); stroke: var(--ktinte); stroke-width: .8; stroke-opacity: .7; }
+.kt-lz-werder { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 1; }
+.kt-lz-rad { fill: none; stroke: var(--ktinte); stroke-width: 1.1; }
+.kt-lz-mauer { fill: none; stroke: var(--ktinte); stroke-width: 2.2; stroke-linecap: round; }
+.kt-lz-welle { fill: none; stroke: var(--kwasserrand, #7b9bb0); stroke-width: 1.1; stroke-linecap: round; }
+.kt-lz-strich { fill: none; stroke: var(--ktinte); stroke-width: .9; stroke-linecap: round; stroke-opacity: .8; }
+
 .kt-randlinie { fill: none; stroke: var(--ktinte); stroke-width: 2.4; stroke-opacity: .75; }
+/* Das graduierte Randband: gefelderte Kaesten zwischen zwei Linien. */
+.kt-randfeld { fill: var(--ktinte); fill-opacity: .66; }
+.kt-randecke { fill: none; stroke: var(--ktinte); stroke-width: 1; stroke-opacity: .6; }
+.kt-randraute { fill: var(--ktinte); fill-opacity: .72; }
 .kt-randlinie.innen { stroke-width: 1; stroke-opacity: .5; }
 .kt-gradstrich { stroke: var(--ktinte); stroke-width: 1.2; stroke-opacity: .55; }
 
@@ -6416,7 +6521,7 @@ ${n.toString()}`)},Ir=class{constructor(t){this.patterns=[],this.$state=t}if(t,n
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.42.0';
+const APP_VERSION = '5.44.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -7381,8 +7486,26 @@ function zeigeDeck(inhalt, beiZu) {
     e.stopPropagation(); e.preventDefault();
     zu();
   };
-  const zu = () => { document.removeEventListener('keydown', beiTaste, true); schleier.remove(); if (beiZu) beiZu(); if (fokusVorher && fokusVorher !== document.body && fokusVorher.isConnected && typeof fokusVorher.focus === 'function' && !$('#deck').querySelector('.schleier')) { try { fokusVorher.focus({ preventScroll: true }); } catch (e) {} } };
+  /* Ein Deck überlebt keinen Ortswechsel.
+     Vorher blieb es liegen: wer aus einem offenen Kabinettfach heraus die
+     Adresse wechselte — Zurück-Taste, ein Verweis, ein Sprung ins Zuhause —,
+     ließ Schleier und Inhalt im Dokument stehen. Beim nächsten Öffnen lag
+     das nächste darüber, und mit ihm eine zweite vollständige Stadtkarte.
+     Nach sieben Besuchen waren es sieben.
+
+     Die Adresse wird beim Aufziehen gemerkt, damit ein Deck, das GERADE
+     durch eine Navigation entsteht, sich nicht selbst wieder zumacht. */
+  const adresseBeimOeffnen = location.hash;
+  const beiOrtswechsel = () => { if (location.hash !== adresseBeimOeffnen) zu(); };
+  const zu = () => {
+    document.removeEventListener('keydown', beiTaste, true);
+    window.removeEventListener('hashchange', beiOrtswechsel);
+    schleier.remove();
+    if (beiZu) beiZu();
+    if (fokusVorher && fokusVorher !== document.body && fokusVorher.isConnected && typeof fokusVorher.focus === 'function' && !$('#deck').querySelector('.schleier')) { try { fokusVorher.focus({ preventScroll: true }); } catch (e) {} }
+  };
   document.addEventListener('keydown', beiTaste, true);
+  window.addEventListener('hashchange', beiOrtswechsel);
   $('#deck').append(schleier);
   return zu;
 }
@@ -34055,29 +34178,40 @@ const PLAN_ALTER = [
 ];
 function planAlterWert(id) { const a = PLAN_ALTER.find((x) => x[0] === id); return a ? a[3] : 0.66; }
 
+/* [Kennung, Name, Ausfallstraßen, Ringe, Radius als Anteil des Blattes]
+   Der Radius ist das Entscheidende: vorher wuchs er kaum mit, und deshalb
+   hatte ein Weiler fast so viele Häuser wie eine Metropole. Eine Stadt ist
+   nicht dichter gebaut als ein Dorf — sie ist GRÖSSER. */
 const PLAN_GROESSEN = [
-  ['weiler', 'Ein Weiler', 5, 3],
-  ['dorf', 'Ein Dorf', 7, 3],
-  ['flecken', 'Ein Marktflecken', 9, 4],
-  ['stadt', 'Eine Stadt', 11, 5],
-  ['grossstadt', 'Eine große Stadt', 14, 6],
-  ['metropole', 'Eine Metropole', 17, 7]
+  ['weiler', 'Ein Weiler', 4, 2, 0.085],
+  ['dorf', 'Ein Dorf', 5, 2, 0.125],
+  ['flecken', 'Ein Marktflecken', 7, 3, 0.185],
+  ['stadt', 'Eine Stadt', 10, 4, 0.27],
+  ['grossstadt', 'Eine große Stadt', 13, 5, 0.36],
+  ['metropole', 'Eine Metropole', 16, 6, 0.46]
 ];
 function planGroesse(id) { return PLAN_GROESSEN.find((g) => g[0] === id) || PLAN_GROESSEN[3]; }
 
 /* ----- Die Viertel -----
    Ein Viertel ist kein Gebiet auf einer Verwaltungskarte, sondern ein
    Charakter: wie eng steht es, wie groß sind die Häuser, was riecht man. */
+/* Die Viertel und ihr Charakter.
+   `dichte` teilt die Parzellenbreite: 0,18 hieß vierundsechzig Einheiten
+   Straßenfront für EIN Haus — das Gartenviertel war danach kein Viertel mehr,
+   sondern ein weißes Loch mit fünfundfünfzig Häusern neben vierhundert im
+   Handwerksviertel. Der Unterschied soll man SEHEN, aber lesen können muss
+   man ihn auch. Darum liegt der Boden jetzt bei gut der Hälfte — und was
+   locker bebaut ist, wird über `gruen` wirklich grün, statt leer zu bleiben. */
 const PLAN_VIERTELARTEN = [
-  { id: 'altstadt', name: 'Altstadt', dichte: 1.0, haus: 0.8, gruen: 0.02, hoefe: 0.15 },
-  { id: 'handwerk', name: 'Handwerk', dichte: 0.92, haus: 0.9, gruen: 0.05, hoefe: 0.3 },
-  { id: 'reich', name: 'Wohlhabend', dichte: 0.5, haus: 1.7, gruen: 0.3, hoefe: 0.6 },
+  { id: 'altstadt', name: 'Altstadt', dichte: 1.0, haus: 0.8, gruen: 0.03, hoefe: 0.15 },
+  { id: 'handwerk', name: 'Handwerk', dichte: 0.94, haus: 0.9, gruen: 0.05, hoefe: 0.3 },
+  { id: 'reich', name: 'Wohlhabend', dichte: 0.7, haus: 1.7, gruen: 0.26, hoefe: 0.5 },
   { id: 'arm', name: 'Arm', dichte: 1.0, haus: 0.6, gruen: 0.02, hoefe: 0.1 },
-  { id: 'geistlich', name: 'Geistlich', dichte: 0.42, haus: 1.5, gruen: 0.35, hoefe: 0.5 },
-  { id: 'hafen', name: 'Hafen', dichte: 0.8, haus: 1.2, gruen: 0.03, hoefe: 0.2 },
-  { id: 'markt', name: 'Markt', dichte: 0.78, haus: 1.0, gruen: 0.06, hoefe: 0.25 },
-  { id: 'vorstadt', name: 'Vorstadt', dichte: 0.42, haus: 0.9, gruen: 0.4, hoefe: 0.45 },
-  { id: 'garten', name: 'Gärten', dichte: 0.18, haus: 0.8, gruen: 0.8, hoefe: 0.7 }
+  { id: 'geistlich', name: 'Geistlich', dichte: 0.68, haus: 1.5, gruen: 0.3, hoefe: 0.42 },
+  { id: 'hafen', name: 'Hafen', dichte: 0.86, haus: 1.2, gruen: 0.04, hoefe: 0.2 },
+  { id: 'markt', name: 'Markt', dichte: 0.82, haus: 1.0, gruen: 0.07, hoefe: 0.25 },
+  { id: 'vorstadt', name: 'Vorstadt', dichte: 0.6, haus: 0.9, gruen: 0.34, hoefe: 0.4 },
+  { id: 'garten', name: 'Gärten', dichte: 0.55, haus: 0.85, gruen: 0.58, hoefe: 0.5 }
 ];
 function planViertelart(id) { return PLAN_VIERTELARTEN.find((v) => v.id === id) || PLAN_VIERTELARTEN[1]; }
 
@@ -34128,6 +34262,17 @@ function planHash(...teile) {
   let h = 2166136261;
   const s = teile.join('|');
   for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  /* Der Nachbrenner ist nicht Zierde, sondern Notwendigkeit.
+     FNV allein lässt das letzte Zeichen fast nur die unteren Bits erreichen —
+     `planZufall` teilt aber durch 2^32 und liest damit die OBEREN. Die Folge
+     war verheerend und lange unsichtbar: 'ww0', 'ww1', 'ww2' … ergaben
+     0.382, 0.379, 0.390 — praktisch derselbe Wert. Jede durchnummerierte
+     Reihe auf dieser Karte, jeder Wald, jedes Feld, jedes Zittern eines
+     Hauses, war damit gar nicht gestreut, sondern gleichgeschaltet.
+     Diese drei Zeilen verrühren die Bits, bis jedes Zeichen überall wirkt. */
+  h ^= h >>> 16; h = Math.imul(h, 2246822507);
+  h ^= h >>> 13; h = Math.imul(h, 3266489909);
+  h ^= h >>> 16;
   return (h >>> 0);
 }
 function planZufall(...teile) { return planHash(...teile) / 4294967296; }
@@ -34181,8 +34326,23 @@ function saubererPlan(roh) {
       mauer: st.mauer !== false,
       burg: st.burg !== false,
       umland: st.umland !== false,
+      /* Hafen, Mühle und Werder gibt es nur am Wasser — der Schalter darf
+         trotzdem stehen bleiben, damit er noch da ist, wenn jemand später
+         einen Fluss dazunimmt. */
+      hafen: st.hafen !== false,
+      muehle: st.muehle !== false,
+      inseln: st.inseln !== false,
       dichte: Math.max(0.5, Math.min(1.6, Number(st.dichte) || 1))
     },
+    wappen: r.wappen && typeof r.wappen === 'object' && r.wappen.eigen ? {
+      eigen: true,
+      grund: PLAN_TINKTUREN.some((t) => t.id === r.wappen.grund) ? r.wappen.grund : 'silber',
+      zweit: PLAN_TINKTUREN.some((t) => t.id === r.wappen.zweit) ? r.wappen.zweit : 'rot',
+      figur: PLAN_TINKTUREN.some((t) => t.id === r.wappen.figur) ? r.wappen.figur : 'rot',
+      teilung: PLAN_TEILUNGEN.some((t) => t.id === r.wappen.teilung) ? r.wappen.teilung : 'ganz',
+      bild: PLAN_WAPPENBILDER.some((b) => b.id === r.wappen.bild) ? r.wappen.bild : 'turm',
+      wieViele: Math.max(1, Math.min(3, Math.round(Number(r.wappen.wieViele) || 1)))
+    } : null,
     marken, namen,
     notiz: String(r.notiz || '').trim().slice(0, 6000)
   };
@@ -34320,17 +34480,50 @@ function planStadt(plan, wasser) {
   const krumm = planAlterWert(plan.stadt.alter);
   const G = PLAN_GROESSE;
 
-  /* Die Mitte liegt selten genau in der Mitte. Bei Wasser rückt sie ans Ufer. */
+  /* Die Mitte liegt selten genau in der Mitte. Bei Wasser rückt sie ans Ufer.
+
+     Der erste Versuch schob sie dafür in eine feste Richtung — zur
+     Blattmitte hin, plus ein wenig Drift. Deckt der See aber genau die
+     Blattmitte ab, führt jeder Schritt wieder ins Wasser: die Mitte blieb
+     nass, es entstand kein einziger Block, und die Karte war LEER. (Saat
+     „mauer“, Gewässer „see“ — ein weißes Blatt mit einer Legende darauf.)
+
+     Jetzt wird ringsum gesucht: in wachsenden Kreisen, und genommen wird
+     die erste Stelle, an der nicht nur der Punkt selbst trocken ist,
+     sondern auch ein Stück Land drumherum. Eine Stadt braucht Ufer, nicht
+     eine Sandbank. */
   let mx = G / 2 + planStreu(saat, 'mx') * G * 0.07;
   let my = G / 2 + planStreu(saat, 'my') * G * 0.06;
-  if (wasser.art !== 'keins') {
-    for (let versuch = 0; versuch < 80 && wasser.drin(mx, my); versuch++) {
-      mx += (G / 2 - mx) * 0.14 + 6;
-      my += (G / 2 - my) * 0.14 + 4;
+  if (wasser.art !== 'keins' && wasser.drin(mx, my)) {
+    const platzDa = (x, y, weit) => {
+      if (x < 90 || x > G - 90 || y < 90 || y > G - 90) return false;
+      if (wasser.drin(x, y)) return false;
+      let trocken = 0;
+      for (let i = 0; i < 12; i++) {
+        const w = (i / 12) * Math.PI * 2;
+        if (!wasser.drin(x + Math.cos(w) * weit, y + Math.sin(w) * weit)) trocken++;
+      }
+      return trocken >= 8;
+    };
+    const start = [mx, my];
+    let gefunden = null;
+    /* Erst nach richtig Platz suchen, dann mit weniger zufrieden sein. */
+    for (const weit of [110, 70, 40]) {
+      for (let r = 30; r <= G * 0.55 && !gefunden; r += 22) {
+        for (let i = 0; i < 24 && !gefunden; i++) {
+          /* Die Richtung wandert mit dem Radius, damit die Suche nicht
+             immer dieselbe Achse zuerst abtastet. */
+          const w = ((i / 24) + (r / 220)) * Math.PI * 2;
+          const x = start[0] + Math.cos(w) * r, y = start[1] + Math.sin(w) * r;
+          if (platzDa(x, y, weit)) gefunden = [x, y];
+        }
+      }
+      if (gefunden) break;
     }
+    if (gefunden) { mx = gefunden[0]; my = gefunden[1]; }
   }
-  const [, , speichen, ringeZahl] = planGroesse(plan.stadt.groesse);
-  const Rmax = G * (0.26 + speichen * 0.0115);
+  const [, , speichen, ringeZahl, radiusAnteil] = planGroesse(plan.stadt.groesse);
+  const Rmax = G * radiusAnteil;
 
   /* --- Das Netz wächst --- */
   const anlage = plan.stadt.anlage;
@@ -34381,10 +34574,29 @@ function planStadt(plan, wasser) {
     let breit = 0;
     for (let i = 0; i < f.length; i++) breit = Math.max(breit, strecke(f[i], f[(i + 1) % f.length]));
     bloecke.push({
+      /* Der Schlüssel war einmal die gerundete Mitte — 'b412_337'. Solange es
+         hundert Blöcke gab, ging das gut; bei zweihundertfünfzig fallen zwei
+         Blöcke auf dieselbe gerundete Mitte, und dann gehört ein Haus plötzlich
+         zum falschen Block. Eine laufende Nummer kann das nicht passieren. */
+      schluessel: 'b' + bloecke.length,
       i: Math.round(m[0]), j: Math.round(m[1]),
       ecken: f, mitte: m, breit, flaeche: fl,
       viertel: v, vorstadt: drausen, sonder: ''
     });
+  }
+
+  /* --- Wo ein Viertel grün ist, wird es grün ---
+     `gruen` stand bis hierher als totes Datenfeld in der Tabelle: notiert,
+     nie gelesen. Ein lockeres Viertel sah dadurch nicht nach Gärten aus,
+     sondern nach unbedrucktem Papier. */
+  for (const b of bloecke) {
+    if (b.sonder) continue;
+    const va = planViertelart(b.viertel.art);
+    /* Nur draußen darf es üppig sein. Hinter der Mauer war jeder Fußbreit
+       teuer — ein Drittel Gärten sah aus wie eine Gartenstadt, nicht wie eine
+       ummauerte Stadt. */
+    const anteil = va.gruen * (b.vorstadt ? 1 : 0.5);
+    if (planZufall(saat, 'gv' + b.schluessel) < anteil) b.sonder = 'garten';
   }
 
   /* --- Besondere Blöcke --- */
@@ -34402,7 +34614,7 @@ function planStadt(plan, wasser) {
   for (const b of bloecke) {
     if (b.sonder === 'garten' || b.sonder === 'friedhof') continue;
     const va = planViertelart(b.viertel.art);
-    planBlockBebauen(b.ecken, saat, 'b' + b.i + '_' + b.j, va, plan.stadt.dichte, wasser, haeuser);
+    planBlockBebauen(b.ecken, saat, b.schluessel, va, plan.stadt.dichte, wasser, haeuser);
     if (b.sonder === 'kirche' && haeuser.length) {
       /* Die Kirche steht als eigener Bau in der Mitte des Blocks. */
       const m = b.mitte;
@@ -34414,8 +34626,33 @@ function planStadt(plan, wasser) {
     }
   }
 
-  /* --- Die Straßen --- */
-  const strassen = gewachsen.wege;
+  /* --- Die Straßen ---
+     Die gewachsenen Züge sind benannt und beschriftet; alles, was beim
+     Verdichten dazukam, wird als schlichte Gasse mitgezeichnet — sonst
+     stünden Häuser an Straßen, die es gar nicht gibt. */
+  const gezeichnet = new Set();
+  for (const w of gewachsen.wege) {
+    for (let i = 1; i < w.punkte.length; i++) {
+      const a = w.punkte[i - 1], b = w.punkte[i];
+      gezeichnet.add(Math.round(a[0]) + ',' + Math.round(a[1]) + '|' + Math.round(b[0]) + ',' + Math.round(b[1]));
+      gezeichnet.add(Math.round(b[0]) + ',' + Math.round(b[1]) + '|' + Math.round(a[0]) + ',' + Math.round(a[1]));
+    }
+  }
+  const strassen = gewachsen.wege.slice();
+  gewachsen.netz.kanten.forEach((k, i) => {
+    const a = gewachsen.netz.knoten[k.a], b = gewachsen.netz.knoten[k.b];
+    const marke = Math.round(a.x) + ',' + Math.round(a.y) + '|' + Math.round(b.x) + ',' + Math.round(b.y);
+    if (gezeichnet.has(marke)) return;
+    strassen.push({ art: k.art === 'platz' ? 'ring' : k.art, richtung: 'quer', i: 7000 + i, punkte: [[a.x, a.y], [b.x, b.y]], name: '' });
+  });
+
+  /* --- Wenn sich kein Block geschlossen hat ---
+     Dann ist es kein Blockgefüge, sondern ein Straßendorf. Ohne diesen
+     Zweig blieb bei einem Weiler mit breitem Fluss ein LEERES Blatt übrig:
+     dreizehn Wege, null Blöcke, null Häuser. */
+  if (haeuser.length < 6) {
+    planStrassendorf(strassen, saat, planViertelart('handwerk'), plan.stadt.dichte, wasser, haeuser, [mx, my], Rmax);
+  }
 
   /* --- Der Marktplatz --- */
   const markt = gewachsen.marktEcken;
@@ -34423,15 +34660,72 @@ function planStadt(plan, wasser) {
   /* --- Die Mauer: der äußerste Ring --- */
   let mauer = null;
   if (plan.stadt.mauer) {
-    const ring = gewachsen.wege.find((w) => w.art === 'mauerweg');
+    /* Die gewachsene und die strahlende Anlage legen ihren äußersten Ring
+       selbst als 'mauerweg' an. Das Schachbrett hat gar keine Ringe — und
+       bekam deshalb überhaupt keine Mauer, obwohl der Haken gesetzt war.
+       Dann wird sie aus der Stadt selbst genommen: in jedem Winkelsektor der
+       äußerste Punkt des Netzes, und das ergibt einen Kranz, der wirklich um
+       das herumläuft, was gebaut wurde. */
+    let ring = gewachsen.wege.find((w) => w.art === 'mauerweg');
+    if (!ring) {
+      const sektoren = 40;
+      const weiteste = new Array(sektoren).fill(null);
+      for (const kn of gewachsen.netz.knoten) {
+        const d = strecke([kn.x, kn.y], [mx, my]);
+        if (d < Rmax * 0.3 || wasser.drin(kn.x, kn.y)) continue;
+        let w = Math.atan2(kn.y - my, kn.x - mx);
+        if (w < 0) w += Math.PI * 2;
+        const s2 = Math.floor((w / (Math.PI * 2)) * sektoren) % sektoren;
+        if (!weiteste[s2] || d > weiteste[s2].d) weiteste[s2] = { p: [kn.x, kn.y], d };
+      }
+      const punkte = [];
+      for (let i = 0; i < sektoren; i++) {
+        const t = weiteste[i];
+        if (!t) continue;
+        /* Ein Stück weiter hinaus als das letzte Haus — die Mauer schneidet
+           nicht durch die Vorstadt. */
+        const w = Math.atan2(t.p[1] - my, t.p[0] - mx);
+        const r = t.d + 16;
+        punkte.push([mx + Math.cos(w) * r, my + Math.sin(w) * r]);
+      }
+      if (punkte.length > 6) {
+        punkte.push(punkte[0]);
+        ring = { art: 'mauerweg', richtung: 'ring', j: 99, punkte, name: '' };
+        strassen.push(ring);
+      }
+    }
     if (ring && ring.punkte.length > 3) {
+      /* Der Kranz wird geglättet, bevor er zur Mauer wird.
+         Gemessen hatte er bei der gewachsenen Anlage Knicke von über
+         hundert Grad und einen Radius, der zwischen 167 und 311 sprang —
+         sechsundachtzig Prozent Schwankung. Unten stand dann eine Spitze
+         im Blatt. Eine Stadtmauer folgt aber dem Gelände, nicht den
+         Zufälligkeiten eines Ringwegs.
+
+         Erst nach dem Winkel ordnen (das behebt zugleich Schleifen, in
+         denen der Ring sich selbst kreuzt), dann den Abstand zur Mitte
+         zweimal über die Nachbarn mitteln. Die Ecken bleiben, die Spitzen
+         gehen. */
+      const kern = [];
+      for (const b of bloecke) {
+        if (b.vorstadt) continue;
+        for (const e of b.ecken) kern.push(e);
+      }
+      ring = { ...ring, punkte: planKranzGlaetten(ring.punkte, [mx, my], 3, kern, wasser) };
+
       const tuerme = [], tore = [];
+      /* Wie nah muss eine Hauptstraße sein, damit dort ein Tor steht?
+         Vierunddreißig Einheiten waren für eine Metropole richtig und für
+         einen Weiler viel zu viel: dort lag fast jeder Ringpunkt neben
+         einer Ausfallstraße, und das Dorf bekam elf Tore. */
+      const torNah = Math.max(16, Math.min(34, Rmax * 0.11));
       ring.punkte.slice(0, -1).forEach((p, i) => {
         if (wasser.drin(p[0], p[1])) return;
-        /* Wo eine Hauptstraße die Mauer trifft, liegt ein Tor. */
-        const ausfall = gewachsen.adern.some((a) => a.haupt && a.knoten.some((q) => strecke(q, p) < 34));
-        if (ausfall) tore.push({ punkt: p, i, name: planTorname(saat, i) });
-        else tuerme.push({ punkt: p, i });
+        const ausfall = gewachsen.adern.some((a) => a.haupt && a.knoten.some((q) => strecke(q, p) < torNah));
+        /* Zwei Tore nebeneinander in derselben Mauer gibt es nicht. */
+        if (ausfall && !tore.some((t) => strecke(t.punkt, p) < Rmax * 0.34)) {
+          tore.push({ punkt: p, i, name: planTorname(saat, i) });
+        } else tuerme.push({ punkt: p, i });
       });
       if (!tore.length && ring.punkte.length > 2) tore.push({ punkt: ring.punkte[0], i: 0, name: planTorname(saat, 0) });
       mauer = { punkte: ring.punkte, tuerme, tore, ring: 1 };
@@ -34458,45 +34752,122 @@ function planStadt(plan, wasser) {
 }
 
 /* ===================== DAS UMLAND =====================
-   Felder in Streifen, Wälder in Nestern, ein paar einzelne Höfe. Ohne
-   Umland schwebt die Stadt im Nichts. */
+   Der erste Versuch legte die Äcker als vollständigen Kranz um die Stadt —
+   und das war wieder ein Spinnennetz, nur aus Feldern. So sieht Land nicht
+   aus: es liegt in FLUREN. Eine Flur ist eine Handvoll paralleler Streifen
+   in einer Richtung; die nächste Flur daneben hat eine andere Richtung, weil
+   dort das Gelände anders fällt. Dazwischen bleibt Platz.
+
+   Genauso Wälder: keine Kreissegmente, sondern unregelmäßige Flächen. */
 function planUmland(plan, stadt, wasser) {
   if (!plan.stadt.umland) return { felder: [], waelder: [], hoefe: [] };
   const saat = plan.saat;
   const G = PLAN_GROESSE;
   const [mx, my] = stadt.mitte;
+  const R = stadt.Rmax;
   const felder = [], waelder = [], hoefe = [];
-  const aussen = stadt.Rmax * 1.06;
 
-  const gruppen = 12 + Math.round(planZufall(saat, 'fg') * 8);
-  for (let g = 0; g < gruppen; g++) {
-    const w = (g / gruppen) * Math.PI * 2 + planStreu(saat, 'fw' + g) * 0.18;
-    const r0 = aussen + planZufall(saat, 'fr' + g) * G * 0.08;
-    const tiefe = G * (0.05 + planZufall(saat, 'ft' + g) * 0.13);
-    const breite = (Math.PI * 2 / gruppen) * 0.86;
-    const streifen = 2 + Math.round(planZufall(saat, 'fs' + g) * 4);
-    const kind = planZufall(saat, 'fk' + g);
-    for (let s = 0; s < streifen; s++) {
-      const w0 = w - breite / 2 + (s / streifen) * breite;
-      const w1 = w - breite / 2 + ((s + 0.86) / streifen) * breite;
-      const ecken = [
-        [mx + Math.cos(w0) * r0, my + Math.sin(w0) * r0],
-        [mx + Math.cos(w1) * r0, my + Math.sin(w1) * r0],
-        [mx + Math.cos(w1) * (r0 + tiefe), my + Math.sin(w1) * (r0 + tiefe)],
-        [mx + Math.cos(w0) * (r0 + tiefe), my + Math.sin(w0) * (r0 + tiefe)]
-      ];
-      if (ecken.some((p) => p[0] < -40 || p[0] > G + 40 || p[1] < -40 || p[1] > G + 40)) continue;
-      if (wasser.drin(ecken[0][0], ecken[0][1]) || wasser.drin(ecken[2][0], ecken[2][1])) continue;
-      if (kind > 0.72) waelder.push({ ecken, n: waelder.length });
-      else felder.push({ ecken, gepfluegt: kind > 0.34, n: felder.length });
-    }
-    if (kind > 0.5 && kind < 0.72) {
-      const hr = r0 + tiefe * 0.4;
-      const hw = w + planStreu(saat, 'hw' + g) * 0.1;
-      const p = [mx + Math.cos(hw) * hr, my + Math.sin(hw) * hr];
-      if (!wasser.drin(p[0], p[1]) && p[0] > 20 && p[0] < G - 20 && p[1] > 20 && p[1] < G - 20) hoefe.push({ punkt: p, n: hoefe.length });
+  const passt = (p) => p[0] > 42 && p[0] < G - 42 && p[1] > 42 && p[1] < G - 42 && !wasser.drin(p[0], p[1]);
+  const frei = (p, weit) => {
+    if (strecke(p, [mx, my]) < R * 1.1 + 34) return false;
+    return !felder.concat(waelder).some((f) => strecke(f.mitte, p) < weit);
+  };
+
+  /* --- Die Wälder ---
+     Sie kommen ZUERST. Ein Wald stand schon da, bevor jemand pflügte; und
+     technisch gesehen würde er sonst keinen Platz mehr finden, weil die
+     Äcker das ganze Blatt belegen. */
+  const waldZahl = 9 + (planHash(saat, 'wz') % 5);
+  for (let i = 0; i < waldZahl; i++) {
+    const w = planZufall(saat, 'ww' + i) * Math.PI * 2;
+    const r = Math.max(R * 1.24, 190) + planZufall(saat, 'wr' + i) * 320;
+    const mitte = [mx + Math.cos(w) * r, my + Math.sin(w) * r * 0.94];
+    if (!passt(mitte) || !frei(mitte, 116)) continue;
+    const gross = 62 + planZufall(saat, 'wg' + i) * 82;
+    const seiten = 7 + (planHash(saat, 'ws' + i) % 4);
+    /* Passt der Wald nicht, wird er nicht verworfen, sondern kleiner
+       versucht. Vorher genügte ein einziger Eckpunkt im Fluss, um den ganzen
+       Wald zu streichen — und übrig blieb ein baumloses Land. */
+    for (const massstab of [1, 0.72, 0.5, 0.34]) {
+      const ecken = [];
+      let gut = true;
+      for (let k = 0; k < seiten; k++) {
+        const a2 = (k / seiten) * Math.PI * 2;
+        const rr = gross * massstab * (0.62 + planZufall(saat, 'wp' + i + '_' + k) * 0.6);
+        const p = [mitte[0] + Math.cos(a2) * rr, mitte[1] + Math.sin(a2) * rr * 0.8];
+        if (!passt(p) || strecke(p, [mx, my]) < R * 1.04 + 16) { gut = false; break; }
+        ecken.push(p);
+      }
+      if (gut && ecken.length > 4) {
+        waelder.push({ ecken, mitte, n: waelder.length, gross: massstab > 0.6 });
+        break;
+      }
     }
   }
+
+  /* --- Die Fluren ---
+     Die Plätze werden nicht auf einem Kranz um die Stadt gesucht, sondern
+     auf dem ganzen Blatt: ein grobes Raster mit Versatz, damit nichts in
+     Reih und Glied steht. Sonst hängt die Menge des Umlands an der Größe der
+     Stadt — und bei einer großen Stadt landete jeder Kranzpunkt außerhalb
+     des Papiers, weshalb überhaupt kein Feld übrig blieb. */
+  const plaetze = [];
+  const raster = 9;
+  for (let gy = 0; gy < raster; gy++) {
+    for (let gx = 0; gx < raster; gx++) {
+      const jx = planStreu(saat, 'pj' + gx + '_' + gy) * 0.42;
+      const jy = planStreu(saat, 'pk' + gx + '_' + gy) * 0.42;
+      plaetze.push([((gx + 0.5 + jx) / raster) * G, ((gy + 0.5 + jy) / raster) * G]);
+    }
+  }
+  plaetze.sort((a2, b2) => planZufall(saat, 'po' + a2[0].toFixed(1)) - planZufall(saat, 'po' + b2[0].toFixed(1)));
+
+  for (let i = 0; i < plaetze.length; i++) {
+    const mitte = plaetze[i];
+    /* Ein fester Mindestabstand, nicht an der Stadtgröße gemessen: sonst
+       wirft eine große Stadt fast alle Plätze weg und das Land bleibt kahl. */
+    const rand = 104;
+    if (!passt(mitte) || !frei(mitte, rand)) continue;
+
+    /* Die Richtung der Flur — nicht die Richtung zur Stadt. */
+    const richtung = planZufall(saat, 'fd' + i) * Math.PI;
+    const dx = Math.cos(richtung), dy = Math.sin(richtung);
+    const nx = -dy, ny = dx;
+    const streifen = 3 + (planHash(saat, 'fs' + i) % 5);
+    /* Ein Acker ist ein Acker — seine Größe hängt nicht daran, wie groß die
+       Stadt daneben ist. Darum feste Maße mit etwas Spiel. */
+    const breite = 16 + planZufall(saat, 'fb' + i) * 13;
+    const laenge = 74 + planZufall(saat, 'fl' + i) * 96;
+    /* Eine Flur ist Acker oder Wiese — niemals Wald: Wald wächst nicht in
+       parallelen Streifen. Die Wälder entstehen weiter unten als eigene,
+       unregelmäßige Flächen. */
+    const wiese = planZufall(saat, 'fk' + i) > 0.7;
+
+    for (let s2 = 0; s2 < streifen; s2++) {
+      const versatz = (s2 - (streifen - 1) / 2) * breite * 1.14;
+      const l = laenge * (0.72 + planZufall(saat, 'fx' + i + '_' + s2) * 0.5);
+      const mitteS = [mitte[0] + nx * versatz, mitte[1] + ny * versatz];
+      const ecken = [
+        [mitteS[0] - dx * l / 2 - nx * breite / 2, mitteS[1] - dy * l / 2 - ny * breite / 2],
+        [mitteS[0] + dx * l / 2 - nx * breite / 2, mitteS[1] + dy * l / 2 - ny * breite / 2],
+        [mitteS[0] + dx * l / 2 + nx * breite / 2, mitteS[1] + dy * l / 2 + ny * breite / 2],
+        [mitteS[0] - dx * l / 2 + nx * breite / 2, mitteS[1] - dy * l / 2 + ny * breite / 2]
+      ];
+      if (!ecken.every(passt)) continue;
+      if (ecken.some((p) => strecke(p, [mx, my]) < R * 1.04 + 20)) continue;
+      felder.push({
+        ecken, mitte: mitteS, n: felder.length,
+        gepfluegt: !wiese && planZufall(saat, 'fg' + i + s2) > 0.34
+      });
+    }
+
+    /* Zu jeder dritten Flur ein Hof am Rand. */
+    if (planZufall(saat, 'fh' + i) > 0.6) {
+      const hp = [mitte[0] + nx * breite * streifen * 0.7, mitte[1] + ny * breite * streifen * 0.7];
+      if (passt(hp) && strecke(hp, [mx, my]) > R * 1.06 + 20) hoefe.push({ punkt: hp, n: hoefe.length });
+    }
+  }
+
   return { felder, waelder, hoefe };
 }
 
@@ -34508,12 +34879,143 @@ function planBauen(plan) {
   const wasser = planWasser(plan);
   const stadt = planStadt(plan, wasser);
   const umland = planUmland(plan, stadt, wasser);
-  return { plan, wasser, stadt, umland };
+  const hafen = planHafen(plan, stadt, wasser);
+  const muehle = planMuehle(plan, stadt, wasser);
+  const inseln = planInseln(plan, wasser);
+  const gebaut = { plan, wasser, stadt, umland, hafen, muehle, inseln, marktplatz: planMarktplatz(plan, stadt) };
+  /* Das Wappen darf wissen, was in der Stadt steht — eine Hafenstadt
+     führt einen Anker, eine Mühlenstadt ein Rad. Darum zuletzt. */
+  gebaut.wappen = planWappen(plan, gebaut);
+  gebaut.legende = planLegende(plan, gebaut);
+  return gebaut;
 }
 /* Woran man erkennt, ob neu gerechnet werden muss. */
+/* Einen geschlossenen Kranz um einen Mittelpunkt glätten: nach dem Winkel
+   ordnen, dann den Abstand zur Mitte über die Nachbarn mitteln. Rein — und
+   damit prüfbar. */
+function planKranzGlaetten(punkte, mitte, runden, einschliessen, wasser) {
+  const roh = punkte.slice();
+  /* Ein geschlossener Zug wiederholt den ersten Punkt am Ende. */
+  if (roh.length > 1 && strecke(roh[0], roh[roh.length - 1]) < 0.5) roh.pop();
+  if (roh.length < 3) return punkte;
+
+  const [mx, my] = mitte;
+  const ZWEIPI = Math.PI * 2;
+  const SEKTOREN = 44;
+
+  /* Der Kranz wird auf feste Sektoren abgetastet.
+     Die erste Fassung hatte für jeden Sonderfall einen eigenen Zweig — und
+     stieg bei wenigen Punkten vorzeitig aus, und zwar genau VOR dem
+     Einschließen. Bei der strahlenden Anlage lagen deshalb im Dorf zweiund-
+     achtzig Prozent der Häuser außerhalb der Mauer. Ein festes Raster
+     kennt diese Sonderfälle nicht. */
+  const polar = roh.map((p) => {
+    let w = Math.atan2(p[1] - my, p[0] - mx);
+    if (w < 0) w += ZWEIPI;
+    return { w, r: strecke(p, mitte) };
+  }).sort((a2, b2) => a2.w - b2.w);
+
+  /* Für einen Winkel den Abstand aus den beiden Nachbarn überblenden.
+     In einer großen Lücke — am Wasser hört der Ringweg auf — wölbt sich
+     der Kranz nach außen, statt eine Sehne quer durch die Stadt zu ziehen. */
+  const abstandBei = (w) => {
+    let vor = polar[polar.length - 1], nach = polar[0];
+    for (let i = 0; i < polar.length; i++) {
+      if (polar[i].w <= w) vor = polar[i];
+      if (polar[i].w > w) { nach = polar[i]; break; }
+    }
+    let spanne = nach.w - vor.w;
+    if (spanne <= 0) spanne += ZWEIPI;
+    let hier = w - vor.w;
+    if (hier < 0) hier += ZWEIPI;
+    const t = spanne < 1e-6 ? 0 : Math.max(0, Math.min(1, hier / spanne));
+    const bauch = 1 + Math.sin(t * Math.PI) * Math.min(0.12, spanne * 0.08);
+    return (vor.r * (1 - t) + nach.r * t) * bauch;
+  };
+
+  const winkel = [], radien = [];
+  for (let i = 0; i < SEKTOREN; i++) {
+    const w = (i / SEKTOREN) * ZWEIPI;
+    winkel.push(w);
+    radien.push(abstandBei(w));
+  }
+
+  /* Die Mauer muss den Kern der Stadt einschließen — eine Mauer, die
+     mitten hindurchläuft, ist keine. */
+  if (einschliessen && einschliessen.length) {
+    for (const p of einschliessen) {
+      let w = Math.atan2(p[1] - my, p[0] - mx);
+      if (w < 0) w += ZWEIPI;
+      const i = Math.floor((w / ZWEIPI) * SEKTOREN) % SEKTOREN;
+      const r = strecke(p, mitte) + 9;
+      if (r > radien[i]) radien[i] = r;
+    }
+  }
+
+  const mitteln = (liste, wie) => {
+    let a2 = liste.slice();
+    for (let d = 0; d < wie; d++) {
+      const neu2 = a2.slice();
+      for (let i = 0; i < SEKTOREN; i++) {
+        neu2[i] = a2[(i - 1 + SEKTOREN) % SEKTOREN] * 0.27 + a2[i] * 0.46 + a2[(i + 1) % SEKTOREN] * 0.27;
+      }
+      a2 = neu2;
+    }
+    return a2;
+  };
+
+  let fertig = mitteln(radien, runden || 3);
+  /* Die Schranke misst sich am eigenen VERLAUF, nicht am Mittelwert des
+     ganzen Kranzes: gegen den Median gezwungen wurde jede Stadt rund, auch
+     die, die von Natur aus länglich am Fluss liegt. */
+  const verlauf = mitteln(fertig, 8);
+  fertig = fertig.map((r, i) => Math.max(verlauf[i] * 0.82, Math.min(verlauf[i] * 1.2, r)));
+  /* Geglättet werden darf die Mauer — aber nicht in die Stadt hinein.
+     Die Untergrenze wird dabei selbst geglättet: eine Mauer BAUSCHT sich um
+     ein einzelnes Haus herum, sie macht keine Zacke. Ohne das standen bei
+     kleinen Orten Knicke von hundertdreißig Grad im Kranz — je Sektor eine
+     Spitze bis zum entferntesten Blockeck. */
+  const untergrenze = mitteln(radien, 2);
+  fertig = fertig.map((r, i) => Math.max(r, untergrenze[i]));
+
+  /* Und zuletzt: KEIN Stück der Mauer liegt im Wasser.
+     Das Einschließen allein trieb den Kranz weit hinaus, um das
+     Hafenviertel mitzunehmen — und danach lief die Mauer in großem Bogen
+     durchs offene Meer. Eine Stadtmauer endet am Ufer. Also wird jeder
+     Sektor so weit hereingeholt, bis er trocken steht. */
+  if (wasser && typeof wasser.drin === 'function' && wasser.art !== 'keins') {
+    const trockenlegen = () => {
+      for (let i = 0; i < SEKTOREN; i++) {
+        const w = winkel[i];
+        let r = fertig[i];
+        let versuche = 0;
+        while (r > 20 && versuche++ < 80 && wasser.drin(mx + Math.cos(w) * r, my + Math.sin(w) * r)) {
+          r -= Math.max(2.5, fertig[i] * 0.025);
+        }
+        fertig[i] = Math.max(20, r);
+      }
+    };
+    trockenlegen();
+    /* Einmal glätten, damit aus dem Hereinholen keine Treppe wird — und
+       DANACH noch einmal trockenlegen. Beim ersten Versuch stand das
+       Glätten am Ende, und es schob die Mauer prompt wieder ins Wasser:
+       auf jedem Blatt lagen wieder drei bis dreizehn Punkte nass. */
+    fertig = mitteln(fertig, 1);
+    trockenlegen();
+  }
+
+  const raus = winkel.map((w, i) => [mx + Math.cos(w) * fertig[i], my + Math.sin(w) * fertig[i]]);
+  raus.push(raus[0]);
+  return raus;
+}
+
 function planSignatur(plan) {
   const s = plan.stadt;
-  return [plan.saat, s.groesse, s.alter, s.anlage, s.wasser, s.mauer, s.burg, s.umland, s.dichte].join('|');
+  /* Alles, was die Karte verändert, gehört hier hinein — sonst zeichnet
+     sie sich nicht neu, wenn man es umstellt. */
+  return [plan.saat, s.groesse, s.alter, s.anlage, s.wasser, s.mauer, s.burg, s.umland,
+    s.hafen, s.muehle, s.inseln, s.dichte,
+    plan.wappen ? JSON.stringify(plan.wappen) : ''].join('|');
 }
 
 /* ===================== KLEINE RECHNUNGEN ===================== */
@@ -34768,11 +35270,57 @@ function netzPunktDrin(poly, saat, k) {
   return netzMitte(poly);
 }
 
+/* Schneiden sich zwei Strecken wirklich? Gemeinsame Endpunkte zählen nicht:
+   zwei Straßen, die sich an einer Kreuzung treffen, schneiden einander nicht,
+   sie berühren sich. */
+function netzOrientierung(a, b, c) {
+  return (b[1] - a[1]) * (c[0] - b[0]) - (b[0] - a[0]) * (c[1] - b[1]);
+}
+function netzSchneidet(a, b, c, d) {
+  /* Berührt sich etwas an einem Endpunkt, ist es kein Schnitt. */
+  const gleich = (p, q) => Math.abs(p[0] - q[0]) < 0.001 && Math.abs(p[1] - q[1]) < 0.001;
+  if (gleich(a, c) || gleich(a, d) || gleich(b, c) || gleich(b, d)) return false;
+  const o1 = netzOrientierung(a, b, c), o2 = netzOrientierung(a, b, d);
+  const o3 = netzOrientierung(c, d, a), o4 = netzOrientierung(c, d, b);
+  return (o1 > 0) !== (o2 > 0) && (o3 > 0) !== (o4 > 0);
+}
+
 /* ===================== DER GRAPH ===================== */
 function netzBauen() {
   const knoten = [];
   const kanten = [];
   const raster = new Map();
+
+  /* Ein zweites Raster, diesmal für die KANTEN. Ohne es tastet jede neue
+     Straße jede vorhandene ab; bei zweitausend Straßen sind das vier
+     Millionen Prüfungen für eine einzige Gasse, und die Metropole brauchte
+     fast fünf Sekunden. Jede Kante wird in die Felder eingetragen, die ihr
+     Hüllrechteck berührt; geprüft wird nur, was im selben Feld liegt. */
+  const KGITTER = 60;
+  const kantenGitter = new Map();
+  const gitterFelder = (pa, pb) => {
+    const x0 = Math.floor(Math.min(pa[0], pb[0]) / KGITTER), x1 = Math.floor(Math.max(pa[0], pb[0]) / KGITTER);
+    const y0 = Math.floor(Math.min(pa[1], pb[1]) / KGITTER), y1 = Math.floor(Math.max(pa[1], pb[1]) / KGITTER);
+    const raus = [];
+    for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) raus.push(x + ':' + y);
+    return raus;
+  };
+  const gitterEintragen = (id, pa, pb) => {
+    for (const f of gitterFelder(pa, pb)) {
+      let liste = kantenGitter.get(f);
+      if (!liste) { liste = []; kantenGitter.set(f, liste); }
+      liste.push(id);
+    }
+  };
+  /* Alle Kanten, die dieser Strecke überhaupt nahe kommen können. */
+  const nahekanten = (pa, pb) => {
+    const gesehen = new Set();
+    for (const f of gitterFelder(pa, pb)) {
+      const liste = kantenGitter.get(f);
+      if (liste) for (const id of liste) gesehen.add(id);
+    }
+    return gesehen;
+  };
 
   const schluessel = (x, y) => Math.round(x / NETZ_RASTER) + ':' + Math.round(y / NETZ_RASTER);
   const punkt = (x, y) => {
@@ -34799,13 +35347,68 @@ function netzBauen() {
       const k = kanten[ki];
       if ((k.a === a && k.b === b) || (k.a === b && k.b === a)) return ki;
     }
+    /* KEINE Straße darf eine andere kreuzen, ohne dass dort eine Kreuzung
+       liegt. Sonst ist der Graph nicht mehr eben — und dann findet die
+       Flächensuche Blöcke, die einander überlappen. Genau das war der Grund,
+       warum sich Häuser zweier Blöcke ins Gehege kamen. */
+    const pa = [knoten[a].x, knoten[a].y], pb = [knoten[b].x, knoten[b].y];
+    for (const ki of nahekanten(pa, pb)) {
+      const k = kanten[ki];
+      if (!k || k.tot) continue;
+      if (k.a === a || k.b === a || k.a === b || k.b === b) continue;
+      if (netzSchneidet(pa, pb, [knoten[k.a].x, knoten[k.a].y], [knoten[k.b].x, knoten[k.b].y])) return -1;
+    }
     const id = kanten.length;
     kanten.push({ id, a, b, art: art || 'gasse' });
     knoten[a].aus.push(id);
     knoten[b].aus.push(id);
+    gitterEintragen(id, pa, pb);
     return id;
   };
-  return { knoten, kanten, punkt, kante };
+  /* Eine Straße an einer Stelle aufteilen: dort entsteht eine Kreuzung.
+     Genau das tut eine Nebenstraße, die auf eine bestehende trifft — und
+     nur so bleibt der Graph eben. */
+  const teileKante = (ki, x, y) => {
+    const k = kanten[ki];
+    if (!k || k.tot) return null;
+    const neu = punkt(x, y);
+    if (neu === k.a || neu === k.b) return neu;
+    k.tot = true;
+    knoten[k.a].aus = knoten[k.a].aus.filter((q) => q !== ki);
+    knoten[k.b].aus = knoten[k.b].aus.filter((q) => q !== ki);
+    const a = k.a, b = k.b, art = k.art;
+    /* Die beiden Hälften ohne Kreuzungsprüfung anlegen — sie liegen ja auf
+       derselben Linie wie vorher. */
+    for (const [x1, x2] of [[a, neu], [neu, b]]) {
+      if (x1 === x2) continue;
+      const id = kanten.length;
+      kanten.push({ id, a: x1, b: x2, art });
+      knoten[x1].aus.push(id);
+      knoten[x2].aus.push(id);
+      gitterEintragen(id, [knoten[x1].x, knoten[x1].y], [knoten[x2].x, knoten[x2].y]);
+    }
+    return neu;
+  };
+  /* Welche Straße kreuzt diese Strecke zuerst? */
+  const ersterSchnitt = (pa, pb, ausser) => {
+    let besteKi = -1, bestesT = 2, besterPunkt = null;
+    for (const ki of nahekanten(pa, pb)) {
+      const k = kanten[ki];
+      if (!k || k.tot) continue;
+      if (ausser && (k.a === ausser || k.b === ausser)) continue;
+      const pc = [knoten[k.a].x, knoten[k.a].y], pd = [knoten[k.b].x, knoten[k.b].y];
+      if (!netzSchneidet(pa, pb, pc, pd)) continue;
+      /* Wo genau? */
+      const r = [pb[0] - pa[0], pb[1] - pa[1]], s2 = [pd[0] - pc[0], pd[1] - pc[1]];
+      const nenner = r[0] * s2[1] - r[1] * s2[0];
+      if (Math.abs(nenner) < 1e-9) continue;
+      const t = ((pc[0] - pa[0]) * s2[1] - (pc[1] - pa[1]) * s2[0]) / nenner;
+      if (t < 0 || t > 1 || t >= bestesT) continue;
+      bestesT = t; besteKi = ki; besterPunkt = [pa[0] + r[0] * t, pa[1] + r[1] * t];
+    }
+    return besteKi < 0 ? null : { ki: besteKi, punkt: besterPunkt };
+  };
+  return { knoten, kanten, punkt, kante, teileKante, ersterSchnitt };
 }
 
 /* ===================== DIE FLÄCHEN =====================
@@ -34817,7 +35420,7 @@ function netzFlaechen(netz) {
   const { knoten, kanten } = netz;
   /* An jedem Punkt die abgehenden Kanten nach Winkel sortieren. */
   const sortiert = knoten.map((k) => {
-    const liste = k.aus.map((ki) => {
+    const liste = k.aus.filter((ki) => kanten[ki] && !kanten[ki].tot).map((ki) => {
       const kk = kanten[ki];
       const ziel = kk.a === k.id ? kk.b : kk.a;
       return { ki, ziel, w: netzWinkel([k.x, k.y], [knoten[ziel].x, knoten[ziel].y]) };
@@ -34829,6 +35432,7 @@ function netzFlaechen(netz) {
   const besucht = new Set();
   const flaechen = [];
   for (const start of kanten) {
+    if (start.tot) continue;
     for (const richtung of [[start.a, start.b], [start.b, start.a]]) {
       const marke0 = richtung[0] + '>' + richtung[1];
       if (besucht.has(marke0)) continue;
@@ -34857,13 +35461,29 @@ function netzFlaechen(netz) {
       if (runde.length >= 3) flaechen.push(runde.map((i) => [knoten[i].x, knoten[i].y]));
     }
   }
-  /* Die Außenwelt hat die größte Fläche und läuft andersherum. */
-  let groesste = 0, weg = -1;
-  flaechen.forEach((f, i) => {
-    const a = Math.abs(netzFlaeche(f));
-    if (a > groesste) { groesste = a; weg = i; }
+  /* Welche Runde ist ein Block und welche die Außenwelt?
+     Vorher wurde nur die GRÖSSTE Fläche verworfen. Das stimmt nur, solange
+     das Netz aus einem Stück besteht. Hängt aber irgendwo ein Straßenzug frei
+     in der Landschaft, hat auch dieses Stück seine eigene Außenrunde — und
+     die legt sich als riesiger Block über alles, was darin liegt. Beim
+     Marktflecken kamen so 189 Blöcke mit einer Million Flächeneinheiten
+     zusammen, auf einer Stadt von 155 000: siebenfach übereinander, und die
+     Häuser standen ineinander.
+
+     Der Umlaufsinn verrät es: bei dieser Art zu laufen kommen alle Innen-
+     flächen mit dem einen Vorzeichen heraus und jede Außenrunde mit dem
+     anderen. Also nimmt man das Vorzeichen der größten Runde — die ist mit
+     Sicherheit außen — und wirft alles weg, was ebenso läuft. */
+  let groesste = 0, aussenZeichen = -1;
+  for (const f of flaechen) {
+    const a = netzFlaeche(f);
+    if (Math.abs(a) > groesste) { groesste = Math.abs(a); aussenZeichen = a > 0 ? 1 : -1; }
+  }
+  return flaechen.filter((f) => {
+    const a = netzFlaeche(f);
+    if ((a > 0 ? 1 : -1) === aussenZeichen) return false;
+    return Math.abs(a) > 260;
   });
-  return flaechen.filter((f, i) => i !== weg && Math.abs(netzFlaeche(f)) > 260);
 }
 
 /* ===================== DAS WACHSTUM ===================== */
@@ -34874,7 +35494,15 @@ function planNetzWachsen(plan, wasser, mitte, Rmax, krumm) {
   const bruecken = [];     /* wo eine Straße das Wasser quert */
   const [mx, my] = mitte;
   const [, , speichen] = planGroesse(plan.stadt.groesse);
-  const schritt = 46 + planZufall(saat, 'sl') * 14;
+  /* Die Schrittweite haengt an der Groesse der Stadt: bei einem Weiler mit
+     hundert Schritt Radius waeren fuenfzig Schritt je Abschnitt so grob, dass
+     gar kein Block entsteht. */
+  /* Ein Häuserblock ist in einem Dorf ungefähr so groß wie in einer
+     Metropole — eine große Stadt hat einfach MEHR davon. Als der Schritt noch
+     voll mit dem Radius wuchs, hatte die Großstadt weniger Blöcke als die
+     Stadt und darin größere Häuser: genau verkehrt herum. Also nur noch ein
+     kleiner Zuschlag statt eines Faktors. */
+  const schritt = Math.max(26, Math.min(42, 24 + Rmax / 22)) * (0.9 + planZufall(saat, 'sl') * 0.25);
 
   /* --- Der Markt in der Mitte: ein kleines Vieleck, kein Punkt --- */
   const marktR = Rmax * 0.085;
@@ -34951,12 +35579,19 @@ function planNetzWachsen(plan, wasser, mitte, Rmax, krumm) {
   for (let r = 1; r <= ringe; r++) {
     const anteil = r / (ringe + 0.4);
     const vorherKnoten = [];
+    const wunschR = Rmax * anteil;
     for (const ader of adern) {
-      const wieViele = ader.knoten.length;
-      const stelle = Math.round(anteil * (wieViele - 1));
-      if (stelle < 1 || stelle >= wieViele) { vorherKnoten.push(null); continue; }
-      const p = ader.knoten[stelle];
-      vorherKnoten.push(netz.punkt(p[0], p[1]));
+      /* Nicht am gleichen ANTEIL der Ader ansetzen, sondern am gleichen
+         ABSTAND von der Mitte — sonst zieht sich der Ring bei einer langen
+         Ausfallstraße weit hinaus und bei einer kurzen bleibt er innen.
+         Genau daran hing die Mauer vorher in spitzen Zähnen. */
+      let beste = null, besterAbstand = 1e9;
+      for (const p of ader.knoten) {
+        const d = Math.abs(strecke(p, [mx, my]) - wunschR);
+        if (d < besterAbstand) { besterAbstand = d; beste = p; }
+      }
+      if (!beste || besterAbstand > wunschR * 0.5) { vorherKnoten.push(null); continue; }
+      vorherKnoten.push(netz.punkt(beste[0], beste[1]));
     }
     const ringSpur = [];
     for (let i = 0; i < vorherKnoten.length; i++) {
@@ -34993,6 +35628,70 @@ function planNetzWachsen(plan, wasser, mitte, Rmax, krumm) {
       });
     }
   }
+
+  /* --- Verdichten -----
+     Bis hierher gibt es Ausfallstraßen und ein paar Querverbindungen — und
+     dazwischen große Leerstellen. Eine gewachsene Stadt ist aber engmaschig:
+     fast jede Kreuzung hat drei, vier Nachbarn.
+
+     Also sucht jeder Punkt seine nächsten Nachbarn und verbindet sich mit
+     ihnen, sofern die Verbindung keine andere Straße kreuzt. Weil `kante`
+     Kreuzungen von sich aus abweist, kann dabei nichts kaputtgehen. */
+  /* Der erste Versuch war, jeden Punkt mit seinen nächsten Nachbarn zu
+     verbinden. Daraus wurde ein Dreiecksnetz — lauter winzige Splitter, auf
+     denen kein Haus Platz hat. Eine echte Nebenstraße geht anders: sie
+     zweigt ab und LÄUFT, bis sie auf eine andere Straße trifft. Dort
+     entsteht eine Kreuzung. So werden Blöcke länglich statt dreieckig. */
+  const nebenstrassen = (wieViele, laenge) => {
+    for (let n = 0; n < wieViele; n++) {
+      const lebende = netz.kanten.filter((k) => !k.tot && k.art !== 'platz');
+      if (!lebende.length) break;
+      /* Die Startkante NICHT über den Index würfeln. Eine geteilte Kante wird
+         hinten angehängt, also wachsen die Indizes dort, wo eben geteilt
+         wurde — und die Auswahl kehrt immer wieder dorthin zurück. Das Netz
+         verdichtet sich dann an einer Ecke zu einem Klumpen, während die
+         andere Hälfte der Stadt leer bleibt. Genau so sah es aus.
+
+         Stattdessen: ein Punkt in der Stadt, gleichmäßig über die Fläche
+         gestreut (die Wurzel sorgt dafür, dass die Mitte nicht bevorzugt
+         wird) — und dazu die nächstgelegene Straße. */
+      const zielW = planZufall(saat, 'nz' + n) * Math.PI * 2;
+      const zielR = Math.sqrt(planZufall(saat, 'nq' + n)) * Rmax * 0.97;
+      const zx = mx + Math.cos(zielW) * zielR, zy = my + Math.sin(zielW) * zielR;
+      let start = null, nah = Infinity;
+      for (const k of lebende) {
+        const ka = netz.knoten[k.a], kb = netz.knoten[k.b];
+        const d = (ka.x + kb.x) / 2 - zx, e = (ka.y + kb.y) / 2 - zy;
+        const q = d * d + e * e;
+        if (q < nah) { nah = q; start = k; }
+      }
+      if (!start) continue;
+      const a = netz.knoten[start.a], b = netz.knoten[start.b];
+      const t = 0.3 + planZufall(saat, 'nt' + n) * 0.4;
+      const sx = a.x + (b.x - a.x) * t, sy = a.y + (b.y - a.y) * t;
+      if (wasser.drin(sx, sy)) continue;
+      if (strecke([sx, sy], [mx, my]) > Rmax * 1.02) continue;
+      /* Quer zur Ausgangsstraße, mit einer kleinen Wendung. */
+      const quer = Math.atan2(b.y - a.y, b.x - a.x) + Math.PI / 2 * (planZufall(saat, 'nr' + n) > 0.5 ? 1 : -1);
+      const w = quer + planStreu(saat, 'nw' + n) * 0.3 * krumm;
+      const ziel = [sx + Math.cos(w) * laenge, sy + Math.sin(w) * laenge];
+      const von = netz.teileKante(netz.kanten.indexOf(start), sx, sy);
+      if (von == null) continue;
+      const schnitt = netz.ersterSchnitt([sx, sy], ziel, von);
+      if (schnitt) {
+        if (wasser.drin(schnitt.punkt[0], schnitt.punkt[1])) continue;
+        const nach = netz.teileKante(schnitt.ki, schnitt.punkt[0], schnitt.punkt[1]);
+        if (nach != null && nach !== von) {
+          netz.kante(von, nach, 'gasse');
+          wege.push({ art: 'gasse', richtung: 'quer', i: 3000 + n, punkte: [[sx, sy], [netz.knoten[nach].x, netz.knoten[nach].y]], name: '' });
+        }
+      }
+    }
+  };
+  /* Wie viele Nebenstraßen? Nicht so viele, wie es Ausfallstraßen gibt —
+     das hing an der falschen Größe, und die Metropole bekam kaum mehr Gassen
+     als der Marktflecken. Eine Stadt wird nach FLÄCHE bebaut. */
+  nebenstrassen(Math.round((Rmax * Rmax) / (schritt * schritt) * 6), schritt * 2.6);
 
   /* --- Gassen: kurze Wege, die zwei Straßen verbinden --- */
   const wieVieleGassen = Math.round(speichen * 2.2);
@@ -35144,8 +35843,12 @@ function planNetzStrahlend(plan, wasser, mitte, Rmax, krumm) {
       spur.push([netz.knoten[K[j][i]].x, netz.knoten[K[j][i]].y]);
       if (j > 0 && K[j - 1][i] != null) netz.kante(K[j - 1][i], K[j][i], haupt ? 'haupt' : 'gasse');
     }
-    /* Hinaus ins Land */
-    if (haupt && plan.stadt.umland && K[ringe][i] != null) {
+    /* Hinaus ins Land.
+       `spur` kann LEER sein: bricht die Speiche schon am innersten Ring ab,
+       weil dort Wasser liegt, existiert der äußere Ringknoten trotzdem noch —
+       und dann griff der nächste Zeile auf ein Nichts zu und die ganze Karte
+       stürzte ab. (Strahlende Anlage, kleiner Ort, Wasser im Weg.) */
+    if (haupt && plan.stadt.umland && spur.length && K[ringe][i] != null) {
       const letzte = spur[spur.length - 1];
       const w = winkelVon(i, ringe) * Math.PI / 180;
       for (const weit of [0.1, 0.3]) {
@@ -35204,7 +35907,9 @@ function planNetzSchachbrett(plan, wasser, mitte, Rmax, krumm) {
   const wege = [], bruecken = [], adern = [];
   const [mx, my] = mitte;
   const [, , speichen] = planGroesse(plan.stadt.groesse);
-  const feld = 62 + planZufall(saat, 'gf') * 16;
+  /* Auch das Raster richtet sich nach der Groesse — sonst passt bei einem
+     Dorf kein einziges Feld hinein. */
+  const feld = Math.max(34, Math.min(54, 32 + Rmax / 24)) * (0.92 + planZufall(saat, 'gf') * 0.2);
   const n = Math.max(4, Math.round(Rmax * 2 / feld));
   const dreh = planZufall(saat, 'gd') * Math.PI / 2;
   const cos = Math.cos(dreh), sin = Math.sin(dreh);
@@ -35328,13 +36033,35 @@ function planBloeckeTeilen(poly, grenze, saat, k, tiefe, raus, schnitte) {
   };
   const t = 0.5 + planStreu(saat, 'bt' + k + tiefe) * 0.14;
   let bestes = null, besteGroesse = Infinity;
-  for (let i = 0; i < poly.length; i++) {
-    for (let j = 0; j < poly.length; j++) {
-      if (i === j) continue;
-      const [eins, zwei] = teile(i, j, t);
-      if (eins.length < 3 || zwei.length < 3) continue;
-      const groesser = Math.max(Math.abs(netzFlaeche(eins)), Math.abs(netzFlaeche(zwei)));
-      if (groesser < besteGroesse) { besteGroesse = groesser; bestes = [i, j]; }
+  const n = poly.length;
+  if (n <= 20) {
+    /* Klein genug: alle Kantenpaare durchprobieren. */
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        if (i === j) continue;
+        const [eins, zwei] = teile(i, j, t);
+        if (eins.length < 3 || zwei.length < 3) continue;
+        const groesser = Math.max(Math.abs(netzFlaeche(eins)), Math.abs(netzFlaeche(zwei)));
+        if (groesser < besteGroesse) { besteGroesse = groesser; bestes = [i, j]; }
+      }
+    }
+  } else {
+    /* Bei einem Vieleck mit hundert Ecken sind alle Paare zehntausend
+       Versuche — pro Ebene, sechs Ebenen tief. Die Metropole brauchte dafür
+       fast fünf Sekunden. Hier genügt die längste Kante und ihr Gegenüber:
+       ein paar Kandidaten statt aller. */
+    const laengen = [];
+    for (let i = 0; i < n; i++) laengen.push([i, strecke(poly[i], poly[(i + 1) % n])]);
+    laengen.sort((a, b) => b[1] - a[1]);
+    for (const [i] of laengen.slice(0, 6)) {
+      for (const versatz of [Math.floor(n / 2), Math.floor(n / 2) - 1, Math.floor(n / 2) + 1, Math.floor(n / 3), Math.floor(n * 2 / 3)]) {
+        const j = (i + versatz + n) % n;
+        if (i === j) continue;
+        const [eins, zwei] = teile(i, j, t);
+        if (eins.length < 3 || zwei.length < 3) continue;
+        const groesser = Math.max(Math.abs(netzFlaeche(eins)), Math.abs(netzFlaeche(zwei)));
+        if (groesser < besteGroesse) { besteGroesse = groesser; bestes = [i, j]; }
+      }
     }
   }
   if (!bestes) { raus.push(poly); return; }
@@ -35350,52 +36077,71 @@ function planBloeckeTeilen(poly, grenze, saat, k, tiefe, raus, schnitte) {
    Parzelle an Parzelle gesetzt. */
 function planBlockBebauen(poly, saat, schluessel, va, dichte, wasser, haeuser) {
   const flaeche = Math.abs(netzFlaeche(poly));
-  if (flaeche < 380) return;
+  if (flaeche < 130) return;
   const mitte = netzMitte(poly);
   /* Umlaufrichtung: nach innen zeigt die Normale immer zur Mitte. */
-  const plotBreite = 17 / (va.dichte * dichte) * va.haus;
-  const tiefeGrund = Math.min(26, Math.max(11, Math.sqrt(flaeche) * 0.22));
+  /* Eine Parzelle in einer alten Stadt ist SCHMAL: das Haus steht mit der
+     Giebelseite zur Gasse, weil die Straßenfront das Teuerste war. Elf
+     Einheiten Front, nicht siebzehn. */
+  const plotBreite = 11.5 / (va.dichte * dichte) * va.haus;
+  const tiefeGrund = Math.min(20, Math.max(8.5, Math.sqrt(flaeche) * 0.19));
   let nr = 0;
 
   for (let e = 0; e < poly.length; e++) {
     const a = poly[e], b = poly[(e + 1) % poly.length];
     const laenge = strecke(a, b);
-    if (laenge < plotBreite * 0.9) continue;
+    if (laenge < plotBreite * 0.75) continue;
     const dx = (b[0] - a[0]) / laenge, dy = (b[1] - a[1]) / laenge;
     /* Die Normale, die zur Blockmitte zeigt */
     let nx = -dy, ny = dx;
     const probe = [(a[0] + b[0]) / 2 + nx * 4, (a[1] + b[1]) / 2 + ny * 4];
     if (!netzImPolygon(poly, probe[0], probe[1])) { nx = -nx; ny = -ny; }
 
-    const wieViele = Math.max(1, Math.floor(laenge / plotBreite));
-    const echteBreite = laenge / wieViele;
+    /* Vorher: `echteBreite = laenge / wieViele`. Das klingt harmlos, war aber
+       der Grund für die Klötze — der Rest der Kante wurde auf die Häuser
+       VERTEILT, und aus elf Einheiten Front wurden schnell sechsundzwanzig.
+       Ein Haus hat aber seine Breite; was übrig bleibt, ist eine Lücke. Die
+       Reihe wird stattdessen auf der Kante zentriert. */
+    const wieViele = Math.max(1, Math.round(laenge / plotBreite));
+    const echteBreite = Math.min(plotBreite * 1.3, laenge / wieViele);
+    const anfang = (laenge - echteBreite * wieViele) / 2;
     for (let i = 0; i < wieViele; i++) {
       const k = schluessel + '_' + e + '_' + i;
       if (planZufall(saat, 'lu' + k) < va.hoefe * 0.3) continue;   /* eine Lücke */
       const randA = 0.07 + planZufall(saat, 'ra' + k) * 0.14;
       const randB = 0.07 + planZufall(saat, 'rb' + k) * 0.14;
-      const tiefe = tiefeGrund * (0.72 + planZufall(saat, 'rt' + k) * 0.56) * va.haus;
+      const tiefeVoll = tiefeGrund * (0.72 + planZufall(saat, 'rt' + k) * 0.56) * va.haus;
       const zurueck = 1.6 + planZufall(saat, 'rz' + k) * 2.4;
 
-      const t0 = (i + randA) * echteBreite, t1 = (i + 1 - randB) * echteBreite;
-      const p0 = [a[0] + dx * t0 + nx * zurueck, a[1] + dy * t0 + ny * zurueck];
-      const p1 = [a[0] + dx * t1 + nx * zurueck, a[1] + dy * t1 + ny * zurueck];
-      const p2 = [p1[0] + nx * tiefe, p1[1] + ny * tiefe];
-      const p3 = [p0[0] + nx * tiefe, p0[1] + ny * tiefe];
-      /* Das Haus muss GANZ im Block liegen — alle vier Ecken. Bei einem
-         einspringenden Block liegt der Rücksprung sonst schon außerhalb,
-         obwohl die Mitte der Kante noch drin war. */
-      if (!netzImPolygon(poly, p0[0], p0[1]) || !netzImPolygon(poly, p1[0], p1[1]) ||
-          !netzImPolygon(poly, p2[0], p2[1]) || !netzImPolygon(poly, p3[0], p3[1])) continue;
-      if (wasser.drin(p0[0], p0[1]) || wasser.drin(p2[0], p2[1])) continue;
-      const ecken = [p0, p1, p2, p3];
-      const gr = Math.abs(netzFlaeche(ecken));
-      if (gr < 30) continue;
+      const t0 = anfang + (i + randA) * echteBreite, t1 = anfang + (i + 1 - randB) * echteBreite;
+      /* Passt das Haus nicht in den Block, wird es nicht gestrichen, sondern
+         FLACHER gebaut. Ein schmaler Block bekommt eben ein schmales Haus —
+         vorher blieb er einfach leer, und mitten in der Stadt klaffte ein
+         weißes Loch. */
+      let ecken = null, gr = 0;
+      for (const massstab of [1, 0.7, 0.48, 0.32]) {
+        const tiefe = tiefeVoll * massstab;
+        const p0 = [a[0] + dx * t0 + nx * zurueck, a[1] + dy * t0 + ny * zurueck];
+        const p1 = [a[0] + dx * t1 + nx * zurueck, a[1] + dy * t1 + ny * zurueck];
+        const p2 = [p1[0] + nx * tiefe, p1[1] + ny * tiefe];
+        const p3 = [p0[0] + nx * tiefe, p0[1] + ny * tiefe];
+        /* Das Haus muss GANZ im Block liegen — alle vier Ecken. Bei einem
+           einspringenden Block liegt der Rücksprung sonst schon außerhalb,
+           obwohl die Mitte der Kante noch drin war. */
+        if (!netzImPolygon(poly, p0[0], p0[1]) || !netzImPolygon(poly, p1[0], p1[1]) ||
+            !netzImPolygon(poly, p2[0], p2[1]) || !netzImPolygon(poly, p3[0], p3[1])) continue;
+        if (wasser.drin(p0[0], p0[1]) || wasser.drin(p2[0], p2[1])) continue;
+        const kandidat = [p0, p1, p2, p3];
+        const f = Math.abs(netzFlaeche(kandidat));
+        if (f < 22) continue;
+        ecken = kandidat; gr = f; break;
+      }
+      if (!ecken) continue;
       haeuser.push({
         ecken,
         umriss: planHausUmriss(ecken, saat, k),
         ton: planHash(saat, 'dt' + k) % 5,
-        gross: gr > 520,
+        gross: gr > 300,
         viertel: va.id,
         sonder: '',
         /* Zu welchem Block das Haus gehoert — ueber den Mittelpunkt laesst
@@ -35408,6 +36154,690 @@ function planBlockBebauen(poly, saat, schluessel, va, dichte, wasser, haeuser) {
     }
   }
   return nr;
+}
+
+
+/* ===================== DAS STRASSENDORF =====================
+   Manchmal schließt sich kein einziger Block: ein Weiler mit einem breiten
+   Fluss mittendrin hat nur ein paar Wegstummel, und aus Stummeln wird kein
+   Kranz. Herausgekommen ist dann ein LEERES Blatt mit einer Legende darauf.
+
+   Ein kleiner Ort ist aber auch in Wirklichkeit kein Blockgefüge, sondern
+   ein Straßendorf: die Höfe stehen links und rechts am Weg, und dahinter
+   fängt gleich das Feld an. Genau das wird hier gebaut. */
+function planStrassendorf(wege, saat, va, dichte, wasser, haeuser, mitte, Rmax) {
+  const abstand = 15 / dichte;
+  let nr = 0;
+  for (const weg of wege) {
+    if (!weg.punkte || weg.punkte.length < 2) continue;
+    if (weg.art === 'platz') continue;
+    for (let i = 1; i < weg.punkte.length; i++) {
+      const a = weg.punkte[i - 1], b = weg.punkte[i];
+      const laenge = strecke(a, b);
+      if (laenge < abstand) continue;
+      const dx = (b[0] - a[0]) / laenge, dy = (b[1] - a[1]) / laenge;
+      const nx = -dy, ny = dx;
+      const wieViele = Math.floor(laenge / abstand);
+      for (let j = 0; j < wieViele; j++) {
+        for (const seite of [-1, 1]) {
+          const k = 'sd' + weg.i + '_' + i + '_' + j + '_' + seite;
+          if (planZufall(saat, 'sl' + k) < 0.42) continue;      /* nicht lückenlos */
+          const t = (j + 0.5) * abstand + planStreu(saat, 'st' + k) * 3;
+          const ab = (8 + planZufall(saat, 'sa' + k) * 4) * seite;
+          const m = [a[0] + dx * t + nx * ab, a[1] + dy * t + ny * ab];
+          if (wasser.drin(m[0], m[1])) continue;
+          if (strecke(m, mitte) > Rmax * 1.15) continue;
+          /* Steht dort schon etwas? */
+          if (haeuser.some((h) => strecke(h.ecken[0], m) < 11)) continue;
+
+          const br = (5.5 + planZufall(saat, 'sb' + k) * 3) / 2;
+          const tf = (7 + planZufall(saat, 'sc' + k) * 4) / 2;
+          const ecken = [
+            [m[0] - dx * br - nx * tf * seite, m[1] - dy * br - ny * tf * seite],
+            [m[0] + dx * br - nx * tf * seite, m[1] + dy * br - ny * tf * seite],
+            [m[0] + dx * br + nx * tf * seite, m[1] + dy * br + ny * tf * seite],
+            [m[0] - dx * br + nx * tf * seite, m[1] - dy * br + ny * tf * seite]
+          ];
+          if (ecken.some((p) => wasser.drin(p[0], p[1]))) continue;
+          haeuser.push({
+            ecken,
+            umriss: planHausUmriss(ecken, saat, k),
+            ton: planHash(saat, 'sdt' + k) % 5,
+            gross: false,
+            viertel: va.id,
+            sonder: '',
+            block: 'weg' + weg.i,
+            n: haeuser.length
+          });
+          nr++;
+        }
+      }
+    }
+  }
+  return nr;
+}
+
+/* ===================================================================
+   DER HAFEN, DIE MÜHLE, DIE INSELN, DAS WAPPEN, DIE LEGENDE
+   -------------------------------------------------------------------
+   Bis hierher hat die Karte eine Stadt und ein Umland. Was ihr fehlte,
+   ist das, woran man eine Stadt WIEDERERKENNT: dass sie am Wasser liegt
+   und davon lebt; dass ein Rad im Bach steht; dass sie ein Zeichen führt.
+
+   Alles hier ist gerechnet, nicht gewürfelt: dieselbe Saat, derselbe
+   Hafen. Und alles hier ist reine Geometrie — gezeichnet wird in
+   65b-stadtplan-karte.js.
+   =================================================================== */
+
+/* ----- Wo trifft die Stadt auf das Wasser? -----
+   Gesucht ist der Uferpunkt, der der Stadtmitte am nächsten liegt, und
+   dazu die Richtung, in der das Wasser tiefer wird. Ohne diese Richtung
+   liefe jede Mole an Land statt hinaus. */
+function planUferAnStadt(wasser, mitte) {
+  if (!wasser || wasser.art === 'keins') return null;
+  const linie = wasser.art === 'fluss' || wasser.art === 'muendung'
+    ? (wasser.links || []).concat(wasser.rechts || [])
+    : wasser.art === 'kueste' ? (wasser.linie || [])
+      : (wasser.polygone && wasser.polygone[0]) || [];
+  if (linie.length < 4) return null;
+
+  let beste = null, nah = Infinity;
+  for (let i = 1; i < linie.length - 1; i++) {
+    const d = strecke(linie[i], mitte);
+    if (d < nah) { nah = d; beste = i; }
+  }
+  if (beste == null) return null;
+
+  const p = linie[beste];
+  const vor = linie[beste - 1], nach = linie[beste + 1];
+  const laengs = [nach[0] - vor[0], nach[1] - vor[1]];
+  const l = Math.hypot(laengs[0], laengs[1]) || 1;
+  const u = [laengs[0] / l, laengs[1] / l];
+  /* Die Senkrechte — welche der beiden Seiten ist nass? */
+  let n = [-u[1], u[0]];
+  if (!wasser.drin(p[0] + n[0] * 14, p[1] + n[1] * 14)) n = [-n[0], -n[1]];
+  if (!wasser.drin(p[0] + n[0] * 14, p[1] + n[1] * 14)) return null;
+
+  return { punkt: p, laengs: u, hinaus: n, stelle: beste, linie, abstand: nah };
+}
+
+/* ----- Der Hafen -----
+   Eine Kaimauer am Ufer, davor Molen, die ins Wasser greifen, und an den
+   Molen liegen Schiffe. Dazu Poller, Kräne, ein Wellenbrecher und — wo es
+   offenes Wasser gibt — ein Leuchtfeuer auf dem äußersten Kopf.
+
+   Die Länge der Molen richtet sich nach dem Wasser, nicht nach dem Wunsch:
+   eine Mole, die auf halber Strecke an Land endet, ist keine Mole. Jede
+   wird deshalb so weit hinausgeschoben, wie sie nass bleibt. */
+function planHafen(plan, stadt, wasser) {
+  const leer = { hat: false, kai: [], molen: [], schiffe: [], poller: [], kraene: [], wellenbrecher: null, leuchtturm: null, name: '' };
+  if (!plan.stadt.hafen || !wasser || wasser.art === 'keins') return leer;
+  const saat = plan.saat;
+  const ufer = planUferAnStadt(wasser, stadt.mitte);
+  if (!ufer) return leer;
+  /* Zu weit draußen ist kein Stadthafen mehr. */
+  if (ufer.abstand > stadt.Rmax * 2.2) return leer;
+
+  const [ux, uy] = ufer.laengs;
+  const [nx, ny] = ufer.hinaus;
+  const p = ufer.punkt;
+
+  /* Wie weit reicht das Wasser an dieser Stelle? */
+  const nassBis = (vonX, vonY, hoechstens) => {
+    let weit = 0;
+    for (let d = 6; d <= hoechstens; d += 6) {
+      if (!wasser.drin(vonX + nx * d, vonY + ny * d)) break;
+      weit = d;
+    }
+    return weit;
+  };
+  const tiefe = nassBis(p[0], p[1], 260);
+  if (tiefe < 26) return leer;
+
+  /* --- Die Kaimauer ---
+     Sie folgt dem Ufer, ein Stück nach beiden Seiten, und wird ein wenig
+     ins Wasser vorgezogen: ein Kai ist aufgeschüttet, nicht gewachsen. */
+  const kaiLaenge = Math.min(stadt.Rmax * 0.62, 190);
+  const schritte = 13;
+  const kai = [];
+  for (let i = 0; i <= schritte; i++) {
+    const t = (i / schritte - 0.5) * kaiLaenge;
+    const vor = 3 + Math.sin((i / schritte) * Math.PI) * 5;
+    kai.push([p[0] + ux * t + nx * vor, p[1] + uy * t + ny * vor]);
+  }
+
+  /* --- Die Molen ---
+     Drei bis fünf, ungleich lang und ungleich weit auseinander: ein Hafen
+     ist über Jahrhunderte gewachsen, nicht an einem Tag gebaut. */
+  const wieViele = 3 + (planHash(saat, 'hm') % 3);
+  const molen = [], schiffe = [], poller = [];
+  for (let m = 0; m < wieViele; m++) {
+    const t = ((m + 0.5) / wieViele - 0.5) * kaiLaenge * 0.86;
+    const wurzel = [p[0] + ux * t + nx * 6, p[1] + uy * t + ny * 6];
+    const wunsch = 34 + planZufall(saat, 'hl' + m) * 58;
+    const moeglich = nassBis(wurzel[0], wurzel[1], wunsch + 30);
+    const laenge = Math.min(wunsch, moeglich - 8);
+    if (laenge < 20) continue;
+    /* Eine leichte Schrägstellung — nichts am Hafen steht rechtwinklig. */
+    const neigung = planStreu(saat, 'hn' + m) * 0.16;
+    const rx = nx * Math.cos(neigung) - ny * Math.sin(neigung);
+    const ry = nx * Math.sin(neigung) + ny * Math.cos(neigung);
+    const kopf = [wurzel[0] + rx * laenge, wurzel[1] + ry * laenge];
+    const breit = 5.5 + planZufall(saat, 'hb' + m) * 3;
+    molen.push({ wurzel, kopf, breit, laengs: [rx, ry], quer: [-ry, rx], n: molen.length });
+
+    /* An jede Mole ein bis zwei Schiffe, längsseits vertäut. */
+    const wieVieleSchiffe = 1 + (planHash(saat, 'hs' + m) % 2);
+    for (let s = 0; s < wieVieleSchiffe; s++) {
+      const seite = s % 2 ? 1 : -1;
+      const anteil = 0.42 + planZufall(saat, 'ha' + m + '_' + s) * 0.34;
+      const an = [wurzel[0] + rx * laenge * anteil, wurzel[1] + ry * laenge * anteil];
+      const ab = breit / 2 + 5.5;
+      const punkt = [an[0] - ry * ab * seite, an[1] + rx * ab * seite];
+      if (!wasser.drin(punkt[0], punkt[1])) continue;
+      schiffe.push({
+        punkt,
+        laengs: [rx, ry],
+        laenge: 17 + planZufall(saat, 'hg' + m + s) * 13,
+        breite: 5 + planZufall(saat, 'hw' + m + s) * 2.4,
+        masten: 1 + (planHash(saat, 'hz' + m + s) % 3),
+        n: schiffe.length
+      });
+    }
+    /* Poller auf dem Kopf und in der Mitte. */
+    for (const anteil of [0.5, 0.95]) {
+      poller.push([wurzel[0] + rx * laenge * anteil, wurzel[1] + ry * laenge * anteil]);
+    }
+  }
+  if (!molen.length) return leer;
+
+  /* --- Die Kräne ---
+     Auf dem Kai, zwischen den Molenwurzeln: ein Tretkran, wie er in jeder
+     Hansestadt stand. */
+  const kraene = [];
+  const wieVieleKraene = 1 + (planHash(saat, 'hk') % 2);
+  for (let k = 0; k < wieVieleKraene; k++) {
+    const t = ((k + 1) / (wieVieleKraene + 1) - 0.5) * kaiLaenge * 0.7;
+    kraene.push({
+      punkt: [p[0] + ux * t + nx * 2, p[1] + uy * t + ny * 2],
+      auslage: [nx, ny],
+      hoehe: 13 + planZufall(saat, 'hh' + k) * 4
+    });
+  }
+
+  /* --- Der Wellenbrecher ---
+     Nur, wo es offenes Wasser gibt: an einem Fluss braucht ihn niemand.
+     Er liegt vor den Molen und lässt eine Einfahrt frei. */
+  let wellenbrecher = null;
+  if (wasser.art === 'kueste' || wasser.art === 'muendung') {
+    const weit = Math.min(tiefe - 14, 150);
+    if (weit > 60) {
+      const wb = [];
+      for (let i = 0; i <= 10; i++) {
+        const t = (i / 10 - 0.5) * kaiLaenge * 1.15;
+        const bogen = Math.cos((i / 10 - 0.5) * Math.PI) * 16;
+        const raus = weit - bogen;
+        const q = [p[0] + ux * t + nx * raus, p[1] + uy * t + ny * raus];
+        if (!wasser.drin(q[0], q[1])) { wb.length = 0; break; }
+        wb.push(q);
+      }
+      /* Die Einfahrt: das mittlere Stück fehlt. */
+      if (wb.length === 11) wellenbrecher = { links: wb.slice(0, 5), rechts: wb.slice(6) };
+    }
+  }
+
+  /* --- Das Leuchtfeuer --- */
+  let leuchtturm = null;
+  if (wellenbrecher) leuchtturm = { punkt: wellenbrecher.rechts[wellenbrecher.rechts.length - 1] };
+  else if (molen.length) {
+    /* Ein Leuchtfeuer weist den Weg von SEE herein. An einem Binnenfluss
+       oder einem See hat es nichts zu suchen — dort steht keins. */
+    if (wasser.art === 'kueste' || wasser.art === 'muendung') {
+      const weiteste = molen.reduce((a, b) => strecke(b.kopf, stadt.mitte) > strecke(a.kopf, stadt.mitte) ? b : a);
+      leuchtturm = { punkt: weiteste.kopf };
+    }
+  }
+
+  return {
+    hat: true, kai, molen, schiffe, poller, kraene, wellenbrecher, leuchtturm,
+    name: planHafenname(saat), mitte: p
+  };
+}
+
+const PLAN_HAFEN_ERST = ['Alter', 'Neuer', 'Tiefer', 'Kleiner', 'Großer', 'Salziger', 'Stiller'];
+const PLAN_HAFEN_ZWEIT = ['Hafen', 'Anleger', 'Kai', 'Wall', 'Bollwerk', 'Hafen', 'Kai'];
+function planHafenname(saat) {
+  return PLAN_HAFEN_ERST[planHash(saat, 'hne') % PLAN_HAFEN_ERST.length] + ' ' +
+    PLAN_HAFEN_ZWEIT[planHash(saat, 'hnz') % PLAN_HAFEN_ZWEIT.length];
+}
+
+/* ----- Die Mühle -----
+   Wo ein Fluss durch die Stadt geht, steht ein Rad darin. Das ist keine
+   Verzierung: Getreide mahlt sich nicht von selbst, und deshalb stand an
+   jedem Stadtbach eine Mühle. Sie sitzt am Ufer, das Rad im Wasser. */
+function planMuehle(plan, stadt, wasser) {
+  if (!plan.stadt.muehle) return null;
+  if (!wasser || (wasser.art !== 'fluss' && wasser.art !== 'muendung')) return null;
+  const saat = plan.saat;
+  const seite = planZufall(saat, 'mus') > 0.5 ? wasser.links : wasser.rechts;
+  if (!seite || seite.length < 6) return null;
+
+  /* Ein Stück flussauf oder flussab von der Stadt — nicht mitten hinein. */
+  let beste = null, bestesMass = Infinity;
+  const wunsch = stadt.Rmax * 0.72;
+  for (let i = 2; i < seite.length - 2; i++) {
+    const d = Math.abs(strecke(seite[i], stadt.mitte) - wunsch);
+    if (d < bestesMass) { bestesMass = d; beste = i; }
+  }
+  if (beste == null) return null;
+
+  const p = seite[beste];
+  const vor = seite[beste - 1], nach = seite[beste + 1];
+  const l = Math.hypot(nach[0] - vor[0], nach[1] - vor[1]) || 1;
+  const u = [(nach[0] - vor[0]) / l, (nach[1] - vor[1]) / l];
+  let n = [-u[1], u[0]];
+  if (!wasser.drin(p[0] + n[0] * 10, p[1] + n[1] * 10)) n = [-n[0], -n[1]];
+  if (!wasser.drin(p[0] + n[0] * 10, p[1] + n[1] * 10)) return null;
+
+  return {
+    punkt: [p[0] - n[0] * 7, p[1] - n[1] * 7],     /* das Haus steht trocken */
+    rad: [p[0] + n[0] * 6, p[1] + n[1] * 6],       /* das Rad steht nass */
+    laengs: u, hinaus: n,
+    name: planZufall(saat, 'mun') > 0.5 ? 'Die Mühle' : 'Die alte Mühle'
+  };
+}
+
+/* ----- Inseln im Fluss -----
+   Ein Fluss ohne Insel sieht gezeichnet aus. Eine Insel — eine Werder —
+   macht ihn zu einem Fluss, der irgendwo herkommt. */
+function planInseln(plan, wasser) {
+  if (!plan.stadt.inseln) return [];
+  if (!wasser || wasser.art === 'keins' || wasser.art === 'insel') return [];
+  const saat = plan.saat;
+  const G = PLAN_GROESSE;
+  const inseln = [];
+  const wieViele = wasser.art === 'see' ? 2 : 3;
+
+  for (let i = 0; i < wieViele; i++) {
+    /* Erst die Größe, dann der Platz — nicht andersherum.
+       Der erste Versuch verlangte sechsundzwanzig Einheiten Wasser rundum;
+       ein Fluss ist aber oft nur vierzig breit, und so bekam ausgerechnet
+       der Fluss nie eine Werder. Jetzt wird die Insel so klein gewählt,
+       wie das Wasser es hergibt, und erst dann geprüft. */
+    let mitte = null, quer = 0;
+    const maasse = [[20, 11], [14, 7], [9, 5]];
+    for (const [wl, wq] of maasse) {
+      for (let versuch = 0; versuch < 40 && !mitte; versuch++) {
+        const x = 90 + planZufall(saat, 'ix' + i + '_' + wl + '_' + versuch) * (G - 180);
+        const y = 90 + planZufall(saat, 'iy' + i + '_' + wl + '_' + versuch) * (G - 180);
+        if (!wasser.drin(x, y)) continue;
+        /* Rundherum muss es nass sein — im Abstand der eigenen Größe. */
+        const probe = Math.max(wl, wq) * 1.5;
+        let frei = true;
+        for (let w = 0; w < 10; w++) {
+          const a = (w / 10) * Math.PI * 2;
+          if (!wasser.drin(x + Math.cos(a) * probe, y + Math.sin(a) * probe)) { frei = false; break; }
+        }
+        if (!frei) continue;
+        if (inseln.some((s) => strecke(s.mitte, [x, y]) < 120)) continue;
+        mitte = [x, y]; quer = wq;
+      }
+      if (mitte) { var langMass = wl; break; }
+    }
+    if (!mitte) continue;
+
+    /* Ein länglicher Umriss, in Fließrichtung gestreckt. */
+    const dreh = planZufall(saat, 'id' + i) * Math.PI;
+    const lang = langMass;
+    const ecken = [];
+    const seiten = 11;
+    for (let k = 0; k < seiten; k++) {
+      const a = (k / seiten) * Math.PI * 2;
+      const r = 0.72 + planZufall(saat, 'ir' + i + '_' + k) * 0.55;
+      const ex = Math.cos(a) * lang * r, ey = Math.sin(a) * quer * r;
+      ecken.push([
+        mitte[0] + ex * Math.cos(dreh) - ey * Math.sin(dreh),
+        mitte[1] + ex * Math.sin(dreh) + ey * Math.cos(dreh)
+      ]);
+    }
+    inseln.push({ mitte, ecken, baeume: 2 + (planHash(saat, 'ib' + i) % 3), n: inseln.length });
+  }
+  return inseln;
+}
+
+/* ===================== DAS WAPPEN =====================
+   Jede Stadt führt ein Zeichen. Auf einem Kupferstich ist es nicht bunt —
+   Farbe konnte der Stecher nicht drucken. Stattdessen gibt es die
+   heraldische Schraffur: eine Übereinkunft aus dem 17. Jahrhundert, mit
+   der man jede Tinktur an ihrer Strichlage erkennt.
+
+   Das ist der schönste Kniff der ganzen Karte: Das Wappen ist einfarbig
+   und trotzdem vollständig lesbar. */
+const PLAN_TINKTUREN = [
+  { id: 'gold', name: 'Gold', strich: 'punkte' },
+  { id: 'silber', name: 'Silber', strich: 'leer' },
+  { id: 'rot', name: 'Rot', strich: 'senkrecht' },
+  { id: 'blau', name: 'Blau', strich: 'waagerecht' },
+  { id: 'gruen', name: 'Grün', strich: 'schraeg' },
+  { id: 'schwarz', name: 'Schwarz', strich: 'gitter' },
+  { id: 'purpur', name: 'Purpur', strich: 'gegenschraeg' }
+];
+
+const PLAN_TEILUNGEN = [
+  { id: 'ganz', name: 'ungeteilt' },
+  { id: 'pfahl', name: 'gespalten' },
+  { id: 'balken', name: 'geteilt' },
+  { id: 'schraeg', name: 'schräggeteilt' },
+  { id: 'geviert', name: 'geviert' },
+  { id: 'spitze', name: 'mit eingebogener Spitze' }
+];
+
+/* Die Wappenbilder mit ihrem Geschlecht und ihrer Mehrzahl.
+   Ohne diese beiden Angaben geht die Blasonierung im Deutschen nicht auf:
+   „belegt mit“ verlangt den Dativ, und der sieht bei „ein Turm“, „eine
+   Brücke“ und „drei Anker“ jedes Mal anders aus. Zusammengeklebt kam
+   „belegt mit eine Brücke“ heraus. */
+const PLAN_WAPPENBILDER = [
+  { id: 'turm', wort: 'Turm', geschlecht: 'm', mehrzahl: 'Türme' },
+  { id: 'schluessel', wort: 'Schlüssel', geschlecht: 'm', mehrzahl: 'Schlüssel' },
+  { id: 'stern', wort: 'Stern', geschlecht: 'm', mehrzahl: 'Sterne' },
+  { id: 'fisch', wort: 'Fisch', geschlecht: 'm', mehrzahl: 'Fische' },
+  { id: 'eichenblatt', wort: 'Eichenblatt', geschlecht: 'n', mehrzahl: 'Eichenblätter' },
+  { id: 'rad', wort: 'Mühlrad', geschlecht: 'n', mehrzahl: 'Mühlräder' },
+  { id: 'anker', wort: 'Anker', geschlecht: 'm', mehrzahl: 'Anker' },
+  { id: 'mond', wort: 'Halbmond', geschlecht: 'm', mehrzahl: 'Halbmonde' },
+  { id: 'krone', wort: 'Krone', geschlecht: 'f', mehrzahl: 'Kronen' },
+  { id: 'bruecke', wort: 'Brücke', geschlecht: 'f', mehrzahl: 'Brücken' },
+  { id: 'ross', wort: 'Rosskopf', geschlecht: 'm', mehrzahl: 'Rossköpfe' },
+  { id: 'lilie', wort: 'Lilie', geschlecht: 'f', mehrzahl: 'Lilien' },
+  { id: 'hammer', wort: 'Hammer', geschlecht: 'm', mehrzahl: 'Hämmer' },
+  { id: 'aehre', wort: 'Ähre', geschlecht: 'f', mehrzahl: 'Ähren' }
+];
+
+/* „ein Turm“, „eine Brücke“, „drei Anker“ — der Werfall. */
+function planBildWerfall(id, wieViele) {
+  const b = planWappenbild(id);
+  if (wieViele > 1) return (wieViele === 2 ? 'zwei ' : 'drei ') + b.mehrzahl;
+  return (b.geschlecht === 'f' ? 'eine ' : 'ein ') + b.wort;
+}
+/* „einem Turm“, „einer Brücke“, „drei Ankern“ — der Wemfall.
+   Die Mehrzahl bekommt im Wemfall ein -n, wenn sie nicht schon auf -n
+   oder -s endet: Anker → Ankern, aber Brücken → Brücken. */
+function planBildWemfall(id, wieViele) {
+  const b = planWappenbild(id);
+  if (wieViele > 1) {
+    const m = b.mehrzahl;
+    const gebeugt = /[ns]$/.test(m) ? m : m + 'n';
+    return (wieViele === 2 ? 'zwei ' : 'drei ') + gebeugt;
+  }
+  return (b.geschlecht === 'f' ? 'einer ' : 'einem ') + b.wort;
+}
+
+function planTinktur(id) { return PLAN_TINKTUREN.find((t) => t.id === id) || PLAN_TINKTUREN[1]; }
+function planWappenbild(id) { return PLAN_WAPPENBILDER.find((b) => b.id === id) || PLAN_WAPPENBILDER[0]; }
+/* Der schlichte Name fuer Listen und Auswahlfelder. */
+function planWappenbildName(id) { const b = planWappenbild(id); return (b.geschlecht === 'f' ? 'Die ' : b.geschlecht === 'n' ? 'Das ' : 'Der ') + b.wort; }
+
+/* Das Wappen wird aus der Saat gerechnet — mit einer Regel, die seit dem
+   Mittelalter gilt: Farbe auf Metall oder Metall auf Farbe, nie Farbe auf
+   Farbe. Ohne sie sieht ein Wappen falsch aus, auch wenn man nicht sagen
+   kann, warum. */
+function planWappen(plan, gebaut) {
+  const saat = plan.saat;
+  if (plan.wappen && plan.wappen.eigen) return plan.wappen;
+
+  const metalle = PLAN_TINKTUREN.filter((t) => t.id === 'gold' || t.id === 'silber');
+  const farben = PLAN_TINKTUREN.filter((t) => t.id !== 'gold' && t.id !== 'silber');
+  const metallGrund = planZufall(saat, 'wpm') > 0.5;
+
+  const grund = metallGrund
+    ? metalle[planHash(saat, 'wpg') % metalle.length]
+    : farben[planHash(saat, 'wpg') % farben.length];
+
+  const teilung = PLAN_TEILUNGEN[planHash(saat, 'wpt') % PLAN_TEILUNGEN.length];
+  /* Bei einer Teilung braucht die zweite Hälfte eine eigene Tinktur —
+     wieder nach derselben Regel. */
+  const zweit = metallGrund
+    ? farben[planHash(saat, 'wpz') % farben.length]
+    : metalle[planHash(saat, 'wpz') % metalle.length];
+
+  /* Die Figur muss sich von BEIDEN Feldern abheben.
+     Der erste Versuch nahm nur den Grund als Gegenstück — heraus kam
+     „Schräggeteilt von Schwarz und Gold, darin drei Anker in Gold“:
+     auf der goldenen Hälfte unsichtbar. Über einer Teilung liegt die
+     Figur aber auf beiden Hälften zugleich. */
+  const gegenteil = metallGrund ? farben : metalle;
+  const uebrig = gegenteil.filter((t) => t.id !== grund.id && t.id !== zweit.id);
+  const topf = uebrig.length ? uebrig : PLAN_TINKTUREN.filter((t) => t.id !== grund.id && t.id !== zweit.id);
+  const figur = topf[planHash(saat, 'wpf') % topf.length];
+
+  /* Das Bild passt zur Stadt, wo es geht: Hafenstadt → Anker,
+     Mühle → Mühlrad, Brücken → Brücke. Sonst frei gewählt. */
+  let bildId = null;
+  if (gebaut && gebaut.hafen && gebaut.hafen.hat && planZufall(saat, 'wpa') > 0.35) bildId = 'anker';
+  else if (gebaut && gebaut.muehle && planZufall(saat, 'wpr') > 0.5) bildId = 'rad';
+  else if (gebaut && gebaut.stadt && gebaut.stadt.bruecken && gebaut.stadt.bruecken.length > 1 && planZufall(saat, 'wpb') > 0.6) bildId = 'bruecke';
+  else if (gebaut && gebaut.stadt && gebaut.stadt.mauer && planZufall(saat, 'wpu') > 0.62) bildId = 'turm';
+  if (!bildId) bildId = PLAN_WAPPENBILDER[planHash(saat, 'wpi') % PLAN_WAPPENBILDER.length].id;
+
+  return {
+    eigen: false,
+    grund: grund.id,
+    zweit: zweit.id,
+    figur: figur.id,
+    teilung: teilung.id,
+    bild: bildId,
+    wieViele: 1 + (planHash(saat, 'wpn') % 3)
+  };
+}
+
+/* Die Blasonierung — die Beschreibung des Wappens in der Sprache, in der
+   Wappen seit siebenhundert Jahren beschrieben werden. Sie steht unter
+   dem Schild und ist der Beweis, dass hier nichts zufällig ist. */
+function planBlason(wappen) {
+  const w = wappen || {};
+  const grund = planTinktur(w.grund).name;
+  const zweit = planTinktur(w.zweit).name;
+  const figur = planTinktur(w.figur).name;
+  const zahl = Math.max(1, Math.min(3, w.wieViele || 1));
+  const werfall = planBildWerfall(w.bild, zahl);
+  const wemfall = planBildWemfall(w.bild, zahl);
+
+  const teilung = w.teilung || 'ganz';
+  if (teilung === 'ganz') return 'In ' + grund + ' ' + werfall + ' in ' + figur + '.';
+  if (teilung === 'pfahl') return 'Gespalten von ' + grund + ' und ' + zweit + ', darin ' + werfall + ' in ' + figur + '.';
+  if (teilung === 'balken') return 'Geteilt von ' + grund + ' und ' + zweit + ', darin ' + werfall + ' in ' + figur + '.';
+  if (teilung === 'schraeg') return 'Schräggeteilt von ' + grund + ' und ' + zweit + ', darin ' + werfall + ' in ' + figur + '.';
+  if (teilung === 'geviert') return 'Geviert von ' + grund + ' und ' + zweit + ', belegt mit ' + wemfall + ' in ' + figur + '.';
+  return 'In ' + grund + ' eine eingebogene Spitze in ' + zweit + ', darin ' + werfall + ' in ' + figur + '.';
+}
+
+
+/* ===================== DIE LEGENDE =====================
+   Eine Karte ohne Zeichenerklärung ist ein Bild. Mit ihr ist es eine
+   Karte: sie behauptet, dass ihre Zeichen etwas bedeuten, und sagt was.
+
+   Aufgenommen wird nur, was auf DIESEM Blatt wirklich vorkommt — eine
+   Legende, die Dinge erklärt, die es nicht gibt, ist eine Lüge auf
+   Papier. */
+function planLegende(plan, gebaut) {
+  const eintraege = [];
+  const dazu = (zeichen, text) => eintraege.push({ zeichen, text });
+  const st = gebaut.stadt;
+
+  if (st.haeuser.some((h) => !h.sonder)) dazu('haus', 'Wohnhaus');
+  if (st.haeuser.some((h) => h.gross)) dazu('grosshaus', 'Speicher, Halle');
+  if (st.haeuser.some((h) => h.sonder === 'kirche')) dazu('kirche', 'Kirche');
+  if (st.burg) dazu('burg', 'Burg');
+  if (st.mauer) dazu('mauer', 'Stadtmauer mit Türmen');
+  if (st.mauer && st.mauer.tore.length) dazu('tor', 'Stadttor');
+  if (st.markt && st.markt.length) dazu('markt', 'Marktplatz');
+  if (st.bloecke.some((b) => b.sonder === 'garten')) dazu('garten', 'Garten, Baumhof');
+  if (st.bloecke.some((b) => b.sonder === 'friedhof')) dazu('friedhof', 'Friedhof');
+  if (st.bruecken.length) dazu('bruecke', 'Brücke');
+  if (gebaut.hafen && gebaut.hafen.hat) dazu('hafen', 'Hafen mit Molen');
+  if (gebaut.hafen && gebaut.hafen.leuchtturm) dazu('leuchtturm', 'Leuchtfeuer');
+  if (gebaut.muehle) dazu('muehle', 'Mühle');
+  if (gebaut.wasser.art !== 'keins') dazu('wasser', planWasserwort(gebaut.wasser.art));
+  if (gebaut.umland.felder.some((f) => f.gepfluegt)) dazu('acker', 'Acker');
+  if (gebaut.umland.felder.some((f) => !f.gepfluegt)) dazu('wiese', 'Wiese, Weide');
+  if (gebaut.umland.waelder.length) dazu('wald', 'Wald');
+  if (gebaut.umland.hoefe.length) dazu('hof', 'Einzelhof');
+  if (gebaut.inseln && gebaut.inseln.length) dazu('insel', 'Werder');
+
+  return eintraege;
+}
+
+function planWasserwort(art) {
+  return art === 'fluss' ? 'Fluss'
+    : art === 'kueste' ? 'Küste, offene See'
+      : art === 'see' ? 'See'
+        : art === 'muendung' ? 'Mündung'
+          : art === 'insel' ? 'Umgebende See'
+            : 'Wasser';
+}
+
+/* ===================== DER RUNDGANG =====================
+   Marken sind einzelne Punkte. Ein Rundgang macht daraus einen Weg: er
+   verbindet sie in der Reihenfolge, in der man sie zu Fuß am kürzesten
+   abläuft, und sagt, wie lange das dauert.
+
+   Gerechnet wird mit dem Nächsten-Nachbarn-Verfahren und danach einmal
+   mit 2-opt geglättet — das genügt für ein Dutzend Punkte vollauf und
+   liefert einen Weg, der sich nicht selbst kreuzt. */
+function planRundgang(plan, marken) {
+  const liste = (marken || []).filter((m) => m && Number.isFinite(m.x) && Number.isFinite(m.y));
+  if (liste.length < 2) return { punkte: [], marken: [], laenge: 0, minuten: 0 };
+
+  const rest = liste.slice(1);
+  const weg = [liste[0]];
+  while (rest.length) {
+    const letzter = weg[weg.length - 1];
+    let beste = 0, nah = Infinity;
+    rest.forEach((m, i) => {
+      const d = strecke([letzter.x, letzter.y], [m.x, m.y]);
+      if (d < nah) { nah = d; beste = i; }
+    });
+    weg.push(rest.splice(beste, 1)[0]);
+  }
+
+  /* 2-opt: solange sich zwei Stücke durch Umdrehen verkürzen lassen,
+     dreh sie um. Ohne das kreuzt der Weg sich selbst, und ein Rundgang,
+     der sich kreuzt, sieht nach Irrweg aus.
+
+     Bewertet wird der UNTERSCHIED, nicht die ganze Länge. Der erste Wurf
+     rechnete für jedes Paar den kompletten Weg zweimal neu — bei
+     vierhundert Marken (so viele erlaubt der Beleg) wären das Milliarden
+     Rechenschritte gewesen, jedes Mal, wenn sich die Karte zeichnet. */
+  const d = (a, b) => strecke([a.x, a.y], [b.x, b.y]);
+  const n = weg.length;
+  /* Bei sehr vielen Marken wird das Feinschleifen begrenzt: die ersten
+     Durchgänge bringen fast alles, die letzten kosten am meisten. */
+  const hoechstens = n > 250 ? 14 : 24;
+  let besser = true, runden = 0;
+  while (besser && runden++ < hoechstens) {
+    besser = false;
+    for (let i = 0; i < n - 1; i++) {
+      const a = weg[i], b = weg[i + 1];
+      for (let j = i + 2; j < n; j++) {
+        const c = weg[j], e = weg[(j + 1) % n];
+        if (e === a) continue;
+        const jetzt = d(a, b) + d(c, e);
+        const danach = d(a, c) + d(b, e);
+        if (danach < jetzt - 0.01) {
+          /* Das Stück zwischen i+1 und j umdrehen. */
+          let l = i + 1, r = j;
+          while (l < r) { const h = weg[l]; weg[l] = weg[r]; weg[r] = h; l++; r--; }
+          besser = true;
+        }
+      }
+    }
+  }
+  const gesamt = (w) => { let s = 0; for (let i = 1; i < w.length; i++) s += d(w[i - 1], w[i]); return s + d(w[w.length - 1], w[0]); };
+
+  const punkte = weg.map((m) => [m.x, m.y]);
+  punkte.push(punkte[0]);
+  const laenge = gesamt(weg);
+  return {
+    punkte, marken: weg, laenge,
+    minuten: Math.round(planWegzeit([0, 0], [laenge, 0], 'gasse'))
+  };
+}
+
+/* ===================== DER MARKT =====================
+   Bis hierher war der Marktplatz eine gepflasterte Leerstelle — genau in
+   der Mitte der Karte, dort, wo das Auge zuerst hinsieht. Ein Markt ist
+   aber das Vollste, was eine Stadt hat: der Brunnen, aus dem alle
+   schöpfen, das Rathaus an der Schmalseite, der Pranger daneben und
+   dazwischen die Stände. */
+function planMarktplatz(plan, stadt) {
+  const ecken = stadt.markt;
+  if (!ecken || ecken.length < 3) return null;
+  const saat = plan.saat;
+  const mitte = netzMitte(ecken);
+  const flaeche = Math.abs(netzFlaeche(ecken));
+  if (flaeche < 900) return null;
+  const weite = Math.sqrt(flaeche);
+
+  /* Die längste Kante ist die Schmalseite des Platzes — dort steht das
+     Rathaus, mit dem Rücken zur Bebauung. */
+  let lang = 0, langI = 0;
+  for (let i = 0; i < ecken.length; i++) {
+    const l = strecke(ecken[i], ecken[(i + 1) % ecken.length]);
+    if (l > lang) { lang = l; langI = i; }
+  }
+  const a = ecken[langI], b = ecken[(langI + 1) % ecken.length];
+  const l = strecke(a, b) || 1;
+  const u = [(b[0] - a[0]) / l, (b[1] - a[1]) / l];
+  let n = [-u[1], u[0]];
+  const kante = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  if (!netzImPolygon(ecken, kante[0] + n[0] * 5, kante[1] + n[1] * 5)) n = [-n[0], -n[1]];
+
+  const rathaus = {
+    punkt: [kante[0] + n[0] * (weite * 0.16), kante[1] + n[1] * (weite * 0.16)],
+    laengs: u,
+    breite: Math.min(lang * 0.52, weite * 0.46),
+    tiefe: Math.min(weite * 0.26, 22)
+  };
+
+  /* Der Brunnen steht nicht in der Mitte, sondern etwas abseits — er
+     stand immer dort, wo der Boden es hergab. */
+  const brunnen = {
+    punkt: [
+      mitte[0] - n[0] * weite * 0.14 + u[0] * planStreu(saat, 'brx') * weite * 0.12,
+      mitte[1] - n[1] * weite * 0.14 + u[1] * planStreu(saat, 'bry') * weite * 0.12
+    ],
+    gross: weite > 46
+  };
+
+  /* Der Pranger: ein Pfahl, nah beim Rathaus. */
+  const pranger = planZufall(saat, 'prg') > 0.45 ? {
+    punkt: [rathaus.punkt[0] + u[0] * rathaus.breite * 0.72, rathaus.punkt[1] + u[1] * rathaus.breite * 0.72]
+  } : null;
+
+  /* Die Stände: kleine Kästen in Reihen, aber nicht in Reih und Glied. */
+  const staende = [];
+  const reihen = weite > 52 ? 2 : 1;
+  for (let r = 0; r < reihen; r++) {
+    const wieViele = 3 + (planHash(saat, 'sr' + r) % 4);
+    for (let i = 0; i < wieViele; i++) {
+      const t = ((i + 0.5) / wieViele - 0.5) * lang * 0.68;
+      const ab = weite * (0.16 + r * 0.2) * -1;
+      const punkt = [
+        mitte[0] + u[0] * t + n[0] * ab + u[0] * planStreu(saat, 'sx' + r + i) * 4,
+        mitte[1] + u[1] * t + n[1] * ab + u[1] * planStreu(saat, 'sy' + r + i) * 4
+      ];
+      if (!netzImPolygon(ecken, punkt[0], punkt[1])) continue;
+      staende.push({
+        punkt, laengs: u,
+        breite: 7 + planZufall(saat, 'sb' + r + i) * 3.5,
+        tiefe: 4.5 + planZufall(saat, 'st' + r + i) * 2,
+        dreh: planStreu(saat, 'sd' + r + i) * 7
+      });
+    }
+  }
+
+  return { mitte, rathaus, brunnen, pranger, staende, weite };
 }
 
 /* ===================== 65b — DIE KARTE =====================
@@ -35456,7 +36886,27 @@ function kweich(punkte, zu) {
   return d + (zu ? ' Z' : '');
 }
 
-let _kt = { id: '', zoom: 1, werkzeug: 'hand', markeArt: 'stern', nurMarke: '', zeigeNamen: true, zeigeUmland: true, messenVon: null, offen: false };
+/* Was gerade auf dem Tisch liegt — und welche Ebenen davon sichtbar sind.
+   Die Ebenen sind Ansichtssache, kein Teil des Belegs: sie gehören zum
+   Schauen, nicht zur Stadt, und werden darum auch nicht gespeichert. */
+let _kt = {
+  id: '', zoom: 1, werkzeug: 'hand', markeArt: 'stern', nurMarke: '',
+  zeigeNamen: true, zeigeUmland: true, zeigeLegende: true, zeigeWappen: true,
+  zeigeGitter: true, zeigeAlterung: true, zeigeRundgang: false,
+  messenVon: null, offen: false
+};
+
+/* Die Ebenen als Liste — einmal beschrieben, überall verwendet: im
+   Knopf, im Tastenkürzel und in der Klasse am Blatt. */
+const KT_EBENEN = [
+  ['zeigeNamen', 'Namen', 'ohne-namen', 'Gassen, Viertel, Tore'],
+  ['zeigeUmland', 'Umland', 'ohne-umland', 'Felder, Wälder, Höfe, Hügel'],
+  ['zeigeLegende', 'Zeichenerklärung', 'ohne-legende', 'Das Feld unten rechts'],
+  ['zeigeWappen', 'Wappen', 'ohne-wappen', 'Schild und Blasonierung'],
+  ['zeigeGitter', 'Gradnetz', 'ohne-gitter', 'Die feinen Linien über dem Blatt'],
+  ['zeigeAlterung', 'Alterung', 'ohne-alterung', 'Stockflecken, Falten, Schatten'],
+  ['zeigeRundgang', 'Rundgang', 'mit-rundgang', 'Ein Weg durch alle Marken']
+];
 
 /* ===================== DAS WERKZEUG IM KABINETT ===================== */
 function stadtplanWerkzeug(zurueck) {
@@ -35565,6 +37015,7 @@ function planOeffnen(id) {
     else if (ev.key === '2') { ev.preventDefault(); _kt.werkzeug = 'marke'; neu(); }
     else if (ev.key === '3') { ev.preventDefault(); _kt.werkzeug = 'messen'; _kt.messenVon = null; neu(); }
     else if (ev.key === 'n' || ev.key === 'N') { ev.preventDefault(); _kt.zeigeNamen = !_kt.zeigeNamen; neu(); }
+    else if (ev.key === 'e' || ev.key === 'E') { ev.preventDefault(); planEbenenwahl(neu); }
     else if (ev.key === 'v' || ev.key === 'V') { ev.preventDefault(); planVerzeichnis(D.docs.get(_kt.id), neu); }
     else if (ev.key === 'Escape' && (_kt.nurMarke || _kt.messenVon)) { ev.preventDefault(); _kt.nurMarke = ''; _kt.messenVon = null; neu(); }
   };
@@ -35607,7 +37058,19 @@ function planZeichne(tafel, flaeche, rahmen, neu, schliessen) {
   const welt = planFarbwelt(plan.welt);
   const papier = planPapier(plan.papier || welt.papier);
 
-  for (const [k, v] of [['--kpapier', papier[2]], ['--kpapier2', papier[3]], ['--ktinte', welt.tinte], ['--kwasser', welt.wasser], ['--kgold', welt.gold]]) {
+  /* Die ganze Farbwelt wird durchgereicht, nicht nur fuenf Werte: Hafen,
+     Legende und Wappen sollen der Welt folgen, in der die Karte steht —
+     sonst haetten sie fest eingetragene Farben, die bei jeder anderen
+     Farbwelt daneben liegen. */
+  for (const [k, v] of [
+    ['--kpapier', papier[2]], ['--kpapier2', papier[3]],
+    ['--ktinte', welt.tinte], ['--ktintezart', welt.tintezart],
+    ['--kwasser', welt.wasser], ['--kwasserrand', welt.wasserrand],
+    ['--kgruen', welt.gruen], ['--kgruendunkel', welt.gruendunkel],
+    ['--kdach', welt.dach], ['--kdachdunkel', welt.dachdunkel],
+    ['--kmauer', welt.mauer], ['--kstrasse', welt.strasse],
+    ['--kgold', welt.gold]
+  ]) {
     tafel.style.setProperty(k, v);
     flaeche.style.setProperty(k, v);
   }
@@ -35618,7 +37081,13 @@ function planZeichne(tafel, flaeche, rahmen, neu, schliessen) {
 
   /* Die Karte hängt: neu gerechnet wird nur, wenn sich die Stadt selbst
      ändert. Marken, Namen und der Blick kommen obenauf. */
-  const signatur = _kt.id + '|' + planSignatur(plan) + '|' + plan.welt + '|' + (plan.papier || '');
+  /* Der Rundgang steht mit in der Signatur: er ist die einzige Ebene, die
+     wirklich etwas HINZUZEICHNET, statt nur etwas auszublenden — und wer
+     ihn nur über eine Klasse versteckte, ließ ihn bei vierhundert Marken
+     bei jedem Zeichnen mitrechnen. Über eine Sekunde für einen Weg, den
+     niemand sieht. */
+  const signatur = _kt.id + '|' + planSignatur(plan) + '|' + plan.welt + '|' + (plan.papier || '') +
+    '|' + (_kt.zeigeRundgang ? 'rund' : '');
   const markenSig = JSON.stringify(plan.marken) + '|' + JSON.stringify(plan.namen) + '|' + plan.titel + '|' + plan.unterzeile;
   let innen = flaeche.querySelector('.kt-innen');
   let svg = innen ? innen.querySelector('svg') : null;
@@ -35644,8 +37113,11 @@ function planZeichne(tafel, flaeche, rahmen, neu, schliessen) {
     svg.setAttribute('width', Math.round(PLAN_GROESSE * _kt.zoom));
     svg.setAttribute('height', Math.round(PLAN_GROESSE * _kt.zoom));
   }
-  svg.classList.toggle('ohne-namen', !_kt.zeigeNamen);
-  svg.classList.toggle('ohne-umland', !_kt.zeigeUmland);
+  for (const [feld, , klasse] of KT_EBENEN) {
+    /* „mit-…“ wird gesetzt, wenn AN; „ohne-…“, wenn AUS. */
+    const an = _kt[feld] !== false;
+    svg.classList.toggle(klasse, klasse.startsWith('mit-') ? an : !an);
+  }
   svg.classList.toggle('eine-im-blick', !!_kt.nurMarke);
   for (const m of svg.querySelectorAll('.kt-marke')) {
     m.classList.toggle('imblick', m.getAttribute('data-marke') === _kt.nurMarke);
@@ -35703,12 +37175,39 @@ function planLeisteInhalt(doc, plan, flaeche, neu, schliessen) {
         el('button', { class: 'kt-wk', title: 'Größer (+)', onclick: () => planZoom(0.2, flaeche, neu) }, '+'),
         el('button', { class: 'kt-wk', title: 'Ganz einpassen', onclick: () => planEinpassen(flaeche, neu) }, '⤢'),
         el('button', { class: 'kt-werkzeugknopf' + (_kt.zeigeNamen ? ' an' : ''), title: 'Namen zeigen oder ausblenden (n)', onclick: () => { _kt.zeigeNamen = !_kt.zeigeNamen; neu(); } }, 'Namen'),
+        el('button', { class: 'kt-werkzeugknopf', title: 'Welche Ebenen liegen auf dem Blatt? (e)', onclick: () => planEbenenwahl(neu) }, 'Ebenen'),
         el('button', { class: 'kt-werkzeugknopf', title: 'Alle Marken und Gassen (v)', onclick: () => planVerzeichnis(doc, neu) }, 'Verzeichnis'),
         el('button', { class: 'kt-werkzeugknopf', title: 'Aussehen, Lage, Größe', onclick: () => planEinrichten(doc, neu) }, 'Der Grundriss'),
         el('button', { class: 'kt-zuknopf', title: 'Die Karte einrollen', onclick: () => schliessen() }, '×'))),
     _kt.werkzeug === 'marke' ? planMarkenwahl(neu) : null,
     _kt.werkzeug === 'messen' ? el('div', { class: 'kt-hinweiszeile' }, 'Tipp zwei Stellen an — VANI sagt dir, wie lange man dazwischen geht.') : null
   ];
+}
+
+/* Die Ebenenwahl: ein kleines Fenster mit einem Schalter je Ebene.
+   Kein Speichern — wer die Karte wieder aufschlägt, sieht sie ganz. */
+function planEbenenwahl(neu) {
+  const liste = el('div', { class: 'kt-ebenenliste' });
+  const zu = zeigeDeck(el('div', { class: 'modal kt-ebenenfenster' },
+    el('div', { class: 'kartenkopf' }, 'EBENEN'),
+    el('small', { class: 'kt-ebenenhilfe' }, 'Was liegt auf dem Blatt? Nimm weg, was gerade stört — die Stadt bleibt, wie sie ist.'),
+    liste,
+    el('div', { class: 'reihe' },
+      el('button', { class: 'knopf zart', onclick: () => { for (const [f] of KT_EBENEN) _kt[f] = f !== 'zeigeRundgang'; zeichnen(); neu(); } }, 'Alles zeigen'),
+      el('button', { class: 'knopf voll', onclick: () => zu() }, 'Fertig'))));
+
+  const zeichnen = () => {
+    liste.innerHTML = '';
+    for (const [feld, name, , was] of KT_EBENEN) {
+      const an = _kt[feld] !== false;
+      liste.append(el('button', {
+        class: 'ktg-schalter' + (an ? ' an' : ''),
+        onclick: () => { _kt[feld] = !(_kt[feld] !== false); zeichnen(); neu(); }
+      }, el('i', {}), el('b', {}, name), el('small', {}, was)));
+    }
+  };
+  zeichnen();
+  return zu;
 }
 
 function planMarkenwahl(neu) {
@@ -35776,13 +37275,13 @@ function planSVG(plan, g, neu) {
     gUmland.append(kv('path', { d: kpfad(f.ecken, true), class: 'kt-feld' + (f.gepfluegt ? ' gepfluegt' : ''), fill: f.gepfluegt ? 'url(#kt-acker)' : 'url(#kt-wiese)' }));
   }
   for (const w of g.umland.waelder) {
-    gUmland.append(kv('path', { d: kpfad(w.ecken, true), class: 'kt-waldgrund', fill: welt.gruendunkel }));
-    /* Bäume als kleine Kronen darauf */
-    const mitte = [(w.ecken[0][0] + w.ecken[2][0]) / 2, (w.ecken[0][1] + w.ecken[2][1]) / 2];
-    for (let t = 0; t < 9; t++) {
-      const u = planZufall(plan.saat, 'wtu' + w.n + t), v = planZufall(plan.saat, 'wtv' + w.n + t);
-      const p = bilinear(w.ecken, 0.1 + u * 0.8, 0.1 + v * 0.8);
-      gUmland.append(planBaum(p[0], p[1], 3.2 + planZufall(plan.saat, 'wtr' + w.n + t) * 2.4, welt));
+    /* Ein Wald ist keine Kachel: sein Rand ist weich, und die Kronen stehen
+       unregelmaessig darin. */
+    gUmland.append(kv('path', { d: kweich(w.ecken, true), class: 'kt-waldgrund', fill: welt.gruendunkel }));
+    const wieViele = w.gross ? 22 : 7;
+    for (let t = 0; t < wieViele; t++) {
+      const p = netzPunktDrin(w.ecken, plan.saat, 'wt' + w.n + '_' + t);
+      gUmland.append(planBaum(p[0], p[1], 3.2 + planZufall(plan.saat, 'wtr' + w.n + t) * 2.6, welt));
     }
   }
   for (const h of g.umland.hoefe) {
@@ -35830,6 +37329,11 @@ function planSVG(plan, g, neu) {
     gWasser.append(kv('path', { d: korn.trim(), class: 'kt-wasserkorn' }));
   }
   svg.append(gWasser);
+
+  /* --- Die Werder ---
+     Sie liegen im Wasser und müssen deshalb darüber, aber unter allem,
+     was an Land steht. */
+  if (g.inseln && g.inseln.length) svg.append(planInselnZeichnen(g.inseln, welt, plan.saat, papier[2]));
 
   /* --- Die Blöcke: ein ruhiger Grund unter den Häusern --- */
   const gBloecke = kv('g', { class: 'kt-bloecke' });
@@ -35920,6 +37424,18 @@ function planSVG(plan, g, neu) {
     svg.append(gb);
   }
 
+  /* --- Was auf dem Markt steht ---
+     Brunnen, Rathaus, Pranger, Stände. Vorher lag genau in der Mitte der
+     Karte eine gepflasterte Leerstelle — dort, wo das Auge zuerst hinsieht. */
+  if (g.marktplatz) svg.append(planMarktZeichnen(g.marktplatz, welt, plan.saat));
+
+  /* --- Der Hafen ---
+     Er greift vom Land ins Wasser und gehört deshalb über beides. */
+  if (g.hafen && g.hafen.hat) svg.append(planHafenZeichnen(g.hafen, welt, plan.saat));
+
+  /* --- Die Mühle --- */
+  if (g.muehle) svg.append(planMuehleZeichnen(g.muehle, welt));
+
   /* --- Hügel im Umland ---
      Leeres Land ist totes Land. Hügel mit Schraffur auf der Schattenseite
      sind das älteste Mittel, einer Karte Gelände zu geben — und sie füllen
@@ -35936,8 +37452,29 @@ function planSVG(plan, g, neu) {
 
   /* --- Kompass, Maßstab, Kartusche --- */
   svg.append(planKompass(G - 128, 128, plan));
-  svg.append(planMassstab(96, G - 74));
+  /* Der Maßstab stand links unten — genau dort, wo jetzt die Blasonierung
+     unter der Kartusche steht; „400 Schritt“ lag mitten im Wappenspruch.
+     Er rückt in die Lücke zwischen Kartusche und Zeichenerklärung. */
+  svg.append(planMassstab(G / 2 - 38, G - 68));
   svg.append(planKartusche(plan, g));
+  /* Die Zeichenerklärung steht der Kartusche gegenüber — unten rechts,
+     wo auf jedem gestochenen Blatt die Legende steht. */
+  if (g.legende && g.legende.length) {
+    const spalten = g.legende.length > 8 ? 2 : 1;
+    const breite = 16 + spalten * 132;
+    const hoehe = 34 + Math.ceil(g.legende.length / spalten) * 15.5;
+    svg.append(planLegendeSVG(g.legende, G - 62 - breite, G - 58 - hoehe, welt));
+  }
+
+  /* --- Das Gradnetz ---
+     Die Striche am Randband deuten es an; hier laufen sie wirklich über
+     das Blatt. Ganz blass: ein Gradnetz soll man finden, wenn man es
+     sucht, und übersehen, wenn man die Stadt anschaut. */
+  svg.append(planGradnetz());
+
+  /* --- Der Rundgang ---
+     Marken sind einzelne Punkte. Der Rundgang macht daraus einen Weg. */
+  if (_kt.zeigeRundgang) svg.append(planRundgangZeichnen(plan));
 
   /* --- Das Papier altert -----
      Ohne das hier ist es eine Vektorgrafik. Mit Stockflecken, Faltlinien und
@@ -35970,6 +37507,42 @@ function planSVG(plan, g, neu) {
 }
 
 /* Die Form, in die die Karte geschnitten ist. */
+/* Das Gradnetz — dieselbe Teilung wie am Randband, damit die Striche
+   dort aufhören, wo die Felder anfangen. */
+function planGradnetz() {
+  const G = PLAN_GROESSE;
+  const g = kv('g', { class: 'kt-gradnetz', 'aria-hidden': 'true' });
+  const AUSSEN = 30, BAND = 12, ECKE = 26;
+  const innen = AUSSEN + BAND;
+  const felder = 24;
+  const feld = (G - (innen + ECKE) * 2) / felder;
+  let d = '';
+  for (let i = 0; i <= felder; i++) {
+    const a = innen + ECKE + i * feld;
+    d += ' M ' + kz(a) + ' ' + kz(innen) + ' V ' + kz(G - innen);
+    d += ' M ' + kz(innen) + ' ' + kz(a) + ' H ' + kz(G - innen);
+  }
+  g.append(kv('path', { d: d.trim(), class: 'kt-gradlinie' }));
+  return g;
+}
+
+/* Der Rundgang: der Weg selbst und an jeder Marke eine Nummer. */
+function planRundgangZeichnen(plan) {
+  const g = kv('g', { class: 'kt-rundgang' });
+  const rund = planRundgang(plan, plan.marken);
+  if (rund.punkte.length < 3) return g;
+  const d = kweich(rund.punkte);
+  g.append(kv('path', { d, class: 'kt-rundweg-rand' }));
+  g.append(kv('path', { d, class: 'kt-rundweg' }));
+  rund.marken.forEach((m, i) => {
+    g.append(kv('circle', { cx: kz(m.x), cy: kz(m.y - 17), r: 8, class: 'kt-rundnummer' }));
+    const t = kv('text', { x: kz(m.x), y: kz(m.y - 13.4), class: 'kt-rundziffer', 'text-anchor': 'middle' });
+    t.textContent = String(i + 1);
+    g.append(t);
+  });
+  return g;
+}
+
 function planZuschnittForm(art) {
   const G = PLAN_GROESSE, m = G / 2, r = G / 2 - 34;
   if (art === 'kreis') return kv('circle', { cx: m, cy: m, r });
@@ -36001,29 +37574,73 @@ function planPunktAus(svg, ev) {
    beieinander, nach außen immer weiter auseinander und immer blasser. Sie
    füllen die Wasserfläche, ohne sie zuzudecken — und erst dadurch sieht
    Wasser nach Wasser aus statt nach blauem Papier. */
+/* Die Geometrie der Uferstriche — ohne Zeichnen, damit sie sich prüfen
+   lässt. Gibt für eine Stufe die Stücke zurück, aus denen der Strich besteht. */
+function planUferlinien(linie, stufe, richtung) {
+  const n = linie.length;
+  if (n < 3) return [];
+  const richtungen = planUferNormalen(linie);
+  let abstand = 0;
+  for (let s = 1; s <= stufe; s++) abstand += 3.2 + s * 1.15;
+  const stuecke = [];
+  let lauf = [];
+  for (let i = 0; i < n; i++) {
+    const r = richtungen[i];
+    if (!r) { if (lauf.length > 2) stuecke.push(lauf); lauf = []; continue; }
+    const zittern = Math.sin(i * 0.7 + stufe * 1.3) * stufe * 0.34;
+    const weit = (abstand + zittern) * richtung;
+    lauf.push([linie[i][0] - r[1] * weit, linie[i][1] + r[0] * weit]);
+  }
+  if (lauf.length > 2) stuecke.push(lauf);
+  return stuecke;
+}
+
 function planUferstriche(g, linie, geschlossen, welt, richtung) {
   const n = linie.length;
-  let abstand = 0;
+  if (n < 3) return;
+  /* Die Richtung „nach außen“ steht senkrecht auf dem Ufer. Sie über den
+     übernächsten Nachbarn zu bestimmen ist bequem — aber an einer KEHRE geht
+     es schief: ein Flusspolygon läuft die eine Seite hinunter und die andere
+     wieder herauf, und am Umkehrpunkt zeigen Vorgänger und Nachfolger fast
+     genau aufeinander. Dann ist die Differenz beinahe null, die Normale kippt
+     ins Beliebige, und aus den Uferstrichen wird ein Fächer, der über das
+     halbe Blatt schießt. (Genau das war zu sehen.)
+
+     Also: die Normale aus den beiden ANLIEGENDEN Strecken mitteln, und an
+     einer echten Kehre den Punkt lieber auslassen. */
   for (let s = 1; s <= 12; s++) {
-    /* Der Abstand wächst — wie bei einem Stein, der ins Wasser fällt. */
-    abstand += 3.2 + s * 1.15;
-    const versetzt = [];
-    for (let i = 0; i < n; i++) {
-      const vor = linie[(i - 1 + n) % n], nach = linie[(i + 1) % n];
-      const dx = nach[0] - vor[0], dy = nach[1] - vor[1];
-      const len = Math.sqrt(dx * dx + dy * dy) || 1;
-      /* Die Striche werden nach außen unruhiger — die Hand wird lockerer. */
-      const zittern = Math.sin(i * 0.7 + s * 1.3) * s * 0.34;
-      const weit = (abstand + zittern) * richtung;
-      versetzt.push([linie[i][0] - (dy / len) * weit, linie[i][1] + (dx / len) * weit]);
+    /* Die Striche brechen an den Kehren ab, laufen also in Stücken. */
+    const stuecke = planUferlinien(linie, s, richtung);
+    const zu = geschlossen && stuecke.length === 1 && stuecke[0].length === n;
+    for (const st of stuecke) {
+      g.append(kv('path', {
+        d: kweich(st, zu), class: 'kt-uferstrich',
+        stroke: welt.wasserrand,
+        'stroke-width': (1.4 - s * 0.05).toFixed(2),
+        'stroke-opacity': (0.92 * Math.pow(1 - s / 14, 1.15)).toFixed(3)
+      }));
     }
-    g.append(kv('path', {
-      d: kweich(versetzt, geschlossen), class: 'kt-uferstrich',
-      stroke: welt.wasserrand,
-      'stroke-width': (1.4 - s * 0.05).toFixed(2),
-      'stroke-opacity': (0.92 * Math.pow(1 - s / 14, 1.15)).toFixed(3)
-    }));
   }
+}
+
+/* Für jeden Punkt die Richtung „nach außen“ — oder null an einer Kehre. */
+function planUferNormalen(linie) {
+  const n = linie.length;
+  const richtungen = [];
+  for (let i = 0; i < n; i++) {
+    const vor = linie[(i - 1 + n) % n], hier = linie[i], nach = linie[(i + 1) % n];
+    const e1 = [hier[0] - vor[0], hier[1] - vor[1]];
+    const e2 = [nach[0] - hier[0], nach[1] - hier[1]];
+    const l1 = Math.hypot(e1[0], e1[1]) || 1, l2 = Math.hypot(e2[0], e2[1]) || 1;
+    const u1 = [e1[0] / l1, e1[1] / l1], u2 = [e2[0] / l2, e2[1] / l2];
+    /* Kehre? Dann kein Strich an dieser Stelle. */
+    if (u1[0] * u2[0] + u1[1] * u2[1] < -0.55) { richtungen.push(null); continue; }
+    const mx = u1[0] + u2[0], my = u1[1] + u2[1];
+    const ml = Math.hypot(mx, my);
+    if (ml < 0.2) { richtungen.push(null); continue; }
+    richtungen.push([mx / ml, my / ml]);
+  }
+  return richtungen;
 }
 
 function planKirche(h, welt) {
@@ -36159,9 +37776,14 @@ function planMassstab(x, y) {
    gemacht, und aus gutem Grund: hier ruht das Auge. */
 function planKartusche(plan, g) {
   const G = PLAN_GROESSE;
-  const breite = Math.max(280, plan.titel.length * 17 + 96);
+  /* Links im Schild steht das Wappen; die Schrift rückt entsprechend nach
+     rechts und wird in dem Platz zentriert, der ihr bleibt. Ohne diese
+     Rechnung säße der Titel schief unter dem Schild. */
+  const wappenPlatz = g.wappen ? 78 : 0;
+  const breite = Math.max(280, plan.titel.length * 17 + 96) + wappenPlatz;
   const h = 92;
-  const gr = kv('g', { class: 'kt-kartusche', transform: 'translate(148 ' + (G - 196) + ')' });
+  const mitte = wappenPlatz + (breite - wappenPlatz) / 2;
+  const gr = kv('g', { class: 'kt-kartusche', transform: 'translate(148 ' + (G - 208) + ')' });
 
   /* Die Voluten: eingerollte Enden links und rechts. */
   for (const seite of [-1, 1]) {
@@ -36187,22 +37809,35 @@ function planKartusche(plan, g) {
   }));
 
   /* Ein Fleuron oben auf dem Schild */
-  const fl = kv('g', { class: 'kt-kfleuron', transform: 'translate(' + kz(breite / 2) + ' -3)' });
+  const fl = kv('g', { class: 'kt-kfleuron', transform: 'translate(' + kz(mitte) + ' -3)' });
   fl.append(kv('path', { d: 'M -22 0 Q -11 -9 0 -3 Q 11 -9 22 0' }));
   fl.append(kv('circle', { cx: 0, cy: -4.5, r: 2.6 }));
   fl.append(kv('path', { d: 'M -30 0 H -24 M 30 0 H 24' }));
   gr.append(fl);
 
-  const t = kv('text', { x: kz(breite / 2), y: 42, class: 'kt-kartuschentitel', 'text-anchor': 'middle' });
+  const t = kv('text', { x: kz(mitte), y: 42, class: 'kt-kartuschentitel', 'text-anchor': 'middle' });
   t.textContent = plan.titel;
   gr.append(t);
   /* Eine Zierlinie zwischen Titel und Zeile darunter */
-  gr.append(kv('path', { class: 'kt-kstrich', d: 'M ' + kz(breite / 2 - 46) + ' 52 H ' + kz(breite / 2 - 8) +
-    ' M ' + kz(breite / 2 + 8) + ' 52 H ' + kz(breite / 2 + 46) +
-    ' M ' + kz(breite / 2) + ' 48 l 4 4 l -4 4 l -4 -4 Z' }));
-  const u = kv('text', { x: kz(breite / 2), y: 70, class: 'kt-kartuschenunter', 'text-anchor': 'middle' });
+  gr.append(kv('path', { class: 'kt-kstrich', d: 'M ' + kz(mitte - 46) + ' 52 H ' + kz(mitte - 8) +
+    ' M ' + kz(mitte + 8) + ' 52 H ' + kz(mitte + 46) +
+    ' M ' + kz(mitte) + ' 48 l 4 4 l -4 4 l -4 -4 Z' }));
+  const u = kv('text', { x: kz(mitte), y: 70, class: 'kt-kartuschenunter', 'text-anchor': 'middle' });
   u.textContent = plan.unterzeile || (planGroesse(plan.stadt.groesse)[1] + ' — ' + g.stadt.haeuser.length + ' Häuser');
   gr.append(u);
+
+  /* Das Wappen steht links im Schild — und darunter, außerhalb, die
+     Blasonierung: klein, kursiv, in der Sprache, in der Wappen seit
+     siebenhundert Jahren beschrieben werden. Sie ist der Beweis, dass an
+     diesem Zeichen nichts zufällig ist. */
+  if (g.wappen) {
+    const gw = kv('g', { transform: 'translate(42 ' + kz(h / 2) + ')' });
+    gw.append(planWappenSVG(g.wappen, 58));
+    gr.append(gw);
+    const bl = kv('text', { x: kz(breite / 2), y: kz(h + 20), class: 'kt-blason', 'text-anchor': 'middle' });
+    bl.textContent = planBlason(g.wappen);
+    gr.append(bl);
+  }
   return gr;
 }
 
@@ -36220,14 +37855,55 @@ function planRandwerk(welt, zuschnitt) {
     g.append(a, b);
     return g;
   }
-  g.append(kv('rect', { x: 14, y: 14, width: G - 28, height: G - 28, class: 'kt-randlinie aussen' }));
-  g.append(kv('rect', { x: 24, y: 24, width: G - 48, height: G - 48, class: 'kt-randlinie innen' }));
-  /* Gradmarken am Rand — die Karte tut so, als wüsste sie, wo sie liegt. */
-  for (let i = 1; i < 12; i++) {
-    const p = 24 + (i / 12) * (G - 48);
-    for (const [x1, y1, x2, y2] of [[p, 14, p, 24], [p, G - 24, p, G - 14], [14, p, 24, p], [G - 24, p, G - 14, p]]) {
-      g.append(kv('path', { d: 'M ' + kz(x1) + ' ' + kz(y1) + ' L ' + kz(x2) + ' ' + kz(y2), class: 'kt-gradstrich' }));
-    }
+  /* Das graduierte Randband — das Erkennungszeichen jeder gestochenen Karte.
+     Zwei Linien mit einem Band dazwischen, und das Band ist gefeldert:
+     abwechselnd voll und leer, wie ein Lineal. Vorher standen hier nur zwei
+     dünne Rechtecke und ein paar Striche; das Blatt hatte keinen Abschluss.
+
+     Die Felder sind nicht Zierde allein, sie zählen: jedes steht für hundert
+     Schritt, und der Maßstab unten sagt dasselbe noch einmal in Worten. */
+  /* Weit genug nach innen, dass die Bütten­kante des Papiers das Band nicht
+     anknabbert — an den Ecken verschwand es sonst im Ausriss. */
+  const AUSSEN = 30, BAND = 12, ECKE = 26;
+  const innen = AUSSEN + BAND;
+  g.append(kv('rect', { x: AUSSEN, y: AUSSEN, width: G - AUSSEN * 2, height: G - AUSSEN * 2, class: 'kt-randlinie aussen' }));
+  g.append(kv('rect', { x: innen, y: innen, width: G - innen * 2, height: G - innen * 2, class: 'kt-randlinie innen' }));
+
+  /* Die Felder laufen zwischen den Ecken, damit die Ecke frei für den
+     Zierrat bleibt. */
+  const laenge = G - (innen + ECKE) * 2;
+  const felder = 24;
+  const feld = laenge / felder;
+  for (let i = 0; i < felder; i++) {
+    if (i % 2) continue;
+    const a = innen + ECKE + i * feld;
+    for (const [x, y, w, h] of [
+      [a, AUSSEN, feld, BAND],                 /* oben */
+      [a, G - innen, feld, BAND],              /* unten */
+      [AUSSEN, a, BAND, feld],                 /* links */
+      [G - innen, a, BAND, feld]               /* rechts */
+    ]) g.append(kv('rect', { x: kz(x), y: kz(y), width: kz(w), height: kz(h), class: 'kt-randfeld' }));
+  }
+
+  /* In jeder Ecke ein kleines Quadrat mit Raute — der Punkt, an dem der
+     Stecher sein Werkzeug absetzt. */
+  for (const [ex, ey] of [[AUSSEN, AUSSEN], [G - innen, AUSSEN], [AUSSEN, G - innen], [G - innen, G - innen]]) {
+    g.append(kv('rect', { x: kz(ex), y: kz(ey), width: BAND, height: BAND, class: 'kt-randecke' }));
+    const m = BAND / 2;
+    g.append(kv('path', {
+      d: 'M ' + kz(ex + m) + ' ' + kz(ey + 2.6) + ' L ' + kz(ex + BAND - 2.6) + ' ' + kz(ey + m) +
+         ' L ' + kz(ex + m) + ' ' + kz(ey + BAND - 2.6) + ' L ' + kz(ex + 2.6) + ' ' + kz(ey + m) + ' Z',
+      class: 'kt-randraute'
+    }));
+  }
+
+  /* Feinere Teilstriche innerhalb jedes Feldes. */
+  for (let i = 0; i <= felder; i++) {
+    const a = innen + ECKE + i * feld;
+    for (const [x1, y1, x2, y2] of [
+      [a, innen - 3.4, a, innen], [a, G - innen, a, G - innen + 3.4],
+      [innen - 3.4, a, innen, a], [G - innen, a, G - innen + 3.4, a]
+    ]) g.append(kv('path', { d: 'M ' + kz(x1) + ' ' + kz(y1) + ' L ' + kz(x2) + ' ' + kz(y2), class: 'kt-gradstrich' }));
   }
   return g;
 }
@@ -36528,6 +38204,470 @@ function planMessband(plan, neu) {
   return kasten;
 }
 
+/* ===================================================================
+   DAS GEZEICHNETE: HAFEN, MÜHLE, WERDER, WAPPEN, LEGENDE
+   -------------------------------------------------------------------
+   Die Geometrie steht in 65e; hier wird sie zu Strichen. Getrennt, weil
+   das Rechnen sich prüfen lässt und das Zeichnen ein Auge braucht.
+   =================================================================== */
+
+/* ----- Der Hafen ----- */
+function planHafenZeichnen(hafen, welt, saat) {
+  const g = kv('g', { class: 'kt-hafen' });
+  if (!hafen || !hafen.hat) return g;
+
+  /* Der Wellenbrecher liegt am weitesten draußen und damit zuunterst. */
+  if (hafen.wellenbrecher) {
+    for (const stueck of [hafen.wellenbrecher.links, hafen.wellenbrecher.rechts]) {
+      g.append(kv('path', { d: kweich(stueck), class: 'kt-wellenbrecher-rand' }));
+      g.append(kv('path', { d: kweich(stueck), class: 'kt-wellenbrecher' }));
+    }
+  }
+
+  /* Die Kaimauer: ein voller Streifen, kein Strich. */
+  if (hafen.kai.length > 2) {
+    g.append(kv('path', { d: kweich(hafen.kai), class: 'kt-kai-rand' }));
+    g.append(kv('path', { d: kweich(hafen.kai), class: 'kt-kai' }));
+  }
+
+  /* Die Molen — erst dunkel und breit, dann hell und schmal: so
+     verschmelzen Kai und Molen zu EINEM Umriss statt zu lauter Stücken,
+     die einander überlappen. Derselbe Kniff wie beim Straßennetz. */
+  for (const m of hafen.molen) {
+    const d = 'M ' + kz(m.wurzel[0]) + ' ' + kz(m.wurzel[1]) + ' L ' + kz(m.kopf[0]) + ' ' + kz(m.kopf[1]);
+    g.append(kv('path', { d, class: 'kt-mole-rand', 'stroke-width': kz(m.breit + 3.2) }));
+  }
+  for (const m of hafen.molen) {
+    const d = 'M ' + kz(m.wurzel[0]) + ' ' + kz(m.wurzel[1]) + ' L ' + kz(m.kopf[0]) + ' ' + kz(m.kopf[1]);
+    g.append(kv('path', { d, class: 'kt-mole', 'stroke-width': kz(m.breit) }));
+  }
+
+  /* Poller: kleine Punkte auf dem Stein. */
+  for (const p of hafen.poller) {
+    g.append(kv('circle', { cx: kz(p[0]), cy: kz(p[1]), r: 1.5, class: 'kt-poller' }));
+  }
+
+  /* Die Schiffe, längsseits vertäut. */
+  for (const s of hafen.schiffe) {
+    const w = Math.atan2(s.laengs[1], s.laengs[0]) * 180 / Math.PI;
+    g.append(planSchiff(s, w, saat));
+  }
+
+  /* Die Kräne. */
+  for (const k of hafen.kraene) {
+    const w = Math.atan2(k.auslage[1], k.auslage[0]) * 180 / Math.PI;
+    const gk = kv('g', { class: 'kt-kran', transform: 'translate(' + kz(k.punkt[0]) + ' ' + kz(k.punkt[1]) + ') rotate(' + Math.round(w) + ')' });
+    /* Ein Tretkran: ein Häuschen mit einem Ausleger darüber. */
+    gk.append(kv('rect', { x: -4.5, y: -4.5, width: 9, height: 9, rx: 1, class: 'kt-kranhaus' }));
+    gk.append(kv('path', { d: 'M 0 0 L ' + kz(k.hoehe) + ' ' + kz(-k.hoehe * 0.55), class: 'kt-kranarm' }));
+    gk.append(kv('path', { d: 'M ' + kz(k.hoehe) + ' ' + kz(-k.hoehe * 0.55) + ' v 5', class: 'kt-kranseil' }));
+    g.append(gk);
+  }
+
+  /* Das Leuchtfeuer. */
+  if (hafen.leuchtturm) {
+    const [x, y] = hafen.leuchtturm.punkt;
+    const gl = kv('g', { class: 'kt-leuchtturm', transform: 'translate(' + kz(x) + ' ' + kz(y) + ')' });
+    gl.append(kv('path', { d: 'M -3.6 4 L -2.4 -6 H 2.4 L 3.6 4 Z', class: 'kt-leuchtkoerper' }));
+    gl.append(kv('path', { d: 'M -3.4 -0.6 H 3.4', class: 'kt-leuchtstrich' }));
+    gl.append(kv('path', { d: 'M -3 -6 H 3 L 2 -8.6 H -2 Z', class: 'kt-leuchtlaterne' }));
+    /* Die Strahlen — das Zeichen, dass es brennt. */
+    for (const [dx, dy] of [[-1, -0.45], [1, -0.45], [-0.8, -1], [0.8, -1]]) {
+      gl.append(kv('path', { d: 'M ' + kz(dx * 4) + ' ' + kz(-8 + dy * 1.4) + ' l ' + kz(dx * 3.4) + ' ' + kz(dy * 3), class: 'kt-leuchtstrahl' }));
+    }
+    g.append(gl);
+  }
+  return g;
+}
+
+/* Ein Schiff von oben: Rumpf mit Spitze, Deckstrich, Masten mit Rah. */
+function planSchiff(s, winkel, saat) {
+  const g = kv('g', { class: 'kt-hafenschiff', transform: 'translate(' + kz(s.punkt[0]) + ' ' + kz(s.punkt[1]) + ') rotate(' + Math.round(winkel) + ')' });
+  const l = s.laenge / 2, b = s.breite / 2;
+  g.append(kv('path', {
+    d: 'M ' + kz(-l) + ' 0 C ' + kz(-l * 0.6) + ' ' + kz(-b) + ', ' + kz(l * 0.55) + ' ' + kz(-b) + ', ' + kz(l) + ' 0' +
+       ' C ' + kz(l * 0.55) + ' ' + kz(b) + ', ' + kz(-l * 0.6) + ' ' + kz(b) + ', ' + kz(-l) + ' 0 Z',
+    class: 'kt-schiffleib'
+  }));
+  g.append(kv('path', { d: 'M ' + kz(-l * 0.7) + ' 0 H ' + kz(l * 0.8), class: 'kt-schiffdeck' }));
+  for (let m = 0; m < s.masten; m++) {
+    const x = -l * 0.5 + (m / Math.max(1, s.masten - 1 || 1)) * l * 1.1;
+    g.append(kv('path', { d: 'M ' + kz(x) + ' ' + kz(-b * 0.9) + ' V ' + kz(b * 0.9), class: 'kt-schiffrah' }));
+  }
+  return g;
+}
+
+/* ----- Die Mühle -----
+   Ein Haus am Ufer und ein Rad im Wasser. Das Rad hat Speichen, sonst
+   ist es ein Kreis, und ein Kreis ist keine Mühle. */
+function planMuehleZeichnen(muehle, welt) {
+  const g = kv('g', { class: 'kt-muehle' });
+  if (!muehle) return g;
+  const w = Math.atan2(muehle.laengs[1], muehle.laengs[0]) * 180 / Math.PI;
+
+  const gh = kv('g', { transform: 'translate(' + kz(muehle.punkt[0]) + ' ' + kz(muehle.punkt[1]) + ') rotate(' + Math.round(w) + ')' });
+  gh.append(kv('rect', { x: -7, y: -5.5, width: 14, height: 11, rx: 1, class: 'kt-muehlenhaus' }));
+  gh.append(kv('path', { d: 'M -7 -1.4 H 7', class: 'kt-muehlenfirst' }));
+  g.append(gh);
+
+  const gr = kv('g', { transform: 'translate(' + kz(muehle.rad[0]) + ' ' + kz(muehle.rad[1]) + ') rotate(' + Math.round(w) + ')' });
+  gr.append(kv('circle', { cx: 0, cy: 0, r: 5.4, class: 'kt-muehlrad' }));
+  gr.append(kv('circle', { cx: 0, cy: 0, r: 1.5, class: 'kt-muehlnabe' }));
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    gr.append(kv('path', {
+      d: 'M ' + kz(Math.cos(a) * 1.5) + ' ' + kz(Math.sin(a) * 1.5) +
+         ' L ' + kz(Math.cos(a) * 5.4) + ' ' + kz(Math.sin(a) * 5.4),
+      class: 'kt-muehlspeiche'
+    }));
+  }
+  g.append(gr);
+  return g;
+}
+
+/* ----- Die Werder im Wasser ----- */
+function planInselnZeichnen(inseln, welt, saat, papier) {
+  const g = kv('g', { class: 'kt-werder' });
+  for (const i of inseln || []) {
+    g.append(kv('path', { d: kweich(i.ecken, true), class: 'kt-werdergrund', fill: papier }));
+    g.append(kv('path', { d: kweich(i.ecken, true), class: 'kt-werderrand' }));
+    for (let t = 0; t < i.baeume; t++) {
+      const p = netzPunktDrin(i.ecken, saat, 'wb' + i.n + '_' + t);
+      g.append(planBaum(p[0], p[1], 2.4 + planZufall(saat, 'wbr' + i.n + t) * 1.6, welt));
+    }
+  }
+  return g;
+}
+
+/* ===================== DAS WAPPEN =====================
+   Die heraldische Schraffur nach Silvestro Petra Sancta (1638): jede
+   Tinktur hat ihre Strichlage. So kann ein Kupferstich, der nur Schwarz
+   kennt, ein farbiges Wappen vollständig wiedergeben — und wer die
+   Übereinkunft kennt, liest die Farben ab. */
+function planTinkturStriche(art, x, y, breite, hoehe, dicht) {
+  const d = dicht || 3;
+  let pfad = '';
+  if (art === 'senkrecht' || art === 'gitter') {
+    for (let a = x; a <= x + breite; a += d) pfad += ' M ' + kz(a) + ' ' + kz(y) + ' V ' + kz(y + hoehe);
+  }
+  if (art === 'waagerecht' || art === 'gitter') {
+    for (let b = y; b <= y + hoehe; b += d) pfad += ' M ' + kz(x) + ' ' + kz(b) + ' H ' + kz(x + breite);
+  }
+  if (art === 'schraeg') {
+    for (let a = x - hoehe; a <= x + breite; a += d) pfad += ' M ' + kz(a) + ' ' + kz(y) + ' l ' + kz(hoehe) + ' ' + kz(hoehe);
+  }
+  if (art === 'gegenschraeg') {
+    for (let a = x; a <= x + breite + hoehe; a += d) pfad += ' M ' + kz(a) + ' ' + kz(y) + ' l ' + kz(-hoehe) + ' ' + kz(hoehe);
+  }
+  if (art === 'punkte') {
+    for (let b = y; b <= y + hoehe; b += d) {
+      const versatz = (Math.round((b - y) / d) % 2) * (d / 2);
+      for (let a = x + versatz; a <= x + breite; a += d) pfad += ' M ' + kz(a) + ' ' + kz(b) + ' h .01';
+    }
+  }
+  return pfad.trim();
+}
+
+/* Der Schild: die deutsche Form mit gerader Schulter und rundem Fuß. */
+function planSchildPfad(b, h) {
+  const x = -b / 2, y = -h / 2;
+  return 'M ' + kz(x) + ' ' + kz(y) +
+    ' H ' + kz(x + b) +
+    ' V ' + kz(y + h * 0.44) +
+    ' C ' + kz(x + b) + ' ' + kz(y + h * 0.82) + ', ' + kz(x + b * 0.62) + ' ' + kz(y + h) + ', 0 ' + kz(y + h) +
+    ' C ' + kz(x + b * 0.38) + ' ' + kz(y + h) + ', ' + kz(x) + ' ' + kz(y + h * 0.82) + ', ' + kz(x) + ' ' + kz(y + h * 0.44) +
+    ' Z';
+}
+
+/* Die Felder einer Teilung, jedes als eigener Pfad, damit es seine
+   eigene Schraffur bekommen kann. */
+function planWappenFelder(teilung, b, h) {
+  const x = -b / 2, y = -h / 2;
+  const ganz = 'M ' + kz(x) + ' ' + kz(y) + ' h ' + kz(b) + ' v ' + kz(h) + ' h ' + kz(-b) + ' Z';
+  if (teilung === 'pfahl') return [
+    'M ' + kz(x) + ' ' + kz(y) + ' h ' + kz(b / 2) + ' v ' + kz(h) + ' h ' + kz(-b / 2) + ' Z',
+    'M 0 ' + kz(y) + ' h ' + kz(b / 2) + ' v ' + kz(h) + ' h ' + kz(-b / 2) + ' Z'
+  ];
+  if (teilung === 'balken') return [
+    'M ' + kz(x) + ' ' + kz(y) + ' h ' + kz(b) + ' v ' + kz(h / 2) + ' h ' + kz(-b) + ' Z',
+    'M ' + kz(x) + ' 0 h ' + kz(b) + ' v ' + kz(h / 2) + ' h ' + kz(-b) + ' Z'
+  ];
+  if (teilung === 'schraeg') return [
+    'M ' + kz(x) + ' ' + kz(y) + ' L ' + kz(x + b) + ' ' + kz(y) + ' L ' + kz(x) + ' ' + kz(y + h) + ' Z',
+    'M ' + kz(x + b) + ' ' + kz(y) + ' L ' + kz(x + b) + ' ' + kz(y + h) + ' L ' + kz(x) + ' ' + kz(y + h) + ' Z'
+  ];
+  if (teilung === 'geviert') return [
+    'M ' + kz(x) + ' ' + kz(y) + ' h ' + kz(b / 2) + ' v ' + kz(h / 2) + ' h ' + kz(-b / 2) + ' Z' +
+    ' M 0 0 h ' + kz(b / 2) + ' v ' + kz(h / 2) + ' h ' + kz(-b / 2) + ' Z',
+    'M 0 ' + kz(y) + ' h ' + kz(b / 2) + ' v ' + kz(h / 2) + ' h ' + kz(-b / 2) + ' Z' +
+    ' M ' + kz(x) + ' 0 h ' + kz(b / 2) + ' v ' + kz(h / 2) + ' h ' + kz(-b / 2) + ' Z'
+  ];
+  if (teilung === 'spitze') return [
+    ganz,
+    'M 0 ' + kz(y) + ' C ' + kz(b * 0.3) + ' ' + kz(y + h * 0.55) + ', ' + kz(b * 0.32) + ' ' + kz(y + h * 0.8) + ', ' + kz(b * 0.28) + ' ' + kz(y + h) +
+    ' H ' + kz(-b * 0.28) +
+    ' C ' + kz(-b * 0.32) + ' ' + kz(y + h * 0.8) + ', ' + kz(-b * 0.3) + ' ' + kz(y + h * 0.55) + ', 0 ' + kz(y) + ' Z'
+  ];
+  return [ganz, ''];
+}
+
+let _wappenZaehler = 0;
+/* Das ganze Wappen als Gruppe. `hoehe` bestimmt alles Übrige. */
+function planWappenSVG(wappen, hoehe, welt) {
+  const w = wappen || {};
+  const h = hoehe || 54;
+  const b = h * 0.84;
+  const g = kv('g', { class: 'kt-wappen' });
+  const id = 'kt-schild-' + (++_wappenZaehler);
+
+  const defs = kv('defs', {});
+  const clip = kv('clipPath', { id });
+  clip.append(kv('path', { d: planSchildPfad(b, h) }));
+  defs.append(clip);
+  g.append(defs);
+
+  const drin = kv('g', { 'clip-path': 'url(#' + id + ')' });
+  /* Der Grund liegt hell; die Schraffur macht daraus eine Farbe. */
+  drin.append(kv('path', { d: planSchildPfad(b, h), class: 'kt-schildgrund' }));
+
+  const felder = planWappenFelder(w.teilung || 'ganz', b, h);
+  const tinkturen = [planTinktur(w.grund), planTinktur(w.zweit)];
+  felder.forEach((pfad, i) => {
+    if (!pfad) return;
+    const t = tinkturen[i] || tinkturen[0];
+    if (t.strich === 'leer') return;
+    const feldId = id + '-f' + i;
+    const feldClip = kv('clipPath', { id: feldId });
+    feldClip.append(kv('path', { d: pfad }));
+    defs.append(feldClip);
+    drin.append(kv('path', {
+      d: planTinkturStriche(t.strich, -b / 2 - 2, -h / 2 - 2, b + 4, h + 4, 2.6),
+      class: 'kt-tinktur' + (t.strich === 'punkte' ? ' korn' : ''),
+      'clip-path': 'url(#' + feldId + ')'
+    }));
+  });
+
+  /* Die Figuren: eine mittig, zwei nebeneinander, drei im Dreipass —
+     zwei oben, eine unten. So werden Wappen seit jeher gestellt. */
+  const zahl = Math.max(1, Math.min(3, w.wieViele || 1));
+  const stellen = zahl === 1 ? [[0, h * 0.02, h * 0.46]]
+    : zahl === 2 ? [[-b * 0.22, h * 0.02, h * 0.34], [b * 0.22, h * 0.02, h * 0.34]]
+      : [[-b * 0.24, -h * 0.14, h * 0.3], [b * 0.24, -h * 0.14, h * 0.3], [0, h * 0.22, h * 0.3]];
+  const figurStrich = planTinktur(w.figur).strich;
+  for (const [fx, fy, fh] of stellen) {
+    const gf = kv('g', { transform: 'translate(' + kz(fx) + ' ' + kz(fy) + ') scale(' + (fh / 20).toFixed(3) + ')' });
+    gf.append(planWappenbildPfad(w.bild, figurStrich));
+    drin.append(gf);
+  }
+
+  g.append(drin);
+  /* Der Schildrand liegt AUF allem — sonst franst die Schraffur aus. */
+  g.append(kv('path', { d: planSchildPfad(b, h), class: 'kt-schildrand' }));
+  return g;
+}
+
+/* Die vierzehn Wappenbilder, jedes in einem Feld von etwa zwanzig
+   Einheiten Höhe. Geritzt, nicht gemalt: ein Umriss und ein paar
+   Binnenstriche, mehr braucht ein Wappentier nie. */
+function planWappenbildPfad(id, strich) {
+  const voll = strich === 'gitter' || strich === 'senkrecht' || strich === 'waagerecht';
+  const g = kv('g', { class: 'kt-wappenbild' + (voll ? ' dunkel' : '') });
+  const p = (d, klasse) => g.append(kv('path', { d, class: klasse || 'kt-wbstrich' }));
+
+  if (id === 'turm') {
+    p('M -6 10 V -4 h 12 V 10 Z', 'kt-wbleib');
+    p('M -7 -4 h 14 M -7 -4 v -2.4 h 2.6 v 2.4 M -1.3 -6.4 h 2.6 v 2.4 M 4.4 -6.4 h 2.6 v 2.4');
+    p('M -2 10 V 3 a 2 2 0 0 1 4 0 v 7');
+    p('M -4 -1 h 2 M 2 -1 h 2');
+  } else if (id === 'schluessel') {
+    p('M 0 -9 a 4 4 0 1 1 -0.01 0 Z M 0 -6.4 a 1.4 1.4 0 1 0 0.01 0 Z', 'kt-wbleib');
+    p('M 0 -5 V 9 M 0 5 h 4 M 0 8 h 3.2', 'kt-wbdick');
+  } else if (id === 'stern') {
+    let d = '';
+    for (let i = 0; i < 12; i++) {
+      const a = -Math.PI / 2 + (i / 12) * Math.PI * 2;
+      const r = i % 2 ? 4 : 10;
+      d += (i ? ' L ' : 'M ') + kz(Math.cos(a) * r) + ' ' + kz(Math.sin(a) * r);
+    }
+    p(d + ' Z', 'kt-wbleib');
+  } else if (id === 'fisch') {
+    p('M -9 0 C -5 -6, 4 -6, 8 0 C 4 6, -5 6, -9 0 Z', 'kt-wbleib');
+    p('M 8 0 l 4 -4 v 8 Z', 'kt-wbleib');
+    p('M 3 -1.4 a 1 1 0 1 0 0.01 0 Z', 'kt-wbdick');
+    p('M -3 -3.4 C 0 0, 0 0, -3 3.4');
+  } else if (id === 'eichenblatt') {
+    p('M 0 10 V -1 M 0 -1 C -6 -2, -7 -6, -4 -9 C -2 -7, -1 -8, 0 -10 C 1 -8, 2 -7, 4 -9 C 7 -6, 6 -2, 0 -1 Z', 'kt-wbleib');
+    p('M 0 2 l -3 -2 M 0 5 l 3 -2');
+  } else if (id === 'rad') {
+    p('M 0 -10 a 10 10 0 1 1 -0.01 0 Z', 'kt-wbring');
+    p('M 0 -3 a 3 3 0 1 1 -0.01 0 Z', 'kt-wbleib');
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      p('M ' + kz(Math.cos(a) * 3) + ' ' + kz(Math.sin(a) * 3) + ' L ' + kz(Math.cos(a) * 10) + ' ' + kz(Math.sin(a) * 10));
+    }
+  } else if (id === 'anker') {
+    p('M 0 -8 V 8', 'kt-wbdick');
+    p('M 0 -10 a 2 2 0 1 1 -0.01 0 Z', 'kt-wbring');
+    p('M -5 -5 H 5', 'kt-wbdick');
+    p('M -8 3 C -8 9, -3 10, 0 8 C 3 10, 8 9, 8 3', 'kt-wbdick');
+    p('M -8 3 l -1.6 -2 M -8 3 l 2.2 -0.6 M 8 3 l 1.6 -2 M 8 3 l -2.2 -0.6');
+  } else if (id === 'mond') {
+    p('M 3 -9 A 10 10 0 1 0 3 9 A 8 8 0 1 1 3 -9 Z', 'kt-wbleib');
+  } else if (id === 'krone') {
+    p('M -9 6 H 9 L 8 -2 L 4.5 2 L 0 -6 L -4.5 2 L -8 -2 Z', 'kt-wbleib');
+    p('M -9 6 h 18', 'kt-wbdick');
+    p('M -8 -3.4 a 1.4 1.4 0 1 0 0.01 0 Z M 0 -7.6 a 1.4 1.4 0 1 0 0.01 0 Z M 8 -3.4 a 1.4 1.4 0 1 0 0.01 0 Z', 'kt-wbdick');
+  } else if (id === 'bruecke') {
+    p('M -10 6 V -1 h 20 V 6 Z', 'kt-wbleib');
+    p('M -10 -1 h 20', 'kt-wbdick');
+    p('M -7 6 V 2 a 3 3 0 0 1 6 0 v 4 M 1 6 V 2 a 3 3 0 0 1 6 0 v 4');
+    p('M -10 -1 v -3 M 10 -1 v -3');
+  } else if (id === 'ross') {
+    p('M -2 10 C -6 6, -7 0, -5 -4 C -4 -7, -1 -9, 3 -9 L 5 -11 L 6 -8 C 8 -6, 8 -2, 6 1 C 4 4, 3 7, 3 10 Z', 'kt-wbleib');
+    p('M 3 -6.4 a 1 1 0 1 0 0.01 0 Z', 'kt-wbdick');
+    p('M -3 -3 C 0 -1, 2 -1, 5 -2');
+  } else if (id === 'lilie') {
+    p('M 0 -10 C 2 -5, 5 -3, 5 0 C 5 3, 2 4, 0 2 C -2 4, -5 3, -5 0 C -5 -3, -2 -5, 0 -10 Z', 'kt-wbleib');
+    p('M -7 2 h 14', 'kt-wbdick');
+    p('M -5 2 C -6 6, -4 9, 0 10 C 4 9, 6 6, 5 2');
+  } else if (id === 'hammer') {
+    p('M -7 -8 h 14 v 5 h -14 Z', 'kt-wbleib');
+    p('M -1.6 -3 h 3.2 V 10 h -3.2 Z', 'kt-wbleib');
+  } else if (id === 'aehre') {
+    p('M 0 10 V -4', 'kt-wbdick');
+    for (let i = 0; i < 5; i++) {
+      const y = -4 - i * 1.9;
+      p('M 0 ' + kz(y) + ' C -3 ' + kz(y - 1) + ', -3.4 ' + kz(y - 3) + ', 0 ' + kz(y - 3.4));
+      p('M 0 ' + kz(y) + ' C 3 ' + kz(y - 1) + ', 3.4 ' + kz(y - 3) + ', 0 ' + kz(y - 3.4));
+    }
+    p('M 0 4 C -4 3, -5 0, -4.6 -2 M 0 6 C 4 5, 5 2, 4.6 0');
+  } else {
+    p('M -6 -6 h 12 v 12 h -12 Z', 'kt-wbleib');
+  }
+  return g;
+}
+
+/* ===================== DIE LEGENDE =====================
+   Ein Feld am Rand, in dem jedes Zeichen einmal steht und dahinter, was
+   es bedeutet. Zwei Spalten, weil eine bei achtzehn Einträgen bis zum
+   Fuß der Karte liefe. */
+function planLegendeSVG(eintraege, x, y, welt) {
+  const g = kv('g', { class: 'kt-legende', transform: 'translate(' + kz(x) + ' ' + kz(y) + ')' });
+  const liste = (eintraege || []).slice(0, 20);
+  if (!liste.length) return g;
+
+  const spalten = liste.length > 8 ? 2 : 1;
+  const jeSpalte = Math.ceil(liste.length / spalten);
+  const zeile = 15.5;
+  const spaltenBreite = 132;
+  const breite = 16 + spalten * spaltenBreite;
+  const hoehe = 34 + jeSpalte * zeile;
+
+  g.append(kv('rect', { x: 0, y: 0, width: kz(breite), height: kz(hoehe), rx: 3, class: 'kt-legendegrund' }));
+  g.append(kv('rect', { x: 3.5, y: 3.5, width: kz(breite - 7), height: kz(hoehe - 7), rx: 2, class: 'kt-legenderahmen' }));
+  const t = kv('text', { x: kz(breite / 2), y: 21, class: 'kt-legendetitel', 'text-anchor': 'middle' });
+  t.textContent = 'Zeichenerklärung';
+  g.append(t);
+  g.append(kv('path', { d: 'M 16 26 H ' + kz(breite - 16), class: 'kt-legendestrich' }));
+
+  liste.forEach((e, i) => {
+    const sp = Math.floor(i / jeSpalte);
+    const zi = i % jeSpalte;
+    const zx = 14 + sp * spaltenBreite;
+    const zy = 34 + zi * zeile + zeile / 2;
+    const gz = kv('g', { transform: 'translate(' + kz(zx + 8) + ' ' + kz(zy) + ')' });
+    gz.append(planLegendeZeichen(e.zeichen, welt));
+    g.append(gz);
+    const tx = kv('text', { x: kz(zx + 21), y: kz(zy + 3.2), class: 'kt-legendetext' });
+    tx.textContent = e.text;
+    g.append(tx);
+  });
+  return g;
+}
+
+/* Die Zeichen der Legende: dieselben Formen wie auf der Karte, nur klein
+   und ohne Umgebung. Ein Legendenzeichen, das anders aussieht als das
+   Ding auf der Karte, ist schlimmer als gar keins. */
+function planLegendeZeichen(art, welt) {
+  const g = kv('g', { class: 'kt-lz' });
+  const p = (d, klasse) => g.append(kv('path', { d, class: klasse }));
+  if (art === 'haus') p('M -4 -3 h 8 v 6 h -8 Z', 'kt-lz-haus');
+  else if (art === 'grosshaus') p('M -5 -3.4 h 10 v 7 h -10 Z', 'kt-lz-grosshaus');
+  else if (art === 'kirche') { p('M -4 -2 h 8 v 5 h -8 Z', 'kt-lz-haus'); p('M 0 -8 V -2 M -1.6 -6.4 h 3.2', 'kt-lz-strich'); }
+  else if (art === 'burg') { p('M -5 -1 h 10 v 5 h -10 Z', 'kt-lz-grosshaus'); p('M -5 -1 v -2.6 h 2 v 2.6 M -1 -3.6 h 2 v 2.6 M 3 -3.6 h 2 v 2.6', 'kt-lz-grosshaus'); }
+  else if (art === 'mauer') { p('M -6 1 H 6', 'kt-lz-mauer'); p('M -6 -1.6 h 1.6 v 1.6 M -2.4 -1.6 h 1.6 v 1.6 M 1.2 -1.6 h 1.6 v 1.6 M 4.8 -1.6 h 1.2 v 1.6', 'kt-lz-strich'); }
+  else if (art === 'tor') { p('M -4 -4 h 8 v 8 h -8 Z', 'kt-lz-tor'); p('M -1.8 4 V 0 a 1.8 1.8 0 0 1 3.6 0 v 4', 'kt-lz-strich'); }
+  else if (art === 'markt') p('M -5 -3.4 h 10 v 6.8 h -10 Z', 'kt-lz-markt');
+  else if (art === 'garten') { p('M 0 3.4 V 1', 'kt-lz-strich'); p('M 0 -4.4 C 3.4 -2.6, 3.4 1.4, 0 1.4 C -3.4 1.4, -3.4 -2.6, 0 -4.4 Z', 'kt-lz-gruen'); }
+  else if (art === 'friedhof') p('M 0 -4 V 4 M -2.4 -1.4 H 2.4', 'kt-lz-strich');
+  else if (art === 'bruecke') { p('M -5 1 H 5', 'kt-lz-mauer'); p('M -3 3 V 1 M 3 3 V 1', 'kt-lz-strich'); }
+  else if (art === 'hafen') { p('M -6 2 H 6', 'kt-lz-mauer'); p('M -2 2 V -3 M 3 2 V -1', 'kt-lz-strich'); }
+  else if (art === 'leuchtturm') { p('M -2.4 4 L -1.4 -4 h 2.8 L 2.4 4 Z', 'kt-lz-tor'); p('M -3.4 -5.4 l -2 -1.4 M 3.4 -5.4 l 2 -1.4', 'kt-lz-strich'); }
+  else if (art === 'muehle') { p('M 0 -4.6 a 4.6 4.6 0 1 1 -0.01 0 Z', 'kt-lz-rad'); p('M 0 -4.6 V 4.6 M -4.6 0 H 4.6 M -3.2 -3.2 L 3.2 3.2 M -3.2 3.2 L 3.2 -3.2', 'kt-lz-strich'); }
+  else if (art === 'wasser') p('M -6 -2 C -3 -4, -1 0, 2 -2 C 4 -3.4, 5 -2.4, 6 -2 M -6 2 C -3 0, -1 4, 2 2 C 4 0.6, 5 1.6, 6 2', 'kt-lz-welle');
+  else if (art === 'acker') { p('M -6 -3.4 h 12 v 6.8 h -12 Z', 'kt-lz-feld'); p('M -3.4 -3.4 V 3.4 M 0 -3.4 V 3.4 M 3.4 -3.4 V 3.4', 'kt-lz-strich'); }
+  else if (art === 'wiese') { p('M -6 -3.4 h 12 v 6.8 h -12 Z', 'kt-lz-feld'); p('M -3.4 2 v -2.4 M 0 2.6 v -3 M 3.4 2 v -2.4', 'kt-lz-strich'); }
+  else if (art === 'wald') { p('M -6 -3.4 h 12 v 6.8 h -12 Z', 'kt-lz-wald'); p('M -3 1.4 C -1.4 -1, -1.4 -1, -3 -1.6 M 0 1.4 C 1.6 -1, 1.6 -1, 0 -1.6 M 3 1.4 C 4.6 -1, 4.6 -1, 3 -1.6', 'kt-lz-strich'); }
+  else if (art === 'hof') { p('M -3.4 -2.4 h 6.8 v 4.8 h -6.8 Z', 'kt-lz-haus'); }
+  else if (art === 'insel') { p('M -5 0 C -4 -3, 4 -3.4, 5 0 C 4 2.6, -4 3, -5 0 Z', 'kt-lz-werder'); }
+  else p('M -3 -3 h 6 v 6 h -6 Z', 'kt-lz-haus');
+  return g;
+}
+
+/* ----- Der Marktplatz ----- */
+function planMarktZeichnen(markt, welt, saat) {
+  const g = kv('g', { class: 'kt-marktleben' });
+  if (!markt) return g;
+  const dreh = (v) => Math.round(Math.atan2(v[1], v[0]) * 180 / Math.PI);
+
+  /* Das Rathaus: ein längliches Haus mit Stufengiebel und einem
+     Glockentürmchen — daran erkennt man es unter allen Häusern. */
+  const r = markt.rathaus;
+  const gr = kv('g', { class: 'kt-rathaus', transform: 'translate(' + kz(r.punkt[0]) + ' ' + kz(r.punkt[1]) + ') rotate(' + dreh(r.laengs) + ')' });
+  const rb = r.breite / 2, rt = r.tiefe / 2;
+  gr.append(kv('rect', { x: kz(-rb), y: kz(-rt), width: kz(rb * 2), height: kz(rt * 2), class: 'kt-rathausleib' }));
+  gr.append(kv('path', { d: 'M ' + kz(-rb) + ' 0 H ' + kz(rb), class: 'kt-rathausfirst' }));
+  /* Stufengiebel an beiden Schmalseiten. */
+  for (const seite of [-1, 1]) {
+    const x = seite * rb;
+    gr.append(kv('path', {
+      d: 'M ' + kz(x) + ' ' + kz(-rt) + ' l ' + kz(seite * 2.4) + ' 0 l 0 ' + kz(rt * 0.5) +
+         ' l ' + kz(seite * 2) + ' 0 l 0 ' + kz(rt * 0.5),
+      class: 'kt-rathausgiebel'
+    }));
+  }
+  gr.append(kv('circle', { cx: 0, cy: 0, r: 2.6, class: 'kt-rathausturm' }));
+  g.append(gr);
+
+  /* Der Brunnen: ein Ring mit einem Kreuz darüber — der Galgen, an dem
+     der Eimer hängt. */
+  const b = markt.brunnen;
+  const gb = kv('g', { class: 'kt-brunnen', transform: 'translate(' + kz(b.punkt[0]) + ' ' + kz(b.punkt[1]) + ')' });
+  const br = b.gross ? 5.2 : 4;
+  gb.append(kv('circle', { cx: 0, cy: 0, r: kz(br), class: 'kt-brunnenring' }));
+  gb.append(kv('circle', { cx: 0, cy: 0, r: kz(br * 0.5), class: 'kt-brunnenloch' }));
+  gb.append(kv('path', { d: 'M ' + kz(-br) + ' 0 H ' + kz(br) + ' M 0 ' + kz(-br) + ' V ' + kz(br), class: 'kt-brunnengalgen' }));
+  g.append(gb);
+
+  /* Der Pranger. */
+  if (markt.pranger) {
+    const [px, py] = markt.pranger.punkt;
+    g.append(kv('path', {
+      d: 'M ' + kz(px) + ' ' + kz(py + 3.4) + ' V ' + kz(py - 4.6) + ' M ' + kz(px - 2.4) + ' ' + kz(py - 3.4) + ' H ' + kz(px + 2.4),
+      class: 'kt-pranger'
+    }));
+  }
+
+  /* Die Stände. */
+  for (const s of markt.staende) {
+    const gs = kv('g', { class: 'kt-stand', transform: 'translate(' + kz(s.punkt[0]) + ' ' + kz(s.punkt[1]) + ') rotate(' + Math.round(dreh(s.laengs) + s.dreh) + ')' });
+    gs.append(kv('rect', { x: kz(-s.breite / 2), y: kz(-s.tiefe / 2), width: kz(s.breite), height: kz(s.tiefe), rx: .8, class: 'kt-standdach' }));
+    gs.append(kv('path', { d: 'M ' + kz(-s.breite / 2) + ' 0 H ' + kz(s.breite / 2), class: 'kt-standstrich' }));
+    g.append(gs);
+  }
+  return g;
+}
+
 /* ===================== 65c — MARKEN UND EINRICHTEN =====================
    Die Zeichen auf der Karte und alles, was man an einem Plan verstellen
    kann. Die Zeichen sind geritzt, nicht gemalt: eine Linie, ein paar
@@ -36586,7 +38726,7 @@ function planNeu(danach) {
   const saat = planNeueSaat();
   const stand = {
     titel: planStadtname(saat), unterzeile: '', saat, welt: 'tinte', papier: '',
-    stadt: { groesse: 'stadt', alter: 'alt', anlage: 'gewachsen', wasser: 'fluss', mauer: true, burg: true, umland: true, dichte: 1 },
+    stadt: { groesse: 'stadt', alter: 'alt', anlage: 'gewachsen', wasser: 'fluss', mauer: true, burg: true, umland: true, hafen: true, muehle: true, inseln: true, dichte: 1 },
     marken: [], namen: {}, notiz: ''
   };
   planGrundrissFenster(stand, 'Eine Stadt gründen', 'Gründen', () => {
@@ -36679,7 +38819,14 @@ function planGrundrissFenster(stand, titel, okText, fertig, doc, danach) {
         el('div', { class: 'ktg-schalter-reihe' },
           schalter('Eine Stadtmauer', () => stand.stadt.mauer, (v) => { stand.stadt.mauer = v; }, 'Mit Türmen und Toren — und einer Vorstadt davor'),
           schalter('Eine Burg', () => stand.stadt.burg, (v) => { stand.stadt.burg = v; }, 'Wer über der Stadt sitzt'),
-          schalter('Das Umland', () => stand.stadt.umland, (v) => { stand.stadt.umland = v; }, 'Felder, Wälder, einzelne Höfe')),
+          schalter('Das Umland', () => stand.stadt.umland, (v) => { stand.stadt.umland = v; }, 'Felder in Fluren, Wälder, einzelne Höfe'),
+          /* Am Wasser: was eine Stadt zur Hafenstadt macht. Ohne Wasser
+             bleiben die Schalter sichtbar, aber blass — sie sollen nicht
+             wegspringen, sobald man den Fluss wegnimmt, und wieder da sein,
+             wenn man ihn zurückholt. */
+          schalter('Ein Hafen', () => stand.stadt.hafen, (v) => { stand.stadt.hafen = v; }, 'Kai, Molen, Schiffe, Kräne — am Meer dazu ein Wellenbrecher und ein Leuchtfeuer'),
+          schalter('Eine Mühle', () => stand.stadt.muehle, (v) => { stand.stadt.muehle = v; }, 'Ein Rad im Fluss, das Haus am Ufer'),
+          schalter('Werder im Wasser', () => stand.stadt.inseln, (v) => { stand.stadt.inseln = v; }, 'Kleine bewachsene Inseln')),
         el('div', { class: 'ktg-abschnitt' }, 'Wie sie aussieht'),
         reihe(PLAN_FARBWELTEN.map((f) => [f.id, f.name]), () => stand.welt, (v) => { stand.welt = v; }),
         reihe([['', 'Zur Farbwelt passend']].concat(PLAN_PAPIERE.map((p) => [p[0], p[1]])), () => stand.papier, (v) => { stand.papier = v; }),

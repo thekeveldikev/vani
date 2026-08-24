@@ -808,3 +808,32 @@ test('Stück-Vertrag: das Lesebändchen heißt nicht wie ein Feld', () => {
   assert.ok(buch.includes("'alb-leseband'"), 'und das Buch vergibt ihn auch');
   assert.ok(!buch.includes("class: 'alb-band'"), 'das Bändchen trägt nicht mehr den Namen der Feldzeile');
 });
+
+test('Deckvertrag: kein Deck überlebt einen Ortswechsel', () => {
+  /* Wer aus einem offenen Kabinettfach heraus die Adresse wechselte, ließ
+     Schleier und Inhalt im Dokument stehen — samt einer vollständigen
+     Stadtkarte. Beim nächsten Öffnen lag das nächste darüber. Nach sieben
+     Besuchen waren sieben Regale im DOM. */
+  const kern = lies('src/30-core.js');
+  const anfang = kern.indexOf('function zeigeDeck(');
+  assert.ok(anfang > 0, 'zeigeDeck gibt es');
+  const stueck = kern.slice(anfang, kern.indexOf('\n}', anfang));
+
+  assert.match(stueck, /addEventListener\('hashchange'/, 'ein Deck horcht auf den Ortswechsel');
+  assert.match(stueck, /removeEventListener\('hashchange'/, 'und meldet sich beim Schließen wieder ab');
+  /* Die Adresse beim Aufziehen wird gemerkt — sonst schlösse sich ein Deck,
+     das gerade DURCH eine Navigation entsteht, sofort selbst wieder. */
+  assert.match(stueck, /location\.hash/, 'die Adresse beim Aufziehen wird gemerkt');
+  assert.ok(/if \(location\.hash !== \w+\)/.test(stueck), 'geschlossen wird nur bei einer ANDEREN Adresse');
+});
+
+test('Kartenvertrag: jede Anlage kann eine Mauer bekommen', () => {
+  /* Das Schachbrett legt keine Ringe an und bekam deshalb gar keine Mauer,
+     obwohl der Haken gesetzt war. */
+  const plan = lies('src/65-stadtplan.js');
+  const anfang = plan.indexOf('/* --- Die Mauer');
+  assert.ok(anfang > 0, 'der Mauerabschnitt ist auffindbar');
+  const stueck = plan.slice(anfang, anfang + 2600);
+  assert.match(stueck, /if \(!ring\)/, 'fehlt der Mauerweg, wird ein Kranz gerechnet');
+  assert.match(stueck, /sektoren/, 'und zwar über Winkelsektoren um die Stadt');
+});

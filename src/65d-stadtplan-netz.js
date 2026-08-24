@@ -65,11 +65,57 @@ function netzPunktDrin(poly, saat, k) {
   return netzMitte(poly);
 }
 
+/* Schneiden sich zwei Strecken wirklich? Gemeinsame Endpunkte zählen nicht:
+   zwei Straßen, die sich an einer Kreuzung treffen, schneiden einander nicht,
+   sie berühren sich. */
+function netzOrientierung(a, b, c) {
+  return (b[1] - a[1]) * (c[0] - b[0]) - (b[0] - a[0]) * (c[1] - b[1]);
+}
+function netzSchneidet(a, b, c, d) {
+  /* Berührt sich etwas an einem Endpunkt, ist es kein Schnitt. */
+  const gleich = (p, q) => Math.abs(p[0] - q[0]) < 0.001 && Math.abs(p[1] - q[1]) < 0.001;
+  if (gleich(a, c) || gleich(a, d) || gleich(b, c) || gleich(b, d)) return false;
+  const o1 = netzOrientierung(a, b, c), o2 = netzOrientierung(a, b, d);
+  const o3 = netzOrientierung(c, d, a), o4 = netzOrientierung(c, d, b);
+  return (o1 > 0) !== (o2 > 0) && (o3 > 0) !== (o4 > 0);
+}
+
 /* ===================== DER GRAPH ===================== */
 function netzBauen() {
   const knoten = [];
   const kanten = [];
   const raster = new Map();
+
+  /* Ein zweites Raster, diesmal für die KANTEN. Ohne es tastet jede neue
+     Straße jede vorhandene ab; bei zweitausend Straßen sind das vier
+     Millionen Prüfungen für eine einzige Gasse, und die Metropole brauchte
+     fast fünf Sekunden. Jede Kante wird in die Felder eingetragen, die ihr
+     Hüllrechteck berührt; geprüft wird nur, was im selben Feld liegt. */
+  const KGITTER = 60;
+  const kantenGitter = new Map();
+  const gitterFelder = (pa, pb) => {
+    const x0 = Math.floor(Math.min(pa[0], pb[0]) / KGITTER), x1 = Math.floor(Math.max(pa[0], pb[0]) / KGITTER);
+    const y0 = Math.floor(Math.min(pa[1], pb[1]) / KGITTER), y1 = Math.floor(Math.max(pa[1], pb[1]) / KGITTER);
+    const raus = [];
+    for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) raus.push(x + ':' + y);
+    return raus;
+  };
+  const gitterEintragen = (id, pa, pb) => {
+    for (const f of gitterFelder(pa, pb)) {
+      let liste = kantenGitter.get(f);
+      if (!liste) { liste = []; kantenGitter.set(f, liste); }
+      liste.push(id);
+    }
+  };
+  /* Alle Kanten, die dieser Strecke überhaupt nahe kommen können. */
+  const nahekanten = (pa, pb) => {
+    const gesehen = new Set();
+    for (const f of gitterFelder(pa, pb)) {
+      const liste = kantenGitter.get(f);
+      if (liste) for (const id of liste) gesehen.add(id);
+    }
+    return gesehen;
+  };
 
   const schluessel = (x, y) => Math.round(x / NETZ_RASTER) + ':' + Math.round(y / NETZ_RASTER);
   const punkt = (x, y) => {
@@ -96,13 +142,68 @@ function netzBauen() {
       const k = kanten[ki];
       if ((k.a === a && k.b === b) || (k.a === b && k.b === a)) return ki;
     }
+    /* KEINE Straße darf eine andere kreuzen, ohne dass dort eine Kreuzung
+       liegt. Sonst ist der Graph nicht mehr eben — und dann findet die
+       Flächensuche Blöcke, die einander überlappen. Genau das war der Grund,
+       warum sich Häuser zweier Blöcke ins Gehege kamen. */
+    const pa = [knoten[a].x, knoten[a].y], pb = [knoten[b].x, knoten[b].y];
+    for (const ki of nahekanten(pa, pb)) {
+      const k = kanten[ki];
+      if (!k || k.tot) continue;
+      if (k.a === a || k.b === a || k.a === b || k.b === b) continue;
+      if (netzSchneidet(pa, pb, [knoten[k.a].x, knoten[k.a].y], [knoten[k.b].x, knoten[k.b].y])) return -1;
+    }
     const id = kanten.length;
     kanten.push({ id, a, b, art: art || 'gasse' });
     knoten[a].aus.push(id);
     knoten[b].aus.push(id);
+    gitterEintragen(id, pa, pb);
     return id;
   };
-  return { knoten, kanten, punkt, kante };
+  /* Eine Straße an einer Stelle aufteilen: dort entsteht eine Kreuzung.
+     Genau das tut eine Nebenstraße, die auf eine bestehende trifft — und
+     nur so bleibt der Graph eben. */
+  const teileKante = (ki, x, y) => {
+    const k = kanten[ki];
+    if (!k || k.tot) return null;
+    const neu = punkt(x, y);
+    if (neu === k.a || neu === k.b) return neu;
+    k.tot = true;
+    knoten[k.a].aus = knoten[k.a].aus.filter((q) => q !== ki);
+    knoten[k.b].aus = knoten[k.b].aus.filter((q) => q !== ki);
+    const a = k.a, b = k.b, art = k.art;
+    /* Die beiden Hälften ohne Kreuzungsprüfung anlegen — sie liegen ja auf
+       derselben Linie wie vorher. */
+    for (const [x1, x2] of [[a, neu], [neu, b]]) {
+      if (x1 === x2) continue;
+      const id = kanten.length;
+      kanten.push({ id, a: x1, b: x2, art });
+      knoten[x1].aus.push(id);
+      knoten[x2].aus.push(id);
+      gitterEintragen(id, [knoten[x1].x, knoten[x1].y], [knoten[x2].x, knoten[x2].y]);
+    }
+    return neu;
+  };
+  /* Welche Straße kreuzt diese Strecke zuerst? */
+  const ersterSchnitt = (pa, pb, ausser) => {
+    let besteKi = -1, bestesT = 2, besterPunkt = null;
+    for (const ki of nahekanten(pa, pb)) {
+      const k = kanten[ki];
+      if (!k || k.tot) continue;
+      if (ausser && (k.a === ausser || k.b === ausser)) continue;
+      const pc = [knoten[k.a].x, knoten[k.a].y], pd = [knoten[k.b].x, knoten[k.b].y];
+      if (!netzSchneidet(pa, pb, pc, pd)) continue;
+      /* Wo genau? */
+      const r = [pb[0] - pa[0], pb[1] - pa[1]], s2 = [pd[0] - pc[0], pd[1] - pc[1]];
+      const nenner = r[0] * s2[1] - r[1] * s2[0];
+      if (Math.abs(nenner) < 1e-9) continue;
+      const t = ((pc[0] - pa[0]) * s2[1] - (pc[1] - pa[1]) * s2[0]) / nenner;
+      if (t < 0 || t > 1 || t >= bestesT) continue;
+      bestesT = t; besteKi = ki; besterPunkt = [pa[0] + r[0] * t, pa[1] + r[1] * t];
+    }
+    return besteKi < 0 ? null : { ki: besteKi, punkt: besterPunkt };
+  };
+  return { knoten, kanten, punkt, kante, teileKante, ersterSchnitt };
 }
 
 /* ===================== DIE FLÄCHEN =====================
@@ -114,7 +215,7 @@ function netzFlaechen(netz) {
   const { knoten, kanten } = netz;
   /* An jedem Punkt die abgehenden Kanten nach Winkel sortieren. */
   const sortiert = knoten.map((k) => {
-    const liste = k.aus.map((ki) => {
+    const liste = k.aus.filter((ki) => kanten[ki] && !kanten[ki].tot).map((ki) => {
       const kk = kanten[ki];
       const ziel = kk.a === k.id ? kk.b : kk.a;
       return { ki, ziel, w: netzWinkel([k.x, k.y], [knoten[ziel].x, knoten[ziel].y]) };
@@ -126,6 +227,7 @@ function netzFlaechen(netz) {
   const besucht = new Set();
   const flaechen = [];
   for (const start of kanten) {
+    if (start.tot) continue;
     for (const richtung of [[start.a, start.b], [start.b, start.a]]) {
       const marke0 = richtung[0] + '>' + richtung[1];
       if (besucht.has(marke0)) continue;
@@ -154,13 +256,29 @@ function netzFlaechen(netz) {
       if (runde.length >= 3) flaechen.push(runde.map((i) => [knoten[i].x, knoten[i].y]));
     }
   }
-  /* Die Außenwelt hat die größte Fläche und läuft andersherum. */
-  let groesste = 0, weg = -1;
-  flaechen.forEach((f, i) => {
-    const a = Math.abs(netzFlaeche(f));
-    if (a > groesste) { groesste = a; weg = i; }
+  /* Welche Runde ist ein Block und welche die Außenwelt?
+     Vorher wurde nur die GRÖSSTE Fläche verworfen. Das stimmt nur, solange
+     das Netz aus einem Stück besteht. Hängt aber irgendwo ein Straßenzug frei
+     in der Landschaft, hat auch dieses Stück seine eigene Außenrunde — und
+     die legt sich als riesiger Block über alles, was darin liegt. Beim
+     Marktflecken kamen so 189 Blöcke mit einer Million Flächeneinheiten
+     zusammen, auf einer Stadt von 155 000: siebenfach übereinander, und die
+     Häuser standen ineinander.
+
+     Der Umlaufsinn verrät es: bei dieser Art zu laufen kommen alle Innen-
+     flächen mit dem einen Vorzeichen heraus und jede Außenrunde mit dem
+     anderen. Also nimmt man das Vorzeichen der größten Runde — die ist mit
+     Sicherheit außen — und wirft alles weg, was ebenso läuft. */
+  let groesste = 0, aussenZeichen = -1;
+  for (const f of flaechen) {
+    const a = netzFlaeche(f);
+    if (Math.abs(a) > groesste) { groesste = Math.abs(a); aussenZeichen = a > 0 ? 1 : -1; }
+  }
+  return flaechen.filter((f) => {
+    const a = netzFlaeche(f);
+    if ((a > 0 ? 1 : -1) === aussenZeichen) return false;
+    return Math.abs(a) > 260;
   });
-  return flaechen.filter((f, i) => i !== weg && Math.abs(netzFlaeche(f)) > 260);
 }
 
 /* ===================== DAS WACHSTUM ===================== */
@@ -171,7 +289,15 @@ function planNetzWachsen(plan, wasser, mitte, Rmax, krumm) {
   const bruecken = [];     /* wo eine Straße das Wasser quert */
   const [mx, my] = mitte;
   const [, , speichen] = planGroesse(plan.stadt.groesse);
-  const schritt = 46 + planZufall(saat, 'sl') * 14;
+  /* Die Schrittweite haengt an der Groesse der Stadt: bei einem Weiler mit
+     hundert Schritt Radius waeren fuenfzig Schritt je Abschnitt so grob, dass
+     gar kein Block entsteht. */
+  /* Ein Häuserblock ist in einem Dorf ungefähr so groß wie in einer
+     Metropole — eine große Stadt hat einfach MEHR davon. Als der Schritt noch
+     voll mit dem Radius wuchs, hatte die Großstadt weniger Blöcke als die
+     Stadt und darin größere Häuser: genau verkehrt herum. Also nur noch ein
+     kleiner Zuschlag statt eines Faktors. */
+  const schritt = Math.max(26, Math.min(42, 24 + Rmax / 22)) * (0.9 + planZufall(saat, 'sl') * 0.25);
 
   /* --- Der Markt in der Mitte: ein kleines Vieleck, kein Punkt --- */
   const marktR = Rmax * 0.085;
@@ -248,12 +374,19 @@ function planNetzWachsen(plan, wasser, mitte, Rmax, krumm) {
   for (let r = 1; r <= ringe; r++) {
     const anteil = r / (ringe + 0.4);
     const vorherKnoten = [];
+    const wunschR = Rmax * anteil;
     for (const ader of adern) {
-      const wieViele = ader.knoten.length;
-      const stelle = Math.round(anteil * (wieViele - 1));
-      if (stelle < 1 || stelle >= wieViele) { vorherKnoten.push(null); continue; }
-      const p = ader.knoten[stelle];
-      vorherKnoten.push(netz.punkt(p[0], p[1]));
+      /* Nicht am gleichen ANTEIL der Ader ansetzen, sondern am gleichen
+         ABSTAND von der Mitte — sonst zieht sich der Ring bei einer langen
+         Ausfallstraße weit hinaus und bei einer kurzen bleibt er innen.
+         Genau daran hing die Mauer vorher in spitzen Zähnen. */
+      let beste = null, besterAbstand = 1e9;
+      for (const p of ader.knoten) {
+        const d = Math.abs(strecke(p, [mx, my]) - wunschR);
+        if (d < besterAbstand) { besterAbstand = d; beste = p; }
+      }
+      if (!beste || besterAbstand > wunschR * 0.5) { vorherKnoten.push(null); continue; }
+      vorherKnoten.push(netz.punkt(beste[0], beste[1]));
     }
     const ringSpur = [];
     for (let i = 0; i < vorherKnoten.length; i++) {
@@ -290,6 +423,70 @@ function planNetzWachsen(plan, wasser, mitte, Rmax, krumm) {
       });
     }
   }
+
+  /* --- Verdichten -----
+     Bis hierher gibt es Ausfallstraßen und ein paar Querverbindungen — und
+     dazwischen große Leerstellen. Eine gewachsene Stadt ist aber engmaschig:
+     fast jede Kreuzung hat drei, vier Nachbarn.
+
+     Also sucht jeder Punkt seine nächsten Nachbarn und verbindet sich mit
+     ihnen, sofern die Verbindung keine andere Straße kreuzt. Weil `kante`
+     Kreuzungen von sich aus abweist, kann dabei nichts kaputtgehen. */
+  /* Der erste Versuch war, jeden Punkt mit seinen nächsten Nachbarn zu
+     verbinden. Daraus wurde ein Dreiecksnetz — lauter winzige Splitter, auf
+     denen kein Haus Platz hat. Eine echte Nebenstraße geht anders: sie
+     zweigt ab und LÄUFT, bis sie auf eine andere Straße trifft. Dort
+     entsteht eine Kreuzung. So werden Blöcke länglich statt dreieckig. */
+  const nebenstrassen = (wieViele, laenge) => {
+    for (let n = 0; n < wieViele; n++) {
+      const lebende = netz.kanten.filter((k) => !k.tot && k.art !== 'platz');
+      if (!lebende.length) break;
+      /* Die Startkante NICHT über den Index würfeln. Eine geteilte Kante wird
+         hinten angehängt, also wachsen die Indizes dort, wo eben geteilt
+         wurde — und die Auswahl kehrt immer wieder dorthin zurück. Das Netz
+         verdichtet sich dann an einer Ecke zu einem Klumpen, während die
+         andere Hälfte der Stadt leer bleibt. Genau so sah es aus.
+
+         Stattdessen: ein Punkt in der Stadt, gleichmäßig über die Fläche
+         gestreut (die Wurzel sorgt dafür, dass die Mitte nicht bevorzugt
+         wird) — und dazu die nächstgelegene Straße. */
+      const zielW = planZufall(saat, 'nz' + n) * Math.PI * 2;
+      const zielR = Math.sqrt(planZufall(saat, 'nq' + n)) * Rmax * 0.97;
+      const zx = mx + Math.cos(zielW) * zielR, zy = my + Math.sin(zielW) * zielR;
+      let start = null, nah = Infinity;
+      for (const k of lebende) {
+        const ka = netz.knoten[k.a], kb = netz.knoten[k.b];
+        const d = (ka.x + kb.x) / 2 - zx, e = (ka.y + kb.y) / 2 - zy;
+        const q = d * d + e * e;
+        if (q < nah) { nah = q; start = k; }
+      }
+      if (!start) continue;
+      const a = netz.knoten[start.a], b = netz.knoten[start.b];
+      const t = 0.3 + planZufall(saat, 'nt' + n) * 0.4;
+      const sx = a.x + (b.x - a.x) * t, sy = a.y + (b.y - a.y) * t;
+      if (wasser.drin(sx, sy)) continue;
+      if (strecke([sx, sy], [mx, my]) > Rmax * 1.02) continue;
+      /* Quer zur Ausgangsstraße, mit einer kleinen Wendung. */
+      const quer = Math.atan2(b.y - a.y, b.x - a.x) + Math.PI / 2 * (planZufall(saat, 'nr' + n) > 0.5 ? 1 : -1);
+      const w = quer + planStreu(saat, 'nw' + n) * 0.3 * krumm;
+      const ziel = [sx + Math.cos(w) * laenge, sy + Math.sin(w) * laenge];
+      const von = netz.teileKante(netz.kanten.indexOf(start), sx, sy);
+      if (von == null) continue;
+      const schnitt = netz.ersterSchnitt([sx, sy], ziel, von);
+      if (schnitt) {
+        if (wasser.drin(schnitt.punkt[0], schnitt.punkt[1])) continue;
+        const nach = netz.teileKante(schnitt.ki, schnitt.punkt[0], schnitt.punkt[1]);
+        if (nach != null && nach !== von) {
+          netz.kante(von, nach, 'gasse');
+          wege.push({ art: 'gasse', richtung: 'quer', i: 3000 + n, punkte: [[sx, sy], [netz.knoten[nach].x, netz.knoten[nach].y]], name: '' });
+        }
+      }
+    }
+  };
+  /* Wie viele Nebenstraßen? Nicht so viele, wie es Ausfallstraßen gibt —
+     das hing an der falschen Größe, und die Metropole bekam kaum mehr Gassen
+     als der Marktflecken. Eine Stadt wird nach FLÄCHE bebaut. */
+  nebenstrassen(Math.round((Rmax * Rmax) / (schritt * schritt) * 6), schritt * 2.6);
 
   /* --- Gassen: kurze Wege, die zwei Straßen verbinden --- */
   const wieVieleGassen = Math.round(speichen * 2.2);
@@ -441,8 +638,12 @@ function planNetzStrahlend(plan, wasser, mitte, Rmax, krumm) {
       spur.push([netz.knoten[K[j][i]].x, netz.knoten[K[j][i]].y]);
       if (j > 0 && K[j - 1][i] != null) netz.kante(K[j - 1][i], K[j][i], haupt ? 'haupt' : 'gasse');
     }
-    /* Hinaus ins Land */
-    if (haupt && plan.stadt.umland && K[ringe][i] != null) {
+    /* Hinaus ins Land.
+       `spur` kann LEER sein: bricht die Speiche schon am innersten Ring ab,
+       weil dort Wasser liegt, existiert der äußere Ringknoten trotzdem noch —
+       und dann griff der nächste Zeile auf ein Nichts zu und die ganze Karte
+       stürzte ab. (Strahlende Anlage, kleiner Ort, Wasser im Weg.) */
+    if (haupt && plan.stadt.umland && spur.length && K[ringe][i] != null) {
       const letzte = spur[spur.length - 1];
       const w = winkelVon(i, ringe) * Math.PI / 180;
       for (const weit of [0.1, 0.3]) {
@@ -501,7 +702,9 @@ function planNetzSchachbrett(plan, wasser, mitte, Rmax, krumm) {
   const wege = [], bruecken = [], adern = [];
   const [mx, my] = mitte;
   const [, , speichen] = planGroesse(plan.stadt.groesse);
-  const feld = 62 + planZufall(saat, 'gf') * 16;
+  /* Auch das Raster richtet sich nach der Groesse — sonst passt bei einem
+     Dorf kein einziges Feld hinein. */
+  const feld = Math.max(34, Math.min(54, 32 + Rmax / 24)) * (0.92 + planZufall(saat, 'gf') * 0.2);
   const n = Math.max(4, Math.round(Rmax * 2 / feld));
   const dreh = planZufall(saat, 'gd') * Math.PI / 2;
   const cos = Math.cos(dreh), sin = Math.sin(dreh);
@@ -625,13 +828,35 @@ function planBloeckeTeilen(poly, grenze, saat, k, tiefe, raus, schnitte) {
   };
   const t = 0.5 + planStreu(saat, 'bt' + k + tiefe) * 0.14;
   let bestes = null, besteGroesse = Infinity;
-  for (let i = 0; i < poly.length; i++) {
-    for (let j = 0; j < poly.length; j++) {
-      if (i === j) continue;
-      const [eins, zwei] = teile(i, j, t);
-      if (eins.length < 3 || zwei.length < 3) continue;
-      const groesser = Math.max(Math.abs(netzFlaeche(eins)), Math.abs(netzFlaeche(zwei)));
-      if (groesser < besteGroesse) { besteGroesse = groesser; bestes = [i, j]; }
+  const n = poly.length;
+  if (n <= 20) {
+    /* Klein genug: alle Kantenpaare durchprobieren. */
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        if (i === j) continue;
+        const [eins, zwei] = teile(i, j, t);
+        if (eins.length < 3 || zwei.length < 3) continue;
+        const groesser = Math.max(Math.abs(netzFlaeche(eins)), Math.abs(netzFlaeche(zwei)));
+        if (groesser < besteGroesse) { besteGroesse = groesser; bestes = [i, j]; }
+      }
+    }
+  } else {
+    /* Bei einem Vieleck mit hundert Ecken sind alle Paare zehntausend
+       Versuche — pro Ebene, sechs Ebenen tief. Die Metropole brauchte dafür
+       fast fünf Sekunden. Hier genügt die längste Kante und ihr Gegenüber:
+       ein paar Kandidaten statt aller. */
+    const laengen = [];
+    for (let i = 0; i < n; i++) laengen.push([i, strecke(poly[i], poly[(i + 1) % n])]);
+    laengen.sort((a, b) => b[1] - a[1]);
+    for (const [i] of laengen.slice(0, 6)) {
+      for (const versatz of [Math.floor(n / 2), Math.floor(n / 2) - 1, Math.floor(n / 2) + 1, Math.floor(n / 3), Math.floor(n * 2 / 3)]) {
+        const j = (i + versatz + n) % n;
+        if (i === j) continue;
+        const [eins, zwei] = teile(i, j, t);
+        if (eins.length < 3 || zwei.length < 3) continue;
+        const groesser = Math.max(Math.abs(netzFlaeche(eins)), Math.abs(netzFlaeche(zwei)));
+        if (groesser < besteGroesse) { besteGroesse = groesser; bestes = [i, j]; }
+      }
     }
   }
   if (!bestes) { raus.push(poly); return; }
@@ -647,52 +872,71 @@ function planBloeckeTeilen(poly, grenze, saat, k, tiefe, raus, schnitte) {
    Parzelle an Parzelle gesetzt. */
 function planBlockBebauen(poly, saat, schluessel, va, dichte, wasser, haeuser) {
   const flaeche = Math.abs(netzFlaeche(poly));
-  if (flaeche < 380) return;
+  if (flaeche < 130) return;
   const mitte = netzMitte(poly);
   /* Umlaufrichtung: nach innen zeigt die Normale immer zur Mitte. */
-  const plotBreite = 17 / (va.dichte * dichte) * va.haus;
-  const tiefeGrund = Math.min(26, Math.max(11, Math.sqrt(flaeche) * 0.22));
+  /* Eine Parzelle in einer alten Stadt ist SCHMAL: das Haus steht mit der
+     Giebelseite zur Gasse, weil die Straßenfront das Teuerste war. Elf
+     Einheiten Front, nicht siebzehn. */
+  const plotBreite = 11.5 / (va.dichte * dichte) * va.haus;
+  const tiefeGrund = Math.min(20, Math.max(8.5, Math.sqrt(flaeche) * 0.19));
   let nr = 0;
 
   for (let e = 0; e < poly.length; e++) {
     const a = poly[e], b = poly[(e + 1) % poly.length];
     const laenge = strecke(a, b);
-    if (laenge < plotBreite * 0.9) continue;
+    if (laenge < plotBreite * 0.75) continue;
     const dx = (b[0] - a[0]) / laenge, dy = (b[1] - a[1]) / laenge;
     /* Die Normale, die zur Blockmitte zeigt */
     let nx = -dy, ny = dx;
     const probe = [(a[0] + b[0]) / 2 + nx * 4, (a[1] + b[1]) / 2 + ny * 4];
     if (!netzImPolygon(poly, probe[0], probe[1])) { nx = -nx; ny = -ny; }
 
-    const wieViele = Math.max(1, Math.floor(laenge / plotBreite));
-    const echteBreite = laenge / wieViele;
+    /* Vorher: `echteBreite = laenge / wieViele`. Das klingt harmlos, war aber
+       der Grund für die Klötze — der Rest der Kante wurde auf die Häuser
+       VERTEILT, und aus elf Einheiten Front wurden schnell sechsundzwanzig.
+       Ein Haus hat aber seine Breite; was übrig bleibt, ist eine Lücke. Die
+       Reihe wird stattdessen auf der Kante zentriert. */
+    const wieViele = Math.max(1, Math.round(laenge / plotBreite));
+    const echteBreite = Math.min(plotBreite * 1.3, laenge / wieViele);
+    const anfang = (laenge - echteBreite * wieViele) / 2;
     for (let i = 0; i < wieViele; i++) {
       const k = schluessel + '_' + e + '_' + i;
       if (planZufall(saat, 'lu' + k) < va.hoefe * 0.3) continue;   /* eine Lücke */
       const randA = 0.07 + planZufall(saat, 'ra' + k) * 0.14;
       const randB = 0.07 + planZufall(saat, 'rb' + k) * 0.14;
-      const tiefe = tiefeGrund * (0.72 + planZufall(saat, 'rt' + k) * 0.56) * va.haus;
+      const tiefeVoll = tiefeGrund * (0.72 + planZufall(saat, 'rt' + k) * 0.56) * va.haus;
       const zurueck = 1.6 + planZufall(saat, 'rz' + k) * 2.4;
 
-      const t0 = (i + randA) * echteBreite, t1 = (i + 1 - randB) * echteBreite;
-      const p0 = [a[0] + dx * t0 + nx * zurueck, a[1] + dy * t0 + ny * zurueck];
-      const p1 = [a[0] + dx * t1 + nx * zurueck, a[1] + dy * t1 + ny * zurueck];
-      const p2 = [p1[0] + nx * tiefe, p1[1] + ny * tiefe];
-      const p3 = [p0[0] + nx * tiefe, p0[1] + ny * tiefe];
-      /* Das Haus muss GANZ im Block liegen — alle vier Ecken. Bei einem
-         einspringenden Block liegt der Rücksprung sonst schon außerhalb,
-         obwohl die Mitte der Kante noch drin war. */
-      if (!netzImPolygon(poly, p0[0], p0[1]) || !netzImPolygon(poly, p1[0], p1[1]) ||
-          !netzImPolygon(poly, p2[0], p2[1]) || !netzImPolygon(poly, p3[0], p3[1])) continue;
-      if (wasser.drin(p0[0], p0[1]) || wasser.drin(p2[0], p2[1])) continue;
-      const ecken = [p0, p1, p2, p3];
-      const gr = Math.abs(netzFlaeche(ecken));
-      if (gr < 30) continue;
+      const t0 = anfang + (i + randA) * echteBreite, t1 = anfang + (i + 1 - randB) * echteBreite;
+      /* Passt das Haus nicht in den Block, wird es nicht gestrichen, sondern
+         FLACHER gebaut. Ein schmaler Block bekommt eben ein schmales Haus —
+         vorher blieb er einfach leer, und mitten in der Stadt klaffte ein
+         weißes Loch. */
+      let ecken = null, gr = 0;
+      for (const massstab of [1, 0.7, 0.48, 0.32]) {
+        const tiefe = tiefeVoll * massstab;
+        const p0 = [a[0] + dx * t0 + nx * zurueck, a[1] + dy * t0 + ny * zurueck];
+        const p1 = [a[0] + dx * t1 + nx * zurueck, a[1] + dy * t1 + ny * zurueck];
+        const p2 = [p1[0] + nx * tiefe, p1[1] + ny * tiefe];
+        const p3 = [p0[0] + nx * tiefe, p0[1] + ny * tiefe];
+        /* Das Haus muss GANZ im Block liegen — alle vier Ecken. Bei einem
+           einspringenden Block liegt der Rücksprung sonst schon außerhalb,
+           obwohl die Mitte der Kante noch drin war. */
+        if (!netzImPolygon(poly, p0[0], p0[1]) || !netzImPolygon(poly, p1[0], p1[1]) ||
+            !netzImPolygon(poly, p2[0], p2[1]) || !netzImPolygon(poly, p3[0], p3[1])) continue;
+        if (wasser.drin(p0[0], p0[1]) || wasser.drin(p2[0], p2[1])) continue;
+        const kandidat = [p0, p1, p2, p3];
+        const f = Math.abs(netzFlaeche(kandidat));
+        if (f < 22) continue;
+        ecken = kandidat; gr = f; break;
+      }
+      if (!ecken) continue;
       haeuser.push({
         ecken,
         umriss: planHausUmriss(ecken, saat, k),
         ton: planHash(saat, 'dt' + k) % 5,
-        gross: gr > 520,
+        gross: gr > 300,
         viertel: va.id,
         sonder: '',
         /* Zu welchem Block das Haus gehoert — ueber den Mittelpunkt laesst
@@ -702,6 +946,67 @@ function planBlockBebauen(poly, saat, schluessel, va, dichte, wasser, haeuser) {
         n: haeuser.length
       });
       nr++;
+    }
+  }
+  return nr;
+}
+
+
+/* ===================== DAS STRASSENDORF =====================
+   Manchmal schließt sich kein einziger Block: ein Weiler mit einem breiten
+   Fluss mittendrin hat nur ein paar Wegstummel, und aus Stummeln wird kein
+   Kranz. Herausgekommen ist dann ein LEERES Blatt mit einer Legende darauf.
+
+   Ein kleiner Ort ist aber auch in Wirklichkeit kein Blockgefüge, sondern
+   ein Straßendorf: die Höfe stehen links und rechts am Weg, und dahinter
+   fängt gleich das Feld an. Genau das wird hier gebaut. */
+function planStrassendorf(wege, saat, va, dichte, wasser, haeuser, mitte, Rmax) {
+  const abstand = 15 / dichte;
+  let nr = 0;
+  for (const weg of wege) {
+    if (!weg.punkte || weg.punkte.length < 2) continue;
+    if (weg.art === 'platz') continue;
+    for (let i = 1; i < weg.punkte.length; i++) {
+      const a = weg.punkte[i - 1], b = weg.punkte[i];
+      const laenge = strecke(a, b);
+      if (laenge < abstand) continue;
+      const dx = (b[0] - a[0]) / laenge, dy = (b[1] - a[1]) / laenge;
+      const nx = -dy, ny = dx;
+      const wieViele = Math.floor(laenge / abstand);
+      for (let j = 0; j < wieViele; j++) {
+        for (const seite of [-1, 1]) {
+          const k = 'sd' + weg.i + '_' + i + '_' + j + '_' + seite;
+          if (planZufall(saat, 'sl' + k) < 0.42) continue;      /* nicht lückenlos */
+          const t = (j + 0.5) * abstand + planStreu(saat, 'st' + k) * 3;
+          const ab = (8 + planZufall(saat, 'sa' + k) * 4) * seite;
+          const m = [a[0] + dx * t + nx * ab, a[1] + dy * t + ny * ab];
+          if (wasser.drin(m[0], m[1])) continue;
+          if (strecke(m, mitte) > Rmax * 1.15) continue;
+          /* Steht dort schon etwas? */
+          if (haeuser.some((h) => strecke(h.ecken[0], m) < 11)) continue;
+
+          const br = (5.5 + planZufall(saat, 'sb' + k) * 3) / 2;
+          const tf = (7 + planZufall(saat, 'sc' + k) * 4) / 2;
+          const ecken = [
+            [m[0] - dx * br - nx * tf * seite, m[1] - dy * br - ny * tf * seite],
+            [m[0] + dx * br - nx * tf * seite, m[1] + dy * br - ny * tf * seite],
+            [m[0] + dx * br + nx * tf * seite, m[1] + dy * br + ny * tf * seite],
+            [m[0] - dx * br + nx * tf * seite, m[1] - dy * br + ny * tf * seite]
+          ];
+          if (ecken.some((p) => wasser.drin(p[0], p[1]))) continue;
+          haeuser.push({
+            ecken,
+            umriss: planHausUmriss(ecken, saat, k),
+            ton: planHash(saat, 'sdt' + k) % 5,
+            gross: false,
+            viertel: va.id,
+            sonder: '',
+            block: 'weg' + weg.i,
+            n: haeuser.length
+          });
+          nr++;
+        }
+      }
     }
   }
   return nr;
