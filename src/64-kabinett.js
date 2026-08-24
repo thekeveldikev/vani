@@ -24,11 +24,13 @@ const KABINETT_FAECHER = [
   },
   {
     id: 'stadtplan',
-    name: 'Der Stadtplan',
-    unter: 'Gassen, Plätze, Häuser — eine Karte, die man selbst zeichnet',
-    text: 'Kommt als Nächstes in dieses Fach.',
+    name: 'Der Kartentisch',
+    unter: 'Stadtpläne für Orte, die es nur bei dir gibt',
+    text: 'Sag, wo die Stadt liegt und wie alt sie ist — Gassen, Blöcke und Häuser wachsen daraus. Danach gehst du hinein und gibst den Stellen Namen.',
     emblem: 'plan',
-    baustelle: true
+    zaehlen: () => (typeof stadtplaene === 'function' ? stadtplaene().length : 0),
+    wort: (n) => n === 1 ? 'eine Stadt' : n + ' Städte',
+    oeffnen: (zurueck) => (typeof stadtplanWerkzeug === 'function' ? stadtplanWerkzeug(zurueck) : null)
   }
 ];
 
@@ -52,7 +54,7 @@ function kabinettFach(fach, i) {
     style: '--n:' + i,
     title: fach.baustelle ? fach.name + ' — noch nicht fertig' : fach.name + ' öffnen',
     onclick: () => {
-      if (fach.baustelle) { toast('Dieses Fach ist noch leer. Der Stadtplan kommt als Nächstes hinein.', 5200); return; }
+      if (fach.baustelle) { toast('Dieses Fach ist noch leer.', 4200); return; }
       kabinettOeffnen(fach);
     }
   },

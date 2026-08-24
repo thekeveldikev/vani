@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.39.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.40.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -139,6 +139,13 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   verschieben — stattdessen wird nur der scrollende Bereich im Dialog nachgeführt; `--sichthoehe` und
   `html.tastatur-offen` kommen aus der visualViewport-API. Chip-Reihen sind `flex: none` mit eigenem
   Scrollfeld: als schrumpfbares Flex-Kind ragten sie in die Liste darunter.
+- **5.40** Der Kartentisch (`src/65-stadtplan.js`, `65b-stadtplan-karte.js`, `65c-stadtplan-blatt.js`),
+  das zweite Fach im Kabinett. Stadtpläne für erfundene Orte, prozedural aus einer SAAT gerechnet: Wasser
+  (Fluss/Küste/See/Insel) zuerst, dann die Stadt radial (Speichen × Ringe → Blöcke → Parzellen → Häuser),
+  dann Umland. Nicht jede Speiche reicht durch alle Ringe — wo eine fehlt, wachsen zwei Blöcke zusammen;
+  das erzeugt die ungleichen Blockgrößen einer gewachsenen Stadt. Gespeichert wird nur die Saat plus
+  Marken und eigene Namen. Karte hängt an `flaeche.dataset.sig` (planSignatur); Marken liegen in einer
+  eigenen Ebene und werden für sich aufgetragen.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

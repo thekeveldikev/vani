@@ -5720,3 +5720,604 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 @media (prefers-reduced-motion: reduce) {
   #raum > * { animation: none; }
 }
+
+/* ============================================================
+   DER KARTENTISCH (65)
+   Ein Stadtplan liegt auf einem Tisch, nicht in einem Fenster. Deshalb
+   dunkles Holz ringsum, und das Papier liegt darauf.
+   ============================================================ */
+
+/* ----- Das Regal der Karten ----- */
+.kt-werkzeug { display: flex; flex-direction: column; gap: 16px; height: 100%; min-height: 0; }
+.kt-wkopf { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.kt-zurueck {
+  border: 1px solid var(--rand); background: var(--karte); color: var(--blass);
+  border-radius: 999px; padding: 6px 14px; font-size: 12.5px; cursor: pointer;
+  transition: color .18s, border-color .18s;
+}
+.kt-wtitel { flex: 1; min-width: 160px; }
+.kt-wtitel b { display: block; font-family: ui-serif, "New York", Georgia, serif; font-size: 21px; }
+.kt-wtitel small { display: block; font-size: 12.5px; color: var(--blass); margin-top: 2px; }
+
+.kt-regal {
+  flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(246px, 1fr)); gap: 14px; align-content: start;
+  padding-bottom: 10px;
+}
+.kt-kachel {
+  display: flex; flex-direction: column; text-align: left; cursor: pointer; padding: 0; overflow: hidden;
+  border: 1px solid var(--rand); border-radius: 12px; background: var(--karte); color: var(--tinte);
+  box-shadow: 0 3px 12px rgba(0,0,0,.14);
+  animation: kt-kachelrein .4s cubic-bezier(.25,1.05,.4,1) both;
+  animation-delay: calc(var(--n, 0) * 45ms);
+  transition: transform .2s, box-shadow .2s;
+}
+@keyframes kt-kachelrein { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.kt-vorschau {
+  display: block; aspect-ratio: 1.5; overflow: hidden; background: var(--papier, #f2e9d2);
+  border-bottom: 1px solid var(--rand); position: relative;
+}
+.kt-vorschau svg { display: block; width: 100%; height: 100%; }
+.kt-vorschau::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(120% 90% at 50% 40%, transparent 40%, rgba(0,0,0,.16));
+  pointer-events: none;
+}
+.kt-kschild { display: block; padding: 11px 14px 13px; }
+.kt-kschild b { display: block; font-family: ui-serif, "New York", Georgia, serif; font-size: 16.5px; letter-spacing: .02em; }
+.kt-kschild small { display: block; font-size: 12px; color: var(--blass); font-style: italic; margin-top: 1px; }
+.kt-kschild i { display: block; font-style: normal; font-size: 11px; color: var(--blass); margin-top: 5px; }
+
+.kt-leer { text-align: center; padding: 40px 20px; color: var(--blass); }
+.kt-leerbild { display: inline-block; color: var(--rand); margin-bottom: 12px; }
+.kt-leer b { display: block; font-family: ui-serif, "New York", Georgia, serif; font-size: 19px; color: var(--tinte); }
+.kt-leer p { max-width: 460px; margin: 10px auto 18px; font-size: 13.5px; line-height: 1.6; }
+
+/* ----- Die aufgeschlagene Karte ----- */
+.kt-huelle { width: min(1500px, 98vw); height: 94vh; display: flex; }
+.kt-tafel {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; border-radius: 8px; overflow: hidden;
+  background: linear-gradient(160deg, #3b2f22, #241c14);
+  box-shadow: 0 40px 90px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,228,190,.14);
+}
+.kt-tafel.rollt-auf { animation: kt-rollt .82s cubic-bezier(.2,.88,.26,1); }
+@keyframes kt-rollt {
+  0% { opacity: 0; transform: perspective(1800px) rotateX(28deg) scale(.94); }
+  100% { opacity: 1; transform: none; }
+}
+
+.kt-leiste {
+  flex: none; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px;
+  background: color-mix(in srgb, var(--papier) 92%, var(--hg2));
+  border-bottom: 1px solid var(--rand);
+}
+.kt-leistezeile { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.kt-titelblock { min-width: 0; }
+.kt-titel {
+  border: 0; background: none; cursor: pointer; padding: 0; text-align: left; color: var(--tinte);
+  display: block; max-width: 260px;
+}
+.kt-titel b { display: block; font-family: ui-serif, "New York", Georgia, serif; font-size: 18px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kt-titel small { display: block; font-size: 11.5px; color: var(--blass); font-style: italic; }
+.kt-zahlen { display: block; font-size: 10.5px; color: var(--blass); margin-top: 2px; }
+
+.kt-suche { position: relative; flex: 1; min-width: 150px; max-width: 300px; }
+.kt-lupe { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--blass); display: flex; pointer-events: none; }
+.kt-lupe svg { width: 14px; height: 14px; }
+.kt-suchfeld { width: 100%; padding-left: 30px; }
+.kt-treffer {
+  position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 20;
+  background: var(--karte); border: 1px solid var(--rand); border-radius: 10px; overflow: hidden;
+  box-shadow: 0 10px 26px rgba(0,0,0,.24); max-height: 260px; overflow-y: auto;
+}
+.kt-treffer:empty { display: none; }
+.kt-trefferzeile {
+  display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 0; background: none;
+  padding: 7px 11px; cursor: pointer; color: var(--tinte); font-size: 13px;
+}
+.kt-trefferzeile i { font-style: normal; color: var(--blass); font-size: 11px; width: 12px; }
+.kt-keintreffer { display: block; padding: 9px 12px; font-size: 12.5px; color: var(--blass); }
+
+.kt-werkzeuge { display: inline-flex; gap: 2px; padding: 2px; border-radius: 10px; background: var(--hg2); border: 1px solid var(--rand); }
+.kt-wz {
+  display: inline-flex; align-items: center; gap: 5px; border: 0; background: none; cursor: pointer;
+  color: var(--blass); border-radius: 8px; padding: 5px 11px; font-size: 11.5px; transition: background .18s, color .18s;
+}
+.kt-wz.an { background: var(--akzent); color: #fff; }
+.kt-wzbild { display: inline-flex; }
+
+.kt-knopfreihe { display: flex; align-items: center; gap: 5px; margin-left: auto; flex-wrap: wrap; }
+.kt-wk {
+  width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--rand); background: var(--karte);
+  color: var(--tinte); cursor: pointer; font-size: 15px; line-height: 1; display: grid; place-items: center;
+}
+.kt-wk.zahl { width: auto; padding: 0 9px; font-size: 11.5px; font-variant-numeric: tabular-nums; color: var(--blass); }
+.kt-werkzeugknopf {
+  border: 1px solid var(--rand); background: var(--karte); color: var(--blass); border-radius: 999px;
+  padding: 5px 12px; font-size: 11.5px; cursor: pointer; transition: background .18s, color .18s;
+}
+.kt-werkzeugknopf.an { background: var(--akzent); border-color: transparent; color: #fff; }
+.kt-zuknopf {
+  width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--rand); background: var(--karte);
+  color: var(--blass); cursor: pointer; font-size: 16px; line-height: 1; display: grid; place-items: center;
+}
+
+.kt-markenwahl {
+  display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
+  padding: 7px 9px; border-radius: 10px; background: var(--hg2); border: 1px solid var(--rand);
+  max-height: 96px; overflow-y: auto; align-content: flex-start;
+}
+.kt-mwgruppe { font-size: 9.5px; letter-spacing: .13em; text-transform: uppercase; color: var(--blass); margin: 0 4px 0 8px; }
+.kt-mwgruppe:first-child { margin-left: 0; }
+.kt-mw {
+  width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--rand); background: var(--karte);
+  color: var(--tinte); cursor: pointer; display: grid; place-items: center; transition: background .16s, border-color .16s;
+}
+.kt-mw.an { background: var(--akzent); border-color: transparent; color: #fff; }
+.kt-hinweiszeile { font-size: 12px; color: var(--blass); font-style: italic; padding: 2px 2px 4px; }
+
+/* ----- Die Fläche mit dem Papier ----- */
+.kt-rahmen { flex: 1; min-height: 0; position: relative; }
+.kt-flaeche {
+  position: absolute; inset: 0; overflow: auto; overscroll-behavior: contain;
+  background:
+    repeating-linear-gradient(96deg, rgba(255,255,255,.014) 0 2px, transparent 2px 7px),
+    radial-gradient(90% 70% at 50% 30%, rgba(0,0,0,.14), rgba(0,0,0,.4));
+  scrollbar-width: thin; scrollbar-color: rgba(255,240,210,.28) transparent;
+}
+.kt-flaeche::-webkit-scrollbar { width: 9px; height: 9px; }
+.kt-flaeche::-webkit-scrollbar-track { background: transparent; }
+.kt-flaeche::-webkit-scrollbar-thumb { background: rgba(255,240,210,.24); border-radius: 5px; }
+.kt-innen { display: inline-block; min-width: 100%; padding: 28px; box-sizing: border-box; text-align: center; }
+.kt-blatt {
+  display: inline-block; vertical-align: top; border-radius: 2px;
+  box-shadow: 0 18px 46px rgba(0,0,0,.5), 0 2px 0 rgba(255,255,255,.1);
+}
+
+/* ----- Was auf dem Papier steht ----- */
+.kt-feld { stroke: var(--ktinte); stroke-width: .7; stroke-opacity: .22; }
+.kt-waldgrund { stroke: var(--ktinte); stroke-width: .7; stroke-opacity: .2; }
+.kt-baum { fill: none; stroke: var(--ktinte); stroke-width: 1.1; stroke-opacity: .5; }
+.kt-hof { fill: var(--ktinte); fill-opacity: .5; }
+.kt-ufer { fill: none; stroke-width: 2; }
+.kt-uferstrich { fill: none; stroke-width: 1.1; }
+.kt-block { stroke: var(--ktinte); stroke-width: .8; stroke-opacity: .18; }
+.kt-block.gruen { stroke-opacity: .26; }
+.kt-markt { stroke: none; }
+.kt-marktrand { fill: none; stroke: var(--ktinte); stroke-width: 1.6; stroke-opacity: .45; }
+
+.kt-strassekante { fill: none; stroke: var(--ktinte); stroke-opacity: .82; stroke-linecap: round; stroke-linejoin: round; }
+.kt-strasse { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+.kt-haus { stroke: var(--ktinte); stroke-width: 1; stroke-opacity: .78; stroke-linejoin: round; }
+.kt-haus.gross { stroke-width: 1.2; }
+.kt-kirchekoerper { stroke: var(--ktinte); stroke-width: 1.3; stroke-linejoin: round; }
+.kt-kirchekreuz { fill: none; stroke: var(--ktinte); stroke-width: 1.3; stroke-linecap: round; }
+.kt-grabkreuz { fill: none; stroke: var(--ktinte); stroke-width: 1; stroke-opacity: .55; stroke-linecap: round; }
+
+.kt-mauer { fill: none; stroke: var(--ktinte); stroke-width: 7; stroke-opacity: .9; stroke-linejoin: round; }
+.kt-mauerzinnen { fill: none; stroke: var(--kpapier); stroke-width: 2.6; stroke-dasharray: 4 5; stroke-opacity: .75; }
+.kt-turm { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 2; }
+.kt-tor { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 2; }
+.kt-torbogen { fill: none; stroke: var(--ktinte); stroke-width: 1.3; }
+.kt-burgmauer { stroke: var(--ktinte); stroke-width: 2.2; stroke-linejoin: round; }
+.kt-burgturm { stroke: var(--ktinte); stroke-width: 1.8; }
+.kt-bergfried { stroke: var(--ktinte); stroke-width: 1.6; }
+.kt-brueckenkoerper { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 1.6; }
+.kt-brueckenstrich { fill: none; stroke: var(--ktinte); stroke-width: 1.1; stroke-opacity: .6; }
+
+/* ----- Die Namen ----- */
+.kt-gassenname {
+  fill: var(--ktinte); fill-opacity: .72; font-size: 11px; letter-spacing: .06em;
+  font-family: ui-serif, "New York", Georgia, serif;
+}
+.kt-gassenname.art-haupt { font-size: 12.5px; fill-opacity: .82; }
+.kt-viertelname {
+  fill: var(--ktinte); fill-opacity: .38; font-size: 15px; letter-spacing: .3em;
+  font-family: ui-serif, "New York", Georgia, serif; pointer-events: none;
+}
+.kt-torname {
+  fill: var(--ktinte); fill-opacity: .78; font-size: 11.5px; letter-spacing: .08em;
+  font-family: ui-serif, "New York", Georgia, serif; pointer-events: none;
+}
+.kt-blatt.ohne-namen .kt-namen { display: none; }
+.kt-blatt.ohne-umland .kt-umland { display: none; }
+
+/* ----- Kompass, Maßstab, Kartusche ----- */
+.kt-kompassring { fill: none; stroke: var(--ktinte); stroke-width: 1.4; stroke-opacity: .55; }
+.kt-kompassring.zart { stroke-width: .9; stroke-opacity: .35; }
+.kt-kompassstrich { stroke: var(--ktinte); stroke-width: 1.2; stroke-opacity: .6; }
+.kt-nadel { stroke: var(--ktinte); stroke-width: .9; }
+.kt-nadel.hell { fill: var(--kpapier); }
+.kt-nadel.dunkel { fill: var(--ktinte); fill-opacity: .8; }
+.kt-kompassbuchstabe {
+  fill: var(--ktinte); font-size: 17px; font-family: ui-serif, "New York", Georgia, serif; letter-spacing: .1em;
+}
+.kt-massfeld { fill: var(--kpapier); stroke: none; }
+.kt-massfeld.voll { fill: var(--ktinte); fill-opacity: .82; }
+.kt-massrahmen { fill: none; stroke: var(--ktinte); stroke-width: 1.3; }
+.kt-masstext { fill: var(--ktinte); fill-opacity: .75; font-size: 11px; font-family: ui-serif, "New York", Georgia, serif; }
+
+.kt-kartuschengrund { fill: var(--kpapier); fill-opacity: .93; stroke: var(--ktinte); stroke-width: 2; stroke-linejoin: round; }
+.kt-kartuschenrahmen { fill: none; stroke: var(--kgold); stroke-width: 1.1; stroke-opacity: .8; }
+.kt-kartuschentitel {
+  fill: var(--ktinte); font-size: 25px; letter-spacing: .05em;
+  font-family: ui-serif, "New York", Georgia, serif;
+}
+.kt-kartuschenunter { fill: var(--ktinte); fill-opacity: .62; font-size: 11.5px; font-style: italic; font-family: ui-serif, "New York", Georgia, serif; }
+
+.kt-randlinie { fill: none; stroke: var(--ktinte); stroke-width: 2.4; stroke-opacity: .75; }
+.kt-randlinie.innen { stroke-width: 1; stroke-opacity: .5; }
+.kt-gradstrich { stroke: var(--ktinte); stroke-width: 1.2; stroke-opacity: .55; }
+
+/* ----- Die Marken ----- */
+.kt-marke { cursor: pointer; color: var(--ktinte); }
+.kt-markenfang { fill: transparent; }
+.kt-markenzeichen { color: var(--ktinte); }
+.kt-marke .kt-markenzeichen svg { overflow: visible; }
+.kt-markenzeichen { transform: translate(-11px, -11px); }
+.kt-marke.wichtig .kt-markenzeichen { transform: translate(-14px, -14px) scale(1.28); }
+.kt-markenname {
+  fill: var(--ktinte); font-size: 12px; font-family: ui-serif, "New York", Georgia, serif;
+  letter-spacing: .03em; pointer-events: none;
+}
+.kt-markenname.hinter { stroke: var(--kpapier); stroke-width: 3.4; stroke-linejoin: round; fill: none; }
+.kt-marke.wichtig .kt-markenname { font-size: 14px; }
+.kt-marke.zieht { opacity: .82; }
+.kt-blatt.eine-im-blick .kt-marke:not(.imblick) { opacity: .35; }
+.kt-marke.imblick .kt-markenzeichen { color: var(--akzent); }
+.kt-marke:focus-visible { outline: none; }
+.kt-marke:focus-visible .kt-markenfang { fill: color-mix(in srgb, var(--akzent) 22%, transparent); }
+
+/* ----- Die Karte zur Marke ----- */
+.kt-markenkarte {
+  position: absolute; left: 18px; bottom: 18px; z-index: 6;
+  width: min(320px, 44vw); max-height: 62%; overflow-y: auto;
+  border-radius: 10px; padding: 12px 14px;
+  background: linear-gradient(180deg, rgba(32,26,19,.96), rgba(22,18,13,.96));
+  border: 1px solid rgba(214,176,106,.42); box-shadow: 0 14px 34px rgba(0,0,0,.55);
+  color: #ece5d2; animation: kt-mkkommt .3s cubic-bezier(.2,.9,.3,1);
+}
+@keyframes kt-mkkommt { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.kt-mkkopf { display: flex; align-items: center; gap: 9px; }
+.kt-mkzeichen { display: inline-flex; color: #e0b46a; }
+.kt-mkkopf b { flex: 1; font-family: ui-serif, "New York", Georgia, serif; font-size: 16px; }
+.kt-mkzu { border: 0; background: none; color: rgba(236,229,210,.6); cursor: pointer; font-size: 17px; line-height: 1; padding: 0 2px; }
+.kt-mkart { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: rgba(236,229,210,.5); margin-top: 2px; }
+.kt-mknotiz { font-size: 12.5px; line-height: 1.55; color: rgba(236,229,210,.82); margin: 8px 0 0; }
+.kt-mkfigur {
+  display: block; width: 100%; text-align: left; margin-top: 9px; padding: 6px 9px; border-radius: 8px;
+  border: 1px solid rgba(214,176,106,.3); background: rgba(255,255,255,.05); color: #ece5d2; cursor: pointer; font-size: 12.5px;
+}
+.kt-mknah { margin-top: 11px; }
+.kt-mknahkopf { display: block; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: rgba(236,229,210,.45); margin-bottom: 4px; }
+.kt-mknahzeile {
+  display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 0; background: none;
+  color: #ece5d2; padding: 5px 6px; border-radius: 7px; cursor: pointer; font-size: 12.5px;
+}
+.kt-mknahzeile i { display: inline-flex; color: rgba(236,229,210,.6); }
+.kt-mknahzeile span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kt-mknahzeile small { color: rgba(236,229,210,.5); font-size: 11px; }
+.kt-mkfuss { display: flex; gap: 6px; margin-top: 11px; }
+.kt-mkfuss .knopf { background: rgba(255,255,255,.07); color: #ece5d2; box-shadow: none; }
+
+/* ----- Das Messband ----- */
+.kt-messband {
+  position: absolute; left: 50%; transform: translateX(-50%); bottom: 18px; z-index: 7;
+  display: flex; align-items: center; gap: 14px; padding: 10px 14px; border-radius: 999px;
+  background: rgba(24,20,15,.95); border: 1px solid rgba(214,176,106,.4); color: #ece5d2;
+  box-shadow: 0 10px 28px rgba(0,0,0,.5); font-size: 12.5px;
+  animation: kt-mkkommt .26s ease;
+}
+.kt-mbzeile b { font-family: ui-serif, "New York", Georgia, serif; font-size: 15px; }
+.kt-mbzeile small { display: block; font-size: 10.5px; color: rgba(236,229,210,.5); }
+.kt-mbzeiten { display: flex; gap: 14px; flex-wrap: wrap; color: rgba(236,229,210,.7); }
+.kt-mbzeiten b { color: #ece5d2; }
+.kt-mbzu { border: 0; background: none; color: rgba(236,229,210,.6); cursor: pointer; font-size: 17px; line-height: 1; }
+
+/* ----- Der Grundriss (das Einrichten) ----- */
+.ktg-fenster { width: min(940px, 96vw); max-height: 92vh; display: flex; flex-direction: column; gap: 10px; }
+.ktg-zwei { display: grid; grid-template-columns: 1fr minmax(240px, 340px); gap: 16px; min-height: 0; flex: 1; }
+.ktg-links { overflow-y: auto; overscroll-behavior: contain; padding-right: 6px; display: flex; flex-direction: column; gap: 7px; }
+.ktg-rechts { display: flex; flex-direction: column; gap: 8px; }
+.ktg-vorschau {
+  flex: 1; min-height: 220px; border-radius: 10px; overflow: hidden; border: 1px solid var(--rand);
+  background: var(--hg2); box-shadow: inset 0 2px 10px rgba(0,0,0,.14);
+}
+.ktg-vorschau svg { display: block; width: 100%; height: 100%; }
+.ktg-vorschautext { font-size: 11.5px; color: var(--blass); text-align: center; font-style: italic; }
+.ktg-abschnitt {
+  font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--blass);
+  margin: 10px 0 1px;
+}
+.ktg-abschnitt:first-of-type { margin-top: 0; }
+.ktg-name { font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; }
+.ktg-wahl { display: flex; flex-wrap: wrap; gap: 5px; }
+.ktg-wahl.breit { flex-direction: column; }
+.ktg-w {
+  border: 1px solid var(--rand); background: var(--karte); border-radius: 9px; padding: 6px 11px;
+  cursor: pointer; color: var(--tinte); text-align: left; transition: border-color .18s, background .18s;
+}
+.ktg-w b { font-size: 13px; font-weight: 500; }
+.ktg-w small { display: block; font-size: 11.5px; color: var(--blass); margin-top: 1px; line-height: 1.4; }
+.ktg-w.an { border-color: var(--akzent); background: color-mix(in srgb, var(--akzent) 11%, var(--karte)); }
+.ktg-schalter-reihe { display: flex; flex-wrap: wrap; gap: 6px; }
+.ktg-schalter {
+  display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--rand); background: var(--karte);
+  border-radius: 999px; padding: 6px 13px 6px 8px; cursor: pointer; color: var(--blass); font-size: 12.5px;
+}
+.ktg-schalter i { width: 13px; height: 13px; border-radius: 4px; border: 1.5px solid var(--rand); }
+.ktg-schalter.an { color: var(--tinte); border-color: var(--akzent); }
+.ktg-schalter.an i { background: var(--akzent); border-color: var(--akzent); }
+.ktg-regler { width: 100%; }
+.ktg-reglertext { display: block; font-size: 11.5px; color: var(--blass); font-style: italic; }
+.ktg-hilfe { display: block; font-size: 11.5px; color: var(--blass); line-height: 1.5; }
+.ktg-saat { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; flex: 1; }
+.ktg-wuerfel {
+  border: 1px dashed var(--rand); background: none; color: var(--blass); border-radius: 999px;
+  padding: 6px 13px; font-size: 12px; cursor: pointer; white-space: nowrap;
+}
+.reihe.eng { display: flex; gap: 6px; align-items: center; }
+
+/* ----- Eine Marke bearbeiten ----- */
+.ktm-fenster { width: min(560px, 95vw); max-height: 92vh; display: flex; flex-direction: column; gap: 8px; }
+.ktm-name { font-family: ui-serif, "New York", Georgia, serif; font-size: 17px; }
+.ktm-abschnitt { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--blass); margin-top: 6px; }
+.ktm-arten { max-height: 190px; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--rand); border-radius: 10px; padding: 8px 10px; }
+.ktm-gruppe { font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--blass); margin: 8px 0 4px; }
+.ktm-gruppe:first-child { margin-top: 0; }
+.ktm-reihe { display: flex; flex-wrap: wrap; gap: 4px; }
+.ktm-art {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; width: 66px; padding: 6px 3px;
+  border: 1px solid transparent; border-radius: 9px; background: none; cursor: pointer; color: var(--tinte);
+  transition: background .16s, border-color .16s;
+}
+.ktm-art small { font-size: 9.5px; color: var(--blass); text-align: center; line-height: 1.15; }
+.ktm-art.an { border-color: var(--akzent); background: color-mix(in srgb, var(--akzent) 11%, transparent); }
+.ktm-art.an small { color: var(--tinte); }
+.ktm-notiz { width: 100%; font-size: 13.5px; line-height: 1.55; }
+.ktm-wichtig { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--blass); margin-top: 4px; }
+.ktm-figur { display: flex; gap: 6px; align-items: center; }
+.ktm-figurknopf {
+  flex: 1; border: 1px dashed var(--rand); background: none; border-radius: 9px; padding: 8px 12px;
+  cursor: pointer; color: var(--blass); font-size: 12.5px; text-align: left;
+}
+.ktm-figurknopf.an { border-style: solid; border-color: var(--akzent); color: var(--tinte); }
+.ktm-figurweg { border: 0; background: none; color: var(--blass); cursor: pointer; font-size: 16px; }
+.ktm-figurfenster { width: min(440px, 94vw); max-height: 80vh; display: flex; flex-direction: column; gap: 9px; }
+.ktm-figurliste { flex: 1; min-height: 120px; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 2px; }
+.ktm-figurzeile {
+  text-align: left; border: 0; background: none; padding: 8px 11px; border-radius: 8px; cursor: pointer; color: var(--tinte);
+}
+.ktm-figurzeile.an { background: color-mix(in srgb, var(--akzent) 14%, transparent); }
+
+/* ----- Das Verzeichnis ----- */
+.ktv-fenster { width: min(620px, 95vw); max-height: 90vh; display: flex; flex-direction: column; gap: 9px; }
+.ktv-reiter { display: flex; gap: 4px; flex: none; }
+.ktv-r {
+  border: 1px solid var(--rand); background: var(--karte); color: var(--blass); border-radius: 999px;
+  padding: 5px 13px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+}
+.ktv-r i { font-style: normal; font-size: 10px; opacity: .7; }
+.ktv-r.an { background: var(--akzent); border-color: transparent; color: #fff; }
+.ktv-inhalt { flex: 1; min-height: 150px; overflow-y: auto; overscroll-behavior: contain; }
+.ktv-liste { display: flex; flex-direction: column; gap: 1px; }
+.ktv-gruppe { font-size: 9.5px; letter-spacing: .15em; text-transform: uppercase; color: var(--blass); margin: 10px 0 3px; }
+.ktv-gruppe:first-child { margin-top: 0; }
+.ktv-zeile {
+  display: flex; align-items: baseline; gap: 9px; width: 100%; text-align: left; border: 0; background: none;
+  padding: 6px 8px; border-radius: 7px; cursor: pointer; color: var(--tinte);
+}
+.ktv-zeile i { display: inline-flex; color: var(--blass); align-self: center; }
+.ktv-zeile b { flex: 1; font-size: 13.5px; font-weight: 500; }
+.ktv-zeile small { font-size: 11px; color: var(--blass); }
+.ktv-gasse { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 7px; }
+.ktv-gassename { flex: 1; border: 0; background: none; text-align: left; cursor: pointer; color: var(--tinte); font-size: 13.5px; padding: 0; }
+.ktv-gassename.fest { cursor: default; }
+.ktv-gasse small { font-size: 11px; color: var(--blass); }
+.ktv-umbenennen { border: 0; background: none; color: var(--blass); cursor: pointer; font-size: 13px; padding: 2px 5px; border-radius: 6px; }
+.ktv-auff { margin-top: 4px; }
+.ktv-auff summary { cursor: pointer; font-size: 12.5px; color: var(--blass); }
+.ktv-auffzeile {
+  display: block; width: 100%; text-align: left; border: 0; background: none; padding: 6px 8px;
+  border-radius: 7px; cursor: pointer; color: var(--tinte); font-size: 12.5px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .kt-kachel:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0,0,0,.2); }
+  .kt-zurueck:hover { color: var(--tinte); border-color: var(--akzent); }
+  .kt-wz:hover { color: var(--tinte); }
+  .kt-wz.an:hover { color: #fff; }
+  .kt-trefferzeile:hover, .ktv-zeile:hover, .ktv-auffzeile:hover, .ktm-figurzeile:hover { background: var(--hg2); }
+  .kt-mknahzeile:hover, .kt-mkfigur:hover { background: rgba(255,255,255,.09); }
+  .ktg-w:hover, .ktg-schalter:hover, .ktm-figurknopf:hover { border-color: var(--akzent); }
+  .ktm-art:hover { background: var(--hg2); }
+  .kt-mw:hover { border-color: var(--akzent); }
+  .kt-mw.an:hover { border-color: transparent; }
+  .ktv-umbenennen:hover, .kt-mkzu:hover, .kt-mbzu:hover, .ktm-figurweg:hover { color: var(--tinte); background: var(--hg2); }
+  .kt-marke:hover .kt-markenzeichen { color: var(--akzent); }
+  .kt-werkzeugknopf:hover { color: var(--tinte); border-color: var(--akzent); }
+  .kt-werkzeugknopf.an:hover { color: #fff; }
+  .kt-wk:hover { border-color: var(--akzent); }
+  .ktg-wuerfel:hover { color: var(--tinte); border-color: var(--akzent); }
+}
+
+@media (max-width: 860px) {
+  .kt-huelle { width: 100vw; height: 100vh; }
+  .kt-tafel { border-radius: 0; }
+  .ktg-zwei { grid-template-columns: 1fr; }
+  .ktg-rechts { order: -1; }
+  .ktg-vorschau { min-height: 170px; }
+  .kt-markenkarte { left: 10px; right: 10px; width: auto; max-height: 46%; }
+  .kt-messband { left: 10px; right: 10px; transform: none; border-radius: 12px; flex-wrap: wrap; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kt-tafel.rollt-auf, .kt-kachel, .kt-markenkarte, .kt-messband { animation: none; }
+}
+
+/* ===================== DER TISCH, AUF DEM DIE KARTE LIEGT =====================
+   Der Wandteppich hängt in einem Rahmen, das Album ist ein Buch, der
+   Schreibtisch ist ein Tisch. Die Karte lag bisher im Nichts. Jetzt liegt
+   sie auf dunklem Holz, ein Lichtkegel fällt von links oben darauf, und an
+   den Ecken halten Messingbeschwerer das Papier flach. */
+
+.kt-tafel {
+  background:
+    repeating-linear-gradient(94deg, rgba(255,255,255,.018) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(88deg, rgba(0,0,0,.05) 0 1px, transparent 1px 22px),
+    linear-gradient(158deg, #4a3a28, #2b2016 55%, #1d150e);
+}
+.kt-rahmen { overflow: hidden; }
+
+/* Das Licht einer Lampe, die außerhalb des Bildes steht. */
+.kt-tischlicht {
+  position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background:
+    radial-gradient(72% 58% at 24% 12%, rgba(255,226,170,.20), transparent 62%),
+    radial-gradient(120% 100% at 50% 55%, transparent 40%, rgba(0,0,0,.42));
+}
+
+.kt-flaeche {
+  background:
+    repeating-linear-gradient(94deg, rgba(255,255,255,.014) 0 2px, transparent 2px 9px),
+    linear-gradient(158deg, #46372a, #281e15 60%, #1a130d);
+}
+
+/* Das Blatt liegt leicht schief und wirft einen warmen Schatten. */
+.kt-innen { padding: 46px; }
+.kt-blattkasten {
+  position: relative; display: inline-block;
+  transform: rotate(-.55deg);
+  filter: drop-shadow(0 16px 30px rgba(0,0,0,.5)) drop-shadow(0 2px 3px rgba(0,0,0,.35));
+}
+.kt-blatt {
+  display: block; border-radius: 1px; box-shadow: none;
+  /* Die Blattkante ist nie ganz gerade — ein Büttenrand. */
+  clip-path: polygon(
+    0.3% 0.5%, 22% 0%, 47% 0.7%, 71% 0.1%, 99.6% 0.6%,
+    100% 25%, 99.3% 51%, 100% 77%, 99.4% 99.4%,
+    76% 100%, 51% 99.3%, 26% 100%, 0.5% 99.5%,
+    0% 74%, 0.7% 49%, 0% 23%
+  );
+}
+
+/* Die Messingbeschwerer: kleine schwere Scheiben auf den Ecken. */
+.kt-beschwerer {
+  position: absolute; width: 40px; height: 40px; border-radius: 50%; pointer-events: none; z-index: 3;
+  background:
+    radial-gradient(circle at 34% 30%, #f0d79a, #c9a55c 42%, #8a6a2e 78%, #6b5122);
+  box-shadow: 0 4px 9px rgba(0,0,0,.5), inset 0 1px 2px rgba(255,240,200,.6), inset 0 -2px 3px rgba(0,0,0,.35);
+}
+.kt-beschwerer::after {
+  content: ""; position: absolute; inset: 10px; border-radius: 50%;
+  border: 1px solid rgba(90,68,26,.5);
+  background: radial-gradient(circle at 40% 34%, rgba(255,244,214,.5), transparent 62%);
+}
+.kt-beschwerer.e1 { left: -13px; top: -13px; }
+.kt-beschwerer.e2 { right: -13px; top: -13px; width: 34px; height: 34px; }
+.kt-beschwerer.e3 { left: -11px; bottom: -13px; width: 36px; height: 36px; }
+.kt-beschwerer.e4 { right: -14px; bottom: -12px; }
+
+/* Zirkel und Lineal liegen daneben auf dem Holz. */
+.kt-zirkel {
+  position: absolute; right: 26px; bottom: 18px; z-index: 2; pointer-events: none;
+  color: #d8b877; opacity: .85; transform: rotate(14deg);
+  filter: drop-shadow(0 5px 9px rgba(0,0,0,.6));
+}
+.kt-lineal {
+  position: absolute; left: -30px; bottom: 54px; z-index: 2; pointer-events: none;
+  width: 230px; height: 26px; transform: rotate(-72deg); transform-origin: left bottom;
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(90deg, rgba(60,40,16,.55) 0 1px, transparent 1px 11px),
+    linear-gradient(180deg, #e6cf9c, #c9ab74 60%, #a98d5c);
+  box-shadow: 0 5px 12px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,246,214,.6);
+  opacity: .9;
+}
+
+/* ----- Die Alterung auf dem Papier ----- */
+.kt-falte { stroke: rgba(90,66,32,.14); stroke-width: 2.6; fill: none; }
+.kt-falte.quer { stroke-opacity: .1; }
+.kt-fleck { fill: rgba(140,102,52,.075); }
+.kt-alterung { pointer-events: none; }
+
+/* ----- Hügel und Wasserleben ----- */
+.kt-huegelgrund { fill-opacity: .5; stroke: var(--ktinte); stroke-width: .8; stroke-opacity: .3; }
+.kt-huegelkamm { fill: none; stroke: var(--ktinte); stroke-width: 1.5; stroke-opacity: .6; stroke-linecap: round; }
+.kt-huegelschraffur { fill: none; stroke: var(--ktinte); stroke-width: .9; stroke-opacity: .38; stroke-linecap: round; }
+.kt-schiffrumpf { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 1.4; stroke-linejoin: round; }
+.kt-schiffmast { stroke: var(--ktinte); stroke-width: 1.4; fill: none; }
+.kt-schiffsegel { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 1.2; }
+.kt-schiffwelle { fill: none; stroke: var(--ktinte); stroke-width: 1; stroke-opacity: .5; }
+.kt-seewesen { fill: var(--kpapier); stroke: var(--ktinte); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.kt-seewesenauge { fill: var(--ktinte); }
+
+/* ----- Die Leiste wird zum Werkzeugbrett ----- */
+.kt-leiste {
+  background:
+    repeating-linear-gradient(92deg, rgba(255,255,255,.02) 0 2px, transparent 2px 8px),
+    linear-gradient(180deg, #3e3122, #2c2118);
+  border-bottom: 1px solid rgba(214,176,106,.24);
+  color: #ece5d2;
+}
+.kt-titel { color: #f2ead5; }
+.kt-titel small, .kt-zahlen { color: rgba(236,229,210,.55); }
+.kt-suchfeld {
+  background: rgba(0,0,0,.24); border: 1px solid rgba(214,176,106,.26); color: #ece5d2;
+}
+.kt-suchfeld::placeholder { color: rgba(236,229,210,.4); }
+.kt-lupe { color: rgba(236,229,210,.5); }
+.kt-treffer { background: #2c2118; border-color: rgba(214,176,106,.3); }
+.kt-trefferzeile { color: #ece5d2; }
+.kt-keintreffer { color: rgba(236,229,210,.5); }
+.kt-werkzeuge { background: rgba(0,0,0,.24); border-color: rgba(214,176,106,.22); }
+.kt-wz { color: rgba(236,229,210,.6); }
+.kt-wz.an { background: #b8874a; color: #241a10; }
+.kt-wk, .kt-werkzeugknopf, .kt-zuknopf {
+  background: rgba(0,0,0,.22); border-color: rgba(214,176,106,.26); color: rgba(236,229,210,.8);
+}
+.kt-wk.zahl { color: rgba(236,229,210,.55); }
+.kt-werkzeugknopf.an { background: #b8874a; border-color: transparent; color: #241a10; }
+.kt-markenwahl { background: rgba(0,0,0,.2); border-color: rgba(214,176,106,.2); }
+.kt-mwgruppe { color: rgba(236,229,210,.45); }
+.kt-mw { background: rgba(0,0,0,.2); border-color: rgba(214,176,106,.2); color: rgba(236,229,210,.85); }
+.kt-mw.an { background: #b8874a; border-color: transparent; color: #241a10; }
+.kt-hinweiszeile { color: rgba(236,229,210,.6); }
+
+@media (hover: hover) and (pointer: fine) {
+  .kt-trefferzeile:hover { background: rgba(255,255,255,.07); }
+  .kt-wz:hover { color: #ece5d2; }
+  .kt-wz.an:hover { color: #241a10; }
+  .kt-wk:hover, .kt-werkzeugknopf:hover, .kt-zuknopf:hover, .kt-mw:hover { border-color: #d6b06a; color: #f2ead5; }
+  .kt-werkzeugknopf.an:hover, .kt-mw.an:hover { color: #241a10; }
+}
+
+@media (max-width: 860px) {
+  .kt-innen { padding: 24px; }
+  .kt-zirkel, .kt-lineal { display: none; }
+  .kt-beschwerer { width: 26px; height: 26px; }
+  .kt-beschwerer.e2, .kt-beschwerer.e3 { width: 22px; height: 22px; }
+}
+
+/* ----- Die Karte wird schöner -----
+   Ein harter, versetzter Schatten unter jedem Haus: so sieht ein Holzschnitt
+   aus. Ohne ihn liegen die Dächer flach auf dem Papier. */
+.kt-haeuser { filter: drop-shadow(1.6px 2.2px 0 rgba(60,44,26,.28)); }
+.kt-welle { fill: none; stroke: var(--kpapier); stroke-width: 1.1; stroke-opacity: .3; stroke-linecap: round; }
+.kt-kartuschengrund { fill: var(--kpapier); fill-opacity: .96; stroke: var(--ktinte); stroke-width: 2.2; stroke-linejoin: round; }
+.kt-kartuschenrahmen { fill: none; stroke: var(--kgold); stroke-width: 1.2; stroke-opacity: .85; }
+.kt-volute { fill: none; stroke: var(--ktinte); stroke-width: 2; stroke-linecap: round; stroke-opacity: .85; }
+.kt-kfleuron { fill: none; stroke: var(--ktinte); stroke-width: 1.6; stroke-linecap: round; }
+.kt-kfleuron circle { fill: var(--kgold); stroke: var(--ktinte); stroke-width: 1.2; }
+.kt-kstrich { fill: var(--kgold); stroke: var(--kgold); stroke-width: 1.1; stroke-opacity: .75; }
+.kt-kartuschentitel { font-size: 30px; letter-spacing: .06em; }
+.kt-kartuschenunter { font-size: 12.5px; }
+
+/* Die Schrift trägt die Karte — größer und großzügiger gesperrt. */
+.kt-gassenname { font-size: 12px; letter-spacing: .1em; fill-opacity: .78; }
+.kt-gassenname.art-haupt { font-size: 14px; letter-spacing: .14em; fill-opacity: .88; }
+.kt-viertelname { font-size: 18px; letter-spacing: .44em; fill-opacity: .3; font-style: italic; }
+.kt-torname { font-size: 12.5px; letter-spacing: .12em; }
+.kt-markenname { font-size: 13px; letter-spacing: .05em; }
+.kt-marke.wichtig .kt-markenname { font-size: 15.5px; letter-spacing: .09em; }
