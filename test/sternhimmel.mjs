@@ -341,3 +341,74 @@ test('Sternfarben sind Farben, keine Filter', async () => {
     }
   }
 });
+
+/* --- Das Fernrohr --- */
+
+test('Das Fernrohr zeigt mehr, als das Auge sieht', async () => {
+  const k = await frisch();
+  /* Das ist der Grund, warum ein Fernrohr etwas anderes ist als ein Zoom:
+     wer hindurchsieht, findet Sterne, die vorher nicht da waren. */
+  const h = himmel(k, { saat: 'rohr', dichte: 'voll' });
+  const auge = k.sternFeld(h);
+  const glas = k.sternRohrfeld(h);
+  assert.ok(glas.length > auge.length, 'im Glas stehen mehr: ' + glas.length + ' gegen ' + auge.length);
+
+  /* Und sie sind alle schwach — sonst wären sie ja schon zu sehen. */
+  for (const s of glas) {
+    assert.ok(s.gr < 0.6, 'ein Fernrohrstern ist schwach: ' + s.gr);
+    assert.ok(s.r <= k.STERN_R, 'und steht auf der Scheibe');
+    assert.ok(Number.isFinite(s.w) && Number.isFinite(s.r) && Number.isFinite(s.ton), 'Zahlen');
+  }
+
+  /* Derselbe Himmel, dasselbe Glas. */
+  const nochmal = k.sternRohrfeld(h);
+  assert.equal(nochmal[17].w, glas[17].w, 'zweimal derselbe Stern an derselber Stelle');
+  /* Eine andere Saat, ein anderes Glas. */
+  assert.notEqual(k.sternRohrfeld(himmel(k, { saat: 'anders' }))[17].w, glas[17].w);
+});
+
+test('Der Befund im Glas sagt, was dasteht', async () => {
+  const k = await frisch();
+  const h = himmel(k, {
+    saat: 'befund',
+    sternbilder: [{ id: 'a', name: 'Der Reiher', sterne: [4, 19, 55], linien: [[0, 1], [1, 2]] }]
+  });
+  const g = k.sternHimmelBauen(h);
+  const m = k.sternbildMitte(h.sternbilder[0], g.sterne);
+
+  /* Direkt auf dem Sternbild wird es genannt. */
+  const drauf = k.sternRohrBefund(h, g, m[0], m[1]);
+  assert.ok(drauf.nah.includes('Der Reiher'), 'das Sternbild wird erkannt: ' + drauf.nah.join(', '));
+  assert.ok(drauf.sterne >= 0, 'die Sterne im Glas werden gezählt');
+  assert.ok(/^im /.test(drauf.richtung), 'mit Himmelsrichtung: ' + drauf.richtung);
+  assert.ok(drauf.hoehe.length > 3, 'und Höhe: ' + drauf.hoehe);
+
+  /* Weit weg nicht mehr. */
+  const weit = k.sternRohrBefund(h, g, k.STERN_MITTE, k.STERN_MITTE + k.STERN_R * 0.9);
+  assert.ok(!weit.nah.includes('Der Reiher') || Math.hypot(m[0] - k.STERN_MITTE, m[1] - (k.STERN_MITTE + k.STERN_R * 0.9)) < 200,
+    'was weit weg steht, wird nicht genannt');
+
+  /* Der Mond wird gemeldet, wenn man darauf hält. */
+  if (g.mond) {
+    const aufMond = k.sternRohrBefund(h, g, g.mond.x, g.mond.y);
+    assert.ok(aufMond.nah.includes('der Mond'), 'der Mond im Glas: ' + aufMond.nah.join(', '));
+  }
+});
+
+test('Das Okular bleibt auf der Scheibe', async () => {
+  const k = await frisch();
+  /* Ein Okular über dem Papierrand zeigt nichts. Die Bedienung hält es
+     deshalb innerhalb der Scheibe — geprüft wird hier die Rechnung, auf
+     der das beruht. */
+  const M = k.STERN_MITTE, R = k.STERN_R;
+  const grenze = R - 20;
+  for (const [x, y] of [[M + R * 2, M], [M, M - R * 3], [M - R * 1.5, M + R * 1.5]]) {
+    const dx = x - M, dy = y - M;
+    const d = Math.hypot(dx, dy);
+    const gx = M + dx / d * grenze, gy = M + dy / d * grenze;
+    assert.ok(Math.hypot(gx - M, gy - M) <= grenze + 0.001, 'zurückgeholt auf die Scheibe');
+  }
+  /* Die Maße des Okulars sind brauchbar. */
+  assert.ok(k.STERN_ROHR_R > 80 && k.STERN_ROHR_R < R, 'das Okular passt auf das Blatt');
+  assert.ok(k.STERN_ROHR_V > 1.5 && k.STERN_ROHR_V < 12, 'die Vergrößerung ist sinnvoll: ' + k.STERN_ROHR_V);
+});

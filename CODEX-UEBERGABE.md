@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.52.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.53.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -415,6 +415,26 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   bestehenden Sternbilder zeigten auf fremde Sterne: die Linien liefen quer über den Himmel.
   Jetzt werden sie hinten angehängt, und ein Test hält fest, dass die ersten N Sterne mit und
   ohne Haufen identisch sind.
+- **5.53** **Das Fernrohr.** Ein Okular aus Messing, das über den Himmel fährt (Knopf „Fernrohr“,
+  Taste `f`). Es vergrößert nicht nur — es zeigt MEHR: Sterne, die mit bloßem Auge nicht dastehen.
+  Das ist der Grund, warum ein Fernrohr etwas anderes ist als ein Zoom.
+  - **Wie es gebaut ist:** der ganze Himmel steht einmal als Gruppe `#sh-alles` im Blatt, und das
+    Okular verwendet sie über `<use>` noch einmal — verschoben und vergrößert. Das kostet fast
+    nichts. Dazu ein eigenes, dichteres Sternfeld (`sternRohrfeld`), von dem nur gezeichnet wird,
+    was gerade ins Glas fällt.
+  - **Es zieht allein um.** Die Stelle des Okulars steht mit Absicht NICHT in der Rendersignatur:
+    sonst würde für jeden Schub der ganze Himmel neu gebaut. Gemessen: **43 ms je Schub vorher,
+    7,4 ms jetzt.** Stattdessen wird in `sternZeichne` das alte Okular entfernt und ein neues
+    angehängt.
+  - Fadenkreuz mit freiem Mittelkreis, Vignette im Glas, geriffelte Messingfassung, die
+    Vergrößerung wie eingraviert — und unten links ein **Befund**: wie viele Sterne im Glas
+    stehen, wo es hinzeigt und was dabei ist.
+- **Der Schein für die Mittelklasse.** Der Versuch, das Okular nachträglich glänzen zu lassen, war
+  der falsche Weg: was im Glas flach aussah, sah auch draußen flach aus — nur kleiner. Die
+  mittleren Sterne hatten schlicht **keinen Schein**, und sie sind das meiste, was man sieht.
+  Jetzt geht die ganze Mittelklasse durch einen sanften Schimmerfilter, und ab Größe 1,45 bekommt
+  auch ein mittlerer Stern seinen Hof. Das ist der Unterschied zwischen Salz auf Papier und einem
+  Himmel — und es hilft überall, nicht nur im Fernrohr.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

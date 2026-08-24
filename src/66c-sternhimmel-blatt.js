@@ -173,6 +173,12 @@ function sternOeffnen(id) {
     else if (ev.key === '1') { ev.preventDefault(); _st.werkzeug = 'schauen'; _st.zieht = null; neu(); }
     else if (ev.key === '2') { ev.preventDefault(); _st.werkzeug = 'ziehen'; neu(); }
     else if (ev.key === 'n' || ev.key === 'N') { ev.preventDefault(); _st.zeigeNamen = !_st.zeigeNamen; neu(); }
+    else if (ev.key === 'f' || ev.key === 'F') {
+      ev.preventDefault();
+      _st.rohrAn = !_st.rohrAn;
+      if (_st.rohrAn && !_st.rohr) _st.rohr = { x: STERN_MITTE, y: STERN_MITTE - STERN_R * 0.3 };
+      neu();
+    }
     else if (ev.key === 'Escape' && _st.zieht) { ev.preventDefault(); _st.zieht = null; neu(); }
   };
   document.addEventListener('keydown', taste);
@@ -226,6 +232,9 @@ function sternZeichne(tafel, flaeche, rahmen, neu, schliessen) {
     /* Der laufende Zug gehoert in die Signatur: er wird ins Blatt gezeichnet,
        und ohne ihn taete sich beim Tippen nichts. */
     '|' + (_st.zieht ? JSON.stringify(_st.zieht) : '');
+  /* Die Stelle des Okulars steht mit Absicht NICHT in der Signatur: sie
+     ändert sich bei jedem Schub, und der ganze Himmel dafür neu gebaut
+     hätte jede Bewegung zäh gemacht. Das Okular zieht allein um. */
   let innen = flaeche.querySelector('.sh-innen');
   let svg = innen ? innen.querySelector('svg') : null;
 
@@ -244,6 +253,15 @@ function sternZeichne(tafel, flaeche, rahmen, neu, schliessen) {
   if (svg) {
     svg.setAttribute('width', Math.round(STERN_GROESSE * _st.zoom));
     svg.setAttribute('height', Math.round(STERN_GROESSE * _st.zoom));
+
+    /* Das Fernrohr zieht allein um: das alte Okular heraus, ein neues
+       hinein. Der Himmel darunter bleibt stehen — er wird über <use>
+       ohnehin nur wiederverwendet. */
+    const altesRohr = svg.querySelector('.sh-fernrohr');
+    if (altesRohr) altesRohr.remove();
+    if (_st.rohrAn && flaeche._gebaut) {
+      svg.append(sternFernrohrZeichnen(himmel, flaeche._gebaut, w, 'sh-alles'));
+    }
   }
 
   /* Die Karte des Sternbilds im Blick. */
@@ -257,11 +275,66 @@ function sternZeichne(tafel, flaeche, rahmen, neu, schliessen) {
   const alterHinweis = tafel.querySelector('.sh-zughinweis');
   if (alterHinweis) alterHinweis.remove();
   if (_st.werkzeug === 'ziehen') rahmen.append(sternZughinweis(doc, neu));
+
+  /* Was gerade im Glas steht — das macht aus dem Blick eine Beobachtung. */
+  const alterBefund = tafel.querySelector('.sh-rohrbefund');
+  if (alterBefund) alterBefund.remove();
+  if (_st.rohrAn && _st.rohr) {
+    const b = sternRohrBefund(himmel, flaeche._gebaut, _st.rohr.x, _st.rohr.y);
+    rahmen.append(el('div', { class: 'sh-rohrbefund' },
+      el('b', {}, b.sterne + (b.sterne === 1 ? ' Stern' : ' Sterne') + ' im Glas'),
+      el('span', {}, b.hoehe + ', ' + b.richtung),
+      b.nah.length ? el('small', {}, 'Dabei: ' + b.nah.join(', ')) : null,
+      el('button', { class: 'sh-bkzu', title: 'Fernrohr abnehmen', onclick: () => { _st.rohrAn = false; neu(); } }, '×')));
+  }
 }
 
 /* ===================== DIE BEDIENUNG AM BLATT ===================== */
 function sternBedienungAnhaengen(svg, flaeche, doc, neu) {
+  /* --- Das Fernrohr führen ---
+     Es folgt dem Finger, solange man zieht. Ein Tipp setzt es dorthin.
+     Beides ohne Neurechnung: das Okular ist ein <use> auf den Himmel, und
+     verschoben wird nur seine Stelle. */
+  let fuehrt = false;
+  const setzeRohr = (ev) => {
+    const p = sternPunktAus(svg, ev);
+    if (!p) return;
+    /* Innerhalb der Scheibe bleiben — ein Okular über dem Papierrand
+       zeigt nichts. */
+    const dx = p.x - STERN_MITTE, dy = p.y - STERN_MITTE;
+    const d = Math.hypot(dx, dy);
+    const grenze = STERN_R - 20;
+    if (d > grenze) {
+      _st.rohr = { x: STERN_MITTE + dx / d * grenze, y: STERN_MITTE + dy / d * grenze };
+    } else {
+      _st.rohr = { x: p.x, y: p.y };
+    }
+    neu();
+  };
+  svg.addEventListener('pointerdown', (ev) => {
+    if (!_st.rohrAn) return;
+    if (ev.button != null && ev.button !== 0) return;
+    fuehrt = true;
+    try { svg.setPointerCapture(ev.pointerId); } catch (e) {}
+    setzeRohr(ev);
+  });
+  svg.addEventListener('pointermove', (ev) => {
+    if (!fuehrt || !_st.rohrAn) return;
+    ev.preventDefault();
+    setzeRohr(ev);
+  });
+  const los = (ev) => {
+    if (!fuehrt) return;
+    fuehrt = false;
+    try { svg.releasePointerCapture(ev.pointerId); } catch (e) {}
+  };
+  svg.addEventListener('pointerup', los);
+  svg.addEventListener('pointercancel', los);
+
   svg.addEventListener('click', async (ev) => {
+    /* Bei aufgelegtem Fernrohr ist der Klick schon durch das Führen
+       erledigt — sonst setzte jeder Schub zugleich eine Marke. */
+    if (_st.rohrAn) return;
     const aufBild = ev.target.closest && ev.target.closest('.sh-bild');
     const p = sternPunktAus(svg, ev);
     if (!p) return;
@@ -381,6 +454,16 @@ function sternLeisteInhalt(doc, himmel, flaeche, neu, schliessen) {
         el('button', { class: 'sh-wk zahl', title: 'Normalgröße (0)', onclick: () => { _st.zoom = 1; neu(); } }, Math.round(_st.zoom * 100) + '%'),
         el('button', { class: 'sh-wk', title: 'Größer (+)', onclick: () => sternZoom(0.2, flaeche, neu) }, '+'),
         el('button', { class: 'sh-wk', title: 'Ganz einpassen', onclick: () => sternEinpassen(flaeche, neu) }, '⤢'),
+        el('button', {
+          class: 'sh-werkzeugknopf' + (_st.rohrAn ? ' an' : ''),
+          title: 'Das Fernrohr auflegen und über den Himmel führen (f)',
+          onclick: () => {
+            _st.rohrAn = !_st.rohrAn;
+            if (_st.rohrAn && !_st.rohr) _st.rohr = { x: STERN_MITTE, y: STERN_MITTE - STERN_R * 0.3 };
+            if (_st.rohrAn) { _st.werkzeug = 'schauen'; _st.zieht = null; }
+            neu();
+          }
+        }, 'Fernrohr'),
         el('button', { class: 'sh-werkzeugknopf' + (_st.zeigeNamen ? ' an' : ''), title: 'Namen zeigen (n)', onclick: () => { _st.zeigeNamen = !_st.zeigeNamen; neu(); } }, 'Namen'),
         zugKnopf(neu),
         el('button', { class: 'sh-werkzeugknopf', title: 'Alle Sternbilder', onclick: () => sternVerzeichnis(doc, neu) }, 'Verzeichnis'),

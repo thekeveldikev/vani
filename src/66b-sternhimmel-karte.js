@@ -30,14 +30,19 @@ let _st = {
   id: '', zoom: 1, werkzeug: 'schauen', offen: false,
   zieht: null,          /* das Sternbild, an dem gerade gezogen wird */
   imBlick: '',          /* welches Sternbild vorn liegt */
-  zeigeNamen: true, zeigeMilch: true, zeigeGitter: true, zeigeSagen: false
+  zeigeNamen: true, zeigeMilch: true, zeigeGitter: true, zeigeSagen: false,
+  /* Das Fernrohr: wo es steht und ob es aufliegt. */
+  rohrAn: false, rohr: null
 };
 
 /* ===================== DAS BLATT ===================== */
 function sternSVG(himmel, gebaut, neu) {
   const w = sternWelt(himmel.welt);
   const G = STERN_GROESSE;
-  const svg = stv('svg', {
+  /* Bewusst „let“ und nicht „const“: weiter unten wird `svg` auf die
+     Himmelsgruppe umgebogen, damit alles Folgende dort hineinwandert und
+     das Fernrohr es als Ganzes wiederverwenden kann. */
+  let svg = stv('svg', {
     viewBox: '0 0 ' + G + ' ' + G,
     width: Math.round(G * _st.zoom), height: Math.round(G * _st.zoom),
     class: 'sh-blatt', 'shape-rendering': 'geometricPrecision',
@@ -75,6 +80,13 @@ function sternSVG(himmel, gebaut, neu) {
   filter('sh-halbweich', 9);     /* Milchstraßenband und Schweif */
   filter('sh-glimmen', 2.6, true); /* die hellen Sterne: Kern plus Schein */
   filter('sh-mondlicht', 7);
+  /* Ein sanfter Schein für die MITTELKLASSE.
+     Der Versuch, das Okular nachträglich glänzen zu lassen, war der
+     falsche Weg: was im Glas flach aussah, sah auch draußen flach aus —
+     nur kleiner. Die mittleren Sterne hatten schlicht keinen Schein, und
+     sie sind das meiste, was man sieht. Hier gehört es hin, dann stimmt
+     beides auf einmal. */
+  filter('sh-schimmer', 1.15, true);
 
   /* Der Himmelsgrund. Drei Stufen statt zwei, und die äußerste ist
      dunkler als der Papiergrund: zum Horizont hin steht mehr Luft im Weg,
@@ -102,6 +114,16 @@ function sternSVG(himmel, gebaut, neu) {
   svg.append(defs);
 
   svg.append(stv('rect', { x: 0, y: 0, width: G, height: G, fill: w.grund }));
+
+  /* Alles, was zum Himmel gehört, kommt in EINE Gruppe mit einer Kennung.
+     Das Fernrohr verwendet sie über <use> noch einmal — verschoben und
+     vergrößert. Deshalb kostet das Okular fast nichts, und deshalb kann
+     es dem Finger folgen, ohne dass etwas neu gerechnet wird. */
+  const allesId = 'sh-alles';
+  const alles = stv('g', { id: allesId, class: 'sh-alles' });
+  const svgEcht = svg;
+  svg = { append: (...k) => alles.append(...k) };
+
   svg.append(stv('circle', { cx: STERN_MITTE, cy: STERN_MITTE, r: STERN_R, fill: 'url(#sh-himmelgrund)' }));
 
   /* --- Das Luftleuchten ---
@@ -216,7 +238,7 @@ function sternSVG(himmel, gebaut, neu) {
      hellen mit Hof und Strahlen. Getrennt, damit die hellen wirklich
      obenauf liegen. */
   const gKorn = stv('g', { class: 'sh-sterne korn' });
-  const gMittel = stv('g', { class: 'sh-sterne mittel' });
+  const gMittel = stv('g', { class: 'sh-sterne mittel', filter: 'url(#sh-schimmer)' });
   /* Die hellen Sterne bekommen ihren Schein aus dem Filter, nicht aus
      einem gemalten Kreis: so leuchtet der Kern durch, statt zu verwaschen. */
   const gHell = stv('g', { class: 'sh-sterne hell', filter: 'url(#sh-glimmen)' });
@@ -231,6 +253,11 @@ function sternSVG(himmel, gebaut, neu) {
        einem weißen Stern auf dunklem Grund war davon nichts zu sehen. */
     const farbe = sternFarbe(s.ton, w);
     if (s.gr < 2.4) {
+      /* Ab anderthalb bekommt auch ein mittlerer Stern seinen Hof. Das ist
+         der Unterschied zwischen Salz auf Papier und einem Himmel. */
+      if (s.gr > 1.45) {
+        gMittel.append(stv('circle', { cx: stz(s.x), cy: stz(s.y), r: stz(s.gr * 2.2), fill: 'url(#sh-hof)', class: 'sh-kleinhof' }));
+      }
       gMittel.append(stv('circle', { cx: stz(s.x), cy: stz(s.y), r: stz(s.gr * 0.52), class: 'sh-stern', fill: farbe }));
       continue;
     }
@@ -333,6 +360,12 @@ function sternSVG(himmel, gebaut, neu) {
     svg.append(g);
   }
 
+  /* Hier endet der Himmel. Was danach kommt — Saum, Randwerk, Kartusche,
+     das Fernrohr — gehört zum BLATT, nicht zum Himmel, und darf deshalb
+     im Okular nicht noch einmal auftauchen. */
+  svgEcht.append(alles);
+  svg = svgEcht;
+
   /* --- Der Saum ---
      Ganz zum Schluss über alles: zum Horizont hin wird es dunkler. Das
      ist keine Zierde, sondern der Grund, warum eine Himmelsscheibe
@@ -341,6 +374,11 @@ function sternSVG(himmel, gebaut, neu) {
     cx: STERN_MITTE, cy: STERN_MITTE, r: STERN_R,
     fill: 'url(#sh-saum)', class: 'sh-saum'
   }));
+
+  /* Das Fernrohr wird NICHT hier gezeichnet, sondern nachträglich ins
+     fertige Blatt gehängt — siehe sternZeichne. Sonst müsste für jeden
+     Schub des Okulars der ganze Himmel neu gebaut werden, und das kostete
+     dreiundvierzig Millisekunden statt zwei. */
 
   /* --- Der Rand: Himmelsrichtungen und ein graduiertes Band --- */
   svg.append(sternRandwerk(w, himmel));
@@ -625,5 +663,177 @@ function sternKometZeichnen(komet, w) {
   const t = stv('title', {});
   t.textContent = komet.name;
   g.append(t);
+  return g;
+}
+
+/* ===================== DAS FERNROHR =====================
+   Ein Okular, das über den Himmel fährt. Es vergrößert nicht nur — es
+   zeigt MEHR: Sterne, die mit bloßem Auge nicht dastehen.
+
+   Das ist der eigentliche Grund, warum ein Fernrohr etwas anderes ist als
+   ein Zoom. Wer hindurchsieht, findet Dinge, die vorher nicht da waren:
+   ein Haufen löst sich in einzelne Sterne auf, ein schwacher Doppelstern
+   wird zu zweien, und zwischen den bekannten stehen plötzlich hundert
+   weitere.
+
+   Technisch: der ganze Himmel steht einmal als Gruppe im Blatt und wird
+   im Okular über <use> noch einmal verwendet, verschoben und vergrößert.
+   Das kostet fast nichts — und deshalb kann das Okular dem Finger folgen,
+   ohne dass irgendetwas neu gerechnet wird. */
+
+const STERN_ROHR_R = 168;         /* der Halbmesser des Okulars auf dem Blatt */
+const STERN_ROHR_V = 3.4;         /* wie stark es vergrößert */
+
+/* Die Sterne, die erst im Fernrohr auftauchen.
+   Sie gehören zum Himmel wie die anderen — sie sind nur zu schwach, um
+   ohne Glas gezeichnet zu werden. Darum stehen sie in einer eigenen
+   Rechnung mit eigener Saat und werden nur dort gezeichnet, wo das Okular
+   gerade steht. */
+function sternRohrfeld(himmel) {
+  const saat = himmel.saat;
+  const wieViele = Math.round(sternDichte(himmel.dichte)[2] * 2.6);
+  const sterne = [];
+  for (let i = 0; i < wieViele; i++) {
+    const w = sternZufall(saat, 'rw' + i) * Math.PI * 2;
+    const r = Math.sqrt(sternZufall(saat, 'rr' + i)) * STERN_R;
+    sterne.push({
+      n: i, w, r,
+      /* Alle schwach — sonst wären sie ja schon zu sehen. */
+      gr: 0.22 + sternZufall(saat, 'rg' + i) * 0.34,
+      ton: sternZufall(saat, 'rt' + i)
+    });
+  }
+  return sterne;
+}
+
+/* Was steht gerade unter dem Okular? Die Auskunft macht aus dem Blick
+   eine Beobachtung. */
+function sternRohrBefund(himmel, gebaut, x, y) {
+  const weite = STERN_ROHR_R / STERN_ROHR_V;
+  const nah = [];
+  for (const b of himmel.sternbilder) {
+    const m = sternbildMitte(b, gebaut.sterne);
+    if (!m) continue;
+    const d = Math.hypot(m[0] - x, m[1] - y);
+    if (d < weite * 2.2) nah.push({ was: b.name || 'ein Sternbild', d });
+  }
+  for (const p of gebaut.wandler || []) {
+    const d = Math.hypot(p.x - x, p.y - y);
+    if (d < weite) nah.push({ was: p.name, d });
+  }
+  if (gebaut.mond) {
+    const d = Math.hypot(gebaut.mond.x - x, gebaut.mond.y - y);
+    if (d < weite + 30) nah.push({ was: 'der Mond', d });
+  }
+  if (gebaut.komet) {
+    const d = Math.hypot(gebaut.komet.x - x, gebaut.komet.y - y);
+    if (d < weite + 30) nah.push({ was: gebaut.komet.name, d });
+  }
+  for (const n of gebaut.nebel || []) {
+    const d = Math.hypot(n.x - x, n.y - y);
+    if (d < weite) nah.push({ was: 'ein Nebel', d });
+  }
+  nah.sort((a, b) => a.d - b.d);
+  const gezaehlt = (gebaut.sterne || []).filter((s) => Math.hypot(s.x - x, s.y - y) < weite).length;
+  return {
+    nah: nah.slice(0, 3).map((n) => n.was),
+    sterne: gezaehlt,
+    richtung: sternRichtung(x, y),
+    hoehe: sternHoehe(x, y)
+  };
+}
+
+/* Das Okular selbst. */
+function sternFernrohrZeichnen(himmel, gebaut, w, allesId) {
+  const rohr = _st.rohr || { x: STERN_MITTE, y: STERN_MITTE };
+  const g = stv('g', { class: 'sh-fernrohr' });
+  const R = STERN_ROHR_R;
+  const V = STERN_ROHR_V;
+  const id = 'sh-okular';
+
+  const defs = stv('defs', {});
+  const clip = stv('clipPath', { id });
+  clip.append(stv('circle', { cx: stz(rohr.x), cy: stz(rohr.y), r: stz(R) }));
+  defs.append(clip);
+  /* Zum Rand des Okulars hin wird es dunkler — jedes Fernrohr vignettiert,
+     und ohne das sieht der Ausschnitt aus wie ein Loch im Papier. */
+  const saum = stv('radialGradient', { id: 'sh-okularsaum' });
+  saum.append(stv('stop', { offset: '55%', 'stop-color': '#000', 'stop-opacity': '0' }));
+  saum.append(stv('stop', { offset: '88%', 'stop-color': '#000', 'stop-opacity': '.22' }));
+  saum.append(stv('stop', { offset: '100%', 'stop-color': '#000', 'stop-opacity': '.62' }));
+  defs.append(saum);
+  g.append(defs);
+
+  /* Der Grund unter dem Okular: sonst schiene der Himmel durch. */
+  g.append(stv('circle', { cx: stz(rohr.x), cy: stz(rohr.y), r: stz(R), fill: w.grund, class: 'sh-okulargrund' }));
+
+  const drin = stv('g', { 'clip-path': 'url(#' + id + ')' });
+  /* Der ganze Himmel noch einmal — verschoben, sodass die Stelle unter dem
+     Okular in dessen Mitte liegt, und vergrößert. */
+  const t = 'translate(' + stz(rohr.x) + ' ' + stz(rohr.y) + ') scale(' + V + ') translate(' + stz(-rohr.x) + ' ' + stz(-rohr.y) + ')';
+  const kopie = stv('use', { href: '#' + allesId, transform: t });
+  kopie.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#' + allesId);
+  drin.append(kopie);
+
+  /* Und das, was erst im Glas sichtbar wird. Gezeichnet wird nur, was
+     wirklich ins Okular fällt — alles andere wäre verschenkte Arbeit. */
+  const weite = R / V + 6;
+  const feld = sternRohrfeld(himmel);
+  const zusatz = stv('g', { class: 'sh-rohrsterne', transform: t });
+  let d = '';
+  let wieViele = 0;
+  for (const s of feld) {
+    const [x, y] = sternStelle(s, himmel.tag);
+    if (Math.hypot(x - rohr.x, y - rohr.y) > weite) continue;
+    wieViele++;
+    if (s.gr < 0.34) { d += ' M ' + stz(x) + ' ' + stz(y) + ' h .01'; continue; }
+    /* Die kräftigeren unter den Fernrohrsternen bekommen einen Hof — im
+       Glas sammelt sich das Licht, und genau das soll man sehen. */
+    if (s.gr > 0.46) {
+      zusatz.append(stv('circle', { cx: stz(x), cy: stz(y), r: stz(s.gr * 3.4), fill: 'url(#sh-hof)', class: 'sh-rohrhof' }));
+    }
+    zusatz.append(stv('circle', { cx: stz(x), cy: stz(y), r: stz(s.gr * 0.62), fill: sternFarbe(s.ton, w), class: 'sh-rohrstern' }));
+  }
+  if (d) zusatz.append(stv('path', { d: d.trim(), class: 'sh-rohrkorn', stroke: w.stern }));
+  drin.append(zusatz);
+  g.append(drin);
+
+  /* Das Fadenkreuz: fein, unterbrochen, mit einem freien Kreis in der
+     Mitte — man will sehen, worauf man zielt, nicht ein Kreuz darüber. */
+  const kreuz = stv('g', { class: 'sh-fadenkreuz' });
+  for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+    kreuz.append(stv('path', {
+      d: 'M ' + stz(rohr.x + dx * 16) + ' ' + stz(rohr.y + dy * 16) +
+         ' L ' + stz(rohr.x + dx * (R - 26)) + ' ' + stz(rohr.y + dy * (R - 26)),
+      class: 'sh-kreuzstrich', stroke: w.rand
+    }));
+  }
+  kreuz.append(stv('circle', { cx: stz(rohr.x), cy: stz(rohr.y), r: 16, class: 'sh-kreuzring', stroke: w.rand }));
+  g.append(kreuz);
+
+  /* Der Saum im Glas. */
+  g.append(stv('circle', { cx: stz(rohr.x), cy: stz(rohr.y), r: stz(R), fill: 'url(#sh-okularsaum)', class: 'sh-okularsaum' }));
+
+  /* Die Fassung: zwei Messingringe und ein Griff, an dem man zieht. */
+  g.append(stv('circle', { cx: stz(rohr.x), cy: stz(rohr.y), r: stz(R), class: 'sh-okularglas', stroke: w.rand }));
+  g.append(stv('circle', { cx: stz(rohr.x), cy: stz(rohr.y), r: stz(R + 9), class: 'sh-okularfassung', stroke: w.rand }));
+  /* Feine Riffelung auf der Fassung — daran erkennt man Messing. */
+  for (let i = 0; i < 72; i++) {
+    const a = (i / 72) * Math.PI * 2;
+    g.append(stv('path', {
+      d: 'M ' + stz(rohr.x + Math.cos(a) * (R + 4)) + ' ' + stz(rohr.y + Math.sin(a) * (R + 4)) +
+         ' L ' + stz(rohr.x + Math.cos(a) * (R + 9)) + ' ' + stz(rohr.y + Math.sin(a) * (R + 9)),
+      class: 'sh-okularriffel', stroke: w.rand
+    }));
+  }
+
+  /* Die Vergrößerung steht unten an der Fassung, wie eingraviert. */
+  const zahl = stv('text', {
+    x: stz(rohr.x), y: stz(rohr.y + R + 26), class: 'sh-okularzahl',
+    'text-anchor': 'middle', fill: w.schrift
+  });
+  zahl.textContent = STERN_ROHR_V.toFixed(1).replace('.', ',') + '×  ·  ' + wieViele + ' Sterne im Glas';
+  g.append(zahl);
+
   return g;
 }
