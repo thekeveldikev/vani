@@ -108,6 +108,10 @@ function albumOeffnen(start, zuFigurId) {
   setTimeout(() => kasten.classList.remove('schlaegt-auf'), 1100);
 
   const neu = (i) => { if (i != null) _alb.i = i; albumZeichne(buehne, neu, zu); };
+
+  /* Wird irgendwo etwas zurückgenommen, schlägt das Album neu auf. */
+  const beiZug = () => { if (huelle.isConnected) neu(); else document.removeEventListener('vani-zug', beiZug); };
+  document.addEventListener('vani-zug', beiZug);
   const taste = (ev) => {
     if (!kasten.isConnected) { document.removeEventListener('keydown', taste); return; }
     const z = ev.target;

@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.47.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.50.0 (24. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -329,6 +329,28 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
 - Der Zeittest „Ein großer Plan wird schnell genug gebaut“ baut zweimal und nimmt das schnellere
   Ergebnis — er kippte unter Last (644 ms gegen 957 ms), und eine Zeitmessung, die mal grün und
   mal rot ist, kostet nur Vertrauen.
+- **5.50** Weiter am Wandteppich.
+  - **„Uneheliches Kind von“ war nirgends zu sehen.** Der Teppich zeichnet auf drei Arten:
+    Gerüstfäden als ÄSTE, Paarfäden als BUND-Bogen, alles andere als RANKEN. Die Ranken filtern
+    Gerüst und Paar heraus — und `unehelich` trug in `FADEN_ARTEN` ein `geruest: true`, stand aber
+    nicht in `TEPPICH_GERUEST`. Damit fiel es durch **beide** Raster: eine Blutsbeziehung, die man
+    eintragen konnte und nie wiederfand. Jetzt ist es Gerüst, bekommt sein Gegenwort
+    („Zeugte unehelich“) und zählt in der Verwandtschaft als Blut (neu: `TEPPICH_BLUT`) — ein
+    uneheliches Kind ist ein Kind, ein Ziehkind nicht.
+    Ein Test hält das fest: **jede Art muss irgendwo gezeichnet werden**, und was Blut ist, muss
+    Gerüst sein.
+  - **Ausblendungen fangen bei jedem Aufschlagen frei an.** Eine Ausblendung ist ein BLICK
+    („zeig mir mal nur das Blut“), keine Einstellung. Sie zu behalten ist die schlechtere von zwei
+    Möglichkeiten: wer den Teppich zumacht und Tage später wieder aufschlägt, sucht seine Fäden
+    und findet den Grund nie.
+  - **„Was auffällt“ nutzt jetzt den Verwandtschaftsrechner** und findet Widersprüche, die kein
+    einzelner Faden zeigt: ein Bund zwischen nahen Verwandten (mit dem fertigen Satz, nicht dem
+    nackten Wort), zwei Fäden die einander widersprechen („Liebt“ und „Hasst“ zugleich), ein
+    Elternteil das bei der Geburt selbst noch Kind war, ein Kind das Jahre nach dem Tod des
+    Elternteils geboren wurde, Tod vor Geburt, ein Alter über 120, und Fäden zwischen zweien, die
+    sich nie begegnet sein können. 400 Leute / 589 Fäden in 63 ms.
+  - **Rückgängig reicht ins Album**: das Abnehmen eines Bildnisses ist umkehrbar, und das Album
+    schlägt nach einem Zurücknehmen neu auf.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

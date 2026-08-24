@@ -994,7 +994,11 @@ test('Teppichvertrag: was man spinnt, sieht man auch', () => {
   /* Die Ausblendung gehoert zu EINEM Teppich. Vorher wanderte sie mit: wer
      in einem Stammbaum „nur Blut“ eingestellt hatte, oeffnete den naechsten
      und fand dort die Haelfte seiner Faeden nicht wieder. */
-  assert.match(tep, /if \(_tep\.id !== id\) \{ _tep\.stumm = \[\]/, 'ein anderer Teppich faengt frei an');
+  /* Eine Ausblendung ist ein BLICK, keine Einstellung. Sie beim
+     Aufschlagen zu behalten ist die schlechtere von zwei Moeglichkeiten:
+     wer den Teppich zumacht und Tage spaeter wieder aufschlaegt, sucht
+     seine Faeden und findet den Grund nie. */
+  assert.match(tep, /_tep\.stumm = \[\]; _tep\.suche = /, 'jedes Aufschlagen faengt frei an');
 
   /* Und es muss DASTEHEN, dass gerade etwas fehlt — nicht nur einen Knopf
      geben, mit dem man es aufheben koennte. */

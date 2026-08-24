@@ -82,7 +82,10 @@ function sippeUeberZieh(baum, von, nach) {
   const nurBlut = new Map();
   for (const p of baum.leute) nurBlut.set(p.id, []);
   for (const f of baum.faeden) {
-    if (f.art !== 'kind') continue;
+    /* Ein uneheliches Kind ist ein Kind — Blut, keine Ziehelternschaft.
+       Vorher zählte nur 'kind', und ein unehelicher Zweig bekam überall
+       „(über eine Ziehelternschaft)“ angehängt. */
+    if (!TEPPICH_BLUT.includes(f.art)) continue;
     const l = nurBlut.get(f.von);
     if (l && !l.includes(f.zu)) l.push(f.zu);
   }

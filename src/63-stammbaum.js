@@ -80,7 +80,7 @@ const FADEN_ARTEN = [
   /* --- Blut, was noch fehlte --- */
   { id: 'zwilling', gruppe: 'blut', name: 'Zwilling von', satz: '{a} und {b} sind Zwillinge', farbe: '#c9c3a8', strich: 'doppelt', gerichtet: false },
   { id: 'halbgeschwister', gruppe: 'blut', name: 'Halbgeschwister von', satz: '{a} und {b} sind Halbgeschwister', farbe: '#b8b299', strich: 'gestrichelt', gerichtet: false },
-  { id: 'unehelich', gruppe: 'blut', name: 'Uneheliches Kind von', satz: '{a} ist das uneheliche Kind von {b}', farbe: '#c9c3a8', strich: 'perlen', gerichtet: true, geruest: true },
+  { id: 'unehelich', gruppe: 'blut', name: 'Uneheliches Kind von', gegen: 'Zeugte unehelich', satz: '{a} ist das uneheliche Kind von {b}', farbe: '#c9c3a8', strich: 'perlen', gerichtet: true, geruest: true },
   { id: 'ahne', gruppe: 'blut', name: 'Stammt ab von', satz: '{a} stammt ab von {b}', farbe: '#b8b299', strich: 'gepunktet', gerichtet: true, worthilfe: 'Wie viele Generationen dazwischen?' },
 
   /* --- Bund, was noch fehlte --- */
@@ -401,7 +401,19 @@ function teppichNachbarn(baum, personId, arten) {
    eine Reihe ein Namensband. Was daraus für ein Bild wird, entscheidet der
    Teppich, nicht die Rechnung. */
 
-const TEPPICH_GERUEST = ['kind', 'ziehkind'];
+/* Welche Fäden das Gerüst des Baumes bilden — also als Ast gezeichnet
+   werden und die Generationen bestimmen.
+
+   `unehelich` stand in FADEN_ARTEN als `geruest: true`, fehlte hier aber.
+   Damit fiel es durch BEIDE Raster: aus den Ranken wurde es als Gerüst
+   herausgefiltert, und als Ast wurde es nie gezeichnet, weil es hier nicht
+   stand. „Uneheliches Kind von“ war nirgends zu sehen — eine
+   Blutsbeziehung, unsichtbar. */
+const TEPPICH_GERUEST = ['kind', 'ziehkind', 'unehelich'];
+/* Und davon ist echtes Blut: ein uneheliches Kind ist ein Kind, ein
+   Ziehkind nicht. Der Unterschied entscheidet über „Großmutter“ oder
+   „Ziehgroßmutter“. */
+const TEPPICH_BLUT = ['kind', 'unehelich'];
 
 function teppichEltern(baum) {
   const karte = new Map();
@@ -773,6 +785,96 @@ function teppichAuffaelligkeiten(baum) {
     const oj = parseInt(String(opfer && opfer.bis || '').slice(0, 4), 10);
     if (f.art === 'toetete' && Number.isFinite(tj) && Number.isFinite(oj) && tj < oj) {
       raus.push({ art: 'zeit', text: name(f.von) + ' war schon tot, als ' + name(f.zu) + ' starb.', wer: f.von });
+    }
+  }
+
+  /* --- Was der Verwandtschaftsrechner sieht ---
+     Seit es ihn gibt, lassen sich Widersprüche prüfen, die vorher niemand
+     bemerkt hätte: nicht ob ein Faden fehlt, sondern ob zwei Fäden
+     zusammen etwas Unmögliches behaupten. */
+
+  /* Ein Bund zwischen nahen Verwandten. Kein Fehler — in vielen
+     Geschichten der Kern der Sache —, aber nichts, was man versehentlich
+     eintragen will. */
+  const paare = teppichPaare(sauber);
+  const schonGesagt = new Set();
+  for (const [id, andere] of paare) {
+    for (const p2 of andere) {
+      const k = [id, p2].sort().join('~');
+      if (schonGesagt.has(k)) continue;
+      schonGesagt.add(k);
+      const v = typeof teppichVerwandtschaft === 'function' ? teppichVerwandtschaft(sauber, id, p2) : null;
+      if (!v || v.art !== 'blut') continue;
+      /* Nur enge Verwandtschaft melden: ab Cousine zweiten Grades ist es
+         in einer erfundenen Welt so alltäglich wie in einer echten. */
+      const eng = (v.auf <= 1 && v.ab <= 2) || (v.ab <= 1 && v.auf <= 2) || (v.auf === 2 && v.ab === 2);
+      /* Nicht das nackte Wort anhängen — „und kind zueinander“ ist kein
+         Deutsch. Der Rechner liefert den fertigen Satz; der gehört hierher. */
+      if (eng) raus.push({ art: 'bund', text: name(id) + ' und ' + name(p2) + ' sind ein Paar. ' + v.satz, wer: id });
+    }
+  }
+
+  /* Dieselben zwei Leute, zwei Fäden, die einander widersprechen. */
+  const gegensaetze = [['liebt', 'hasst'], ['traut', 'verriet'], ['beschuetzt', 'verletzte'], ['heirat', 'geschieden']];
+  for (const [a, b] of gegensaetze) {
+    for (const f of sauber.faeden) {
+      if (f.art !== a) continue;
+      const gegen = sauber.faeden.find((g) => g.art === b &&
+        ((g.von === f.von && g.zu === f.zu) || (g.von === f.zu && g.zu === f.von)));
+      if (!gegen) continue;
+      const artA = fadenArt(a, sauber), artB = fadenArt(b, sauber);
+      raus.push({
+        art: 'gegensatz',
+        text: name(f.von) + ' und ' + name(f.zu) + ': „' + artA.name + '“ und „' + artB.name + '“ zugleich.',
+        wer: f.von
+      });
+    }
+  }
+
+  /* Ein Elternteil, das zur Geburt noch ein Kind war. */
+  for (const f of sauber.faeden) {
+    if (!TEPPICH_BLUT.includes(f.art)) continue;
+    const kind = sauber.leute.find((x) => x.id === f.von), elter = sauber.leute.find((x) => x.id === f.zu);
+    const kj = parseInt(String(kind && kind.von || '').slice(0, 4), 10);
+    const ej = parseInt(String(elter && elter.von || '').slice(0, 4), 10);
+    if (Number.isFinite(kj) && Number.isFinite(ej) && kj - ej > 0 && kj - ej < 13) {
+      raus.push({ art: 'jahre', text: name(f.zu) + ' wäre bei der Geburt von ' + name(f.von) + ' erst ' + (kj - ej) + ' gewesen.', wer: f.zu });
+    }
+  }
+
+  /* Wer geboren wurde, nachdem der Elternteil starb — mehr als neun
+     Monate danach geht nicht. */
+  for (const f of sauber.faeden) {
+    if (!TEPPICH_BLUT.includes(f.art)) continue;
+    const kind = sauber.leute.find((x) => x.id === f.von), elter = sauber.leute.find((x) => x.id === f.zu);
+    const kj = parseInt(String(kind && kind.von || '').slice(0, 4), 10);
+    const et = parseInt(String(elter && elter.bis || '').slice(0, 4), 10);
+    if (Number.isFinite(kj) && Number.isFinite(et) && kj > et + 1) {
+      raus.push({ art: 'zeit', text: name(f.zu) + ' war schon ' + (kj - et) + ' Jahre tot, als ' + name(f.von) + ' geboren wurde.', wer: f.zu });
+    }
+  }
+
+  /* Wer nach dem eigenen Tod noch geboren wird. */
+  for (const p of sauber.leute) {
+    const g = parseInt(String(p.von || '').slice(0, 4), 10);
+    const t = parseInt(String(p.bis || '').slice(0, 4), 10);
+    if (Number.isFinite(g) && Number.isFinite(t) && t < g) {
+      raus.push({ art: 'jahre', text: name(p.id) + ' stirbt vor der eigenen Geburt.', wer: p.id });
+    }
+    if (Number.isFinite(g) && Number.isFinite(t) && t - g > 120) {
+      raus.push({ art: 'jahre', text: name(p.id) + ' würde ' + (t - g) + ' Jahre alt.', wer: p.id });
+    }
+  }
+
+  /* Ein Faden auf jemanden, den es zu Lebzeiten nie gab. */
+  for (const f of sauber.faeden) {
+    const art = fadenArt(f.art, sauber);
+    if (art.geruest || art.paar || f.art === 'ahne' || f.art === 'benanntNach' || f.art === 'wiedergaenger') continue;
+    const a = sauber.leute.find((x) => x.id === f.von), b = sauber.leute.find((x) => x.id === f.zu);
+    const aTod = parseInt(String(a && a.bis || '').slice(0, 4), 10);
+    const bGeb = parseInt(String(b && b.von || '').slice(0, 4), 10);
+    if (Number.isFinite(aTod) && Number.isFinite(bGeb) && bGeb > aTod) {
+      raus.push({ art: 'zeit', text: name(f.von) + ' starb ' + aTod + ' — ' + name(f.zu) + ' wurde erst ' + bGeb + ' geboren.', wer: f.von });
     }
   }
 

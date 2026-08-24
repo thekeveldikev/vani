@@ -95,11 +95,13 @@ function teppichLeerBild() {
 function teppichOeffnen(id) {
   const doc = D.docs.get(id);
   if (!doc || doc.typ !== 'stammbaum' || doc.geloescht) { toast('Der Wandteppich ist nicht mehr da.'); return; }
-  /* Ausgeblendete Fadenarten gehören zu EINEM Teppich. Vorher standen sie
-     im Modulzustand und wanderten mit: wer in einem Stammbaum „nur Blut“
-     eingestellt hatte, öffnete den nächsten und fand dort die Hälfte seiner
-     Fäden nicht wieder — ohne dass irgendwo stand, warum. */
-  if (_tep.id !== id) { _tep.stumm = []; _tep.suche = ''; _tep.nurPerson = ''; }
+  /* Eine Ausblendung ist ein BLICK, keine Einstellung: „zeig mir mal nur
+     das Blut“. Sie beim Aufschlagen zu behalten ist die schlechtere von
+     zwei Möglichkeiten — wer den Teppich zumacht und Tage später wieder
+     aufschlägt, sucht seine Fäden und findet den Grund nie.
+
+     Vorher wanderte sie sogar von einem Stammbaum zum nächsten mit. */
+  _tep.stumm = []; _tep.suche = ''; _tep.nurPerson = '';
   _tep.id = id;
   if (!_tep.zoom || !Number.isFinite(_tep.zoom)) _tep.zoom = 1;
 

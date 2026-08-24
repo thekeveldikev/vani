@@ -527,3 +527,124 @@ test('Der Umkreis zeigt nur, was nah ist', async () => {
   const weit = k.teppichUmkreis(b, 'a', 6);
   assert.equal(weit.size, 5, 'bei genug Schritten alle');
 });
+
+test('Jede Fadenart wird auch irgendwo gezeichnet', async () => {
+  const k = await frisch();
+  /* Der Teppich zeichnet auf drei Arten: Gerüstfäden werden zu ÄSTEN,
+     Paarfäden zu einem BUND-Bogen, alles andere zu RANKEN. Die Ranken
+     filtern Gerüst und Paar heraus — wer also in FADEN_ARTEN `geruest`
+     trägt, aber nicht in TEPPICH_GERUEST steht, fällt durch BEIDE Raster
+     und ist nirgends zu sehen.
+
+     Genau das war „Uneheliches Kind von“: eine Blutsbeziehung, die man
+     eintragen konnte und nie wiederfand. */
+  for (const art of k.FADEN_ARTEN) {
+    if (art.geruest) {
+      assert.ok(k.TEPPICH_GERUEST.includes(art.id),
+        '„' + art.name + '“ gilt als Gerüst, wird aber nie als Ast gezeichnet');
+    }
+    if (k.TEPPICH_GERUEST.includes(art.id)) {
+      assert.ok(art.geruest, '„' + art.name + '“ wird als Ast gezeichnet, gilt aber nicht als Gerüst');
+    }
+    /* Und niemals beides: ein Faden kann nicht Ast und Bund sein. */
+    assert.ok(!(art.geruest && art.paar), '„' + art.name + '“ wäre Ast und Bund zugleich');
+  }
+
+  /* Was Blut ist, muss auch Gerüst sein — sonst zählt die Verwandtschaft
+     eine Abstammung, die der Baum nicht kennt. */
+  for (const id of k.TEPPICH_BLUT) {
+    assert.ok(k.TEPPICH_GERUEST.includes(id), id + ' ist Blut, aber kein Gerüst');
+  }
+  assert.ok(!k.TEPPICH_BLUT.includes('ziehkind'), 'eine Ziehelternschaft ist kein Blut');
+  assert.ok(k.TEPPICH_BLUT.includes('unehelich'), 'ein uneheliches Kind ist ein Kind');
+
+  /* Jede Art ist vollständig beschrieben — sonst steht irgendwo
+     „undefined“ auf dem Tuch. */
+  const gruppen = k.FADEN_GRUPPEN.map((g) => g[0]);
+  for (const art of k.FADEN_ARTEN) {
+    assert.ok(art.id && art.name && art.satz && art.farbe && art.strich, 'unvollständig: ' + art.id);
+    assert.ok(gruppen.includes(art.gruppe), art.id + ' gehört zu keiner Gruppe: ' + art.gruppe);
+    assert.ok(k.FADEN_STRICHE.includes(art.strich), art.id + ' hat einen Strich, den es nicht gibt: ' + art.strich);
+    assert.match(art.satz, /\{a\}/, art.id + ': im Satz fehlt {a}');
+    assert.match(art.satz, /\{b\}/, art.id + ': im Satz fehlt {b}');
+    /* Ein gerichteter Faden braucht ein Gegenwort — „Kind von“ / „Elternteil von“. */
+    if (art.gerichtet && art.geruest) assert.ok(art.gegen, art.id + ': ein Gerüstfaden braucht sein Gegenwort');
+  }
+});
+
+test('Ein unehelicher Zweig ist Blut, kein Ziehverhältnis', async () => {
+  const k = await frisch();
+  const b = baum(k, [
+    P('o', 'Ada Reet', { geschlecht: 'w' }),
+    P('v', 'Bo Reet', { geschlecht: 'm' }),
+    P('u', 'Cil Reet', { geschlecht: 'w' }),
+    P('e', 'Dorn Reet', { geschlecht: 'm' })
+  ], [
+    F('kind', 'v', 'o'),
+    F('unehelich', 'u', 'v'),
+    F('kind', 'e', 'u')
+  ]);
+  /* Der Zweig hängt wirklich am Baum. */
+  assert.equal((k.teppichEltern(b).get('u') || []).join(','), 'v', 'das uneheliche Kind hat seinen Vater');
+  const gen = k.teppichGenerationen(b);
+  assert.equal(gen.get('u'), 2);
+  assert.equal(gen.get('e'), 3);
+  /* Und die Verwandtschaft rechnet ihn als Blut. */
+  assert.equal(k.teppichVerwandtschaft(b, 'u', 'o').wort, 'Großmutter');
+  assert.equal(k.teppichVerwandtschaft(b, 'e', 'o').wort, 'Urgroßmutter');
+  assert.ok(!/Zieh/.test(k.teppichVerwandtschaft(b, 'e', 'o').satz), 'kein Ziehverhältnis');
+  /* Ein Ziehkind dagegen schon. */
+  const z = baum(k, [P('a', 'Ada'), P('b', 'Bo')], [F('ziehkind', 'b', 'a')]);
+  assert.match(k.teppichVerwandtschaft(z, 'b', 'a').wort, /^Zieh/, 'ein Ziehkind bleibt ein Ziehkind');
+});
+
+test('Was auffällt: der Rechner sieht Widersprüche, die kein Faden zeigt', async () => {
+  const k = await frisch();
+  const finde = (liste, teil) => liste.find((a) => a.text.includes(teil));
+
+  /* Ein Bund zwischen nahen Verwandten. Kein Fehler — in vielen
+     Geschichten der Kern der Sache —, aber nichts, was man versehentlich
+     einträgt. Erst der Verwandtschaftsrechner kann das überhaupt sehen. */
+  const bund = baum(k, [
+    P('a', 'Ada Reet', { geschlecht: 'w', von: '1900' }),
+    P('b', 'Bo Reet', { geschlecht: 'm', von: '1925' }),
+    P('c', 'Cil Reet', { geschlecht: 'w', von: '1928' })
+  ], [F('kind', 'b', 'a'), F('kind', 'c', 'a'), F('heirat', 'b', 'c')]);
+  const auff = k.teppichAuffaelligkeiten(bund);
+  const paar = finde(auff, 'sind ein Paar');
+  assert.ok(paar, 'der Bund unter Geschwistern fällt auf');
+  /* Und es steht im richtigen Deutsch da — nicht „und schwester zueinander“. */
+  assert.match(paar.text, /Cil Reet ist Bo Reets Schwester\./, paar.text);
+
+  /* Zwei Fäden, die einander widersprechen. */
+  const gegen = baum(k, [P('a', 'Ada'), P('b', 'Bo')], [F('liebt', 'a', 'b'), F('hasst', 'a', 'b')]);
+  assert.ok(finde(k.teppichAuffaelligkeiten(gegen), 'zugleich'), 'Liebe und Hass zugleich fällt auf');
+
+  /* Zeitliche Unmöglichkeiten. */
+  const zeit = baum(k, [
+    P('m', 'Mutter', { von: '1900', bis: '1940' }),
+    P('k', 'Kind', { von: '1950' }),
+    P('j', 'Jung', { von: '1912' }),
+    P('s', 'Spross', { von: '1920' }),
+    P('t', 'Tot', { von: '1980', bis: '1970' }),
+    P('u', 'Uralt', { von: '1800', bis: '1990' })
+  ], [F('kind', 'k', 'm'), F('kind', 's', 'j')]);
+  const z = k.teppichAuffaelligkeiten(zeit);
+  assert.ok(finde(z, 'Jahre tot'), 'ein Kind lange nach dem Tod des Elternteils');
+  assert.ok(finde(z, 'erst 8 gewesen'), 'ein Elternteil, das selbst noch Kind war');
+  assert.ok(finde(z, 'vor der eigenen Geburt'), 'Tod vor Geburt');
+  assert.ok(finde(z, '190 Jahre alt'), 'ein unmögliches Alter');
+
+  /* Ein Faden auf jemanden, den es zu Lebzeiten nie gab. */
+  const nie = baum(k, [
+    P('a', 'Alt', { von: '1800', bis: '1850' }),
+    P('n', 'Neu', { von: '1900' })
+  ], [F('kennt', 'a', 'n')]);
+  assert.ok(finde(k.teppichAuffaelligkeiten(nie), 'wurde erst 1900 geboren'), 'zwei, die sich nie begegnet sein können');
+
+  /* Ein sauberer Baum bleibt still — bis auf die Einzelgänger. */
+  const heil = baum(k, [
+    P('a', 'Ada', { von: '1900' }), P('b', 'Bo', { von: '1930' })
+  ], [F('kind', 'b', 'a')]);
+  assert.equal(k.teppichAuffaelligkeiten(heil).length, 0, 'nichts zu meckern');
+});
