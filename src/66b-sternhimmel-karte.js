@@ -754,7 +754,7 @@ function sternRohrBefund(himmel, gebaut, x, y, rohrfeld) {
 /* Das Okular selbst. */
 function sternFernrohrZeichnen(himmel, gebaut, w, allesId, rohrfeld) {
   const rohr = _st.rohr || { x: STERN_MITTE, y: STERN_MITTE };
-  const g = stv('g', { class: 'sh-fernrohr' });
+  const g = stv('g', { class: 'sh-fernrohr', 'data-rohr-x': stz(rohr.x), 'data-rohr-y': stz(rohr.y) });
   const R = STERN_ROHR_R;
   const V = STERN_ROHR_V;
   const id = 'sh-okular';

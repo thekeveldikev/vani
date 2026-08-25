@@ -678,13 +678,14 @@ RENDER.salon = function (haupt) {
   const frageFeld = el('input', { type: 'text', placeholder: 'Frag die Wand — „Wer ist …?“, „Mein Anfang ist langweilig“, „Wie bleibe ich dran?“ …', 'aria-label': 'Frage an die Wand' });
   const fragen = () => { const f = frageFeld.value.trim(); if (!f) { frageFeld.focus(); return; } salonRunde(f); };
   frageFeld.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); fragen(); } });
-  const kopf = el('div', { class: 'kopf' },
+  const kopf = el('div', { class: 'kopf viele-aktionen' },
     el('h1', {}, 'Der Salon', el('div', { class: 'unter' }, 'Die Lieblingswand. Sie wissen, wie es geht — und sie reden, wenn man anklopft.')),
-    el('button', { class: 'rundknopf zart', html: ik('brief'), title: 'Einen Brief an die Wand schreiben', onclick: () => salonBriefSchreiben() }),
-    el('button', { class: 'rundknopf zart', html: ik('plus'), title: 'Jemanden an die Wand hängen', onclick: () => salonEigenenAnlegen() }),
-    el('button', { class: 'rundknopf zart salon-tonknopf' + (salonTonAn() ? ' an' : ''), html: ik('klang'), title: salonTonAn() ? 'Salonklang ist an: Kamin und Uhr. Tippen schaltet aus.' : 'Salonklang ist aus. Tippen: Kaminknistern und die Uhr.', 'aria-pressed': salonTonAn() ? 'true' : 'false', onclick: (ev) => { salonKlang().then(() => { const an = salonTonAn(); ev.target.closest('button').classList.toggle('an', an); ev.target.closest('button').setAttribute('aria-pressed', an ? 'true' : 'false'); }); } }),
-    el('button', { class: 'rundknopf zart', html: ik('stift'), title: 'Wie die Wand dich nennt', onclick: async () => { const n = await eingabe({ titel: 'Wie soll die Wand dich nennen?', wert: D.einst.salonAnrede || '', platzhalter: 'dein Name oder Spitzname' }); if (n === null) return; D.einst.salonAnrede = String(n).trim().slice(0, 40); speichereEinst(); toast(D.einst.salonAnrede ? 'Die Wand nennt dich jetzt ' + D.einst.salonAnrede + '.' : 'Die Wand nennt dich beim Profilnamen.'); zeichne(); } }),
-    el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Über die Bilder', onclick: () => salonUeberBilder() }));
+    el('div', { class: 'kopf-aktionen' },
+      el('button', { class: 'rundknopf zart', html: ik('brief'), title: 'Einen Brief an die Wand schreiben', onclick: () => salonBriefSchreiben() }),
+      el('button', { class: 'rundknopf zart', html: ik('plus'), title: 'Jemanden an die Wand hängen', onclick: () => salonEigenenAnlegen() }),
+      el('button', { class: 'rundknopf zart salon-tonknopf' + (salonTonAn() ? ' an' : ''), html: ik('klang'), title: salonTonAn() ? 'Salonklang ist an: Kamin und Uhr. Tippen schaltet aus.' : 'Salonklang ist aus. Tippen: Kaminknistern und die Uhr.', 'aria-pressed': salonTonAn() ? 'true' : 'false', onclick: (ev) => { salonKlang().then(() => { const an = salonTonAn(); ev.target.closest('button').classList.toggle('an', an); ev.target.closest('button').setAttribute('aria-pressed', an ? 'true' : 'false'); }); } }),
+      el('button', { class: 'rundknopf zart', html: ik('stift'), title: 'Wie die Wand dich nennt', onclick: async () => { const n = await eingabe({ titel: 'Wie soll die Wand dich nennen?', wert: D.einst.salonAnrede || '', platzhalter: 'dein Name oder Spitzname' }); if (n === null) return; D.einst.salonAnrede = String(n).trim().slice(0, 40); speichereEinst(); toast(D.einst.salonAnrede ? 'Die Wand nennt dich jetzt ' + D.einst.salonAnrede + '.' : 'Die Wand nennt dich beim Profilnamen.'); zeichne(); } }),
+      el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Über die Bilder', onclick: () => salonUeberBilder() })));
   const haus = alle.filter((a) => !a.gast && !a.eigen), gaeste = alle.filter((a) => a.gast), eigene = alle.filter((a) => a.eigen);
   /* Die Wand: nur die Rahmen — oben die Hausherren, darunter kleiner die Gäste und die eigenen */
   const reihe1 = el('div', { class: 'salon-reihe haus' }, ...haus.map((a, i) => salonRahmen(a, i, () => salonSprechen(a))));

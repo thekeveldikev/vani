@@ -8,7 +8,7 @@ const SYNC_TEXTFELDER = new Set(['text', 'titel', 'notiz', 'schlagworte', 'label
 const SYNC_INTERNE_FELDER = new Set(['_rev', '_geraet', '_syncZeit']);
 let _sync = {
   config: null, ydoc: null, ydocs: null, ystate: null, ymedia: null, persistence: null,
-  poll: null, status: { art: 'aus' }, uebernimmt: false, anwendenTimer: null,
+  poll: null, retry: null, status: { art: 'aus' }, uebernimmt: false, anwendenTimer: null,
   sendet: false, holt: false, medien: false, generation: 0, fremdZuletzt: 0, nachzug: null
 };
 /* Hat die andere Seite in den letzten Minuten etwas gebracht? (zweite Tasse am Schreibtisch) */
@@ -440,17 +440,48 @@ async function syncHoleUpdates() {
 }
 async function syncJetzt() {
   if (!_sync.config) return false;
+  if (!_sync.ydoc) { syncPlaneWiederanlauf(_sync.config, 0); return false; }
   await syncSendeWartend(); await syncHoleUpdates();
   syncMedienAbgleich().catch(() => {});
   return _sync.status.art === 'synchron';
 }
+function syncPollAbstand() {
+  if (!navigator.onLine) return 8000;
+  if (document.visibilityState !== 'visible') return 12000;
+  /* Beim Schreiben darf ein zweites Gerät fast unmittelbar folgen. In Ruhe
+     reichen anderthalb Sekunden und sparen auf iPad und Handy Akku. */
+  return syncSchreibtGerade() ? 900 : 1400;
+}
+function syncPlanePoll(warte = syncPollAbstand()) {
+  clearTimeout(_sync.poll);
+  const generation = _sync.generation;
+  _sync.poll = setTimeout(async () => {
+    if (!_sync.config || generation !== _sync.generation) return;
+    try { await syncJetzt(); } catch (e) {}
+    if (_sync.config && generation === _sync.generation) syncPlanePoll();
+  }, Math.max(250, warte));
+}
+function syncPlaneWiederanlauf(config, warte = 4000) {
+  if (!config || _sync.retry) return;
+  _sync.retry = setTimeout(async () => {
+    _sync.retry = null;
+    if (!_sync.config || _sync.ydoc) return;
+    const c = syncSaubereConfig(_sync.config || config);
+    if (!c) return;
+    try { await syncStarte(c, 'start'); }
+    catch (e) {
+      syncStoppe(); _sync.config = c; syncMelde('offline');
+      syncPlaneWiederanlauf(c, navigator.onLine ? 5000 : 12000);
+    }
+  }, Math.max(0, warte));
+}
 function syncStoppe() {
   _sync.generation++;
-  clearInterval(_sync.poll); clearTimeout(_sync.anwendenTimer);
+  clearTimeout(_sync.poll); clearTimeout(_sync.retry); clearTimeout(_sync.anwendenTimer);
   try { if (_sync.persistence) _sync.persistence.destroy(); } catch (e) {}
   try { if (_sync.ydoc) _sync.ydoc.destroy(); } catch (e) {}
   _sync.ydoc = _sync.ydocs = _sync.ystate = _sync.ymedia = _sync.persistence = null;
-  _sync.poll = null; _sync.sendet = _sync.holt = _sync.medien = false;
+  _sync.poll = _sync.retry = null; _sync.sendet = _sync.holt = _sync.medien = false;
 }
 async function syncStarte(config, modus = 'start') {
   if (!globalThis.VaniY || !VaniY.Y || !VaniY.IndexeddbPersistence) throw new Error('Sync-Baustein fehlt');
@@ -474,7 +505,7 @@ async function syncStarte(config, modus = 'start') {
   await syncMerkeUpdate(Y.encodeStateAsUpdate(_sync.ydoc), generation);
   await syncSendeWartend(); await syncHoleUpdates();
   syncMedienAbgleich().catch(() => {});
-  _sync.poll = setInterval(() => syncJetzt().catch(() => {}), 2500);
+  syncPlanePoll();
   syncMelde('synchron', { zuletzt: Date.now() });
   return true;
 }
@@ -482,7 +513,11 @@ async function syncBeimStart() {
   const config = await syncLadeConfig();
   if (!config) { syncMelde('aus'); return false; }
   try { await syncStarte(config, 'start'); return true; }
-  catch (e) { _sync.config = config; syncMelde('offline'); return false; }
+  catch (e) {
+    syncStoppe(); _sync.config = config; syncMelde('offline');
+    syncPlaneWiederanlauf(config, navigator.onLine ? 4000 : 12000);
+    return false;
+  }
 }
 async function syncErstelleBereich(name, server) {
   const adresse = syncServerAdresse(server);
@@ -510,6 +545,12 @@ async function syncTrennen() {
 }
 
 try {
-  window.addEventListener('online', () => syncJetzt().catch(() => {}));
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') syncJetzt().catch(() => {}); });
+  const weckeSync = () => {
+    if (!_sync.config) return;
+    if (!_sync.ydoc) syncPlaneWiederanlauf(_sync.config, 0);
+    else { syncJetzt().catch(() => {}); syncPlanePoll(700); }
+  };
+  window.addEventListener('online', weckeSync);
+  window.addEventListener('focus', weckeSync);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') weckeSync(); });
 } catch (e) {}

@@ -83,22 +83,52 @@ Passwort-Tür angelegt. Danach verbindet der persönliche Kopplungscode genau di
 Bestand. Beide Personen verwenden unterschiedliche Codes und bleiben vollständig
 getrennt.
 
+### Drei Geräte für eine Person — die sichere Reihenfolge
+
+1. Auf dem Gerät mit dem bisherigen Bestand: **Feinheiten → iPad ↔ Laptop ↔
+   weitere Geräte → Neuen privaten Bereich**. Nur einen Namen eingeben; VANI kennt
+   den verschlüsselten Dienst bereits.
+2. Auf Handy und Laptop jeweils VANI öffnen, ein **lokales Profil** anlegen und
+   **Mit Bereich verbinden** wählen.
+3. Auf dem ersten Gerät **Weiteres Gerät koppeln** wählen und den Code unmittelbar
+   auf dem neuen Gerät einsetzen. Ist das neue Gerät leer, darf sein leerer Bestand
+   ersetzt werden.
+4. Danach kurz auf jedem Gerät „Jetzt abgleichen“ wählen. Ab dann gehen lokale
+   Änderungen sofort hinaus; ein geöffnetes VANI holt Änderungen im Vordergrund
+   normalerweise binnen Augenblicken.
+
+iPadOS und iOS halten geschlossene Apps im Schlaf an. Darum kann kein Webprogramm
+im ausgeschalteten oder tief schlafenden Gerät weiterlaufen. Beim nächsten Öffnen,
+nach einem Funkloch oder nach dem Aufwachen gleicht VANI automatisch nach. Offline
+geschriebene Sätze bleiben lokal sicher und werden anschließend zusammengeführt.
+
+### Handy und zweites iPad
+
+- **iPhone/iPad:** die feste Adresse in Safari öffnen → Teilen → „Zum
+  Home-Bildschirm“. Dasselbe Icon bleibt für spätere Fassungen bestehen.
+- **Android:** die feste Adresse in Chrome öffnen → Menü → „App installieren“ oder
+  „Zum Startbildschirm hinzufügen“.
+- Für eine zweite Person niemals den ersten Kopplungscode verwenden: auf ihrem
+  ersten Gerät einen neuen privaten Bereich anlegen und nur ihre eigenen Geräte
+  damit koppeln.
+
 ## Windows
 
-- Normal installieren: `VANI-5.2.1-x64-Setup.exe` doppelklicken.
-- Ohne Installation testen: `VANI-5.2.1-x64-Portable.exe` öffnen.
-- Die Dateien liegen im Ordner `release`. Bei einer neuen Fassung trägt die Datei
-  eine höhere Versionsnummer im Namen — immer die neueste nehmen.
-- Eine spätere Setup-Datei einfach über die alte Fassung installieren. Die
-  Programm-ID bleibt gleich und die eigenen Inhalte bleiben im Benutzerprofil.
+- Normal installieren: auf GitHub unter **Releases** die neueste
+  `VANI-…-x64-Setup.exe` laden und einmal doppelklicken.
+- Ohne Installation testen: `VANI-…-x64-Portable.exe` öffnen. Die portable Fassung
+  ist zum Probieren gedacht; für automatische Updates die Setup-Fassung verwenden.
+- Ab VANI 5.55 prüft die installierte Desktop-App selbst auf GitHub nach neuen
+  Fassungen, lädt sie im Hintergrund und bietet **Neu starten** an. Ein neuer
+  Installer ist danach nicht mehr nötig.
 - Beim Deinstallieren lässt VANI die persönlichen Daten absichtlich stehen.
   Vor einem Rechnerwechsel trotzdem immer eine `.vani`-Sicherung machen.
 
-Die erste private Windows-Ausgabe ist noch nicht mit einem öffentlichen
-signierten Update-Kanal verbunden. Bis dieser Kanal eingerichtet ist, wird eine
-neue Setup-Datei über die vorhandene installiert. Windows kann bei dieser
-privaten, noch nicht kommerziell signierten Ausgabe einen SmartScreen-Hinweis
-zeigen.
+Windows kann beim allerersten Setup einen SmartScreen-Hinweis zeigen, solange die
+private Ausgabe noch kein kommerzielles Codesignatur-Zertifikat hat. Die Dateien
+kommen ausschließlich aus den Releases dieses GitHub-Projekts. Automatische
+Desktop-Updates erscheinen, sobald eine neue, zur Paketversion passende `v…`-Fassung
+als GitHub Release veröffentlicht wurde.
 
 ## Was synchronisiert wird
 

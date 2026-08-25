@@ -1,6 +1,6 @@
 {
   "name": "vani",
-  "version": "5.54.0",
+  "version": "5.55.0",
   "private": true,
   "author": "VANI",
   "description": "VANI – ein privates Zuhause zum Schreiben, auf iPad und Desktop.",
@@ -60,6 +60,12 @@
       "output": "release",
       "buildResources": "icons"
     },
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://github.com/thekeveldikev/vani/releases/latest/download"
+      }
+    ],
     "win": {
       "icon": "icons/icon-512.png",
       "target": [

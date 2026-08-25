@@ -85,12 +85,16 @@ function oeffneSchreibraum(docId) {
     vorlesen((doc.titel ? doc.titel + '. ' : '') + srAktuellerText(), e.currentTarget);
   } });
 
-  const kopf = el('div', { class: 'sr-kopf' },
-    el('button', { class: 'knopf', onclick: () => schliesseSchreibraum(true) }, el('span', { html: ik('haken'), style: 'display:flex' }), 'Fertig'),
-    titel,
+  const fertigKnopf = el('button', { class: 'knopf sr-fertig', onclick: () => schliesseSchreibraum(true) },
+    el('span', { html: ik('haken'), style: 'display:flex' }), el('span', {}, 'Fertig'));
+  const speicher = typeof speicherAnzeige === 'function' ? speicherAnzeige() : null;
+  /* Titel und Fertig dürfen nie gegen die Werkzeugknöpfe zusammengedrückt
+     werden. Auf dem Handy werden daraus zwei ruhige Zeilen; am Rechner liegen
+     beide Gruppen weiterhin nebeneinander. */
+  const hauptzeile = el('div', { class: 'sr-hauptzeile' }, fertigKnopf, titel, speicher);
+  const aktionszeile = el('div', { class: 'sr-aktionen' },
     kerzenhalter,
     worteAnzeige,
-    typeof speicherAnzeige === 'function' ? speicherAnzeige() : null,
     vorleseKnopf,
     typeof diktatKnopf === 'function' ? diktatKnopf(() => (_sr ? _sr.ta : null)) : null,
     klangKnopf,
@@ -99,8 +103,8 @@ function oeffneSchreibraum(docId) {
       doc.format = 'rich'; doc.rich = richAusText(srAktuellerText()); speichere(doc);
       const id = doc.id; schliesseSchreibraum(); setTimeout(() => oeffneSchreibraum(id), 30);
     } }, 'Aa'),
-    el('button', { class: 'rundknopf zart', html: ik('feinheiten'), title: 'Schreibraum einstellen', onclick: () => srEinstellungen() })
-  );
+    el('button', { class: 'rundknopf zart', html: ik('feinheiten'), title: 'Schreibraum einstellen', onclick: () => srEinstellungen() }));
+  const kopf = el('div', { class: 'sr-kopf' }, hauptzeile, aktionszeile);
 
   /* Sonderzeichen, immer griffbereit über der Tastatur */
   const zeichen = ['–', '„', '“', '…', '‚', '’', '»', '«'];

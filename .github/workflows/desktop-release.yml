@@ -1,0 +1,41 @@
+name: VANI Desktop veröffentlichen
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Quelltext holen
+        uses: actions/checkout@v4
+
+      - name: Node einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: Vollständig prüfen
+        run: npm test
+
+      - name: Setup, Portable und Update-Dateien bauen
+        run: npm run desktop:win -- --publish never
+
+      - name: GitHub-Fassung bereitstellen
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            release/VANI-*-x64-Setup.exe
+            release/VANI-*-x64-Setup.exe.blockmap
+            release/VANI-*-x64-Portable.exe
+            release/latest.yml

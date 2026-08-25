@@ -165,19 +165,20 @@ RENDER.heft = function (haupt, heftId) {
     });
   };
 
-  haupt.append(el('div', { class: 'kopf' },
+  haupt.append(el('div', { class: 'kopf heft-kopf viele-aktionen' },
     zurueckknopf('#/hefte'),
     el('button', { class: 'heft-minideckel', title: 'Umschlag gestalten', onclick: () => heftGestalten(heft, () => zeichne()) }, baueDeckelElement(heft, { seitenzahl: seiten.length })),
     el('h1', {}, heft.titel),
-    el('div', { class: 'heft-ansichtswahl', role: 'group', 'aria-label': 'Heftansicht' },
-      el('button', { class: (heft.ansicht || 'seiten') === 'seiten' ? 'an' : '', title: 'Einzelne Seiten', onclick: () => { heft.ansicht = 'seiten'; speichere(heft); zeichne(); } }, 'Seiten'),
-      el('button', { class: heft.ansicht === 'rolle' ? 'an' : '', title: 'Seite für Seite untereinander', onclick: () => { heft.ansicht = 'rolle'; speichere(heft); zeichne(); } }, 'Rolle'),
-      el('button', { class: heft.ansicht === 'fluss' ? 'an' : '', title: 'Eine einzige lange Seite, ohne Umbruch', onclick: () => { heft.ansicht = 'fluss'; speichere(heft); zeichne(); } }, 'Am Stück')),
-    el('button', { class: 'rundknopf zart', html: ik('inhalt'), title: 'Inhalt: alle Seiten', onclick: () => heftInhalt(heft, (seite) => {
-      sessionStorage.setItem('zielSeite', seite.id); zeichne();
-    }) }),
-    heftHatUeberschriften(heft) ? el('button', { class: 'rundknopf zart', html: ik('gliederung'), title: 'Gliederung aus Überschriften', onclick: () => heftGliederung(heft) }) : null,
-    el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Heft-Menü', onclick: () => heftMenue(heft, () => zeichne()) })
+    el('div', { class: 'kopf-aktionen' },
+      el('div', { class: 'heft-ansichtswahl', role: 'group', 'aria-label': 'Heftansicht' },
+        el('button', { class: (heft.ansicht || 'seiten') === 'seiten' ? 'an' : '', title: 'Einzelne Seiten', onclick: () => { heft.ansicht = 'seiten'; speichere(heft); zeichne(); } }, 'Seiten'),
+        el('button', { class: heft.ansicht === 'rolle' ? 'an' : '', title: 'Seite für Seite untereinander', onclick: () => { heft.ansicht = 'rolle'; speichere(heft); zeichne(); } }, 'Rolle'),
+        el('button', { class: heft.ansicht === 'fluss' ? 'an' : '', title: 'Eine einzige lange Seite, ohne Umbruch', onclick: () => { heft.ansicht = 'fluss'; speichere(heft); zeichne(); } }, 'Am Stück')),
+      el('button', { class: 'rundknopf zart', html: ik('inhalt'), title: 'Inhalt: alle Seiten', onclick: () => heftInhalt(heft, (seite) => {
+        sessionStorage.setItem('zielSeite', seite.id); zeichne();
+      }) }),
+      heftHatUeberschriften(heft) ? el('button', { class: 'rundknopf zart', html: ik('gliederung'), title: 'Gliederung aus Überschriften', onclick: () => heftGliederung(heft) }) : null,
+      el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Heft-Menü', onclick: () => heftMenue(heft, () => zeichne()) }))
   ));
   /* Farbige Reiter: springen zu ihren Seiten — in jeder Ansicht. */
   if (Array.isArray(heft.reiter) && heft.reiter.length) {
@@ -313,7 +314,10 @@ RENDER.heft = function (haupt, heftId) {
             }
           }
         });
-        toast('Weiter auf Seite ' + (idx + 1) + '.');
+        /* Die sichtbare Seitenzahl und der Cursor zeigen den Wechsel bereits.
+           Bei einem langen Paste können hier in wenigen Augenblicken viele
+           Seiten entstehen; ein Toast pro Seite würde danach noch über ganz
+           anderen Räumen hängen und die App scheinbar blockieren. */
       } : null
     }));
 

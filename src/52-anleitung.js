@@ -465,10 +465,10 @@ const ANLEITUNG = [
     kurz: 'iPad, Laptop und Handy halten sich gegenseitig aktuell — verschlüsselt.',
     abschnitte: [
       { t: 'Der private Bereich', p: ['Ein Bereich ist mein verschlüsselter Stapel in VANIs unsichtbarem Tresor. Der Tresor sieht nur Geheimtext; den Schlüssel haben nur meine Geräte. Ohne Bereich bleibt jedes Gerät für sich — das ist der Standard. Die Tresoradresse muss ich im Alltag nie öffnen.'] },
-      { t: 'Anlegen', s: ['Feinheiten → „iPad ↔ Laptop ↔ weitere Geräte“ → „Neuen privaten Bereich“.', 'Einen Namen geben. Der richtige VANI-Tresor ist bereits vorausgefüllt.', 'Fertig — alles, was auf diesem Gerät liegt, nimmt der Bereich mit.'] },
+      { t: 'Anlegen', s: ['Feinheiten → „iPad ↔ Laptop ↔ weitere Geräte“ → „Neuen privaten Bereich“.', 'Nur einen Namen geben. Den technischen Dienst kennt VANI bereits und fragt nicht danach.', 'Fertig — alles, was auf diesem Gerät liegt, nimmt der Bereich mit.'] },
       { t: 'Ein zweites Gerät koppeln', s: ['Auf dem ersten Gerät: „Weiteres Gerät koppeln“ → der Kopplungscode (VANI1-…) wird kopiert.', 'Den Code zum zweiten Gerät bringen — Nachricht an mich selbst, Mail, egal.', 'Dort: „Mit Bereich verbinden“ → Code einfügen → „Beides zusammenlegen“ oder „Diesen Gerätebestand ersetzen“.'], p: ['Der Code ist wie ein Hausschlüssel: wer ihn hat, sieht den Bereich. Nur an eigene Geräte geben.'], b: 'Auf dem iPad Bereich anlegen, Code per WhatsApp an mich schicken, am Laptop einfügen. Ab da schreibe ich am Laptop weiter, was ich am iPad angefangen habe.' },
       { t: 'Was mitreist', p: ['Texte, Hefte, Seiten, Zettel, Projekte, Szenen, Bretter, Blasen, Wörter, Funken, Beziehungen, Fotos, Kritzeleien, Einstellungen und Zählungen. Goodnotes-Originale nur, wenn „Goodnotes-Originaldateien mitsenden“ an ist.'] },
-      { t: 'Gleichzeitig und offline', p: ['Offline schreiben ist in Ordnung — Änderungen warten und gehen beim nächsten Netz weiter. Schreiben zwei Geräte gleichzeitig am selben Text, werden die Änderungen zusammengeführt, nicht überschrieben.'] },
+      { t: 'Gleichzeitig und offline', p: ['Offline schreiben ist in Ordnung — Änderungen warten und gehen beim nächsten Netz weiter. Im Vordergrund sehen geöffnete Geräte Neues normalerweise binnen Augenblicken. iPhone und iPad halten geschlossene Apps im Schlaf an; beim Öffnen wird sofort nachgeholt. Schreiben zwei Geräte gleichzeitig am selben Text, werden die Änderungen zusammengeführt, nicht überschrieben.'] },
       { t: 'Status', p: ['Synchron, arbeitet, offline, nur hier — die Karte in den Feinheiten sagt es in Worten. „Jetzt abgleichen“ stößt einen Abgleich an. „Gerät trennen“ nimmt nur dieses Gerät aus dem Bereich; Inhalte bleiben hier, der Bereich und die anderen Geräte bleiben unberührt.'] },
       { t: 'Zwei Personen, zwei Bereiche', p: ['Jede Person legt ihren eigenen Bereich an. Nur gleiche Kopplungscodes führen zum gleichen Bestand.'] }
     ]
@@ -487,7 +487,7 @@ const ANLEITUNG = [
         'Das Icon lange halten zeigt Schnellstarts: Neuer Schnipsel, Neues Blatt, Suchen.',
         'Auf dem iPhone und iPad gibt es diese beiden Wege nicht — Apple erlaubt sie Web-Apps nicht. Dort bleibt Kopieren und Einfügen.'
       ] },
-      { t: 'Desktop-App aktualisieren', p: ['Die Windows-App aktualisiert sich noch nicht selbst. Eine neue Setup-Datei einfach über die alte installieren — Inhalte bleiben.'] },
+      { t: 'Desktop-App aktualisieren', p: ['Die Setup-Fassung prüft selbst nach neuen GitHub-Releases, lädt die neue Fassung im Hintergrund und zeigt „Neu starten“. Nur die allererste Installation braucht die Setup-Datei. Die Portable-Fassung ist zum Probieren und aktualisiert sich nicht selbst.'] },
       { t: 'Offline', p: ['Nach dem ersten Öffnen läuft VANI komplett ohne Internet. Internet braucht es nur für Updates, für den Sync und zum Hereinholen des Fadens.'] },
       { t: 'Wenn das alte Icon weg soll', p: ['Icon lange halten → „App entfernen“. Zeigt es kein Minus, ist das iPad verwaltet: Einstellungen → Bildschirmzeit → Beschränkungen → Apps löschen → Erlauben, oder die Verwaltung fragen. Vorher sichern, falls Inhalte am alten Icon hängen.'] }
     ]
@@ -537,7 +537,7 @@ const ANLEITUNG = [
       { t: 'Warum ist der Klang stumm?', p: ['Einmal irgendwo tippen, dann „Ton prüfen“ oder „Klang neu wecken“. Auf dem iPad ist das eine Systemgrenze.'] },
       { t: 'Wie bekomme ich Texte heraus?', p: ['Teilen (im Schreibraum, im Blatt-Menü, in der Szene), Leseansicht „Kopieren“ oder „Als Datei“, Feinheiten „Nur Texte kopieren“, „Alles sichern“ für alles mit Bildern.'] },
       { t: 'Wie lösche ich wirklich?', p: ['Löschen legt in den Papierkorb. Erst „Endgültig leeren“ in den Feinheiten löscht wirklich.'] },
-      { t: 'Was ist mit der Desktop-App?', p: ['Dieselbe App in einem eigenen Fenster, mit sicher verwahrtem Sync-Geheimnis. Updates über eine neue Setup-Datei.'] },
+      { t: 'Was ist mit der Desktop-App?', p: ['Dieselbe App in einem eigenen Fenster, mit sicher verwahrtem Sync-Geheimnis. Nach der ersten Setup-Installation kommen freigegebene Fassungen über den eingebauten GitHub-Updater.'] },
       { t: 'Passwort vergessen?', p: ['Lässt sich nicht zurücksetzen — es gibt keinen Server dafür. Darum sichern. Mit einer Sicherung geht es in ein neues Profil.'] },
       { t: 'Was ist mit Spotify?', p: ['Gibt es nicht. Der Klang in VANI kommt ganz aus VANI.'] }
     ]

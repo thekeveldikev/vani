@@ -139,6 +139,7 @@ html[data-thema="kerze"] body::before {
 /* Leiste */
 #leiste {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-width: 0;
   padding: calc(env(safe-area-inset-top) + 14px) 0 14px;
   background: var(--hg2);
   border-right: 1px solid var(--linie);
@@ -158,6 +159,7 @@ html[data-thema="kerze"] body::before {
 .lknopf.an { color: var(--akzent); background: var(--papier); box-shadow: 0 1px 6px var(--schein); }
 .lknopf:active { transform: scale(.94); }
 #leiste .luecke { flex: 1; }
+.mobile-mehr { display: none; }
 
 /* ----- Raumkopf ----- */
 .kopf {
@@ -168,6 +170,7 @@ html[data-thema="kerze"] body::before {
 }
 .kopf h1 { font-family: ui-serif, "New York", Georgia, serif; font-size: 27px; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .kopf .unter { font-size: 13px; color: var(--blass); margin-top: 2px; font-family: ui-rounded, -apple-system, system-ui, sans-serif; font-weight: 400; }
+.kopf-aktionen { display: flex; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; }
 
 .inhalt { padding: 6px 22px calc(env(safe-area-inset-bottom) + 30px); max-width: 1060px; margin: 0 auto; }
 
@@ -806,7 +809,7 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 @media (max-width: 520px) {
   .desk-szene { min-height: 640px; }
   .desk-ding.lampe { left: -22px; transform: scale(.62); transform-origin: top left; }
-  .desk-ding.leuchter { right: -30px; transform: scale(.55); transform-origin: top right; }
+  .desk-ding.leuchter { right: 0; transform: scale(.55); transform-origin: top right; }
   .desk-ding.uhr { right: 20%; transform: scale(.62); transform-origin: top; }
   .desk-wetterglas { left: 60%; transform: scale(.75); } .desk-teelichter { left: 22%; top: calc(44% - 20px); transform: scale(.72); transform-origin: left bottom; }
   .desk-ding-halter.buecher { left: 2%; width: 54%; top: calc(44% + 8px); }
@@ -1031,6 +1034,10 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
   padding: calc(env(safe-area-inset-top) + 10px) 16px 8px;
   transition: opacity .5s ease;
 }
+.sr-hauptzeile, .sr-aktionen { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.sr-hauptzeile { flex: 1; }
+.sr-aktionen { flex: none; }
+.kerzenhalter:empty { display: none; }
 .sr-kopf.versunken { opacity: 0; pointer-events: none; }
 .sr-titel { flex: 1; text-align: center; font-family: ui-serif, Georgia, serif; font-size: 16px; font-weight: 600; color: var(--blass); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sr-worte { font-size: 13px; color: var(--blass); font-variant-numeric: tabular-nums; }
@@ -1286,13 +1293,8 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22p
 /* Schmale Bildschirme: Leiste nach unten */
 @media (max-width: 620px) {
   #app { grid-template-columns: 1fr; grid-template-rows: 1fr auto; padding-left: 0; }
-  #leiste {
-    flex-direction: row; justify-content: space-around; order: 2;
-    padding: 6px 8px calc(env(safe-area-inset-bottom) + 6px);
-    border-right: none; border-top: 1px solid var(--linie);
-  }
+  #leiste { order: 2; border-right: none; border-top: 1px solid var(--linie); }
   #leiste .wortmarke, #leiste .luecke { display: none; }
-  .lknopf { width: auto; min-width: 54px; padding: 6px 6px 4px; }
   .inhalt { padding-left: 16px; padding-right: 16px; }
   .kopf { padding-left: 16px; padding-right: 16px; }
   .schnipsel-raum { height: calc(100dvh - 0px); }
@@ -1378,7 +1380,9 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22p
   display: flex; gap: 4px; justify-content: center;
   padding: 6px 10px calc(env(safe-area-inset-bottom) / 2 + 6px);
   background: var(--hg2); border-top: 1px solid var(--linie);
+  overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
 }
+.zeichenleiste::-webkit-scrollbar { display: none; }
 .zeichenleiste button {
   min-width: 44px; padding: 7px 0; border-radius: 10px;
   font-family: ui-serif, Georgia, serif; font-size: 19px; line-height: 1;
@@ -1553,6 +1557,8 @@ textarea:focus-visible, input:focus-visible, [contenteditable]:focus-visible, .s
 .sync-weg > span { grid-row: 1 / span 2; color: var(--akzent2); }
 .sync-weg small { color: var(--blass); line-height: 1.4; }
 .sync-hinweis, .sync-servername { display: block; margin-top: 13px; color: var(--blass); line-height: 1.5; }
+.sync-schritte { margin: 0 0 14px; padding: 12px 14px 12px 34px; border-radius: 12px; background: var(--hg2); color: var(--blass); font-size: 13.5px; line-height: 1.55; }
+.sync-schritte b { color: var(--tinte); }
 .sync-goodnotes { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--linie); }
 @keyframes sync-atmen { 0%,100% { transform: scale(1); opacity: .72; } 50% { transform: scale(1.05); opacity: 1; } }
 @media (max-width: 620px) { .sync-wege { grid-template-columns: 1fr; } }
@@ -1567,8 +1573,6 @@ textarea:focus-visible, input:focus-visible, [contenteditable]:focus-visible, .s
 }
 
 @media (max-width: 620px) {
-  #leiste { justify-content: flex-start; overflow-x: auto; overscroll-behavior-x: contain; }
-  #leiste .lknopf { flex: none; }
   .freie-suche { width: calc(100% - 24px); }
   .goodnotes-gitter { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .goodnotes-deckel { height: 105px; }
@@ -1879,8 +1883,11 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 @keyframes seite-landet { from { opacity: .3; transform: translateX(12px) rotate(.25deg); } }
 
 @media (max-width: 700px) {
-  .formatleiste { position: relative; top: 0; width: 100%; flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; border-radius: 13px; }
-  .format-trenner { flex: none; } .format-knopf, .format-farbe, .format-slider { flex: none; }
+  .formatleiste { position: relative; top: 0; width: 100%; flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; border-radius: 13px; }
+  .formatleiste::-webkit-scrollbar { display: none; }
+  .format-trenner { flex: none; }
+  .format-knopf, .format-farbe, .format-slider { flex: none; min-height: 44px; }
+  .format-farbe { width: 44px; height: 44px; }
   .papierseite { padding: 27px 18px 42px; }
   .rollen-seite .papierseite { padding-inline: 17px; }
   .seitenwerkzeuge { right: 7px; top: 7px; }
@@ -2095,9 +2102,7 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
    Handy: alles bleibt sichtbar und antippbar
    ================================================================ */
 
-/* Die Räume liegen in einer eigenen Rolle. */
-/* Die Räume rollen in ihrer eigenen Rolle — wird es eng, scrollt nur sie; Suche
-   und Feinheiten bleiben unten immer sichtbar. */
+/* Die Räume liegen am Rechner in einer eigenen, vertikal rollbaren Rolle. */
 .raumrolle { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
 .raumrolle::-webkit-scrollbar { display: none; }
 #leiste { min-height: 0; }
@@ -2108,21 +2113,6 @@ html[data-thema="tinte"] .regalbrett .brettrand, html[data-thema="kerze"] .regal
 .statistikbalken .tag b { overflow: hidden; }
 
 @media (max-width: 620px) {
-  /* Die Leiste selbst scrollt nicht mehr: nur die Räume schieben sich. Suche
-     und Feinheiten stehen fest am Rand und sind immer erreichbar.
-     min-width: 0 ist entscheidend — ein Grid-Element wächst sonst mit seinem
-     Inhalt über den Bildschirm hinaus, statt sich zu begrenzen. */
-  #leiste { overflow: visible; justify-content: flex-start; gap: 0; min-width: 0; max-width: 100%; }
-  .raumrolle {
-    flex-direction: row; flex: 1; min-width: 0; width: auto;
-    overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
-   
-    mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 22px), transparent 100%);
-  }
-  .raumrolle::-webkit-scrollbar { display: none; }
-  .raumrolle .lknopf { flex: none; }
-  #leiste > .lknopf { flex: none; box-shadow: -1px 0 0 var(--linie); }
-
   /* Alle Funkenarten sichtbar statt versteckt hinter einem Seitwärtsschub. */
   .funke-arten { flex-wrap: wrap; overflow-x: visible; }
 
@@ -3005,6 +2995,9 @@ html[data-thema="tinte"] #raum[data-ort="cluster"] .brettliste .brettkarte, html
 @media (hover: hover) and (pointer: fine) { .scrollleiste:hover .sl-sprung { opacity: .85; } }
 @media (hover: hover) and (pointer: fine) { .sl-sprung:hover { color: var(--akzent); } }
 @media (max-width: 700px) { .scrollleiste { width: 30px; right: 0; } .sl-fahne { right: 34px; } }
+/* Auf Touch-Geräten ist die ganze Fläche bereits eine direkte Scrollfläche.
+   Der schmale Mausgriff lag dort über Text, Formatleiste und Sonderzeichen. */
+@media (max-width: 620px) and (any-pointer: coarse) { .scrollleiste { display: none !important; } }
 @media (prefers-reduced-motion: reduce) { .scrollleiste, .sl-griff, .sl-fahne, .sl-sprung { transition: none; } }
 
 /* ============================================================
@@ -6696,7 +6689,7 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
    Ein Okular, das ueber den Himmel faehrt. Die Fassung ist Messing, das
    Glas vignettiert zum Rand hin — ohne das sieht der Ausschnitt aus wie
    ein Loch im Papier. */
-.sh-fernrohr { cursor: grab; touch-action: none; }
+.sh-fernrohr { cursor: grab; touch-action: none; will-change: transform; }
 .sh-fernrohr:active { cursor: grabbing; }
 .sh-okulargrund { stroke: none; }
 .sh-okularsaum { stroke: none; pointer-events: none; }
@@ -6851,4 +6844,98 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
     background: linear-gradient(to bottom, transparent 20px, var(--linie) 20px, var(--linie) 24px, transparent 24px);
   }
   input[type="checkbox"], input[type="radio"] { min-inline-size: 24px; min-block-size: 24px; }
+}
+
+/* ================================================================
+   VANI am Handy: feste Wege, ruhige Köpfe und echte Fingerflächen
+   ================================================================ */
+@media (max-width: 620px) {
+  #raum { scrollbar-width: none; }
+  #raum::-webkit-scrollbar { display: none; }
+  /* Fünf feste Plätze. Kein seitlich abgeschnittener sechzehnteiliger Zug
+     mehr, kein sichtbarer Browser-Scrollbalken in der Navigation. */
+  #leiste {
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: stretch; gap: 2px; overflow: visible;
+    padding: 5px max(5px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 5px) max(5px, env(safe-area-inset-left));
+  }
+  #leiste .raumrolle { display: contents; }
+  #leiste .raumrolle .lknopf:not(.mobil-haupt), #leiste .nav-feinheiten { display: none; }
+  #leiste .mobile-mehr { display: flex; }
+  #leiste .lknopf {
+    width: 100%; min-width: 0; max-width: none; min-height: 52px;
+    padding: 5px 2px 3px; border-radius: 12px; box-shadow: none;
+  }
+  #leiste .lknopf.an { box-shadow: 0 1px 5px var(--schein); }
+  #leiste .lknopf > span:last-child {
+    display: block; width: 100%; padding-inline: 2px; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap; text-align: center;
+  }
+
+  /* Köpfe mit vielen Werkzeugen bekommen eine zweite, seitlich rollbare
+     Zeile. Der Titel behält dadurch seine Wörter und seine Unterzeile. */
+  .kopf { padding-top: calc(env(safe-area-inset-top) + 10px); }
+  .kopf h1 { font-size: 24px; }
+  .kopf.viele-aktionen { flex-wrap: wrap; align-items: center; gap-block: 4px; }
+  .kopf.viele-aktionen .kopf-aktionen {
+    flex: 1 0 100%; width: 100%; justify-content: flex-end;
+    overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+  }
+  .kopf.viele-aktionen .kopf-aktionen::-webkit-scrollbar { display: none; }
+  .heft-kopf .heft-minideckel { flex: none; }
+
+  /* Dialoge werden am Handy zu einer gut erreichbaren unteren Schublade.
+     Die Tastatur darf sie verkürzen, aber nie aus dem Bild schieben. */
+  .schleier { align-items: flex-end; padding: 0; }
+  .modal, .menue {
+    width: 100%; max-width: none; max-height: calc(var(--vvh, 100dvh) - max(10px, env(safe-area-inset-top)));
+    border-radius: 22px 22px 0 0;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
+  }
+  .menue { padding-inline: 8px; }
+  .modal .reihe { flex-wrap: wrap; }
+  .modal .reihe .knopf { flex: 1 1 auto; justify-content: center; }
+  html.tastatur-offen .schleier { align-items: flex-end; padding-top: 0; }
+  input:not(.sr-text):not([type="range"]):not([type="color"]),
+  textarea:not(.sr-text), select { font-size: 16px; }
+
+  /* Der Schreibraum hat am Telefon zwei Kopfzeilen: Abschluss + Titel oben,
+     die optionalen Werkzeuge darunter. Beide dürfen rollen, nichts quetscht. */
+  .sr-kopf { flex-direction: column; align-items: stretch; gap: 3px; padding: calc(env(safe-area-inset-top) + 7px) 10px 5px; }
+  .sr-hauptzeile, .sr-aktionen { width: 100%; }
+  .sr-hauptzeile { flex: none; }
+  .sr-aktionen {
+    justify-content: flex-end; overflow-x: auto; overscroll-behavior-x: contain;
+    scrollbar-width: none; min-height: 44px;
+  }
+  .sr-aktionen::-webkit-scrollbar { display: none; }
+  .sr-fertig { flex: none; padding: 8px 11px; }
+  .sr-titel { text-align: left; font-size: 17px; }
+  .sr-worte { white-space: nowrap; padding-inline: 4px; }
+  .sr-mitte { min-height: 0; scrollbar-width: none; }
+  .sr-mitte::-webkit-scrollbar { display: none; }
+  .sr-spalte { padding: 10px 17px 42vh; }
+  .schreibraum .formatleiste { margin-bottom: 10px; }
+  .zeichenleiste { justify-content: flex-start; scroll-snap-type: x proximity; }
+  .zeichenleiste button { flex: none; scroll-snap-align: start; min-height: 44px; }
+
+  /* Zwei Bilder nebeneinander lesen sich auf dem Handy als Wand; eine einzige
+     übergroße Spalte wirkte wie eine endlose Bilderliste. */
+  .salon-galerie.zimmer { padding: 18px 12px 120px; }
+  .salon-reihe { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 12px; }
+  .salon-reihe.haus .salon-rahmen { max-width: 158px; }
+  .salon-reihe.gaeste { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 12px; }
+  .salon-reihe.gaeste .salon-rahmen { width: 100%; max-width: 154px; }
+
+  /* Das halbe Jahr passt vollständig in die Karte; niemand muss für die drei
+     neuesten Wochen einen unsichtbaren Miniscroller erraten. */
+  .jahresraster { overflow: hidden; gap: 2px; }
+  .jr-woche { flex: 1 1 0; min-width: 0; gap: 2px; }
+  .jr-tag { width: 100%; height: auto; aspect-ratio: 1; border-radius: 2px; }
+
+  /* Die sichtbaren Zeichnungen bleiben klein; die unsichtbare Knopffläche
+     misst trotz der Kulissen-Skalierung mindestens einen Finger. */
+  .desk-ding.uhr { width: 72px; }
+  .desk-wetterglas { width: 59px; }
+  .desk-ding.uhr::after, .desk-wetterglas::after { content: ""; position: absolute; inset: -8px; }
 }

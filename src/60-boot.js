@@ -135,6 +135,22 @@ async function sucheAppUpdate(neuLaden = false) {
      verbindet sich der private Bereich im Hintergrund. */
   setTimeout(() => syncBeimStart().catch(() => {}), 80);
 
+  /* Die installierte Desktop-App lädt neue Fassungen im Hintergrund. Sobald
+     sie vollständig und geprüft vorliegt, genügt ein einziger Neustart — kein
+     neuer Installer und kein Verlust des lokalen Profils. */
+  if (globalThis.vaniDesktop && vaniDesktop.updateStatus) {
+    try {
+      vaniDesktop.updateStatus((status) => {
+        if (!status || !status.art) return;
+        if (status.art === 'gefunden') toast('Desktop-Fassung ' + (status.version || '') + ' wird im Hintergrund geladen …', 5000);
+        else if (status.art === 'bereit') toastMitAktion(
+          'Desktop-Fassung ' + (status.version || '') + ' ist bereit.',
+          'Neu starten', () => vaniDesktop.updateInstallieren(), 30000);
+        else if (status.art === 'fehler') toast('Die Desktop-Aktualisierung hakt gerade. Die jetzige Fassung läuft weiter.', 6000);
+      });
+    } catch (e) {}
+  }
+
   /* Speicher festhalten */
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
 

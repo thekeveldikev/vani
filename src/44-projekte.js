@@ -114,13 +114,14 @@ RENDER.projekt = function (haupt, pid) {
   if (!p) { location.hash = '#/projekte'; return; }
   const w = projektWorte(p);
 
-  haupt.append(el('div', { class: 'kopf' },
+  haupt.append(el('div', { class: 'kopf viele-aktionen' },
     zurueckknopf('#/projekte'),
     el('h1', {}, p.titel, el('div', { class: 'unter' },
       w.toLocaleString('de-DE') + ' Wörter' + (p.ziel ? ' von ' + p.ziel.toLocaleString('de-DE') : '') + ' · ' + (p.art || ''))),
-    el('button', { class: 'rundknopf zart', html: ik('gliederung'), title: 'Gliederung: Kapitel, Szenen, Überschriften', onclick: () => projektGliederung(p) }),
-    el('button', { class: 'rundknopf zart', html: ik('lesen'), title: 'Leseansicht', onclick: () => zeigeLeseansicht(p) }),
-    el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Projekt-Menü', onclick: () => projektMenue(p, () => zeichne()) })
+    el('div', { class: 'kopf-aktionen' },
+      el('button', { class: 'rundknopf zart', html: ik('gliederung'), title: 'Gliederung: Kapitel, Szenen, Überschriften', onclick: () => projektGliederung(p) }),
+      el('button', { class: 'rundknopf zart', html: ik('lesen'), title: 'Leseansicht', onclick: () => zeigeLeseansicht(p) }),
+      el('button', { class: 'rundknopf zart', html: ik('mehr'), title: 'Projekt-Menü', onclick: () => projektMenue(p, () => zeichne()) }))
   ));
 
   const inhalt = el('div', { class: 'inhalt' });

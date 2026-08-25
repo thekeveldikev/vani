@@ -321,14 +321,25 @@ function sternBedienungAnhaengen(svg, flaeche, doc, neu) {
      verschoben wird nur seine Stelle. */
   let fuehrt = 0, rohrRaf = 0;
   const finger = new Set();
-  const zeichneRohr = () => {
+  const zeichneRohrVoll = () => {
     if (rohrRaf) return;
     rohrRaf = requestAnimationFrame(() => {
       rohrRaf = 0;
       if (flaeche._rohrAktualisieren) flaeche._rohrAktualisieren();
     });
   };
-  const setzeRohr = (ev) => {
+  /* Während der Finger fährt, verschiebt die Grafikkarte nur die bestehende
+     Okulargruppe. Sterne, Clip und Befund werden erst beim Loslassen einmal
+     neu gerechnet. So bleibt das Rohr auch auf 120-Hz-iPads am Finger. */
+  const verschiebeRohr = () => {
+    const rohr = svg.querySelector('.sh-fernrohr');
+    if (!rohr || !_st.rohr) { zeichneRohrVoll(); return; }
+    const x0 = Number(rohr.getAttribute('data-rohr-x'));
+    const y0 = Number(rohr.getAttribute('data-rohr-y'));
+    if (!Number.isFinite(x0) || !Number.isFinite(y0)) { zeichneRohrVoll(); return; }
+    rohr.setAttribute('transform', 'translate(' + stz(_st.rohr.x - x0) + ' ' + stz(_st.rohr.y - y0) + ')');
+  };
+  const setzeRohr = (ev, voll = false) => {
     const p = sternPunktAus(svg, ev);
     if (!p) return;
     /* Innerhalb der Scheibe bleiben — ein Okular über dem Papierrand
@@ -341,7 +352,7 @@ function sternBedienungAnhaengen(svg, flaeche, doc, neu) {
     } else {
       _st.rohr = { x: p.x, y: p.y };
     }
-    zeichneRohr();
+    if (voll) zeichneRohrVoll(); else verschiebeRohr();
   };
   svg.addEventListener('pointerdown', (ev) => {
     if (ev.pointerType !== 'mouse') finger.add(ev.pointerId);
@@ -375,6 +386,7 @@ function sternBedienungAnhaengen(svg, flaeche, doc, neu) {
     fuehrt = 0;
     flaeche.classList.remove('rohr-bewegt');
     try { svg.releasePointerCapture(ev.pointerId); } catch (e) {}
+    zeichneRohrVoll();
   };
   svg.addEventListener('pointerup', los);
   svg.addEventListener('pointercancel', los);
@@ -384,7 +396,7 @@ function sternBedienungAnhaengen(svg, flaeche, doc, neu) {
     /* Ein Tipp neben das Okular setzt es einmal um. Scrollen erzeugt in
        Safari keinen click und bleibt deshalb ungestoert. */
     if (_st.rohrAn) {
-      if (!(ev.target.closest && ev.target.closest('.sh-fernrohr'))) setzeRohr(ev);
+      if (!(ev.target.closest && ev.target.closest('.sh-fernrohr'))) setzeRohr(ev, true);
       return;
     }
     const aufBild = ev.target.closest && ev.target.closest('.sh-bild');

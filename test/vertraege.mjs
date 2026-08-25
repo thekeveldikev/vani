@@ -294,7 +294,7 @@ test('Handyvertrag: nur der Raum scrollt, die Leiste bleibt unten und die Tastat
   assert.match(css, /#leiste \{[^}]*min-width: 0/);
 });
 
-test('Leistenvertrag: Suche und Feinheiten stehen außerhalb der scrollenden Räume', () => {
+test('Leistenvertrag: am Handy fünf feste Ziele und alle übrigen Räume hinter Mehr', () => {
   const router = lies('src/40-router.js');
   assert.match(router, /class: 'raumrolle'/, 'die Räume brauchen eine eigene Rolle');
   const rolleAnfang = router.indexOf("const rolle = el('div', { class: 'raumrolle' })");
@@ -304,6 +304,11 @@ test('Leistenvertrag: Suche und Feinheiten stehen außerhalb der scrollenden Rä
   assert.ok(rolleAnfang > 0 && rolleEnde > rolleAnfang, 'Rolle wird angelegt und eingehängt');
   assert.ok(sucheStelle > rolleEnde, 'die Suche gehört nicht in die scrollende Rolle');
   assert.ok(feinStelle > rolleEnde, 'die Feinheiten gehören nicht in die scrollende Rolle');
+  assert.match(router, /MOBILE_HAUPTRAEUME[^\n]+zuhause[^\n]+schreibtisch[^\n]+hefte/);
+  assert.match(router, /class: 'lknopf mobile-mehr'/, 'alle weiteren Räume brauchen einen festen Mehr-Knopf');
+  const css = lies('src/10-style.css');
+  assert.match(css, /grid-template-columns: repeat\(5, minmax\(0, 1fr\)\)/, 'fünf Plätze müssen ohne Seitwärtsschub passen');
+  assert.match(css, /\.raumrolle \.lknopf:not\(\.mobil-haupt\)/, 'Nebenräume verschwinden am Handy nur optisch, nicht aus der Raumwahl');
   assert.match(lies('src/10-style.css'), /\.raumrolle \{[^}]*flex-direction: column/, 'am Rechner bleibt es eine Spalte');
 });
 
@@ -606,6 +611,8 @@ test('Ruhe-Vertrag: Sync zeichnet nicht mitten ins Schreiben, volle Seiten reich
   /* Schreibraum: formatierter Text scrollt den Textbereich, nicht das Fenster. */
   const r = lies('src/45-schreibraum.js');
   assert.match(r, /function zentriereZeileRich/);
+  assert.doesNotMatch(lies('src/43-hefte.js'), /toast\(['"]Weiter auf Seite/,
+    'ein langer Paste darf nicht den naechsten Raum mit einem Toast-Stapel verdecken');
   assert.match(r, /if \(_sr\.istRich\) \{ zentriereZeileRich\(false\); return; \}/);
   /* Nachgefuehrt wird ENTPRELLT, nicht bei jedem Anschlag: auf dem iPad
      laeuft danach noch die Autokorrektur, und ein Scroll mittendrin

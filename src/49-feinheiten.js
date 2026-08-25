@@ -4,7 +4,7 @@
 
 function syncStatusWorte(status) {
   const art = status && status.art;
-  if (art === 'synchron') return ['synchron', 'Alles ist auf dem gleichen Stand.'];
+  if (art === 'synchron') return ['live verbunden', 'Änderungen gehen sofort hinaus und kommen im Vordergrund binnen Augenblicken an.'];
   if (art === 'verbindet') return ['arbeitet', 'VANI verbindet die Geräte …'];
   if (art === 'offline') return ['offline', 'Änderungen bleiben sicher hier und gehen später weiter.'];
   if (art === 'schluessel') return ['Achtung', 'Der Bereichsschlüssel passt nicht oder wurde zurückgezogen.'];
@@ -13,13 +13,11 @@ function syncStatusWorte(status) {
 }
 
 async function neuerSyncBereich() {
-  const name = await eingabe({ titel: 'Wie soll dein privater Bereich heißen?', wert: 'Mein VANI', platzhalter: 'z. B. Kevins VANI', ok: 'Weiter' });
+  const name = await eingabe({ titel: 'Wie soll dein privater Bereich heißen?', wert: 'Mein VANI', platzhalter: 'z. B. Marias VANI', ok: 'Sicher anlegen' });
   if (!name) return;
   const standard = await syncStandardServer();
-  const server = await eingabe({ titel: 'Adresse des VANI-Sync-Dienstes', wert: standard, platzhalter: 'https://…', ok: 'Bereich anlegen' });
-  if (!server) return;
   toast('Lege deinen verschlüsselten Bereich an …', 5000);
-  try { await syncErstelleBereich(name, server); toast('Dein privater Bereich ist bereit.', 4000); zeichne(); }
+  try { await syncErstelleBereich(name, standard); toast('Dein privater Bereich ist bereit. Jetzt kannst du weitere Geräte koppeln.', 5000); zeichne(); }
   catch (e) { toast((e && e.message) || 'Der Bereich ließ sich noch nicht anlegen.', 5000); }
 }
 
@@ -398,7 +396,7 @@ RENDER.feinheiten = function (haupt) {
         el('div', { class: 'sync-status' }, el('i', { class: sinfo.status.art || 'aus' }), el('b', {}, sname), ' · ', stext))),
     sinfo.verbunden
       ? el('div', { class: 'sync-inhalt' },
-          el('p', {}, 'Texte, Hefte, Projekte, Schnipsel, Verknüpfungen, Fotos und Einstellungen laufen verschlüsselt zwischen deinen gekoppelten Geräten. Gleichzeitiges und Offline-Schreiben wird beim Wiederverbinden zusammengeführt.'),
+          el('p', {}, 'Texte, Hefte, Projekte, Schnipsel, Verknüpfungen, Fotos und Einstellungen laufen verschlüsselt zwischen deinen gekoppelten Geräten. Im Vordergrund kommen Änderungen normalerweise binnen Augenblicken an; nach Schlafmodus oder Funkloch holt VANI alles beim Öffnen nach.'),
           el('div', { class: 'sync-geheimnis' },
             el('b', {}, 'Nur deine Geräte können hineinsehen.'),
             el('span', {}, 'Der Kopplungscode ist wie ein Hausschlüssel. Schicke ihn nur direkt an ein Gerät, das in genau diesen Bereich gehört.')),
@@ -418,13 +416,17 @@ RENDER.feinheiten = function (haupt) {
             } }, el('i'))),
           el('small', { class: 'sync-servername' }, 'Bereich: ' + sinfo.vault.slice(0, 6) + '… · Dienst: ' + (() => { try { return new URL(sinfo.server).host; } catch (e) { return sinfo.server; } })()))
       : el('div', { class: 'sync-inhalt' },
-          el('p', {}, 'Du und deine Cousine bekommt jeweils einen eigenen Bereich. Ein Bereich wird nur zwischen den Geräten gekoppelt, die wirklich denselben Bestand sehen sollen.'),
+          el('p', {}, 'Noch ist dieser Bestand nur auf diesem Gerät. Lege hier den persönlichen Bereich an, der genau die Geräte derselben Person zusammenhält.'),
+          el('ol', { class: 'sync-schritte' },
+            el('li', {}, el('b', {}, 'Erstes Gerät:'), ' privaten Bereich anlegen — der jetzige Bestand wird die Grundlage.'),
+            el('li', {}, el('b', {}, 'Weiteres Gerät:'), ' VANI öffnen, lokales Profil anlegen und „Mit Bereich verbinden“ wählen.'),
+            el('li', {}, el('b', {}, 'Getrennte Personen:'), ' immer getrennte Bereiche und getrennte Kopplungscodes verwenden.')),
           el('div', { class: 'sync-wege' },
             el('button', { class: 'sync-weg', onclick: () => neuerSyncBereich() },
               el('span', { html: ik('plus') }), el('b', {}, 'Neuen privaten Bereich'), el('small', {}, 'Nimmt alles mit, was gerade auf diesem Gerät liegt.')),
             el('button', { class: 'sync-weg', onclick: () => vorhandenenSyncBereichKoppeln() },
               el('span', { html: ik('verbinden') }), el('b', {}, 'Mit Bereich verbinden'), el('small', {}, 'Kopplungscode von iPad oder Laptop verwenden.'))),
-          el('small', { class: 'sync-hinweis' }, 'Wichtig: Deine Cousine legt auf ihrem iPad ihren Bereich an. Du legst auf deinem Gerät deinen eigenen an. Nur gleiche Kopplungscodes führen zum gleichen Bestand.')));
+          el('small', { class: 'sync-hinweis' }, 'Der technische Sync-Dienst ist bereits eingerichtet. Du musst keine Adresse kennen oder ein Konto eröffnen.')));
   inhalt.append(el('div', { class: 'abschnitt' }, el('h2', {}, 'iPad ↔ Laptop ↔ weitere Geräte'), syncKarte));
 
   /* Faden holen — verschluesselt, ohne Datei-Dialog */
