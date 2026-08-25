@@ -170,7 +170,9 @@ html[data-thema="kerze"] body::before {
 }
 .kopf h1 { font-family: ui-serif, "New York", Georgia, serif; font-size: 27px; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .kopf .unter { font-size: 13px; color: var(--blass); margin-top: 2px; font-family: ui-rounded, -apple-system, system-ui, sans-serif; font-weight: 400; }
-.kopf-aktionen { display: flex; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; }
+/* Der Abstand ist derselbe wie in .kopf — sonst ruecken die Knoepfe
+   allein dadurch zusammen, dass sie jetzt in einer Huelle stehen. */
+.kopf-aktionen { display: flex; align-items: center; justify-content: flex-end; gap: 10px; min-width: 0; }
 
 .inhalt { padding: 6px 22px calc(env(safe-area-inset-bottom) + 30px); max-width: 1060px; margin: 0 auto; }
 
@@ -1034,9 +1036,11 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
   padding: calc(env(safe-area-inset-top) + 10px) 16px 8px;
   transition: opacity .5s ease;
 }
-.sr-hauptzeile, .sr-aktionen { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.sr-hauptzeile { flex: 1; }
-.sr-aktionen { flex: none; }
+/* Zwei Gruppen, damit der Kopf am Handy in zwei ruhige Zeilen brechen kann.
+   Ueberall sonst loesen sie sich auf: display:contents legt Fertig, Titel
+   und Werkzeuge wieder direkt in den Kopf, und der Titel steht dadurch
+   mittig zwischen Rand und Rand — nicht mittig in seiner halben Zeile. */
+.sr-hauptzeile, .sr-aktionen { display: contents; }
 .kerzenhalter:empty { display: none; }
 .sr-kopf.versunken { opacity: 0; pointer-events: none; }
 .sr-titel { flex: 1; text-align: center; font-family: ui-serif, Georgia, serif; font-size: 16px; font-weight: 600; color: var(--blass); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -6829,22 +6833,19 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 }
 .sh-vzeile.auff b { font-weight: 500; }
 
-/* Fingerziele: Ein iPad-Finger ist kein Mauszeiger. Kleine Schriftknöpfe
-   bleiben optisch ruhig, bekommen auf Touch-Geräten aber die verlässliche
-   Mindestfläche, die auch am Rand und in Bewegung noch getroffen wird. */
-@media (any-pointer: coarse) {
-  button, .lknopf, .knopf, .rundknopf, select,
-  input:not([type]), input[type="text"], input[type="search"],
-  input[type="password"], input[type="number"], input[type="url"] {
-    min-inline-size: 44px;
-    min-block-size: 44px;
-  }
-  input[type="range"] {
-    min-block-size: 44px;
-    background: linear-gradient(to bottom, transparent 20px, var(--linie) 20px, var(--linie) 24px, transparent 24px);
-  }
-  input[type="checkbox"], input[type="radio"] { min-inline-size: 24px; min-block-size: 24px; }
-}
+/* Fingerziele — und warum hier NICHTS mehr steht.
+   Der Gedanke war richtig: ein iPad-Finger ist kein Mauszeiger, und eine
+   Fläche von 44 Punkten trifft sich verlässlicher. Der Weg war falsch.
+   Eine Mindestgröße auf ALLE Knöpfe der App zu legen, verschiebt jede
+   Leiste, jede Zeile und jedes Raster, das auf seine Maße gebaut ist:
+   die Funkenarten wuchsen von 25 auf 44 Pixel, die Formatleiste von 66
+   auf 95 — und deckte beim Schreiben genau die Zeile zu, an der man
+   gerade sitzt. Sechzehn von fünfunddreißig Knöpfen allein auf der
+   Startseite hatten plötzlich eine andere Größe. Nebenbei war die Regel
+   auch noch ungleich: `.format-farbe` ist ein <label>, kein <button>,
+   und blieb als einziges Feld in der Reihe klein.
+   Eine Fingerfläche gehört an den einzelnen Knopf — dort, wo man weiß,
+   was daneben liegt und wie viel Luft da ist. Nicht an alle auf einmal. */
 
 /* ================================================================
    VANI am Handy: feste Wege, ruhige Köpfe und echte Fingerflächen
@@ -6902,7 +6903,7 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
   /* Der Schreibraum hat am Telefon zwei Kopfzeilen: Abschluss + Titel oben,
      die optionalen Werkzeuge darunter. Beide dürfen rollen, nichts quetscht. */
   .sr-kopf { flex-direction: column; align-items: stretch; gap: 3px; padding: calc(env(safe-area-inset-top) + 7px) 10px 5px; }
-  .sr-hauptzeile, .sr-aktionen { width: 100%; }
+  .sr-hauptzeile, .sr-aktionen { display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0; }
   .sr-hauptzeile { flex: none; }
   .sr-aktionen {
     justify-content: flex-end; overflow-x: auto; overscroll-behavior-x: contain;

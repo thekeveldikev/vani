@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.54.0 (25. August 2026)
+# Übergabe an Codex — Stand VANI 5.56.0 (25. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -468,6 +468,46 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   jedem Schalter, und Leser- sowie Brieffenster laden den unveränderten Hintergrund nicht
   grundlos erneut. Die drei IndexedDB-Bestände starten parallel; der künstliche Startvorhang
   ist deutlich kürzer.
+- **5.56** **Die Rücknahme einer gut gemeinten Regel.** In 5.55 stand ein Block im
+  Stylesheet, der auf Touch-Geräten JEDEM `button`, `.knopf`, `.rundknopf`, `select` und
+  Textfeld der App `min-inline-size: 44px; min-block-size: 44px` gab. Der Gedanke ist
+  richtig — ein Finger ist kein Mauszeiger. Der Weg war falsch, und zwar gemessen:
+  - **Klangraum: 218 von 218 Bedienelementen** verändert. Die Lautstärkeschieber
+    wuchsen von 253×4 auf 253×44 Pixel — die elffache Fläche, quer über jeder Zeile.
+  - **Feinheiten: 81 von 91.** **Zuhause: 16 von 18.**
+  - Der Statuspunkt an den Szenenkarten: **13×13 → 44×44**, elfeinhalbfache Fläche.
+    Aus einem Punkt wurde ein Klecks.
+  - Die Formatleiste im Schreibraum: **66 → 95 Pixel hoch.** Sie steht klebend über
+    dem Text und deckte damit genau die Zeile zu, an der man gerade schrieb.
+  - Der Bleistiftstummel auf dem Schreibtisch — eine *gezeichnete Kulisse* — wurde zum
+    53×53-Quadrat.
+  - `min-width` schlägt `width`, auch inline gesetztes. Knöpfe mit
+    `style="width:28px"` wurden trotzdem 44 Pixel breit.
+  - Und die Regel war ungleich: `.format-farbe` ist ein `<label>`, kein `<button>`,
+    und blieb als einziges Feld in der Reihe klein.
+  **Merksatz: Eine Fingerfläche gehört an den einzelnen Knopf — dort, wo man weiß, was
+  danebenliegt und wie viel Luft da ist. Nie an alle auf einmal.** Wenn eine Fläche
+  wirklich zu klein ist, bekommt sie einen unsichtbaren Saum (`::after` mit negativem
+  `inset`), der mitgetroffen wird, ohne dass die Zeichnung wächst — so wie es die Uhr
+  und das Wetterglas auf dem Schreibtisch schon machen.
+- **5.56** Zwei Folgeschäden derselben Runde mit zurückgenommen:
+  - `.kopf-aktionen` ist nur eine Klammer, damit die Werkzeuge am Handy als Ganzes
+    umbrechen. Sie trug aber `gap: 8px`, wo `.kopf` selbst `10px` hat — dadurch rückten
+    die Knöpfe auf **jedem** Bildschirm zusammen, auch wo nie etwas umbricht.
+  - `.sr-hauptzeile` / `.sr-aktionen` sind jetzt `display: contents`. Am Handy bleiben
+    es zwei echte Zeilen; überall sonst lösen sie sich auf und legen Fertig, Titel und
+    Werkzeuge wieder direkt in den Kopf. Sonst zentriert `.sr-titel` sich in seiner
+    halben Zeile statt im ganzen Kopf und sitzt sichtbar links von der Mitte.
+- **Was aus 5.54/5.55 ausdrücklich bleibt**, weil es echte Verbesserungen sind: die
+  Absicherung des Dev-Servers (Pfad-Allowlist, `realpath`, Sicherheitsköpfe), der
+  gebündelte Build über esbuild (3,0 → 2,3 MB), die Object-URL-Lecks in Medien und
+  Tonnotizen, das Kneifen im Cluster, das Handy-Layout unter 620 Pixeln mit seinen fünf
+  festen Zielen — und vor allem der **Sync**: der Abstand richtet sich jetzt nach der
+  Lage (900 ms beim Schreiben statt starrer 2500 ms, 12 s im Hintergrund), ein
+  gescheiterter Start läuft von selbst wieder an statt bis zum Neustart offline zu
+  bleiben, und `focus`/`online`/`visibilitychange` wecken ihn. Das ist der Grund, warum
+  diese Runde repariert und nicht zurückgedreht wurde: der Schaden war ein
+  Stylesheet-Block, der Gewinn sind zwei Dutzend Dateien.
 
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 

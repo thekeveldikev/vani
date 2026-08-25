@@ -87,14 +87,15 @@ function oeffneSchreibraum(docId) {
 
   const fertigKnopf = el('button', { class: 'knopf sr-fertig', onclick: () => schliesseSchreibraum(true) },
     el('span', { html: ik('haken'), style: 'display:flex' }), el('span', {}, 'Fertig'));
-  const speicher = typeof speicherAnzeige === 'function' ? speicherAnzeige() : null;
   /* Titel und Fertig dürfen nie gegen die Werkzeugknöpfe zusammengedrückt
-     werden. Auf dem Handy werden daraus zwei ruhige Zeilen; am Rechner liegen
-     beide Gruppen weiterhin nebeneinander. */
-  const hauptzeile = el('div', { class: 'sr-hauptzeile' }, fertigKnopf, titel, speicher);
+     werden. Auf dem Handy werden daraus zwei ruhige Zeilen; überall sonst
+     lösen die beiden Gruppen sich in CSS wieder auf, und der Kopf steht Stück
+     für Stück so da wie immer — der Titel mittig zwischen Rand und Rand. */
+  const hauptzeile = el('div', { class: 'sr-hauptzeile' }, fertigKnopf, titel);
   const aktionszeile = el('div', { class: 'sr-aktionen' },
     kerzenhalter,
     worteAnzeige,
+    typeof speicherAnzeige === 'function' ? speicherAnzeige() : null,
     vorleseKnopf,
     typeof diktatKnopf === 'function' ? diktatKnopf(() => (_sr ? _sr.ta : null)) : null,
     klangKnopf,

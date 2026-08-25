@@ -943,8 +943,19 @@ test('iPad-Vertrag: Fingerziele, Sternhimmel und Cluster kaempfen nicht gegen Ge
   const stern = lies('src/66c-sternhimmel-blatt.js');
   const cluster = lies('src/46-cluster.js');
 
-  assert.match(css, /@media \(any-pointer: coarse\)[\s\S]*min-block-size: 44px/,
-    'Touch-Geraete bekommen 44-Pixel-Ziele');
+  /* Hier stand einmal die Forderung nach einem pauschalen 44-Pixel-Mass fuer
+     JEDEN Knopf der App. Der Gedanke war richtig, der Weg falsch: er hat
+     sechzehn von fuenfunddreissig Knoepfen allein auf der Startseite anders
+     gross gemacht, die Funkenarten von 25 auf 44 gedehnt und die Formatleiste
+     von 66 auf 95 Pixel — die steht klebend ueber dem Text und deckte damit
+     genau die Zeile zu, an der man gerade schrieb. Eine Fingerflaeche gehoert
+     an den einzelnen Knopf, wo man weiss, was danebenliegt. */
+  assert.doesNotMatch(css, /@media \(any-pointer: coarse\) \{\s*button,/,
+    'kein pauschales Mindestmass auf jeden Knopf der App');
+  assert.doesNotMatch(css, /input\[type="range"\] \{[^}]*min-block-size: 44px/,
+    'ein 44 Pixel hoher Schieber sprengt die Formatleiste');
+  assert.match(css, /\.format-knopf \{[^}]*min-height: 32px/, 'die Formatknoepfe behalten ihr Mass');
+  assert.match(css, /\.format-farbe \{[^}]*width: 32px; height: 32px/, 'und die Farbfelder daneben genauso');
   assert.match(css, /\.sh-flaeche \{[\s\S]*?touch-action: pan-x pan-y/,
     'der Himmel darf nativ mit Schwung rollen');
   assert.match(css, /\.sh-fernrohr \{[^}]*touch-action: none/,
@@ -960,6 +971,30 @@ test('iPad-Vertrag: Fingerziele, Sternhimmel und Cluster kaempfen nicht gegen Ge
   assert.match(zoom, /sichtSpaeterSpeichern\(\)/, 'Kneifen speichert entprellt');
   assert.ok(!/speichereStill\(brett\)/.test(zoom), 'und niemals direkt pro Fingerbewegung');
   assert.match(cluster, /kantenImNaechstenBild\(\)/, 'Fadenpunkte folgen hoechstens einmal pro Bild');
+});
+
+test('Kopfvertrag: die Huelle um die Werkzeuge aendert keinen Abstand', () => {
+  /* .kopf-aktionen ist nur eine Klammer, damit die Werkzeuge am Handy als
+     Ganzes umbrechen koennen. Traegt sie einen anderen Abstand als .kopf
+     selbst, ruecken die Knoepfe allein durch die Klammer zusammen — auf
+     jedem Bildschirm, auch dort, wo nie etwas umbricht. */
+  const css = lies('src/10-style.css');
+  const luecke = (block) => ((block || '').match(/gap: (\d+)px/) || [])[1];
+  const kopf = luecke((css.match(/\n\.kopf \{[^}]*\}/) || [])[0]);
+  const klammer = luecke((css.match(/\n\.kopf-aktionen \{[^}]*\}/) || [])[0]);
+  assert.ok(kopf, 'der Kopf hat einen Abstand');
+  assert.equal(klammer, kopf, 'und die Klammer denselben');
+});
+
+test('Schreibkopf-Vertrag: der Titel steht mittig zwischen Rand und Rand', () => {
+  /* Am Handy sind Haupt- und Werkzeugzeile zwei echte Zeilen, damit der Titel
+     nicht gegen acht Knoepfe gequetscht wird. Ueberall sonst loesen sie sich
+     auf: sonst zentriert .sr-titel sich in seiner halben Zeile statt im
+     ganzen Kopf, und der Titel sitzt sichtbar links von der Mitte. */
+  const css = lies('src/10-style.css');
+  assert.match(css, /\.sr-hauptzeile, \.sr-aktionen \{ display: contents; \}/);
+  const handy = css.slice(css.indexOf('VANI am Handy'));
+  assert.match(handy, /\.sr-hauptzeile, \.sr-aktionen \{ display: flex/, 'am Handy wieder echte Zeilen');
 });
 
 test('Kartenvertrag: eine neue Marke reisst kein Fenster auf', () => {
