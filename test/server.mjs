@@ -31,6 +31,8 @@ test('Server: Startseite, HEAD und Sicherheitsheader sind korrekt', async () => 
   assert.match(get.headers['content-type'], /^text\/html/);
   assert.equal(get.headers['x-content-type-options'], 'nosniff');
   assert.equal(get.headers['referrer-policy'], 'no-referrer');
+  assert.equal(get.headers['x-frame-options'], 'DENY');
+  assert.ok(Number(get.headers['content-length']) > 100000);
   assert.ok(get.body.includes(Buffer.from('<title>VANI')));
   const head = await anfrage('/index.html', 'HEAD');
   assert.equal(head.status, 200);
@@ -43,12 +45,22 @@ test('Server: Methoden, kaputte Kodierung, Traversal und fehlende Dateien bleibe
   assert.equal(post.headers.allow, 'GET, HEAD');
   assert.equal((await anfrage('/%E0%A4%A')).status, 400);
   assert.equal((await anfrage('/..%5C..%5CWindows%5Cwin.ini')).status, 403);
-  assert.equal((await anfrage('/gibt-es-nicht-' + Date.now())).status, 404);
+  assert.equal((await anfrage('/gibt-es-nicht-' + Date.now())).status, 403);
   assert.equal((await anfrage('/manifest.json')).headers['content-type'], 'application/json; charset=utf-8');
+  assert.equal((await anfrage('/vendor/wasm/openjpeg.wasm')).headers['content-type'], 'application/wasm');
+});
+
+test('Server: nur App-Dateien sind öffentlich — Bestand, Git und lokale Altlasten bleiben privat', async () => {
+  for (const pfad of ['/src/30-core.js', '/package.json', '/.git/config', '/faden.enc', '/einlesung/einlesung.json', '/CODEX-UEBERGABE.md']) {
+    const r = await anfrage(pfad);
+    assert.equal(r.status, 403, pfad);
+    assert.equal(r.headers['x-content-type-options'], 'nosniff');
+  }
+  assert.equal((await anfrage('/einlesung/umschlag.json')).status, 200);
+  assert.equal((await anfrage('/einlesung/einlesung.enc')).status, 200);
 });
 
 test('Server: parallele Lesezugriffe führen weder zu Aussetzern noch Zustandskorruption', async () => {
   const antworten = await Promise.all(Array.from({ length: 80 }, (_, i) => anfrage(i % 2 ? '/manifest.json' : '/icons/icon-192.png')));
   assert.ok(antworten.every((r) => r.status === 200 && r.body.length > 0));
 });
-

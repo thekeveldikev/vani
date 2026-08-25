@@ -1,5 +1,5 @@
 /* VANI Service Worker — Seiten frisch aus dem Netz, offline aus dem sicheren Cache. */
-const VERSION = '5.53.0';
+const VERSION = '5.54.0';
 const CACHE = 'vani-v5-' + VERSION;
 const KERN = [
   './',
@@ -32,17 +32,23 @@ self.addEventListener('fetch', (e) => {
 
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req).then((res) => {
-      if (res && res.ok) caches.open(CACHE).then((c) => c.put('./index.html', res.clone()));
-      return res;
-    }).catch(() => caches.match('./index.html')));
+      if (!res || !res.ok) return res;
+      const kopie = res.clone();
+      return caches.open(CACHE).then((c) => c.put('./index.html', kopie)).catch(() => {}).then(() => res);
+    }).catch(() => caches.match('./index.html').then((hit) => hit || new Response('VANI ist offline noch nicht vollständig eingerichtet.', { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } }))));
     return;
   }
   e.respondWith(caches.match(req).then((hit) => {
-    const frisch = fetch(req).then((res) => {
-      if (res && res.ok) caches.open(CACHE).then((c) => c.put(req, res.clone()));
-      return res;
-    }).catch(() => hit);
-    return hit || frisch;
+    /* Der Cache-Name traegt bereits die App-Version. Ein Treffer ist deshalb
+       fuer diese Fassung fertig und wird nicht bei jedem erneuten Dialog im
+       Hintergrund noch einmal geladen. Die naechste Fassung bekommt ohnehin
+       einen neuen Cache. */
+    if (hit) return hit;
+    return fetch(req).then((res) => {
+      if (!res || !res.ok) return res;
+      const kopie = res.clone();
+      return caches.open(CACHE).then((c) => c.put(req, kopie)).catch(() => {}).then(() => res);
+    });
   }));
 });
 

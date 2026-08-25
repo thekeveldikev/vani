@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -6,22 +6,29 @@ const hosting = join(dirname(fileURLToPath(import.meta.url)), '..');
 const wurzel = join(hosting, '..');
 const publicDir = join(hosting, 'public');
 const hauptadresse = 'https://thekeveldikev.github.io/vani/';
-mkdirSync(join(publicDir, 'icons'), { recursive: true });
+mkdirSync(publicDir, { recursive: true });
+function kopiereOrdner(name, optionen = {}) {
+  const ziel = join(publicDir, name);
+  /* public/ ist ein erzeugtes Abbild. Vorherige Dateien muessen verschwinden,
+     sonst kann ein spaeter ausgeschlossener Klartext dort liegen bleiben. */
+  rmSync(ziel, { recursive: true, force: true });
+  try { cpSync(join(wurzel, name), ziel, { recursive: true, ...optionen }); } catch (e) {}
+}
 for (const name of ['manifest.json', 'robots.txt']) cpSync(join(wurzel, name), join(publicDir, name));
 /* Die Klangaufnahmen liegen neben der App und werden erst bei Bedarf geholt. */
-try { cpSync(join(wurzel, 'klang'), join(publicDir, 'klang'), { recursive: true }); } catch (e) {}
+kopiereOrdner('klang');
 /* pdf.js für den Lesestapel — ohne es ließe sich im Rettungsraum kein Buch aufschlagen. */
-try { cpSync(join(wurzel, 'vendor'), join(publicDir, 'vendor'), { recursive: true }); } catch (e) {}
+kopiereOrdner('vendor');
 /* Mitgebrachte Sticker ebenso — der Rettungsraum soll sie auch kennen. */
-try { cpSync(join(wurzel, 'sticker'), join(publicDir, 'sticker'), { recursive: true }); } catch (e) {}
-try { cpSync(join(wurzel, 'autoren'), join(publicDir, 'autoren'), { recursive: true }); } catch (e) {}
-try { cpSync(join(wurzel, 'einlesung'), join(publicDir, 'einlesung'), { recursive: true, filter: (q) => !/einlesung\.json$/.test(q) }); } catch (e) {}
+kopiereOrdner('sticker');
+kopiereOrdner('autoren');
+kopiereOrdner('einlesung', { filter: (q) => !/(?:einlesung\.json|\.quelle\.js)$/i.test(q) });
 /* Der frühere Sites-Origin bleibt für die verschlüsselten Pakete erhalten, ist
    aber keine zweite installierbare App mehr. Die echte App liegt als bewusst
    aufrufbarer Rettungsraum am selben Origin, damit alte IndexedDB-Inhalte nicht
    durch den Umzug verloren gehen. */
 cpSync(join(wurzel, 'index.html'), join(publicDir, 'rettung.html'));
-cpSync(join(wurzel, 'icons'), join(publicDir, 'icons'), { recursive: true, force: true });
+kopiereOrdner('icons');
 
 const umzug = `<!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">

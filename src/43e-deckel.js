@@ -128,6 +128,7 @@ async function heftAtelier(h, danach) {
       halter.style.left = s.pos.x + '%'; halter.style.top = s.pos.y + '%';
     });
     halter.addEventListener('pointerup', () => { zieht = null; });
+    halter.addEventListener('pointercancel', () => { zieht = null; });
     langdruck(halter, async () => {
       const wahl = await menue([
         { text: 'Etwas drehen', icon: 'drehen', wert: 'dreh' },
@@ -247,17 +248,17 @@ function tischEinrichten(danach) {
   let behalten = false;
   const wahlgruppe = (liste, lies, setze) => {
     const g = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
-    for (const [id, name] of liste) g.append(el('button', { class: lies() === id ? 'an' : '', onclick: (e) => { setze(id); $$('button', g).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); D.einst.tisch = { ...t }; if (danach) danach(); } }, name));
+    for (const [id, name] of liste) g.append(el('button', { class: lies() === id ? 'an' : '', onclick: (e) => { setze(id); $$('button', g).forEach((b) => b.classList.toggle('an', b === e.currentTarget)); D.einst.tisch = { ...t }; } }, name));
     return g;
   };
-  const unordnung = el('button', { class: 'schalter' + (t.unordnung ? ' an' : ''), onclick: (e) => { t.unordnung = !t.unordnung; e.currentTarget.classList.toggle('an', t.unordnung); D.einst.tisch = { ...t }; if (danach) danach(); } }, el('i'));
+  const unordnung = el('button', { class: 'schalter' + (t.unordnung ? ' an' : ''), onclick: (e) => { t.unordnung = !t.unordnung; e.currentTarget.classList.toggle('an', t.unordnung); D.einst.tisch = { ...t }; } }, el('i'));
   const kasten = el('div', { class: 'modal tisch-einrichten' },
     el('h2', {}, 'Tisch und Regal einrichten'),
     el('div', { class: 'einstellgruppe' }, el('b', {}, 'Platte und Bretter'), wahlgruppe(TISCH_PLATTEN, () => t.platte, (v) => { t.platte = v; })),
     el('div', { class: 'einstellgruppe' }, el('b', {}, 'Größe der Hefte'), wahlgruppe(TISCH_GROESSEN, () => t.groesse, (v) => { t.groesse = v; })),
     el('div', { class: 'einstellgruppe' }, el('b', {}, 'Reihenfolge'), wahlgruppe(TISCH_SORTIERUNGEN, () => t.sortierung, (v) => { t.sortierung = v; })),
     el('div', { class: 'einstellgruppe einstellzeile' }, el('span', { class: 'ename' }, 'Unordnung', el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Hefte liegen leicht verdreht — wie auf einem echten Tisch.')), unordnung),
-    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => { D.einst.tisch = alt; if (danach) danach(); zu(); } }, 'Zurück'),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => { D.einst.tisch = alt; zu(); } }, 'Zurück'),
       el('button', { class: 'knopf voll', onclick: () => { behalten = true; D.einst.tisch = { ...t }; speichereEinst(); zu(); if (danach) danach(); } }, 'So bleibt es')));
   const zu = zeigeDeck(kasten, () => { if (!behalten) { D.einst.tisch = alt; if (danach) danach(); } });
 }

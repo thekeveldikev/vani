@@ -9,6 +9,10 @@ Er braucht Node.js 22.13 oder neuer und ein dauerhaftes Datenverzeichnis:
 VANI_DATA_DIR=/data PORT=8787 npm run start:sync
 ```
 
+Die ausgelieferte Dateiansicht ist auf die App-Artefakte und ihre
+Medienordner begrenzt. Repository-Dateien, Git-Metadaten und lokale
+`faden.enc`-Altbestände werden nie vom Dienst ausgeliefert.
+
 Für eine öffentliche Installation muss davor HTTPS liegen. `VANI_ORIGINS`
 kann als kommagetrennte Liste auf die genaue öffentliche App-Adresse begrenzt
 werden. Backups müssen das komplette `VANI_DATA_DIR` einschließen.

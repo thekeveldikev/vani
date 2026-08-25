@@ -1,0 +1,12 @@
+.git
+.claude
+node_modules
+release
+hosting/work
+hosting/node_modules
+artifact.html
+faden.enc
+*.vani
+vani-sync-data
+einlesung/einlesung.json
+einlesung/*.quelle.js

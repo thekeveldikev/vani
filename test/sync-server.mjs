@@ -88,4 +88,19 @@ test('Sync-Server: übergroße Körper werden früh und sauber abgewiesen', asyn
   const zuGross = JSON.stringify({ blobId: 'x', chunk: 0, iv: 'z'.repeat(16), ciphertext: 'q'.repeat(2 * 1024 * 1024) });
   const r = await api(`/v1/vaults/${vaultA}/blobs`, { method: 'POST', token: tokenA, roh: zuGross });
   assert.equal(r.status, 413);
+  assert.equal((await r.json()).fehler, 'zu_gross');
+});
+
+test('Sync-Server: Fehler tragen CORS-Header und interne Projektdateien werden nie ausgeliefert', async () => {
+  const falsch = await api(`/v1/vaults/${vaultA}/updates`);
+  assert.equal(falsch.status, 401);
+  assert.equal(falsch.headers.get('access-control-allow-origin'), '*');
+  for (const pfad of ['/src/30-core.js', '/package.json', '/.git/config', '/faden.enc', '/einlesung/einlesung.json']) {
+    const r = await api(pfad);
+    assert.equal(r.status, 403, pfad);
+  }
+  assert.equal((await api('/einlesung/umschlag.json')).status, 200);
+  const wasm = await api('/vendor/wasm/openjpeg.wasm');
+  assert.equal(wasm.status, 200);
+  assert.equal(wasm.headers.get('content-type'), 'application/wasm');
 });

@@ -74,7 +74,7 @@ function sternKachel(doc, i, neu) {
         sternDichte(himmel.dichte)[1],
         z.bilder ? z.bilder + (z.bilder === 1 ? ' Sternbild' : ' Sternbilder') : 'noch kein Sternbild'
       ].join('  ·  '))));
-  kachel.addEventListener('contextmenu', (ev) => { ev.preventDefault(); sternKachelMenue(doc, neu); });
+  langdruck(kachel, () => sternKachelMenue(doc, neu));
   return kachel;
 }
 
@@ -253,15 +253,11 @@ function sternZeichne(tafel, flaeche, rahmen, neu, schliessen) {
   if (svg) {
     svg.setAttribute('width', Math.round(STERN_GROESSE * _st.zoom));
     svg.setAttribute('height', Math.round(STERN_GROESSE * _st.zoom));
-
-    /* Das Fernrohr zieht allein um: das alte Okular heraus, ein neues
-       hinein. Der Himmel darunter bleibt stehen — er wird über <use>
-       ohnehin nur wiederverwendet. */
-    const altesRohr = svg.querySelector('.sh-fernrohr');
-    if (altesRohr) altesRohr.remove();
-    if (_st.rohrAn && flaeche._gebaut) {
-      svg.append(sternFernrohrZeichnen(himmel, flaeche._gebaut, w, 'sh-alles'));
-    }
+    flaeche._rohrAktualisieren = () => {
+      if (!svg.isConnected) return;
+      sternRohrAktualisieren(tafel, flaeche, rahmen, himmel, w, svg, neu);
+    };
+    flaeche._rohrAktualisieren();
   }
 
   /* Die Karte des Sternbilds im Blick. */
@@ -276,17 +272,45 @@ function sternZeichne(tafel, flaeche, rahmen, neu, schliessen) {
   if (alterHinweis) alterHinweis.remove();
   if (_st.werkzeug === 'ziehen') rahmen.append(sternZughinweis(doc, neu));
 
-  /* Was gerade im Glas steht — das macht aus dem Blick eine Beobachtung. */
-  const alterBefund = tafel.querySelector('.sh-rohrbefund');
-  if (alterBefund) alterBefund.remove();
-  if (_st.rohrAn && _st.rohr) {
-    const b = sternRohrBefund(himmel, flaeche._gebaut, _st.rohr.x, _st.rohr.y);
-    rahmen.append(el('div', { class: 'sh-rohrbefund' },
-      el('b', {}, b.sterne + (b.sterne === 1 ? ' Stern' : ' Sterne') + ' im Glas'),
-      el('span', {}, b.hoehe + ', ' + b.richtung),
-      b.nah.length ? el('small', {}, 'Dabei: ' + b.nah.join(', ')) : null,
-      el('button', { class: 'sh-bkzu', title: 'Fernrohr abnehmen', onclick: () => { _st.rohrAn = false; neu(); } }, '×')));
+}
+
+/* Das Fernrohr ist die einzige Schicht, die beim Fuehren wechseln muss.
+   Toolbar, Himmel, Karten und Hinweise bleiben unangetastet. Das ist auf
+   einem 120-Hz-iPad der Unterschied zwischen einem Werkzeug, das am Finger
+   klebt, und einem, das sichtbar hinterher springt. */
+function sternRohrAktualisieren(tafel, flaeche, rahmen, himmel, w, svg, neu) {
+  const altesRohr = svg.querySelector('.sh-fernrohr');
+  if (altesRohr) altesRohr.remove();
+
+  const feldKey = himmel.saat + '|' + himmel.dichte + '|' + himmel.tag;
+  if (flaeche._rohrfeldKey !== feldKey) {
+    flaeche._rohrfeldKey = feldKey;
+    flaeche._rohrfeld = sternRohrfeld(himmel).map((s) => {
+      const stelle = sternStelle(s, himmel.tag);
+      return Object.assign({}, s, { x: stelle[0], y: stelle[1] });
+    });
   }
+  if (_st.rohrAn && flaeche._gebaut) {
+    svg.append(sternFernrohrZeichnen(himmel, flaeche._gebaut, w, 'sh-alles', flaeche._rohrfeld));
+  }
+
+  let befund = tafel.querySelector('.sh-rohrbefund');
+  if (!_st.rohrAn || !_st.rohr || !flaeche._gebaut) {
+    if (befund) befund.remove();
+    return;
+  }
+  if (!befund) {
+    befund = el('div', { class: 'sh-rohrbefund' },
+      el('b', {}), el('span', {}), el('small', {}),
+      el('button', { class: 'sh-bkzu', title: 'Fernrohr abnehmen', onclick: () => { _st.rohrAn = false; neu(); } }, '×'));
+    rahmen.append(befund);
+  }
+  const b = sternRohrBefund(himmel, flaeche._gebaut, _st.rohr.x, _st.rohr.y, flaeche._rohrfeld);
+  const teile = befund.children;
+  teile[0].textContent = b.sterne + (b.sterne === 1 ? ' Stern' : ' Sterne') + ' im Glas';
+  teile[1].textContent = b.hoehe + ', ' + b.richtung;
+  teile[2].textContent = b.nah.length ? 'Dabei: ' + b.nah.join(', ') : '';
+  teile[2].hidden = !b.nah.length;
 }
 
 /* ===================== DIE BEDIENUNG AM BLATT ===================== */
@@ -295,7 +319,15 @@ function sternBedienungAnhaengen(svg, flaeche, doc, neu) {
      Es folgt dem Finger, solange man zieht. Ein Tipp setzt es dorthin.
      Beides ohne Neurechnung: das Okular ist ein <use> auf den Himmel, und
      verschoben wird nur seine Stelle. */
-  let fuehrt = false;
+  let fuehrt = 0, rohrRaf = 0;
+  const finger = new Set();
+  const zeichneRohr = () => {
+    if (rohrRaf) return;
+    rohrRaf = requestAnimationFrame(() => {
+      rohrRaf = 0;
+      if (flaeche._rohrAktualisieren) flaeche._rohrAktualisieren();
+    });
+  };
   const setzeRohr = (ev) => {
     const p = sternPunktAus(svg, ev);
     if (!p) return;
@@ -309,32 +341,52 @@ function sternBedienungAnhaengen(svg, flaeche, doc, neu) {
     } else {
       _st.rohr = { x: p.x, y: p.y };
     }
-    neu();
+    zeichneRohr();
   };
   svg.addEventListener('pointerdown', (ev) => {
+    if (ev.pointerType !== 'mouse') finger.add(ev.pointerId);
     if (!_st.rohrAn) return;
     if (ev.button != null && ev.button !== 0) return;
-    fuehrt = true;
+    /* Nur die Fassung selbst ist ein Griff. Auf dem restlichen Himmel darf
+       ein Finger wieder ganz normal rollen. Ein kurzer Tipp daneben setzt
+       das Glas spaeter ueber den click-Handler um. */
+    const aufRohr = ev.target.closest && ev.target.closest('.sh-fernrohr');
+    if (!aufRohr || finger.size > 1) {
+      if (finger.size > 1 && fuehrt) {
+        try { svg.releasePointerCapture(fuehrt); } catch (e) {}
+        fuehrt = 0;
+        flaeche.classList.remove('rohr-bewegt');
+      }
+      return;
+    }
+    fuehrt = ev.pointerId;
+    flaeche.classList.add('rohr-bewegt');
     try { svg.setPointerCapture(ev.pointerId); } catch (e) {}
     setzeRohr(ev);
   });
   svg.addEventListener('pointermove', (ev) => {
-    if (!fuehrt || !_st.rohrAn) return;
+    if (fuehrt !== ev.pointerId || !_st.rohrAn || finger.size > 1) return;
     ev.preventDefault();
     setzeRohr(ev);
   });
   const los = (ev) => {
-    if (!fuehrt) return;
-    fuehrt = false;
+    finger.delete(ev.pointerId);
+    if (fuehrt !== ev.pointerId) return;
+    fuehrt = 0;
+    flaeche.classList.remove('rohr-bewegt');
     try { svg.releasePointerCapture(ev.pointerId); } catch (e) {}
   };
   svg.addEventListener('pointerup', los);
   svg.addEventListener('pointercancel', los);
+  svg.addEventListener('pointerleave', (ev) => { if (fuehrt !== ev.pointerId) finger.delete(ev.pointerId); });
 
   svg.addEventListener('click', async (ev) => {
-    /* Bei aufgelegtem Fernrohr ist der Klick schon durch das Führen
-       erledigt — sonst setzte jeder Schub zugleich eine Marke. */
-    if (_st.rohrAn) return;
+    /* Ein Tipp neben das Okular setzt es einmal um. Scrollen erzeugt in
+       Safari keinen click und bleibt deshalb ungestoert. */
+    if (_st.rohrAn) {
+      if (!(ev.target.closest && ev.target.closest('.sh-fernrohr'))) setzeRohr(ev);
+      return;
+    }
     const aufBild = ev.target.closest && ev.target.closest('.sh-bild');
     const p = sternPunktAus(svg, ev);
     if (!p) return;

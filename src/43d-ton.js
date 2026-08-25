@@ -29,7 +29,7 @@ function tonAufnehmen() {
   return new Promise((res) => {
     if (!tonUnterstuetzt()) { toast('Dieses Gerät gibt das Mikrofon hier nicht frei.', 3600); return res(null); }
     let strom = null, rekorder = null, stuecke = [], laeuft = false, fertig = false, t0 = 0, uhrTimer = null;
-    let audioCtx = null, analyser = null, pegelRaf = 0, blob = null, dauer = 0, probe = null;
+    let audioCtx = null, analyser = null, pegelRaf = 0, blob = null, dauer = 0, probe = null, probeURL = '';
     const uhr = el('div', { class: 'ton-uhr' }, '0:00');
     const pegel = el('div', { class: 'ton-pegel' }, el('i'));
     const hinweis = el('div', { class: 'stickerblock-hinweis' }, 'Antippen startet die Aufnahme, noch einmal hält an. Bis zu fünf Minuten.');
@@ -40,11 +40,17 @@ function tonAufnehmen() {
       try { const id = await speichereDateiBlob(new File([blob], 'tonnotiz', { type: blob.type || 'audio/webm' })); res({ datei: id, dauer, mime: blob.type || '' }); }
       catch (e) { toast('Die Aufnahme ließ sich nicht ablegen.'); res(null); }
     } }, 'Aufkleben');
+    const probeStoppen = () => {
+      if (probe) { try { probe.pause(); probe.removeAttribute('src'); probe.load(); } catch (e) {} }
+      if (probeURL) { try { URL.revokeObjectURL(probeURL); } catch (e) {} }
+      probe = null; probeURL = ''; anhoeren.textContent = 'Anhören';
+    };
     const anhoeren = el('button', { class: 'knopf', disabled: 'disabled', onclick: () => {
       if (!blob) return;
-      if (probe) { probe.pause(); probe = null; anhoeren.textContent = 'Anhören'; return; }
-      probe = new Audio(URL.createObjectURL(blob)); probe.onended = () => { probe = null; anhoeren.textContent = 'Anhören'; };
-      probe.play().catch(() => {}); anhoeren.textContent = 'Anhalten';
+      if (probe) { probeStoppen(); return; }
+      probeURL = URL.createObjectURL(blob); probe = new Audio(probeURL);
+      probe.onended = probeStoppen; probe.onerror = probeStoppen;
+      probe.play().catch(probeStoppen); anhoeren.textContent = 'Anhalten';
     } }, 'Anhören');
 
     const pegelZeichnen = () => {
@@ -60,13 +66,13 @@ function tonAufnehmen() {
       try { if (rekorder && rekorder.state !== 'inactive') rekorder.stop(); } catch (e) {}
       try { if (strom) strom.getTracks().forEach((t) => t.stop()); } catch (e) {}
       try { if (audioCtx) audioCtx.close(); } catch (e) {}
-      if (probe) { try { probe.pause(); } catch (e) {} }
+      probeStoppen();
     };
     const starte = async () => {
       try { strom = await navigator.mediaDevices.getUserMedia({ audio: true }); }
       catch (e) { toast('Kein Zugriff aufs Mikrofon. In den Geräteeinstellungen erlauben.', 4200); return; }
       if (fertig) { try { strom.getTracks().forEach((t) => t.stop()); } catch (e) {} strom = null; return; }
-      stuecke = []; blob = null; aufkleben.disabled = true; anhoeren.disabled = true;
+      probeStoppen(); stuecke = []; blob = null; aufkleben.disabled = true; anhoeren.disabled = true;
       const mime = tonMime();
       try { rekorder = mime ? new MediaRecorder(strom, { mimeType: mime }) : new MediaRecorder(strom); }
       catch (e) { rekorder = new MediaRecorder(strom); }
@@ -112,16 +118,21 @@ function baueTon(a, blatt, neuBauen) {
   const spiel = el('button', { class: 'ton-spiel', html: ik('vorlesen'), title: 'Abspielen' });
   const name = el('div', { class: 'ton-name' }, a.label || 'Tonnotiz');
   const zeit = el('div', { class: 'ton-zeit' }, tonFormat(a.dauer));
+  const spielBeenden = () => {
+    if (audio) medienURLAktiv(audio.src, false);
+    halter.classList.remove('spielt'); zeit.textContent = tonFormat(a.dauer);
+  };
   spiel.addEventListener('pointerdown', (e) => e.stopPropagation());
   spiel.addEventListener('click', async (e) => {
     e.stopPropagation();
-    if (audio && !audio.paused) { audio.pause(); audio.currentTime = 0; halter.classList.remove('spielt'); zeit.textContent = tonFormat(a.dauer); return; }
+    if (audio && !audio.paused) { audio.pause(); audio.currentTime = 0; spielBeenden(); return; }
     const url = await bildURL(a.datei);
     if (!url) { toast('Die Aufnahme ist nicht da.'); return; }
     audio = new Audio(url);
     audio.ontimeupdate = () => { zeit.textContent = tonFormat(audio.currentTime) + ' / ' + tonFormat(a.dauer); };
-    audio.onended = () => { halter.classList.remove('spielt'); zeit.textContent = tonFormat(a.dauer); };
-    try { await audio.play(); halter.classList.add('spielt'); } catch (x) { toast('Abspielen ging gerade nicht.'); }
+    audio.onended = spielBeenden; audio.onerror = spielBeenden;
+    medienURLAktiv(url, true);
+    try { await audio.play(); halter.classList.add('spielt'); } catch (x) { spielBeenden(); toast('Abspielen ging gerade nicht.'); }
   });
   halter.append(el('div', { class: 'ton-kassette' }, spiel, el('div', { class: 'ton-text' }, name, zeit)));
   anlageGesten(halter, a, blatt, neuBauen);

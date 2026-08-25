@@ -1,4 +1,4 @@
-# Übergabe an Codex — Stand VANI 5.53.0 (24. August 2026)
+# Übergabe an Codex — Stand VANI 5.54.0 (25. August 2026)
 
 Dieses Dokument fasst zusammen, was seit der letzten Hosting-Übergabe (Sites-Deploy,
 Stand um 5.8/5.9) in VANI entstanden ist — knapp genug zum Lesen, genau genug zum
@@ -436,6 +436,39 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
   auch ein mittlerer Stern seinen Hof. Das ist der Unterschied zwischen Salz auf Papier und einem
   Himmel — und es hilft überall, nicht nur im Fernrohr.
 
+- **5.54** Große Bestandsaufnahme und Härtung: lokale und selbst gehostete Server liefern nur
+  noch echte App-Dateien aus (keine Quellen, Git-Daten oder `faden.enc`), der Desktop- und
+  Docker-Bau nehmen den privaten Altbestand nicht mehr mit. Insbesondere reist die lokal
+  ignorierte `einlesung/einlesung.json` weder in ASAR, Docker noch Hosting; ausgeliefert werden
+  nur der versiegelte Inhalt und sein Umschlag. Dialoge räumen auch bei
+  programmatischen Wechseln Listener und Animationen vollständig weg. Parallele Bildwünsche
+  teilen sich eine Object-URL, Tonvorschauen geben ihre URL frei, Salon-Resize-Hörer leben nur
+  noch so lange wie der Raum, PDF-Canvas- und Ambience-Caches haben Speichergrenzen; unter
+  „Alles sicher“ lassen sich unsichtbare Zwischenspeicher zudem bewusst freigeben. EPUB legt
+  schnelle Folgeaufträge nicht mehr ab. Der Service Worker lädt bereits gecachte Zusatzdateien
+  nicht bei jedem Öffnen erneut. Der Web-Build behält globale Namen, entfernt aber Produktions-
+  leerraum und spart dadurch rund 740 KB Rohgröße; `VANI_DEBUG_BUILD=1` erzeugt weiter die
+  unkomprimierte Diagnosefassung.
+
+  **Bedien- und iPad-Runde:** Alle sichtbaren Fingerziele haben auf Touch-Geräten mindestens
+  44 × 44 px. Der Sternhimmel lässt sich auch mit aufgelegtem Fernrohr nativ rollen; nur die
+  Fassung fängt eine Ziehbewegung ab. Beim Führen werden Himmel, Leiste und Karten nicht mehr
+  neu gebaut, sondern nur Okular und Befund höchstens einmal pro Animationsbild aktualisiert.
+  Das Fernrohrfeld wird je Saat/Dichte/Tag vorbereitet, die 72 Riffelstriche sind ein einziger
+  SVG-Pfad und der teure Schattenfilter über dem ganzen Himmel ist einem kompositorisch
+  günstigeren Kreisschatten gewichen. Die Beschriftung im Glas und der Befund zählen jetzt
+  dieselben sichtbaren und nur im Fernrohr erkennbaren Sterne.
+
+  Auf Cluster-Brettern schreibt eine Kneifgeste nicht mehr bis zu 120-mal pro Sekunde in
+  IndexedDB. Ansicht und Kanten folgen per `requestAnimationFrame`; Kanten-DOM wird beim Ziehen
+  nur vermessen und versetzt, nicht fortlaufend abgerissen und wieder aufgebaut. Abgebrochene
+  Touchgesten hinterlassen in Cluster, Projekten, Heften, Album, PDF und EPUB keinen Zieh- oder
+  Wischzustand mehr; EPUB-Wischen blättert nicht zusätzlich über den nachfolgenden Klick.
+  Schreibtisch- und Umschlageinstellungen zeichnen den Raum erst beim Schließen neu statt nach
+  jedem Schalter, und Leser- sowie Brieffenster laden den unveränderten Hintergrund nicht
+  grundlos erneut. Die drei IndexedDB-Bestände starten parallel; der künstliche Startvorhang
+  ist deutlich kürzer.
+
 ## 4. Technische Punkte, die beim Hosting wichtig sind
 
 - Einzelne HTML-Datei aus `src/` (`npm run build:web` → `index.html`); Service Worker `sw.js`
@@ -453,4 +486,8 @@ Deployen. Die ausführliche Entwicklergeschichte steht in `CLAUDE-UEBERNAHME.md`
 
 ## 5. Tests
 
-`npm test` → 178 grün (Stand 5.27.1). Hosting: `node --test hosting/tests/*.test.mjs` → 2 grün.
+`npm test` → 381 grün (Stand 5.54.0). Hosting: `npm test --prefix hosting` → 2 grün.
+Zusätzlich wurden alle 13 Hauptbereiche im iPad-Hoch- und Querformat vermessen: kein
+horizontal abgeschnittener App-Inhalt und kein sichtbares Fingerziel unter 44 px. Der
+gepackte Windows-Build 5.54.0 besteht den CDP-Smoke; sein ASAR enthält weder Klartext-Einlesung
+noch `faden.enc`, App-Quellen oder Git-Daten. `npm audit` meldet 0 bekannte Schwachstellen.

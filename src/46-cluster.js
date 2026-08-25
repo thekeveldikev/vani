@@ -117,9 +117,22 @@ RENDER.brett = function (haupt, bid) {
 
   haupt.append(raum, kopfleiste, werkzeuge);
 
+  let wendeRaf = 0, sichtSpeicher = 0;
   function wende() {
-    flaeche.style.transform = 'translate(' + sicht.x + 'px,' + sicht.y + 'px) scale(' + sicht.z + ')';
-    zoomAnzeige.textContent = Math.round(sicht.z * 100) + '%';
+    if (wendeRaf) return;
+    wendeRaf = requestAnimationFrame(() => {
+      wendeRaf = 0;
+      if (!raum.isConnected) return;
+      flaeche.style.transform = 'translate(' + sicht.x + 'px,' + sicht.y + 'px) scale(' + sicht.z + ')';
+      zoomAnzeige.textContent = Math.round(sicht.z * 100) + '%';
+    });
+  }
+  /* Beim Kneifen kamen auf einem iPad Pro bis zu 120 Speicherungen pro
+     Sekunde zusammen. Die Ansicht darf jedem Fingerbild folgen; auf die
+     Platte muss sie erst, wenn die Geste kurz stillsteht. */
+  function sichtSpaeterSpeichern() {
+    clearTimeout(sichtSpeicher);
+    sichtSpeicher = setTimeout(() => { sichtSpeicher = 0; speichereStill(brett); }, 220);
   }
   function weltPunkt(cx, cy) { return { x: (cx - sicht.x) / sicht.z, y: (cy - sicht.y) / sicht.z }; }
   function zoomeUm(f, cx, cy) {
@@ -129,7 +142,7 @@ RENDER.brett = function (haupt, bid) {
     sicht.x = cx - (cx - sicht.x) * echt;
     sicht.y = cy - (cy - sicht.y) * echt;
     wende();
-    speichereStill(brett);
+    sichtSpaeterSpeichern();
   }
 
   /* Kanten zeichnen */
@@ -139,15 +152,43 @@ RENDER.brett = function (haupt, bid) {
     const h = elem ? elem.offsetHeight : 60;
     return { x: b.pos.x + w / 2, y: b.pos.y + h / 2 };
   }
+  let kantenAnzeige = [], kantenRaf = 0;
+  function kantenPunkteAktualisieren() {
+    const punkte = new Map();
+    const punkt = (d) => {
+      if (!d) return null;
+      if (!punkte.has(d.id)) punkte.set(d.id, mittelpunkt(d));
+      return punkte.get(d.id);
+    };
+    for (const anzeige of kantenAnzeige) {
+      const von = D.docs.get(anzeige.k.von), zu = D.docs.get(anzeige.k.zu);
+      const a = punkt(von), b = punkt(zu);
+      if (!a || !b) continue;
+      for (const linie of [anzeige.linie, anzeige.griff]) {
+        linie.setAttribute('x1', a.x + 20000); linie.setAttribute('y1', a.y + 20000);
+        linie.setAttribute('x2', b.x + 20000); linie.setAttribute('y2', b.y + 20000);
+      }
+      if (anzeige.text) {
+        anzeige.text.setAttribute('x', (a.x + b.x) / 2 + 20000);
+        anzeige.text.setAttribute('y', (a.y + b.y) / 2 + 20000 - 6);
+      }
+    }
+  }
+  function kantenImNaechstenBild() {
+    if (kantenRaf) return;
+    kantenRaf = requestAnimationFrame(() => {
+      kantenRaf = 0;
+      if (raum.isConnected) kantenPunkteAktualisieren();
+    });
+  }
   function baueKanten() {
+    if (kantenRaf) { cancelAnimationFrame(kantenRaf); kantenRaf = 0; }
     svg.innerHTML = '';
+    kantenAnzeige = [];
     for (const k of kinder(brett.id, 'kante')) {
       const von = D.docs.get(k.von), zu = D.docs.get(k.zu);
       if (!von || !zu) continue;
-      const a = mittelpunkt(von), b = mittelpunkt(zu);
       const linie = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      linie.setAttribute('x1', a.x + 20000); linie.setAttribute('y1', a.y + 20000);
-      linie.setAttribute('x2', b.x + 20000); linie.setAttribute('y2', b.y + 20000);
       svg.append(linie);
       const griff = linie.cloneNode();
       griff.setAttribute('class', 'klickbar');
@@ -162,15 +203,16 @@ RENDER.brett = function (haupt, bid) {
         } else if (wahl === 'weg') { await loesche(k.id); baueKanten(); }
       });
       svg.append(griff);
+      let text = null;
       if (k.label) {
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', (a.x + b.x) / 2 + 20000);
-        text.setAttribute('y', (a.y + b.y) / 2 + 20000 - 6);
+        text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('text-anchor', 'middle');
         text.textContent = k.label;
         svg.append(text);
       }
+      kantenAnzeige.push({ k, linie, griff, text });
     }
+    kantenPunkteAktualisieren();
   }
 
   /* Blasen bauen */
@@ -217,7 +259,7 @@ RENDER.brett = function (haupt, bid) {
         const el2 = flaeche.querySelector('[data-id="' + m.b.id + '"]');
         if (el2) { el2.style.left = m.b.pos.x + 'px'; el2.style.top = m.b.pos.y + 'px'; }
       }
-      baueKanten();
+      kantenImNaechstenBild();
     });
     const endeZug = () => {
       if (!zug) return;
@@ -373,7 +415,7 @@ RENDER.brett = function (haupt, bid) {
       b.pos.x = zieht.px + dx; b.pos.y = zieht.py + dy;
       blase.style.left = b.pos.x + 'px';
       blase.style.top = b.pos.y + 'px';
-      baueKanten();
+      kantenImNaechstenBild();
     });
     blase.addEventListener('pointerup', () => {
       if (!zieht) return;
@@ -396,7 +438,14 @@ RENDER.brett = function (haupt, bid) {
       ta.removeAttribute('readonly');
       ta.focus();
     });
-    blase.addEventListener('pointercancel', () => { zieht = null; });
+    blase.addEventListener('pointercancel', () => {
+      if (!zieht) return;
+      const bewegt = zieht.bewegt;
+      zieht = null;
+      blase._zieht = false;
+      if (bewegt) speichereStill(b);
+      kantenImNaechstenBild();
+    });
 
     langdruck(blase, async () => {
       const wahl = await menue([

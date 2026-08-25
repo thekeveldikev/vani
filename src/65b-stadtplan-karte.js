@@ -108,7 +108,10 @@ function planKachel(doc, i, neu) {
         z.haeuser + ' Häuser',
         z.marken ? z.marken + (z.marken === 1 ? ' Marke' : ' Marken') : ''
       ].filter(Boolean).join('  ·  '))));
-  kachel.addEventListener('contextmenu', (ev) => { ev.preventDefault(); planKachelMenue(doc, neu); });
+  /* Auf dem iPad gibt es keinen Rechtsklick. Der gemeinsame Langdruck
+     unterdrueckt anschliessend auch den normalen Klick und oeffnet das
+     Kartenmenue zuverlaessig, ohne Safaris Text-/Bildmenue. */
+  langdruck(kachel, () => planKachelMenue(doc, neu));
   return kachel;
 }
 
@@ -1411,7 +1414,7 @@ function planMarkenkarte(doc, plan, markeId, neu) {
     el('div', { class: 'kt-mkart' }, art.name),
     m.notiz ? el('p', { class: 'kt-mknotiz' }, m.notiz) : null,
     figur && figur.typ === 'albumfigur' && !figur.geloescht
-      ? el('button', { class: 'kt-mkfigur', onclick: () => { if (typeof albumSpringeZu === 'function') { const h = document.querySelector('.kt-huelle'); const s = h && h.closest('.schleier'); if (s) s.remove(); albumSpringeZu(figur.id); } } },
+      ? el('button', { class: 'kt-mkfigur', onclick: () => { if (typeof albumSpringeZu === 'function') { const h = document.querySelector('.kt-huelle'); if (h) schliesseDeck(h); albumSpringeZu(figur.id); } } },
         'Im Album: ', el('b', {}, figur.name || 'ohne Namen'))
       : null);
 

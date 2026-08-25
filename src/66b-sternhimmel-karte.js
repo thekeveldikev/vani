@@ -708,7 +708,7 @@ function sternRohrfeld(himmel) {
 
 /* Was steht gerade unter dem Okular? Die Auskunft macht aus dem Blick
    eine Beobachtung. */
-function sternRohrBefund(himmel, gebaut, x, y) {
+function sternRohrBefund(himmel, gebaut, x, y, rohrfeld) {
   const weite = STERN_ROHR_R / STERN_ROHR_V;
   const nah = [];
   for (const b of himmel.sternbilder) {
@@ -734,7 +734,15 @@ function sternRohrBefund(himmel, gebaut, x, y) {
     if (d < weite) nah.push({ was: 'ein Nebel', d });
   }
   nah.sort((a, b) => a.d - b.d);
-  const gezaehlt = (gebaut.sterne || []).filter((s) => Math.hypot(s.x - x, s.y - y) < weite).length;
+  let gezaehlt = 0;
+  for (const s of gebaut.sterne || []) if (Math.hypot(s.x - x, s.y - y) < weite) gezaehlt++;
+  /* Im Befund muessen auch die Sterne stehen, die erst das Glas sichtbar
+     macht. Vorher meldete die Gravur am Okular z. B. 105 Sterne, die Karte
+     darunter aber nur 13 — beide zaehlten unterschiedliche Himmel. */
+  for (const s of rohrfeld || []) {
+    const [sx, sy] = Number.isFinite(s.x) && Number.isFinite(s.y) ? [s.x, s.y] : sternStelle(s, himmel.tag);
+    if (Math.hypot(sx - x, sy - y) < weite) gezaehlt++;
+  }
   return {
     nah: nah.slice(0, 3).map((n) => n.was),
     sterne: gezaehlt,
@@ -744,7 +752,7 @@ function sternRohrBefund(himmel, gebaut, x, y) {
 }
 
 /* Das Okular selbst. */
-function sternFernrohrZeichnen(himmel, gebaut, w, allesId) {
+function sternFernrohrZeichnen(himmel, gebaut, w, allesId, rohrfeld) {
   const rohr = _st.rohr || { x: STERN_MITTE, y: STERN_MITTE };
   const g = stv('g', { class: 'sh-fernrohr' });
   const R = STERN_ROHR_R;
@@ -778,14 +786,18 @@ function sternFernrohrZeichnen(himmel, gebaut, w, allesId) {
   /* Und das, was erst im Glas sichtbar wird. Gezeichnet wird nur, was
      wirklich ins Okular fällt — alles andere wäre verschenkte Arbeit. */
   const weite = R / V + 6;
-  const feld = sternRohrfeld(himmel);
+  const feld = rohrfeld || sternRohrfeld(himmel);
   const zusatz = stv('g', { class: 'sh-rohrsterne', transform: t });
   let d = '';
   let wieViele = 0;
+  for (const s of gebaut.sterne || []) {
+    if (Math.hypot(s.x - rohr.x, s.y - rohr.y) < R / V) wieViele++;
+  }
   for (const s of feld) {
-    const [x, y] = sternStelle(s, himmel.tag);
-    if (Math.hypot(x - rohr.x, y - rohr.y) > weite) continue;
-    wieViele++;
+    const [x, y] = Number.isFinite(s.x) && Number.isFinite(s.y) ? [s.x, s.y] : sternStelle(s, himmel.tag);
+    const abstand = Math.hypot(x - rohr.x, y - rohr.y);
+    if (abstand > weite) continue;
+    if (abstand < R / V) wieViele++;
     if (s.gr < 0.34) { d += ' M ' + stz(x) + ' ' + stz(y) + ' h .01'; continue; }
     /* Die kräftigeren unter den Fernrohrsternen bekommen einen Hof — im
        Glas sammelt sich das Licht, und genau das soll man sehen. */
@@ -818,14 +830,15 @@ function sternFernrohrZeichnen(himmel, gebaut, w, allesId) {
   g.append(stv('circle', { cx: stz(rohr.x), cy: stz(rohr.y), r: stz(R), class: 'sh-okularglas', stroke: w.rand }));
   g.append(stv('circle', { cx: stz(rohr.x), cy: stz(rohr.y), r: stz(R + 9), class: 'sh-okularfassung', stroke: w.rand }));
   /* Feine Riffelung auf der Fassung — daran erkennt man Messing. */
+  /* Eine einzige Kontur statt 72 einzelner SVG-Knoten. Das sieht gleich aus,
+     spart aber bei jeder Fingerbewegung sehr viel DOM-Arbeit. */
+  let riffel = '';
   for (let i = 0; i < 72; i++) {
     const a = (i / 72) * Math.PI * 2;
-    g.append(stv('path', {
-      d: 'M ' + stz(rohr.x + Math.cos(a) * (R + 4)) + ' ' + stz(rohr.y + Math.sin(a) * (R + 4)) +
-         ' L ' + stz(rohr.x + Math.cos(a) * (R + 9)) + ' ' + stz(rohr.y + Math.sin(a) * (R + 9)),
-      class: 'sh-okularriffel', stroke: w.rand
-    }));
+    riffel += 'M ' + stz(rohr.x + Math.cos(a) * (R + 4)) + ' ' + stz(rohr.y + Math.sin(a) * (R + 4)) +
+      ' L ' + stz(rohr.x + Math.cos(a) * (R + 9)) + ' ' + stz(rohr.y + Math.sin(a) * (R + 9)) + ' ';
   }
+  g.append(stv('path', { d: riffel.trim(), class: 'sh-okularriffel', stroke: w.rand }));
 
   /* Die Vergrößerung steht unten an der Fassung, wie eingraviert. */
   const zahl = stv('text', {

@@ -13,6 +13,18 @@ protocol.registerSchemesAsPrivileged([{
 const APP_ID = 'de.vani.schreibzuhause';
 let fenster = null;
 let updater = null;
+const OEFFENTLICHE_DATEIEN = new Set(['index.html', 'manifest.json', 'sw.js', 'robots.txt']);
+const OEFFENTLICHE_ORDNER = new Set(['icons', 'vendor', 'klang', 'sticker', 'autoren']);
+const OEFFENTLICHE_EINLESUNG = new Set(['einlesung/einlesung.enc', 'einlesung/umschlag.json']);
+
+function oeffentlicherPfad(p) {
+  const relativ = String(p || '').replace(/\\/g, '/').replace(/^\/+/, '');
+  const teile = relativ.split('/');
+  if (!relativ || relativ.includes('\0') || teile.some((x) => !x || x === '.' || x === '..')) return null;
+  if (teile.length === 1 && OEFFENTLICHE_DATEIEN.has(relativ)) return relativ;
+  if (OEFFENTLICHE_EINLESUNG.has(relativ)) return relativ;
+  return OEFFENTLICHE_ORDNER.has(teile[0]) ? relativ : null;
+}
 
 function appWurzel() { return app.getAppPath(); }
 function istVaniAbsender(event) {
@@ -67,7 +79,8 @@ async function registriereProtokoll() {
     try {
       const url = new URL(anfrage.url);
       if (url.hostname !== 'app') return new Response('Nicht erlaubt', { status: 403 });
-      relativ = decodeURIComponent(url.pathname).replace(/^\/+/, '') || 'index.html';
+      relativ = oeffentlicherPfad(decodeURIComponent(url.pathname).replace(/^\/+/, '') || 'index.html');
+      if (!relativ) return new Response('Nicht erlaubt', { status: 403 });
     } catch (_) { return new Response('Kaputte Adresse', { status: 400 }); }
     const wurzel = path.resolve(appWurzel());
     const datei = path.resolve(wurzel, relativ);

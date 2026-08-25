@@ -434,6 +434,24 @@ async function buchCoverAusSeite(b, n) {
 
 /* ----- Der Lesemodus ----- */
 let _leser = null;
+const LESE_CACHE_SEITEN = 6;
+const LESE_CACHE_PIXEL = 24 * 1000 * 1000;   /* ungefaehr 96 MB RGBA, auf Retina wichtig */
+function leserCacheAblegen(cache, schluessel, canvas, maxSeiten = LESE_CACHE_SEITEN, maxPixel = LESE_CACHE_PIXEL) {
+  const pixel = (c) => Math.max(0, Number(c && c.width) || 0) * Math.max(0, Number(c && c.height) || 0);
+  let belegt = 0;
+  for (const c of cache.values()) belegt += pixel(c);
+  const neu = pixel(canvas);
+  while (cache.size && (cache.size >= maxSeiten || (belegt + neu > maxPixel && belegt > 0))) {
+    const [altKey, alt] = cache.entries().next().value;
+    cache.delete(altKey); belegt -= pixel(alt);
+  }
+  cache.set(schluessel, canvas);
+  return cache.size;
+}
+function leserCacheFreigeben() {
+  if (!_leser || !_leser.cache) return 0;
+  const n = _leser.cache.size; _leser.cache.clear(); return n;
+}
 async function buchOeffnen(b) {
   if (b && b.art === 'epub' && typeof epubOeffnen === 'function') return epubOeffnen(b);
   if (_leser) buchSchliessen();
@@ -491,8 +509,7 @@ async function buchOeffnen(b) {
     c.style.width = Math.round(vp.width / dpr) + 'px'; c.style.height = Math.round(vp.height / dpr) + 'px';
     await seite.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
     c._vp = vp; c._dpr = dpr; c._seite = n;
-    if (leser.cache.size > 10) leser.cache.delete(leser.cache.keys().next().value);
-    leser.cache.set(schl, c);
+    leserCacheAblegen(leser.cache, schl, c);
     return c;
   }
   async function zeige(richtung) {
@@ -553,6 +570,7 @@ async function buchOeffnen(b) {
     if (!wisch) return; const dx = ev.clientX - wisch.x, dy = ev.clientY - wisch.y; wisch = null;
     if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { wischte = true; blaettere(dx < 0 ? 1 : -1); ev.preventDefault(); }
   });
+  buehne.addEventListener('pointercancel', () => { wisch = null; });
   leser.tasten = (ev) => {
     if (!_leser) return;
     const ziel = ev.target;
@@ -586,7 +604,6 @@ function buchSchliessen() {
   if (l.liest) { l.liest = null; try { speechSynthesis.cancel(); } catch (e) {} document.body.classList.remove('liest-vor'); }
   try { if (l.dok) l.dok.destroy(); } catch (e) {}
   l.raum.remove();
-  zeichne();
 }
 async function leserGliederung() {
   if (!_leser || !_leser.dok) return;

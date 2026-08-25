@@ -1305,7 +1305,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22p
   position: fixed; inset: 0; z-index: 2000;
   background: var(--hg);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px;
-  transition: opacity .6s ease;
+  transition: opacity .32s ease;
 }
 #vorhang.auf { opacity: 0; pointer-events: none; }
 #vorhang .streichholz { position: relative; width: 8px; height: 62px; }
@@ -6659,8 +6659,11 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 .sh-flaeche::-webkit-scrollbar-track { background: transparent; }
 .sh-flaeche::-webkit-scrollbar-thumb { background: rgba(255,255,255,.16); border-radius: 5px; }
 .sh-innen { min-width: 100%; min-height: 100%; display: grid; place-items: center; padding: 22px; }
-.sh-blattkasten { position: relative; filter: drop-shadow(0 12px 40px rgba(0,0,0,.65)); }
-.sh-blatt { display: block; max-width: none; max-height: none; border-radius: 50%; }
+.sh-blattkasten { position: relative; }
+/* Ein Filter ueber dem kompletten, grossen SVG wurde bei jedem Scrollbild
+   neu zusammengesetzt. Der kreisrunde Box-Schatten sieht gleich aus und
+   kann als Teil derselben Ebene mitrollen. */
+.sh-blatt { display: block; max-width: none; max-height: none; border-radius: 50%; box-shadow: 0 12px 40px rgba(0,0,0,.65); }
 
 /* ----- Was auf dem Blatt liegt ----- */
 .sh-milchschein { stroke: none; }
@@ -6693,7 +6696,7 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
    Ein Okular, das ueber den Himmel faehrt. Die Fassung ist Messing, das
    Glas vignettiert zum Rand hin — ohne das sieht der Ausschnitt aus wie
    ein Loch im Papier. */
-.sh-fernrohr { cursor: grab; }
+.sh-fernrohr { cursor: grab; touch-action: none; }
 .sh-fernrohr:active { cursor: grabbing; }
 .sh-okulargrund { stroke: none; }
 .sh-okularsaum { stroke: none; pointer-events: none; }
@@ -6709,6 +6712,7 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 .sh-kleinhof { stroke: none; opacity: .45; }
 .sh-rohrkorn { fill: none; stroke-width: .5; stroke-linecap: round; stroke-opacity: .5; }
 .sh-blatt .sh-fernrohr { animation: sh-okularkommt .3s cubic-bezier(.2,.9,.3,1); }
+.sh-flaeche.rohr-bewegt .sh-fernrohr { animation: none; }
 @keyframes sh-okularkommt { from { opacity: 0; } to { opacity: 1; } }
 
 /* Was gerade im Glas steht. */
@@ -6831,3 +6835,20 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
   .sh-vzeile:hover { background: color-mix(in srgb, var(--akzent) 9%, var(--karte)); }
 }
 .sh-vzeile.auff b { font-weight: 500; }
+
+/* Fingerziele: Ein iPad-Finger ist kein Mauszeiger. Kleine Schriftknöpfe
+   bleiben optisch ruhig, bekommen auf Touch-Geräten aber die verlässliche
+   Mindestfläche, die auch am Rand und in Bewegung noch getroffen wird. */
+@media (any-pointer: coarse) {
+  button, .lknopf, .knopf, .rundknopf, select,
+  input:not([type]), input[type="text"], input[type="search"],
+  input[type="password"], input[type="number"], input[type="url"] {
+    min-inline-size: 44px;
+    min-block-size: 44px;
+  }
+  input[type="range"] {
+    min-block-size: 44px;
+    background: linear-gradient(to bottom, transparent 20px, var(--linie) 20px, var(--linie) 24px, transparent 24px);
+  }
+  input[type="checkbox"], input[type="radio"] { min-inline-size: 24px; min-block-size: 24px; }
+}

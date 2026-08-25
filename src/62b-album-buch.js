@@ -192,6 +192,7 @@ function albumZeichne(buehne, neu, schliessen) {
     if (Date.now() - s.t > 700 || Math.abs(dx) < 70 || Math.abs(dy) > Math.abs(dx) * .6) return;
     albumBlaettern(dx < 0 ? 1 : -1, buehne, neu);
   });
+  block.addEventListener('pointercancel', () => { start = null; });
 }
 
 /* ----- Die feste Leiste oben ----- */
@@ -701,7 +702,7 @@ function albumSpringeZu(id) {
   if (!buehne) { albumOeffnen(stelle); return; }
   const neu = (j) => {
     if (j != null) _alb.i = j;
-    albumZeichne(buehne, neu, () => { const h = document.querySelector('.alb-huelle'); const s = h && h.closest('.schleier'); if (s) s.remove(); });
+    albumZeichne(buehne, neu, () => { const h = document.querySelector('.alb-huelle'); if (h) schliesseDeck(h); });
   };
   albumSpringen(stelle, neu);
 }

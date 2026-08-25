@@ -17,8 +17,22 @@ const B64_RE = /^[A-Za-z0-9_-]+$/;
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.png': 'image/png',
-  '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json'
+  '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.ico': 'image/x-icon',
+  '.webmanifest': 'application/manifest+json', '.wasm': 'application/wasm',
+  '.opus': 'audio/ogg', '.wav': 'audio/wav', '.enc': 'application/octet-stream'
 };
+const OEFFENTLICHE_DATEIEN = new Set(['index.html', 'manifest.json', 'sw.js', 'robots.txt']);
+const OEFFENTLICHE_ORDNER = new Set(['icons', 'vendor', 'klang', 'sticker', 'autoren', 'buecher']);
+const OEFFENTLICHE_EINLESUNG = new Set(['einlesung/einlesung.enc', 'einlesung/umschlag.json']);
+
+export function oeffentlicherPfad(p) {
+  const relativ = String(p || '').replace(/\\/g, '/').replace(/^\/+/, '');
+  const teile = relativ.split('/');
+  if (!relativ || relativ.includes('\0') || teile.some((x) => !x || x === '.' || x === '..')) return null;
+  if (teile.length === 1 && OEFFENTLICHE_DATEIEN.has(relativ)) return relativ;
+  if (OEFFENTLICHE_EINLESUNG.has(relativ)) return relativ;
+  return OEFFENTLICHE_ORDNER.has(teile[0]) ? relativ : null;
+}
 
 function tokenHash(token) { return createHash('sha256').update(token).digest(); }
 function gleich(a, b) {
@@ -31,9 +45,17 @@ function json(res, status, wert, extra = {}) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': inhalt.length, ...extra });
   res.end(inhalt);
 }
-function fehler(res, status, code) { json(res, status, { fehler: code }); }
+function fehler(res, status, code, extra = {}) { json(res, status, { fehler: code }, extra); }
+function bodyFehler(e) {
+  return e && (e.message === 'kaputtes_json' || e.message === 'zu_gross') ? e.message : 'serverfehler';
+}
 function liesBody(req, max) {
   return new Promise((resolve, reject) => {
+    const angekuendigt = Number(req.headers['content-length'] || 0);
+    if (Number.isFinite(angekuendigt) && angekuendigt > max) {
+      req.resume();
+      reject(Object.assign(new Error('zu_gross'), { status: 413 })); return;
+    }
     const teile = [];
     let laenge = 0, zuGross = false;
     req.on('data', (teil) => {
@@ -70,6 +92,7 @@ export function erzeugeSyncDienst({ datenbankPfad, statikWurzel = STANDARD_WURZE
   const dbPfad = datenbankPfad || path.join(process.env.VANI_DATA_DIR || path.join(STANDARD_WURZEL, 'vani-sync-data'), 'vani.sqlite');
   if (dbPfad !== ':memory:') fs.mkdirSync(path.dirname(path.resolve(dbPfad)), { recursive: true });
   const db = new DatabaseSync(dbPfad, { timeout: 5000 });
+  const statikBasis = fs.realpathSync(path.resolve(statikWurzel));
   db.exec(`
     PRAGMA journal_mode=WAL;
     PRAGMA synchronous=FULL;
@@ -135,12 +158,13 @@ export function erzeugeSyncDienst({ datenbankPfad, statikWurzel = STANDARD_WURZE
   const server = http.createServer(async (req, res) => {
     const origin = originFuer(req);
     const cors = sichereHeader(origin || 'null');
-    if (!origin && req.headers.origin) { fehler(res, 403, 'origin_nicht_erlaubt'); return; }
+    const fail = (status, code) => fehler(res, status, code, cors);
+    if (!origin && req.headers.origin) { fail(403, 'origin_nicht_erlaubt'); return; }
     if (req.method === 'OPTIONS') { res.writeHead(204, cors); res.end(); return; }
-    if (!rateOk(req)) { fehler(res, 429, 'zu_viele_anfragen'); return; }
+    if (!rateOk(req)) { fail(429, 'zu_viele_anfragen'); return; }
     let url;
     try { url = new URL(req.url || '/', 'http://vani.local'); }
-    catch (_) { fehler(res, 400, 'kaputte_adresse'); return; }
+    catch (_) { fail(400, 'kaputte_adresse'); return; }
 
     if (req.method === 'GET' && url.pathname === '/v1/health') {
       json(res, 200, { ok: true, dienst: 'vani-sync', version: 1 }, cors); return;
@@ -148,24 +172,24 @@ export function erzeugeSyncDienst({ datenbankPfad, statikWurzel = STANDARD_WURZE
     if (req.method === 'POST' && url.pathname === '/v1/vaults') {
       try {
         const body = await liesBody(req, MAX_KLEIN_BODY);
-        if (!ID_RE.test(body.vaultId || '') || !TOKEN_RE.test(body.token || '')) { fehler(res, 400, 'ungueltiger_bereich'); return; }
+        if (!ID_RE.test(body.vaultId || '') || !TOKEN_RE.test(body.token || '')) { fail(400, 'ungueltiger_bereich'); return; }
         try { qInsertVault.run(body.vaultId, tokenHash(body.token), Date.now()); }
         catch (e) {
-          if (String(e.message).includes('UNIQUE')) { fehler(res, 409, 'bereich_existiert'); return; }
+          if (String(e.message).includes('UNIQUE')) { fail(409, 'bereich_existiert'); return; }
           throw e;
         }
         json(res, 201, { ok: true }, cors);
-      } catch (e) { if (!res.headersSent) fehler(res, e.status || 500, e.message === 'kaputtes_json' ? 'kaputtes_json' : 'serverfehler'); }
+      } catch (e) { if (!res.headersSent) fail(e.status || 500, bodyFehler(e)); }
       return;
     }
     const treffer = url.pathname.match(/^\/v1\/vaults\/([A-Za-z0-9_-]{20,100})\/updates$/);
     if (treffer) {
       const vaultId = treffer[1];
-      if (!autorisiert(req, vaultId)) { fehler(res, 401, 'nicht_berechtigt'); return; }
+      if (!autorisiert(req, vaultId)) { fail(401, 'nicht_berechtigt'); return; }
       if (req.method === 'GET') {
         const afterText = url.searchParams.get('after') || '0';
         const limitText = url.searchParams.get('limit') || '200';
-        if (!/^\d{1,16}$/.test(afterText) || !/^\d{1,4}$/.test(limitText)) { fehler(res, 400, 'ungueltiger_marker'); return; }
+        if (!/^\d{1,16}$/.test(afterText) || !/^\d{1,4}$/.test(limitText)) { fail(400, 'ungueltiger_marker'); return; }
         const after = Math.min(Number(afterText), Number.MAX_SAFE_INTEGER);
         const limit = Math.max(1, Math.min(500, Number(limitText)));
         const updates = qUpdates.all(vaultId, after, limit);
@@ -178,12 +202,12 @@ export function erzeugeSyncDienst({ datenbankPfad, statikWurzel = STANDARD_WURZE
           const body = await liesBody(req, MAX_UPDATE_BODY);
           if (!ID_RE.test(body.id || '') || typeof body.iv !== 'string' || body.iv.length < 16 || body.iv.length > 32 || !B64_RE.test(body.iv) ||
               typeof body.ciphertext !== 'string' || body.ciphertext.length < 20 || body.ciphertext.length > 22 * 1024 * 1024 || !B64_RE.test(body.ciphertext)) {
-            fehler(res, 400, 'ungueltiges_update'); return;
+            fail(400, 'ungueltiges_update'); return;
           }
           qInsertUpdate.run(vaultId, body.id, body.iv, body.ciphertext, Date.now());
           const zeile = qUpdate.get(vaultId, body.id);
           json(res, 200, { ok: true, seq: Number(zeile.seq) }, cors);
-        } catch (e) { if (!res.headersSent) fehler(res, e.status || 500, e.message === 'kaputtes_json' ? 'kaputtes_json' : 'serverfehler'); }
+        } catch (e) { if (!res.headersSent) fail(e.status || 500, bodyFehler(e)); }
         return;
       }
       res.writeHead(405, { Allow: 'GET, POST, OPTIONS', ...cors }); res.end(); return;
@@ -191,7 +215,7 @@ export function erzeugeSyncDienst({ datenbankPfad, statikWurzel = STANDARD_WURZE
     const blobTreffer = url.pathname.match(/^\/v1\/vaults\/([A-Za-z0-9_-]{20,100})\/blobs(?:\/([A-Za-z0-9_-]{1,200})\/(\d{1,6}))?$/);
     if (blobTreffer) {
       const vaultId = blobTreffer[1];
-      if (!autorisiert(req, vaultId)) { fehler(res, 401, 'nicht_berechtigt'); return; }
+      if (!autorisiert(req, vaultId)) { fail(401, 'nicht_berechtigt'); return; }
       if (req.method === 'POST' && !blobTreffer[2]) {
         try {
           const body = await liesBody(req, MAX_BLOB_BODY);
@@ -199,18 +223,18 @@ export function erzeugeSyncDienst({ datenbankPfad, statikWurzel = STANDARD_WURZE
           if (!/^[A-Za-z0-9_-]{1,200}$/.test(body.blobId || '') || !Number.isInteger(chunk) || chunk < 0 || chunk > 100000 ||
               typeof body.iv !== 'string' || body.iv.length < 16 || body.iv.length > 32 || !B64_RE.test(body.iv) ||
               typeof body.ciphertext !== 'string' || body.ciphertext.length < 20 || body.ciphertext.length > 1500000 || !B64_RE.test(body.ciphertext)) {
-            fehler(res, 400, 'ungueltiger_block'); return;
+            fail(400, 'ungueltiger_block'); return;
           }
           qInsertChunk.run(vaultId, body.blobId, chunk, body.iv, body.ciphertext, Date.now());
           json(res, 200, { ok: true }, cors);
-        } catch (e) { if (!res.headersSent) fehler(res, e.status || 500, e.message === 'kaputtes_json' ? 'kaputtes_json' : 'serverfehler'); }
+        } catch (e) { if (!res.headersSent) fail(e.status || 500, bodyFehler(e)); }
         return;
       }
       if (req.method === 'GET' && blobTreffer[2]) {
         const chunk = Number(blobTreffer[3]);
-        if (!Number.isInteger(chunk) || chunk < 0 || chunk > 100000) { fehler(res, 400, 'ungueltiger_block'); return; }
+        if (!Number.isInteger(chunk) || chunk < 0 || chunk > 100000) { fail(400, 'ungueltiger_block'); return; }
         const zeile = qChunk.get(vaultId, blobTreffer[2], chunk);
-        if (!zeile) { fehler(res, 404, 'nicht_da'); return; }
+        if (!zeile) { fail(404, 'nicht_da'); return; }
         json(res, 200, zeile, cors); return;
       }
       res.writeHead(405, { Allow: 'GET, POST, OPTIONS', ...cors }); res.end(); return;
@@ -219,16 +243,28 @@ export function erzeugeSyncDienst({ datenbankPfad, statikWurzel = STANDARD_WURZE
     if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405, { Allow: 'GET, HEAD', ...cors }); res.end(); return; }
     let relativ;
     try { relativ = decodeURIComponent(url.pathname).replace(/^\/+/, '') || 'index.html'; }
-    catch (_) { fehler(res, 400, 'kaputte_adresse'); return; }
-    const wurzel = path.resolve(statikWurzel);
-    const datei = path.resolve(wurzel, relativ);
-    if (datei !== wurzel && !datei.startsWith(wurzel + path.sep)) { fehler(res, 403, 'nicht_erlaubt'); return; }
-    fs.readFile(datei, (err, inhalt) => {
-      if (err) { fehler(res, 404, 'nicht_da'); return; }
-      res.writeHead(200, { ...cors, 'Content-Type': MIME[path.extname(datei).toLowerCase()] || 'application/octet-stream' });
-      res.end(req.method === 'HEAD' ? undefined : inhalt);
+    catch (_) { fail(400, 'kaputte_adresse'); return; }
+    relativ = oeffentlicherPfad(relativ);
+    if (!relativ) { fail(403, 'nicht_erlaubt'); return; }
+    const datei = path.resolve(statikBasis, relativ);
+    if (datei !== statikBasis && !datei.startsWith(statikBasis + path.sep)) { fail(403, 'nicht_erlaubt'); return; }
+    fs.realpath(datei, (realErr, echteDatei) => {
+      const erlaubt = !realErr && (echteDatei === statikBasis || echteDatei.startsWith(statikBasis + path.sep));
+      if (!erlaubt) { fail(realErr ? 404 : 403, realErr ? 'nicht_da' : 'nicht_erlaubt'); return; }
+      fs.stat(echteDatei, (err, st) => {
+        if (err || !st.isFile()) { fail(404, 'nicht_da'); return; }
+        res.writeHead(200, { ...cors, 'Content-Type': MIME[path.extname(echteDatei).toLowerCase()] || 'application/octet-stream', 'Content-Length': st.size });
+        if (req.method === 'HEAD') { res.end(); return; }
+        const strom = fs.createReadStream(echteDatei);
+        strom.on('error', () => res.destroy());
+        strom.pipe(res);
+      });
     });
   });
+  server.headersTimeout = 15000;
+  server.requestTimeout = 120000;
+  server.keepAliveTimeout = 5000;
+  server.maxRequestsPerSocket = 1000;
   server.on('close', () => { try { db.close(); } catch (_) {} });
   return server;
 }

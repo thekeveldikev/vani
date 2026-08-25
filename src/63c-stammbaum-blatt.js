@@ -892,7 +892,7 @@ function teppichEinstellungen(doc, danach, frisch) {
         sichern.sofort();
         await loesche(doc.id);
         zu();
-        document.querySelectorAll('.tep-fenster').forEach((f) => { const s = f.closest('.schleier'); if (s) s.remove(); });
+        document.querySelectorAll('.tep-fenster').forEach((f) => schliesseDeck(f));
         if (danach) danach();
       } }, 'Abhängen') : null,
       el('button', { class: 'knopf voll', onclick: () => { sichern.sofort(); zu(); if (danach) danach(); } }, frisch ? 'Weben' : 'Fertig')));

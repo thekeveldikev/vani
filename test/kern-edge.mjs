@@ -31,6 +31,35 @@ test('freie Schnipsel: Positionen bleiben deterministisch und die Fläche bleibt
   assert.ok(g.breite >= 900 && g.hoehe >= 680 && Object.values(g).every(Number.isFinite));
 });
 
+test('Medien: parallele Bildwünsche teilen eine Object-URL statt Speicher zu verdoppeln', async () => {
+  const k = await frisch();
+  await k.dbPut('media', new Blob(['bild'], { type: 'image/jpeg' }), 'bild-gleich');
+  const [a, b, c] = await Promise.all([k.bildURL('bild-gleich'), k.bildURL('bild-gleich'), k.bildURL('bild-gleich')]);
+  assert.ok(a && a.startsWith('blob:'));
+  assert.equal(a, b); assert.equal(b, c);
+  k.loeseMedienURL('bild-gleich');
+});
+
+test('Medien: nur wirklich laufender Ton schützt eine URL vor der Speicherfreigabe', async () => {
+  const k = await frisch();
+  await k.dbPut('media', new Blob(['audio'], { type: 'audio/webm' }), 'ton-1');
+  const url = await k.bildURL('ton-1');
+  k.medienURLAktiv(url, true);
+  assert.equal(k.medienURLsFreigeben(), 0);
+  k.medienURLAktiv(url, false);
+  assert.equal(k.medienURLsFreigeben(), 1);
+});
+
+test('PDF-Seitencache: Anzahl und Pixelbudget bleiben auch auf Retina begrenzt', async () => {
+  const k = await frisch();
+  const cache = new Map();
+  for (let i = 0; i < 12; i++) k.leserCacheAblegen(cache, String(i), { width: 1000, height: 1000 });
+  assert.equal(cache.size, 6);
+  const gross = new Map();
+  for (let i = 0; i < 4; i++) k.leserCacheAblegen(gross, String(i), { width: 4000, height: 3000 });
+  assert.equal(gross.size, 2);
+});
+
 test('sauberesDokument: kaputte Sicherungswerte werden begrenzt und CSS-Injektion verschwindet', async () => {
   const k = await frisch();
   const lang = 'x'.repeat(2200);

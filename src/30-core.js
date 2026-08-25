@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.53.0';
+const APP_VERSION = '5.54.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -628,12 +628,18 @@ function sauberesDokument(quelle) {
 
 async function ladeAlles() {
   await dbAuf();
-  (await dbAlle('docs')).forEach((roh) => {
+  /* Die drei unabhaengigen IndexedDB-Lesevorgaenge duerfen gleichzeitig
+     laufen. Auf grossen iPad-Bestaenden warteten Einstellungen und Statistik
+     vorher erst darauf, dass wirklich jedes Dokument eingelesen war. */
+  const [dokumente, einstellungen, statistik] = await Promise.all([
+    dbAlle('docs'), dbGet('kv', 'einst'), dbGet('kv', 'stats')
+  ]);
+  dokumente.forEach((roh) => {
     const d = sauberesDokument(roh);
     if (d) D.docs.set(d.id, d);
   });
-  uebernehmeEinstellungen(await dbGet('kv', 'einst'));
-  const s = await dbGet('kv', 'stats');
+  uebernehmeEinstellungen(einstellungen);
+  const s = statistik;
   if (s && typeof s === 'object') D.stats = {
     tage: saubereZaehler(s.tage), letzte: saubereZaehler(s.letzte),
     letzteSicherung: begrenze(s.letzteSicherung, 0, Date.now() + 86400000, 0)
@@ -1340,6 +1346,7 @@ function zoomSanft(flaeche, holeBild, von, nach, fertig) {
 function zeigeDeck(inhalt, beiZu) {
   const fokusVorher = document.activeElement;
   const schleier = el('div', { class: 'schleier' }, inhalt);
+  let geschlossen = false;
   schleier.addEventListener('pointerdown', (e) => { if (e.target === schleier) zu(); });
   /* Escape schließt nur die oberste Lage — wie ein Tipp neben den Kasten. */
   const beiTaste = (e) => {
@@ -1360,16 +1367,35 @@ function zeigeDeck(inhalt, beiZu) {
   const adresseBeimOeffnen = location.hash;
   const beiOrtswechsel = () => { if (location.hash !== adresseBeimOeffnen) zu(); };
   const zu = () => {
+    if (geschlossen) return;
+    geschlossen = true;
     document.removeEventListener('keydown', beiTaste, true);
     window.removeEventListener('hashchange', beiOrtswechsel);
     schleier.remove();
-    if (beiZu) beiZu();
-    if (fokusVorher && fokusVorher !== document.body && fokusVorher.isConnected && typeof fokusVorher.focus === 'function' && !$('#deck').querySelector('.schleier')) { try { fokusVorher.focus({ preventScroll: true }); } catch (e) {} }
+    try { if (beiZu) beiZu(); }
+    finally {
+      const deck = $('#deck');
+      if (fokusVorher && fokusVorher !== document.body && fokusVorher.isConnected && typeof fokusVorher.focus === 'function' && (!deck || !deck.querySelector('.schleier'))) { try { fokusVorher.focus({ preventScroll: true }); } catch (e) {} }
+    }
   };
+  /* Auch ein programmatischer Wechsel zwischen zwei grossen Werkzeugen muss
+     denselben Aufraeumweg nehmen wie Escape und der Schliessen-Knopf. Ein
+     nacktes `.remove()` liess vorher Tastatur-, Zug- und Animationshoerer am
+     Dokument haengen. */
+  schleier._vaniSchliessen = zu;
   document.addEventListener('keydown', beiTaste, true);
   window.addEventListener('hashchange', beiOrtswechsel);
   $('#deck').append(schleier);
   return zu;
+}
+
+function schliesseDeck(ziel) {
+  const schleier = ziel && ziel.classList && ziel.classList.contains('schleier')
+    ? ziel : ziel && ziel.closest ? ziel.closest('.schleier') : null;
+  if (!schleier) return false;
+  if (typeof schleier._vaniSchliessen === 'function') schleier._vaniSchliessen();
+  else schleier.remove();
+  return true;
 }
 
 function frage(text, { ja = 'Ja', nein = 'Lieber nicht', gefahr = false } = {}) {

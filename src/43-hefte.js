@@ -680,7 +680,9 @@ function anlageGesten(elem, a, blatt, neuBauen) {
     a.pos.w = Math.max(a.typ === 'sticker' ? 6 : 12, Math.min(92, groesse.w + (e.clientX - groesse.sx) / groesse.r.width * 100));
     elem.style.width = a.pos.w + '%';
   });
-  griff.addEventListener('pointerup', () => { if (groesse) speichereStill(a); groesse = null; });
+  const groesseEnde = () => { if (groesse) speichereStill(a); groesse = null; };
+  griff.addEventListener('pointerup', groesseEnde);
+  griff.addEventListener('pointercancel', groesseEnde);
   elem.append(griff);
 
   /* Drehgriff: um die Mitte drehen, nahe null rastet es gerade ein. */

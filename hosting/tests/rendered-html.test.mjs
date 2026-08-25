@@ -18,23 +18,27 @@ test("Hosting-Build enthält Umzugsseite, Rettungsraum und keinen zweiten Servic
      nicht bei jedem Versionssprung um, aber sehr wohl bei einer alten Kopie. */
   const kern = await readFile(new URL("../src/30-core.js", root), "utf8");
   const version = kern.match(/APP_VERSION = '([^']+)'/)[1];
+  /* Der Produktions-Build darf kurze Latin-1-Escapes verwenden. Fuer die
+     Inhaltsvertraege lesen wir sie wie der Browser als normale Zeichen. */
+  const rettungText = rettung.replace(/\\x([0-9a-f]{2})/gi, (_, hex) => String.fromCharCode(Number.parseInt(hex, 16)));
   assert.match(index, /VANI hat jetzt ein einziges Zuhause/);
   assert.match(index, /https:\/\/thekeveldikev\.github\.io\/vani\//);
   assert.match(index, /rettung\.html\?rettung=1&amp;kein-sw=1/);
   assert.doesNotMatch(index, /rel=["']manifest["']/);
-  assert.ok(rettung.includes("const APP_VERSION = '" + version + "'"), 'Die Rettungsfassung traegt eine andere Version als die App: ' + version);
+  const versionMuster = new RegExp(`(?:const|let|var)\\s+APP_VERSION\\s*=\\s*["']${version.replaceAll('.', '\\.')}["']`);
+  assert.match(rettung, versionMuster, 'Die Rettungsfassung traegt eine andere Version als die App: ' + version);
   /* Die Rettungsfassung muss den Umzugshelfer und den dateilosen Weg kennen —
      sonst steht jemand mit altem Bestand auf einem Schul-iPad ohne Ausweg da. */
-  assert.match(rettung, /function umzugsHelfer/);
-  assert.match(rettung, /In die Zwischenablage sichern/);
+  assert.match(rettungText, /function umzugsHelfer/);
+  assert.match(rettungText, /In die Zwischenablage sichern/);
   /* Die Umzugsseite leitet nicht mehr blind nach fünf Sekunden weiter. */
   assert.match(index, /indexedDB\.open/);
   assert.match(index, /Alten Bestand retten/);
   assert.doesNotMatch(index, /\),5000\)/, 'der blinde 5-Sekunden-Redirect ist zurück');
-  assert.match(rettung, /Privater Bereich/);
-  assert.match(rettung, /Wem gehört dieses VANI/);
-  assert.match(rettung, /Funkenkiste/);
-  assert.match(rettung, /richTeileFuerHoehe/);
+  assert.match(rettungText, /Privater Bereich/);
+  assert.match(rettungText, /Wem gehört dieses VANI/);
+  assert.match(rettungText, /Funkenkiste/);
+  assert.match(rettungText, /richTeileFuerHoehe/);
   assert.match(serviceWorker, /self\.registration\.unregister/);
   assert.doesNotMatch(serviceWorker, /fetch/);
   assert.equal(JSON.parse(manifest).id, "./");

@@ -209,10 +209,13 @@ async function sucheAppUpdate(neuLaden = false) {
   /* Vorhang auf */
   const vorhang = $('#vorhang');
   if (vorhang) {
-    const warte = Math.max(0, 650 - (Date.now() - startzeit));
+    /* Ein kurzer Auftritt bleibt, aber kein kuenstlicher Dreiviertelsekunden-
+       Stillstand mehr. Gerade am Home-Bildschirm fuehlt sich das sonst bei
+       jedem Oeffnen wie Ladezeit an, obwohl VANI laengst fertig ist. */
+    const warte = Math.max(0, 220 - (Date.now() - startzeit));
     setTimeout(() => {
       vorhang.classList.add('auf');
-      setTimeout(() => vorhang.remove(), 700);
+      setTimeout(() => vorhang.remove(), 380);
     }, warte);
   }
 })();

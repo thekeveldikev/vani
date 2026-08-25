@@ -164,9 +164,45 @@ test('Seitenvertrag: fehlende Teile werden gefiltert, nie als Text „null" eing
 test('Fadenvertrag: die verschlüsselte Fadendatei liegt nicht mehr öffentlich im Offline-Kern', () => {
   assert.doesNotMatch(lies('sw.js'), /faden\.enc/, 'sonst scheitert die Offline-Installation an einer fehlenden Datei');
   assert.doesNotMatch(lies('hosting/scripts/copy-vani.mjs'), /faden\.enc/);
+  assert.doesNotMatch(lies('package.json'), /"faden\.enc"/);
+  assert.doesNotMatch(lies('sync-server/Dockerfile'), /faden\.enc/);
+  assert.doesNotMatch(lies('hosting/worker/index.ts'), /"\/faden\.enc"/);
+  assert.match(lies('.dockerignore'), /^faden\.enc$/m);
   assert.match(lies('.gitignore'), /^faden\.enc$/m, 'die Fadendatei bleibt lokal');
   assert.match(lies('src/49-feinheiten.js'), /async function fadenPaketHolen/);
   assert.match(lies('src/49-feinheiten.js'), /Fadendatei von Hand wählen/);
+});
+
+test('Einlesungsvertrag: nur der versiegelte Umschlag reist mit, nie der Klartext', () => {
+  const paket = lies('package.json');
+  assert.match(paket, /"!einlesung\/einlesung\.json"/);
+  assert.match(paket, /"!einlesung\/\*\.quelle\.js"/);
+  assert.match(lies('.dockerignore'), /^einlesung\/einlesung\.json$/m);
+  assert.match(lies('hosting/scripts/copy-vani.mjs'), /einlesung\\\.json\|\\\.quelle\\\.js/);
+  for (const datei of ['server.js', 'sync-server/server.mjs', 'desktop/main.cjs']) {
+    const quelle = lies(datei);
+    assert.match(quelle, /einlesung\/einlesung\.enc/);
+    assert.match(quelle, /einlesung\/umschlag\.json/);
+    assert.doesNotMatch(quelle, /OEFFENTLICHE_ORDNER[^\n]+['"]einlesung['"]/, datei);
+  }
+});
+
+test('Dialogvertrag: programmatisches Schließen läuft durch denselben Aufräumweg', () => {
+  const kern = lies('src/30-core.js');
+  assert.match(kern, /schleier\._vaniSchliessen = zu/);
+  assert.match(kern, /function schliesseDeck/);
+  for (const datei of ['src/62b-album-buch.js', 'src/63c-stammbaum-blatt.js', 'src/65b-stadtplan-karte.js']) {
+    assert.doesNotMatch(lies(datei), /closest\('\.schleier'\); if \(s\) s\.remove\(\)/, datei);
+  }
+});
+
+test('Speichervertrag: schwere Zwischenspeicher lassen sich bewusst freigeben', () => {
+  const sicherheit = lies('src/32-sicherheit.js');
+  assert.match(sicherheit, /Arbeitsspeicher freigeben/);
+  assert.match(sicherheit, /medienURLsFreigeben/);
+  assert.match(sicherheit, /ambiencePufferFreigeben/);
+  assert.match(sicherheit, /leserCacheFreigeben/);
+  assert.match(sicherheit, /epubCacheFreigeben/);
 });
 
 test('Dialogvertrag: ein Fenster meldet sein Ergebnis, bevor es zugeht', () => {
@@ -893,6 +929,30 @@ test('Zoomvertrag: beim Kneifen wird nicht neu gezeichnet', () => {
   const sanft = kern.slice(kern.indexOf('function zoomSanft('));
   assert.ok(!/addEventListener\('transitionend'/.test(sanft.slice(0, 2000)), 'kein transitionend, das ausbleiben kann');
   assert.match(sanft.slice(0, 2000), /setTimeout\(abschluss/, 'sondern ein Zeitgeber, der immer kommt');
+});
+
+test('iPad-Vertrag: Fingerziele, Sternhimmel und Cluster kaempfen nicht gegen Gesten', () => {
+  const css = lies('src/10-style.css');
+  const stern = lies('src/66c-sternhimmel-blatt.js');
+  const cluster = lies('src/46-cluster.js');
+
+  assert.match(css, /@media \(any-pointer: coarse\)[\s\S]*min-block-size: 44px/,
+    'Touch-Geraete bekommen 44-Pixel-Ziele');
+  assert.match(css, /\.sh-flaeche \{[\s\S]*?touch-action: pan-x pan-y/,
+    'der Himmel darf nativ mit Schwung rollen');
+  assert.match(css, /\.sh-fernrohr \{[^}]*touch-action: none/,
+    'nur das Fernrohr selbst ist ein Zuggriff');
+
+  const bedienen = stern.slice(stern.indexOf('function sternBedienungAnhaengen('));
+  assert.match(bedienen, /closest\('\.sh-fernrohr'\)/, 'ein Zug beginnt wirklich nur am Okular');
+  assert.match(bedienen, /requestAnimationFrame/, 'Fernrohrbewegungen werden bildsynchron gebuendelt');
+  const setzer = bedienen.slice(bedienen.indexOf('const setzeRohr'), bedienen.indexOf("svg.addEventListener('pointerdown'"));
+  assert.ok(!/neu\(\)/.test(setzer), 'das Fernrohr baut nicht die ganze Sternwarte neu');
+
+  const zoom = cluster.slice(cluster.indexOf('function zoomeUm('), cluster.indexOf('\/\* Kanten zeichnen'));
+  assert.match(zoom, /sichtSpaeterSpeichern\(\)/, 'Kneifen speichert entprellt');
+  assert.ok(!/speichereStill\(brett\)/.test(zoom), 'und niemals direkt pro Fingerbewegung');
+  assert.match(cluster, /kantenImNaechstenBild\(\)/, 'Fadenpunkte folgen hoechstens einmal pro Bild');
 });
 
 test('Kartenvertrag: eine neue Marke reisst kein Fenster auf', () => {

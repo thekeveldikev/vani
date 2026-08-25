@@ -293,6 +293,15 @@ function speicherAnzeige() {
   return kasten;
 }
 
+function arbeitsspeicherFreigeben() {
+  let n = 0;
+  try { if (typeof medienURLsFreigeben === 'function') n += medienURLsFreigeben(); } catch (e) {}
+  try { if (typeof ambiencePufferFreigeben === 'function') n += ambiencePufferFreigeben(); } catch (e) {}
+  try { if (typeof leserCacheFreigeben === 'function') n += leserCacheFreigeben(); } catch (e) {}
+  try { if (typeof epubCacheFreigeben === 'function') n += epubCacheFreigeben(); } catch (e) {}
+  return n;
+}
+
 /* ----- Das Fenster „Alles sicher“ ----- */
 async function zeigeSicherheit() {
   const z = speicherZustand();
@@ -322,6 +331,10 @@ async function zeigeSicherheit() {
         toast(ok ? 'Der Browser hat den Dauerspeicher zugesagt: hier wird nichts mehr weggeräumt.' : 'Der Browser sagt: noch nicht. Auf dem iPad hilft es, VANI zum Home-Bildschirm hinzuzufügen — dann wird es zugesagt.', 7000);
       } catch (e) { toast('Das ging gerade nicht.'); }
     } }, 'Dauerspeicher anfordern') : null,
+    el('button', { class: 'knopf zart', style: 'justify-self:start', onclick: () => {
+      const n = arbeitsspeicherFreigeben();
+      toast(n ? zaehl(n, 'Zwischenspeicher', 'Zwischenspeicher') + ' freigegeben. Sichtbare Seiten bleiben offen.' : 'Der Arbeitsspeicher ist schon aufgeräumt.', 4200);
+    } }, 'Arbeitsspeicher freigeben'),
     el('div', { class: 'sicher-netze' },
       el('div', { class: 'sicher-netz' }, el('b', {}, '1 · Hauptspeicher'), el('span', {}, 'Jedes Speichern wird bei einem Fehler dreimal wiederholt.')),
       el('div', { class: 'sicher-netz' }, el('b', {}, '2 · Rettungskopie'), el('span', {}, 'Beim Schreiben liegt der Text zusätzlich in einem zweiten Speicher.')),

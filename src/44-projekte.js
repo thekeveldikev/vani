@@ -405,6 +405,7 @@ function szenenGesten(karte, s, p) {
     clearTimeout(hebeTimer); hebeTimer = null;
     start = null; gezogen = false;
     karte.classList.remove('zieht');
+    karte._zieht = false;
     if (geist) { geist.remove(); geist = null; }
   });
 

@@ -166,15 +166,16 @@ async function briefeZeigen() {
   const b = D.docs.get(wahl);
   if (!b) return;
   if (!briefIstOffen(b)) { toast('Noch versiegelt — bis ' + fmtDatum(b.oeffnen) + '. Geduld ist auch eine Schreibtugend.', 4200); return; }
-  if (b.versiegelt) { b.versiegelt = false; speichere(b); }
+  const wurdeGeoeffnet = !!b.versiegelt;
+  if (wurdeGeoeffnet) { b.versiegelt = false; speichere(b); }
   const kasten = el('div', { class: 'modal brief-kasten offen' },
     el('div', { class: 'kartenkopf' }, el('span', { html: ik('blatt') }), 'GESCHRIEBEN ' + fmtDatum(b.angelegt).toUpperCase()),
     el('div', { class: 'brief-text serif' }, b.text),
     el('div', { class: 'reihe' },
-      el('button', { class: 'knopf zart', onclick: async () => { if (await frage('Diesen Brief wegwerfen?', { ja: 'Wegwerfen', gefahr: true })) { await loesche(b.id); zu(); zeichne(); } } }, 'Wegwerfen'),
+      el('button', { class: 'knopf zart', onclick: async () => { if (await frage('Diesen Brief wegwerfen?', { ja: 'Wegwerfen', gefahr: true })) { await loesche(b.id); zu(); if (!wurdeGeoeffnet) zeichne(); } } }, 'Wegwerfen'),
       el('button', { class: 'knopf', onclick: () => { zu(); const bl = blattAusText('Antwort auf einen Brief an mich', ''); oeffneSchreibraum(bl.id); } }, 'Antworten'),
-      el('button', { class: 'knopf voll', onclick: () => { zu(); zeichne(); } }, 'Gut')));
-  const zu = zeigeDeck(kasten);
+      el('button', { class: 'knopf voll', onclick: () => zu() }, 'Gut')));
+  const zu = zeigeDeck(kasten, () => { if (wurdeGeoeffnet) zeichne(); });
 }
 
 /* Die Schublade: Dinge, die kein vernünftiger Mensch aufbewahren würde. */
@@ -714,15 +715,14 @@ function schreibtischEinrichten(danach) {
   const alt = { ...e };
   const wahlgruppe = (liste, lies, setze) => {
     const g = el('div', { class: 'wahlgruppe', style: 'flex-wrap:wrap' });
-    for (const [id, name] of liste) g.append(el('button', { class: lies() === id ? 'an' : '', onclick: (ev) => { setze(id); $$('button', g).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); D.einst.schreibtisch = { ...e }; if (danach) danach(); } }, name));
+    for (const [id, name] of liste) g.append(el('button', { class: lies() === id ? 'an' : '', onclick: (ev) => { setze(id); $$('button', g).forEach((b) => b.classList.toggle('an', b === ev.currentTarget)); D.einst.schreibtisch = { ...e }; } }, name));
     return g;
   };
-  const schalter = (lies, setze) => el('button', { class: 'schalter' + (lies() ? ' an' : ''), onclick: (ev) => { setze(!lies()); ev.currentTarget.classList.toggle('an', lies()); D.einst.schreibtisch = { ...e }; if (danach) danach(); } }, el('i'));
+  const schalter = (lies, setze) => el('button', { class: 'schalter' + (lies() ? ' an' : ''), onclick: (ev) => { setze(!lies()); ev.currentTarget.classList.toggle('an', lies()); D.einst.schreibtisch = { ...e }; } }, el('i'));
   const lampe = el('input', { type: 'range', min: '.25', max: '1', step: '.05', value: String(e.lampe) });
   lampe.addEventListener('input', () => { e.lampe = Number(lampe.value); D.einst.schreibtisch = { ...e }; const s = document.querySelector('.desk-szene'); if (s) s.style.setProperty('--lampe', e.lampe); });
-  lampe.addEventListener('change', () => { if (danach) danach(); });
   const unordnung = el('input', { type: 'range', min: '0', max: '1', step: '.1', value: String(e.unordnung) });
-  unordnung.addEventListener('change', () => { e.unordnung = Number(unordnung.value); D.einst.schreibtisch = { ...e }; if (danach) danach(); });
+  unordnung.addEventListener('input', () => { e.unordnung = Number(unordnung.value); D.einst.schreibtisch = { ...e }; });
   let behalten = false;
   const zeile = (name, unter, inhalt) => el('div', { class: 'einstellgruppe einstellzeile' }, el('span', { class: 'ename' }, name, unter ? el('div', { style: 'font-size:12.5px;color:var(--blass)' }, unter) : null), inhalt);
   const kasten = el('div', { class: 'modal tisch-einrichten' },
@@ -738,14 +738,14 @@ function schreibtischEinrichten(danach) {
     /* Diese beiden Abschnitte legen sofort fest, statt nur vorzuschauen —
        deshalb wandert das Ergebnis auch in `alt`. Sonst nimmt das Schliessen
        des Kastens die Wahl wieder zurueck. */
-    typeof jahreszeitEinstellung === 'function' ? jahreszeitEinstellung(e, () => { Object.assign(alt, e); if (danach) danach(); }) : null,
-    typeof tischblattEinstellung === 'function' ? tischblattEinstellung(e, () => { Object.assign(alt, e); if (danach) danach(); }) : null,
-    typeof tischzitatEinstellung === 'function' ? tischzitatEinstellung(e, () => { Object.assign(alt, e); if (danach) danach(); }, () => zu()) : null,
+    typeof jahreszeitEinstellung === 'function' ? jahreszeitEinstellung(e, () => { Object.assign(alt, e); }) : null,
+    typeof tischblattEinstellung === 'function' ? tischblattEinstellung(e, () => { Object.assign(alt, e); }) : null,
+    typeof tischzitatEinstellung === 'function' ? tischzitatEinstellung(e, () => { Object.assign(alt, e); }, () => zu()) : null,
     zeile('Die Feder kratzt', 'Ein leises Kratzen beim Tippen auf dem eingespannten Blatt.', schalter(() => e.federKratzt, (v) => { e.federKratzt = v; })),
     zeile('Aufgeschlagenes Buch', 'Das zuletzt gelesene Buch liegt offen auf dem Tisch; links und rechts tippen blättert.', schalter(() => e.offenesBuch, (v) => { e.offenesBuch = v; })),
-    (e.kleckse && e.kleckse.length) ? zeile('Kleckse', e.kleckse.length + ' Tintenkleckse von der Feder — einer je Sitzung.', el('button', { class: 'knopf zart', onclick: () => { e.kleckse = []; D.einst.schreibtisch = { ...e }; speichereEinst(); toast('Die Platte ist gewischt.'); if (danach) danach(); } }, 'Wegwischen')) : null,
+    (e.kleckse && e.kleckse.length) ? zeile('Kleckse', e.kleckse.length + ' Tintenkleckse von der Feder — einer je Sitzung.', el('button', { class: 'knopf zart', onclick: () => { e.kleckse = []; D.einst.schreibtisch = { ...e }; speichereEinst(); toast('Die Platte ist gewischt.'); } }, 'Wegwischen')) : null,
     zeile('Unordnung', 'Wie viel auf dem Tisch liegt und wie schief.', unordnung),
-    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => { D.einst.schreibtisch = alt; if (danach) danach(); zu(); } }, 'Zurück'),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf zart', onclick: () => { D.einst.schreibtisch = alt; zu(); } }, 'Zurück'),
       el('button', { class: 'knopf voll', onclick: () => { behalten = true; D.einst.schreibtisch = { ...e }; speichereEinst(); zu(); if (danach) danach(); } }, 'So bleibt es')));
   const zu = zeigeDeck(kasten, () => { if (!behalten) { D.einst.schreibtisch = alt; if (danach) danach(); } });
 }

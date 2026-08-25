@@ -15,7 +15,7 @@ const ID_RE = /^[A-Za-z0-9_-]{20,100}$/;
 const TOKEN_RE = /^[A-Za-z0-9_-]{40,180}$/;
 const B64_RE = /^[A-Za-z0-9_-]+$/;
 const VANI_HAUPTADRESSE = "https://thekeveldikev.github.io/vani/";
-const VANI_DATEIEN = new Set(["/index.html", "/rettung.html", "/manifest.json", "/sw.js", "/faden.enc", "/robots.txt"]);
+const VANI_DATEIEN = new Set(["/index.html", "/rettung.html", "/manifest.json", "/sw.js", "/robots.txt"]);
 const rate = new Map<string, { seit: number; zahl: number }>();
 let schemaBereit: Promise<void> | null = null;
 

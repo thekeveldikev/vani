@@ -709,11 +709,12 @@ RENDER.salon = function (haupt) {
   } catch (e) {}
   const galerie = el('div', { class: 'salon-galerie gemalt zimmer' }, reihe1, reihe2, eigenerRahmen, sessel, kamin);
   let maler = null;
+  let flaechenAufraeumen = () => {};
   if (typeof salonMaler === 'function') {
     const leinwand = el('canvas', { class: 'salon-malerei', 'aria-hidden': 'true' });
     galerie.prepend(leinwand);
     maler = salonMaler(leinwand);
-    const beobachter = new MutationObserver(() => { if (!leinwand.isConnected) { maler.stopp(); beobachter.disconnect(); } });
+    const beobachter = new MutationObserver(() => { if (!leinwand.isConnected) { maler.stopp(); flaechenAufraeumen(); beobachter.disconnect(); } });
     beobachter.observe(haupt, { childList: true });
   }
   /* Die Konsole unter der Wand: Rat des Tages je Person, Aufgabe, Briefe */
@@ -736,7 +737,9 @@ RENDER.salon = function (haupt) {
   if (maler) maler.start();
   /* Die Tippflächen genau auf das gemalte Möbel legen — der Maler weiß, wo es steht */
   if (maler && maler.flaechen) {
+    let ro = null;
     const legeFlaechen = () => {
+      if (!galerie.isConnected) { flaechenAufraeumen(); return; }
       const f = maler.flaechen(); if (!f) return;
       const setz = (elm, r) => {
         if (!elm) return;
@@ -750,7 +753,8 @@ RENDER.salon = function (haupt) {
     /* Die Wand waechst noch, waehrend Schrift und Bilder laden. Ein paar
        Nachmessungen kosten nichts und ersparen falsch liegende Flaechen. */
     for (const ms of [120, 400, 1200]) setTimeout(() => { if (galerie.isConnected) legeFlaechen(); }, ms);
-    if (typeof ResizeObserver !== 'undefined') { const ro = new ResizeObserver(() => { if (!galerie.isConnected) { ro.disconnect(); return; } legeFlaechen(); }); ro.observe(galerie); }
+    flaechenAufraeumen = () => { window.removeEventListener('resize', legeFlaechen); if (ro) { ro.disconnect(); ro = null; } };
+    if (typeof ResizeObserver !== 'undefined') { ro = new ResizeObserver(legeFlaechen); ro.observe(galerie); }
     window.addEventListener('resize', legeFlaechen);
   }
   salonBriefeNachsehen();

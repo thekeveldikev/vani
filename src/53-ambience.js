@@ -107,6 +107,19 @@ async function ambienceBlob(id, beiFortschritt) {
 
 /* Dekodierte Aufnahmen bleiben im Speicher, solange die App offen ist. */
 const _ambiencePuffer = new Map();
+function ambiencePufferBegrenzen(max = 6) {
+  if (_ambiencePuffer.size <= max) return;
+  for (const id of [..._ambiencePuffer.keys()]) {
+    if (_ambiencePuffer.size <= max) break;
+    if (typeof _ambienceLaeuft !== 'undefined' && _ambienceLaeuft.has(id)) continue;
+    _ambiencePuffer.delete(id);
+  }
+}
+function ambiencePufferFreigeben() {
+  const vorher = _ambiencePuffer.size;
+  ambiencePufferBegrenzen(0);
+  return vorher - _ambiencePuffer.size;
+}
 async function ambiencePuffer(id, beiFortschritt) {
   if (_ambiencePuffer.has(id)) return _ambiencePuffer.get(id);
   const a = holeAudio();
@@ -120,6 +133,7 @@ async function ambiencePuffer(id, beiFortschritt) {
     } catch (e) { schief(e); }
   });
   _ambiencePuffer.set(id, puffer);
+  ambiencePufferBegrenzen();
   return puffer;
 }
 

@@ -194,8 +194,10 @@ function naechstesBild() {
 }
 
 async function ladeKapitel(i, anteil = 0, richtung = 0) {
-    if (!L.buch || L.busy) return;
+    if (!L.buch) return;
+    if (L.busy) { L.ladeAusstehend = [i, anteil, richtung]; return; }
     L.busy = true;
+    try {
     const k = Math.max(0, Math.min(L.buch.spine.length - 1, i));
     let html = L.htmlCache.get(k);
     if (html == null) { try { html = await epubKapitelHTML(L.buch, L.buch.spine[k].pfad, urls); } catch (x) { html = '<p><i>Dieses Kapitel ließ sich nicht lesen.</i></p>'; } L.htmlCache.set(k, html); }
@@ -214,7 +216,13 @@ async function ladeKapitel(i, anteil = 0, richtung = 0) {
     stelleSeite(richtung, true);
     /* Interne Sprünge: Links auf andere Kapitel */
     inhalt.querySelectorAll('a[data-intern]').forEach((a) => a.addEventListener('click', (ev) => { ev.preventDefault(); const ziel = L.buch.spine.findIndex((s) => s.pfad === a.dataset.intern); if (ziel >= 0) ladeKapitel(ziel, 0, 1); }));
-    L.busy = false;
+    } catch (e) {
+      toast('Dieses Kapitel ließ sich gerade nicht setzen. Du kannst weiterblättern.', 3600);
+    } finally {
+      L.busy = false;
+      const naechste = L.ladeAusstehend; L.ladeAusstehend = null;
+      if (naechste && _epub === L) queueMicrotask(() => ladeKapitel(...naechste));
+    }
   }
   function stelleSeite(richtung, frisch) {
     inhalt.style.transition = frisch || !L.e.blaettern ? 'none' : 'transform .34s cubic-bezier(.2,.8,.2,1)';
@@ -240,17 +248,19 @@ async function ladeKapitel(i, anteil = 0, richtung = 0) {
     zeigeLeisten();
   }
   L.ladeKapitel = ladeKapitel; L.blaettere = blaettere; L.stelleSeite = stelleSeite; L.zeigeLeisten = zeigeLeisten;
-  L.neuSetzen = () => { const a = L.seiten > 1 ? L.seite / (L.seiten - 1) : 0; L.htmlCache.size; ladeKapitel(L.kapitel, a, 0); };
+  L.neuSetzen = () => { const a = L.seiten > 1 ? L.seite / (L.seiten - 1) : 0; ladeKapitel(L.kapitel, a, 0); };
   balken.addEventListener('change', () => { const v = Number(balken.value) / 1000; const ges = L.buch.spine.length; const k = Math.min(ges - 1, Math.floor(v * ges)); ladeKapitel(k, (v * ges) - k, 0); });
   buehne.addEventListener('click', (ev) => {
+    if (wischte) { wischte = false; return; }
     if (ev.target.closest('a')) return;
     const sel = window.getSelection && window.getSelection(); if (sel && String(sel).trim()) return;
     const r = buehne.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width;
     if (x > .66) blaettere(1); else if (x < .34) blaettere(-1); else zeigeLeisten();
   });
-  let wisch = null;
+  let wisch = null, wischte = false;
   buehne.addEventListener('pointerdown', (ev) => { wisch = { x: ev.clientX, y: ev.clientY }; });
-  buehne.addEventListener('pointerup', (ev) => { if (!wisch) return; const dx = ev.clientX - wisch.x, dy = ev.clientY - wisch.y; wisch = null; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) blaettere(dx < 0 ? 1 : -1); });
+  buehne.addEventListener('pointerup', (ev) => { if (!wisch) return; const dx = ev.clientX - wisch.x, dy = ev.clientY - wisch.y; wisch = null; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { wischte = true; ev.preventDefault(); blaettere(dx < 0 ? 1 : -1); } });
+  buehne.addEventListener('pointercancel', () => { wisch = null; });
   L.tasten = (ev) => {
     if (!_epub) return;
     if (ev.key === 'ArrowRight' || ev.key === 'PageDown' || ev.key === ' ') { ev.preventDefault(); blaettere(1); }
@@ -289,6 +299,10 @@ function epubSchliessen() {
   for (const u of L.urls.values()) { try { URL.revokeObjectURL(u); } catch (e) {} }
   if (typeof vorlesenStopp === 'function') vorlesenStopp();
   L.raum.remove();
+}
+function epubCacheFreigeben() {
+  if (!_epub || !_epub.htmlCache) return 0;
+  const n = _epub.htmlCache.size; _epub.htmlCache.clear(); return n;
 }
 function epubInhalt() {
   if (!_epub || !_epub.buch) return;

@@ -73,6 +73,8 @@ und bei verwalteten Geräten **VPN & Geräteverwaltung** prüfen.
 - verschlüsselter lokaler Sync-Dienst: `npm run start:sync`
 - Lokal ansehen: `node server.js` → http://localhost:4321 (`?kein-sw` schaltet
   den Service Worker beim Entwickeln ab)
+- Bewusst im LAN freigeben: `VANI_HOST=0.0.0.0 node server.js` (standardmäßig
+  hört die Vorschau aus Sicherheitsgründen nur auf diesem Rechner)
 - Prüfen: `npm test`
   — notwendige adversariale Prüfungen für Kernlogik, Audio-Wiederanlauf,
   Speicherrennen, Sicherungen, Beziehungen, Import, PWA-Verträge und Server

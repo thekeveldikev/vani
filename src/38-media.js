@@ -49,21 +49,53 @@ function verkleinereUndSpeichere(datei, maxKante = 1600) {
 }
 
 const _bildURLs = new Map();
+const _bildAnfragen = new Map();
+const _aktiveMedienURLs = new Set();
+function medienURLAktiv(url, aktiv = true) {
+  if (!url) return;
+  if (aktiv) _aktiveMedienURLs.add(url); else _aktiveMedienURLs.delete(url);
+}
 async function bildURL(id) {
   if (_bildURLs.has(id)) return _bildURLs.get(id);
-  const blob = await dbGet('media', id);
-  if (!blob) return null;
-  const url = URL.createObjectURL(blob);
-  _bildURLs.set(id, url);
-  return url;
+  if (_bildAnfragen.has(id)) return _bildAnfragen.get(id);
+  /* Ein Albumraster kann dasselbe Bild in mehreren Karten zugleich zeigen.
+     Ohne eine gemeinsame laufende Anfrage las jede Karte den Blob erneut und
+     erzeugte eine eigene Object-URL; nur die letzte davon war spaeter noch
+     erreichbar und die anderen blieben bis zum App-Ende im Speicher. */
+  const anfrage = (async () => {
+    const blob = await dbGet('media', id);
+    if (!blob) return null;
+    if (_bildURLs.has(id)) return _bildURLs.get(id);
+    const url = URL.createObjectURL(blob);
+    _bildURLs.set(id, url);
+    return url;
+  })();
+  _bildAnfragen.set(id, anfrage);
+  try { return await anfrage; }
+  finally { if (_bildAnfragen.get(id) === anfrage) _bildAnfragen.delete(id); }
 }
 function setzeBild(img, id) {
-  bildURL(id).then((u) => { if (u) img.src = u; });
+  bildURL(id).then((u) => { if (u && img.isConnected !== false) img.src = u; }).catch(() => {});
 }
 function loeseMedienURL(id) {
   const url = _bildURLs.get(id);
   if (url) URL.revokeObjectURL(url);
+  if (url) _aktiveMedienURLs.delete(url);
   _bildURLs.delete(id);
+  _bildAnfragen.delete(id);
+}
+function medienURLsFreigeben() {
+  const aktive = new Set();
+  try { document.querySelectorAll('[src^="blob:"], [href^="blob:"]').forEach((e) => aktive.add(e.src || e.href)); } catch (e) {}
+  let n = 0;
+  for (const [id, url] of [..._bildURLs]) {
+    /* Laufende Tonnotizen benutzen ein nicht eingehängtes Audio-Element und
+       melden ihre URL deshalb ausdrücklich an. Pausierte alte Notizen dürfen
+       dagegen genauso wie unsichtbare Bilder aus dem Speicher verschwinden. */
+    if (aktive.has(url) || _aktiveMedienURLs.has(url)) continue;
+    loeseMedienURL(id); n++;
+  }
+  return n;
 }
 async function speichereDateiBlob(datei) {
   if (!datei || typeof datei.size !== 'number') throw new Error('Keine Datei');
@@ -87,4 +119,5 @@ async function speichereKritzelei(canvas, alteId) {
 
 window.addEventListener('pagehide', () => {
   for (const id of [..._bildURLs.keys()]) loeseMedienURL(id);
+  _aktiveMedienURLs.clear();
 });

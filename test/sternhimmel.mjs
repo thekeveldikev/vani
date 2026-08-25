@@ -383,6 +383,14 @@ test('Der Befund im Glas sagt, was dasteht', async () => {
   assert.ok(/^im /.test(drauf.richtung), 'mit Himmelsrichtung: ' + drauf.richtung);
   assert.ok(drauf.hoehe.length > 3, 'und Höhe: ' + drauf.hoehe);
 
+  /* Die Anzeige unter dem Himmel und die Gravur am Okular muessen denselben
+     Himmel zaehlen — also auch die Sterne, die erst das Glas sichtbar macht. */
+  const rohrfeld = k.sternRohrfeld(h);
+  const rohrstelle = k.sternStelle(rohrfeld[0], h.tag);
+  const nurAuge = k.sternRohrBefund(h, g, rohrstelle[0], rohrstelle[1]);
+  const mitGlas = k.sternRohrBefund(h, g, rohrstelle[0], rohrstelle[1], rohrfeld);
+  assert.ok(mitGlas.sterne >= nurAuge.sterne + 1, 'der sichere Fernrohrstern wird mitgezaehlt');
+
   /* Weit weg nicht mehr. */
   const weit = k.sternRohrBefund(h, g, k.STERN_MITTE, k.STERN_MITTE + k.STERN_R * 0.9);
   assert.ok(!weit.nah.includes('Der Reiher') || Math.hypot(m[0] - k.STERN_MITTE, m[1] - (k.STERN_MITTE + k.STERN_R * 0.9)) < 200,

@@ -14,13 +14,13 @@ ws.addEventListener('message', (event) => {
   const msg = JSON.parse(event.data);
   if (msg.id && offen.has(msg.id)) { const { resolve, reject, timer } = offen.get(msg.id); clearTimeout(timer); offen.delete(msg.id); msg.error ? reject(new Error(msg.error.message)) : resolve(msg.result); }
 });
-function sende(method, params = {}) {
+function sende(method, params = {}, frist = 90000) {
   const nr = ++id;
   ws.send(JSON.stringify({ id: nr, method, params }));
   return new Promise((resolve, reject) => {
     /* Die UI-Prüfung wartet bis zu 48×350 ms auf die Autopaginierung; unter Last
        (z. B. parallel laufender Installer-Bau) reicht eine kurze Frist nicht. */
-    const timer = setTimeout(() => { offen.delete(nr); reject(new Error(method + ' antwortete 90 Sekunden lang nicht')); }, 90000);
+    const timer = setTimeout(() => { offen.delete(nr); reject(new Error(method + ' antwortete ' + Math.round(frist / 1000) + ' Sekunden lang nicht')); }, frist);
     offen.set(nr, { resolve, reject, timer });
   });
 }
@@ -134,9 +134,14 @@ const auswertung = await sende('Runtime.evaluate', {
 });
 let bildPfad = '';
 if (process.argv.includes('--bild')) {
-  const bild = await sende('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
-  bildPfad = join(process.cwd(), 'release', 'desktop-smoke.png');
-  writeFileSync(bildPfad, Buffer.from(bild.data, 'base64'));
+  try {
+    /* Ein absichtlich verborgenes Smoke-Fenster liefert unter Windows nicht
+       auf jeder GPU eine Aufnahme. Die bereits bestandene UI-Pruefung darf
+       daran weder 90 Sekunden haengen noch nachtraeglich als Fehler gelten. */
+    const bild = await sende('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false }, 12000);
+    bildPfad = join(process.cwd(), 'release', 'desktop-smoke.png');
+    writeFileSync(bildPfad, Buffer.from(bild.data, 'base64'));
+  } catch (e) { console.warn('Screenshot ausgelassen: ' + e.message); }
 }
 ws.close();
 console.log(auswertung.result.value);
