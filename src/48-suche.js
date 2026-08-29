@@ -66,7 +66,13 @@ function oeffneSuche() {
   setTimeout(() => feld.focus(), 60);
 
   function eintrag(d, umfeldHtml) {
-    return el('button', { onclick: () => { zu(); merkeSuche(feld.value); if (typeof _sr !== 'undefined' && _sr && typeof schliesseSchreibraum === 'function') schliesseSchreibraum(); oeffneDoc(d); } },
+    return el('button', { onclick: () => {
+      zu(); merkeSuche(feld.value);
+      /* Der Zettel fuer 48c: nicht nur oeffnen, sondern zur Stelle springen. */
+      if (typeof suchZielMerken === 'function') suchZielMerken(d.id, feld.value);
+      if (typeof _sr !== 'undefined' && _sr && typeof schliesseSchreibraum === 'function') schliesseSchreibraum();
+      oeffneDoc(d);
+    } },
       el('span', { class: 'ttitel' }, d.titel || ((d.text || '').split('\n')[0] || 'Ohne Titel').slice(0, 50)),
       umfeldHtml ? el('span', { class: 'tprobe', html: umfeldHtml }) : null
     );

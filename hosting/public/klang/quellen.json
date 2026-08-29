@@ -1,21 +1,29 @@
 {
- "hinweis": "Katzengeräusche in der Diele (Räume als Orte). Gekürzt, mono, 22 kHz.",
- "dateien": [
-  {
-   "datei": "klang/katze-miau.wav",
-   "titel": "Meow of a Siamese cat - freemaster2.wav",
-   "urheber": "freemaster2",
-   "lizenz": "CC0 1.0",
-   "lizenzUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-   "seite": "https://commons.wikimedia.org/wiki/File:Meow_of_a_Siamese_cat_-_freemaster2.wav"
-  },
-  {
-   "datei": "klang/katze-schnurr.wav",
-   "titel": "Jupey purring.wav",
-   "urheber": "Pangea1962",
-   "lizenz": "CC BY-SA 4.0",
-   "lizenzUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-   "seite": "https://commons.wikimedia.org/wiki/File:Jupey_purring.wav"
-  }
- ]
+  "hinweis": "Katzengeräusche in der Diele (Räume als Orte). Gekürzt, mono, 22 kHz.",
+  "dateien": [
+    {
+      "datei": "klang/katze-miau.wav",
+      "titel": "Meow of a Siamese cat - freemaster2.wav",
+      "urheber": "freemaster2",
+      "lizenz": "CC0 1.0",
+      "lizenzUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "seite": "https://commons.wikimedia.org/wiki/File:Meow_of_a_Siamese_cat_-_freemaster2.wav"
+    },
+    {
+      "datei": "klang/katze-schnurr.wav",
+      "titel": "Jupey purring.wav",
+      "urheber": "Pangea1962",
+      "lizenz": "CC BY-SA 4.0",
+      "lizenzUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "seite": "https://commons.wikimedia.org/wiki/File:Jupey_purring.wav"
+    },
+    {
+      "datei": "klang/uhr-ticken.ogg",
+      "titel": "Grandfather Clock Ticking.ogg",
+      "urheber": "Jud McCranie",
+      "lizenz": "CC BY-SA 4.0",
+      "lizenzUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "seite": "https://commons.wikimedia.org/wiki/File:Grandfather_Clock_Ticking.ogg"
+    }
+  ]
 }

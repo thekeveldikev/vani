@@ -102,6 +102,7 @@ function spotlightOeffnen() {
     const e = eintraege[wahl]; if (!e) return;
     zu();
     if (e.befehl) { try { e.befehl.tu(); } catch (x) {} return; }
+    if (typeof suchZielMerken === 'function') suchZielMerken(e.d.id, feld.value);
     if (typeof _sr !== 'undefined' && _sr && typeof schliesseSchreibraum === 'function') schliesseSchreibraum();
     oeffneDoc(e.d);
   };

@@ -131,6 +131,10 @@ RENDER.projekt = function (haupt, pid) {
   }
 
   const kapitel = kinder(p.id, 'kapitel');
+  /* Ein Suchfeld erst, wenn es etwas zu suchen gibt. Bei drei Szenen sieht
+     man sie alle; ab da wird das Blaettern laestig. */
+  const szenenGesamt = [...D.docs.values()].filter((d) => d.typ === 'szene' && !d.geloescht && d.projekt === p.id).length;
+  if (szenenGesamt >= 4 && typeof baueProjektsuche === 'function') inhalt.append(baueProjektsuche(inhalt, p));
   for (const k of kapitel) inhalt.append(baueKapitel(k, p));
 
   const projektHefte = vomTyp('heft').filter((h) => h.projektRef === p.id);

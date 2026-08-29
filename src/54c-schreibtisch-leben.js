@@ -54,15 +54,25 @@ function schreibtischFederTropft(x, y) {
 /* ----- Klang: Federkratzen beim Tippen, das Klangbild des Tisches ----- */
 function federKratzen() {
   try {
-    const ctx = typeof audioCtxHolen === 'function' ? audioCtxHolen() : (window.__vaniKlick || (window.__vaniKlick = new (window.AudioContext || window.webkitAudioContext)()));
-    if (!ctx) return;
+    /* holeAudio, nicht ein eigener Kontext: hier stand einmal ein Aufruf an
+       audioCtxHolen — eine Funktion, die es in VANI nie gab. Also griff immer
+       der Notweg daneben, baute einen zweiten AudioContext auf und haengte
+       ihn direkt an die Ausgabe. Zwei Folgen, beide unschoen: der
+       Lautstaerkeregler hatte auf das Federkratzen keine Wirkung, und auf dem
+       iPad blieb der zweite Kontext meist stehen — also still. */
+    const a = typeof holeAudio === 'function' ? holeAudio() : null;
+    const ctx = a && a.ctx;
+    const ziel = (a && a.master) || (ctx && ctx.destination);
+    if (!ctx || !ziel) return;
+    /* Ist alles leise gestellt, bleibt es leise. */
+    if (typeof begrenze === 'function' && begrenze(D.einst.lautstaerke, 0, 1, .5) <= 0) return;
     const dauer = .045 + Math.random() * .05, n = Math.floor(ctx.sampleRate * dauer);
     const buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
     for (let i = 0; i < n; i++) { const u = i / n; d[i] = (Math.random() * 2 - 1) * Math.sin(u * Math.PI) * (1 - u * .4); }
     const q = ctx.createBufferSource(); q.buffer = buf;
     const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 2200 + Math.random() * 1800; f.Q.value = 1.1;
     const g = ctx.createGain(); g.gain.value = .04 + Math.random() * .03;
-    q.connect(f); f.connect(g); g.connect(ctx.destination); q.start();
+    q.connect(f); f.connect(g); g.connect(ziel); q.start();
   } catch (e) {}
 }
 async function schreibtischKlangbild() {

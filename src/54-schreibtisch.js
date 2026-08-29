@@ -300,6 +300,146 @@ function schreibtischKlick(art) {
   } catch (e) {}
 }
 
+
+/* ----- Das Ticken der Standuhr: eine echte Aufnahme, in Schleife -----
+   Ein Ticken laesst sich nicht ueberzeugend rechnen. Was hier vorher stand —
+   Rauschen durch ein schmales Band, darunter ein tiefer Holzkoerper — klang
+   nach Klopfen, nicht nach Uhr. Jetzt laeuft eine Aufnahme einer echten
+   Standuhr (klang/uhr-ticken.ogg, Herkunft und Lizenz in klang/quellen.json).
+
+   Drei Dinge machen den Unterschied:
+
+   1. Sie haengt am Hauptregler wie jeder andere Klang. Wer alles leise
+      stellt, hoert nichts — das war beim gerechneten Ticken nicht so.
+   2. Die Schleifenpunkte werden EINMAL aus der Aufnahme gerechnet, statt
+      geraten: Anfang und Ende liegen in der Stille zwischen zwei Schlaegen,
+      und dazwischen liegt eine ganze Zahl von Schlaegen. Sonst haette man
+      am Uebergang entweder ein Knacken oder einen Stolperer im Takt.
+   3. Sie laeuft nur, solange der Tisch wirklich zu sehen ist. */
+let _uhrTicken = null;
+
+/* Wo sind die Schlaege, und wie weit liegen sie auseinander?
+   Gerechnet auf der Huellkurve, nicht auf dem Signal: ein Schlag ist ein
+   kurzer Ausschlag, und dazwischen ist es fast still. Pur genug, um sie
+   auch einzeln pruefen zu koennen. */
+function tickenSchleife(puffer) {
+  const rate = puffer.sampleRate;
+  const kanal = puffer.getChannelData(0);
+  const schritt = Math.max(1, Math.round(rate * 0.005));      /* 5 ms je Punkt */
+  const n = Math.floor(kanal.length / schritt);
+  const huelle = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    let summe = 0;
+    for (let j = i * schritt, e2 = j + schritt; j < e2; j++) summe += kanal[j] * kanal[j];
+    huelle[i] = Math.sqrt(summe / schritt);
+  }
+  /* Die Schlagdauer: der Abstand, bei dem sich die Huellkurve am ehesten
+     selbst wiederholt. Eine Standuhr schlaegt etwa einmal je Sekunde. */
+  const vonP = Math.round(0.35 / 0.005), bisP = Math.min(Math.round(2.6 / 0.005), Math.floor(n / 3));
+  let beste = 0, besterWert = -Infinity;
+  for (let p = vonP; p <= bisP; p++) {
+    let s = 0, zaehl = 0;
+    for (let i = 0; i + p < n; i += 2) { s += huelle[i] * huelle[i + p]; zaehl++; }
+    const wert = zaehl ? s / zaehl : 0;
+    if (wert > besterWert) { besterWert = wert; beste = p; }
+  }
+  if (!beste) return null;
+  const periode = beste * 0.005;
+
+  /* Die stillste Stelle in einem Fenster — dort darf geschnitten werden.
+     Bei mehreren gleich stillen Stellen gewinnt die, die dem Wunschpunkt am
+     naechsten liegt. Das ist der Unterschied zwischen einer Schleife, die
+     sauber schliesst, und einer, die zusaetzlich im Takt bleibt: gaebe man
+     nur die leiseste zurueck, landete das Ende irgendwo in der Stille und
+     der Abstand zum naechsten Schlag waere jedes Mal ein anderer. */
+  const stillsteStelle = (vonSek, bisSek, wunsch) => {
+    const a = Math.max(0, Math.round(vonSek / 0.005)), b = Math.min(n - 1, Math.round(bisSek / 0.005));
+    let leisester = Infinity;
+    for (let i = a; i <= b; i++) if (huelle[i] < leisester) leisester = huelle[i];
+    /* „So still wie es hier ueberhaupt wird“ — mit etwas Spielraum, damit
+       nicht ein einzelnes Sample die Wahl bestimmt. */
+    const grenze = leisester + Math.max(1e-6, leisester * 0.35);
+    const ziel = wunsch == null ? null : Math.round(wunsch / 0.005);
+    let bester = a, abstand = Infinity;
+    for (let i = a; i <= b; i++) {
+      if (huelle[i] > grenze) continue;
+      const d = ziel == null ? i - a : Math.abs(i - ziel);
+      if (d < abstand) { abstand = d; bester = i; }
+    }
+    return bester * 0.005;
+  };
+
+  const dauer = puffer.duration;
+  /* Der Anfang: die stillste Stelle im zweiten Schlag — der erste kann
+     einen Einschwinger haben. */
+  const start = stillsteStelle(periode, periode * 2.2, periode);
+  /* Das Ende: so viele ganze Schlaege wie hineinpassen. Es wird nur so weit
+     verschoben, wie es fuer eine stille Naht noetig ist — liegt der exakte
+     Punkt schon in der Stille, bleibt er stehen, und der Takt laeuft ueber
+     den Uebergang hinweg einfach weiter. */
+  const platz = dauer - 0.35 - start;
+  const schlaege = Math.max(1, Math.floor(platz / periode));
+  const roh = start + schlaege * periode;
+  const ende = stillsteStelle(Math.max(start + periode, roh - periode * 0.25), Math.min(dauer - 0.05, roh + periode * 0.25), roh);
+  if (!(ende > start + periode * 0.9)) return null;
+  return { start, ende, periode };
+}
+
+/* Die Aufnahme wird einmal geholt und behalten. */
+let _tickenPuffer = null;
+async function tickenPufferHolen() {
+  if (_tickenPuffer) return _tickenPuffer;
+  const a = holeAudio();
+  const antwort = await fetch('klang/uhr-ticken.ogg', { cache: 'force-cache' });
+  if (!antwort.ok) throw new Error('Die Aufnahme fehlt');
+  const roh = await antwort.arrayBuffer();
+  _tickenPuffer = await new Promise((res, rej) => {
+    /* Safari kennt die Fassung mit Versprechen erst spaet — beide Wege. */
+    const p = a.ctx.decodeAudioData(roh, res, rej);
+    if (p && typeof p.then === 'function') p.then(res, rej);
+  });
+  return _tickenPuffer;
+}
+
+async function uhrTickenAn() {
+  if (_uhrTicken) return true;
+  if (typeof holeAudio !== 'function') return false;
+  _uhrTicken = { laeuft: false };   /* Platzhalter: kein zweiter Anlauf nebenher */
+  try {
+    const a = holeAudio();
+    const puffer = await tickenPufferHolen();
+    if (!_uhrTicken) return false;   /* zwischendurch ausgeschaltet */
+    const quelle = a.ctx.createBufferSource();
+    quelle.buffer = puffer;
+    quelle.loop = true;
+    const s = tickenSchleife(puffer);
+    if (s) { quelle.loopStart = s.start; quelle.loopEnd = s.ende; }
+    const leise = a.ctx.createGain();
+    leise.gain.value = 0;
+    quelle.connect(leise); leise.connect(a.master);
+    quelle.start(0, s ? s.start : 0);
+    /* Nicht hereinplatzen: in zwei Sekunden aufblenden. */
+    leise.gain.setTargetAtTime(0.16, a.ctx.currentTime, 0.7);
+    _uhrTicken = { quelle, leise, ctx: a.ctx, laeuft: true };
+    return true;
+  } catch (e) {
+    _uhrTicken = null;
+    return false;
+  }
+}
+
+function uhrTickenAus() {
+  const t = _uhrTicken;
+  _uhrTicken = null;
+  if (!t || !t.laeuft) return;
+  try {
+    /* Ausblenden statt abschneiden — ein hartes Ende knackt. */
+    t.leise.gain.setTargetAtTime(0, t.ctx.currentTime, 0.15);
+    const q = t.quelle;
+    setTimeout(() => { try { q.stop(); } catch (e) {} try { q.disconnect(); } catch (e) {} }, 700);
+  } catch (e) {}
+}
+
 /* ----- Der siebenarmige Leuchter: Messingarme und sieben Flammen ----- */
 function baueLeuchter(einst, woche) {
   const W = 170, H = 150;
@@ -477,12 +617,19 @@ function baueUhr(e) {
     uhr.querySelector('.zeiger.minute').style.transform = 'rotate(' + (d.getMinutes() * 6 + d.getSeconds() * .1) + 'deg)';
   };
   stelle();
+  /* Das Ticken ist eine laufende Aufnahme, kein Schlag je Sekunde. Hier wird
+     nur noch dafuer gesorgt, dass sie laeuft, solange die Uhr zu sehen ist —
+     und dass sie aufhoert, sobald sie es nicht mehr ist. */
   let timer = setInterval(() => {
-    if (!uhr.isConnected) { clearInterval(timer); return; }
+    if (!uhr.isConnected) { clearInterval(timer); uhrTickenAus(); return; }
     stelle();
     const d = new Date();
-    if (e.uhrTickt) { schreibtischKlick('tick'); if (d.getMinutes() === 0 && d.getSeconds() === 0 && typeof glocke === 'function') glocke(); }
+    if (!e.uhrTickt || document.hidden || begrenze(D.einst.lautstaerke, 0, 1, .5) <= 0) { uhrTickenAus(); return; }
+    if (!_uhrTicken) uhrTickenAn();
+    if (d.getMinutes() === 0 && d.getSeconds() === 0 && typeof glocke === 'function') glocke();
   }, 1000);
+  /* Sofort anfangen, nicht erst nach einer Sekunde. */
+  if (e.uhrTickt && !document.hidden) uhrTickenAn();
   uhr.addEventListener('click', () => {
     const start = Number(sessionStorage.getItem('vani-session-start') || Date.now());
     const min = Math.max(0, Math.round((Date.now() - start) / 60000));

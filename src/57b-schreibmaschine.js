@@ -58,8 +58,13 @@ function schreibmaschineTaste(zeichen) {
 function schreibmaschineKlang(art, einst) {
   if (einst && einst.ton === false) return;
   try {
-    const ctx = typeof audioCtxHolen === 'function' ? audioCtxHolen() : (window.__vaniKlick || (window.__vaniKlick = new (window.AudioContext || window.webkitAudioContext)()));
-    if (!ctx) return;
+    /* Siehe 54c: audioCtxHolen gab es nie. Der Notweg baute jedes Mal einen
+       zweiten AudioContext, der am Lautstaerkeregler vorbei lief. */
+    const a = typeof holeAudio === 'function' ? holeAudio() : null;
+    const ctx = a && a.ctx;
+    const ziel = (a && a.master) || (ctx && ctx.destination);
+    if (!ctx || !ziel) return;
+    if (typeof begrenze === 'function' && begrenze(D.einst.lautstaerke, 0, 1, .5) <= 0) return;
     if (ctx.state === 'suspended') { try { ctx.resume().catch(() => {}); } catch (e) {} }
     const t0 = ctx.currentTime;
     const rausch = (dauer, freq, q, lautstaerke, start = 0) => {
@@ -68,12 +73,12 @@ function schreibmaschineKlang(art, einst) {
       const s = ctx.createBufferSource(); s.buffer = b;
       const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q;
       const g = ctx.createGain(); g.gain.setValueAtTime(lautstaerke, t0 + start); g.gain.exponentialRampToValueAtTime(.0001, t0 + start + dauer);
-      s.connect(f); f.connect(g); g.connect(ctx.destination); s.start(t0 + start); s.stop(t0 + start + dauer + .02);
+      s.connect(f); f.connect(g); g.connect(ziel); s.start(t0 + start); s.stop(t0 + start + dauer + .02);
     };
     const ton = (freq, dauer, lautstaerke, typ = 'sine', start = 0) => {
       const o = ctx.createOscillator(), g = ctx.createGain(); o.type = typ; o.frequency.setValueAtTime(freq, t0 + start);
       g.gain.setValueAtTime(.0001, t0 + start); g.gain.exponentialRampToValueAtTime(lautstaerke, t0 + start + .006); g.gain.exponentialRampToValueAtTime(.0001, t0 + start + dauer);
-      o.connect(g); g.connect(ctx.destination); o.start(t0 + start); o.stop(t0 + start + dauer + .02);
+      o.connect(g); g.connect(ziel); o.start(t0 + start); o.stop(t0 + start + dauer + .02);
     };
     if (art === 'taste') { rausch(.045, 2400 + Math.random() * 900, 1.2, .22); ton(180 + Math.random() * 60, .035, .05, 'triangle'); }
     else if (art === 'leer') { rausch(.06, 900, 1, .14); }

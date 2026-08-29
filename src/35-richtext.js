@@ -326,6 +326,49 @@ function baueFormatleiste(editor, beiAenderung, kompakt) {
     el('label', { class: 'format-slider' }, 'Größe', groesse, groesseWert));
 }
 
+/* ----- Ersetzen, ohne die Formatierung mitzunehmen -----
+   Suchen & Ersetzen hat in formatiertem Text bisher den reinen Text genommen,
+   ersetzt und daraus das HTML neu gebaut. Das Ergebnis stimmte — und war
+   nackt: fett, kursiv, Farben, Ueberschriften, Zitate, Listen, alles weg.
+   In einem Blatt faellt das kaum auf, in einer Szene ist es ein Verlust.
+
+   Also wird jetzt nur in den Textknoten ersetzt und das Geruest angefasst
+   gelassen. Der pure Teil steht hier fuer sich, damit er zu pruefen ist. */
+function textStueckeErsetzen(stuecke, suchen, ersetzen) {
+  const q = String(suchen == null ? '' : suchen);
+  if (!q) return { stuecke: (stuecke || []).slice(), anzahl: 0 };
+  const durch = String(ersetzen == null ? '' : ersetzen);
+  let anzahl = 0;
+  const raus = (stuecke || []).map((s) => {
+    const teile = String(s == null ? '' : s).split(q);
+    anzahl += teile.length - 1;
+    return teile.join(durch);
+  });
+  return { stuecke: raus, anzahl };
+}
+/* Wie oft kommt es vor, wenn man nur innerhalb einzelner Stuecke sucht? */
+function textStueckeZaehlen(stuecke, suchen) {
+  return textStueckeErsetzen(stuecke, suchen, suchen).anzahl;
+}
+/* Die Textknoten eines Bereichs — in der Reihenfolge, in der sie dastehen. */
+function richTextknoten(wurzel) {
+  if (!wurzel || typeof document === 'undefined' || !document.createTreeWalker) return [];
+  const lauf = document.createTreeWalker(wurzel, NodeFilter.SHOW_TEXT, null);
+  const raus = [];
+  let k;
+  while ((k = lauf.nextNode())) raus.push(k);
+  return raus;
+}
+function richErsetzen(wurzel, suchen, ersetzen) {
+  const knoten = richTextknoten(wurzel);
+  const { stuecke, anzahl } = textStueckeErsetzen(knoten.map((k) => k.data), suchen, ersetzen);
+  if (anzahl) knoten.forEach((k, i) => { if (k.data !== stuecke[i]) k.data = stuecke[i]; });
+  return anzahl;
+}
+function richZaehlen(wurzel, suchen) {
+  return textStueckeZaehlen(richTextknoten(wurzel).map((k) => k.data), suchen);
+}
+
 function baueRichEditor(doc, optionen = {}) {
   const editor = el('div', {
     class: (optionen.class || '') + ' rich-editor text', contenteditable: 'true', role: 'textbox', 'aria-multiline': 'true',

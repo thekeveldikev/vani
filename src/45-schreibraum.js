@@ -125,6 +125,10 @@ function oeffneSchreibraum(docId) {
   }
   _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, sprint: null, klangKnopf, istRich, richPaket, titelSichern };
 
+  /* Kam man ueber die Suche hierher, wird jetzt die Fundstelle angesprungen —
+     sonst stuende man in einer langen Szene oben und suchte von vorn. */
+  if (typeof suchZielAnspringen === 'function') { try { suchZielAnspringen(doc, ta, istRich, mitte); } catch (x) {} }
+
   wendeSchriftAn();
   wendeTastaturArtAn();
   if (!istRich) autogrow(ta);
@@ -493,8 +497,17 @@ function sucheErsetze() {
   const zaehle = () => {
     const q = suchFeld.value;
     if (!q) { zaehler.textContent = ''; return 0; }
-    const n = srAktuellerText().split(q).length - 1;
+    /* In formatiertem Text wird innerhalb der Textknoten gezaehlt — genau so,
+       wie danach auch ersetzt wird. Sonst verspräche der Zaehler mehr, als
+       das Ersetzen halten kann. */
+    const imGanzen = srAktuellerText().split(q).length - 1;
+    const n = _sr.istRich && typeof richZaehlen === 'function' ? richZaehlen(_sr.ta, q) : imGanzen;
     zaehler.textContent = n === 0 ? 'Kommt nicht vor.' : n === 1 ? 'Einmal gefunden.' : n + ' Treffer.';
+    /* Ein Wort, das mitten in einer Auszeichnung anfaengt und dahinter
+       weitergeht — „Wa“ fett, „ld“ normal —, laesst sich nicht ersetzen,
+       ohne die Auszeichnung zu zerschneiden. Das wird gesagt, nicht
+       verschwiegen. */
+    if (n < imGanzen) zaehler.textContent += ' (' + (imGanzen - n) + ' davon quer durch eine Formatierung — die bleiben stehen)';
     return n;
   };
   suchFeld.addEventListener('input', zaehle);
@@ -510,7 +523,15 @@ function sucheErsetze() {
           const n = zaehle();
           if (!n) { toast('Nichts zu ersetzen.'); return; }
           friereEin();
-          srSetzeText(srAktuellerText().split(suchFeld.value).join(ersatzFeld.value));
+          /* Im formatierten Text nur die Woerter tauschen, nicht das Geruest:
+             srSetzeText wuerde das HTML aus der reinen Textfassung neu bauen
+             und dabei jede Auszeichnung wegwerfen. */
+          if (_sr.istRich && typeof richErsetzen === 'function') {
+            richErsetzen(_sr.ta, suchFeld.value, ersatzFeld.value);
+            _sr.ta.dispatchEvent(new Event('input', { bubbles: true }));
+          } else {
+            srSetzeText(srAktuellerText().split(suchFeld.value).join(ersatzFeld.value));
+          }
           _sr.sichern.sofort();
           zu();
           toast(n === 1 ? 'Einmal ersetzt.' : n + '-mal ersetzt. Der alte Stand ist eingefroren.');
