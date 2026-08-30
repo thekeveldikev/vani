@@ -306,7 +306,7 @@ function schreibtischKlick(art) {
    Ein Ticken laesst sich nicht ueberzeugend rechnen. Was hier vorher stand —
    Rauschen durch ein schmales Band, darunter ein tiefer Holzkoerper — klang
    nach Klopfen, nicht nach Uhr. Jetzt laeuft eine Aufnahme einer echten
-   Standuhr (klang/uhr-ticken.ogg, Herkunft und Lizenz in klang/quellen.json).
+   Standuhr (klang/uhr-ticken.m4a, Herkunft und Lizenz in klang/quellen.json).
 
    Drei Dinge machen den Unterschied:
 
@@ -391,7 +391,7 @@ let _tickenPuffer = null;
 async function tickenPufferHolen() {
   if (_tickenPuffer) return _tickenPuffer;
   const a = holeAudio();
-  const antwort = await fetch('klang/uhr-ticken.ogg', { cache: 'force-cache' });
+  const antwort = await fetch('klang/uhr-ticken.m4a', { cache: 'force-cache' });
   if (!antwort.ok) throw new Error('Die Aufnahme fehlt');
   const roh = await antwort.arrayBuffer();
   _tickenPuffer = await new Promise((res, rej) => {

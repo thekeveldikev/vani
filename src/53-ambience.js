@@ -25,7 +25,7 @@ function ambienceKatalogSetzen(liste) {
       id: k.id,
       name: String(k.name || k.id).slice(0, 60),
       kat: String(k.kat || 'Sonst').slice(0, 30),
-      datei: String(k.datei || (k.id + '.opus')).replace(/[^a-zA-Z0-9._-]/g, ''),
+      datei: String(k.datei || (k.id + '.m4a')).replace(/[^a-zA-Z0-9._-]/g, ''),
       mb: begrenze(k.mb, 0, 100, 0),
       quelle: String(k.quelle || '').slice(0, 200)
     }));
@@ -69,7 +69,7 @@ async function ambienceVorratLeeren() {
 }
 
 /* Holt eine Aufnahme — aus dem Vorrat, sonst aus dem Netz und dann in den Vorrat. */
-async function ambienceBlob(id, beiFortschritt) {
+async function ambienceBlob(id, beiFortschritt, ohneAblage) {
   const a = ambienceFinde(id);
   if (!a) throw new Error('Diesen Klang gibt es nicht.');
   if (a.eigen) {
@@ -78,8 +78,10 @@ async function ambienceBlob(id, beiFortschritt) {
     return blob;
   }
   const schluessel = ambienceSchluessel(id);
-  const gespeichert = await dbGet('media', schluessel).catch(() => null);
-  if (gespeichert) return gespeichert;
+  if (!ohneAblage) {
+    const gespeichert = await dbGet('media', schluessel).catch(() => null);
+    if (gespeichert) { gespeichert._ausDerAblage = true; return gespeichert; }
+  }
   if (typeof navigator !== 'undefined' && navigator.onLine === false) throw new Error('Dafür braucht es einmal Internet.');
   const antwort = await fetch('klang/' + a.datei, { cache: 'force-cache' });
   if (!antwort.ok) throw new Error('Der Klang ließ sich nicht laden.');
@@ -96,7 +98,7 @@ async function ambienceBlob(id, beiFortschritt) {
       if (geladen > AMBIENCE_MAX) throw new Error('Diese Aufnahme ist zu groß.');
       beiFortschritt(Math.min(1, geladen / gesamt));
     }
-    blob = new Blob(stuecke, { type: 'audio/ogg' });
+    blob = new Blob(stuecke, { type: 'audio/mp4' });
   } else {
     blob = await antwort.blob();
     if (blob.size > AMBIENCE_MAX) throw new Error('Diese Aufnahme ist zu groß.');
@@ -120,17 +122,89 @@ function ambiencePufferFreigeben() {
   ambiencePufferBegrenzen(0);
   return vorher - _ambiencePuffer.size;
 }
+/* ----- Kann dieser Browser die Aufnahmen ueberhaupt? -----
+   Die Klaenge liegen als Ogg-Opus vor. Das ist ueberall zu Hause — ausser in
+   Safari: dort haengt es an der Systemfassung. Auf einem neueren iPad laeuft
+   es, auf einem aelteren nicht, und dann kam bisher nur „Diese Aufnahme
+   versteht der Browser nicht“ — eine Sackgasse, die aussieht wie ein Fehler
+   in der Datei, obwohl es am Geraet liegt.
+
+   Gefragt wird nicht der Browsername, sondern der Browser selbst: was er
+   abspielen kann, weiss er am besten. 'probably' und 'maybe' sind beide ein
+   Ja — 'maybe' heisst nur, dass er es erst am Inhalt sicher sagen kann. */
+let _ambienceKann = null;
+function ambienceKannOgg() {
+  if (_ambienceKann !== null) return _ambienceKann;
+  try {
+    const probe = document.createElement('audio');
+    const opus = probe.canPlayType('audio/ogg; codecs="opus"');
+    const vorbis = probe.canPlayType('audio/ogg; codecs="vorbis"');
+    _ambienceKann = !!(opus || vorbis);
+  } catch (e) { _ambienceKann = true; }   /* im Zweifel probieren, nicht verhindern */
+  return _ambienceKann;
+}
+/* Welche Formen der Browser sonst versteht — fuer die ehrliche Auskunft. */
+function ambienceFormate() {
+  const raus = [];
+  try {
+    const probe = document.createElement('audio');
+    for (const [name, typ] of [['Ogg-Opus', 'audio/ogg; codecs="opus"'], ['AAC', 'audio/mp4; codecs="mp4a.40.2"'], ['MP3', 'audio/mpeg'], ['WAV', 'audio/wav']]) {
+      if (probe.canPlayType(typ)) raus.push(name);
+    }
+  } catch (e) {}
+  return raus;
+}
+
 async function ambiencePuffer(id, beiFortschritt) {
   if (_ambiencePuffer.has(id)) return _ambiencePuffer.get(id);
   const a = holeAudio();
-  const blob = await ambienceBlob(id, beiFortschritt);
+  const eintrag = typeof ambienceFinde === 'function' ? ambienceFinde(id) : null;
+  /* Beim ersten Anlauf darf die Ablage helfen. Scheitert das Dekodieren an
+     einem Stueck, das dort liegt, wird es weggeworfen und einmal frisch
+     geholt — siehe unten. */
+  return ambienceDekodieren(id, a, eintrag, beiFortschritt, false);
+}
+
+/* Der eigentliche Weg: holen, dekodieren, behalten.
+   Der zweite Anlauf ist der Grund, warum das eine eigene Funktion ist. Die
+   Ablage merkt sich das heruntergeladene Stueck, BEVOR es dekodiert wird —
+   sonst muesste jeder Klang zweimal durchs Netz. Das hat aber eine Folge, die
+   lange niemand gesehen hat: Auf einem Geraet, das Ogg-Opus nicht abspielen
+   kann, lag danach ein unlesbares Stueck in der Ablage. Es wurde bei jedem
+   Versuch wieder hervorgeholt und scheiterte wieder — auch nachdem die
+   Aufnahmen laengst in einer Form vorlagen, die das Geraet versteht. Das
+   Update allein haette also gar nichts geaendert.
+
+   Deshalb: Was sich nicht dekodieren laesst, hat in der Ablage nichts
+   verloren. Wegwerfen und genau einmal neu holen. */
+async function ambienceDekodieren(id, a, eintrag, beiFortschritt, ohneAblage) {
+  const blob = await ambienceBlob(id, beiFortschritt, ohneAblage);
+  const ausDerAblage = !!blob._ausDerAblage;
   const roh = await blob.arrayBuffer();
   const puffer = await new Promise((res, rej) => {
-    const fertig = (p) => res(p), schief = (e) => rej(e || new Error('Diese Aufnahme versteht der Browser nicht.'));
+    const fertig = (p) => res(p);
+    /* Beim Scheitern nicht nur sagen, DASS es nicht geht, sondern warum —
+       und was hilft. Sonst sucht man den Fehler bei der Datei. */
+    const schief = () => {
+      const eigen = eintrag && eintrag.eigen;
+      if (!eigen && typeof ambienceKannOgg === 'function' && !ambienceKannOgg()) {
+        const kann = ambienceFormate();
+        rej(new Error('Dieses Gerät kann Ogg-Opus nicht abspielen — daran liegt es, nicht am Klang. '
+          + 'Auf einem neueren iPadOS läuft es; ein Systemupdate behebt es.'
+          + (kann.length ? ' (Dieses Gerät versteht: ' + kann.join(', ') + '.)' : '')));
+        return;
+      }
+      rej(new Error('Diese Aufnahme versteht der Browser nicht.'));
+    };
     try {
       const p = a.ctx.decodeAudioData(roh, fertig, schief);
       if (p && typeof p.then === 'function') p.then(fertig, schief);
     } catch (e) { schief(e); }
+  }).catch(async (fehler) => {
+    if (!ausDerAblage || ohneAblage) throw fehler;
+    /* Das lag in der Ablage und laesst sich nicht abspielen — weg damit. */
+    try { await dbDel('media', ambienceSchluessel(id)); } catch (e) {}
+    return ambienceDekodieren(id, a, eintrag, beiFortschritt, true);
   });
   _ambiencePuffer.set(id, puffer);
   ambiencePufferBegrenzen();

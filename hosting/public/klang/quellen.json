@@ -18,12 +18,13 @@
       "seite": "https://commons.wikimedia.org/wiki/File:Jupey_purring.wav"
     },
     {
-      "datei": "klang/uhr-ticken.ogg",
+      "datei": "klang/uhr-ticken.m4a",
       "titel": "Grandfather Clock Ticking.ogg",
       "urheber": "Jud McCranie",
       "lizenz": "CC BY-SA 4.0",
       "lizenzUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "seite": "https://commons.wikimedia.org/wiki/File:Grandfather_Clock_Ticking.ogg"
+      "seite": "https://commons.wikimedia.org/wiki/File:Grandfather_Clock_Ticking.ogg",
+      "hinweis": "Aus der Ogg-Vorbis-Aufnahme nach AAC umgewandelt: Safari auf aelteren iPads kann Ogg nicht abspielen."
     }
   ]
 }

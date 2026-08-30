@@ -3,520 +3,520 @@
   "id": "donner_fern",
   "name": "Ferner Donner",
   "kat": "Wetter",
-  "datei": "donner_fern.opus",
-  "mb": 0.41,
+  "datei": "donner_fern.m4a",
+  "mb": 0.59,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "wind_heulen",
   "name": "Heulender Wind",
   "kat": "Wetter",
-  "datei": "wind_heulen.opus",
-  "mb": 0.36,
+  "datei": "wind_heulen.m4a",
+  "mb": 0.51,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "wind_mittel",
   "name": "Pfeifender Wind",
   "kat": "Wetter",
-  "datei": "wind_mittel.opus",
-  "mb": 0.45,
+  "datei": "wind_mittel.m4a",
+  "mb": 0.63,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "regen_stark",
   "name": "Regen mit Donner",
   "kat": "Wetter",
-  "datei": "regen_stark.opus",
-  "mb": 0.46,
+  "datei": "regen_stark.m4a",
+  "mb": 0.63,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "regen_sanft",
   "name": "Sanfter Regen",
   "kat": "Wetter",
-  "datei": "regen_sanft.opus",
-  "mb": 0.48,
+  "datei": "regen_sanft.m4a",
+  "mb": 0.63,
   "quelle": "Nature Sounds / Sound Therapy (CC0)"
  },
  {
   "id": "wind_sanft",
   "name": "Sanfter Wind",
   "kat": "Wetter",
-  "datei": "wind_sanft.opus",
-  "mb": 0.34,
+  "datei": "wind_sanft.m4a",
+  "mb": 0.55,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "wind_stark",
   "name": "Starker Wind",
   "kat": "Wetter",
-  "datei": "wind_stark.opus",
-  "mb": 0.43,
+  "datei": "wind_stark.m4a",
+  "mb": 0.59,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "bach",
   "name": "Bach",
   "kat": "Wasser",
-  "datei": "bach.opus",
-  "mb": 0.38,
+  "datei": "bach.m4a",
+  "mb": 0.59,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "bach_grillen",
   "name": "Bach mit Grillen",
   "kat": "Wasser",
-  "datei": "bach_grillen.opus",
-  "mb": 0.47,
+  "datei": "bach_grillen.m4a",
+  "mb": 0.6,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "stream_voegel",
   "name": "Bach mit Vögeln",
   "kat": "Wasser",
-  "datei": "stream_voegel.opus",
-  "mb": 0.47,
+  "datei": "stream_voegel.m4a",
+  "mb": 0.63,
   "quelle": "Nature Sounds / Sound Therapy (CC0)"
  },
  {
   "id": "brandung",
   "name": "Brandung",
   "kat": "Wasser",
-  "datei": "brandung.opus",
-  "mb": 0.45,
+  "datei": "brandung.m4a",
+  "mb": 0.59,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "meer_ruhig",
   "name": "Meer und Möwen",
   "kat": "Wasser",
-  "datei": "meer_ruhig.opus",
-  "mb": 0.51,
+  "datei": "meer_ruhig.m4a",
+  "mb": 0.63,
   "quelle": "Nature Sounds / Sound Therapy (CC0)"
  },
  {
   "id": "meer_sturm",
   "name": "Sturm auf See",
   "kat": "Wasser",
-  "datei": "meer_sturm.opus",
-  "mb": 0.49,
+  "datei": "meer_sturm.m4a",
+  "mb": 0.63,
   "quelle": "Nature Sounds / Sound Therapy (CC0)"
  },
  {
   "id": "unterwasser",
   "name": "Unter Wasser",
   "kat": "Wasser",
-  "datei": "unterwasser.opus",
-  "mb": 0.3,
+  "datei": "unterwasser.m4a",
+  "mb": 0.43,
   "quelle": "SSE Library: AMBIENCE (CC0)"
  },
  {
   "id": "wasserfall",
   "name": "Wasserfall",
   "kat": "Wasser",
-  "datei": "wasserfall.opus",
-  "mb": 0.44,
+  "datei": "wasserfall.m4a",
+  "mb": 0.59,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "kamin",
   "name": "Kaminfeuer",
   "kat": "Feuer",
-  "datei": "kamin.opus",
-  "mb": 0.36,
+  "datei": "kamin.m4a",
+  "mb": 0.48,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "lagerfeuer",
   "name": "Lagerfeuer",
   "kat": "Feuer",
-  "datei": "lagerfeuer.opus",
-  "mb": 0.58,
+  "datei": "lagerfeuer.m4a",
+  "mb": 0.61,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "dschungel_tag",
   "name": "Dschungel am Tag",
   "kat": "Natur",
-  "datei": "dschungel_tag.opus",
-  "mb": 0.27,
+  "datei": "dschungel_tag.m4a",
+  "mb": 0.41,
   "quelle": "SSE Library: AMBIENCE (CC0)"
  },
  {
   "id": "dschungel_nacht",
   "name": "Dschungel bei Nacht",
   "kat": "Natur",
-  "datei": "dschungel_nacht.opus",
-  "mb": 0.48,
+  "datei": "dschungel_nacht.m4a",
+  "mb": 0.6,
   "quelle": "SSE Library: AMBIENCE (CC0)"
  },
  {
   "id": "grillen",
   "name": "Grillen",
   "kat": "Natur",
-  "datei": "grillen.opus",
-  "mb": 0.46,
+  "datei": "grillen.m4a",
+  "mb": 0.59,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "grillen_teich",
   "name": "Grillen am Teich",
   "kat": "Natur",
-  "datei": "grillen_teich.opus",
-  "mb": 0.39,
+  "datei": "grillen_teich.m4a",
+  "mb": 0.46,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "grillen_fern",
   "name": "Grillen nah und fern",
   "kat": "Natur",
-  "datei": "grillen_fern.opus",
-  "mb": 0.52,
+  "datei": "grillen_fern.m4a",
+  "mb": 0.59,
   "quelle": "GOLD TAPE: Ambience (CC0)"
  },
  {
   "id": "sumpf_nacht",
   "name": "Sumpf bei Nacht",
   "kat": "Natur",
-  "datei": "sumpf_nacht.opus",
-  "mb": 0.47,
+  "datei": "sumpf_nacht.m4a",
+  "mb": 0.6,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "wald_regen",
   "name": "Wald im Regen",
   "kat": "Natur",
-  "datei": "wald_regen.opus",
-  "mb": 0.37,
+  "datei": "wald_regen.m4a",
+  "mb": 0.51,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "wald_voegel",
   "name": "Wald mit Vögeln",
   "kat": "Natur",
-  "datei": "wald_voegel.opus",
-  "mb": 0.43,
+  "datei": "wald_voegel.m4a",
+  "mb": 0.55,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "abendvoegel",
   "name": "Abendamseln",
   "kat": "Draußen",
-  "datei": "abendvoegel.opus",
-  "mb": 0.41,
+  "datei": "abendvoegel.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "dschungel",
   "name": "Dschungelnacht",
   "kat": "Draußen",
-  "datei": "dschungel.opus",
-  "mb": 0.45,
+  "datei": "dschungel.m4a",
+  "mb": 0.59,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "herbstvoegel",
   "name": "Herbstvögel",
   "kat": "Draußen",
-  "datei": "herbstvoegel.opus",
-  "mb": 0.44,
+  "datei": "herbstvoegel.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "weide",
   "name": "Kühe auf der Weide",
   "kat": "Draußen",
-  "datei": "weide.opus",
-  "mb": 0.41,
+  "datei": "weide.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "daemmerung",
   "name": "Landdämmerung",
   "kat": "Draußen",
-  "datei": "daemmerung.opus",
-  "mb": 0.47,
+  "datei": "daemmerung.m4a",
+  "mb": 0.59,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "wiese",
   "name": "Schafe auf der Wiese",
   "kat": "Draußen",
-  "datei": "wiese.opus",
-  "mb": 0.49,
+  "datei": "wiese.m4a",
+  "mb": 0.59,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "starenschwarm",
   "name": "Starenschwarm",
   "kat": "Draußen",
-  "datei": "starenschwarm.opus",
-  "mb": 0.41,
+  "datei": "starenschwarm.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "waldmorgen",
   "name": "Waldmorgen",
   "kat": "Draußen",
-  "datei": "waldmorgen.opus",
-  "mb": 0.5,
+  "datei": "waldmorgen.m4a",
+  "mb": 0.59,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "windmuehle",
   "name": "Windmühle",
   "kat": "Draußen",
-  "datei": "windmuehle.opus",
-  "mb": 0.38,
+  "datei": "windmuehle.m4a",
+  "mb": 0.56,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "cafe",
   "name": "Café",
   "kat": "Orte",
-  "datei": "cafe.opus",
-  "mb": 0.31,
+  "datei": "cafe.m4a",
+  "mb": 0.47,
   "quelle": "SSE Library: AMBIENCE (CC0)"
  },
  {
   "id": "hotelhalle",
   "name": "Hotelhalle",
   "kat": "Orte",
-  "datei": "hotelhalle.opus",
-  "mb": 0.23,
+  "datei": "hotelhalle.m4a",
+  "mb": 0.35,
   "quelle": "SSE Library: AMBIENCE (CC0)"
  },
  {
   "id": "markt_marrakesch",
   "name": "Markt in Marrakesch",
   "kat": "Orte",
-  "datei": "markt_marrakesch.opus",
-  "mb": 0.51,
+  "datei": "markt_marrakesch.m4a",
+  "mb": 0.59,
   "quelle": "SSE Library: AMBIENCE (CC0)"
  },
  {
   "id": "markt",
   "name": "Marktgemurmel",
   "kat": "Orte",
-  "datei": "markt.opus",
-  "mb": 0.37,
+  "datei": "markt.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "covent",
   "name": "Markthalle im Morgen",
   "kat": "Orte",
-  "datei": "covent.opus",
-  "mb": 0.36,
+  "datei": "covent.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "promenade",
   "name": "Promenade mit Glocken",
   "kat": "Orte",
-  "datei": "promenade.opus",
-  "mb": 0.41,
+  "datei": "promenade.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "restaurant_ruhig",
   "name": "Ruhiges Lokal",
   "kat": "Orte",
-  "datei": "restaurant_ruhig.opus",
-  "mb": 0.43,
+  "datei": "restaurant_ruhig.m4a",
+  "mb": 0.55,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "schulflur",
   "name": "Schulflur",
   "kat": "Orte",
-  "datei": "schulflur.opus",
-  "mb": 0.47,
+  "datei": "schulflur.m4a",
+  "mb": 0.55,
   "quelle": "SSE Library: AMBIENCE (CC0)"
  },
  {
   "id": "schulhof",
   "name": "Schulhof",
   "kat": "Orte",
-  "datei": "schulhof.opus",
-  "mb": 0.45,
+  "datei": "schulhof.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "stadt",
   "name": "Stadt von oben",
   "kat": "Orte",
-  "datei": "stadt.opus",
-  "mb": 0.45,
+  "datei": "stadt.m4a",
+  "mb": 0.59,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "strasse_china",
   "name": "Straße in China",
   "kat": "Orte",
-  "datei": "strasse_china.opus",
-  "mb": 0.4,
+  "datei": "strasse_china.m4a",
+  "mb": 0.59,
   "quelle": "GOLD TAPE: Ambience (CC0)"
  },
  {
   "id": "basar",
   "name": "Straßen von Beirut",
   "kat": "Orte",
-  "datei": "basar.opus",
-  "mb": 0.36,
+  "datei": "basar.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "restaurant",
   "name": "Volles Restaurant",
   "kat": "Orte",
-  "datei": "restaurant.opus",
-  "mb": 0.38,
+  "datei": "restaurant.m4a",
+  "mb": 0.59,
   "quelle": "GOLD TAPE: Ambience (CC0)"
  },
  {
   "id": "wirtshaus",
   "name": "Wirtshaus am Samstag",
   "kat": "Orte",
-  "datei": "wirtshaus.opus",
-  "mb": 0.35,
+  "datei": "wirtshaus.m4a",
+  "mb": 0.49,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "muehle",
   "name": "Alte Mühle",
   "kat": "Innen",
-  "datei": "muehle.opus",
-  "mb": 0.39,
+  "datei": "muehle.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "uhrwerk",
   "name": "Altes Uhrwerk",
   "kat": "Innen",
-  "datei": "uhrwerk.opus",
-  "mb": 0.39,
+  "datei": "uhrwerk.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "buero",
   "name": "Büro mit Telefonen",
   "kat": "Innen",
-  "datei": "buero.opus",
-  "mb": 0.5,
+  "datei": "buero.m4a",
+  "mb": 0.61,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "fabrik",
   "name": "Große Fabrik",
   "kat": "Innen",
-  "datei": "fabrik.opus",
-  "mb": 0.39,
+  "datei": "fabrik.m4a",
+  "mb": 0.59,
   "quelle": "GOLD TAPE: Ambience (CC0)"
  },
  {
   "id": "schreibbuero",
   "name": "Schreibmaschinenbüro",
   "kat": "Innen",
-  "datei": "schreibbuero.opus",
-  "mb": 0.46,
+  "datei": "schreibbuero.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "kuhstall",
   "name": "Stall bei Nacht",
   "kat": "Innen",
-  "datei": "kuhstall.opus",
-  "mb": 0.42,
+  "datei": "kuhstall.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "werkstatt",
   "name": "Werkstatt",
   "kat": "Innen",
-  "datei": "werkstatt.opus",
-  "mb": 0.36,
+  "datei": "werkstatt.m4a",
+  "mb": 0.59,
   "quelle": "SSE Library: AMBIENCE (CC0)"
  },
  {
   "id": "bahnhof",
   "name": "Bahnhof Helsinki",
   "kat": "Reise",
-  "datei": "bahnhof.opus",
-  "mb": 0.42,
+  "datei": "bahnhof.m4a",
+  "mb": 0.59,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "bahnhofshalle",
   "name": "Bahnhofshalle",
   "kat": "Reise",
-  "datei": "bahnhofshalle.opus",
-  "mb": 0.34,
+  "datei": "bahnhofshalle.m4a",
+  "mb": 0.55,
   "quelle": "GOLD TAPE: Ambience (CC0)"
  },
  {
   "id": "motorboot",
   "name": "Boot auf dem Wasser",
   "kat": "Reise",
-  "datei": "motorboot.opus",
-  "mb": 0.4,
+  "datei": "motorboot.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "dampfzug",
   "name": "Dampfzug",
   "kat": "Reise",
-  "datei": "dampfzug.opus",
-  "mb": 0.42,
+  "datei": "dampfzug.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "frachter",
   "name": "Frachtschiff",
   "kat": "Reise",
-  "datei": "frachter.opus",
-  "mb": 0.34,
+  "datei": "frachter.m4a",
+  "mb": 0.55,
   "quelle": "BBC Sound Effects (RemArc-Lizenz, privat)"
  },
  {
   "id": "flughafen_klein",
   "name": "Kleiner Flugplatz",
   "kat": "Reise",
-  "datei": "flughafen_klein.opus",
-  "mb": 0.27,
+  "datei": "flughafen_klein.m4a",
+  "mb": 0.43,
   "quelle": "GOLD TAPE: Ambience (CC0)"
  },
  {
   "id": "ubahn",
   "name": "U-Bahn",
   "kat": "Reise",
-  "datei": "ubahn.opus",
-  "mb": 0.45,
+  "datei": "ubahn.m4a",
+  "mb": 0.59,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "ubahnhof",
   "name": "U-Bahnhof",
   "kat": "Reise",
-  "datei": "ubahnhof.opus",
-  "mb": 0.42,
+  "datei": "ubahnhof.m4a",
+  "mb": 0.55,
   "quelle": "Valentino Sound Effects Library (Public Domain Mark)"
  },
  {
   "id": "verkehr",
   "name": "Verkehr",
   "kat": "Reise",
-  "datei": "verkehr.opus",
-  "mb": 0.34,
+  "datei": "verkehr.m4a",
+  "mb": 0.55,
   "quelle": "GOLD TAPE: Ambience (CC0)"
  },
  {
   "id": "tunnel",
   "name": "Verkehr im Tunnel",
   "kat": "Reise",
-  "datei": "tunnel.opus",
-  "mb": 0.39,
+  "datei": "tunnel.m4a",
+  "mb": 0.59,
   "quelle": "GOLD TAPE: Ambience (CC0)"
  }
 ]

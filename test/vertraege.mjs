@@ -412,7 +412,11 @@ test('Klangkatalog: jede Aufnahme hat Namen, Kategorie und ehrliche Herkunft', (
     assert.match(k.id, /^[a-z0-9_-]{1,40}$/, 'Kennung: ' + k.id);
     assert.ok(!ids.has(k.id), 'doppelte Kennung: ' + k.id);
     ids.add(k.id);
-    assert.equal(k.datei, k.id + '.opus');
+    /* AAC in .m4a, nicht Ogg-Opus. Opus ist sparsamer, aber Safari kann Ogg
+       je nach iPadOS-Fassung nicht abspielen: auf einem neueren iPad lief der
+       Klang, auf einem älteren kam nur „Diese Aufnahme versteht der Browser
+       nicht“. Ein Format, das alle können, ist die paar Megabyte wert. */
+    assert.equal(k.datei, k.id + '.m4a');
     assert.ok(existsSync(join(wurzel, 'klang', k.datei)), 'Datei fehlt: ' + k.datei);
     assert.ok(k.name && k.name.length <= 60, 'Name: ' + k.id);
     assert.ok(k.kat && k.kat.length <= 30, 'Kategorie: ' + k.id);

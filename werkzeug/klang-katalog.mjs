@@ -2,9 +2,14 @@
    Baut klang/katalog.json aus den vorhandenen Aufnahmen.
 
    Die Aufnahmen selbst entstehen lokal mit einem eigenen Werkzeug
-   (Herunterladen, ruhigen Abschnitt schneiden, als Opus kodieren) und liegen
-   in klang/. Dieses Skript liest nur, was da ist, und schreibt die Liste,
-   aus der die App ihren Fundus aufbaut.
+   (Herunterladen, ruhigen Abschnitt schneiden, kodieren) und liegen in
+   klang/. Dieses Skript liest nur, was da ist, und schreibt die Liste, aus
+   der die App ihren Fundus aufbaut.
+
+   Kodiert wird als AAC in .m4a, nicht mehr als Ogg-Opus. Opus ist sparsamer,
+   aber Safari kann Ogg je nach Systemfassung nicht abspielen: auf einem
+   neueren iPad lief der Klang, auf einem aelteren kam nur „Diese Aufnahme
+   versteht der Browser nicht“. AAC koennen alle.
 
    Aufruf:  node werkzeug/klang-katalog.mjs
    ================================================================ */
@@ -21,12 +26,12 @@ if (!existsSync(klang)) { console.log('Kein klang/-Ordner — nichts zu tun.'); 
 const BEKANNT = JSON.parse(readFileSync(join(wurzel, 'werkzeug', 'klang-namen.json'), 'utf8'));
 
 const REIHENFOLGE = ['Wetter', 'Wasser', 'Feuer', 'Natur', 'Draußen', 'Orte', 'Innen', 'Reise', 'Sonst'];
-const dateien = readdirSync(klang).filter((f) => f.endsWith('.opus'));
+const dateien = readdirSync(klang).filter((f) => f.endsWith('.m4a'));
 const katalog = [];
 const fehlend = [];
 
 for (const datei of dateien.sort()) {
-  const id = datei.replace(/\.opus$/, '');
+  const id = datei.replace(/\.m4a$/, '');
   const mb = +(statSync(join(klang, datei)).size / 1048576).toFixed(2);
   if (mb < 0.05) { console.log('übersprungen (zu klein, vermutlich still): ' + datei); continue; }
   const b = BEKANNT[id];
