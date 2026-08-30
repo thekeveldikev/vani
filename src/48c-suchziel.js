@@ -88,6 +88,22 @@ function suchFundMarkieren(bereich) {
   return false;
 }
 
+/* Welcher Kasten scrollt hier eigentlich?
+   Der Schreibraum weiß das (.sr-mitte). Das Heft weiß es nicht — dort steht
+   der Text mal auf einer einzelnen Seite, mal in einer Rolle, mal am Stück,
+   und der scrollende Kasten ist jedes Mal ein anderer. Also wird er gesucht:
+   der nächste Vorfahr, der wirklich mehr Inhalt hat, als er zeigen kann. */
+function suchRolleFuer(element) {
+  let e = element && element.parentElement;
+  while (e && e !== document.body) {
+    let s = null;
+    try { s = getComputedStyle(e); } catch (x) {}
+    if (s && (s.overflowY === 'auto' || s.overflowY === 'scroll') && e.scrollHeight > e.clientHeight + 4) return e;
+    e = e.parentElement;
+  }
+  return document.scrollingElement || document.documentElement;
+}
+
 /* Die Stelle in die Mitte rücken — nicht an den oberen Rand.
    Kein scrollIntoView: das scrollt auch alle Eltern mit und reißt auf dem
    iPad die ganze Seite herum. Hier wird genau ein Bereich gescrollt. */
@@ -104,13 +120,13 @@ function suchInDieMitte(rolle, obenImBild) {
    Gesucht wird über die echten Textknoten, nicht über doc.text: die reine
    Textfassung setzt an Absatzgrenzen Zeilenumbrüche ein, die es im DOM gar
    nicht gibt — die Zählung würde um jeden Absatz verrutschen. */
-function richBereichFuer(wurzel, wort) {
+function richBereichFuer(wurzel, wort, abPosition = 0) {
   if (!wurzel || typeof document === 'undefined' || !document.createTreeWalker) return null;
   const lauf = document.createTreeWalker(wurzel, NodeFilter.SHOW_TEXT, null);
   const knoten = [];
   let text = '', k;
   while ((k = lauf.nextNode())) { knoten.push({ k, ab: text.length }); text += k.data; }
-  const stelle = suchStelle(text, wort);
+  const stelle = suchStelle(text, wort, abPosition);
   if (!stelle) return null;
   const finde = (pos) => {
     for (let i = knoten.length - 1; i >= 0; i--) {
@@ -123,8 +139,26 @@ function richBereichFuer(wurzel, wort) {
   try {
     const r = document.createRange();
     r.setStart(a.k, a.o); r.setEnd(b.k, b.o);
+    /* Wo im Text das hier war — damit der naechste Aufruf dahinter weitersucht. */
+    r._vaniVon = stelle.von; r._vaniBis = stelle.bis;
     return r;
   } catch (e) { return null; }
+}
+/* Wie oft kommt das Wort im ganzen Bereich vor? Fuer „3 von 7“. */
+function suchAnzahl(text, wort) {
+  const q = normalisiere(String(wort || '').trim());
+  if (!q) return 0;
+  return suchKarte(text).norm.split(q).length - 1;
+}
+/* Der reine Text eines Fliesstext-Bereichs, so wie richBereichFuer ihn zaehlt —
+   also ueber die Textknoten, ohne die Zeilenumbrueche, die richReinerText an
+   Absatzgrenzen einfuegt. Sonst stimmten Zaehlung und Sprung nicht ueberein. */
+function richKnotenText(wurzel) {
+  if (!wurzel || typeof document === 'undefined' || !document.createTreeWalker) return '';
+  const lauf = document.createTreeWalker(wurzel, NodeFilter.SHOW_TEXT, null);
+  let text = '', k;
+  while ((k = lauf.nextNode())) text += k.data;
+  return text;
 }
 
 /* ----- Im einfachen Text: über einen Spiegel messen -----
@@ -154,7 +188,7 @@ function textStelleHoehe(feld, von) {
 }
 
 /* ----- Der eine Aufruf, den der Schreibraum macht ----- */
-function suchZielAnspringen(doc, feld, istRich, rolle) {
+function suchZielAnspringen(doc, feld, istRich, wohin) {
   if (!doc || !feld) return false;
   const wort = suchZielHolen(doc.id);
   if (!wort) return false;
@@ -163,6 +197,9 @@ function suchZielAnspringen(doc, feld, istRich, rolle) {
      verdeckt ist, und dann spränge nie jemand irgendwohin. */
   setTimeout(() => {
     if (!feld.isConnected) return;
+    /* Erst jetzt: beim Bauen hing das Feld noch gar nicht im Fenster, und ein
+       Kasten, der noch keine Hoehe hat, scrollt auch nicht. */
+    const rolle = wohin || suchRolleFuer(feld);
     try {
       if (istRich) {
         const bereich = richBereichFuer(feld, wort);

@@ -124,3 +124,19 @@ test('Das Umfeld zeigt die Stelle, nicht immer den Anfang', async () => {
   const vorn = k.projektSuchUmfeld(k.sauberesDokument({ id: 'y', typ: 'szene', text: 'Losungswort gleich am Anfang.', angelegt: 1, geaendert: 1 }), 'losungswort');
   assert.ok(vorn.startsWith('Losungswort'));
 });
+
+test('Zählen und Weitersuchen stimmen überein', async () => {
+  const k = await frisch();
+  const t = 'Der Wald. Im Wald. Am Waldrand. Und Straße vor dem Wald.';
+  assert.equal(k.suchAnzahl(t, 'wald'), 4, 'auch „Waldrand“ zählt — es steht ja drin');
+  assert.equal(k.suchAnzahl(t, 'strasse'), 1, 'ß wird gefunden, ohne die Zählung zu verschieben');
+  assert.equal(k.suchAnzahl(t, 'einhorn'), 0);
+  assert.equal(k.suchAnzahl(t, ''), 0);
+  assert.equal(k.suchAnzahl('', 'wald'), 0);
+
+  /* Und genau so viele Stellen findet das Weitersuchen auch — das ist der
+     Punkt: der Zähler darf nicht mehr versprechen als die Sprünge halten. */
+  let n = 0, ab = 0, s;
+  while ((s = k.suchStelle(t, 'wald', ab))) { n++; ab = s.bis; }
+  assert.equal(n, k.suchAnzahl(t, 'wald'));
+});

@@ -148,6 +148,9 @@ function rettungAnbieten() {
       doc ? el('button', { class: 'knopf voll', onclick: async () => {
         /* Der alte Stand bleibt als Version erhalten — nichts wird überschrieben, ohne dass es einen Weg zurück gibt. */
         try { if (typeof standEinfrieren === 'function') standEinfrieren(doc, 'vor der Rettung'); } catch (e) {}
+        /* Der eingefrorene Stand muss auf der Platte liegen, bevor der Text
+           ueberschrieben wird — sonst waere das Versprechen wieder keins. */
+        try { await sicherSpeichern('docs', doc); } catch (e) {}
         rettungEinsetzen(doc, rettung); await sicherSpeichern('docs', doc); speichere(doc);
         rettungLoeschen(); zu(); toast('Zurückgeholt. Der Stand von vorher liegt als Version daneben.', 5000);
         if (typeof oeffneSchreibraum === 'function') setTimeout(() => oeffneSchreibraum(doc.id), 120);

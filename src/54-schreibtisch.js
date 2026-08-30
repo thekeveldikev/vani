@@ -206,6 +206,7 @@ async function schubladeOeffnen() {
 /* Der Papierkorb unterm Tisch: zerknüllte Blätter glätten = zurückholen. */
 async function papierkorbAmTisch() {
   const alle = (await dbAlle('papierkorb')).sort((a, b) => (b.wann || 0) - (a.wann || 0));
+  if (typeof papierkorbZahlSetzen === 'function') papierkorbZahlSetzen(alle.length);
   if (!alle.length) { toast('Der Papierkorb ist leer. Schön.'); return; }
   const wahl = await menue([
     ...alle.slice(0, 12).map((b) => ({ text: (b.name || b.typ || 'Etwas') + ' · ' + fmtDatum(b.wann) + (b.docs && b.docs.length > 1 ? ' · ' + b.docs.length + ' Teile' : ''), icon: 'blatt', wert: b.id })),
@@ -827,7 +828,18 @@ RENDER.schreibtisch = function (haupt) {
   if (typeof tischzitateBauen === 'function') { try { tischzitateBauen(dinge, e, () => zeichne()); } catch (x) {} }
 
   /* Papierkorb, Schublade, Einrichten */
-  dinge.append(el('button', { class: 'desk-korb', title: 'Der Papierkorb unterm Tisch', onclick: () => papierkorbAmTisch() }, el('i', { class: 'knuell k1' }), el('i', { class: 'knuell k2' }), el('i', { class: 'knuell k3' }), el('i', { class: 'korbrand' })));
+  /* Der Korb zeigt, wie viel drin liegt: leer ist er leer, und je mehr
+     weggeworfen wurde, desto mehr Knuell liegt obenauf. Vorher lagen immer
+     dieselben drei Papierkugeln darin — auch in einem ganz frischen VANI. */
+  const korbVoll = typeof papierkorbZahl === 'function' ? papierkorbZahl() : 0;
+  const knuell = Math.min(4, korbVoll);
+  dinge.append(el('button', {
+    class: 'desk-korb' + (korbVoll ? '' : ' leer'),
+    title: korbVoll ? 'Der Papierkorb unterm Tisch — ' + zaehl(korbVoll, 'Bündel', 'Bündel', 'ein') + ' darin' : 'Der Papierkorb unterm Tisch — leer',
+    onclick: () => papierkorbAmTisch()
+  },
+    Array.from({ length: knuell }, (x, i) => el('i', { class: 'knuell k' + (i + 1) })),
+    el('i', { class: 'korbrand' })));
   dinge.append(el('button', { class: 'desk-schublade', title: 'Die Schublade', onclick: () => schubladeOeffnen() }, el('i', { class: 'griffknauf' })));
   dinge.append(el('button', { class: 'rundknopf zart desk-einrichten', html: ik('feinheiten'), title: 'Schreibtisch einrichten', onclick: () => schreibtischEinrichten(() => zeichne()) }));
 

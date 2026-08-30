@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.57.0';
+const APP_VERSION = '5.58.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -608,7 +608,13 @@ function sauberesDokument(quelle) {
   if (d.staende != null) {
     d.staende = Array.isArray(d.staende) ? d.staende.slice(-20).filter((s) => s && typeof s === 'object').map((s) => ({
       wann: begrenze(s.wann, 0, Date.now() + 86400000, Date.now()),
-      titel: String(s.titel || '').slice(0, 1000), text: String(s.text || '').slice(0, 10000000), ...(s.auto ? { auto: true } : {})
+      titel: String(s.titel || '').slice(0, 1000), text: String(s.text || '').slice(0, 10000000),
+      /* Die Formatierung gehoert zum Stand: sonst kommt eine Szene nackt
+         zurueck. Und der Grund sagt beim Nachsehen, warum hier eingefroren
+         wurde — „vor der Rettung“ ist etwas anderes als „automatisch“. */
+      ...(s.rich && typeof sauberesRichHTML === 'function' ? { rich: sauberesRichHTML(String(s.rich).slice(0, 10000000)) } : {}),
+      ...(s.grund ? { grund: String(s.grund).slice(0, 80) } : {}),
+      ...(s.auto ? { auto: true } : {})
     })) : [];
   }
   if (d.pegel != null) {
@@ -687,6 +693,33 @@ function staendeAutomatisch(d, jetzt = Date.now()) {
   while (st.length > 20) { const i = st.findIndex((s) => s.auto); st.splice(i >= 0 ? i : 0, 1); }
   return true;
 }
+/* ----- Einen Stand von Hand einfrieren -----
+   Das muss auch ohne offenen Schreibraum gehen, und genau daran hat es
+   gefehlt: die Rettung nach einem Absturz (32) rief standEinfrieren auf, bevor
+   sie einen Text ueberschrieb — eine Funktion, die es nicht gab. Der Aufruf
+   stand hinter einem typeof-Schutz, fiel also still durch, und der Toast
+   danach versprach trotzdem „Der Stand von vorher liegt als Version daneben“.
+   Ausgerechnet an der Stelle, an der man VANI am meisten vertrauen muss.
+
+   Mit eingefroren wird jetzt auch die Formatierung. Ein Stand hielt bisher nur
+   den reinen Text fest; beim Zurueckholen kam eine Szene nackt zurueck — ohne
+   fett, kursiv, Ueberschriften, Zitate. Das war kein Zurueckholen. */
+function standEinfrieren(doc, grund, text, rich) {
+  if (!doc) return null;
+  const stand = {
+    wann: Date.now(),
+    titel: doc.titel || '',
+    text: String(text != null ? text : (doc.text || ''))
+  };
+  const formatiert = rich != null ? rich : (doc.format === 'rich' ? doc.rich : null);
+  if (formatiert) stand.rich = String(formatiert);
+  if (grund) stand.grund = String(grund).slice(0, 80);
+  doc.staende = Array.isArray(doc.staende) ? doc.staende : [];
+  doc.staende.push(stand);
+  while (doc.staende.length > 20) doc.staende.shift();
+  return stand;
+}
+
 function speichereStill(d) { markiereAenderung(d, false); sicherSpeichern('docs', d); }
 
 /* Löschen ist bei VANI nie endgültig: alles wandert erst in den Papierkorb. */
@@ -736,6 +769,7 @@ async function loesche(id, still, kinderDerWurzelBehalten = false) {
     toast('Der Papierkorb nimmt gerade nichts an — deshalb wurde auch nichts gelöscht. Alles ist noch da.', 8000);
     return;
   }
+  papierkorbZahlSetzen(_korbZahl + 1);
   for (const [d, feld] of putzen) delete d[feld];
   for (const d of new Set(putzen.map((x) => x[0]))) speichereStill(d);
   for (const d of buendel.docs) {
@@ -748,6 +782,27 @@ async function loesche(id, still, kinderDerWurzelBehalten = false) {
       zeichne();
     });
   }
+}
+
+/* ----- Wie voll der Papierkorb ist -----
+   Der Korb unterm Schreibtisch fragt danach, um zu zeigen, wie viel drin
+   liegt — und der Schreibtisch fragt danach, um zu merken, dass sich etwas
+   geaendert hat. Beides braucht die Zahl sofort, in jedem Aufbau.
+
+   Nachsehen heisst hier aber: den ganzen Papierkorb laden, mitsamt allen
+   geloeschten Texten. Das ist nichts fuer eine Zeichenrunde. Also wird
+   mitgezaehlt, wo etwas hineingeht und herauskommt, und nur beim Start (und
+   nach jedem echten Blick hinein) wirklich nachgezaehlt.
+
+   papierkorbZahl hat es vorher nicht gegeben. Der Schreibtisch rief sie hinter
+   einem typeof-Schutz auf und bekam still immer 0 — der Korb blieb also
+   stehen, egal wie viel man wegwarf. */
+let _korbZahl = 0;
+function papierkorbZahl() { return _korbZahl; }
+function papierkorbZahlSetzen(n) { _korbZahl = Math.max(0, Math.round(Number(n) || 0)); return _korbZahl; }
+async function papierkorbNachzaehlen() {
+  try { papierkorbZahlSetzen((await dbAlle('papierkorb')).length); } catch (e) {}
+  return _korbZahl;
 }
 
 async function holeZurueck(buendelId) {
@@ -767,11 +822,13 @@ async function holeZurueck(buendelId) {
   /* Der Papierkorb bleibt voll, solange nicht wirklich alles zurück ist. */
   if (!allesDa) { toast('Ein Teil ließ sich noch nicht speichern — im Papierkorb liegt alles weiter bereit.', 8000); return false; }
   await dbDel('papierkorb', buendelId);
+  papierkorbZahlSetzen(_korbZahl - 1);
   return true;
 }
 
 async function papierkorbLeeren(nurAelterAlsTage) {
   const alle = await dbAlle('papierkorb');
+  papierkorbZahlSetzen(alle.length);
   const grenze = nurAelterAlsTage ? Date.now() - nurAelterAlsTage * 86400000 : Infinity;
   for (const b of alle) {
     if (nurAelterAlsTage && b.wann > grenze) continue;

@@ -121,7 +121,15 @@ function oeffneSchreibraum(docId) {
   /* Die Scrollleiste: in langen Texten die schnellste Art, an eine Stelle zu
      kommen. Die Fahne zeigt beim Ziehen die Überschrift, nicht nur Prozent. */
   if (typeof scrollleiste === 'function') {
-    try { scrollleiste(mitte, { ziel: raum, marken: (b) => scrollMarkenAusUeberschriften(b, 'h1, h2, h3'), fahne: scrollFahneText(mitte) }); } catch (x) {}
+    try {
+      scrollleiste(mitte, {
+        ziel: raum,
+        /* Wird gerade gesucht, zeigt die Leiste die Fundstellen — sonst die
+           Ueberschriften. Beides zugleich waere nur Gestreife. */
+        marken: (b) => (_srFundWort && typeof srFundMarken === 'function' ? srFundMarken(b) : scrollMarkenAusUeberschriften(b, 'h1, h2, h3')),
+        fahne: scrollFahneText(mitte)
+      });
+    } catch (x) {}
   }
   _sr = { raum, doc, ta, spiegel, mitte, kopf, spalte, startWorte, sprint: null, klangKnopf, istRich, richPaket, titelSichern };
 
@@ -433,13 +441,14 @@ function srEinstellungen() {
   const zu = zeigeDeck(kasten);
 }
 
-/* ----- Stände (Schnappschüsse) ----- */
-function friereEin() {
+/* ----- Stände (Schnappschüsse) -----
+   Das Einfrieren selbst steht in 30: es gehoert zum Dokument, nicht zum Raum,
+   in dem man es gerade ansieht. Hier liegt nur der Weg fuer den offenen
+   Schreibraum — mit dem Text, wie er in diesem Augenblick dasteht. */
+function friereEin(grund) {
   if (!_sr) return;
   const doc = _sr.doc;
-  doc.staende = doc.staende || [];
-  doc.staende.push({ wann: Date.now(), titel: doc.titel || '', text: srAktuellerText() });
-  if (doc.staende.length > 20) doc.staende.shift();
+  standEinfrieren(doc, grund, srAktuellerText(), _sr.istRich ? _sr.ta.innerHTML : null);
   speichereStill(doc);
   toast('Eingefroren. Dieser Stand bleibt.');
 }
@@ -456,10 +465,16 @@ function zeigeStaende() {
           { text: 'Nur ansehen', icon: 'lesen', wert: 'sehen' },
           { text: 'Mit jetzt vergleichen — Wort für Wort', icon: 'suche', wert: 'diff' },
           { text: 'Diesen Stand vergessen', icon: 'muell', wert: 'weg', rot: true }
-        ], fmtDatum(st.wann) + ', ' + fmtZeit(st.wann));
+        ], fmtDatum(st.wann) + ', ' + fmtZeit(st.wann) + (st.grund ? ' · ' + st.grund : ''));
         if (wahl === 'zurueck') {
-          friereEin();
-          srSetzeText(st.text);
+          friereEin('vor dem Zurückholen');
+          /* Hat der Stand die Formatierung dabei, kommt sie mit zurueck.
+             srSetzeText wuerde aus dem reinen Text neues HTML bauen und dabei
+             alles wegwerfen, was ausgezeichnet war. */
+          if (st.rich && _sr.istRich) {
+            _sr.ta.innerHTML = typeof sauberesRichHTML === 'function' ? sauberesRichHTML(st.rich) : st.rich;
+            _sr.ta.dispatchEvent(new Event('input', { bubbles: true }));
+          } else srSetzeText(st.text);
           _sr.doc.titel = st.titel; const tf = _sr.raum.querySelector('.sr-titel'); if (tf) tf.value = st.titel;
           _sr.sichern.sofort();
           zeichne();
@@ -468,8 +483,12 @@ function zeigeStaende() {
           const bogen = el('div', { class: 'lesebogen' },
             el('div', { class: 'innen' },
               el('h1', {}, st.titel || 'Stand vom ' + fmtDatum(st.wann)),
-              el('div', { class: 'lmeta' }, worte(st.text) + ' Wörter · eingefroren ' + fmtDatum(st.wann) + ', ' + fmtZeit(st.wann) + (st.auto ? ' · automatisch' : '')),
-              el('div', { class: 'lesetext' }, st.text)));
+              el('div', { class: 'lmeta' }, worte(st.text) + ' Wörter · eingefroren ' + fmtDatum(st.wann) + ', ' + fmtZeit(st.wann) + (st.grund ? ' · ' + st.grund : st.auto ? ' · automatisch' : '')),
+              /* Traegt der Stand seine Formatierung, wird sie auch gezeigt —
+                 sonst sieht der Bogen anders aus als das, was zurueckkaeme. */
+              st.rich && typeof sauberesRichHTML === 'function'
+                ? el('div', { class: 'lesetext', html: sauberesRichHTML(st.rich) })
+                : el('div', { class: 'lesetext' }, st.text)));
           const leiste2 = el('div', { class: 'schwebeleiste' },
             el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Stand schließen', onclick: () => { bogen.remove(); leiste2.remove(); } }));
           document.body.append(bogen, leiste2);
@@ -487,10 +506,116 @@ function zeigeStaende() {
   const zu = zeigeDeck(kasten);
 }
 
+/* ----- Im Text springen: von Fundstelle zu Fundstelle -----
+   Suchen & Ersetzen konnte bisher nur zaehlen und alles auf einmal tauschen.
+   Was fehlte, war das, was eine Suche eigentlich ausmacht: hingehen. In einem
+   Blatt sieht man den Treffer ohnehin; in einer Szene ueber mehrere Seiten
+   half die Zahl „7 Treffer“ ueberhaupt nicht weiter.
+
+   Gemerkt wird nur, wo man zuletzt stand. Weitersuchen faengt dahinter an und
+   laeuft am Ende wieder von vorn — sonst haenge man am letzten Treffer fest. */
+let _srFundAb = 0;      /* hinter der jetzigen Fundstelle — von hier laeuft „weiter“ */
+let _srFundVon = -1;    /* der Anfang der jetzigen Fundstelle — daran haengt „zurueck“ */
+let _srFundWort = '';   /* wonach gerade gesucht wird — die Scrollleiste zeigt es an */
+
+/* ----- Wo ueberall steht das Wort? Fuer die Striche an der Scrollleiste -----
+   In einer langen Szene ist das die eigentliche Auskunft: nicht „7 Treffer“,
+   sondern „zwei ganz vorn, fuenf im letzten Drittel“. Man sieht die Verteilung,
+   bevor man losspringt.
+
+   Gemessen wird ueber die echten Kaesten im Fenster, nicht gerechnet: bei
+   Fliesstext haengt die Hoehe einer Stelle an Absaetzen, Bildern und
+   Ueberschriften, und die kennt nur der Browser. */
+function srFundMarken(bereich) {
+  if (!_sr || !_srFundWort || !bereich) return [];
+  const ganz = bereich.scrollHeight;
+  if (!ganz) return [];
+  const oben = bereich.getBoundingClientRect().top - bereich.scrollTop;
+  const text = srFundText();
+  const raus = [];
+  let ab = 0, s;
+  /* Sechzig reichen fuer das Bild; mehr Striche waeren ohnehin ein Balken. */
+  while ((s = suchStelle(text, _srFundWort, ab)) && raus.length < 60) {
+    ab = s.bis;
+    let y = null;
+    try {
+      if (_sr.istRich) {
+        const r = richBereichFuer(_sr.ta, _srFundWort, s.von);
+        if (r) y = r.getBoundingClientRect().top - oben;
+      } else {
+        const h = textStelleHoehe(_sr.ta, s.von);
+        if (h != null) y = _sr.ta.getBoundingClientRect().top + h - oben;
+      }
+    } catch (e) {}
+    if (y == null) continue;
+    raus.push({ anteil: begrenze(y / ganz, 0, 1, 0), name: _srFundWort, stark: true });
+  }
+  return raus;
+}
+function srFundWortSetzen(wort) {
+  _srFundWort = String(wort || '').trim();
+  const leiste = _sr && _sr.mitte && _sr.mitte._leiste;
+  if (leiste && typeof leiste.markenSetzen === 'function') leiste.markenSetzen();
+}
+function srFundText() {
+  if (!_sr) return '';
+  return _sr.istRich && typeof richKnotenText === 'function' ? richKnotenText(_sr.ta) : (_sr.ta.value || '');
+}
+function srFundZahl(wort) {
+  return typeof suchAnzahl === 'function' ? suchAnzahl(srFundText(), wort) : 0;
+}
+/* Der wievielte Treffer sitzt an dieser Stelle? Fuer „3 von 7“. */
+function srFundNummer(wort, von) {
+  const text = srFundText();
+  let n = 0, ab = 0, s;
+  while ((s = suchStelle(text, wort, ab))) { n++; if (s.von >= von) return n; ab = s.bis; }
+  return n;
+}
+function srFundSpringen(wort, vorwaerts = true) {
+  if (!_sr || !wort) return null;
+  const text = srFundText();
+  let stelle = null;
+  if (vorwaerts) {
+    stelle = suchStelle(text, wort, _srFundAb);
+    if (!stelle) stelle = suchStelle(text, wort, 0);        /* wieder von vorn */
+  } else {
+    /* Rueckwaerts: die letzte Stelle, die VOR der jetzigen anfaengt.
+       Verglichen wird mit dem Anfang der jetzigen, nicht mit ihrem Ende —
+       sonst findet sich die jetzige Stelle selbst wieder und man bleibt
+       stehen. Ist keine davor, wird hinten wieder angefangen. */
+    let ab = 0, s, davor = null, letzteImText = null;
+    while ((s = suchStelle(text, wort, ab))) {
+      letzteImText = s;
+      if (_srFundVon >= 0 && s.von < _srFundVon) davor = s;
+      ab = s.bis;
+    }
+    stelle = davor || letzteImText;
+  }
+  if (!stelle) return null;
+  _srFundAb = stelle.bis;
+  _srFundVon = stelle.von;
+  /* Hinspringen und markieren — dieselben Handgriffe wie bei der grossen Suche. */
+  try {
+    if (_sr.istRich) {
+      const bereich = richBereichFuer(_sr.ta, wort, stelle.von);
+      if (bereich) {
+        suchInDieMitte(_sr.mitte, bereich.getBoundingClientRect().top);
+        suchFundMarkieren(bereich);
+      }
+    } else {
+      const hoehe = textStelleHoehe(_sr.ta, stelle.von);
+      if (hoehe != null) suchInDieMitte(_sr.mitte, _sr.ta.getBoundingClientRect().top + hoehe);
+      try { _sr.ta.setSelectionRange(stelle.von, stelle.bis); } catch (e) {}
+    }
+  } catch (e) {}
+  return stelle;
+}
+
 /* ----- Suchen & Ersetzen (im offenen Text) ----- */
 function sucheErsetze() {
   if (!_sr) return;
   const ta = _sr.ta;
+  _srFundAb = 0; _srFundVon = -1;
   const suchFeld = el('input', { type: 'text', placeholder: 'suchen …' });
   const ersatzFeld = el('input', { type: 'text', placeholder: 'ersetzen durch …' });
   const zaehler = el('div', { style: 'font-size:13px;color:var(--blass);margin-top:8px' }, '');
@@ -510,10 +635,37 @@ function sucheErsetze() {
     if (n < imGanzen) zaehler.textContent += ' (' + (imGanzen - n) + ' davon quer durch eine Formatierung — die bleiben stehen)';
     return n;
   };
-  suchFeld.addEventListener('input', zaehle);
+  /* Die Knoepfe zum Springen. Sie erscheinen erst, wenn es etwas zu springen gibt. */
+  const wo = el('span', { class: 'sr-fund-wo' }, '');
+  const springen = (vor) => {
+    const q = suchFeld.value.trim();
+    if (!q) return;
+    const stelle = typeof srFundSpringen === 'function' ? srFundSpringen(q, vor) : null;
+    if (!stelle) { wo.textContent = ''; return; }
+    wo.textContent = srFundNummer(q, stelle.von) + ' von ' + srFundZahl(q);
+  };
+  const zurueckKnopf = el('button', { class: 'knopf zart klein', title: 'Vorige Fundstelle', onclick: () => springen(false) }, '‹');
+  const weiterKnopf = el('button', { class: 'knopf zart klein', title: 'Nächste Fundstelle (Enter)', onclick: () => springen(true) }, '›');
+  const springLeiste = el('div', { class: 'sr-fund-leiste' }, zurueckKnopf, weiterKnopf, wo);
+  const zaehleUndZeigen = () => {
+    _srFundAb = 0; _srFundVon = -1; wo.textContent = '';
+    const n = zaehle();
+    srFundWortSetzen(suchFeld.value);
+    springLeiste.classList.toggle('aus', !suchFeld.value.trim() || srFundZahl(suchFeld.value.trim()) === 0);
+    return n;
+  };
+  suchFeld.addEventListener('input', zaehleUndZeigen);
+  /* Enter im Suchfeld springt weiter — nicht ersetzen. Ersetzen ist ein Knopf,
+     und das soll es auch bleiben: es ist der Schritt, der etwas kaputtmachen kann. */
+  suchFeld.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Enter') return;
+    ev.preventDefault();
+    springen(!ev.shiftKey);
+  });
   const kasten = el('div', { class: 'modal' },
     el('h2', {}, 'Suchen & Ersetzen'),
     suchFeld,
+    springLeiste,
     el('div', { style: 'margin-top:10px' }, ersatzFeld),
     zaehler,
     el('div', { class: 'reihe' },
@@ -522,7 +674,7 @@ function sucheErsetze() {
         class: 'knopf voll', onclick: () => {
           const n = zaehle();
           if (!n) { toast('Nichts zu ersetzen.'); return; }
-          friereEin();
+          friereEin('vor dem Ersetzen');
           /* Im formatierten Text nur die Woerter tauschen, nicht das Geruest:
              srSetzeText wuerde das HTML aus der reinen Textfassung neu bauen
              und dabei jede Auszeichnung wegwerfen. */
@@ -533,13 +685,15 @@ function sucheErsetze() {
             srSetzeText(srAktuellerText().split(suchFeld.value).join(ersatzFeld.value));
           }
           _sr.sichern.sofort();
+          _srFundAb = 0; _srFundVon = -1;
           zu();
           toast(n === 1 ? 'Einmal ersetzt.' : n + '-mal ersetzt. Der alte Stand ist eingefroren.');
         }
       }, 'Ersetzen')
     )
   );
-  const zu = zeigeDeck(kasten);
+  const zu = zeigeDeck(kasten, () => srFundWortSetzen(''));
+  springLeiste.classList.add('aus');
   setTimeout(() => suchFeld.focus(), 60);
 }
 

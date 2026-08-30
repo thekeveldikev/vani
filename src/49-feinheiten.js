@@ -300,6 +300,7 @@ RENDER.feinheiten = function (haupt) {
   async function baueKorb() {
     korbKarte.innerHTML = '';
     const alle = (await dbAlle('papierkorb')).sort((a, b) => b.wann - a.wann);
+    if (typeof papierkorbZahlSetzen === 'function') papierkorbZahlSetzen(alle.length);
     if (!alle.length) {
       korbKarte.append(el('div', { style: 'color:var(--blass);font-size:14.5px' }, 'Leer. So soll es sein.'));
       return;

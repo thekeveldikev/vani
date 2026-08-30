@@ -600,6 +600,12 @@ function baueSeite(seite, heft, neuZeichnen, optionen = {}) {
   /* Ohne Filter macht die native append-Methode aus einem fehlenden Element
      den sichtbaren Text „null“ — auf jeder schlichten Heftseite. */
   blatt.append(...[skizzenbild, titel, formatleiste, text, werkzeuge].filter(Boolean));
+  /* Kam man ueber die Suche auf diese Seite, wird die Fundstelle angesprungen —
+     genau wie im Schreibraum. Vorher landete man oben auf der Seite und musste
+     das Wort noch einmal selbst suchen. */
+  if (typeof suchZielAnspringen === 'function') {
+    try { suchZielAnspringen(seite, text, seite.format === 'rich'); } catch (x) {}
+  }
   /* Aus der Gliederung kommend: zur n-ten Überschrift dieser Seite scrollen. */
   const zielUe = sessionStorage.getItem('zielUeberschrift');
   if (zielUe !== null && sessionStorage.getItem('zielSeiteGerade') !== seite.id) {

@@ -717,6 +717,11 @@ html[data-thema="tinte"] .kk-hinten, html[data-thema="kerze"] .kk-hinten { backg
 .desk-korb .korbrand { position: absolute; left: -3px; right: -3px; top: -3px; height: 7px; border-radius: 4px; background: linear-gradient(#5a4530, #2a1f14); }
 .desk-korb .knuell { position: absolute; width: 22px; height: 20px; border-radius: 45% 55% 50% 50%; background: radial-gradient(circle at 35% 35%, #f3e9d4, #c9bda0 70%); box-shadow: inset -3px -3px 6px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.5); }
 .desk-korb .k1 { left: 6px; top: -10px; transform: rotate(-12deg); } .desk-korb .k2 { left: 26px; top: -14px; transform: rotate(18deg); } .desk-korb .k3 { left: 42px; top: -6px; transform: rotate(-30deg); width: 18px; height: 16px; }
+/* Der vierte Knuell liegt tiefer im Korb — er kommt erst dazu, wenn wirklich
+   viel drin ist. Und ein leerer Korb ist leer: keine Papierkugeln, kein
+   Schatten darueber. */
+.desk-korb .k4 { left: 16px; top: 2px; transform: rotate(8deg); width: 20px; height: 18px; opacity: .82; }
+.desk-korb.leer { filter: drop-shadow(0 3px 5px rgba(0,0,0,.4)); opacity: .88; }
 .desk-schublade { position: absolute; left: 30%; right: 30%; bottom: 0; height: 36px; border-radius: 6px 6px 0 0; background: linear-gradient(#2c1f16, #1b120d); box-shadow: inset 0 2px 0 rgba(255,255,255,.08), 0 -2px 8px rgba(0,0,0,.4); z-index: 3; transition: transform .25s; }
 @media (hover: hover) and (pointer: fine) { .desk-schublade:hover { transform: translateY(-4px); } }
 .desk-schublade .griffknauf { position: absolute; left: 50%; top: 50%; width: 36px; height: 10px; margin: -5px 0 0 -18px; border-radius: 5px; background: linear-gradient(#d9b463, #7a5a2a); box-shadow: 0 1px 2px rgba(0,0,0,.6); }
@@ -6974,3 +6979,63 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
   background: color-mix(in srgb, var(--akzent) 30%, transparent);
   color: inherit;
 }
+
+
+/* ===== Zwei Klassen, die vergeben wurden und nichts taten =====
+   Beide standen im Code, wurden gesetzt und wieder weggenommen — und hatten
+   im Stil keine Entsprechung. Man sah also nichts davon. */
+
+/* .ritzt liegt auf dem Zitat, solange die Klinge laeuft.
+   Wichtiger als die Optik ist hier das Antippen: mitten im Schnitt oeffnete
+   ein Tipp das Menue zu einem Satz, der noch gar nicht fertig dasteht — und
+   das Neuzeichnen brach die Animation ab. Und weil frisch geschnittenes Holz
+   heller ist als altes, glimmt die Faser um die Zeile herum, solange gearbeitet
+   wird, und geht danach aus. */
+.desk-zitat.ritzt { pointer-events: none; }
+.desk-zitat.ritzt::after {
+  content: ""; position: absolute; inset: -6px -10px; border-radius: 8px; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 60%, rgba(255,226,170,.13), transparent 72%);
+  animation: tz-faser 1.1s ease-in-out infinite alternate;
+}
+@keyframes tz-faser { from { opacity: .45; } to { opacity: 1; } }
+
+/* .liest-vor liegt auf dem ganzen Fenster, solange VANI vorliest.
+   Dann soll der Text allein dastehen: alles Bedienbare tritt zurueck, ohne zu
+   verschwinden — wer eingreifen will, sieht es beim Hinsehen sofort wieder. */
+body.liest-vor .sr-kopf, body.liest-vor .sr-fuss, body.liest-vor .schwebeleiste,
+body.liest-vor .leiste, body.liest-vor .lese-kopf, body.liest-vor .lese-fuss, body.liest-vor .format-leiste {
+  opacity: .38; transition: opacity .5s ease;
+}
+/* Zurueckholen laesst sich alles ueber den Fokus — das gilt auf jedem Geraet.
+   Das Zeigen mit der Maus gibt es nur, wo es eine Maus gibt: auf dem iPad
+   bliebe ein :hover nach einer Beruehrung haengen. */
+body.liest-vor .sr-kopf:focus-within, body.liest-vor .sr-fuss:focus-within, body.liest-vor .leiste:focus-within,
+body.liest-vor .schwebeleiste:focus-within, body.liest-vor .lese-kopf:focus-within,
+body.liest-vor .lese-fuss:focus-within, body.liest-vor .format-leiste:focus-within {
+  opacity: 1;
+}
+@media (hover: hover) and (pointer: fine) {
+  body.liest-vor .sr-kopf:hover, body.liest-vor .sr-fuss:hover, body.liest-vor .schwebeleiste:hover,
+  body.liest-vor .leiste:hover, body.liest-vor .lese-kopf:hover, body.liest-vor .lese-fuss:hover,
+  body.liest-vor .format-leiste:hover { opacity: 1; }
+}
+/* Der Knopf, der gerade vorliest, bleibt hell — sonst sucht man ihn zum Anhalten. */
+body.liest-vor .an { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .desk-zitat.ritzt::after { animation: none; opacity: .7; }
+  body.liest-vor .sr-kopf, body.liest-vor .sr-fuss, body.liest-vor .schwebeleiste,
+  body.liest-vor .leiste, body.liest-vor .lese-kopf, body.liest-vor .lese-fuss, body.liest-vor .format-leiste { transition: none; }
+}
+
+
+/* ===== Im Text springen (45): die Leiste unter dem Suchfeld ===== */
+.sr-fund-leiste { display: flex; align-items: center; gap: 6px; margin-top: 9px; }
+.sr-fund-leiste.aus { display: none; }
+/* Die beiden Pfeile sind das eigentliche Werkzeug hier — sie duerfen nicht
+   aussehen wie ein Nebensatz. Gross genug fuer einen Daumen. */
+.sr-fund-leiste .knopf.klein {
+  min-width: 42px; min-height: 34px; padding: 4px 12px; font-size: 17px; line-height: 1;
+  border: 1px solid var(--linie); color: var(--tinte); opacity: .9;
+}
+@media (hover: hover) and (pointer: fine) { .sr-fund-leiste .knopf.klein:hover { opacity: 1; } }
+.sr-fund-wo { font-size: 12.5px; color: var(--blass); font-variant-numeric: tabular-nums; margin-left: 6px; }

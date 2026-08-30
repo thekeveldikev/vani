@@ -64,6 +64,10 @@ async function sucheAppUpdate(neuLaden = false) {
     return;
   }
 
+  /* Wie viel im Papierkorb liegt — nebenher, ohne den Start aufzuhalten.
+     Der Korb am Schreibtisch zeigt es danach richtig an. */
+  if (typeof papierkorbNachzaehlen === 'function') papierkorbNachzaehlen().then(() => { if (location.hash.startsWith('#/schreibtisch')) zeichne(); }).catch(() => {});
+
   /* Die Tastatur soll den Dialog nicht aus dem Bild schieben. */
   if (typeof tastaturZaehmen === 'function') tastaturZaehmen();
   /* Strg+Z überall — einmal angemeldet, gilt für jeden Raum. */
