@@ -4,6 +4,7 @@ const { app, BrowserWindow, protocol, net, shell, session, ipcMain, safeStorage 
 const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
+const berechtigung = require('./berechtigung.cjs');
 
 protocol.registerSchemesAsPrivileged([{
   scheme: 'vani',
@@ -202,8 +203,14 @@ else {
   });
   app.whenReady().then(async () => {
     await registriereProtokoll();
-    session.defaultSession.setPermissionRequestHandler((_wc, _permission, antwort) => antwort(false));
-    session.defaultSession.setPermissionCheckHandler(() => false);
+    /* Grundsätzlich nein — außer Ton und Zwischenablage für VANI selbst.
+       Warum genau diese beiden, steht in berechtigung.cjs. */
+    session.defaultSession.setPermissionRequestHandler((wc, permission, antwort, details) => {
+      const adresse = (details && details.requestingUrl) || (wc && !wc.isDestroyed() ? wc.getURL() : '');
+      antwort(berechtigung.darfAnfrage(permission, adresse, details && details.mediaTypes));
+    });
+    session.defaultSession.setPermissionCheckHandler((_wc, permission, herkunft, details) =>
+      berechtigung.darfPruefung(permission, herkunft || (details && details.requestingUrl) || '', details && details.mediaType));
     baueFenster();
     richteUpdaterEin();
     app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) baueFenster(); });

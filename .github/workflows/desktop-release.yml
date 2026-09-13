@@ -1,41 +1,94 @@
 name: VANI Desktop veröffentlichen
 
+# Baut den Windows-Installer und stellt ihn als GitHub-Release bereit. Die
+# installierte Desktop-App fragt genau dort nach neuen Fassungen.
+#
+# Bis 5.59.0 lief dieser Workflow nur, wenn ein Tag (v*) gepusht wurde. Das ist
+# nie passiert — es gab also nie ein Release, und jede Update-Suche der
+# Desktop-App lief ins Leere (latest.yml: 404). Jetzt genügt es, eine neue
+# Versionsnummer in package.json zu pushen. Gibt es das Release zu dieser
+# Nummer schon, hört der Lauf nach dem ersten Schritt wieder auf.
+
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main]
+    paths:
+      - package.json
+      - .github/workflows/desktop-release.yml
+  workflow_dispatch:
 
 permissions:
   contents: write
 
+# Zwei schnelle Pushes hintereinander sollen nicht zweimal dasselbe Release bauen.
+concurrency:
+  group: desktop-release
+  cancel-in-progress: false
+
 jobs:
   windows:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Quelltext holen
         uses: actions/checkout@v4
 
+      - name: Welche Version — und gibt es sie schon?
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if gh release view "v$version" > /dev/null 2>&1; then
+            echo "Das Release v$version gibt es schon — nichts zu tun."
+            echo "neu=nein" >> "$GITHUB_OUTPUT"
+          else
+            echo "v$version ist neu — wird gebaut."
+            echo "neu=ja" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Node einrichten
+        if: steps.version.outputs.neu == 'ja'
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
 
       - name: Abhängigkeiten installieren
+        if: steps.version.outputs.neu == 'ja'
         run: npm ci
 
+      # Ein kaputter Stand wird gar nicht erst gebaut — sonst holte sich jede
+      # installierte Desktop-App ihn von selbst.
       - name: Vollständig prüfen
+        if: steps.version.outputs.neu == 'ja'
         run: npm test
 
       - name: Setup, Portable und Update-Dateien bauen
+        if: steps.version.outputs.neu == 'ja'
         run: npm run desktop:win -- --publish never
 
-      - name: GitHub-Fassung bereitstellen
-        uses: softprops/action-gh-release@v2
-        with:
-          generate_release_notes: true
-          files: |
-            release/VANI-*-x64-Setup.exe
-            release/VANI-*-x64-Setup.exe.blockmap
-            release/VANI-*-x64-Portable.exe
-            release/latest.yml
+      # latest.yml muss exakt zur Setup-Datei passen (Version, Pfad, Prüfsumme,
+      # Größe). Passt sie nicht, lehnt die Desktop-App die Aktualisierung ab.
+      - name: Passt alles zusammen?
+        if: steps.version.outputs.neu == 'ja'
+        run: node werkzeug/release-pruefen.mjs "${{ steps.version.outputs.version }}"
+
+      # Erst als Entwurf mit allen Dateien, dann veröffentlichen: so sieht keine
+      # Desktop-App je ein Release, dem noch die latest.yml fehlt.
+      - name: Veröffentlichen
+        if: steps.version.outputs.neu == 'ja'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="${{ steps.version.outputs.version }}"
+          node werkzeug/release-notizen.mjs "$v" > release-notizen.md
+          gh release create "v$v" --draft --target "$GITHUB_SHA" --title "VANI $v" --notes-file release-notizen.md \
+            "release/VANI-$v-x64-Setup.exe" \
+            "release/VANI-$v-x64-Setup.exe.blockmap" \
+            "release/VANI-$v-x64-Portable.exe" \
+            "release/latest.yml"
+          gh release edit "v$v" --draft=false --latest

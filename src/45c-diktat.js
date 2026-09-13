@@ -5,7 +5,13 @@
    Stimme („Punkt“, „Komma“, „neue Zeile“), Pausen werden Absätze. Nichts
    davon verlässt das Gerät anders als durch die Erkennung des Systems. */
 
-function diktatMoeglich() { return typeof window !== 'undefined' && !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
+/* In der Desktop-App gibt es den Baustein zwar, er kommt aber nie durch:
+   Chromium schickt die Aufnahme an einen Google-Dienst, den nur Chrome und
+   Edge selbst mitbringen, Electron nicht. Nachgeprüft mit freigegebenem
+   Mikrofon — start, onaudiostart, dann sofort „network“. Ohne diese Weiche
+   meldete VANI dort „braucht gerade das Netz“, obwohl das Netz da war. */
+function diktatInDerDesktopApp() { return typeof globalThis !== 'undefined' && !!(globalThis.vaniDesktop && globalThis.vaniDesktop.istDesktop); }
+function diktatMoeglich() { return typeof window !== 'undefined' && !diktatInDerDesktopApp() && !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
 
 /* Gesprochene Satzzeichen in Zeichen verwandeln. Pur. */
 const DIKTAT_ZEICHEN = [
@@ -73,7 +79,9 @@ function diktatIstApfel() {
 function diktatUmschalten(knopf, zielHolen) {
   if (_diktat) { diktatStopp(); return; }
   if (!diktatMoeglich()) {
-    toast('Dieser Browser kennt keine Spracherkennung. Auf dem iPad geht es trotzdem: das Mikrofon unten rechts auf der Bildschirmtastatur diktiert in jedes Feld.', 7000);
+    toast(diktatInDerDesktopApp()
+      ? 'Die Desktop-App kann nicht selbst diktieren. Windows kann es: Windows-Taste + H drücken und sprechen — das schreibt in jedes Feld, auch hier.'
+      : 'Dieser Browser kennt keine Spracherkennung. Auf dem iPad geht es trotzdem: das Mikrofon unten rechts auf der Bildschirmtastatur diktiert in jedes Feld.', 7000);
     return;
   }
   const Erk = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -163,7 +171,9 @@ function diktatKnopf(zielHolen) {
   const kann = diktatMoeglich();
   const k = el('button', {
     class: 'rundknopf zart diktat-knopf' + (kann ? '' : ' kannnicht'), html: ik('mikro'),
-    title: kann ? 'Diktat: sprechen statt tippen' : 'Diktat: dieser Browser kann es nicht — das Mikrofon der Bildschirmtastatur schon'
+    title: kann ? 'Diktat: sprechen statt tippen'
+      : diktatInDerDesktopApp() ? 'Diktat: in der Desktop-App über Windows — Windows-Taste + H'
+      : 'Diktat: dieser Browser kann es nicht — das Mikrofon der Bildschirmtastatur schon'
   });
   k.addEventListener('click', () => diktatUmschalten(k, zielHolen));
   return k;
