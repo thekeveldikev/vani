@@ -1550,12 +1550,12 @@ textarea:focus-visible, input:focus-visible, [contenteditable]:focus-visible, .s
 .sync-kopf { display: flex; gap: 13px; align-items: center; }
 .sync-siegel { width: 43px; height: 43px; flex: 0 0 43px; border-radius: 50%; display: grid; place-items: center; color: var(--blass); background: var(--hg2); box-shadow: inset 0 0 0 1px var(--linie); }
 .sync-siegel.synchron { color: #427a55; background: color-mix(in srgb, #75ad82 16%, var(--karte)); }
-.sync-siegel.arbeitet, .sync-siegel.verbindet { color: var(--akzent2); animation: sync-atmen 1.4s ease-in-out infinite; }
+.sync-siegel.arbeitet, .sync-siegel.verbindet, .sync-siegel.sendet { color: var(--akzent2); animation: sync-atmen 1.4s ease-in-out infinite; }
 .sync-siegel.offline, .sync-siegel.fehler, .sync-siegel.schluessel { color: #a56f32; }
 .sync-status { margin-top: 4px; font-size: 12.5px; line-height: 1.4; color: var(--blass); font-weight: 400; }
 .sync-status i { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%; background: var(--blass); }
 .sync-status i.synchron { background: #55966a; box-shadow: 0 0 0 3px color-mix(in srgb, #55966a 15%, transparent); }
-.sync-status i.verbindet { background: var(--akzent2); }
+.sync-status i.verbindet, .sync-status i.sendet { background: var(--akzent2); }
 .sync-status i.offline, .sync-status i.fehler, .sync-status i.schluessel { background: #b77a34; }
 .sync-inhalt { margin-top: 16px; }
 .sync-inhalt > p { color: var(--blass); font-size: 14px; line-height: 1.62; margin-bottom: 14px; }

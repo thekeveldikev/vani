@@ -32,6 +32,8 @@ function fakeIndexedDB() {
                   get: (key) => op(() => map.get(key)),
                   delete: (key) => op(() => { map.delete(key); }),
                   getAll: () => op(() => [...map.values()]),
+                  getAllKeys: () => op(() => [...map.keys()]),
+                  count: () => op(() => map.size),
                   clear: () => op(() => map.clear())
                 };
               };

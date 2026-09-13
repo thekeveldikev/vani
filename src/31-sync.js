@@ -10,7 +10,8 @@ let _sync = {
   config: null, ydoc: null, ydocs: null, ystate: null, ymedia: null, persistence: null,
   poll: null, retry: null, status: { art: 'aus' }, uebernimmt: false, anwendenTimer: null,
   sendet: false, holt: false, medien: false, generation: 0, fremdZuletzt: 0, nachzug: null,
-  aufgeholt: false, geholt: 0, seite: 20, merken: null, merkenOffen: 0, einstUebernommen: null
+  aufgeholt: false, geholt: 0, seite: 20, merken: null, merkenOffen: 0, einstUebernommen: null,
+  wartend: 0, haengt: null
 };
 /* Hat die andere Seite in den letzten Minuten etwas gebracht? (zweite Tasse am Schreibtisch) */
 function syncFremdAktiv(minuten = 20) { return !!_sync.config && _sync.fremdZuletzt > 0 && Date.now() - _sync.fremdZuletzt < minuten * 60000; }
@@ -26,7 +27,10 @@ function syncInfo() {
     name: _sync.config ? _sync.config.name : '',
     server: _sync.config ? _sync.config.server : '',
     vault: _sync.config ? _sync.config.vault : '',
-    status: Object.assign({}, _sync.status)
+    status: Object.assign({}, _sync.status),
+    hier: D.docs.size,
+    imBereich: _sync.ydocs ? _sync.ydocs.size : 0,
+    wartend: _sync.wartend || 0
   };
 }
 function syncIstVerbunden() { return !!_sync.config; }
@@ -365,7 +369,7 @@ async function syncUebernehmeAusY() {
        ersten Hochladens neu startete, raeumte 124 von 150 eigenen Texten weg. */
     let eigeneUnterwegs = _sync.merkenOffen > 0;
     if (!eigeneUnterwegs) {
-      try { eigeneUnterwegs = (await dbAlle('sync-pending')).some((p) => p && _sync.config && p.vault === _sync.config.vault); }
+      try { eigeneUnterwegs = !!_sync.config && (await syncWartendeSchluessel(_sync.config.vault)).length > 0; }
       catch (e) { eigeneUnterwegs = true; }
     }
     if (_sync.aufgeholt && !eigeneUnterwegs) {
@@ -476,6 +480,127 @@ async function syncMedienAbgleich() {
   finally { _sync.medien = false; }
 }
 
+/* ----- Grosse Pakete reisen in Teilen -----
+   Der Dienst nimmt ein Paket nur bis 22 MB Geheimtext an. Ein grosser Bestand
+   ist als Ganzes schnell groesser. Nachgestellt mit 12 langen Texten (18,7 MB):
+   Der Dienst wies das Paket jedes Mal ab (413), alles dahinter blieb liegen,
+   auf dem neuen Laptop kam kein einziger Text an — und beide Geraete zeigten
+   „live verbunden“. Jetzt geht alles ueber 1 MB in Teilen hinaus. Das
+   empfangende Geraet legt die Teile beiseite, bis alle da sind, und wendet
+   dann das Ganze an. */
+const SYNC_TEIL_BYTES = 1024 * 1024;
+/* So gross wird ein Teil als Geheimtext nie. Was groesser in der
+   Warteschlange liegt, stammt aus einer aelteren Fassung. */
+const SYNC_PAKET_ZEICHEN_MAX = 2 * 1024 * 1024;
+const SYNC_TEIL_KENNUNG = Object.freeze([0, 86, 65, 78, 73, 84, 76, 49]);   /* Null-Byte, dann VANITL1 */
+const SYNC_TEIL_KOPF = 32;
+function syncAlsBytes(wert) {
+  return ArrayBuffer.isView(wert) ? new Uint8Array(wert.buffer, wert.byteOffset, wert.byteLength) : new Uint8Array(wert || []);
+}
+/* Kennung, Gruppe (16 Bytes), Nummer und Anzahl, dann das Stueck. Pur bis auf
+   die zufaellige Gruppe. */
+function syncTeileBauen(update, gruppe, groesse = SYNC_TEIL_BYTES) {
+  const bytes = syncAlsBytes(update);
+  const g = ArrayBuffer.isView(gruppe) && gruppe.byteLength === 16 ? syncAlsBytes(gruppe) : crypto.getRandomValues(new Uint8Array(16));
+  const stueck = Math.max(1, Math.floor(Number(groesse) || SYNC_TEIL_BYTES));
+  const gesamt = Math.max(1, Math.ceil(bytes.length / stueck));
+  const teile = [];
+  for (let i = 0; i < gesamt; i++) {
+    const daten = bytes.subarray(i * stueck, Math.min(bytes.length, (i + 1) * stueck));
+    const teil = new Uint8Array(SYNC_TEIL_KOPF + daten.length);
+    teil.set(SYNC_TEIL_KENNUNG, 0);
+    teil.set(g, 8);
+    const dv = new DataView(teil.buffer);
+    dv.setUint32(24, i);
+    dv.setUint32(28, gesamt);
+    teil.set(daten, SYNC_TEIL_KOPF);
+    teile.push(teil);
+  }
+  return teile;
+}
+/* Ein Teil? Dann seine Angaben, sonst null. Ein gewoehnliches Yjs-Update
+   beginnt nie mit dieser Kennung. Pur. */
+function syncTeilLesen(wert) {
+  if (!ArrayBuffer.isView(wert) || wert.byteLength < SYNC_TEIL_KOPF) return null;
+  const bytes = syncAlsBytes(wert);
+  for (let i = 0; i < SYNC_TEIL_KENNUNG.length; i++) if (bytes[i] !== SYNC_TEIL_KENNUNG[i]) return null;
+  const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const index = dv.getUint32(24), gesamt = dv.getUint32(28);
+  if (!gesamt || gesamt > 100000 || index >= gesamt) return null;
+  return { gruppe: syncB64(bytes.subarray(8, 24)), index, gesamt, daten: bytes.subarray(SYNC_TEIL_KOPF) };
+}
+/* Legt ein Update sicher in die Warteschlange, ein grosses in Teilen. Wirft,
+   wenn das nicht gelingt — dann darf nichts anderes weggeraeumt werden. */
+async function syncLegeInWarteschlange(update, vault) {
+  const bytes = syncAlsBytes(update);
+  const stuecke = bytes.length > SYNC_TEIL_BYTES ? syncTeileBauen(bytes) : [bytes];
+  for (const stueck of stuecke) {
+    if (!_sync.config || _sync.config.vault !== vault) throw new Error('Bereich gewechselt');
+    const paket = await syncVerschluessle(stueck);
+    await dbPut('sync-pending', paket, paket.vault + ':' + paket.id);
+    _sync.wartend = (_sync.wartend || 0) + 1;
+  }
+  return stuecke.length;
+}
+/* Ein Teil kommt an: beiseitelegen, und sind alle da, das Ganze anwenden. Die
+   Teile liegen dauerhaft, weil der Lesestand nach jedem Paket weiterzieht:
+   reisst die Leitung ab oder startet VANI neu, sind die ersten Teile noch da. */
+async function syncTeilAnnehmen(vault, teil) {
+  const basis = 'sync-teile:' + vault + ':' + teil.gruppe;
+  let liste = await dbGet('kv', basis);
+  if (!liste || liste.gesamt !== teil.gesamt || !Array.isArray(liste.da)) liste = { gesamt: teil.gesamt, da: [] };
+  if (!liste.da.includes(teil.index)) {
+    await dbPut('kv', syncB64(teil.daten), basis + ':' + teil.index);
+    liste = { gesamt: liste.gesamt, da: [...liste.da, teil.index] };
+    await dbPut('kv', liste, basis);
+  }
+  if (liste.da.length < liste.gesamt) return false;
+  const stuecke = [];
+  let laenge = 0;
+  for (let i = 0; i < liste.gesamt; i++) {
+    const roh = await dbGet('kv', basis + ':' + i);
+    if (typeof roh !== 'string') return false;
+    const b = syncBytes(roh);
+    stuecke.push(b); laenge += b.length;
+  }
+  if (!_sync.ydoc || !_sync.config || _sync.config.vault !== vault) return false;
+  const ganz = new Uint8Array(laenge);
+  let pos = 0;
+  for (const b of stuecke) { ganz.set(b, pos); pos += b.length; }
+  VaniY.Y.applyUpdate(_sync.ydoc, ganz, SYNC_NETZ);
+  /* Erst nach dem Anwenden aufraeumen: bis dahin sind die Teile der Ersatz. */
+  for (let i = 0; i < liste.gesamt; i++) { try { await dbDel('kv', basis + ':' + i); } catch (e) {} }
+  try { await dbDel('kv', basis); } catch (e) {}
+  return true;
+}
+/* Nur die Schluessel — die Pakete selbst koennen gross sein und werden einzeln gelesen. */
+async function syncWartendeSchluessel(vault) {
+  const alle = await dbTu('sync-pending', 'readonly', (s) => s.getAllKeys());
+  return (alle || []).filter((k) => typeof k === 'string' && k.startsWith(vault + ':'));
+}
+/* Pakete aus einer aelteren Fassung, die fuer den Dienst zu gross sind, werden
+   gerettet: Ihr Inhalt wandert in die lokale Kopie (die ihn meist ohnehin
+   schon hat), dann geht der ganze Stand EINMAL in Teilen in die Warteschlange,
+   und erst wenn die Teile sicher liegen, gehen die alten Pakete. Lagen dort
+   mehrere Kopien, reist so nur noch eine. */
+async function syncRetteGrossePakete(vault) {
+  if (!_sync.ydoc || !_sync.config || _sync.config.vault !== vault) return 0;
+  const Y = VaniY.Y;
+  const gerettet = [];
+  for (const key of await syncWartendeSchluessel(vault)) {
+    const p = await dbGet('sync-pending', key);
+    if (!p || String(p.ciphertext || '').length <= SYNC_PAKET_ZEICHEN_MAX) continue;
+    try { Y.applyUpdate(_sync.ydoc, await syncEntschluessle(p), SYNC_NETZ); gerettet.push(key); } catch (e) {}
+    if (!_sync.ydoc || !_sync.config || _sync.config.vault !== vault) return 0;
+  }
+  if (!gerettet.length) return 0;
+  const sv = Y.encodeStateVector(_sync.ydoc);
+  await syncLegeInWarteschlange(Y.encodeStateAsUpdate(_sync.ydoc), vault);
+  await dbPut('kv', syncB64(sv), 'sync-sv:' + vault);
+  for (const key of gerettet) await dbDel('sync-pending', key);
+  return gerettet.length;
+}
+
 async function syncMerkeUpdate(update, generation, sv, vault) {
   /* Massgeblich ist der Bereich, nicht die Generation: startet der Sync neu,
      waehrend eine eigene Aenderung noch auf dem Weg in die Warteschlange ist,
@@ -484,30 +609,65 @@ async function syncMerkeUpdate(update, generation, sv, vault) {
   const bereich = vault || (_sync.config && _sync.config.vault);
   if (!_sync.config || !bereich || _sync.config.vault !== bereich) return;
   try {
-    const paket = await syncVerschluessle(update);
-    if (!_sync.config || _sync.config.vault !== bereich) return;
-    await dbPut('sync-pending', paket, paket.vault + ':' + paket.id);
+    await syncLegeInWarteschlange(update, bereich);
     /* Erst wenn das Paket sicher in der Warteschlange liegt, gilt sein Stand als bekannt. */
-    if (sv) await dbPut('kv', syncB64(sv), 'sync-sv:' + paket.vault);
+    if (sv) await dbPut('kv', syncB64(sv), 'sync-sv:' + bereich);
     syncSendeWartend().catch(() => {});
-  } catch (e) { syncMelde('fehler'); }
+  } catch (e) { if (_sync.config && _sync.config.vault === bereich) syncMelde('fehler'); }
+}
+/* Fertig ist erst, was auch hinausgegangen ist. Frueher stand „live verbunden“
+   da, sobald das Holen klappte — auch wenn die eigenen Pakete in der
+   Warteschlange festhingen. */
+function syncMeldeFertig() {
+  const h = _sync.haengt;
+  if (h && h.rest) return syncMelde(h.abgewiesen ? 'fehler' : 'sendet', { rest: h.rest, abgewiesen: h.abgewiesen });
+  return syncMelde('synchron', { zuletzt: Date.now() });
 }
 async function syncSendeWartend() {
   if (_sync.sendet || !_sync.config || !navigator.onLine) return;
   _sync.sendet = true;
   const generation = _sync.generation;
+  const vault = _sync.config.vault;
+  const abgewiesen = new Set(), uebrig = new Set();
+  let versucht = false;
   try {
-    const alle = await dbAlle('sync-pending');
-    const wartend = alle.filter((p) => p && p.vault === _sync.config.vault).slice(0, 2000);
-    for (const p of wartend) {
+    for (let durchgang = 0; durchgang < 8; durchgang++) {
+      const schluessel = (await syncWartendeSchluessel(vault)).filter((k) => !abgewiesen.has(k) && !uebrig.has(k));
+      _sync.wartend = schluessel.length + abgewiesen.size + uebrig.size;
+      if (!schluessel.length) break;
+      const grosse = [];
+      for (const key of schluessel) {
+        if (generation !== _sync.generation) return;
+        const p = await dbGet('sync-pending', key);
+        if (!p) continue;
+        if (String(p.ciphertext || '').length > SYNC_PAKET_ZEICHEN_MAX) { grosse.push(key); continue; }
+        versucht = true;
+        try {
+          await syncFetch('/v1/vaults/' + encodeURIComponent(vault) + '/updates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: p.id, iv: p.iv, ciphertext: p.ciphertext }) });
+        } catch (e) {
+          /* Netz weg, Schluessel falsch, Dienst ueberlastet: spaeter weiter. Weist
+             der Dienst aber nur dieses eine Paket ab, gehen die anderen trotzdem
+             hinaus — frueher blieb alles dahinter liegen. */
+          if (!e || !e.status || e.status === 401 || e.status === 408 || e.status === 429 || e.status >= 500) throw e;
+          abgewiesen.add(key); continue;
+        }
+        await dbDel('sync-pending', key);
+        _sync.wartend = Math.max(0, _sync.wartend - 1);
+        if (schluessel.length > 3) syncMelde('sendet', { rest: _sync.wartend });
+      }
       if (generation !== _sync.generation) return;
-      const body = JSON.stringify({ id: p.id, iv: p.iv, ciphertext: p.ciphertext });
-      await syncFetch('/v1/vaults/' + encodeURIComponent(_sync.config.vault) + '/updates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
-      await dbDel('sync-pending', p.vault + ':' + p.id);
+      if (grosse.length && !(await syncRetteGrossePakete(vault))) for (const k of grosse) uebrig.add(k);
     }
-    if (wartend.length && _sync.aufgeholt) syncMelde('synchron', { zuletzt: Date.now() });
-  } catch (e) { syncMelde(e && e.status === 401 ? 'schluessel' : 'offline'); }
-  finally { _sync.sendet = false; }
+    const rest = (await syncWartendeSchluessel(vault)).length;
+    _sync.wartend = rest;
+    _sync.haengt = rest ? { rest, abgewiesen: abgewiesen.size } : null;
+    if (_sync.aufgeholt && generation === _sync.generation && (versucht || rest || _sync.status.art === 'sendet')) syncMeldeFertig();
+  } catch (e) {
+    if (generation === _sync.generation) {
+      _sync.haengt = { rest: Math.max(1, _sync.wartend || 0), abgewiesen: abgewiesen.size };
+      syncMelde(e && e.status === 401 ? 'schluessel' : 'offline');
+    }
+  } finally { _sync.sendet = false; }
 }
 /* ----- Wie viele Pakete auf einmal geholt werden -----
    Eine feste Zahl passt nie: ein lange benutzter Bereich besteht aus Tausenden
@@ -578,7 +738,10 @@ async function syncHoleUpdates(frist = 0) {
       let bytes = 0;
       for (const paket of updates) {
         if (generation !== _sync.generation) return false;
-        VaniY.Y.applyUpdate(_sync.ydoc, await syncEntschluessle(paket), SYNC_NETZ);
+        const klar = await syncEntschluessle(paket);
+        const teil = syncTeilLesen(klar);
+        if (teil) { await syncTeilAnnehmen(vault, teil); if (generation !== _sync.generation) return false; }
+        else VaniY.Y.applyUpdate(_sync.ydoc, klar, SYNC_NETZ);
         seq = Math.max(seq, Math.round(begrenze(paket.seq, 0, Number.MAX_SAFE_INTEGER, seq)));
         /* Nach JEDEM Paket merken, nicht erst nach der ganzen Antwort: reisst
            die Leitung ab, geht es hier weiter statt wieder bei null. */
@@ -600,7 +763,7 @@ async function syncHoleUpdates(frist = 0) {
   _sync.aufgeholt = true;
   /* Zum ersten Mal vollstaendig: jetzt darf die Uebernahme auch aufraeumen. */
   if (!vorher) syncPlaneUebernahme();
-  syncMelde('synchron', { zuletzt: Date.now() });
+  syncMeldeFertig();
   return true;
 }
 async function syncJetzt() {
@@ -650,7 +813,7 @@ function syncStoppe() {
   try { if (_sync.ydoc) _sync.ydoc.destroy(); } catch (e) {}
   _sync.ydoc = _sync.ydocs = _sync.ystate = _sync.ymedia = _sync.persistence = null;
   _sync.poll = _sync.retry = null; _sync.sendet = _sync.holt = _sync.medien = false;
-  _sync.aufgeholt = false; _sync.geholt = 0; _sync.merken = null; _sync.merkenOffen = 0; _sync.einstUebernommen = null;
+  _sync.aufgeholt = false; _sync.geholt = 0; _sync.merken = null; _sync.merkenOffen = 0; _sync.einstUebernommen = null; _sync.wartend = 0; _sync.haengt = null;
 }
 async function syncStarte(config, modus = 'start') {
   if (!globalThis.VaniY || !VaniY.Y || !VaniY.IndexeddbPersistence) throw new Error('Sync-Baustein fehlt');
@@ -702,6 +865,9 @@ async function syncStarte(config, modus = 'start') {
   _sync.ydocs.observeDeep((_events, tx) => { if (tx.origin !== SYNC_LOKAL) syncPlaneUebernahme(); });
   _sync.ystate.observeDeep((_events, tx) => { if (tx.origin !== SYNC_LOKAL) syncPlaneUebernahme(); });
   _sync.ymedia.observeDeep((_events, tx) => { if (tx.origin !== SYNC_LOKAL) syncMedienAbgleich().catch(() => {}); });
+  /* Erst retten, was aus einer aelteren Fassung zu gross in der Warteschlange
+     liegt — das legt den Merkzettel neu, und der ganze Stand geht nur einmal. */
+  try { await syncRetteGrossePakete(bereich); } catch (e) {}
   await syncSendeUnbekanntes(generation);
   await syncSendeWartend();
   syncMedienAbgleich().catch(() => {});
@@ -709,7 +875,7 @@ async function syncStarte(config, modus = 'start') {
   /* „live verbunden“ nur, wenn es stimmt. Frueher stand das hier auch dann,
      wenn das Holen eben gescheitert war — der Laptop sah verbunden aus und
      blieb leer. */
-  if (_sync.aufgeholt) syncMelde('synchron', { zuletzt: Date.now() });
+  if (_sync.aufgeholt) syncMeldeFertig();
   else if (!['offline', 'schluessel', 'fehler'].includes(_sync.status.art)) syncMelde('verbindet', { geholt: _sync.geholt });
   return true;
 }

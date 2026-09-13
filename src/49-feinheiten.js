@@ -10,9 +10,40 @@ function syncStatusWorte(status) {
     : 'VANI verbindet die Geräte …'];
   if (art === 'offline') return ['offline', 'Änderungen bleiben sicher hier und gehen später weiter.'];
   if (art === 'schluessel') return ['Achtung', 'Der Bereichsschlüssel passt nicht oder wurde zurückgezogen.'];
-  if (art === 'fehler') return ['Achtung', 'Etwas ist noch nicht fertig synchronisiert.'];
+  if (art === 'sendet') return ['arbeitet', status.rest
+    ? 'Schickt deinen Bestand — noch ' + zaehl(status.rest, 'Paket', 'Pakete', 'ein') + '. VANI dabei bitte offen lassen.'
+    : 'Schickt deine Änderungen …'];
+  if (art === 'fehler') return ['Achtung', status.abgewiesen
+    ? 'Der Dienst hat ' + zaehl(status.abgewiesen, 'Paket', 'Pakete', 'ein') + ' abgewiesen. Alles andere geht weiter hinaus.'
+    : 'Etwas ist noch nicht fertig synchronisiert.'];
   return ['nur hier', 'Dieser Bestand ist noch mit keinem privaten Bereich verbunden.'];
 }
+/* Was hier liegt, was im Bereich angekommen ist und was noch hinaus muss —
+   damit auf zwei Geräten zu sehen ist, wo es hängt. */
+function syncZahlenText(info) {
+  if (!info || !info.verbunden) return '';
+  return 'Auf diesem Gerät: ' + zaehl(info.hier, 'Eintrag', 'Einträge') + ' · im Bereich: ' + Number(info.imBereich || 0).toLocaleString('de-DE') +
+    (info.wartend ? ' · noch zu senden: ' + zaehl(info.wartend, 'Paket', 'Pakete') : '');
+}
+/* Die Karte folgt dem Status, ohne dass jemand „Jetzt abgleichen“ drücken muss:
+   beim Holen und beim Schicken zählen die Zahlen mit. */
+try {
+  window.addEventListener('vani-sync-status', () => {
+    try {
+      const karte = document.querySelector('.sync-karte');
+      if (!karte) return;
+      const info = syncInfo();
+      const art = info.status.art || 'aus';
+      const [name, text] = syncStatusWorte(info.status);
+      const zeile = karte.querySelector('.sync-status');
+      if (zeile) zeile.replaceChildren(el('i', { class: art }), el('b', {}, name), ' · ', text);
+      const siegel = karte.querySelector('.sync-siegel');
+      if (siegel) siegel.className = 'sync-siegel ' + art;
+      const zahlen = karte.querySelector('.sync-zahlen');
+      if (zahlen) zahlen.textContent = syncZahlenText(info);
+    } catch (e) {}
+  });
+} catch (e) {}
 
 async function neuerSyncBereich() {
   const name = await eingabe({ titel: 'Wie soll dein privater Bereich heißen?', wert: 'Mein VANI', platzhalter: 'z. B. Marias VANI', ok: 'Sicher anlegen' });
@@ -423,7 +454,8 @@ RENDER.feinheiten = function (haupt) {
               D.einst.goodnotesSync = !D.einst.goodnotesSync; e.currentTarget.classList.toggle('an', D.einst.goodnotesSync);
               speichereEinst(); if (D.einst.goodnotesSync) syncMedienAbgleich().catch(() => {});
             } }, el('i'))),
-          el('small', { class: 'sync-servername' }, 'Bereich: ' + sinfo.vault.slice(0, 6) + '… · Dienst: ' + (() => { try { return new URL(sinfo.server).host; } catch (e) { return sinfo.server; } })()))
+          el('small', { class: 'sync-servername' }, 'Bereich: ' + sinfo.vault.slice(0, 6) + '… · Dienst: ' + (() => { try { return new URL(sinfo.server).host; } catch (e) { return sinfo.server; } })(),
+            el('br'), el('span', { class: 'sync-zahlen' }, syncZahlenText(sinfo))))
       : el('div', { class: 'sync-inhalt' },
           el('p', {}, 'Noch ist dieser Bestand nur auf diesem Gerät. Lege hier den persönlichen Bereich an, der genau die Geräte derselben Person zusammenhält.'),
           el('ol', { class: 'sync-schritte' },
