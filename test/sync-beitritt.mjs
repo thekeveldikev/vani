@@ -394,7 +394,48 @@ test('Die Karte sagt auf Deutsch, was gerade hinausgeht und wo es hängt', () =>
   assert.match(k.syncStatusWorte({ art: 'sendet', rest: 1 })[1], /noch ein Paket\./);
   assert.match(k.syncStatusWorte({ art: 'sendet', rest: 12 })[1], /noch 12 Pakete\./);
   assert.match(k.syncStatusWorte({ art: 'fehler', abgewiesen: 2 })[1], /hat 2 Pakete abgewiesen/);
+  assert.match(k.syncStatusWorte({ art: 'sendet', vorbereiten: true })[1], /^Teilt deinen Bestand in handliche Pakete\./);
+  assert.match(k.syncStatusWorte({ art: 'fehler', alt: 1 })[1], /^Ein altes Paket ließ sich hier nicht aufteilen\./);
+  assert.match(k.syncStatusWorte({ art: 'fehler', alt: 2 })[1], /^2 alte Pakete ließen sich/);
   assert.equal(k.syncZahlenText({ verbunden: true, hier: 1, imBereich: 0, wartend: 0 }), 'Auf diesem Gerät: 1 Eintrag · im Bereich: 0');
   assert.equal(k.syncZahlenText({ verbunden: true, hier: 152, imBereich: 1520, wartend: 1 }), 'Auf diesem Gerät: 152 Einträge · im Bereich: 1.520 · noch zu senden: 1 Paket');
   assert.equal(k.syncZahlenText({ verbunden: false }), '');
+});
+
+test('Kommt VANI beim Retten wieder nach vorn, wird trotzdem nur einmal gerettet', async () => {
+  const c = await neuerBereich();
+  const ipad = await geraet();
+  fuelleBestand(ipad.k, 90);
+  ipad.k.navigator.onLine = false;
+  await ipad.k.syncStarte(c, 'erstellen');
+  for (let i = 0; i < 300 && ipad.s('_sync.merkenOffen'); i++) await warte(10);
+  for (const p of await ipad.k.dbAlle('sync-pending')) await ipad.k.dbDel('sync-pending', p.vault + ':' + p.id);
+  await ipad.k.dbDel('kv', 'sync-sv:' + c.vault);
+  const ganz = Y.encodeStateAsUpdate(ipad.s('_sync.ydoc'));
+  let alt = 0;
+  for (let i = 0; i < 2; i++) {
+    const p = await ipad.k.syncVerschluessle(ganz);
+    await ipad.s('dbPut')('sync-pending', p, p.vault + ':' + p.id);
+    alt = p.ciphertext.length;
+  }
+  ipad.k.syncStoppe();
+  ipad.k.navigator.onLine = true;
+  const start = ipad.k.syncStarte(c, 'start');
+  /* Das iPad kommt wieder nach vorn: VANI gleicht sofort ab, während der Start noch läuft. */
+  const wecken = [ipad.k.syncJetzt(), ipad.k.syncJetzt()];
+  await start;
+  await Promise.all(wecken);
+  await fertigGesendet(ipad);
+  await ipad.k.syncJetzt();
+  const stand = serverStand(c.vault);
+  assert.equal((await ipad.k.dbAlle('sync-pending')).length, 0, 'die Warteschlange ist leer');
+  assert.ok(stand.bytes < 1.5 * alt, 'der Bestand ging nur einmal hinaus: ' + stand.bytes + ' bei ' + alt + ' je Kopie');
+  assert.equal(ipad.s('_sync.status.art'), 'synchron');
+
+  const laptop = await geraet();
+  await laptop.k.syncStarte(c, 'ersetzen');
+  for (let i = 0; i < 40 && laptop.s('_sync.status.art') !== 'synchron'; i++) await laptop.k.syncJetzt();
+  await warte(250);
+  assert.equal(laptop.k.D.docs.size, 90, 'und drüben ist alles da');
+  ipad.k.syncStoppe(); laptop.k.syncStoppe();
 });

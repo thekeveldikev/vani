@@ -11,15 +11,34 @@ let _sync = {
   poll: null, retry: null, status: { art: 'aus' }, uebernimmt: false, anwendenTimer: null,
   sendet: false, holt: false, medien: false, generation: 0, fremdZuletzt: 0, nachzug: null,
   aufgeholt: false, geholt: 0, seite: 20, merken: null, merkenOffen: 0, einstUebernommen: null,
-  wartend: 0, haengt: null
+  wartend: 0, haengt: null, rettung: null, nichtRettbar: null, wach: null, wachGewuenscht: false
 };
 /* Hat die andere Seite in den letzten Minuten etwas gebracht? (zweite Tasse am Schreibtisch) */
 function syncFremdAktiv(minuten = 20) { return !!_sync.config && _sync.fremdZuletzt > 0 && Date.now() - _sync.fremdZuletzt < minuten * 60000; }
 
 function syncMelde(art, extra) {
   _sync.status = Object.assign({ art, wann: Date.now() }, extra || {});
+  syncWachHalten(art === 'sendet' || (art === 'verbindet' && !!(extra && extra.geholt)));
   try { window.dispatchEvent(new CustomEvent('vani-sync-status', { detail: _sync.status })); } catch (e) {}
   return _sync.status;
+}
+/* Waehrend ein grosser Bestand hinausgeht oder ankommt, soll der Bildschirm
+   nicht einschlafen: iPad und Handy halten eine App im Hintergrund an, und
+   dann steht auch der Abgleich. Wo es keine Wachhaltung gibt, passiert nichts. */
+function syncWachHalten(an) {
+  _sync.wachGewuenscht = !!an;
+  try {
+    if (an && !_sync.wach && navigator.wakeLock && document.visibilityState === 'visible') {
+      _sync.wach = 'kommt';
+      navigator.wakeLock.request('screen').then((w) => {
+        if (!_sync.wachGewuenscht) { _sync.wach = null; w.release().catch(() => {}); return; }
+        _sync.wach = w;
+        w.addEventListener('release', () => { if (_sync.wach === w) _sync.wach = null; });
+      }).catch(() => { _sync.wach = null; });
+    } else if (!an && _sync.wach && _sync.wach !== 'kommt') {
+      const w = _sync.wach; _sync.wach = null; w.release().catch(() => {});
+    }
+  } catch (e) { _sync.wach = null; }
 }
 function syncInfo() {
   return {
@@ -275,7 +294,11 @@ function syncMetadatenGeaendert(art) {
   const neu = {};
   if (!art || art === 'einst') {
     const j = JSON.stringify(D.einst);
-    if (j !== _sync.einstUebernommen) neu.einst = j;
+    const u = _sync.einstUebernommen;
+    /* Gilt ueber einen Neustart hinweg, aber nur fuer denselben Bereich: Ein
+       verzoegertes Sichern aus der letzten Uebernahme landete sonst genau
+       zwischen Neustart und neuer Uebernahme und schickte ein leeres Paket. */
+    if (!(u && _sync.config && u.vault === _sync.config.vault && u.json === j)) neu.einst = j;
   }
   if (!art || art === 'stats') neu.stats = JSON.stringify(D.stats);
   const anders = Object.keys(neu).filter((k) => _sync.ystate.get(k) !== neu[k]);
@@ -381,7 +404,7 @@ async function syncUebernehmeAusY() {
     }
     if (veraendert) _sync.fremdZuletzt = Date.now();
     const einst = _sync.ystate.get('einst');
-    if (typeof einst === 'string') try { uebernehmeEinstellungen(JSON.parse(einst)); await sicherSpeichern('kv', D.einst, 'einst'); setzeThema(D.einst.thema); _sync.einstUebernommen = JSON.stringify(D.einst); } catch (e) {}
+    if (typeof einst === 'string') try { uebernehmeEinstellungen(JSON.parse(einst)); await sicherSpeichern('kv', D.einst, 'einst'); setzeThema(D.einst.thema); _sync.einstUebernommen = { vault: _sync.config && _sync.config.vault, json: JSON.stringify(D.einst) }; } catch (e) {}
     const stats = _sync.ystate.get('stats');
     if (typeof stats === 'string') try {
       const s = JSON.parse(stats);
@@ -583,17 +606,40 @@ async function syncWartendeSchluessel(vault) {
    schon hat), dann geht der ganze Stand EINMAL in Teilen in die Warteschlange,
    und erst wenn die Teile sicher liegen, gehen die alten Pakete. Lagen dort
    mehrere Kopien, reist so nur noch eine. */
-async function syncRetteGrossePakete(vault) {
+function syncRetteGrossePakete(vault) {
+  /* Nur eine Rettung zur Zeit. Kommt VANI waehrend des Startens wieder nach
+     vorn, gleicht es sofort ab — ohne diese Sperre liefen dann zwei Rettungen
+     nebeneinander, jede mit dem ganzen Bestand im Speicher, und der Stand
+     ginge zweimal hinaus. */
+  if (!_sync.rettung) _sync.rettung = syncRetteGrossePaketeJetzt(vault).finally(() => { _sync.rettung = null; });
+  return _sync.rettung;
+}
+async function syncRetteGrossePaketeJetzt(vault) {
   if (!_sync.ydoc || !_sync.config || _sync.config.vault !== vault) return 0;
   const Y = VaniY.Y;
+  const nie = _sync.nichtRettbar || (_sync.nichtRettbar = new Set());
   const gerettet = [];
+  let unlesbar = 0, gemeldet = false;
   for (const key of await syncWartendeSchluessel(vault)) {
+    if (nie.has(key)) continue;
     const p = await dbGet('sync-pending', key);
     if (!p || String(p.ciphertext || '').length <= SYNC_PAKET_ZEICHEN_MAX) continue;
-    try { Y.applyUpdate(_sync.ydoc, await syncEntschluessle(p), SYNC_NETZ); gerettet.push(key); } catch (e) {}
+    if (!gemeldet) { gemeldet = true; syncMelde('sendet', { vorbereiten: true }); }
+    try {
+      const bytes = await syncEntschluessle(p);
+      /* Nur anwenden, was die lokale Kopie noch nicht hat — meist nichts. Das
+         ganze alte Paket noch einmal einzuarbeiten, kostet auf einem iPad
+         Minuten und viel Speicher. */
+      const fehlt = typeof Y.diffUpdate === 'function' ? Y.diffUpdate(bytes, Y.encodeStateVector(_sync.ydoc)) : bytes;
+      Y.applyUpdate(_sync.ydoc, fehlt, SYNC_NETZ);
+      gerettet.push(key);
+    } catch (e) { nie.add(key); unlesbar++; }
     if (!_sync.ydoc || !_sync.config || _sync.config.vault !== vault) return 0;
   }
-  if (!gerettet.length) return 0;
+  if (!gerettet.length && !unlesbar) return 0;
+  /* Der ganze Stand geht einmal in Teilen hinaus — auch wenn sich ein altes
+     Paket nicht lesen liess: Was dieses Geraet hat, soll drueben ankommen.
+     Weggeraeumt wird nur, was sicher im neuen Stand steckt. */
   const sv = Y.encodeStateVector(_sync.ydoc);
   await syncLegeInWarteschlange(Y.encodeStateAsUpdate(_sync.ydoc), vault);
   await dbPut('kv', syncB64(sv), 'sync-sv:' + vault);
@@ -620,7 +666,7 @@ async function syncMerkeUpdate(update, generation, sv, vault) {
    Warteschlange festhingen. */
 function syncMeldeFertig() {
   const h = _sync.haengt;
-  if (h && h.rest) return syncMelde(h.abgewiesen ? 'fehler' : 'sendet', { rest: h.rest, abgewiesen: h.abgewiesen });
+  if (h && h.rest) return syncMelde(h.abgewiesen || h.alt ? 'fehler' : 'sendet', { rest: h.rest, abgewiesen: h.abgewiesen, alt: h.alt });
   return syncMelde('synchron', { zuletzt: Date.now() });
 }
 async function syncSendeWartend() {
@@ -638,6 +684,8 @@ async function syncSendeWartend() {
       const grosse = [];
       for (const key of schluessel) {
         if (generation !== _sync.generation) return;
+        /* Ein altes Paket, das sich schon nicht retten liess, nicht bei jedem Abgleich neu laden. */
+        if (_sync.nichtRettbar && _sync.nichtRettbar.has(key)) { uebrig.add(key); continue; }
         const p = await dbGet('sync-pending', key);
         if (!p) continue;
         if (String(p.ciphertext || '').length > SYNC_PAKET_ZEICHEN_MAX) { grosse.push(key); continue; }
@@ -660,7 +708,7 @@ async function syncSendeWartend() {
     }
     const rest = (await syncWartendeSchluessel(vault)).length;
     _sync.wartend = rest;
-    _sync.haengt = rest ? { rest, abgewiesen: abgewiesen.size } : null;
+    _sync.haengt = rest ? { rest, abgewiesen: abgewiesen.size, alt: uebrig.size } : null;
     if (_sync.aufgeholt && generation === _sync.generation && (versucht || rest || _sync.status.art === 'sendet')) syncMeldeFertig();
   } catch (e) {
     if (generation === _sync.generation) {
@@ -813,7 +861,8 @@ function syncStoppe() {
   try { if (_sync.ydoc) _sync.ydoc.destroy(); } catch (e) {}
   _sync.ydoc = _sync.ydocs = _sync.ystate = _sync.ymedia = _sync.persistence = null;
   _sync.poll = _sync.retry = null; _sync.sendet = _sync.holt = _sync.medien = false;
-  _sync.aufgeholt = false; _sync.geholt = 0; _sync.merken = null; _sync.merkenOffen = 0; _sync.einstUebernommen = null; _sync.wartend = 0; _sync.haengt = null;
+  _sync.aufgeholt = false; _sync.geholt = 0; _sync.merken = null; _sync.merkenOffen = 0; _sync.wartend = 0; _sync.haengt = null;
+  syncWachHalten(false);
 }
 async function syncStarte(config, modus = 'start') {
   if (!globalThis.VaniY || !VaniY.Y || !VaniY.IndexeddbPersistence) throw new Error('Sync-Baustein fehlt');

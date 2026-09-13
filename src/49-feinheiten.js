@@ -10,12 +10,16 @@ function syncStatusWorte(status) {
     : 'VANI verbindet die Geräte …'];
   if (art === 'offline') return ['offline', 'Änderungen bleiben sicher hier und gehen später weiter.'];
   if (art === 'schluessel') return ['Achtung', 'Der Bereichsschlüssel passt nicht oder wurde zurückgezogen.'];
-  if (art === 'sendet') return ['arbeitet', status.rest
-    ? 'Schickt deinen Bestand — noch ' + zaehl(status.rest, 'Paket', 'Pakete', 'ein') + '. VANI dabei bitte offen lassen.'
-    : 'Schickt deine Änderungen …'];
+  if (art === 'sendet') return ['arbeitet', status.vorbereiten
+    ? 'Teilt deinen Bestand in handliche Pakete. Das kann ein paar Minuten dauern — VANI dabei bitte offen und das Gerät wach lassen.'
+    : status.rest
+      ? 'Schickt deinen Bestand — noch ' + zaehl(status.rest, 'Paket', 'Pakete', 'ein') + '. VANI dabei bitte offen lassen.'
+      : 'Schickt deine Änderungen …'];
   if (art === 'fehler') return ['Achtung', status.abgewiesen
     ? 'Der Dienst hat ' + zaehl(status.abgewiesen, 'Paket', 'Pakete', 'ein') + ' abgewiesen. Alles andere geht weiter hinaus.'
-    : 'Etwas ist noch nicht fertig synchronisiert.'];
+    : status.alt
+      ? zaehl(status.alt, 'altes Paket ließ', 'alte Pakete ließen', 'Ein') + ' sich hier nicht aufteilen. Der Bestand geht trotzdem vollständig hinaus.'
+      : 'Etwas ist noch nicht fertig synchronisiert.'];
   return ['nur hier', 'Dieser Bestand ist noch mit keinem privaten Bereich verbunden.'];
 }
 /* Was hier liegt, was im Bereich angekommen ist und was noch hinaus muss —
@@ -33,6 +37,12 @@ try {
       const karte = document.querySelector('.sync-karte');
       if (!karte) return;
       const info = syncInfo();
+      /* Gezeichnet, bevor die Verbindung geladen war? Dann die ganze Karte neu —
+         sonst stand unter „Schickt deinen Bestand“ noch „nur auf diesem Gerät“. */
+      if (!!karte.querySelector('.sync-zahlen') !== info.verbunden) {
+        if (!syncSchreibtGerade()) zeichne();
+        return;
+      }
       const art = info.status.art || 'aus';
       const [name, text] = syncStatusWorte(info.status);
       const zeile = karte.querySelector('.sync-status');
