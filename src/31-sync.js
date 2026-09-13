@@ -9,7 +9,8 @@ const SYNC_INTERNE_FELDER = new Set(['_rev', '_geraet', '_syncZeit']);
 let _sync = {
   config: null, ydoc: null, ydocs: null, ystate: null, ymedia: null, persistence: null,
   poll: null, retry: null, status: { art: 'aus' }, uebernimmt: false, anwendenTimer: null,
-  sendet: false, holt: false, medien: false, generation: 0, fremdZuletzt: 0, nachzug: null
+  sendet: false, holt: false, medien: false, generation: 0, fremdZuletzt: 0, nachzug: null,
+  aufgeholt: false, geholt: 0, seite: 20, merken: null, merkenOffen: 0, einstUebernommen: null
 };
 /* Hat die andere Seite in den letzten Minuten etwas gebracht? (zweite Tasse am Schreibtisch) */
 function syncFremdAktiv(minuten = 20) { return !!_sync.config && _sync.fremdZuletzt > 0 && Date.now() - _sync.fremdZuletzt < minuten * 60000; }
@@ -152,16 +153,49 @@ async function syncEntschluessleBlock(paket, id, block) {
   const klar = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: syncBytes(paket.iv), additionalData: aad }, await syncSchluessel(), syncBytes(paket.ciphertext));
   return new Uint8Array(klar);
 }
+/* ----- Wie lange eine Anfrage dauern darf -----
+   Frueher galten fuer alles 15 Sekunden. Das reicht fuer eine Aenderung, aber
+   nicht fuer den ersten Abgleich eines grossen Bestands: bei langsamem Netz
+   brach das Herunterladen jedes Mal ab und fing beim naechsten Versuch wieder
+   bei null an. Nachgestellt mit 150 Texten: ein neuer Laptop bei 10 Mbit/s
+   bekam 0 von 150.
+
+   Jetzt gilt: Hochladen bekommt Zeit nach Groesse (vorsichtig gerechnet mit
+   20 KB/s), und eine Antwort wird nur abgebrochen, wenn wirklich nichts mehr
+   fliesst. Pur. */
+const SYNC_STILLSTAND_MS = 30000;
+function syncZeitFuer(bytes) {
+  const b = Math.max(0, Number(bytes) || 0);
+  return Math.min(15 * 60000, 15000 + Math.ceil(b / 20000) * 1000);
+}
 async function syncFetch(pfad, optionen, config) {
   const c = config || _sync.config;
   if (!c) throw new Error('Kein Bereich');
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15000);
+  const koerper = optionen && optionen.body;
+  let timer = setTimeout(() => controller.abort(), syncZeitFuer(typeof koerper === 'string' ? koerper.length : 0));
+  const nochDa = () => { clearTimeout(timer); timer = setTimeout(() => controller.abort(), SYNC_STILLSTAND_MS); };
   try {
     const headers = Object.assign({ Authorization: 'Bearer ' + c.token }, optionen && optionen.headers || {});
     const antwort = await fetch(c.server + pfad, Object.assign({}, optionen || {}, { headers, signal: controller.signal, cache: 'no-store' }));
+    /* Ab hier zaehlt der Stillstand: solange Daten fliessen, darf es dauern. */
+    nochDa();
+    let text = '';
+    if (antwort.body && typeof antwort.body.getReader === 'function' && typeof TextDecoder !== 'undefined') {
+      const leser = antwort.body.getReader();
+      const dekoder = new TextDecoder();
+      for (;;) {
+        const { done, value } = await leser.read();
+        if (done) break;
+        nochDa();
+        text += dekoder.decode(value, { stream: true });
+      }
+      text += dekoder.decode();
+    } else {
+      text = await antwort.text();
+    }
     let body = null;
-    try { body = await antwort.json(); } catch (e) {}
+    try { body = text ? JSON.parse(text) : null; } catch (e) {}
     if (!antwort.ok) {
       const err = new Error(body && body.fehler || 'Verbindung fehlgeschlagen');
       err.status = antwort.status; throw err;
@@ -228,15 +262,52 @@ function syncDokumentGeaendert(d, geloescht) {
 }
 function syncMetadatenGeaendert(art) {
   if (!_sync.ydoc || !_sync.ystate || _sync.uebernimmt) return;
-  _sync.ydoc.transact(() => {
-    if (!art || art === 'einst') _sync.ystate.set('einst', JSON.stringify(D.einst));
-    if (!art || art === 'stats') _sync.ystate.set('stats', JSON.stringify(D.stats));
-  }, SYNC_LOKAL);
+  /* Nur schreiben, was sich wirklich aendert: Yjs macht aus jedem Setzen ein
+     neues Paket, auch beim selben Wert. Und nichts zurueckschreiben, was eben
+     erst von drueben uebernommen wurde: Die Uebernahme sichert die
+     Einstellungen (setzeThema), und weil sie dabei aufgeraeumt werden, sahen
+     sie jedes Mal ein wenig anders aus — zwei offene Geraete schickten sie
+     sich so endlos hin und her, und der Dienst hob jedes Paket auf. */
+  const neu = {};
+  if (!art || art === 'einst') {
+    const j = JSON.stringify(D.einst);
+    if (j !== _sync.einstUebernommen) neu.einst = j;
+  }
+  if (!art || art === 'stats') neu.stats = JSON.stringify(D.stats);
+  const anders = Object.keys(neu).filter((k) => _sync.ystate.get(k) !== neu[k]);
+  if (!anders.length) return;
+  /* Wer selbst schreibt, vergleicht beim naechsten Mal mit dem Bereich — sonst
+     ginge das Zuruecksetzen auf den uebernommenen Wert nicht mehr hinaus. */
+  if (anders.includes('einst')) _sync.einstUebernommen = null;
+  _sync.ydoc.transact(() => { for (const k of anders) _sync.ystate.set(k, neu[k]); }, SYNC_LOKAL);
+}
+/* Ungefaehres Gewicht eines Dokuments im Sync — nur fuers Aufteilen. Pur. */
+function syncDokumentGewicht(d) {
+  try { return 64 + JSON.stringify(d).length; } catch (e) { return 64; }
+}
+/* Den Bestand in Portionen teilen, jede hoechstens etwa maxBytes schwer.
+   Ein einzelnes schweres Dokument ist seine eigene Portion. Pur. */
+function syncSeedPortionen(docs, maxBytes = 512 * 1024) {
+  const portionen = [];
+  let jetzt = [], summe = 0;
+  for (const d of docs || []) {
+    const g = syncDokumentGewicht(d);
+    if (jetzt.length && summe + g > maxBytes) { portionen.push(jetzt); jetzt = []; summe = 0; }
+    jetzt.push(d); summe += g;
+  }
+  if (jetzt.length) portionen.push(jetzt);
+  return portionen;
 }
 function syncSeedLokal() {
   if (!_sync.ydoc) return;
+  /* Jede Portion ist ihr eigenes Paket. Frueher war der ganze Bestand EIN
+     Paket — viele Megabyte, die bei langsamem Netz nie in einem Stueck
+     durchkamen. So kommt jede Portion einzeln an, und was angekommen ist,
+     bleibt angekommen. */
+  for (const portion of syncSeedPortionen([...D.docs.values()])) {
+    _sync.ydoc.transact(() => { for (const d of portion) syncSchreibeDokument(d); }, SYNC_LOKAL);
+  }
   _sync.ydoc.transact(() => {
-    for (const d of D.docs.values()) syncSchreibeDokument(d);
     _sync.ystate.set('einst', JSON.stringify(D.einst));
     _sync.ystate.set('stats', JSON.stringify(D.stats));
   }, SYNC_LOKAL);
@@ -285,14 +356,28 @@ async function syncUebernehmeAusY() {
       }
       veraendert++;
     }
-    for (const id of [...D.docs.keys()]) {
-      const d = D.docs.get(id);
-      /* Nur löschen, was nicht währenddessen hier entstanden oder angefasst wurde */
-      if (!da.has(id) && !(d && (d.angelegt > start || d.geaendert > start)) && !(_sync.nachzug && _sync.nachzug.has(id))) { D.docs.delete(id); await dbDel('docs', id); veraendert++; }
+    /* Was im Bereich fehlt, darf hier erst gehen, wenn der Bereich vollstaendig
+       angekommen ist. Mitten im Herunterladen fehlt dort noch vieles, das es
+       sehr wohl gibt — das waere Wegraeumen, bevor der Ersatz sicher steht.
+       Dasselbe, solange von hier noch eigene Pakete unterwegs sind: der Dienst
+       wirkt dann vollstaendig, kennt aber gerade das noch nicht, was dieses
+       Geraet ihm eben erst schickt. Nachgestellt: ein Geraet, das waehrend des
+       ersten Hochladens neu startete, raeumte 124 von 150 eigenen Texten weg. */
+    let eigeneUnterwegs = _sync.merkenOffen > 0;
+    if (!eigeneUnterwegs) {
+      try { eigeneUnterwegs = (await dbAlle('sync-pending')).some((p) => p && _sync.config && p.vault === _sync.config.vault); }
+      catch (e) { eigeneUnterwegs = true; }
+    }
+    if (_sync.aufgeholt && !eigeneUnterwegs) {
+      for (const id of [...D.docs.keys()]) {
+        const d = D.docs.get(id);
+        /* Nur löschen, was nicht währenddessen hier entstanden oder angefasst wurde */
+        if (!da.has(id) && !(d && (d.angelegt > start || d.geaendert > start)) && !(_sync.nachzug && _sync.nachzug.has(id))) { D.docs.delete(id); await dbDel('docs', id); veraendert++; }
+      }
     }
     if (veraendert) _sync.fremdZuletzt = Date.now();
     const einst = _sync.ystate.get('einst');
-    if (typeof einst === 'string') try { uebernehmeEinstellungen(JSON.parse(einst)); await sicherSpeichern('kv', D.einst, 'einst'); setzeThema(D.einst.thema); } catch (e) {}
+    if (typeof einst === 'string') try { uebernehmeEinstellungen(JSON.parse(einst)); await sicherSpeichern('kv', D.einst, 'einst'); setzeThema(D.einst.thema); _sync.einstUebernommen = JSON.stringify(D.einst); } catch (e) {}
     const stats = _sync.ystate.get('stats');
     if (typeof stats === 'string') try {
       const s = JSON.parse(stats);
@@ -391,12 +476,19 @@ async function syncMedienAbgleich() {
   finally { _sync.medien = false; }
 }
 
-async function syncMerkeUpdate(update, generation) {
-  if (!_sync.config || generation !== _sync.generation) return;
+async function syncMerkeUpdate(update, generation, sv, vault) {
+  /* Massgeblich ist der Bereich, nicht die Generation: startet der Sync neu,
+     waehrend eine eigene Aenderung noch auf dem Weg in die Warteschlange ist,
+     gehoert sie trotzdem hierher und darf nicht verloren gehen. Nur wer den
+     Bereich verlassen hat, schreibt nichts mehr hinein. */
+  const bereich = vault || (_sync.config && _sync.config.vault);
+  if (!_sync.config || !bereich || _sync.config.vault !== bereich) return;
   try {
     const paket = await syncVerschluessle(update);
-    if (generation !== _sync.generation) return;
+    if (!_sync.config || _sync.config.vault !== bereich) return;
     await dbPut('sync-pending', paket, paket.vault + ':' + paket.id);
+    /* Erst wenn das Paket sicher in der Warteschlange liegt, gilt sein Stand als bekannt. */
+    if (sv) await dbPut('kv', syncB64(sv), 'sync-sv:' + paket.vault);
     syncSendeWartend().catch(() => {});
   } catch (e) { syncMelde('fehler'); }
 }
@@ -413,30 +505,103 @@ async function syncSendeWartend() {
       await syncFetch('/v1/vaults/' + encodeURIComponent(_sync.config.vault) + '/updates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
       await dbDel('sync-pending', p.vault + ':' + p.id);
     }
-    if (wartend.length) syncMelde('synchron', { zuletzt: Date.now() });
+    if (wartend.length && _sync.aufgeholt) syncMelde('synchron', { zuletzt: Date.now() });
   } catch (e) { syncMelde(e && e.status === 401 ? 'schluessel' : 'offline'); }
   finally { _sync.sendet = false; }
 }
-async function syncHoleUpdates() {
-  if (_sync.holt || !_sync.config || !navigator.onLine) return;
+/* ----- Wie viele Pakete auf einmal geholt werden -----
+   Eine feste Zahl passt nie: ein lange benutzter Bereich besteht aus Tausenden
+   winziger Pakete, ein frisch angelegter aus wenigen grossen. Frueher waren es
+   immer bis zu 200 in einer Antwort — im Nachbau 44,5 MB am Stueck. Kam die
+   letzte Antwort gross oder gar nicht, wird verkleinert, war sie klein,
+   vergroessert. Pur. */
+function syncSeitenGroesse(bisher, antwortBytes, abgebrochen) {
+  const alt = Math.max(1, Math.min(200, Math.round(Number(bisher) || 20)));
+  if (abgebrochen) return Math.max(1, Math.floor(alt / 4));
+  if (antwortBytes > 4 * 1048576) return Math.max(1, Math.floor(alt / 2));
+  if (antwortBytes < 256 * 1024) return Math.min(200, alt * 2);
+  return alt;
+}
+/* Den Merkzettel fortschreiben: bis hierhin ist alles vom Dienst gekommen oder
+   liegt sicher in der Warteschlange. Nur, wenn gerade keine eigene Aenderung
+   auf dem Weg dorthin ist — sonst stuende auf dem Zettel etwas, das noch nicht
+   sicher liegt. */
+async function syncBekanntSpeichern(vault) {
+  if (!_sync.ydoc || _sync.merkenOffen) return;
+  const sv = VaniY.Y.encodeStateVector(_sync.ydoc);
+  try { await dbPut('kv', syncB64(sv), 'sync-sv:' + vault); } catch (e) {}
+}
+/* Beim Start nur schicken, was ueber den Merkzettel hinausgeht. Frueher ging
+   hier bei JEDEM Start der komplette Stand hinaus, mit neuer Kennung; der
+   Dienst hob jede Kopie auf. Nachgestellt: ein Bestand von 6 MB lag nach vier
+   Starts mit 29,7 MB auf dem Server — und ein neues Geraet musste alles laden.
+   Ohne Merkzettel (erster Start nach dem Update) geht der Stand noch genau
+   einmal ganz hinaus. */
+async function syncSendeUnbekanntes(generation) {
+  if (!_sync.ydoc || !_sync.config) return false;
+  try { await (_sync.merken || Promise.resolve()); } catch (e) {}
+  if (generation !== _sync.generation) return false;
+  const Y = VaniY.Y;
+  let sv = null;
+  try { const roh = await dbGet('kv', 'sync-sv:' + _sync.config.vault); if (typeof roh === 'string' && roh) sv = syncBytes(roh); } catch (e) {}
+  if (generation !== _sync.generation) return false;
+  let update;
+  try { update = sv ? Y.encodeStateAsUpdate(_sync.ydoc, sv) : Y.encodeStateAsUpdate(_sync.ydoc); }
+  catch (e) { update = Y.encodeStateAsUpdate(_sync.ydoc); }
+  /* Nichts Neues darin? Dann auch kein Paket. */
+  try { if (Y.decodeUpdate(update).structs.length === 0) return false; } catch (e) {}
+  _sync.merkenOffen++;
+  const svJetzt = Y.encodeStateVector(_sync.ydoc);
+  try { await syncMerkeUpdate(update, generation, svJetzt); }
+  finally { if (generation === _sync.generation) _sync.merkenOffen--; }
+  return true;
+}
+async function syncHoleUpdates(frist = 0) {
+  if (_sync.holt || !_sync.config || !navigator.onLine) return false;
   _sync.holt = true;
   const generation = _sync.generation;
+  const vault = _sync.config.vault;
+  const t0 = Date.now();
+  let aufgeholt = false;
   try {
-    let seq = await syncLadeSeq(_sync.config.vault);
-    for (let runde = 0; runde < 100; runde++) {
-      const body = await syncFetch('/v1/vaults/' + encodeURIComponent(_sync.config.vault) + '/updates?after=' + seq + '&limit=200', { method: 'GET' });
+    let seq = await syncLadeSeq(vault);
+    for (let runde = 0; runde < 400; runde++) {
+      let body;
+      try {
+        body = await syncFetch('/v1/vaults/' + encodeURIComponent(vault) + '/updates?after=' + seq + '&limit=' + _sync.seite, { method: 'GET' });
+      } catch (e) {
+        if (e && e.name === 'AbortError') _sync.seite = syncSeitenGroesse(_sync.seite, 0, true);
+        throw e;
+      }
+      if (generation !== _sync.generation) return false;
       const updates = Array.isArray(body.updates) ? body.updates : [];
+      let bytes = 0;
       for (const paket of updates) {
-        if (generation !== _sync.generation) return;
+        if (generation !== _sync.generation) return false;
         VaniY.Y.applyUpdate(_sync.ydoc, await syncEntschluessle(paket), SYNC_NETZ);
         seq = Math.max(seq, Math.round(begrenze(paket.seq, 0, Number.MAX_SAFE_INTEGER, seq)));
+        /* Nach JEDEM Paket merken, nicht erst nach der ganzen Antwort: reisst
+           die Leitung ab, geht es hier weiter statt wieder bei null. */
+        await syncSpeichereSeq(vault, seq);
+        bytes += String(paket.ciphertext || '').length;
       }
-      await syncSpeichereSeq(_sync.config.vault, seq);
-      if (!body.more && updates.length < 200) break;
+      if (updates.length) { _sync.geholt += updates.length; await syncBekanntSpeichern(vault); }
+      _sync.seite = syncSeitenGroesse(_sync.seite, bytes, false);
+      if (!body.more) { aufgeholt = true; break; }
+      syncMelde('verbindet', { geholt: _sync.geholt });
+      if (frist && Date.now() - t0 > frist) break;
     }
-    syncMelde('synchron', { zuletzt: Date.now() });
-  } catch (e) { syncMelde(e && (e.status === 401 || e.name === 'OperationError') ? 'schluessel' : 'offline'); }
-  finally { _sync.holt = false; }
+  } catch (e) {
+    syncMelde(e && (e.status === 401 || e.name === 'OperationError') ? 'schluessel' : 'offline');
+    return false;
+  } finally { _sync.holt = false; }
+  if (!aufgeholt) return false;
+  const vorher = _sync.aufgeholt;
+  _sync.aufgeholt = true;
+  /* Zum ersten Mal vollstaendig: jetzt darf die Uebernahme auch aufraeumen. */
+  if (!vorher) syncPlaneUebernahme();
+  syncMelde('synchron', { zuletzt: Date.now() });
+  return true;
 }
 async function syncJetzt() {
   if (!_sync.config) return false;
@@ -447,6 +612,9 @@ async function syncJetzt() {
 }
 function syncPollAbstand() {
   if (!navigator.onLine) return 8000;
+  /* Ein Geraet, das noch aufholt, soll zwischen den Portionen nicht warten —
+     ausser der Dienst ist gerade nicht zu erreichen. */
+  if (_sync.config && _sync.ydoc && !_sync.aufgeholt && _sync.status.art === 'verbindet') return 250;
   if (document.visibilityState !== 'visible') return 12000;
   /* Beim Schreiben darf ein zweites Gerät fast unmittelbar folgen. In Ruhe
      reichen anderthalb Sekunden und sparen auf iPad und Handy Akku. */
@@ -482,31 +650,67 @@ function syncStoppe() {
   try { if (_sync.ydoc) _sync.ydoc.destroy(); } catch (e) {}
   _sync.ydoc = _sync.ydocs = _sync.ystate = _sync.ymedia = _sync.persistence = null;
   _sync.poll = _sync.retry = null; _sync.sendet = _sync.holt = _sync.medien = false;
+  _sync.aufgeholt = false; _sync.geholt = 0; _sync.merken = null; _sync.merkenOffen = 0; _sync.einstUebernommen = null;
 }
 async function syncStarte(config, modus = 'start') {
   if (!globalThis.VaniY || !VaniY.Y || !VaniY.IndexeddbPersistence) throw new Error('Sync-Baustein fehlt');
   syncStoppe(); _sync.config = syncSaubereConfig(config);
   if (!_sync.config) throw new Error('Ungültiger Bereich');
   const generation = _sync.generation;
+  const bereich = _sync.config.vault;
   syncMelde('verbindet');
   const Y = VaniY.Y;
   _sync.ydoc = new Y.Doc(); _sync.ydocs = _sync.ydoc.getMap('docs'); _sync.ystate = _sync.ydoc.getMap('state'); _sync.ymedia = _sync.ydoc.getMap('media');
   _sync.persistence = new VaniY.IndexeddbPersistence('vani-bereich-' + _sync.config.vault, _sync.ydoc);
   await new Promise((resolve) => _sync.persistence.once('synced', resolve));
   if (generation !== _sync.generation) return false;
-  await syncHoleUpdates();
-  if (modus === 'erstellen' || modus === 'dazu' || (_sync.ydocs.size === 0 && D.docs.size > 0)) syncSeedLokal();
-  if (modus === 'ersetzen') { D.docs.clear(); await dbTu('docs', 'readwrite', (s) => s.clear()); }
+  /* Ist die lokale Kopie des Bereichs leer, obwohl dieses Geraet schon
+     abgeglichen hatte (Browser hat sie verworfen, sie liess sich nicht oeffnen),
+     passt der gemerkte Lesestand nicht mehr dazu. Dann alles neu holen — sonst
+     sah VANI den eigenen Bestand als neu an und schickte ihn komplett noch
+     einmal. Der Merkzettel bleibt: er beschreibt, was der Dienst schon hat. */
+  if (_sync.ydocs.size === 0 && _sync.ystate.size === 0) {
+    try { if (await syncLadeSeq(bereich) > 0) await syncSpeichereSeq(bereich, 0); } catch (e) {}
+    if (generation !== _sync.generation) return false;
+  }
+  /* Ab hier wird jede eigene Aenderung als eigenes Paket gemerkt — auch jede
+     Portion des ersten Abgleichs. Was die lokale Ablage eben eingelesen hat,
+     liegt davor und zaehlt nicht als neu. Der Stand dazu wandert in einer
+     Kette, damit die Reihenfolge stimmt und der Merkzettel nie vorauslaeuft. */
+  _sync.ydoc.on('update', (update, origin) => {
+    if (origin === SYNC_NETZ || generation !== _sync.generation) return;
+    _sync.merkenOffen++;
+    let sv = null;
+    try { sv = Y.encodeStateVector(_sync.ydoc); } catch (e) {}
+    _sync.merken = (_sync.merken || Promise.resolve())
+      .then(() => syncMerkeUpdate(update, generation, sv, bereich))
+      .catch(() => {})
+      .finally(() => { if (generation === _sync.generation) _sync.merkenOffen--; });
+  });
+  /* Erst holen, was der Bereich schon hat — aber nicht endlos am Stueck: nach
+     zwanzig Sekunden geht es im normalen Abgleich weiter, Portion fuer Portion,
+     und die Texte erscheinen nach und nach. */
+  const aufgeholt = await syncHoleUpdates(20000);
+  if (generation !== _sync.generation) return false;
+  if (modus === 'erstellen' || modus === 'dazu' || (aufgeholt && _sync.ydocs.size === 0 && D.docs.size > 0)) syncSeedLokal();
+  /* Ersetzen heisst: der Bestand aus dem Bereich loest den hiesigen ab. Aber
+     nie etwas wegraeumen, bevor der Ersatz sicher da ist. Kam noch nicht alles
+     an, bleibt der hiesige Bestand stehen; sobald der Bereich vollstaendig
+     angekommen ist, raeumt die Uebernahme weg, was darin nicht vorkommt. */
+  if (modus === 'ersetzen' && aufgeholt) { D.docs.clear(); await dbTu('docs', 'readwrite', (s) => s.clear()); }
   await syncUebernehmeAusY();
   _sync.ydocs.observeDeep((_events, tx) => { if (tx.origin !== SYNC_LOKAL) syncPlaneUebernahme(); });
   _sync.ystate.observeDeep((_events, tx) => { if (tx.origin !== SYNC_LOKAL) syncPlaneUebernahme(); });
   _sync.ymedia.observeDeep((_events, tx) => { if (tx.origin !== SYNC_LOKAL) syncMedienAbgleich().catch(() => {}); });
-  _sync.ydoc.on('update', (update, origin) => { if (origin !== SYNC_NETZ) syncMerkeUpdate(update, generation); });
-  await syncMerkeUpdate(Y.encodeStateAsUpdate(_sync.ydoc), generation);
-  await syncSendeWartend(); await syncHoleUpdates();
+  await syncSendeUnbekanntes(generation);
+  await syncSendeWartend();
   syncMedienAbgleich().catch(() => {});
   syncPlanePoll();
-  syncMelde('synchron', { zuletzt: Date.now() });
+  /* „live verbunden“ nur, wenn es stimmt. Frueher stand das hier auch dann,
+     wenn das Holen eben gescheitert war — der Laptop sah verbunden aus und
+     blieb leer. */
+  if (_sync.aufgeholt) syncMelde('synchron', { zuletzt: Date.now() });
+  else if (!['offline', 'schluessel', 'fehler'].includes(_sync.status.art)) syncMelde('verbindet', { geholt: _sync.geholt });
   return true;
 }
 async function syncBeimStart() {

@@ -5,7 +5,9 @@
 function syncStatusWorte(status) {
   const art = status && status.art;
   if (art === 'synchron') return ['live verbunden', 'Änderungen gehen sofort hinaus und kommen im Vordergrund binnen Augenblicken an.'];
-  if (art === 'verbindet') return ['arbeitet', 'VANI verbindet die Geräte …'];
+  if (art === 'verbindet') return ['arbeitet', status.geholt
+    ? 'Holt deinen Bestand — ' + zaehl(status.geholt, 'Paket ist', 'Pakete sind', 'ein') + ' schon da. VANI dabei bitte offen lassen.'
+    : 'VANI verbindet die Geräte …'];
   if (art === 'offline') return ['offline', 'Änderungen bleiben sicher hier und gehen später weiter.'];
   if (art === 'schluessel') return ['Achtung', 'Der Bereichsschlüssel passt nicht oder wurde zurückgezogen.'];
   if (art === 'fehler') return ['Achtung', 'Etwas ist noch nicht fertig synchronisiert.'];
@@ -34,7 +36,13 @@ async function vorhandenenSyncBereichKoppeln(codeVorgabe) {
     if (modus === 'ersetzen' && !await frage('Wirklich den jetzigen Bestand auf diesem Gerät durch den gekoppelten Bereich ersetzen? Eine Sicherung vorher ist die sicherste Wahl.', { ja: 'Ersetzen', gefahr: true })) return;
   }
   toast('Prüfe den geheimen Bereich …', 5000);
-  try { await syncVerbindeBereich(code, modus); toast('Verbunden. Ab jetzt halten sich die Geräte gegenseitig aktuell.', 5000); zeichne(); }
+  try {
+    await syncVerbindeBereich(code, modus);
+    toast(syncInfo().status.art === 'synchron'
+      ? 'Verbunden. Ab jetzt halten sich die Geräte gegenseitig aktuell.'
+      : 'Verbunden. Dein Bestand kommt jetzt nach und nach an — VANI dabei bitte offen lassen.', 6000);
+    zeichne();
+  }
   catch (e) { toast((e && e.message) || 'Der Kopplungscode ließ sich nicht verbinden.', 5000); }
 }
 
