@@ -201,7 +201,7 @@ function albumKopfleiste(liste, neu, schliessen) {
   suchfeld.addEventListener('input', entprellt(() => {
     _alb.suche = suchfeld.value; _alb.i = _alb.suche.trim() ? 1 : 0; neu();
     setTimeout(() => { const f = document.querySelector('.alb-suchfeld'); if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); } }, 0);
-  }, 240, true));
+  }, 240, () => suchfeld.isConnected));
 
   const register = el('div', { class: 'alb-register' });
   for (const r of albumRegister(liste)) {
@@ -578,7 +578,7 @@ function albumStueck(figur, s, flach) {
           figur.felder = Object.assign({}, figur.felder, { faden: a });
           speichere(figur);
           const buehne = document.querySelector('.alb-buehne');
-          if (buehne) { const n = (j) => { if (j != null) _alb.i = j; albumZeichne(buehne, n, () => {}); }; n(); }
+          if (buehne) { const n = (j) => { if (j != null) _alb.i = j; albumZeichne(buehne, n, () => { const h = document.querySelector('.alb-huelle'); if (h) schliesseDeck(h); }); }; n(); }
         }
       }, el('i', { class: 'alb-fadenhaken' }, x.erledigt ? '✓' : ''), el('span', {}, x.text))));
   }
@@ -613,7 +613,7 @@ function albumStueck(figur, s, flach) {
             _alb.geschichte = _alb.geschichte === z ? '' : z; _alb.suche = '';
             _alb.i = albumBlattVon(figur.id, albumSichtbare()) || 0;
             const buehne = document.querySelector('.alb-buehne');
-            if (buehne) { const n = (j) => { if (j != null) _alb.i = j; albumZeichne(buehne, n, () => {}); }; n(); }
+            if (buehne) { const n = (j) => { if (j != null) _alb.i = j; albumZeichne(buehne, n, () => { const h = document.querySelector('.alb-huelle'); if (h) schliesseDeck(h); }); }; n(); }
           }
         }, z))));
     }
@@ -667,7 +667,7 @@ function albumErwaehnungenBlock(figur) {
   const funde = albumErwaehnungen(figur, 6);
   if (!funde.length) return null;
   return el('details', { class: 'alb-stueck alb-erwaehnungen' },
-    el('summary', {}, 'Kommt in ' + funde.length + (funde.length === 1 ? ' deiner Texte vor' : ' deiner Texte vor')),
+    el('summary', {}, (funde.length === 1 ? 'Kommt in einem deiner Texte vor' : 'Kommt in ' + funde.length + ' deiner Texte vor')),
     ...funde.map((x) => el('button', { class: 'alb-erwaehnung', onclick: () => { if (typeof oeffneDoc === 'function') oeffneDoc(x.doc); else if (typeof oeffneDokument === 'function') oeffneDokument(x.doc); } },
       el('b', {}, x.doc.titel || tischblattArt(x.doc) || 'Text'),
       el('span', {}, x.stelle))));
@@ -820,9 +820,9 @@ function albumGegenueberFenster(a, b) {
   const kasten = el('div', { class: 'modal albg-fenster' },
     el('div', { class: 'kartenkopf' }, 'NEBENEINANDER'),
     el('div', { class: 'albg-kopf' },
-      el('div', { class: 'albg-wer', style: '--figurfarbe:' + albumFarbe(a) }, el('b', {}, a.name || 'ohne Namen'), el('small', {}, albumStuecke(a).length + ' Einträge')),
+      el('div', { class: 'albg-wer', style: '--figurfarbe:' + albumFarbe(a) }, el('b', {}, a.name || 'ohne Namen'), el('small', {}, (albumStuecke(a).length === 1 ? 'ein Eintrag' : albumStuecke(a).length + ' Einträge'))),
       el('i', { class: 'albg-mitte', title: 'Wie viele der mehrfach besetzten Felder — Wesen, Schwächen, Leidenschaften, Eigenheiten, Geschichten, Spitznamen — die beiden gemeinsam haben.' }, Math.round(albumAehnlichkeit(a, b) * 100) + '%'),
-      el('div', { class: 'albg-wer', style: '--figurfarbe:' + albumFarbe(b) }, el('b', {}, b.name || 'ohne Namen'), el('small', {}, albumStuecke(b).length + ' Einträge'))),
+      el('div', { class: 'albg-wer', style: '--figurfarbe:' + albumFarbe(b) }, el('b', {}, b.name || 'ohne Namen'), el('small', {}, (albumStuecke(b).length === 1 ? 'ein Eintrag' : albumStuecke(b).length + ' Einträge')))),
     gleiche ? el('p', { class: 'albg-hinweis' }, gleiche === 1 ? 'Ein Feld ist wortgleich — das ist markiert.' : gleiche + ' Felder sind wortgleich — das ist markiert.') : null,
     zeilen.length
       ? el('div', { class: 'albg-tafel' }, ...zeilen.map((z, i) => el('div', { class: 'albg-zeile' + (z.gleich ? ' gleich' : '') + (z.nurEiner ? ' einer' : ''), style: '--n:' + Math.min(i, 30) },

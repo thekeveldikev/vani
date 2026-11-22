@@ -33,7 +33,16 @@ function albumKalenderAbgleich(figur) {
       leute: [{ id: figur.id, name: figur.name || 'ohne Namen' }]
     });
     if (!felder) continue;
-    if (vorhanden) { Object.assign(vorhanden, felder); speichere(vorhanden); }
+    /* Nur das, was aus dem Album kommt — Datum, Art, Titel, Leute. Vorher
+       wurde der GANZE frische Termin darübergelegt, bei jedem Speichern der
+       Figur: eine Notiz, ein Ort oder ein Zeichen, das man im Kalender dazu
+       eingetragen hatte, war danach weg. Und gespeichert wird nur, wenn sich
+       wirklich etwas geändert hat. */
+    if (vorhanden) {
+      const neu = { wann: felder.wann, art: felder.art, titel: felder.titel, leute: felder.leute };
+      const anders = Object.keys(neu).some((k) => JSON.stringify(vorhanden[k]) !== JSON.stringify(neu[k]));
+      if (anders) { Object.assign(vorhanden, neu); speichere(vorhanden); }
+    }
     else neuDoc('termin', Object.assign({ ausAlbum: marke }, felder));
   }
 }
@@ -44,6 +53,9 @@ function albumBearbeiten(doc, danach, frisch) {
   let gruppe = 'kopf';
 
   const sichern = entprellt(() => {
+    /* Aus dem Album genommen: kein Nachsichern beim Schliessen, das sie
+       zurueckschreibt und ihre Kalendertermine neu anlegt. */
+    if (istWeggeraeumt(doc)) return;
     const sauber = saubereAlbumFigur(stand);
     doc.name = sauber.name;
     doc.titel = sauber.name;          /* damit Suche und Papierkorb es lesbar finden */
@@ -159,6 +171,13 @@ function albumBearbeiten(doc, danach, frisch) {
         if (await frage((stand.name ? '„' + stand.name + '“' : 'Diese Figur') + ' aus dem Album nehmen?', { ja: 'Herausnehmen' })) {
           sichern.sofort();
           await loesche(doc.id);
+          /* Ihre Geburts- und Todestermine gehen mit in den Papierkorb —
+             vorher blieb „X kommt zur Welt“ verwaist im Kalender stehen. */
+          if (istWeggeraeumt(doc)) {
+            for (const t of [...D.docs.values()]) {
+              if (t.typ === 'termin' && typeof t.ausAlbum === 'string' && t.ausAlbum.startsWith('album:' + doc.id + ':')) await loesche(t.id, true);
+            }
+          }
           zu(); if (danach) danach();
         }
       } }, 'Aus dem Album nehmen'),
@@ -455,7 +474,7 @@ function albumAlsBlatt(stand, doc) {
    waeren dort ein Aergernis. */
 async function albumAbschreiben(doc, stand, sichern, zu, danach) {
   const vorschlag = albumAbschrift(Object.assign({ id: doc.id }, stand)).name;
-  const name = await eingabe({ titel: 'Wie soll die Abschrift heissen?', wert: vorschlag, platzhalter: 'Ein Name', ok: 'Abschreiben' });
+  const name = await eingabe({ titel: 'Wie soll die Abschrift heißen?', wert: vorschlag, platzhalter: 'Ein Name', ok: 'Abschreiben' });
   if (name === null) return;
   if (sichern && sichern.sofort) sichern.sofort();
   const daten = albumAbschrift(Object.assign({ id: doc.id }, stand), name);

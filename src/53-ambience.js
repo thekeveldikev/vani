@@ -377,6 +377,28 @@ function ambienceAllesAus() { return ambienceMischungAnwenden({}); }
    Ein Klangbild kann an einer Szene, einem Kapitel, einem Heft oder einem
    Projekt hängen. Wer dort zu schreiben beginnt, hört es von selbst. */
 function klangbilder() { return vomTyp('klangbild').sort((a, b) => (a.titel || '').localeCompare(b.titel || '', 'de')); }
+/* Ist in einem Klangbild ueberhaupt etwas, das klingt?
+   Ein Klangbild, das gemerkt wurde, waehrend nichts lief, ist eine leere
+   Mischung — antippen und: Stille. So ging es einem eigenen Klangbild auf dem iPad:
+   gemerkt zu einer Zeit, in der die Aufnahmen dort nicht dekodiert werden
+   konnten und deshalb aus der Mischung fielen. */
+function klangbildHatKlang(doc) {
+  if (!doc) return false;
+  const voll = (m) => !!m && typeof m === 'object' && Object.values(m).some((v) => Number(v) > 0);
+  return voll(doc.pegel) || voll(doc.gewebt);
+}
+/* Der Fundus kommt als kleine Liste neben der App (60-boot). Wird ein
+   Klangbild angewendet, bevor sie da ist — etwa wenn es beim Oeffnen einer
+   Szene von selbst anspringt —, haette saubereAmbienceMischung jede Aufnahme
+   als unbekannt verworfen. Also notfalls erst die Liste holen. */
+async function ambienceKatalogSicher() {
+  if (AMBIENCE_KATALOG.length) return true;
+  try {
+    const r = await fetch('klang/katalog.json', { cache: 'no-cache' });
+    if (r.ok) ambienceKatalogSetzen(await r.json());
+  } catch (e) {}
+  return AMBIENCE_KATALOG.length > 0;
+}
 function klangbildJetzt(titel) {
   const pegel = { ...(D.einst.ambience || {}) };
   const gewebt = { ...(D.einst.mischung || {}) };
@@ -393,9 +415,17 @@ async function klangbildAnwenden(doc) {
     D.einst.ambienceFein = {};
     for (const [id, f] of Object.entries(doc.fein)) D.einst.ambienceFein[id] = saubereAmbienceFeinheit(f);
   }
-  if (typeof doc.lautstaerke === 'number') setzeLautstaerke(begrenze(doc.lautstaerke, 0, 1, .5));
+  /* Ein Klangbild mit Lautstaerke 0 waere nur eine teure Art von Stille —
+     dann bleibt die jetzige Lautstaerke stehen. */
+  if (typeof doc.lautstaerke === 'number' && doc.lautstaerke > 0) setzeLautstaerke(begrenze(doc.lautstaerke, 0, 1, .5));
   if (typeof mischungAnwenden === 'function') mischungAnwenden(doc.gewebt || {});
-  await ambienceMischungAnwenden(doc.pegel || {});
+  const pegel = doc.pegel || {};
+  if (Object.keys(pegel).some((id) => !id.startsWith('eigen:'))) await ambienceKatalogSicher();
+  const fehler = await ambienceMischungAnwenden(pegel);
+  /* Nicht still scheitern: wer antippt und nichts hoert, soll erfahren warum. */
+  if (fehler && fehler.length && typeof toast === 'function') {
+    toast(fehler.length === 1 ? fehler[0].meldung : fehler.length + ' Klänge wollten nicht: ' + fehler[0].meldung, 6000);
+  }
   return true;
 }
 

@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.61.2';
+const APP_VERSION = '5.62.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -660,8 +660,21 @@ const speichereStats = entprellt(() => {
   if (typeof syncMetadatenGeaendert === 'function') syncMetadatenGeaendert('stats');
 }, 800);
 
+/* ----- Weggeräumt bleibt weggeräumt -----
+   Ein Fenster, das beim Schliessen noch einmal sichert (`sichern.sofort()`
+   im beiZu), hat ein gerade geloeschtes Dokument sofort wieder in die
+   Datenbank geschrieben — und als „nicht geloescht“ in den Sync gemeldet.
+   Album („Aus dem Album nehmen“) und Wandteppich („Abhängen“) taten genau
+   das: die Figur lag im Papierkorb UND nach dem Neuladen wieder im Album.
+   Was hier geloescht wurde und nicht wieder im Bestand liegt, wird nicht mehr
+   geschrieben. Zurueckholen und Rueckgaengig legen es vorher wieder in
+   D.docs — dann darf es auch wieder gespeichert werden. */
+const _weggeraeumt = new Set();
+function istWeggeraeumt(d) { return !!d && !!d.id && _weggeraeumt.has(d.id) && !D.docs.has(d.id); }
+
 function markiereAenderung(d, geloescht) {
   if (!d || !d.id) return;
+  if (!geloescht && istWeggeraeumt(d)) return;
   const alt = Number.isFinite(d._rev) ? d._rev : 0;
   d._rev = alt + 1;
   d._geraet = GERAET_ID;
@@ -774,6 +787,7 @@ async function loesche(id, still, kinderDerWurzelBehalten = false) {
   for (const d of new Set(putzen.map((x) => x[0]))) speichereStill(d);
   for (const d of buendel.docs) {
     D.docs.delete(d.id);
+    _weggeraeumt.add(d.id);
     await dbDel('docs', d.id);
   }
   if (!still) {
@@ -1312,8 +1326,65 @@ function zweiFingerZoom(flaeche, opts) {
     sichtZeigen(sicht.zoom0 * (abstand(p[0], p[1]) / d0), mx, my);
   };
 
+  /* ----- Zwei Finger auf dem iPad: ueber Touch-Ereignisse -----
+     Auf dem iPad stotterte das Kneifen und der Baum sprang zwischen zwei
+     Groessen hin und her. Grund: Die Flaeche darf nativ rollen
+     (`touch-action: pan-x pan-y`). Wandert die Mitte zwischen den Fingern
+     auch nur ein wenig — das tut sie bei jedem echten Kneifen —, faengt
+     Safari an zu rollen und bricht dafuer die Zeiger-Ereignisse mit
+     `pointercancel` ab. Mitten in der Geste wurde dann festgeschrieben und
+     neu gewebt, danach rollte Safari allein weiter.
+
+     Touch-Ereignisse laufen auch waehrend des Rollens weiter, und solange
+     zwei Finger liegen, sagt `preventDefault` auf `touchmove` dem Browser:
+     diese Bewegung gehoert der Karte. Ein Finger rollt weiter nativ. */
+  const mitTouch = typeof window !== 'undefined' && 'ontouchstart' in window;
+  let tAktiv = false;
+  const tPunkte = (ev) => {
+    const t = ev.touches;
+    if (!t || t.length < 2) return null;
+    return [{ x: t[0].clientX, y: t[0].clientY }, { x: t[1].clientX, y: t[1].clientY }];
+  };
+  const tStart = (ev) => {
+    const p = tPunkte(ev);
+    if (!p) return;
+    if (sicht) return;
+    const mx = (p[0].x + p[1].x) / 2, my = (p[0].y + p[1].y) / 2;
+    if (!sichtAnfangen(opts.bild(), mx, my)) return;
+    d0 = Math.max(1, abstand(p[0], p[1]));
+    tAktiv = true;
+    if (ev.cancelable) ev.preventDefault();
+  };
+  const tBewegt = (ev) => {
+    if (!tAktiv) return;
+    const p = tPunkte(ev);
+    if (!p || !sicht) return;
+    if (ev.cancelable) ev.preventDefault();
+    const mx = (p[0].x + p[1].x) / 2, my = (p[0].y + p[1].y) / 2;
+    sichtZeigen(sicht.zoom0 * (abstand(p[0], p[1]) / d0), mx, my);
+  };
+  const tEnde = (ev) => {
+    if (!tAktiv) return;
+    if (ev.touches && ev.touches.length >= 2) return;
+    tAktiv = false;
+    if (sicht) sichtBeenden();
+  };
+  /* Safaris eigene Kneifgeste (Seitenzoom) gehoert hier nicht hin. */
+  const geste = (ev) => { if (ev.cancelable) ev.preventDefault(); };
+  if (mitTouch) {
+    flaeche.addEventListener('touchstart', tStart, { passive: false });
+    flaeche.addEventListener('touchmove', tBewegt, { passive: false });
+    flaeche.addEventListener('touchend', tEnde, { passive: true });
+    flaeche.addEventListener('touchcancel', tEnde, { passive: true });
+    flaeche.addEventListener('gesturestart', geste, { passive: false });
+    flaeche.addEventListener('gesturechange', geste, { passive: false });
+  }
+
   const runter = (ev) => {
     if (ev.pointerType === 'mouse') return;
+    /* Wo es Touch-Ereignisse gibt, fuehren die das Kneifen — sonst liefen
+       zwei Wege gleichzeitig und braechen sich gegenseitig ab. */
+    if (mitTouch && ev.pointerType === 'touch') return;
     zeiger.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
     if (zeiger.size === 2 && !sicht) anfangen();
   };
@@ -1350,6 +1421,14 @@ function zweiFingerZoom(flaeche, opts) {
   return () => {
     clearTimeout(ruhe);
     if (sicht) sichtBeenden();
+    if (mitTouch) {
+      flaeche.removeEventListener('touchstart', tStart);
+      flaeche.removeEventListener('touchmove', tBewegt);
+      flaeche.removeEventListener('touchend', tEnde);
+      flaeche.removeEventListener('touchcancel', tEnde);
+      flaeche.removeEventListener('gesturestart', geste);
+      flaeche.removeEventListener('gesturechange', geste);
+    }
     flaeche.removeEventListener('pointerdown', runter);
     flaeche.removeEventListener('pointermove', bewegt);
     flaeche.removeEventListener('pointerup', hoch);
@@ -1678,6 +1757,12 @@ function oeffneDoc(d) {
   else if (d.typ === 'wort' || d.typ === 'wortkiste') location.hash = '#/woerter';
   else if (d.typ === 'klang' || d.typ === 'klangbild') location.hash = '#/klang';
   else if (d.typ === 'zettel' || d.typ === 'foto') { const s = D.docs.get(d.parent); if (s) oeffneDoc(s); }
+  /* Die Welten-Werkzeuge: seit 5.62 findet die Suche sie auch. */
+  else if (d.typ === 'albumfigur' && typeof albumOeffnen === 'function') albumOeffnen(0, d.id);
+  else if (d.typ === 'stammbaum' && typeof teppichOeffnen === 'function') teppichOeffnen(d.id);
+  else if (d.typ === 'stadtplan' && typeof planOeffnen === 'function') planOeffnen(d.id);
+  else if (d.typ === 'sternhimmel' && typeof sternOeffnen === 'function') sternOeffnen(d.id);
+  else if (d.typ === 'termin' && typeof kalenderOeffnen === 'function') kalenderOeffnen(d.wann);
 }
 document.addEventListener('click', (e) => {
   const v = e.target.closest('.verweis');

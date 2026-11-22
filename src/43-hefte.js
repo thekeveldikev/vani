@@ -1065,15 +1065,24 @@ async function starteKritzeln(blatt, seite) {
          überschreibt und beim nächsten Öffnen alles doppelt dasteht. */
       /* „Alles löschen“ gilt auch für die Grundlage: sonst taucht das alte Bild beim nächsten Strich wieder auf */
       const geleert = striche.some((s) => s && s.leeren);
-      if (geleert) { basis = null; if (seite.skizzeBasis) { dbDel('media', seite.skizzeBasis).catch(() => {}); delete seite.skizzeBasis; } }
+      /* Das alte Grundbild wird erst weggeraeumt, wenn das neue Bild und die
+         Seite sicher liegen (unten) — nie vorher. */
+      let altBasis = null;
+      if (geleert) { basis = null; if (seite.skizzeBasis) { altBasis = seite.skizzeBasis; delete seite.skizzeBasis; } }
       if (basis && seite.skizze && !seite.skizzeBasis) {
         try { const alt = await dbGet('media', seite.skizze); if (alt) { const neuId = uid(); await dbPut('media', alt, neuId); seite.skizzeBasis = neuId; if (typeof syncMediaGeaendert === 'function') syncMediaGeaendert(neuId); } } catch (x) {}
       }
       auswahl = []; lasso = null; alleszeichnen();
       seite.striche = leer ? [] : saubereStriche(striche.map((s) => strichVerdichten(s)));
       const neuId = leer ? seite.skizze : await speichereKritzelei(canvas, seite.skizze);
-      if (!leer && !neuId) toast('Das Bild ließ sich nicht sichern — die Striche selbst sind gespeichert.'); else seite.skizze = neuId;
-      speichere(seite);
+      const bildSicher = leer || !!neuId;
+      if (!bildSicher) toast('Das Bild ließ sich nicht sichern — die Striche selbst sind gespeichert.'); else seite.skizze = neuId;
+      seite.geaendert = Date.now(); staendeAutomatisch(seite); markiereAenderung(seite, false);
+      const seiteSicher = await sicherSpeichern('docs', seite);
+      if (altBasis) {
+        if (bildSicher && seiteSicher) dbDel('media', altBasis).catch(() => {});
+        else seite.skizzeBasis = altBasis;   /* nichts verloren: die alte Grundlage bleibt */
+      }
       aufraeumen();
       if (altesBild) {
         altesBild.style.display = '';

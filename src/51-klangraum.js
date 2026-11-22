@@ -178,7 +178,13 @@ function baueKlangbilder(statusNeu, neuZeichnen) {
   }
   for (const b of klangbilder()) {
     const anzahl = Array.isArray(b.orte) ? b.orte.length : 0;
-    const chip = el('button', { class: 'szenenchip eigen', onclick: async () => {
+    const leer = typeof klangbildHatKlang === 'function' && !klangbildHatKlang(b);
+    const chip = el('button', { class: 'szenenchip eigen' + (leer ? ' ohneklang' : ''), title: leer ? 'Leer — lange drücken und „Mit dem Jetzigen überschreiben“' : '', onclick: async () => {
+      /* Ein leeres Klangbild sagt das, statt still zu bleiben. */
+      if (leer) {
+        toast('„' + b.titel + '“ ist leer — es wurde gemerkt, als gerade nichts lief. Stell die Klänge ein, dann lange drücken → „Mit dem Jetzigen überschreiben“.', 7000);
+        return;
+      }
       await audioFreigeben(); await klangbildAnwenden(b); if (neuZeichnen) neuZeichnen(); setTimeout(statusNeu, 200);
     } }, b.titel, anzahl ? el('small', {}, String(anzahl)) : null);
     langdruck(chip, async () => {
@@ -192,6 +198,10 @@ function baueKlangbilder(statusNeu, neuZeichnen) {
         const n = await eingabe({ titel: 'Das Klangbild heißt jetzt …', wert: b.titel });
         if (n) { b.titel = n; speichere(b); if (neuZeichnen) neuZeichnen(); }
       } else if (wahl === 'ueber') {
+        if (!klangbildHatKlang({ pegel: D.einst.ambience, gewebt: D.einst.mischung })) {
+          toast('Gerade läuft kein Klang — erst etwas anschalten, dann überschreiben.', 5000);
+          return;
+        }
         b.pegel = { ...(D.einst.ambience || {}) };
         b.gewebt = { ...(D.einst.mischung || {}) };
         b.fein = JSON.parse(JSON.stringify(D.einst.ambienceFein || {}));
@@ -315,6 +325,12 @@ function baueKlangFuss(statusNeu, neuZeichnen) {
       folgt),
     el('div', { class: 'fussreihe' },
       el('button', { class: 'knopf voll', onclick: async () => {
+        /* Nichts merken, was nicht klingt — sonst entsteht ein Klangbild, das
+           beim Antippen still bleibt. */
+        if (!klangbildHatKlang({ pegel: D.einst.ambience, gewebt: D.einst.mischung })) {
+          toast('Gerade läuft kein Klang. Schalte erst etwas an — dann lässt es sich merken.', 5000);
+          return;
+        }
         const name = await eingabe({ titel: 'Dieses Klangbild heißt …', platzhalter: 'z. B. Regen überm Schreibtisch' });
         if (!name) return;
         klangbildJetzt(name);

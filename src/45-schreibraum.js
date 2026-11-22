@@ -184,15 +184,23 @@ function oeffneSchreibraum(docId) {
   }
 
   let zielKlangGespielt = false;
-  ta.addEventListener('input', () => {
-    ersetzeKlug();
-    sichern();
+  /* Tempo: Die Woerter wurden bei jedem Anschlag im GANZEN Text gezaehlt, bei
+     formatiertem Text sogar erst das ganze HTML ausgelesen und zerlegt. Bei
+     langen Texten war das auf dem iPad spuerbar. Die Zahl im Kopf darf einen
+     Atemzug hinterherhinken — gezaehlt wird, sobald 250 ms Ruhe ist. */
+  const zaehleAnzeige = entprellt(() => {
+    if (!_sr || _sr.ta !== ta) return;
     const roh = istRich ? richReinerText(ta.innerHTML) : ta.value;
     const n = worte(roh);
     const dazu = n - startWorte;
     worteAnzeige.textContent = String(n) + (dazu > 0 ? ' · +' + dazu : '');
     worteAnzeige.title = n.toLocaleString('de-DE') + ' Wörter · ' + roh.length.toLocaleString('de-DE')
       + ' Zeichen · etwa ' + Math.max(1, Math.round(n / 200)) + ' Min. Lesezeit';
+  }, 250);
+  ta.addEventListener('input', () => {
+    ersetzeKlug();
+    sichern();
+    zaehleAnzeige();
     kopf.classList.add('versunken');
     aktualisiereSpiegel();
     /* Nachfuehren erst, wenn ein Moment Ruhe ist. Auf dem iPad laeuft nach
@@ -373,8 +381,30 @@ function zentriereZeile() {
   }
   _messer.className = ta.className.replace('sr-text', 'sr-spiegel');
   _messer.style.cssText = 'position:absolute;inset:auto;top:0;left:0;visibility:hidden;width:' + ta.clientWidth + 'px;font-size:' + stil.fontSize + ';line-height:' + stil.lineHeight + ';white-space:pre-wrap;word-wrap:break-word';
-  _messer.textContent = ta.value.slice(0, ta.selectionStart || 0) || ' ';
-  const caretY = _messer.offsetHeight;
+  /* Tempo: Frueher wurde bei JEDEM Anschlag der ganze Text bis zum Cursor in
+     den Messkasten gelegt und neu gesetzt — bei einem langen Text (50 000
+     Woerter) fast 10 ms am Rechner, auf dem iPad ein Mehrfaches davon, und
+     das zweimal je Zeichen (Eingabe und Auswahlwechsel).
+     Absaetze brechen unabhaengig voneinander um. Die Hoehe aller FERTIGEN
+     Absaetze vor dem Cursor aendert sich also nicht, solange man im selben
+     Absatz tippt — sie wird gemerkt, neu gemessen wird nur der eine Absatz. */
+  const t = ta.value;
+  const caret = ta.selectionStart || 0;
+  const absatz = t.lastIndexOf('\n', caret - 1) + 1;
+  const art = _messer.style.cssText + '|' + _messer.className;
+  const vorher = absatz > 0 ? t.slice(0, absatz - 1) : '';
+  let obenHoehe = 0;
+  if (absatz > 0) {
+    const c = _messer._vorrat;
+    if (c && c.art === art && c.text === vorher) obenHoehe = c.hoehe;
+    else {
+      _messer.textContent = vorher || ' ';
+      obenHoehe = _messer.offsetHeight;
+      _messer._vorrat = { art, text: vorher, hoehe: obenHoehe };
+    }
+  }
+  _messer.textContent = t.slice(absatz, caret) || ' ';
+  const caretY = obenHoehe + _messer.offsetHeight;
   const zielY = ta.offsetTop + caretY - mitte.clientHeight * .42;
   mitte.scrollTo({ top: Math.max(0, zielY) });
 }

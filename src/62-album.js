@@ -292,14 +292,16 @@ function albumFehlt(f, zufall) {
 
 /* ----- Verweise: wer im Album schon steht ----- */
 /* Ein Eintrag darf „Mutter — Ilva“ heißen. Erkannt wird, was hinter dem
-   Gedankenstrich steht oder der ganze Eintrag. */
+   Gedankenstrich steht oder der ganze Eintrag. Ein einfacher Bindestrich
+   trennt nur mit Leerzeichen davor und danach — sonst wurde aus „Anna-Lena“
+   die Rolle „Anna“ und der Name „Lena“. */
 function albumVerweisName(eintrag) {
   const s = String(eintrag || '').trim();
-  const m = /^(.{1,40}?)\s*[—–-]\s*(.+)$/.exec(s);
+  const m = /^(.{1,40}?)(?:\s*[—–]\s*|\s+-\s+)(.+)$/.exec(s);
   return (m ? m[2] : s).trim();
 }
 function albumVerweisRolle(eintrag) {
-  const m = /^(.{1,40}?)\s*[—–-]\s*(.+)$/.exec(String(eintrag || '').trim());
+  const m = /^(.{1,40}?)(?:\s*[—–]\s*|\s+-\s+)(.+)$/.exec(String(eintrag || '').trim());
   return m ? m[1].trim() : '';
 }
 function albumFindeFigur(name, liste) {
@@ -365,7 +367,7 @@ function albumAlterText(f, stichtag) {
   const t = (f.felder || {}).gestorben;
   if (t && kalGueltig(t)) {
     const a = kalAlter(g, t);
-    return a ? 'wurde ' + a.jahre + ' Jahre alt' : '';
+    return a ? 'wurde ' + (a.jahre === 1 ? 'ein Jahr' : a.jahre + ' Jahre') + ' alt' : '';
   }
   const a = kalAlter(g, stichtag || kalHeute());
   return a ? 'heute ' + kalAlterText(a) : '';

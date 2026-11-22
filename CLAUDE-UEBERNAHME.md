@@ -2649,3 +2649,125 @@ einsetzt, baut sich einen Fehler, der erst beim Anschauen auffaellt.
 Beim Suchen kam heraus, dass sich der Fehler mit einem gestellten Waehler
 NICHT zeigt — nur wenn der Ersatz sich verhaelt wie das Original (also ein
 Objekt liefert). Das gehoert zu jeder Nachstellung dazu.
+
+> **Luecke:** Die Abschnitte fuer 5.50 bis 5.61.2 fehlen hier. Was dort geschah,
+> steht in der Commit-Geschichte (`git log`) und in `03-VERSIONSCHRONIK.md` der
+> Uebergabemappe vom 22.11.2026.
+
+## 5.62.0 — Rückmelde-Videos (22. November 2026, erste Runde mit Claude 5.5)
+
+Von der iPad-Nutzerin kamen drei Rückmelde-Videos. Gesprochenes per Whisper (large-v3, GPU)
+abgeschrieben, Szenen als Standbilder angesehen. Fuenf Fehler, alle behoben,
+Tests in `test/video-korrekturen.mjs`.
+
+**1 · Kabinett: Kneifen stotterte, der Baum sprang.** Die Flaechen
+(`.tep-flaeche`, `.kt-flaeche`, `.sh-flaeche`) duerfen nativ rollen
+(`touch-action: pan-x pan-y`). Wandert die Mitte zwischen zwei Fingern auch nur
+etwas — bei jedem echten Kneifen —, faengt Safari an zu rollen und bricht die
+Zeiger-Ereignisse mit `pointercancel` ab. `zweiFingerZoom` (30-core.js) schrieb
+dann mitten in der Geste fest, webte neu, und Safari rollte allein weiter.
+Jetzt fuehren auf Touch-Geraeten **Touch-Ereignisse** das Kneifen
+(`touchmove` mit `passive: false` + `preventDefault`, solange zwei Finger
+liegen; ein Finger rollt weiter nativ), Zeiger-Ereignisse vom Typ `touch`
+werden dort ignoriert, `gesturestart/-change` (Safaris Seitenzoom) ebenso.
+Am Rechner bleibt alles wie es war. **Nicht auf dem iPad geprueft** — im
+Browser mit gestellten Touch-Ereignissen: Geste wird uebernommen, Zoom 1,6
+festgeschrieben, ein Finger bleibt beim Browser.
+
+**2 · Suche.** Gesucht wurde ein Figurenname („Zander“): im Umfeld war „und“ markiert, und die
+Liste war voller „ähnlicher“ Treffer. Drei Ursachen:
+- Die Fundstelle wurde in der normalisierten Fassung gezaehlt (ß → ss) und im
+  Originaltext markiert: jedes ß davor schob die Marke ein Zeichen weiter.
+  Jetzt `suchFundstellen()` mit der Karte aus 48c (`suchKarte`).
+- „Zander“ ist dank Nachsicht (`fastGleich`, ein Zeichen Abweichung) „ähnlich“
+  zu „ ander“ in jedem „anderen“. Diese Treffer standen gleichrangig neben den
+  echten, sortiert nach Datum, sechs Plaetze je Gruppe. Jetzt
+  `suchErgebnisse()` (rein, testbar): erst alle genauen Funde, die Nachsicht
+  nur, wenn es insgesamt weniger als drei gibt; Titel vor Text, mehr
+  Fundstellen vor weniger; „Alle N zeigen …“ statt stillem Abschneiden;
+  Zaehler je Gruppe und „(3-mal)“ am Eintrag.
+- Album, Wandteppiche, Stadtplaene, Sternhimmel und Kalender wurden gar nicht
+  durchsucht. Neu in `SUCH_GRUPPEN`, Inhalt ueber `suchTextFuer()`, Oeffnen in
+  `oeffneDoc()`. Chips dafuer erscheinen nur, wenn es dort etwas gibt.
+- Tempo: normalisierte Fassung je Dokument gemerkt (`suchNorm`, bis zur
+  naechsten Aenderung), `suchKarte` mit ASCII-Schnellweg.
+- Spotlight (48b): Vorschau zeigt jetzt den Ausschnitt UM die Fundstelle (vorher
+  immer die ersten 1400 Zeichen), Marke ueber `suchStelle`.
+
+**3 · Ein eigenes Klangbild blieb still.**
+Im Browser spielt ein so gemerktes Klangbild einwandfrei. Wahrscheinlichste
+Ursache: Es wurde gemerkt, als auf dem iPad der Nutzerin die Aufnahmen noch nicht
+dekodiert werden konnten (vor 5.59) — gescheiterte Klaenge fallen aus
+`D.einst.ambience`, gemerkt wurde eine leere Mischung. Jetzt:
+`klangbildHatKlang()`; „Klangbild merken“ und „Mit dem Jetzigen
+überschreiben“ verweigern, wenn nichts laeuft; ein leeres Klangbild ist
+gestrichelt (`.ohneklang`) und sagt beim Antippen, was zu tun ist;
+`klangbildAnwenden` laedt notfalls erst den Fundus (`ambienceKatalogSicher`),
+meldet Fehler per Toast und setzt keine gemerkte Lautstaerke 0.
+**Abhilfe:** Klaenge einstellen, das Klangbild lange druecken → „Mit dem
+Jetzigen überschreiben“.
+
+**4 · Album: Text rutschte beim Tippen weg.** Mit offener Tastatur fuellten Kopf,
+Farben, Fuellstand, Reiter, „Noch offen“ und vier Fussknoepfe den Platz ueber
+der Tastatur, das Feld lag unsichtbar dazwischen. Jetzt unter
+`.tastatur-offen` (setzt `tastaturZaehmen` in 30-core.js) nur Name, Reiter,
+Felder und „Fertig“; das Blatt richtet sich nach `--vvh` bzw. `--sichthoehe`.
+Nur auf dem iPad wirklich pruefbar.
+
+**5 · Weisser Nebel oben.** Unter der Statusleiste lag ein heller Schleier ueber
+der dunklen Kulisse („Orte“). iPadOS 26 toent den Rand unter der Statusleiste
+in der Farbe der Seite — `theme-color` und der helle Seitengrund. Jetzt
+`orteStatusFarbe()` (57-orte.js): solange eine Kulisse oben steht (Intersection
+Observer auf die obersten 5 %), bekommen `theme-color` und ein festes Band
+`#statusband` (so hoch wie `env(safe-area-inset-top)`, am Rechner 0) die
+Wandfarbe der Kulisse; rollt sie weg, der Papierton. **Nicht auf dem iPad
+geprueft**; falls der Nebel bleibt, ist es der Systemeffekt selbst.
+
+**Tempo im Schreibraum.** Bei einem langen Text (50 000 Woerter) kostete jeder
+Anschlag ~11 ms VANI-Arbeit plus ~10 ms Schreibmaschinen-Nachfuehrung (am
+Rechner). `zentriereZeile` mass bei jedem Zeichen den ganzen Text bis zum
+Cursor; jetzt wird die Hoehe der fertigen Absaetze gemerkt und nur der
+aktuelle gemessen (9,6 → 0,45 ms). Der Wortzaehler im Kopf zaehlt erst nach
+250 ms Ruhe. Uebrig bleiben ~12 ms, die der Browser selbst fuer das Setzen
+des riesigen Textfelds braucht.
+
+**Bugjagd (Album, Wandteppich, Kalender, Hefte).**
+- **Kritisch: Geloeschtes kam zurueck.** „Aus dem Album nehmen“ und
+  „Abhängen“ (Teppich) riefen nach `loesche()` beim Schliessen noch einmal
+  `sichern.sofort()` — `entprellt.sofort` laeuft immer, auch ohne Anstehendes.
+  Das schrieb das Dokument zurueck in die Datenbank und meldete es dem Sync
+  als „nicht geloescht“. Neu in 30-core.js: `_weggeraeumt` +
+  `istWeggeraeumt(d)` (in dieser Sitzung geloescht UND nicht mehr in
+  `D.docs`). `markiereAenderung` (ausser beim Loeschen selbst),
+  `sicherSpeichern('docs', …)`, das Album-Blatt und die Teppich-Schreiber
+  lassen solche Dokumente in Ruhe. Zurueckholen/Rueckgaengig legen vorher
+  wieder in `D.docs` und duerfen danach normal speichern.
+- Der Kalenderabgleich des Albums legte bei jedem Speichern einen frischen
+  Termin ueber den vorhandenen — Notiz, Ort, Zeichen waren weg. Jetzt nur
+  Datum/Art/Titel/Leute, und nur bei Aenderung. Herausgenommene Figuren
+  nehmen ihre `ausAlbum`-Termine mit in den Papierkorb.
+- Kalender, Ansicht „Leben“: Tod vor Geburt → `kalLebensalter` = null →
+  Absturz der ganzen Ansicht. Abgefangen; „alt alt“ ebenfalls.
+- Album: × schloss nach Faden-Abhaken / Geschichten-Wahl nicht mehr (leere
+  Schliess-Funktion). „Anna-Lena“ wurde als Rolle „Anna“ + Name „Lena“
+  zerlegt — ein einfacher Bindestrich trennt nur noch mit Leerzeichen.
+- Hefte/Kritzeln: das alte Grundbild wurde geloescht, bevor neues Bild und
+  Seite sicher lagen. Jetzt danach — und bei Fehlschlag bleibt es.
+- Suchfelder in Kalender/Album/Teppich: `entprellt(…, true)` in bei jedem
+  Neuzeichnen neu gebauten Leisten wuchs im Spueler-Verzeichnis endlos →
+  `() => suchfeld.isConnected`.
+- Suche liess sich doppelt oeffnen; im Album-Umfeld stand der Text klein
+  geschrieben doppelt. Grammatik: „ein Eintrag“, „in einem deiner Texte“,
+  „wurde ein Jahr alt“, „heißen“.
+
+**Offen aus der Bugjagd (nicht angefasst):** unscharfe Daten („April 1783“)
+erzeugen falsche Widersprueche im Kalender (`61-kalender.js` ~440–455);
+Faeden mit unbekannter Fadenart werden beim Speichern verworfen
+(`63-stammbaum.js` ~328); Vorschlagsliste in Verweisfeldern fehlt nach dem
+ersten „+“ (`62c` ~260); „x “ am Anfang eines offenen Fadens gilt als
+erledigt (`62-album.js` ~379); Geburtsdatum 1970-01-01 in `62d` ~42;
+Register bei Akzent-Initialen (`62-album.js` ~349); `schwaeche` in
+`ALBUM_AEHNLICH_FELDER` gibt es nicht; Randzellen im Kalender → „vor NaN
+Tagen“ (`61b` ~476); Eichhoernchen im Teppich laeuft nie (`63b` ~1824).
+
+Tests 445/445.

@@ -268,7 +268,9 @@ function teppichLeisteInhalt(doc, baum, ordnung, flaeche, neu, schliessen) {
   suchfeld.addEventListener('input', entprellt(() => {
     _tep.suche = suchfeld.value; neu();
     setTimeout(() => { const f = document.querySelector('.tep-suchfeld'); if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); } }, 0);
-  }, 240, true));
+  /* Die Leiste wird bei jedem Neuzeichnen neu gebaut: mit `true` blieb jeder
+     alte Entpreller fuer immer im Spueler-Verzeichnis haengen. */
+  }, 240, () => suchfeld.isConnected));
 
   const arten = teppichSichtbareArten(baum);
   return [

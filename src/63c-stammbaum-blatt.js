@@ -14,7 +14,7 @@
    Immer über eine geputzte Fassung: was hier hineingeht, ist gültig, oder es
    geht gar nicht erst hinein. */
 async function teppichSchreiben(doc, aenderung, was) {
-  if (!doc) return false;
+  if (!doc || istWeggeraeumt(doc)) return false;
   /* Vor JEDER Änderung am Teppich eine Abschrift beiseitelegen. Eine Zeile
      — und alles am Stammbaum lässt sich zurücknehmen: ein zerschnittener
      Faden, ein abgenommener Name, ein verschobenes Band. */
@@ -33,6 +33,8 @@ async function teppichSchreiben(doc, aenderung, was) {
 /* Für alles, was beim Tippen läuft: entprellt und still. */
 function teppichSchreiberFuer(doc, danach) {
   return entprellt(() => {
+    /* Abgehängt heißt abgehängt — kein Nachsichern holt ihn zurück ins Regal. */
+    if (istWeggeraeumt(doc)) return;
     doc.geaendert = Date.now();
     markiereAenderung(doc, false);
     D.docs.set(doc.id, doc);

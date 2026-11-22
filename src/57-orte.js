@@ -456,6 +456,49 @@ function orteKastenSchuetteln() {
   const zu = zeigeDeck(kasten);
 }
 
+/* ----- Der weisse Nebel oben am iPad -----
+   Seit iPadOS 26 legt das System unter der Statusleiste einen weichen
+   Schleier ueber den Inhalt, getoent in der `theme-color` der Seite. Die steht
+   auf dem hellen Papierton — ueber der dunklen Wand einer Kulisse wurde daraus
+   ein weisser Nebel. Solange eine Kulisse oben im Bild steht, bekommt die
+   Leiste deshalb die Farbe ihrer Wand; rollt sie weg, wieder den Papierton. */
+let _orteFarbBeob = null;
+function orteObenFarbe(kulisse) {
+  try {
+    const svg = kulisse && kulisse.querySelector('svg');
+    const rect = svg && svg.querySelector('rect');
+    if (!rect) return '';
+    const fill = rect.getAttribute('fill') || '';
+    const verweis = fill.match(/^url\(#([\w-]+)\)$/);
+    const farbe = verweis ? ((svg.querySelector('#' + verweis[1] + ' stop') || { getAttribute: () => '' }).getAttribute('stop-color') || '') : fill;
+    return /^#[0-9a-f]{3,8}$/i.test(farbe) ? farbe : '';
+  } catch (e) { return ''; }
+}
+function orteStatusFarbe(kulisse) {
+  if (_orteFarbBeob) { try { _orteFarbBeob.disconnect(); } catch (e) {} _orteFarbBeob = null; }
+  const m = typeof document !== 'undefined' && document.querySelector('meta[name="theme-color"]');
+  if (!m) return;
+  const grund = (typeof THEMEN !== 'undefined' && THEMEN[D.einst.thema]) || '#ece3d1';
+  const farbe = kulisse ? orteObenFarbe(kulisse) : '';
+  /* Safari 26 liest `theme-color` nicht ueberall mehr, sondern nimmt die
+     Farbe dessen, was oben FEST steht. Dafuer gibt es ein Band, genau so hoch
+     wie die Statusleiste — am Rechner ist das 0 Pixel, also unsichtbar. */
+  let band = document.getElementById('statusband');
+  if (!band && document.body) { band = document.createElement('div'); band.id = 'statusband'; band.setAttribute('aria-hidden', 'true'); document.body.append(band); }
+  const zeigen = (an) => {
+    m.content = an ? farbe : grund;
+    if (band) { band.style.background = an ? farbe : ''; band.classList.toggle('an', !!an); }
+  };
+  if (!farbe || typeof IntersectionObserver !== 'function') { zeigen(false); return; }
+  zeigen(true);
+  /* Beobachtet wird nur der oberste Streifen des Fensters (5 %). */
+  _orteFarbBeob = new IntersectionObserver((eintraege) => {
+    const e = eintraege[eintraege.length - 1];
+    zeigen(!!(e && e.isIntersecting && kulisse.isConnected));
+  }, { rootMargin: '0px 0px -95% 0px' });
+  _orteFarbBeob.observe(kulisse);
+}
+
 /* Beim Zeichnen eines Raums: Kulisse davor, Haut anlegen, Tür aufgehen lassen. */
 let _orteLetzterRaum = null;
 function orteAnwenden(haupt, raum) {
@@ -466,9 +509,11 @@ function orteAnwenden(haupt, raum) {
   const an = orteAktiv(raum);
   haupt.dataset.ort = an ? orteRaumFuer(raum) : '';
   if (!(an && orteRaumFuer(raum) === 'zuhause')) orteKameraStopp();
+  let kulisse = null;
   if (an) {
-    try { const k = orteKulisse(raum, haupt); if (k) haupt.prepend(k); } catch (e) {}
+    try { kulisse = orteKulisse(raum, haupt); if (kulisse) haupt.prepend(kulisse); } catch (e) {}
   }
+  orteStatusFarbe(kulisse);
   if (o.an && o.tueren && _orteLetzterRaum !== null && _orteLetzterRaum !== raum) {
     haupt.classList.add('tuer-auf'); setTimeout(() => haupt.classList.remove('tuer-auf'), 520);
     if (o.geraeusche && typeof schreibtischKlick === 'function') schreibtischKlick('klick');

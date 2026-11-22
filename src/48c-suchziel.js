@@ -30,6 +30,11 @@ function suchKarte(text) {
   let norm = '';
   const karte = [];
   for (let i = 0; i < roh.length; i++) {
+    /* Schneller Weg fuer das Uebliche: ein ASCII-Zeichen wird nur klein.
+       normalisiere() je Zeichen (Regeln + NFD) war bei langen Texten der
+       teuerste Teil jedes Suchanschlags. */
+    const c = roh.charCodeAt(i);
+    if (c < 128) { norm += (c >= 65 && c <= 90) ? String.fromCharCode(c + 32) : roh[i]; karte.push(i); continue; }
     const n = normalisiere(roh[i]);
     for (let j = 0; j < n.length; j++) { norm += n[j]; karte.push(i); }
   }

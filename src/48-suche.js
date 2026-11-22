@@ -19,8 +19,125 @@ const SUCH_GRUPPEN = [
   ['funkeln', 'Funken', 'woerter'],
   ['mischung', 'Klang-Szenen', 'klang'],
   ['klangbild', 'Klangbilder', 'klang'],
-  ['klang', 'Eigene Klänge', 'klang']
+  ['klang', 'Eigene Klänge', 'klang'],
+  /* Die Welten-Werkzeuge. Vorher fehlten sie ganz: wer den Namen seiner
+     Hauptfigur suchte, fand sie im Album, im Wandteppich und im Kalender
+     nie — nur dort, wo sie zufaellig im Fliesstext stand. */
+  ['albumfigur', 'Album', 'album'],
+  ['stammbaum', 'Wandteppiche', 'kabinett'],
+  ['stadtplan', 'Stadtpläne', 'kabinett'],
+  ['sternhimmel', 'Sternhimmel', 'kabinett'],
+  ['termin', 'Kalender', 'kalender']
 ];
+
+/* Was an einem Dokument durchsucht wird. Fuer die meisten ist das Text und
+   Notiz; Album, Teppich, Plan und Kalender tragen ihren Stoff in Feldern. */
+function suchTextFuer(d) {
+  if (!d) return '';
+  const teile = [d.text, d.notiz];
+  try {
+    if (d.typ === 'albumfigur') {
+      /* Selbst zusammengesetzt statt albumVolltext(): der liefert alles klein
+         geschrieben — im Umfeld stand dann „zander moretti“ neben dem Namen. */
+      if (d.name) teile.unshift(d.name);
+      for (const w of Object.values(d.felder || {})) teile.push(Array.isArray(w) ? w.join(', ') : (typeof w === 'string' ? w : ''));
+      for (const e of Array.isArray(d.eigene) ? d.eigene : []) if (e && e.wert) teile.push([e.name, e.wert].filter(Boolean).join(': '));
+      for (const z of Array.isArray(d.zettel) ? d.zettel : []) if (z && z.text) teile.push(z.text);
+    } else if (d.typ === 'stammbaum') {
+      for (const p of Array.isArray(d.leute) ? d.leute : []) if (p) teile.push([p.name, p.notiz].filter(Boolean).join(' – '));
+      if (d.spruch) teile.push(d.spruch);
+    } else if (d.typ === 'stadtplan') {
+      for (const m of Array.isArray(d.marken) ? d.marken : []) if (m && m.name) teile.push([m.name, m.notiz].filter(Boolean).join(' – '));
+    } else if (d.typ === 'sternhimmel') {
+      if (d.unterzeile) teile.push(d.unterzeile);
+      for (const s of Array.isArray(d.sternbilder) ? d.sternbilder : []) if (s && (s.name || s.sage)) teile.push([s.name, s.sage].filter(Boolean).join(' – '));
+    } else if (d.typ === 'termin') {
+      if (d.ort) teile.push(d.ort);
+      for (const p of Array.isArray(d.leute) ? d.leute : []) if (p && p.name) teile.push(p.name);
+    }
+  } catch (e) {}
+  /* Doppeltes (der Name steht im Volltext noch einmal) faellt weg. */
+  return [...new Set(teile.filter((x) => typeof x === 'string' && x.trim()))].join('\n');
+}
+/* Die Suche selbst, ohne Bildschirm: Gruppen mit sortierten Treffern.
+   Erst werden alle genauen Funde ueber alle Gruppen gesammelt. Nur wenn es
+   davon wenige gibt, kommt die Nachsicht bei Tippfehlern dazu — sonst schob
+   „Zander“ jedes „anderen“ als ähnlichen Treffer vor die echten, und bei
+   sechs Plaetzen je Gruppe blieb fuer die echten oft nur einer. */
+function suchErgebnisse(docs, roh, filter) {
+  const q = normalisiere(String(roh || '').trim());
+  if (q.length < 2) return [];
+  const proGruppe = [];
+  let genaueGesamt = 0;
+  const alle = [...docs];
+  for (const [typ, name] of SUCH_GRUPPEN) {
+    if (filter && typ !== filter) continue;
+    const genau = [], vielleicht = [];
+    for (const d of alle) {
+      if (!d || d.typ !== typ || d.geloescht) continue;
+      const titelN = normalisiere(suchTitelFuer(d));
+      const suchText = suchTextFuer(d);
+      const imTitel = titelN.indexOf(q) >= 0;
+      /* Schneller Vortest auf der (gemerkten) normalisierten Fassung — die
+         Karte fuer die genaue Stelle wird nur fuer echte Funde gebaut. */
+      const stellen = suchNorm(d, suchText).indexOf(q) >= 0 ? suchFundstellen(suchText, q) : [];
+      if (imTitel || stellen.length) genau.push({ d, stellen, unscharf: false, suchText, imTitel });
+      else if (q.length >= 5) vielleicht.push({ d, stellen, unscharf: true, suchText, titelN, imTitel: false });
+    }
+    genaueGesamt += genau.length;
+    proGruppe.push({ typ, name, genau, vielleicht });
+  }
+  const mitNachsicht = genaueGesamt < 3;
+  const raus = [];
+  for (const g of proGruppe) {
+    /* Genaue zuerst: Titeltreffer vor Texttreffern, dann die mit den meisten
+       Fundstellen, dann die juengsten. */
+    let liste = g.genau.sort((a, b) => (b.imTitel - a.imTitel) || (b.stellen.length - a.stellen.length) || ((b.d.geaendert || 0) - (a.d.geaendert || 0)));
+    if (mitNachsicht) {
+      const aehnlich = g.vielleicht.filter((f) => fastGleich(f.titelN, q) || fastGleich(suchNorm(f.d, f.suchText), q));
+      liste = liste.concat(aehnlich.sort((a, b) => (b.d.geaendert || 0) - (a.d.geaendert || 0)));
+    }
+    if (liste.length) raus.push({ typ: g.typ, name: g.name, liste });
+  }
+  return raus;
+}
+
+/* Die normalisierte Fassung je Dokument, gemerkt bis zur naechsten Aenderung.
+   Ohne das wurde bei JEDEM Anschlag im Suchfeld der ganze Bestand neu
+   normalisiert — mit einem langen Faden spuerbar auf dem iPad. */
+const _suchNormCache = new Map();
+function suchNorm(d, suchText) {
+  const alt = _suchNormCache.get(d.id);
+  if (alt && alt.g === (d.geaendert || 0) && alt.t === suchText.length) return alt.n;
+  const n = normalisiere(suchText);
+  if (_suchNormCache.size > 5000) _suchNormCache.clear();
+  _suchNormCache.set(d.id, { g: d.geaendert || 0, t: suchText.length, n });
+  return n;
+}
+function suchTitelFuer(d) {
+  if (!d) return '';
+  if (d.typ === 'albumfigur') return d.name || d.titel || '';
+  return d.titel || '';
+}
+
+/* Alle Fundstellen eines Wortes im echten Text — mit der Karte aus 48c, damit
+   ß → ss und Umlaute die Stelle nicht verschieben. Vorher wurde die Stelle in
+   der normalisierten Fassung gezaehlt und im Originaltext markiert: jedes ß
+   davor schob die Marke um ein Zeichen nach rechts. Aus „Zander“ wurde so im
+   Umfeld ein markiertes „und“. */
+function suchFundstellen(text, q, hoechstens = 50) {
+  const raus = [];
+  if (!q) return raus;
+  const { norm, karte } = suchKarte(text);
+  let i = norm.indexOf(q);
+  while (i >= 0 && raus.length < hoechstens) {
+    const von = karte[i];
+    const bis = i + q.length < karte.length ? karte[i + q.length] : text.length;
+    raus.push({ von, bis: Math.max(von + 1, bis) });
+    i = norm.indexOf(q, i + q.length);
+  }
+  return raus;
+}
 
 /* Ein kaputter Eintrag im Browser-Speicher darf die Suche nicht lahmlegen. */
 /* Letzte Suchen je Profil getrennt */
@@ -33,6 +150,9 @@ function leseLetzteSuchen() {
 }
 
 function oeffneSuche() {
+  /* Nicht zweimal uebereinander (doppelter Tipp, Kuerzel waehrend sie offen ist). */
+  const offen = document.querySelector('.suchbogen');
+  if (offen) { const f = offen.querySelector('input'); if (f) f.focus(); return; }
   const feld = el('input', { type: 'text', placeholder: 'Wonach suchst du?' });
   const treffer = el('div', { class: 'suchtreffer' });
   let filter = null;
@@ -42,6 +162,8 @@ function oeffneSuche() {
     chips.innerHTML = '';
     for (const [typ, name] of SUCH_GRUPPEN) {
       if (typ === 'faden' && !vomTyp('faden').length) continue;
+      /* Welten-Werkzeuge nur als Chip, wenn es dort auch etwas gibt. */
+      if (['albumfigur', 'stammbaum', 'stadtplan', 'sternhimmel', 'termin'].includes(typ) && !vomTyp(typ).length) continue;
       chips.append(el('button', {
         class: 'suchchip' + (filter === typ ? ' an' : ''),
         onclick: () => { filter = filter === typ ? null : typ; baueChips(); suche(); }
@@ -73,7 +195,7 @@ function oeffneSuche() {
       if (typeof _sr !== 'undefined' && _sr && typeof schliesseSchreibraum === 'function') schliesseSchreibraum();
       oeffneDoc(d);
     } },
-      el('span', { class: 'ttitel' }, d.titel || ((d.text || '').split('\n')[0] || 'Ohne Titel').slice(0, 50)),
+      el('span', { class: 'ttitel' }, suchTitelFuer(d) || ((d.text || '').split('\n')[0] || 'Ohne Titel').slice(0, 50)),
       umfeldHtml ? el('span', { class: 'tprobe', html: umfeldHtml }) : null
     );
   }
@@ -120,42 +242,32 @@ function oeffneSuche() {
     const roh = feld.value.trim();
     if (roh.length < 2) { leererZustand(); return; }
     treffer.innerHTML = '';
-    const q = normalisiere(roh);
     let gesamt = 0;
-    for (const [typ, name] of SUCH_GRUPPEN) {
-      if (filter && typ !== filter) continue;
-      const funde = [];
-      for (const d of D.docs.values()) {
-        if (d.typ !== typ) continue;
-        const titelN = normalisiere(d.titel || '');
-        const suchText = [d.text, d.notiz].filter(Boolean).join('\n');
-        const textN = normalisiere(suchText);
-        let stelle = titelN.indexOf(q);
-        let woText = -1;
-        if (stelle === -1) { woText = textN.indexOf(q); }
-        let unscharf = false;
-        if (stelle === -1 && woText === -1 && q.length >= 5) {
-          if (fastGleich(titelN, q) || fastGleich(textN, q)) unscharf = true;
-          else continue;
-        } else if (stelle === -1 && woText === -1) continue;
-        funde.push({ d, woText, unscharf, suchText });
-      }
-      funde.sort((a, b) => b.d.geaendert - a.d.geaendert);
-      if (!funde.length) continue;
-      treffer.append(el('div', { class: 'gruppe' }, name.toUpperCase()));
-      for (const { d, woText, unscharf, suchText } of funde.slice(0, filter ? 40 : 6)) {
+    for (const g of suchErgebnisse(D.docs.values(), roh, filter)) {
+      const liste = g.liste;
+      treffer.append(el('div', { class: 'gruppe' }, g.name.toUpperCase() + (liste.length > 1 ? ' · ' + liste.length : '')));
+      const grenze = filter ? 60 : 6;
+      for (const { d, stellen, unscharf, suchText } of liste.slice(0, grenze)) {
         gesamt++;
         let umfeld = '';
         const text = suchText || '';
-        if (woText >= 0) {
-          const von = Math.max(0, woText - 28);
-          const stueck = text.slice(von, woText + q.length + 50).replace(/\n/g, ' ');
-          const rel = woText - von;
-          umfeld = (von > 0 ? '… ' : '') + esc(stueck.slice(0, rel)) + '<mark>' + esc(stueck.slice(rel, rel + q.length)) + '</mark>' + esc(stueck.slice(rel + q.length)) + ' …';
+        if (stellen.length) {
+          const s = stellen[0];
+          const von = Math.max(0, s.von - 28);
+          const stueck = text.slice(von, s.bis + 50).replace(/\n/g, ' ');
+          const rel = s.von - von, lang = s.bis - s.von;
+          umfeld = (von > 0 ? '… ' : '') + esc(stueck.slice(0, rel)) + '<mark>' + esc(stueck.slice(rel, rel + lang)) + '</mark>' + esc(stueck.slice(rel + lang)) + ' …';
+          if (stellen.length > 1) umfeld += ' <i style="opacity:.6">(' + (stellen.length >= 50 ? '50+' : stellen.length) + '-mal)</i>';
         } else {
           umfeld = esc(text.replace(/\s+/g, ' ').slice(0, 78)) + (unscharf ? ' <i style="opacity:.6">(ähnlich)</i>' : '');
         }
         treffer.append(eintrag(d, umfeld.trim() || null));
+      }
+      /* Mehr als sechs: nicht still abschneiden, sondern sagen und anbieten. */
+      if (liste.length > grenze) {
+        const typ = g.typ;
+        treffer.append(el('button', { class: 'suchmehr', onclick: () => { filter = typ; baueChips(); suche(); } },
+          el('span', { class: 'ttitel', style: 'font-weight:400;color:var(--blass)' }, 'Alle ' + liste.length + ' zeigen …')));
       }
     }
     if (!gesamt) {

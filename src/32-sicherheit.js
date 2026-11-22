@@ -41,6 +41,10 @@ const warte = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* Speichern mit drei Anläufen. Gibt true zurück, wenn es geklappt hat. */
 async function sicherSpeichern(store, wert, key, { versuche = 3 } = {}) {
+  /* Ein eben geloeschtes Dokument kommt nicht durch die Hintertuer zurueck
+     (siehe istWeggeraeumt in 30-core.js). Kein Fehler — es gibt nur nichts
+     mehr zu sichern. */
+  if (store === 'docs' && typeof istWeggeraeumt === 'function' && istWeggeraeumt(wert)) return true;
   _speicher.offen++; speicherMelden();
   let letzter = null;
   for (let i = 0; i < versuche; i++) {

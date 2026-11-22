@@ -404,7 +404,7 @@ function zeichneKalender(buehne, neuZeichnen, schliessen) {
     neuZeichnen(kalDatum(j, m, 1));
   };
   const suchfeld = el('input', { type: 'search', class: 'kal-suchfeld', placeholder: 'Suchen …', value: _kal.suche });
-  suchfeld.addEventListener('input', entprellt(() => { _kal.suche = suchfeld.value; neuZeichnen(); }, 280, true));
+  suchfeld.addEventListener('input', entprellt(() => { _kal.suche = suchfeld.value; neuZeichnen(); }, 280, () => suchfeld.isConnected));
   const ansicht = (id, name, titelText) => el('button', {
     class: 'kal-ansichtknopf' + (_kal.ansicht === id ? ' an' : ''), title: titelText,
     onclick: () => { _kal.ansicht = id; neuZeichnen(); }
@@ -702,7 +702,16 @@ function kalLebensbaender(alle, neuZeichnen) {
         onclick: () => { _kal.ansicht = 'monat'; neuZeichnen(e.wann); }
       }, el('i', { html: kalIcon(e.icon || art.icon, 12) })));
     }
-    const alterText = lebt ? 'wurde ' + kalLebensalter(p).jahre + ' Jahre' : p.geburt ? kalAlterText(kalAlter(p.geburt, kalHeute())) + ' alt' : p.termine.length + (p.termine.length === 1 ? ' Eintrag' : ' Einträge');
+    /* Stirbt jemand (scheinbar) vor der eigenen Geburt, liefert
+       kalLebensalter null — vorher brach hier die ganze Leben-Ansicht ab,
+       ausgerechnet bei dem Widerspruch, den der Kalender zeigen soll. Und
+       kalAlterText haengt bei ganz Jungen selbst schon „alt“ an. */
+    const la = lebt ? kalLebensalter(p) : null;
+    const jetztAlt = !lebt && p.geburt ? kalAlterText(kalAlter(p.geburt, kalHeute())) : '';
+    const eintraege = p.termine.length + (p.termine.length === 1 ? ' Eintrag' : ' Einträge');
+    const alterText = la ? 'wurde ' + (la.jahre === 1 ? 'ein Jahr' : la.jahre + ' Jahre') + ' alt'
+      : jetztAlt ? (/ alt$/.test(jetztAlt) ? jetztAlt : jetztAlt + ' alt')
+      : eintraege;
     band.append(el('button', { class: 'kal-bandname', title: 'Alles über ' + p.name, onclick: () => kalPersonBlatt(p, neuZeichnen) },
       el('b', {}, p.name),
       el('small', {}, (p.geburt ? '✻ ' + kalKurz(p.geburt) : '') + (p.tod ? '   † ' + kalKurz(p.tod) : '') + (p.geburt || p.tod ? ' · ' : '') + alterText)), spur);

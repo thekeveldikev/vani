@@ -35,7 +35,10 @@ function spotlightTreffer(roh, docs, max = 14) {
   const funde = [];
   for (const d of docs) {
     if (!d || !d.typ || !gruppen.some((g) => g[0] === d.typ)) continue;
-    const titelN = normalisiere(d.titel || ''), text = [d.text, d.notiz].filter(Boolean).join('\n'), textN = normalisiere(text);
+    if (d.geloescht) continue;
+    const titel = typeof suchTitelFuer === 'function' ? suchTitelFuer(d) : (d.titel || '');
+    const text = typeof suchTextFuer === 'function' ? suchTextFuer(d) : [d.text, d.notiz].filter(Boolean).join('\n');
+    const titelN = normalisiere(titel), textN = typeof suchNorm === 'function' ? suchNorm(d, text) : normalisiere(text);
     let wo = titelN.indexOf(q), inTitel = wo >= 0;
     if (!inTitel) wo = textN.indexOf(q);
     if (wo < 0) continue;
@@ -65,16 +68,23 @@ function spotlightOeffnen() {
     if (e.befehl) { vorschau.append(el('div', { class: 'spotlight-leer' }, el('b', {}, e.befehl.text), el('div', {}, e.befehl.unter || ''))); return; }
     const d = e.d, q = normalisiere(feld.value.trim());
     const text = (e.text || '').replace(/\r/g, '');
-    let auszug = text.slice(0, 1400), html;
-    const n = normalisiere(auszug), wo = n.indexOf(q);
-    if (wo >= 0 && normalisiere(auszug.slice(0, wo)).length === wo) {
-      /* normalisiere ändert die Länge nicht, solange keine Ligaturen dabei sind — dann markieren wir sicher */
-      html = esc(auszug.slice(0, wo)) + '<mark>' + esc(auszug.slice(wo, wo + q.length)) + '</mark>' + esc(auszug.slice(wo + q.length));
-    } else html = esc(auszug);
+    /* Die Stelle im ECHTEN Text (48c rechnet ß → ss und Umlaute zurueck) und
+       der Auszug um sie herum. Vorher zeigte die Vorschau immer die ersten
+       1400 Zeichen: stand der Fund weiter hinten, war nichts markiert. */
+    const stelle = typeof suchStelle === 'function' ? suchStelle(text, feld.value.trim()) : null;
+    let html, ab = 0;
+    if (stelle) {
+      ab = Math.max(0, stelle.von - 500);
+      const bis = Math.min(text.length, ab + 1400);
+      html = (ab > 0 ? '… ' : '') + esc(text.slice(ab, stelle.von)) + '<mark>' + esc(text.slice(stelle.von, stelle.bis)) + '</mark>' + esc(text.slice(stelle.bis, bis));
+      if (bis < text.length) html += ' …';
+    } else {
+      html = esc(text.slice(0, 1400)) + (text.length > 1400 ? ' …' : '');
+    }
     vorschau.append(
-      el('div', { class: 'spotlight-vtitel' }, d.titel || (text.split('\n')[0] || 'Ohne Titel').slice(0, 60)),
+      el('div', { class: 'spotlight-vtitel' }, (typeof suchTitelFuer === 'function' ? suchTitelFuer(d) : d.titel) || (text.split('\n')[0] || 'Ohne Titel').slice(0, 60)),
       el('div', { class: 'spotlight-vmeta' }, e.gruppe + (d.geaendert ? ' · ' + fmtDatum(d.geaendert) + ', ' + fmtZeit(d.geaendert) : '') + (text ? ' · ' + worte(text) + ' Wörter' : '')),
-      el('div', { class: 'spotlight-vtext', html: html.replace(/\n/g, '<br>') + (text.length > 1400 ? ' …' : '') },),
+      el('div', { class: 'spotlight-vtext', html: html.replace(/\n/g, '<br>') },),
       el('div', { class: 'spotlight-vhinweis' }, 'Enter öffnet · ↑↓ wählen'));
   };
   const zeigeListe = () => {
