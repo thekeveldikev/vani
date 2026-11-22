@@ -42,6 +42,34 @@ function orteUmbruch(text, breite, maxZeilen) {
   return zeilen;
 }
 
+/* ----- Gestaltung v2: eine zweite Malschicht fuer die Diele -----
+   Unter den Dingen: Damasttapete, Vertaefelung mit Stuhlleiste, ein
+   Lichtfleck auf den Dielen, Kontaktschatten. Ueber den Dingen: ein Glanz,
+   der ueber den Spiegel wandert. Alles ohne Zeiger (pointer-events none),
+   damit jedes antippbare Ding antippbar bleibt. Nur mit Gestaltung v2. */
+function orteV2An() { return typeof document !== 'undefined' && document.documentElement && document.documentElement.dataset.v2 === 'an'; }
+function orteV2DieleUnten() {
+  if (!orteV2An()) return '';
+  const zier = '<path d="M20 5c4.5 5 9.5 7.5 9.5 13.5S24.5 28 20 32c-4.5-4-9.5-7.5-9.5-13.5S15.5 10 20 5z" fill="none" stroke="#ffe8c8" stroke-width=".9"/>' +
+    '<path d="M20 13c2 2.6 4.2 3.8 4.2 6s-2.2 3.6-4.2 5.6c-2-2-4.2-3.4-4.2-5.6s2.2-3.4 4.2-6z" fill="#ffe8c8" opacity=".5"/>' +
+    '<circle cx="0" cy="40" r="1.5" fill="#ffe8c8"/><circle cx="40" cy="40" r="1.5" fill="#ffe8c8"/>';
+  return '<defs><pattern id="ortDamast" width="40" height="44" patternUnits="userSpaceOnUse">' + zier + '</pattern>' +
+    '<linearGradient id="ortDielenlicht" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff0cc" stop-opacity="0"/><stop offset=".3" stop-color="#fff0cc" stop-opacity=".22"/><stop offset=".5" stop-color="#fff0cc" stop-opacity="0"/></linearGradient></defs>' +
+    '<g pointer-events="none">' +
+    '<rect width="800" height="112" fill="url(#ortDamast)" opacity=".11"/>' +
+    /* Vertaefelung: Stuhlleiste und Felder */
+    '<rect x="0" y="82" width="800" height="3" fill="#e2d2ad" opacity=".55"/><rect x="0" y="85" width="800" height="1" fill="rgba(0,0,0,.25)"/>' +
+    Array.from({ length: 10 }, (_, i) => '<rect x="' + (i * 80 + 8) + '" y="89" width="64" height="19" rx="1.5" fill="rgba(0,0,0,.06)" stroke="rgba(255,232,200,.14)" stroke-width="1"/>').join('') +
+    '<rect x="0" y="120" width="800" height="30" fill="url(#ortDielenlicht)"/>' +
+    '<g fill="rgba(0,0,0,.32)"><ellipse cx="130" cy="121" rx="22" ry="2.6"/><ellipse cx="540" cy="129" rx="40" ry="3.2"/><ellipse cx="631" cy="121" rx="8" ry="1.8"/><ellipse cx="769" cy="121" rx="8" ry="1.8"/><ellipse cx="722" cy="122" rx="28" ry="3"/></g>' +
+    '</g>';
+}
+function orteV2DieleOben() {
+  if (!orteV2An()) return '';
+  return '<defs><clipPath id="ortSpiegelGlas"><ellipse cx="540" cy="72" rx="44" ry="54"/></clipPath></defs>' +
+    '<g pointer-events="none" clip-path="url(#ortSpiegelGlas)"><rect class="ort-glanz" x="470" y="-10" width="18" height="170" fill="rgba(255,255,255,.42)" transform="rotate(22 540 72)"/></g>';
+}
+
 /* ----- Die Kulissen: kleine Bühnenbilder oben im Raum ----- */
 const ORTE_SVG = 'xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"';
 const ORTE_H = 150;
@@ -51,7 +79,9 @@ function orteDampf(x, y, k) { return '<g class="ort-dampf" style="transform-orig
 function orteKulisse(raum, haupt) {
   const r = orteRaumFuer(raum);
   const o = saubereOrte(D.einst.orte);
-  const wrap = el('div', { class: 'ort-kulisse ort-' + r + (o.bewegung ? ' lebt' : '') });
+  /* zeit-…: das Licht der v2-Schicht folgt der Stunde (Morgen, Tag, Abendrot, Mondlicht). */
+  const zeit = typeof grussTageszeit === 'function' ? ' zeit-' + grussTageszeit() : '';
+  const wrap = el('div', { class: 'ort-kulisse ort-' + r + (o.bewegung ? ' lebt' : '') + zeit });
   const svg = (inner, vb = '0 0 800 ' + ORTE_H) => { const d = document.createElement('div'); d.innerHTML = '<svg ' + ORTE_SVG + ' viewBox="' + vb + '" class="ort-bild">' + inner + '</svg>'; return d.firstElementChild; };
   const jz = typeof schreibtischJahreszeit === 'function' ? schreibtischJahreszeit() : 'sommer';
   const T = orteTipp;
@@ -68,6 +98,7 @@ function orteKulisse(raum, haupt) {
       /* Fußleiste und Dielenboden */
       '<rect x="0" y="112" width="800" height="8" fill="#d9c9a6"/><rect x="0" y="120" width="800" height="30" fill="url(#ortboden)"/>' +
       '<g stroke="rgba(0,0,0,.28)" stroke-width="1">' + [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => '<line x1="' + (i * 88 - 20) + '" y1="120" x2="' + (i * 88 + 20) + '" y2="150"/>').join('') + '<line x1="0" y1="134" x2="800" y2="134"/></g>' +
+      orteV2DieleUnten() +
       /* Garderobenleiste mit fünf Haken */
       '<rect x="40" y="26" width="300" height="10" rx="3" fill="#c9a25a"/><rect x="40" y="36" width="300" height="3" fill="rgba(0,0,0,.25)"/><g fill="#8a6a2e">' + [70, 130, 190, 250, 310].map((x) => '<circle cx="' + x + '" cy="42" r="4"/><rect x="' + (x - 2) + '" y="42" width="4" height="10"/>').join('') + '</g>' +
       /* Hut */
@@ -150,7 +181,8 @@ function orteKulisse(raum, haupt) {
       '<g ' + T('uhr', 'Tick. Die Uhr geht richtig — ' + heute.getHours() + ':' + String(heute.getMinutes()).padStart(2, '0') + '.') + ' style="transform-origin:700px 30px"><circle cx="700" cy="30" r="17" fill="#f3e7c9" stroke="#8a6a2e" stroke-width="3"/>' + [0, 1, 2, 3].map((i) => '<line x1="' + (700 + 13 * Math.sin(i * Math.PI / 2)) + '" y1="' + (30 - 13 * Math.cos(i * Math.PI / 2)) + '" x2="' + (700 + 10 * Math.sin(i * Math.PI / 2)) + '" y2="' + (30 - 10 * Math.cos(i * Math.PI / 2)) + '" stroke="#2c2218" stroke-width="1.5"/>').join('') +
       '<line x1="700" y1="30" x2="' + (700 + 7 * Math.sin((heute.getHours() % 12 + heute.getMinutes() / 60) * Math.PI / 6)) + '" y2="' + (30 - 7 * Math.cos((heute.getHours() % 12 + heute.getMinutes() / 60) * Math.PI / 6)) + '" stroke="#2c2218" stroke-width="2.2" stroke-linecap="round"/>' +
       '<line x1="700" y1="30" x2="' + (700 + 11 * Math.sin(heute.getMinutes() * Math.PI / 30)) + '" y2="' + (30 - 11 * Math.cos(heute.getMinutes() * Math.PI / 30)) + '" stroke="#2c2218" stroke-width="1.6" stroke-linecap="round"/>' +
-      '<line class="ort-sekunde" x1="700" y1="34" x2="700" y2="18" stroke="#b0352b" stroke-width="1" style="transform-origin:700px 30px"/><circle cx="700" cy="30" r="1.5" fill="#2c2218"/></g>'
+      '<line class="ort-sekunde" x1="700" y1="34" x2="700" y2="18" stroke="#b0352b" stroke-width="1" style="transform-origin:700px 30px"/><circle cx="700" cy="30" r="1.5" fill="#2c2218"/></g>' +
+      orteV2DieleOben()
     ));
     /* Neuigkeiten: was in den Räumen wartet */
     const chips = el('div', { class: 'ort-chips' });

@@ -257,7 +257,11 @@ function albumFeldEingabe(feld, stand, doc, merke) {
       liste.innerHTML = '';
       const w = feldEintraege();
       w.forEach((eintrag, i) => {
+        /* Die Vorschlagsliste haengt an JEDEM neu gebauten Feld — vorher nur an
+           denen, die beim Oeffnen schon da waren. Eigene Kennung je Feld, damit
+           Bewundert/Verachtet/Schuldet nicht dieselbe ID dreimal tragen. */
         const t = el('input', { type: 'text', value: eintrag, maxlength: '600' });
+        if (feld.verweis) t.setAttribute('list', 'albb-verweise-' + feld.id);
         t.addEventListener('input', () => { const a = feldEintraege().slice(); a[i] = t.value; stand.felder[feld.id] = a; merke(); });
         liste.append(el('div', { class: 'albb-mehrzeile' }, t,
           el('button', { class: 'albb-weg', title: 'Weg damit', onclick: () => { const a = feldEintraege().filter((_, j) => j !== i); if (a.length) stand.felder[feld.id] = a; else delete stand.felder[feld.id]; zeichne(); merke(); } }, '×')));
@@ -274,9 +278,8 @@ function albumFeldEingabe(feld, stand, doc, merke) {
     /* Verweise: aus dem Album und aus dem Salon vorschlagen */
     if (feld.verweis) {
       const vorschlaege = albumVorschlaege();
-      const dl = el('datalist', { id: 'albb-verweise' }, ...vorschlaege.slice(0, 300).map((n) => el('option', { value: n })));
+      const dl = el('datalist', { id: 'albb-verweise-' + feld.id }, ...vorschlaege.slice(0, 300).map((n) => el('option', { value: n })));
       kasten.append(dl);
-      liste.querySelectorAll('input').forEach((i) => i.setAttribute('list', 'albb-verweise'));
       kasten.append(el('small', { class: 'albb-hilfe' }, 'Wer schon im Album steht, wird erkannt und verlinkt. Schreib die Rolle davor: „Mutter — Ilva“.'));
     }
     kasten.append(el('button', { class: 'albb-dazu', onclick: dazu }, '+ ' + (platz || 'Dazu')));

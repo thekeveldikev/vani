@@ -767,7 +767,7 @@ function albumNetzFenster() {
       ...netz.allein.slice(0, 12).map((k, i) => el('button', { class: 'albn-alleinname', onclick: () => { zu(); albumSpringeZu(k.id); } }, (i ? ', ' : '') + k.name))) : null,
     zwillinge.length ? el('details', { class: 'albn-zwillinge' },
       el('summary', {}, zwillinge.length === 1 ? 'Zwei Figuren ähneln sich auffällig' : zwillinge.length + ' Paare ähneln sich auffällig'),
-      el('p', {}, 'Gezählt über gemeinsame Wesenswörter, Schwächen, Leidenschaften, Eigenheiten und Geschichten. Das muss nichts heißen — Geschwister dürfen sich gleichen.'),
+      el('p', {}, 'Gezählt über gemeinsame Wesenswörter, Ängste, Leidenschaften, Eigenheiten und Geschichten. Das muss nichts heißen — Geschwister dürfen sich gleichen.'),
       ...zwillinge.map((z) => el('div', { class: 'albn-zwilling' },
         el('button', { onclick: () => { zu(); albumSpringeZu(z.a.id); } }, z.a.name || 'ohne Namen'),
         el('i', {}, Math.round(z.wert * 100) + '%'),
@@ -821,7 +821,7 @@ function albumGegenueberFenster(a, b) {
     el('div', { class: 'kartenkopf' }, 'NEBENEINANDER'),
     el('div', { class: 'albg-kopf' },
       el('div', { class: 'albg-wer', style: '--figurfarbe:' + albumFarbe(a) }, el('b', {}, a.name || 'ohne Namen'), el('small', {}, (albumStuecke(a).length === 1 ? 'ein Eintrag' : albumStuecke(a).length + ' Einträge'))),
-      el('i', { class: 'albg-mitte', title: 'Wie viele der mehrfach besetzten Felder — Wesen, Schwächen, Leidenschaften, Eigenheiten, Geschichten, Spitznamen — die beiden gemeinsam haben.' }, Math.round(albumAehnlichkeit(a, b) * 100) + '%'),
+      el('i', { class: 'albg-mitte', title: 'Wie viele der mehrfach besetzten Felder — Wesen, Ängste, Leidenschaften, Eigenheiten, Geschichten, Spitznamen — die beiden gemeinsam haben.' }, Math.round(albumAehnlichkeit(a, b) * 100) + '%'),
       el('div', { class: 'albg-wer', style: '--figurfarbe:' + albumFarbe(b) }, el('b', {}, b.name || 'ohne Namen'), el('small', {}, (albumStuecke(b).length === 1 ? 'ein Eintrag' : albumStuecke(b).length + ' Einträge')))),
     gleiche ? el('p', { class: 'albg-hinweis' }, gleiche === 1 ? 'Ein Feld ist wortgleich — das ist markiert.' : gleiche + ' Felder sind wortgleich — das ist markiert.') : null,
     zeilen.length

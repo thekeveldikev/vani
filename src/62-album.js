@@ -347,8 +347,10 @@ function albumFarbe(f) {
 function albumBuchstabe(f) {
   const n = String((f && f.name) || '').trim();
   if (!n) return '#';
-  const c = n[0].toUpperCase();
-  return /[A-ZÄÖÜ]/.test(c) ? (({ 'Ä': 'A', 'Ö': 'O', 'Ü': 'U' })[c] || c) : '#';
+  /* Akzente fallen weg: „Éowyn“ steht unter E, „Çelik“ unter C — so, wie
+     sortiert wird. Vorher bekamen sie „#“ und das Register zerfiel. */
+  const c = n[0].toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  return /[A-Z]/.test(c[0] || '') ? c[0] : '#';
 }
 function albumRegister(liste) {
   const raus = [];
@@ -378,8 +380,10 @@ function albumAlterText(f, stichtag) {
    Leser: der Schlüssel in der Schublade, der Cousin in Marseille, die
    Warnung vor dem Obstgarten. Wer sie nicht einlöst, lässt den Leser stehen.
    Ein Haken vorn heißt: eingelöst. */
-function albumFadenErledigt(eintrag) { return /^\s*[✓✔x]\s+/i.test(String(eintrag || '')); }
-function albumFadenText(eintrag) { return String(eintrag || '').replace(/^\s*[✓✔x]\s+/i, '').trim(); }
+/* Nur ✓ und ✔ — ein „x“ am Anfang war auch einmal ein Haken, aber dann galt
+   „X markiert die Stelle“ als eingelöst und verlor sein X. */
+function albumFadenErledigt(eintrag) { return /^\s*[✓✔]\s*/.test(String(eintrag || '')); }
+function albumFadenText(eintrag) { return String(eintrag || '').replace(/^\s*[✓✔]\s*/, '').trim(); }
 function albumFadenSetzen(eintrag, erledigt) {
   const t = albumFadenText(eintrag);
   return erledigt ? '✓ ' + t : t;

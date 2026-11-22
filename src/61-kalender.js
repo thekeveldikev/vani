@@ -436,8 +436,13 @@ function kalWidersprueche(liste) {
   const alle = liste || kalTermine();
   const leute = kalLeute(alle);
   const raus = [];
+  /* Ungenaue Daten sind Spannen: „1783“ ist das ganze Jahr, „April 1783“
+     der ganze April. Ein Widerspruch ist es erst, wenn die Spannen sich gar
+     nicht beruehren — sonst hiess es „kommt im April 1783 vor — geboren aber
+     erst am 9. April 1783“, obwohl beides stimmen kann. */
+  const vor = (a, b) => kalSpanne(a).bis < kalSpanne(b).von;
   for (const p of leute) {
-    if (p.geburt && p.tod && kalZeit(p.tod) < kalZeit(p.geburt)) {
+    if (p.geburt && p.tod && vor(p.tod, p.geburt)) {
       raus.push({ art: 'reihenfolge', person: p.name, text: p.name + ' stirbt vor der eigenen Geburt.' });
     }
     const geburten = p.termine.filter((e) => e.art === 'geburt');
@@ -446,11 +451,11 @@ function kalWidersprueche(liste) {
     if (tode.length > 1) raus.push({ art: 'doppelt', person: p.name, text: p.name + ' hat ' + tode.length + ' Todesdaten.' });
     for (const e of p.termine) {
       if (e.art === 'geburt' || e.art === 'tod') continue;
-      if (p.geburt && kalZeit(e.wann) < kalZeit(p.geburt)) {
-        raus.push({ art: 'vorGeburt', person: p.name, termin: e, text: p.name + ' kommt am ' + kalLesbar(e.wann) + ' vor — geboren aber erst ' + kalLesbar(p.geburt) + '.' });
+      if (p.geburt && vor(e.wann, p.geburt)) {
+        raus.push({ art: 'vorGeburt', person: p.name, termin: e, text: p.name + ' kommt ' + kalAmText(e.wann) + ' vor — geboren aber erst ' + kalAmText(p.geburt) + '.' });
       }
-      if (p.tod && kalZeit(e.wann) > kalZeit(p.tod)) {
-        raus.push({ art: 'nachTod', person: p.name, termin: e, text: p.name + ' kommt am ' + kalLesbar(e.wann) + ' vor — gestorben aber schon ' + kalLesbar(p.tod) + '.' });
+      if (p.tod && vor(p.tod, e.wann)) {
+        raus.push({ art: 'nachTod', person: p.name, termin: e, text: p.name + ' kommt ' + kalAmText(e.wann) + ' vor — gestorben aber schon ' + kalAmText(p.tod) + '.' });
       }
     }
   }
@@ -458,6 +463,24 @@ function kalWidersprueche(liste) {
 }
 
 /* ----- Lesbares ----- */
+/* Die Spanne, die ein Datum meint — in Millisekunden, beide Enden einschliesslich. */
+function kalSpanne(s) {
+  const t = kalTeile(s);
+  if (!t) return { von: NaN, bis: NaN };
+  const tag = 86400000;
+  if (t.genau === 'jahr') return { von: Date.UTC(t.jahr, 0, 1), bis: Date.UTC(t.jahr, 11, 31) };
+  if (t.genau === 'monat') return { von: Date.UTC(t.jahr, t.monat - 1, 1), bis: Date.UTC(t.jahr, t.monat - 1, kalMonatstage(t.jahr, t.monat)) };
+  const z = Date.UTC(t.jahr, t.monat - 1, t.tag);
+  return { von: z, bis: z + tag - 1 };
+}
+/* „am 9. April 1783“, „im April 1783“, „im Jahr 1783“ — je nachdem, wie genau. */
+function kalAmText(s) {
+  const t = kalTeile(s);
+  if (!t) return '';
+  if (t.genau === 'jahr') return 'im Jahr ' + t.jahr;
+  if (t.genau === 'monat') return 'im ' + kalLesbar(s);
+  return 'am ' + kalLesbar(s);
+}
 function kalLesbar(s, lang) {
   const t = kalTeile(s);
   if (!t) return '';

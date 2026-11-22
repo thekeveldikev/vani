@@ -204,3 +204,103 @@ test('Album: das × schließt auch nach Abhaken eines Fadens oder Wahl einer Ges
   const buch = lies('src/62b-album-buch.js');
   assert.ok(!/albumZeichne\(buehne, n, \(\) => \{\}\)/.test(buch), 'keine leere Schließ-Funktion mehr');
 });
+
+/* ===== Zweite Runde: die offenen Funde ===== */
+
+test('Kalender: ungenaue Daten sind Spannen, kein falscher Widerspruch', async () => {
+  const k = await frisch();
+  const t = (felder) => k.saubererTermin(felder);
+  const liste = [
+    t({ wann: '1783-04-09', art: 'geburt', titel: 'Geburt', leute: [{ name: 'Ilva' }] }),
+    t({ wann: '1783-04', art: 'ereignis', titel: 'Taufe', leute: [{ name: 'Ilva' }] }),
+    t({ wann: '1790', art: 'tod', titel: 'Tod', leute: [{ name: 'Ilva' }] }),
+    t({ wann: '1790-12', art: 'ereignis', titel: 'Brief', leute: [{ name: 'Ilva' }] })
+  ];
+  assert.equal(k.kalWidersprueche(liste).length, 0, 'April 1783 und Dezember 1790 können stimmen');
+  const falsch = liste.concat([t({ wann: '1782-12-24', art: 'ereignis', titel: 'Fest', leute: [{ name: 'Ilva' }] })]);
+  const w = k.kalWidersprueche(falsch);
+  assert.equal(w.length, 1);
+  assert.match(w[0].text, /kommt am 24\. Dezember 1782 vor — geboren aber erst am 9\. April 1783/);
+  assert.equal(k.kalAmText('1783-04'), 'im April 1783', 'im April, nicht am April');
+  assert.equal(k.kalAmText('1783'), 'im Jahr 1783');
+});
+
+test('Album: „X markiert die Stelle“ ist ein offener Faden, Akzente im Register, 1970 zählt', async () => {
+  const k = await frisch();
+  assert.equal(k.albumFadenErledigt('X markiert die Stelle'), false);
+  assert.equal(k.albumFadenText('X markiert die Stelle'), 'X markiert die Stelle');
+  assert.equal(k.albumFadenErledigt('✓ Brief zurückgeben'), true);
+  assert.equal(k.albumFadenText(k.albumFadenSetzen('Brief zurückgeben', true)), 'Brief zurückgeben');
+  assert.equal(k.albumBuchstabe({ name: 'Éowyn' }), 'E');
+  assert.equal(k.albumBuchstabe({ name: 'Çelik' }), 'C');
+  assert.equal(k.albumBuchstabe({ name: 'Ödön' }), 'O');
+  assert.equal(k.albumBuchstabe({ name: '7 Raben' }), '#');
+  const mehr = lies('src/62d-album-mehr.js');
+  assert.match(mehr, /if \(gx != null\) return -1;/, 'der 1. Januar 1970 ist ein Datum');
+  assert.ok(!/'schwaeche'/.test(mehr), 'kein Feld, das es nicht gibt');
+});
+
+test('Album: die Vorschlagsliste hängt an jedem neuen Verweisfeld', () => {
+  const blatt = lies('src/62c-album-blatt.js');
+  assert.match(blatt, /if \(feld\.verweis\) t\.setAttribute\('list', 'albb-verweise-' \+ feld\.id\)/);
+});
+
+/* ===== Gestaltung v2 (5.63) ===== */
+
+test('Gestaltung v2: eine abschaltbare Schicht, Bewegung extra, nichts ohne Schalter', async () => {
+  const k = await frisch();
+  const css = lies('src/10-style.css');
+  const v2 = css.slice(css.indexOf('GESTALTUNG v2 (5.63)'));
+  assert.ok(v2.length > 2000, 'die Schicht gibt es');
+  /* Jede Regel der Schicht haengt am Schalter — sonst saehe „aus“ nicht aus wie frueher. */
+  const ohneKommentar = v2.slice(v2.indexOf('*/') + 2).replace(/\/\*[\s\S]*?\*\//g, '');
+  const regeln = ohneKommentar.match(/(^|[{}])\s*([^{}]+)\{/g) || [];
+  const ohne = regeln.map((r) => r.replace(/^[{}]?\s*/, '').replace(/\{$/, '').trim())
+    .filter((sel) => sel && !sel.startsWith('@') && !/^(from|to|\d+%)/.test(sel) && !/^\d+%, \d+%$/.test(sel) && sel !== '.gruss-vignette, .gruss-ranke' && sel !== '.gruss-text')
+    .filter((sel) => sel.split(',').some((s) => !/html\[data-v2="an"\]/.test(s)));
+  assert.deepEqual(ohne, [], 'jede v2-Regel steht hinter html[data-v2="an"]');
+  /* Bewegung nur mit dem eigenen Schalter und ohne „Bewegung reduzieren“. */
+  const animiert = ohneKommentar.match(/[^{}]*\{[^{}]*animation:[^{}]*\}/g) || [];
+  for (const a of animiert) {
+    const sel = a.slice(0, a.indexOf('{'));
+    assert.match(sel, /data-v2bewegung="an"/, 'Animation ohne Bewegungsschalter: ' + sel.trim());
+  }
+  assert.match(v2, /@media \(prefers-reduced-motion: no-preference\)/);
+
+  /* Standard: an (Kevins Wunsch); ausgeschaltet bleibt aus. */
+  k.D.einst.v2 = undefined; k.D.einst.v2Bewegung = undefined;
+  k.setzeGestaltung();
+  assert.equal(k.document.documentElement.dataset.v2, 'an');
+  k.D.einst.v2 = false; k.D.einst.v2Bewegung = false;
+  k.setzeGestaltung();
+  assert.equal(k.document.documentElement.dataset.v2, 'aus');
+  assert.equal(k.document.documentElement.dataset.v2bewegung, 'aus');
+  assert.match(lies('src/49-feinheiten.js'), /'Gestaltung v2'/, 'der Schalter steht in den Feinheiten');
+});
+
+test('Gestaltung v2: die Tagesvignette ist gezeichnet und folgt der Stunde', async () => {
+  const k = await frisch();
+  assert.equal(k.grussTageszeit(3), 'nacht');
+  assert.equal(k.grussTageszeit(7), 'morgen');
+  assert.equal(k.grussTageszeit(12), 'tag');
+  assert.equal(k.grussTageszeit(19), 'abend');
+  assert.equal(k.grussTageszeit(23), 'nacht');
+  for (const z of ['morgen', 'tag', 'abend', 'nacht']) {
+    const svg = k.grussVignette(z);
+    assert.match(svg, /^<svg class="gruss-vignette-bild"/);
+    assert.ok(!/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/u.test(svg), 'keine Emoji oder Schriftsymbole — iOS malt sie bunt');
+  }
+  assert.match(k.grussVignette('nacht'), /gv-stern/);
+  assert.match(k.grussVignette('tag'), /gv-strahlen/);
+});
+
+test('Gestaltung v2: die Malschicht der Diele faengt keine Tipps ab', () => {
+  const orte = lies('src/57-orte.js');
+  const unten = orte.slice(orte.indexOf('function orteV2DieleUnten('), orte.indexOf('function orteV2DieleOben('));
+  const oben = orte.slice(orte.indexOf('function orteV2DieleOben('), orte.indexOf('/* ----- Die Kulissen'));
+  assert.match(unten, /<g pointer-events="none">/);
+  assert.match(oben, /<g pointer-events="none"/);
+  const css = lies('src/10-style.css');
+  assert.match(css, /\.ort-kulisse::before \{[^}]*pointer-events: none/);
+  assert.match(css, /\.ort-kulisse::after \{[^}]*pointer-events: none/);
+});

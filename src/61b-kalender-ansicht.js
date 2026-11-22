@@ -473,7 +473,7 @@ function zeichneKalender(buehne, neuZeichnen, schliessen) {
         raster.append(el('button', {
           class: 'kal-zelle' + (zelle.fremd ? ' fremd' : '') + (zelle.datum === heute ? ' heute' : '') +
             (zelle.datum === _kal.tag ? ' gewaehlt' : '') + (termine.length ? ' voll' : '') + (wt >= 5 ? ' wochenende' : ''),
-          onclick: () => { _kal.tag = zelle.datum; neuZeichnen(zelle.fremd ? zelle.datum : undefined); },
+          onclick: () => { if (!zelle.datum) return; _kal.tag = zelle.datum; neuZeichnen(zelle.fremd ? zelle.datum : undefined); },
           ondblclick: () => kalTerminBearbeiten(null, zelle.datum, (d) => neuZeichnen(d))
         },
           el('span', { class: 'kal-zahl' }, String(zelle.tag)),
@@ -538,7 +538,9 @@ function kalTagesBlatt(datum, alle, neuZeichnen) {
   const mond = typeof mondphase === 'function' ? mondphase(kalZeit(datum)) : null;
   const mondwort = mond == null ? '' : mond < .04 || mond > .96 ? 'Neumond' : Math.abs(mond - .5) < .04 ? 'Vollmond' : mond < .5 ? 'zunehmender Mond' : 'abnehmender Mond';
   const tageWeg = Math.round((kalZeit(datum) - kalZeit(heute)) / 86400000);
-  const abstand = tageWeg === 0 ? 'heute' : tageWeg > 0
+  /* Die Randzellen (Dezember 1599, Januar 2051) haben kein gueltiges Datum —
+     dort stand „vor NaN Tagen“. Dann lieber gar nichts. */
+  const abstand = !Number.isFinite(tageWeg) ? '' : tageWeg === 0 ? 'heute' : tageWeg > 0
     ? (tageWeg === 1 ? 'morgen' : 'in ' + tageWeg.toLocaleString('de-DE') + ' Tagen')
     : (tageWeg === -1 ? 'gestern' : 'vor ' + Math.abs(tageWeg).toLocaleString('de-DE') + ' Tagen');
 

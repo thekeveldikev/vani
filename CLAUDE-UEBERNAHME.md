@@ -2771,3 +2771,49 @@ Register bei Akzent-Initialen (`62-album.js` ~349); `schwaeche` in
 Tagen“ (`61b` ~476); Eichhoernchen im Teppich laeuft nie (`63b` ~1824).
 
 Tests 445/445.
+
+## 5.63.0 — Die offenen Funde und Gestaltung v2 (23. November 2026)
+
+**Offene Funde aus 5.62 erledigt:** unscharfe Kalenderdaten sind Spannen
+(`kalSpanne`, `kalAmText`: „im April 1783“, kein falscher Widerspruch mehr);
+„X markiert die Stelle“ ist ein offener Faden (nur ✓/✔ zaehlen als Haken);
+Register: Akzente fallen weg (Éowyn unter E); Geburtsdatum 1970-01-01 zaehlt;
+`schwaeche` → `angst` in der Aehnlichkeit (Texte: „Ängste“);
+Vorschlagsliste haengt an jedem neuen Verweisfeld (eigene ID je Feld);
+Kalender-Randzellen tun nichts statt „vor NaN Tagen“; das Eichhoernchen im
+Teppich laeuft auf der Oberkante eines Astes.
+**Bewusst NICHT geaendert:** Faeden mit unbekannter Fadenart fallen beim
+Speichern weiter weg — `test/stammbaum.mjs` legt das ausdruecklich fest
+(„was nicht sein kann, kommt nicht herein“). Wenn das anders sein soll, ist
+es eine Entscheidung, keine Reparatur.
+
+**Gestaltung v2.** Eine eigene Schicht am Ende von `src/10-style.css`
+(Block „GESTALTUNG v2“), jede Regel hinter `html[data-v2="an"]`.
+Schalter: Feinheiten → Stimmung → „Gestaltung v2“ (`D.einst.v2`, Standard an)
+und „Bewegung in den Verzierungen“ (`D.einst.v2Bewegung`, Standard an;
+ruht ausserdem bei „Bewegung reduzieren“). `setzeGestaltung()` in 30-core.js
+setzt beide Attribute, aufgerufen aus `setzeThema`.
+- Papierlicht im Hintergrund; Leiste als Buchruecken mit Goldkante, das „V“
+  als Siegel (am Handy ausgeblendet wie bisher).
+- Karten: doppelter Rahmen (Linie, Papierband, Goldring per Box-Shadow — keine
+  Pseudo-Elemente, keine Positionierung), Eckranken als SVG-Hintergrund.
+  Ueber `:where()` mit niedriger Spezifitaet: Sonderkarten (rote „hakt“-Karte,
+  Holzkarten der Orte) behalten ihre eigenen Farben.
+- Abschnittskoepfe in Kapitaelchen mit Raute und auslaufender Goldlinie;
+  Raumkoepfe mit kursivem Untertitel und kleiner Ranke; leere Raeume mit Fleuron.
+- Zuhause: gezeichnete **Tagesvignette** neben dem Gruss (`grussVignette`,
+  41-zuhause.js: Morgendunst, Mittagssonne mit drehenden Strahlen, Abendrot mit
+  Voegeln, Mondnacht mit funkelnden Sternen) und eine Ranke unter dem Gruss,
+  die sich einzeichnet. Karten tauchen gestaffelt auf.
+- Knoepfe mit Licht und Tiefe; graue Rollbalken (Funken-Chips u. a.) weg.
+- Alle Kulissen („Orte“): Stuck oben, schraeger Lichtstrahl mit Staub darin,
+  Vignette — nachts Mondlicht, abends Abendrot (`zeit-…` an der Kulisse).
+- Diele (Zuhause-Kulisse): zweite Malschicht `orteV2DieleUnten/Oben`
+  (57-orte.js): Damasttapete, Vertaefelung mit Stuhlleiste, Lichtfleck,
+  Kontaktschatten, ein Glanz, der ueber den Spiegel wandert. Alles mit
+  `pointer-events="none"`.
+- Geprueft im Browser bei 1024×768, 768×1024 und 375 px, hell und „Tinte“.
+  **Nicht auf dem iPad.** Tests: `test/video-korrekturen.mjs` (v2-Vertrag:
+  keine Regel ohne Schalter, keine Animation ohne Bewegungsschalter).
+
+Tests 451/451.

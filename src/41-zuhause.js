@@ -118,6 +118,52 @@ function zeigeFunkenSammlung() {
   const zu = zeigeDeck(kasten); baue(); setTimeout(() => suche.focus(), 60);
 }
 
+/* ----- Die Tagesvignette (Gestaltung v2) -----
+   Ein kleines gemaltes Medaillon neben dem Gruss: Morgendunst, Mittagssonne,
+   Abendrot oder Mondnacht — je nach Stunde. Gezeichnet, nicht aus Zeichen:
+   Emoji malt iOS bunt und fremd. Die Bewegung (Strahlen, Sterne, Wolken)
+   kommt aus dem CSS und ruht mit „Bewegung in den Verzierungen“. */
+function grussTageszeit(h = new Date().getHours()) {
+  return h < 5 ? 'nacht' : h < 10 ? 'morgen' : h < 17 ? 'tag' : h < 21 ? 'abend' : 'nacht';
+}
+function grussVignette(zeit) {
+  const rand = '<circle cx="40" cy="40" r="37" fill="none" stroke="#b8923f" stroke-width="1.2" opacity=".75"/>' +
+    '<circle cx="40" cy="40" r="33.5" fill="none" stroke="#b8923f" stroke-width=".6" opacity=".45"/>' +
+    [0, 90, 180, 270].map((w) => '<path d="M40 1.6 l2 2.4 -2 2.4 -2 -2.4z" fill="#b8923f" opacity=".8" transform="rotate(' + w + ' 40 40)"/>').join('');
+  const himmel = {
+    morgen: ['#f6dcc0', '#f3ead8'], tag: ['#cfe3ec', '#f1ecdc'], abend: ['#e9a46c', '#f3d6a8'], nacht: ['#1d2340', '#3a3d63']
+  }[zeit] || ['#cfe3ec', '#f1ecdc'];
+  let bild = '';
+  if (zeit === 'morgen') {
+    bild = '<circle class="gv-sonne" cx="40" cy="50" r="11" fill="url(#gvS)"/>' +
+      '<path d="M8 52 Q24 44 40 50 T72 48 L72 74 L8 74z" fill="#a9b79a" opacity=".85"/>' +
+      '<path d="M8 58 Q30 52 48 58 T72 56 L72 74 L8 74z" fill="#7f9172"/>' +
+      '<g class="gv-dunst" fill="none" stroke="#fffaf0" stroke-linecap="round" opacity=".8"><path d="M14 46 h18" stroke-width="1.6"/><path d="M44 42 h20" stroke-width="1.4"/><path d="M22 38 h12" stroke-width="1.2"/></g>';
+  } else if (zeit === 'tag') {
+    bild = '<g class="gv-strahlen" stroke="#e2b552" stroke-width="1.6" stroke-linecap="round">' +
+      Array.from({ length: 12 }, (_, i) => '<path d="M40 14 v5" transform="rotate(' + (i * 30) + ' 40 34)"/>').join('') + '</g>' +
+      '<circle cx="40" cy="34" r="10" fill="url(#gvS)"/>' +
+      '<g class="gv-wolke"><path d="M18 56 q1-6 7-5 q2-6 9-3 q6-1 6 5 q4 1 3 5 H19 q-4 0-1-2z" fill="#fffdf6" opacity=".95"/></g>' +
+      '<path d="M8 64 Q30 58 50 63 T72 61 L72 74 L8 74z" fill="#9aae86"/>';
+  } else if (zeit === 'abend') {
+    bild = '<circle cx="40" cy="54" r="15" fill="url(#gvS)"/>' +
+      '<path d="M8 56 H72 V74 H8z" fill="#5e4a5c"/>' +
+      '<g stroke="#f7cf98" stroke-width="1.1" opacity=".7"><path d="M22 60 h36"/><path d="M28 64 h24"/><path d="M34 68 h12"/></g>' +
+      '<g class="gv-voegel" fill="none" stroke="#4a3328" stroke-width="1.2" stroke-linecap="round"><path d="M20 30 q3-3 6 0 q3-3 6 0"/><path d="M46 24 q2-2 4 0 q2-2 4 0"/></g>';
+  } else {
+    bild = '<path d="M50 22 a14 14 0 1 0 6 24 a11 11 0 1 1 -6 -24z" fill="#f3e6bf"/>' +
+      '<g class="gv-sterne" fill="#fff4cf">' +
+      [[20, 24, 1.6], [28, 44, 1.1], [16, 52, 1.3], [60, 54, 1.2], [36, 16, 1], [62, 30, 1.4]].map(([x, y, r], i) =>
+        '<path class="gv-stern s' + i + '" d="M' + x + ' ' + (y - r * 2.2) + ' L' + (x + r * .6) + ' ' + (y - r * .6) + ' L' + (x + r * 2.2) + ' ' + y + ' L' + (x + r * .6) + ' ' + (y + r * .6) + ' L' + x + ' ' + (y + r * 2.2) + ' L' + (x - r * .6) + ' ' + (y + r * .6) + ' L' + (x - r * 2.2) + ' ' + y + ' L' + (x - r * .6) + ' ' + (y - r * .6) + 'z"/>').join('') + '</g>' +
+      '<path d="M8 64 Q28 60 44 64 T72 62 L72 74 L8 74z" fill="#141831"/>';
+  }
+  return '<svg class="gruss-vignette-bild" viewBox="0 0 80 80" aria-hidden="true" focusable="false">' +
+    '<defs><radialGradient id="gvS" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fff6cf"/><stop offset=".55" stop-color="#f2c45e"/><stop offset="1" stop-color="#d98a3a"/></radialGradient>' +
+    '<linearGradient id="gvH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + himmel[0] + '"/><stop offset="1" stop-color="' + himmel[1] + '"/></linearGradient>' +
+    '<clipPath id="gvK"><circle cx="40" cy="40" r="32.6"/></clipPath></defs>' +
+    '<g clip-path="url(#gvK)"><rect width="80" height="80" fill="url(#gvH)"/>' + bild + '</g>' + rand + '</svg>';
+}
+
 RENDER.zuhause = function (haupt) {
   const inhalt = el('div', { class: 'inhalt' });
 
@@ -128,9 +174,13 @@ RENDER.zuhause = function (haupt) {
     const letzter = new Date(letzteTage[letzteTage.length - 1]);
     return Math.floor((Date.now() - letzter.getTime()) / 86400000);
   })();
-  inhalt.append(el('div', { class: 'zuhause-gruss' },
-    el('h1', {}, tageWeg > 6 ? GRUSS_LANGE_WEG : grussZeile()),
-    el('p', {}, zufall(GRUSS_UNTEN))
+  const tageszeit = grussTageszeit();
+  inhalt.append(el('div', { class: 'zuhause-gruss', 'data-zeit': tageszeit },
+    el('span', { class: 'gruss-vignette', html: grussVignette(tageszeit) }),
+    el('div', { class: 'gruss-text' },
+      el('h1', {}, tageWeg > 6 ? GRUSS_LANGE_WEG : grussZeile()),
+      el('i', { class: 'gruss-ranke', 'aria-hidden': 'true' }),
+      el('p', {}, zufall(GRUSS_UNTEN)))
   ));
 
   const gitter = el('div', { class: 'zuhause-gitter' });

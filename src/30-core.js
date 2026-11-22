@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.62.0';
+const APP_VERSION = '5.63.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -1017,7 +1017,20 @@ function flammeHTML() {
 
 /* ----- Thema ----- */
 const THEMEN = { papier: '#ece3d1', tinte: '#141110', kerze: '#1b1206', nebel: '#e2e5e1', weiss: '#ffffff' };
+/* ----- Gestaltung v2 (5.63) -----
+   Eine zweite Gestaltungsschicht ueber allem: Papierlicht, Goldrahmen,
+   Zierlinien, Vignetten, lebendigere Kulissen. Abschaltbar in den
+   Feinheiten (Stimmung) — dann steht alles wie vor 5.63. Die Bewegungen
+   darin haben einen eigenen Schalter und ruhen ausserdem, wenn das System
+   „Bewegung reduzieren“ verlangt (CSS). */
+function setzeGestaltung() {
+  const w = document.documentElement;
+  if (!w || !w.dataset) return;
+  w.dataset.v2 = D.einst.v2 === false ? 'aus' : 'an';
+  w.dataset.v2bewegung = D.einst.v2Bewegung === false ? 'aus' : 'an';
+}
 function setzeThema(name) {
+  setzeGestaltung();
   document.documentElement.dataset.thema = name;
   D.einst.thema = name;
   const m = $('meta[name="theme-color"]');

@@ -39,8 +39,9 @@ function albumGeordnet(liste, ordnung) {
     return a.sort((x, y) => {
       const gx = stempel(x), gy = stempel(y);
       if (gx != null && gy != null) return gx - gy || albumVergleich(x, y);
-      if (gx) return -1;
-      if (gy) return 1;
+      /* `!= null` statt Wahrheitswert: der 1. Januar 1970 hat den Stempel 0. */
+      if (gx != null) return -1;
+      if (gy != null) return 1;
       return albumVergleich(x, y);
     });
   }
@@ -127,7 +128,8 @@ function albumGegenueber(a, b) {
 }
 /* Wie ähnlich sind sich zwei? Gezählt über die Felder, in denen mehrere
    Stichworte stehen — dort verrät sich, ob zwei Figuren dieselbe sind. */
-const ALBUM_AEHNLICH_FELDER = ['wesen', 'schwaeche', 'leidenschaft', 'eigenheit', 'geschichte', 'nennung'];
+/* „schwaeche“ stand hier — ein Feld, das es nie gab. Gemeint waren die Ängste. */
+const ALBUM_AEHNLICH_FELDER = ['wesen', 'angst', 'leidenschaft', 'eigenheit', 'geschichte', 'nennung'];
 function albumAehnlichkeit(a, b) {
   let treffer = 0, moeglich = 0;
   for (const id of ALBUM_AEHNLICH_FELDER) {

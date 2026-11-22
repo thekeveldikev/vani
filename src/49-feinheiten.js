@@ -229,9 +229,23 @@ RENDER.feinheiten = function (haupt) {
     if (typeof speicherHorchen === 'function') { const loesen = speicherHorchen(() => setz()); setTimeout(() => { if (!karte.isConnected) loesen(); }, 60000); }
   }
 
+  /* Gestaltung v2: zwei Schalter neben der Stimmung. */
+  const v2Schalter = (lies, setze) => el('button', {
+    class: 'schalter' + (lies() ? ' an' : ''),
+    onclick: (e) => { setze(!lies()); e.currentTarget.classList.toggle('an', lies()); speichereEinst(); setzeGestaltung(); }
+  }, el('i'));
+  const gestaltung = el('div', { class: 'karte gestaltung-karte' },
+    el('div', { class: 'einstellzeile' },
+      el('span', { class: 'ename' }, 'Gestaltung v2',
+        el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Goldrahmen, Zierlinien, Papierlicht, gezeichnete Vignetten und lebendigere Kulissen. Aus: alles wie früher.')),
+      v2Schalter(() => D.einst.v2 !== false, (v) => { D.einst.v2 = v; })),
+    el('div', { class: 'einstellzeile' },
+      el('span', { class: 'ename' }, 'Bewegung in den Verzierungen',
+        el('div', { style: 'font-size:12.5px;color:var(--blass)' }, 'Staub im Lichtstrahl, funkelnde Sterne, Ranken, die sich einzeichnen. Ruht ohnehin, wenn das iPad „Bewegung reduzieren“ verlangt.')),
+      v2Schalter(() => D.einst.v2Bewegung !== false, (v) => { D.einst.v2Bewegung = v; })));
   inhalt.append(el('div', { class: 'abschnitt' },
     el('div', { class: 'abschnitt-kopfzeile' }, el('h2', {}, 'Stimmung'), el('span', { class: 'abschnitt-fassung' }, 'v' + APP_VERSION), aktKnopf),
-    themen));
+    themen, gestaltung));
 
   /* Schreiben */
   const zielFeld = el('input', { type: 'text', inputmode: 'numeric', value: D.einst.tagesziel || '', placeholder: 'keins', style: 'width:90px;text-align:right;background:var(--karte);border-radius:10px;padding:7px 11px;box-shadow:inset 0 0 0 1px var(--linie)' });

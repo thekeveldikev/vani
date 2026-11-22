@@ -1823,10 +1823,13 @@ function teppichAnimationenAn(flaeche, svg, baum) {
     if (!document.hidden && _tep.tiere) {
       const e = svg.querySelector('.tep-tier');
       if (e) {
-        const aeste = [...svg.querySelectorAll('.tep-astgruppe[data-mittel]')];
+        /* `.tep-astgruppe[data-mittel]` wurde nirgends erzeugt — das
+           Eichhoernchen lief deshalb nie. Es nimmt jetzt die Oberkante eines
+           kraeftigen Astes als Weg. */
+        const aeste = [...svg.querySelectorAll('.tep-astkante:not(.duenn)')].filter((p) => (p.getAttribute('d') || '').length > 20);
         if (aeste.length) {
           const welcher = aeste[Math.floor(Math.random() * aeste.length)];
-          e.style.offsetPath = 'path("' + welcher.getAttribute('data-mittel') + '")';
+          e.style.offsetPath = 'path("' + welcher.getAttribute('d') + '")';
           e.classList.remove('laeuft');
           /* Ein Neustart der Animation braucht einen Takt Pause. */
           setTimeout(() => e.classList.add('laeuft'), 30);
