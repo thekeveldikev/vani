@@ -2902,3 +2902,61 @@ Tests 453/453.
 - Geprueft im Browser bei 800×600 und 1024×768. **Nicht auf dem iPad.**
 
 Tests 457/457.
+
+
+## 5.66.0 — Alle Dinge neu gemalt, eigene Tipp-Bewegungen (23. November 2026)
+
+- **Neue Datei `src/57d-orte-dinge.js`** (in `build.sh`, `werkzeug/build-web.mjs`
+  und `test/sandkasten.mjs` nach `57c-katze.js` eingetragen). Darin die Maler
+  `od…()` fuer die Dinge der Kulissen, `odGlanz(art)`, die Teilchen
+  `orteFunken(ding)` und die Klaenge `orteTon(name)`.
+- **Neu gemalt (immer, nicht nur mit v2):** Schreibmaschine (Wagen mit Walze,
+  Papier, Zeilenhebel, Farbbandspulen, Typenkorb, Tasten mit Chromring),
+  Hut am Haken (Faden), Tintenfass aus geschliffenem Glas mit Schreibfeder,
+  Farbwalze mit Buegel und Holzgriff, Grammophonschrank (Furnier, Kurbel),
+  Metronom, Stumpenkerze in Messingschale, die ganze Werkzeugwand (Hammer,
+  Feinsaege, Kombizange, Schraubendreher, Wasserwaage mit drei Libellen,
+  Massband, Bleistiftstummel, Schrauben, Werkzeugkiste), Stempel mit
+  gedrechseltem Griff, Briefe mit Marke, Poststempel und Siegel, Messinguhr
+  mit Glas, Jahreszeit am Haken (Tannenzweig, Kirschblueten, Strohhut,
+  Ahornblatt), Farn im Terrakottatopf, Polsterbank mit Knopfheftung und
+  Rollarmlehnen. Astloecher statt Blattumrissen auf dem Kuechentisch.
+- **Fehler behoben — Glanz blieb stehen:** Die obere Malschicht (eigene SVG
+  ueber dem Buehnenbild) malte Glanz auf antippbare Dinge. Beim Antippen
+  wackelte das Ding, der Glanz blieb stehen; nach dem Neumalen lagen alte
+  Glanzformen ueber den neuen Dingen (Becher, Hut, Kraeutertopf). Jetzt haengt
+  der Glanz am Ding (`odGlanz`, nur mit v2), oben bleibt nur Raumlicht.
+  Faustregel: **Nichts in `orteV2Malerei(r, 'oben')`, was zu einem Ding mit
+  `T(...)` gehoert.**
+- **Fehler behoben — Reiter im Zettelkasten wirkten durchscheinend:** Der
+  Kastenglanz lag ueber den Reitern. Neue Ebene `orteV2Malerei('schnipsel',
+  'mitte')` zwischen Karten und Reitern.
+- **Fehler behoben — Dielenuhr stand still:** Stunden- und Minutenzeiger
+  wurden einmal gemalt. `orteUhrLaufen(wrap)` stellt sie alle 20 s nach (und
+  den Satz beim Antippen), der Zeitgeber raeumt sich weg, wenn die Diele weg ist.
+- **Fehler behoben — Spiegel mit Kamera:** Das Videobild liegt als HTML ueber
+  dem Glas und kann nicht mitwackeln; mit Kamera wackelt der Spiegel nicht.
+- **Fehler behoben — zweimal schnell tippen:** Der alte Zeitgeber nahm
+  `tippt` mitten in der zweiten Bewegung weg (`ding._tippZeit`).
+- **Antippen:** Jedes Ding hat eine eigene Bewegung (`@keyframes ot-…`, CSS am
+  Ende des v2-Blocks, nur mit v2 + Bewegung, nie bei „Bewegung reduzieren“;
+  sonst das alte Wackeln): Hut hebt sich, Mantel pendelt, Schuhe huepfen,
+  Uhr und Telefon klingeln, Hammer holt aus und schlaegt (Funken), Saege saegt
+  (Spaene), Zange oeffnet sich, Massband schnappt ein, Libelle wandert,
+  Schreibmaschinenwagen faehrt, Lettern drehen sich lesbar herum, Papier-
+  flieger fliegt einen Looping, Kerzenflamme lodert, Metronom tickt schneller,
+  Kurbel dreht sich, Bank federt. Dazu Teilchen (`ORTE_FUNKEN`: Dampf, Tinte,
+  Kruemel, Spaene, Noten, Klingelwellen, Herzen, Blaetter, Blueten, Schnee,
+  Regen, Staub, Buchstaben, Wind; Obergrenze 48 gleichzeitig) und, wenn die
+  Kulissen Geraeusche machen duerfen, kleine Klaenge (`ORTE_TIPPKLANG`:
+  Glocke, Klingel, Klimpern, Tock, Zupfen, Ton, Hauch; sonst das alte Tick).
+- **Falle:** `ORTE_KLANG` gibt es schon (Ambience je Ort). Neue globale Namen
+  vorher mit `grep -h "const NAME\b" src/*.js` pruefen — esbuild bricht sonst ab.
+- **Falle beim Pruefen im Browser:** Das Vorschaufenster hat zeitweise doppelte
+  Pixeldichte; dann zeigt ein Screenshot nur das linke obere Viertel. Fuer
+  Detailbilder die Kulisse als Klon in ein festes 400er-Fenster legen.
+- Geprueft im Browser bei 800×600 (alle zehn Kulissen, Tipp-Bewegungen als
+  Standbilder mitten in der Bewegung). **Nicht auf dem iPad**, Klaenge nicht
+  angehoert.
+
+Tests 463/463.

@@ -2597,6 +2597,8 @@ mark.lupe-wdh { background: rgba(255,196,90,.45); color: inherit; border-radius:
 @media (hover: hover) and (pointer: fine) { .ort-tipp:hover { filter: brightness(1.08); } }
 .ort-tipp:focus-visible { filter: drop-shadow(0 0 4px rgba(255,220,150,.9)); }
 .ort-tipp.tippt { animation: ort-wackeln .95s cubic-bezier(.3,1.4,.5,1); }
+/* Mit Kamera liegt das Spiegelbild als HTML ueber dem Glas, es kann nicht mitwackeln: also wackelt der Spiegel dann nicht. */
+.ort-kulisse.kamera .ort-tipp.ort-spiegel.tippt { animation: none; }
 @keyframes ort-wackeln { 0% { transform: none; } 18% { transform: rotate(-5deg) translateY(-1.5px); } 42% { transform: rotate(4deg); } 66% { transform: rotate(-2deg); } 100% { transform: none; } }
 .ort-kulisse .ort-schal, .ort-kulisse .ort-lichtkegel, .ort-kulisse .ort-platte.dreht, .ort-kulisse .ort-schnur { animation: none; }
 .ort-kulisse.lebt .ort-schal { animation: ort-schal 5s ease-in-out infinite alternate; transform-origin: 250px 48px; }
@@ -7445,3 +7447,81 @@ html[data-v2="an"] .ort-glanz { opacity: 0; transform-box: view-box; transform-o
 @keyframes v2-staub { from { background-position: 11px 7px, 63px 31px, 120px 50px; } to { background-position: 108px -54px, 206px -58px, 331px -77px; } }
 @keyframes v2-staubatem { from { opacity: .55; } to { opacity: 1; } }
 @keyframes v2-lichtatem { from { opacity: .88; } to { opacity: 1; } }
+
+/* ===== 5.66: Antippen mit eigener Bewegung je Ding =====
+   Ohne v2 oder ohne Bewegung bleibt das alte Wackeln. Drehpunkte setzt
+   57-orte.js je Ding (transform-origin), die Teilchen kommen aus orteFunken(). */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-hut.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-strohhut.tippt { animation: ot-lupf 1.1s cubic-bezier(.3,1.4,.5,1); }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-mantel.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-stift.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-zweig.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-bluete.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-blatt.tippt { animation: ot-pendel 1.4s ease-out; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-schuhe.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-keks.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-buecher.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-tinte.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-tasse.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-kraut.tippt { animation: ot-hops .8s cubic-bezier(.3,1.5,.5,1); }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-schirm.tippt { animation: ot-schirm 1s cubic-bezier(.3,1.5,.5,1); }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-uhr.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-telefon.tippt { animation: ot-klingeln .9s linear; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-briefe.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-karte.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-zettel.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-foto.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-kalender.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-block.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-heft.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-andruck.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-huellen.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-reiter.tippt { animation: ot-flattern 1s ease-out; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-stempel.tippt { animation: ot-stempeln .7s cubic-bezier(.4,1.6,.5,1); }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-bleistift.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-stummel.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-glas.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-walze.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-fueller.tippt { animation: ot-rollen 1.2s cubic-bezier(.3,1.2,.5,1); }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-hammer.tippt { animation: ot-hammer 1s cubic-bezier(.4,0,.3,1); }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-saege.tippt { animation: ot-saegen 1.1s ease-in-out; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-schrauber.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-spitzer.tippt { animation: ot-drehen 1s cubic-bezier(.3,1.3,.5,1); }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-waage.tippt { animation: ot-kippen 1.1s ease-in-out; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-schreibmaschine.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-lampe.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-massband.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-horn.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-zange.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-metronom.tippt, html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-schluessel.tippt { animation: ot-ruck .6s cubic-bezier(.3,1.6,.5,1); }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-pflanze.tippt { animation: ot-wiegen 1.6s ease-in-out; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-letter.tippt { animation: ot-spiegeln 1.3s ease-in-out; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-flieger.tippt { animation: ot-looping 1.4s cubic-bezier(.45,0,.35,1); }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-stapel.tippt { animation: ot-blaettern .7s ease-out; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-bank.tippt { animation: ot-quetschen .8s cubic-bezier(.3,1.5,.5,1); }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-faden.tippt { animation: ot-zupfen .8s ease-out; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-brille.tippt { animation: ot-brille 1s ease-in-out; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-kerze.tippt { animation: ot-flackern 1s ease-out; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-faden .ort-tipp.ort-hut.tippt { animation: ot-pendel 1.4s ease-out; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.tippt .ort-wagen { animation: ot-wagen 1.2s cubic-bezier(.5,0,.3,1); transform-box: view-box; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.tippt .ort-taste:nth-child(3n) { animation: ot-taste .5s ease-out 2; transform-box: view-box; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.tippt .ort-kurbel { animation: ot-kurbel 1.2s ease-in-out; transform-box: view-box; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.tippt .ort-zangeL { animation: ot-zangeL .9s ease-in-out; transform-box: view-box; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.tippt .ort-zangeR { animation: ot-zangeR .9s ease-in-out; transform-box: view-box; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.tippt .ort-bandzunge { animation: ot-zunge 1.1s cubic-bezier(.6,0,.3,1); transform-box: view-box; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.tippt .ort-walzenrolle { animation: ot-walzenglanz 1.2s ease-in-out; transform-box: view-box; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-kulisse .ort-tipp.ort-metronom.tippt .ort-pendel { animation: ort-pendel .32s ease-in-out 4 alternate; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-kerze.tippt .ort-flamme { animation: ot-flamme 1s ease-out; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-schluessel.tippt .ort-schluesselbund { animation: ot-bund .9s ease-out; }
+  html[data-v2="an"][data-v2bewegung="an"] .ot-teil { animation-name: ot-teil; animation-timing-function: cubic-bezier(.2,.7,.4,1); animation-fill-mode: both; transform-box: view-box; }
+  html[data-v2="an"][data-v2bewegung="an"] .ot-teil.ot-fall { animation-name: ot-wurf; animation-timing-function: linear; }
+  html[data-v2="an"][data-v2bewegung="an"] .ot-teil.ot-sanft { animation-name: ot-segeln; animation-timing-function: ease-in-out; }
+  html[data-v2="an"][data-v2bewegung="an"] .ot-teil.ot-wachs { animation-name: ot-welle; }
+  html[data-v2="an"][data-v2bewegung="an"] .ot-teil.ot-bleib { animation-name: ot-abdruck; }
+}
+@keyframes ot-lupf { 0% { transform: none; } 22% { transform: translateY(-8px) rotate(-9deg); } 48% { transform: translateY(-1px) rotate(4deg); } 70% { transform: rotate(-2deg); } 100% { transform: none; } }
+@keyframes ot-pendel { 0% { transform: none; } 15% { transform: rotate(9deg); } 35% { transform: rotate(-7deg); } 55% { transform: rotate(4.5deg); } 75% { transform: rotate(-2deg); } 100% { transform: none; } }
+@keyframes ot-hops { 0% { transform: none; } 20% { transform: translateY(1px) scale(1.04, .94); } 40% { transform: translateY(-6px) scale(.97, 1.04); } 62% { transform: translateY(0) scale(1.03, .96); } 78% { transform: translateY(-2px); } 100% { transform: none; } }
+@keyframes ot-schirm { 0% { transform: none; } 25% { transform: translateY(-9px) rotate(-6deg); } 50% { transform: translateY(0) rotate(4deg); } 70% { transform: rotate(-2deg); } 100% { transform: none; } }
+@keyframes ot-klingeln { 0%, 100% { transform: none; } 6%, 18%, 30%, 42%, 54%, 66% { transform: rotate(-5deg) translateY(-1px); } 12%, 24%, 36%, 48%, 60%, 72% { transform: rotate(5deg) translateY(-1px); } 84% { transform: rotate(-1.5deg); } }
+@keyframes ot-flattern { 0% { transform: none; } 18% { transform: rotate(-5deg) skewX(4deg); } 38% { transform: rotate(4deg) skewX(-3deg); } 58% { transform: rotate(-2.4deg) skewX(1.6deg); } 78% { transform: rotate(1deg); } 100% { transform: none; } }
+@keyframes ot-stempeln { 0% { transform: none; } 30% { transform: translateY(-10px); } 48% { transform: translateY(3px) scale(1.04, .9); } 62% { transform: translateY(0); } 100% { transform: none; } }
+@keyframes ot-rollen { 0% { transform: none; } 30% { transform: translateX(14px) rotate(2deg); } 62% { transform: translateX(-6px) rotate(-1deg); } 82% { transform: translateX(2px); } 100% { transform: none; } }
+@keyframes ot-hammer { 0% { transform: none; } 28% { transform: rotate(-28deg); } 42% { transform: rotate(16deg); } 52% { transform: rotate(10deg); } 70% { transform: rotate(-5deg); } 86% { transform: rotate(2deg); } 100% { transform: none; } }
+@keyframes ot-saegen { 0%, 100% { transform: none; } 15%, 47%, 79% { transform: translateX(-9px) rotate(-1deg); } 31%, 63% { transform: translateX(7px) rotate(1deg); } }
+@keyframes ot-drehen { 0% { transform: none; } 30% { transform: rotate(-24deg); } 60% { transform: rotate(14deg); } 80% { transform: rotate(-5deg); } 100% { transform: none; } }
+@keyframes ot-kippen { 0%, 100% { transform: none; } 25% { transform: rotate(-3deg); } 60% { transform: rotate(2.4deg); } 82% { transform: rotate(-.8deg); } }
+@keyframes ot-ruck { 0% { transform: none; } 30% { transform: translateY(-3px) scale(1.015); } 60% { transform: translateY(.6px) scale(.995); } 100% { transform: none; } }
+@keyframes ot-wiegen { 0% { transform: none; } 20% { transform: rotate(-5deg); } 45% { transform: rotate(4deg); } 70% { transform: rotate(-2deg); } 100% { transform: none; } }
+@keyframes ot-spiegeln { 0% { transform: none; } 25% { transform: translateY(-5px) scaleX(-1); } 75% { transform: translateY(-5px) scaleX(-1); } 100% { transform: none; } }
+@keyframes ot-looping { 0% { transform: none; } 22% { transform: translate(70px, -10px) rotate(-25deg); } 45% { transform: translate(120px, -34px) rotate(-170deg); } 68% { transform: translate(70px, -38px) rotate(-290deg); } 86% { transform: translate(18px, -8px) rotate(-350deg); } 100% { transform: rotate(-360deg); } }
+@keyframes ot-blaettern { 0% { transform: none; } 30% { transform: translateY(-3px) skewX(-2deg) scaleY(.98); } 60% { transform: skewX(1deg); } 100% { transform: none; } }
+@keyframes ot-quetschen { 0% { transform: none; } 30% { transform: scale(1.012, .955); } 60% { transform: scale(.996, 1.012); } 100% { transform: none; } }
+@keyframes ot-zupfen { 0%, 100% { transform: none; } 15% { transform: translateY(-2px); } 30% { transform: translateY(1.6px); } 45% { transform: translateY(-1px); } 60% { transform: translateY(.6px); } }
+@keyframes ot-brille { 0% { transform: none; } 35% { transform: translateY(-4px) scaleX(-.9); } 70% { transform: translateY(-1px) scaleX(1.04); } 100% { transform: none; } }
+@keyframes ot-flackern { 0%, 100% { transform: none; } 30% { transform: translateY(-1px); } }
+@keyframes ot-wagen { 0% { transform: none; } 45% { transform: translateX(-14px); } 58% { transform: translateX(-14px); } 82% { transform: translateX(1.4px); } 100% { transform: none; } }
+@keyframes ot-taste { 0%, 100% { transform: none; } 40% { transform: translateY(1.2px); } }
+@keyframes ot-kurbel { from { transform: none; } to { transform: rotate(720deg); } }
+@keyframes ot-zangeL { 0%, 100% { transform: none; } 40% { transform: rotate(-9deg); } 70% { transform: rotate(1deg); } }
+@keyframes ot-zangeR { 0%, 100% { transform: none; } 40% { transform: rotate(9deg); } 70% { transform: rotate(-1deg); } }
+@keyframes ot-zunge { 0% { transform: none; } 38% { transform: scaleX(.1); } 55% { transform: scaleX(.1); } 82% { transform: scaleX(1.03); } 100% { transform: none; } }
+@keyframes ot-walzenglanz { 0%, 100% { opacity: 1; } 50% { opacity: .82; } }
+@keyframes ot-flamme { 0% { transform: none; } 25% { transform: scale(1.5, 1.7); } 50% { transform: scale(.8, .9) rotate(-6deg); } 75% { transform: scale(1.1) rotate(4deg); } 100% { transform: none; } }
+@keyframes ot-bund { 0% { transform: none; } 20% { transform: rotate(-16deg); } 45% { transform: rotate(12deg); } 70% { transform: rotate(-5deg); } 100% { transform: none; } }
+@keyframes ot-teil { 0% { opacity: 0; transform: none; } 15% { opacity: 1; } 70% { opacity: .9; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--dr)); } }
+@keyframes ot-wurf { 0% { opacity: 1; transform: none; } 35% { transform: translate(calc(var(--dx) * .45), var(--hoch)) rotate(calc(var(--dr) * .4)); } 85% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--dr)); } }
+@keyframes ot-segeln { 0% { opacity: 0; transform: none; } 12% { opacity: 1; } 35% { transform: translate(calc(var(--dx) * -.4), calc(var(--dy) * .3)) rotate(calc(var(--dr) * .3)); } 65% { transform: translate(calc(var(--dx) * .6), calc(var(--dy) * .65)) rotate(calc(var(--dr) * .7)); } 85% { opacity: .9; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--dr)); } }
+@keyframes ot-welle { 0% { opacity: 0; transform: scale(.6); } 25% { opacity: .9; } 100% { opacity: 0; transform: scale(1.9); } }
+@keyframes ot-abdruck { 0% { opacity: 0; transform: scale(1.15); } 12% { opacity: 1; transform: none; } 75% { opacity: 1; } 100% { opacity: 0; } }

@@ -91,27 +91,23 @@ function orteV2Malerei(r, ebene) {
     if (ebene === 'unten') return '';   /* unten malt orteV2DieleUnten */
     return defs(kugel('v2mUhrglas', 'rgba(255,255,255,.55)', 'rgba(255,255,255,.05)', 'rgba(0,0,0,.18)') +
       verlauf('v2mGoldring', 0, 0, 1, 1, [[0, '#fff1c4'], [.35, 'rgba(201,162,90,0)'], [.7, 'rgba(90,60,20,.0)'], [1, 'rgba(90,60,20,.45)']])) +
-      '<path d="M70 50c-18 0-26 14-26 26h52c0-12-8-26-26-26z" fill="url(#v2mRund)"/>' + L('M56 60 Q 62 54 70 53', 'rgba(255,255,255,.28)', 1.4) +
-      '<path d="M117 51 C 114.5 59 114 70 113 84 L111 116 q 5 3 10 1 l 4 -2 q 5 2 10 0 l 4 2 q 5 2 10 -1 L147 84 C 146 70 145.5 59 143 51 C 139 48.6 121 48.6 117 51 Z" fill="url(#v2mRund)" opacity=".8"/>' +
       '<ellipse cx="540" cy="72" rx="48" ry="58" fill="none" stroke="url(#v2mGoldring)" stroke-width="5"/>' +
-      '<circle cx="700" cy="30" r="15.5" fill="url(#v2mUhrglas)"/>' + L('M690 22 Q 694 18 700 17', 'rgba(255,255,255,.7)', 1.2) +
-      '<rect x="620" y="78" width="160" height="8" rx="2" fill="url(#v2mOben)"/>' +
-      '<rect x="40" y="26" width="300" height="10" rx="3" fill="url(#v2mOben)"/>' +
-      '<rect x="364" y="28" width="96" height="46" rx="4" fill="url(#v2mOben)" opacity=".7"/>';
+      '<rect x="40" y="26" width="300" height="10" rx="3" fill="url(#v2mOben)"/>';
   }
   if (r === 'schnipsel') {
     if (ebene === 'unten') return defs('') +
       '<rect x="0" y="0" width="800" height="124" fill="url(#v2mOben)" opacity=".5"/>' +
       S(46, 66, 720, 70, .2, 8) + S(30, 124, 742, 8, .28, 4) +
       E(120, 36, 22, 3, .25) + E(318, 139, 14, 2, .2) + E(560, 136, 46, 3, .22);
+    if (ebene === 'oben') return defs('') + '<rect x="0" y="0" width="800" height="60" fill="url(#v2mOben)" opacity=".3"/>' + L('M0 124.6 H800', 'rgba(255,236,200,.35)', 1) + E(400, 6, 300, 6, 0, 'rgba(255,240,210,.12)');
+    /* 'mitte': der Glanz am Kasten liegt UNTER den Reitern (5.66) — darueber sahen sie durchscheinend aus */
     return defs(verlauf('v2mKasten', 0, 0, 1, 0, [[0, 'rgba(255,230,190,.14)'], [.5, 'rgba(255,230,190,0)'], [1, 'rgba(0,0,0,.24)']]) +
       verlauf('v2mMessing', 0, 0, 0, 1, [[0, '#fff1c6'], [.5, 'rgba(201,162,90,0)'], [1, 'rgba(90,60,20,.5)']])) +
       '<rect x="40" y="60" width="720" height="68" rx="6" fill="url(#v2mKasten)"/>' +
       holz(46, 100, 708, 26, 4, .16) +
       L('M44 60.6 H756', 'rgba(255,236,200,.4)', 1) + L('M42 127.4 H758', 'rgba(0,0,0,.4)', 1.2) +
       Array.from({ length: 22 }, (_, i) => L('M' + (60 + i * 31) + ' ' + (70.6 + (i % 3)) + ' h26', 'rgba(255,255,255,.7)', .8) + L('M' + (86 + i * 31) + ' ' + (71 + (i % 3)) + ' v51', 'rgba(0,0,0,.14)', 1.2)).join('') +
-      '<rect x="372" y="84" width="56" height="12" rx="2" fill="url(#v2mMessing)" opacity=".7"/><rect x="380" y="98" width="40" height="6" rx="3" fill="url(#v2mMessing)" opacity=".8"/>' +
-      '<rect x="114" y="6" width="12" height="14" rx="3" fill="url(#v2mRund)"/><rect x="100" y="18" width="40" height="10" rx="3" fill="url(#v2mOben)"/>';
+      '<rect x="372" y="84" width="56" height="12" rx="2" fill="url(#v2mMessing)" opacity=".7"/><rect x="380" y="98" width="40" height="6" rx="3" fill="url(#v2mMessing)" opacity=".8"/>';
   }
   if (r === 'blaetter') {
     if (ebene === 'unten') return defs('') +
@@ -122,9 +118,6 @@ function orteV2Malerei(r, ebene) {
       verlauf('v2mGlasT', 0, 0, 1, 0, [[0, 'rgba(255,255,255,.3)'], [.25, 'rgba(255,255,255,0)'], [.8, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,.35)']])) +
       /* Papierkanten am Stapel, Eselsohr mit Schatten */
       [0, 1, 2, 3].map((i) => L('M' + (272 + i * 2) + ' ' + (119 - i * 4) + ' H' + (528 + i * 2), 'rgba(160,140,100,.35)', .7)).join('') +
-      L('M510 10 L530 30', 'rgba(0,0,0,.12)', 3) +
-      '<g transform="rotate(-12 200 116)"><rect x="150" y="112" width="110" height="8" fill="url(#v2mStift)"/></g>' +
-      '<rect x="676" y="90" width="28" height="24" rx="3" fill="url(#v2mGlasT)"/>' + L('M680 92 v18', 'rgba(255,255,255,.4)', 1.4) +
       '<rect x="620" y="106" width="26" height="12" rx="2" fill="url(#v2mOben)" transform="rotate(8 633 112)"/>';
   }
   if (r === 'hefte') {
@@ -134,15 +127,8 @@ function orteV2Malerei(r, ebene) {
       E(232, 114, 48, 3, .3) + E(402, 115, 76, 4, .32) + E(562, 115, 22, 2.6, .3) + E(642, 115, 30, 2.4, .2) + E(732, 114, 26, 3, .3) + E(121, 115, 26, 4, .3);
     return defs(verlauf('v2mSchirm', 0, 0, 1, 0, [[0, 'rgba(255,255,255,.25)'], [.3, 'rgba(255,255,255,.05)'], [.7, 'rgba(0,0,0,.08)'], [1, 'rgba(0,0,0,.3)']]) +
       verlauf('v2mMasch', 0, 0, 0, 1, [[0, 'rgba(255,255,255,.18)'], [.4, 'rgba(255,255,255,0)'], [1, 'rgba(0,0,0,.25)']])) +
-      '<path d="M86 56h70l-12-26H98z" fill="url(#v2mSchirm)"/>' + L('M100 32 L90 54', 'rgba(255,255,255,.35)', 1.4) +
-      '<rect x="118" y="52" width="6" height="60" fill="url(#v2mRund)"/>' +
-      /* Buecher: Kapitalbaender und Goldlinien auf den Ruecken */
-      L('M190 99 H274', 'rgba(232,196,110,.7)', .8) + L('M190 109 H274', 'rgba(232,196,110,.7)', .8) + L('M196 85 H272', 'rgba(232,196,110,.6)', .8) + L('M192 73 H262', 'rgba(255,240,200,.5)', .8) +
-      '<rect x="190" y="70" width="84" height="42" fill="url(#v2mOben)" opacity=".6"/>' +
-      '<path d="M340 86h120l10 26H330z" fill="url(#v2mMasch)"/>' + L('M332 72.6 H468', 'rgba(255,255,255,.18)', .8) +
-      '<rect x="544" y="92" width="32" height="22" rx="4" fill="url(#v2mRund)"/>' +
-      '<rect x="710" y="84" width="40" height="28" rx="3" fill="url(#v2mRund)"/>' +
-      '<g stroke="rgba(230,250,220,.35)" stroke-width=".7" fill="none"><path d="M729 82c-8-10-18-16-28-20"/><path d="M731 82c8-10 18-16 28-20"/><path d="M730 80c0-12 3-24 9-36"/></g>';
+      /* Glanz der Dinge haengt seit 5.66 an den Dingen selbst; hier nur noch Licht im Raum */
+      '<rect x="0" y="0" width="800" height="112" fill="url(#v2mMasch)" opacity=".35"/>' + L('M0 112.6 H800', 'rgba(255,236,200,.35)', 1);
   }
   if (r === 'projekte') {
     if (ebene === 'unten') return defs('') +
@@ -158,16 +144,14 @@ function orteV2Malerei(r, ebene) {
     if (ebene === 'unten') return defs(kugel('v2mTischlicht', 'rgba(255,236,200,.35)', 'rgba(255,236,200,.08)', 'rgba(255,236,200,0)')) +
       '<ellipse cx="420" cy="40" rx="420" ry="120" fill="url(#v2mTischlicht)"/>' +
       holz(0, 0, 800, 150, 14, .12) +
-      '<path d="M120 20c-6 6-6 14 0 20 6-6 6-14 0-20z M650 30c-8 7-8 17 0 24 8-7 8-17 0-24z" fill="none" stroke="rgba(60,35,15,.18)" stroke-width="1"/>' +
+      [[120, 30, 4, 9], [650, 42, 5, 11]].map(([x, y, rx, ry]) => '<ellipse cx="' + x + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '" fill="none" stroke="rgba(60,35,15,.16)" stroke-width="1"/><ellipse cx="' + x + '" cy="' + y + '" rx="' + (rx * .45) + '" ry="' + (ry * .5) + '" fill="rgba(60,35,15,.22)"/>').join('') +
       '<g transform="rotate(-2 400 80)">' + S(268, 30, 276, 112, .22, 2) + '</g>' +
       '<g transform="rotate(-6 120 70)">' + S(94, 55, 60, 40, .2, 1) + '</g><g transform="rotate(5 180 110)">' + S(154, 97, 60, 40, .2, 1) + '</g>' +
       E(718, 128, 13, 3, .25) + E(42, 54, 18, 3, .25);
     return defs(verlauf('v2mFalz', 0, 0, 1, 0, [[0, 'rgba(0,0,0,0)'], [.42, 'rgba(0,0,0,0)'], [.5, 'rgba(60,40,10,.22)'], [.58, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,0)']]) +
       kugel('v2mKeks', 'rgba(255,230,170,.5)', 'rgba(255,230,170,0)', 'rgba(80,40,10,.35)')) +
-      '<g transform="rotate(-2 400 80)"><rect x="262" y="24" width="276" height="112" fill="url(#v2mFalz)"/>' + L('M264 25 H536', 'rgba(255,255,255,.6)', .8) + '</g>' +
-      '<circle cx="716" cy="124" r="12" fill="url(#v2mKeks)"/>' +
-      '<g fill="rgba(120,70,20,.35)"><circle cx="709" cy="127" r=".9"/><circle cx="722" cy="119" r=".8"/><circle cx="716" cy="117" r=".7"/></g>' +
-      '<rect x="24" y="30" width="32" height="22" rx="3" fill="url(#v2mRund)"/>';
+      /* Glanz der Dinge haengt seit 5.66 an den Dingen selbst */
+      '<rect x="0" y="0" width="800" height="150" fill="url(#v2mOben)" opacity=".18"/>' + L('M0 .6 H800', 'rgba(255,240,210,.3)', 1);
   }
   if (r === 'woerter') {
     if (ebene === 'unten') return defs('') +
@@ -176,7 +160,6 @@ function orteV2Malerei(r, ebene) {
       verlauf('v2mRahmen', 0, 0, 0, 1, [[0, 'rgba(255,230,190,.35)'], [.08, 'rgba(255,230,190,0)'], [.92, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,.4)']])) +
       '<rect x="40" y="20" width="540" height="116" rx="4" fill="url(#v2mRahmen)"/>' +
       holz(40, 20, 540, 6, 1, .25) + holz(40, 130, 540, 6, 1, .25) +
-      Array.from({ length: 12 }, (_, i) => { const x = 52 + (i % 6) * 88 + (i % 2) * 6, y = 34 + Math.floor(i / 6) * 52; return '<rect x="' + (x + 3) + '" y="' + (y + 3) + '" width="34" height="30" rx="2" fill="url(#v2mLetter)"/>' + L('M' + (x + 4) + ' ' + (y + 3.6) + ' h32', 'rgba(255,255,255,.45)', .7); }).join('') +
       L('M622 65 H778', 'rgba(255,255,255,.5)', .8);
   }
   if (r === 'klang') {
@@ -187,13 +170,8 @@ function orteV2Malerei(r, ebene) {
       S(254, 116, 176, 8, .35, 4) + E(132, 122, 66, 3.5, .3) + E(700, 122, 30, 3, .3) + E(590, 121, 16, 2.5, .3);
     return defs(verlauf('v2mKasten2', 0, 0, 0, 1, [[0, 'rgba(255,220,170,.28)'], [.15, 'rgba(255,220,170,0)'], [1, 'rgba(0,0,0,.3)']]) +
       verlauf('v2mWachs', 0, 0, 1, 0, [[0, 'rgba(255,255,255,.5)'], [.4, 'rgba(255,255,255,0)'], [1, 'rgba(120,80,30,.25)']])) +
-      '<rect x="250" y="76" width="170" height="44" rx="4" fill="url(#v2mKasten2)"/>' + holz(258, 90, 154, 24, 3, .2) +
-      L('M250 82.4 H420', '#e8c27a', .8) + L('M252 119 H418', 'rgba(0,0,0,.4)', 1) +
-      '<ellipse cx="478" cy="36" rx="13" ry="31.6" transform="rotate(25 478 36)" fill="none" stroke="rgba(120,80,20,.45)" stroke-width="1"/>' +
-      '<path d="M430 16c20 2 44 14 54 34" fill="none" stroke="rgba(90,60,10,.3)" stroke-width="5" stroke-linecap="round"/>' +
-      '<rect x="584" y="96" width="12" height="22" fill="url(#v2mWachs)"/>' +
-      '<path d="M680 118l10-70h20l10 70z" fill="url(#v2mRund)"/>' +
-      [0, 1, 2, 3].map((i) => '<rect x="' + (80 + i * 28) + '" y="' + (48 + (i % 2) * 4) + '" width="26" height="70" rx="2" fill="url(#v2mRund)" transform="rotate(' + (-6 + i * 3) + ' ' + (93 + i * 28) + ' 118)"/>').join('');
+      /* Glanz der Dinge haengt seit 5.66 an den Dingen selbst; hier das Licht im Raum */
+      '<rect x="0" y="0" width="800" height="118" fill="url(#v2mKasten2)" opacity=".5"/>' + L('M0 118.6 H800', 'rgba(255,220,170,.4)', 1);
   }
   if (r === 'faden') {
     if (ebene === 'unten') return defs(kugel('v2mLampenwand2', 'rgba(255,214,140,.45)', 'rgba(255,214,140,.1)', 'rgba(255,214,140,0)')) +
@@ -203,11 +181,8 @@ function orteV2Malerei(r, ebene) {
       E(400, 129, 160, 4, .3) + E(625, 96, 40, 3, .3) + E(160, 129, 26, 4, .3) + E(740, 129, 24, 3, .3);
     return defs(verlauf('v2mPolster', 0, 0, 0, 1, [[0, 'rgba(255,220,180,.3)'], [.3, 'rgba(255,220,180,0)'], [1, 'rgba(0,0,0,.28)']]) +
       kugel('v2mBakelit', 'rgba(255,255,255,.35)', 'rgba(255,255,255,0)', 'rgba(0,0,0,.2)')) +
-      '<rect x="250" y="60" width="300" height="34" rx="8" fill="url(#v2mPolster)"/>' +
-      [300, 350, 400, 450, 500].map((x) => '<circle cx="' + x + '" cy="76" r="1.6" fill="rgba(60,20,5,.4)"/><path d="M' + (x - 8) + ' 72 Q ' + x + ' 76 ' + (x - 8) + ' 80 M' + (x + 8) + ' 72 Q ' + x + ' 76 ' + (x + 8) + ' 80" fill="none" stroke="rgba(60,20,5,.18)"/>').join('') +
-      '<rect x="590" y="64" width="70" height="30" rx="8" fill="url(#v2mBakelit)"/>' + L('M598 66 Q 625 62 652 66', 'rgba(255,255,255,.4)', 1.2) +
-      '<path d="M124 36h72l-12-20H136z" fill="url(#v2mRund)"/>' +
-      '<path d="M60 42c-14 0-20 12-20 22h40c0-10-6-22-20-22z" fill="url(#v2mRund)"/>';
+      /* Glanz der Dinge haengt seit 5.66 an den Dingen selbst */
+      '<rect x="0" y="0" width="800" height="126" fill="url(#v2mPolster)" opacity=".3"/>' + L('M0 126.6 H800', 'rgba(255,232,200,.3)', 1);
   }
   if (r === 'feinheiten') {
     if (ebene === 'unten') return defs('') +
@@ -215,16 +190,11 @@ function orteV2Malerei(r, ebene) {
       '<rect x="0" y="0" width="800" height="118" fill="url(#v2mOben)" opacity=".5"/>' +
       holz(0, 122, 800, 26, 4, .2) +
       S(386, 66, 260, 60, .32, 6) + S(664, 99, 120, 14, .3, 3) + E(64, 117, 18, 3, .3) +
-      S(112, 44, 8, 60, .22, 2) + S(186, 36, 70, 22, .18, 2);
+      S(112, 44, 8, 48, .22, 2) + S(182, 34, 70, 24, .18, 2) + S(312, 30, 24, 58, .12, 8);
     return defs(verlauf('v2mKiste', 0, 0, 0, 1, [[0, 'rgba(255,200,180,.3)'], [.2, 'rgba(255,200,180,0)'], [.85, 'rgba(0,0,0,.12)'], [1, 'rgba(0,0,0,.35)']]) +
       verlauf('v2mStahl', 0, 0, 0, 1, [[0, 'rgba(255,255,255,.45)'], [.5, 'rgba(255,255,255,0)'], [1, 'rgba(0,0,0,.3)']])) +
-      '<rect x="380" y="60" width="260" height="60" rx="6" fill="url(#v2mKiste)"/>' +
-      '<rect x="386" y="76" width="16" height="10" rx="2" fill="#c9a25a"/><rect x="618" y="76" width="16" height="10" rx="2" fill="#c9a25a"/>' +
-      '<rect x="386" y="76" width="16" height="10" rx="2" fill="url(#v2mStahl)"/><rect x="618" y="76" width="16" height="10" rx="2" fill="url(#v2mStahl)"/>' +
-      '<rect x="90" y="26" width="40" height="18" rx="3" fill="url(#v2mStahl)"/><rect x="106" y="40" width="8" height="60" rx="2" fill="url(#v2mRund)"/>' +
-      '<path d="M180 30h70v22H180z" fill="url(#v2mStahl)"/>' +
-      '<rect x="660" y="94" width="120" height="14" rx="3" fill="url(#v2mOben)"/>' +
-      '<circle cx="60" cy="100" r="16" fill="url(#v2mRund)"/>';
+      /* Glanz der Werkzeuge haengt seit 5.66 an den Werkzeugen selbst */
+      '<rect x="0" y="0" width="800" height="118" fill="url(#v2mStahl)" opacity=".18"/>' + L('M0 118.6 H800', 'rgba(255,230,180,.45)', 1.2);
   }
   return '';
 }
@@ -405,7 +375,7 @@ function orteKulisse(raum, haupt) {
       '<circle cx="134.6" cy="63" r="1.3" fill="#c9a25a"/><circle cx="133.4" cy="71" r="1.3" fill="#c9a25a"/>' +
       /* Saumkante und Schlitz */
       '<path d="M111 116 q 5 3 10 1 l 4 -2 q 5 2 10 0 l 4 2 q 5 2 10 -1" fill="none" stroke="#1a2a44" stroke-width="1.2" stroke-linejoin="round"/>' +
-      '<path d="M128.6 104 C 128 109 128 113 128.6 117" fill="none" stroke="rgba(10,18,34,.3)" stroke-width="1"/></g>' +
+      '<path d="M128.6 104 C 128 109 128 113 128.6 117" fill="none" stroke="rgba(10,18,34,.3)" stroke-width="1"/>' + odGlanz('mantel') + '</g>' +
       /* Schal (bewegt sich) und Jahreszeit am Haken */
       /* Ein Strickschal ueber dem Haken: zwei Enden mit Rippen, Querstreifen und Fransen */
       '<g class="ort-schal" style="transform-origin:250px 48px">' +
@@ -418,7 +388,7 @@ function orteKulisse(raum, haupt) {
       '<g fill="#e2c799" opacity=".9">' + [64, 80, 96].map((y) => '<path d="M' + (242.4 + (y - 64) * -.02) + ' ' + y + ' L 251.8 ' + (y - .6) + ' L 251.7 ' + (y + 2.8) + ' L ' + (242.2) + ' ' + (y + 3.4) + ' Z"/>').join('') + [68, 84].map((y) => '<path d="M' + (255 + (y - 60) * .12) + ' ' + y + ' L ' + (262.6 + (y - 60) * .1) + ' ' + (y - .4) + ' L ' + (263 + (y - 60) * .1) + ' ' + (y + 2.8) + ' L ' + (255.4 + (y - 60) * .12) + ' ' + (y + 3.2) + ' Z" opacity=".85"/>').join('') + '</g>' +
       '<g stroke="#b0552f" stroke-width="1.2" stroke-linecap="round">' + [244, 246, 248, 250].map((x) => '<path d="M' + x + ' 107 l ' + ((x - 247) * .3) + ' 5"/>').join('') + [260, 262, 264, 266].map((x) => '<path d="M' + x + ' 103.6 l ' + ((x - 263) * .3) + ' 5"/>').join('') + '</g>' +
       '</g>' +
-      (jz === 'winter' ? '<g ' + T('zweig', 'Tannenzweig. Es duftet nach Dezember.') + ' style="transform-origin:310px 48px"><path d="M310 48l0 44M310 60l-10-8M310 60l10-8M310 74l-10-8M310 74l10-8M310 86l-8-6M310 86l8-6" stroke="#4a7a46" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="310" cy="52" r="4" fill="#c0392b"/></g>' : jz === 'fruehling' ? '<g ' + T('bluete', 'Die Blüte nickt. Frühling in der Diele.') + ' style="transform-origin:310px 50px"><g fill="#e9a9b8"><circle cx="305" cy="56" r="5"/><circle cx="315" cy="56" r="5"/><circle cx="310" cy="50" r="5"/><circle cx="310" cy="62" r="5"/><circle cx="310" cy="56" r="3" fill="#f2d98a"/></g><path d="M310 64v28" stroke="#4a7a46" stroke-width="2.5"/></g>' : jz === 'sommer' ? '<g ' + T('strohhut', 'Der Strohhut. Riecht nach Heu und Meer.') + ' style="transform-origin:310px 50px"><ellipse cx="310" cy="62" rx="26" ry="7" fill="#d9b463"/><path d="M296 62c0-12 6-18 14-18s14 6 14 18" fill="#e8c878"/><path d="M296 60h28" stroke="#b0352b" stroke-width="3"/></g>' : '<g ' + T('blatt', 'Ein Herbstblatt. Es knistert.') + ' style="transform-origin:310px 50px"><path d="M310 50c-14 6-16 22-4 30 12-8 10-24 4-30z" fill="#c8873a"/><path d="M308 54l-2 26" stroke="#8a4a22" stroke-width="1.2"/></g>') +
+      (() => { const j = { winter: ['zweig', 'Tannenzweig. Es duftet nach Dezember.'], fruehling: ['bluete', 'Die Blüte nickt. Frühling in der Diele.'], sommer: ['strohhut', 'Der Strohhut. Riecht nach Heu und Meer.'] }[jz] || ['blatt', 'Ein Herbstblatt. Es knistert.']; return '<g ' + T(j[0], j[1]) + ' style="transform-origin:310px 48px">' + odJahreszeitHaken(jz) + '</g>'; })() +
       /* Schuhe und Schirmständer */
       /* Ein Paar Lederschuhe: Sohle, Absatz, Kappe, Schnuerung, Glanz auf dem Leder */
       '<g ' + T('schuhe', 'Die Schuhe stehen ordentlich. Fast.') + ' style="transform-origin:200px 118px">' +
@@ -449,7 +419,7 @@ function orteKulisse(raum, haupt) {
       '<path d="M10.6 96 L 33.4 96 M11.2 108 L 32.8 108" stroke="rgba(60,40,10,.45)" stroke-width="1.2"/>' +
       '</g>' +
       /* Schlüsselbrett: drei Haken — Haustür, Fahrrad, der Busschlüssel mit Bus-Anhänger */
-      '<g ' + T('schluessel', 'Der Busschlüssel klimpert. Wohin fahren wir?') + ' style="transform-origin:410px 30px"><rect x="364" y="28" width="96" height="46" rx="4" fill="#a3783f"/><rect x="368" y="32" width="88" height="38" rx="3" fill="#7a5a2e"/><text x="412" y="41" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-size="6.5" letter-spacing=".2" fill="#f3e7c9">SCHLÜSSEL</text>' +
+      '<g ' + T('schluessel', 'Der Busschlüssel klimpert. Wohin fahren wir?') + ' style="transform-origin:410px 30px"><rect x="364" y="28" width="96" height="46" rx="4" fill="#a3783f"/><rect x="368" y="32" width="88" height="38" rx="3" fill="#7a5a2e"/><text x="412" y="41" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-size="6.5" letter-spacing=".2" fill="#f3e7c9">SCHLÜSSEL</text>' + odGlanz('schluessel') +
       '<g fill="#d9c29a"><circle cx="384" cy="50" r="2.2"/><circle cx="412" cy="50" r="2.2"/><circle cx="440" cy="50" r="2.2"/></g>' +
       '<g class="ort-schluesselbund" style="transform-origin:384px 50px"><circle cx="384" cy="56" r="3.5" fill="none" stroke="#c9a25a" stroke-width="1.4"/><rect x="382.5" y="59" width="3" height="16" fill="#c9a25a"/><rect x="385" y="70" width="3" height="2" fill="#c9a25a"/><rect x="385" y="74" width="2" height="2" fill="#c9a25a"/></g>' +
       '<g class="ort-schluesselbund b" style="transform-origin:412px 50px"><circle cx="412" cy="56" r="3.5" fill="none" stroke="#8a8f96" stroke-width="1.4"/><rect x="410.5" y="59" width="3" height="14" fill="#8a8f96"/><rect x="413" y="68" width="3" height="2" fill="#8a8f96"/></g>' +
@@ -466,14 +436,11 @@ function orteKulisse(raum, haupt) {
       '<g class="ort-hauch" opacity="0"><ellipse cx="540" cy="100" rx="30" ry="11" fill="rgba(255,255,255,.55)"/><text class="ort-hauch-text" x="540" y="103" text-anchor="middle" font-family="\'Bradley Hand\', \'Segoe Print\', \'Chalkboard SE\', cursive" font-size="8.5" fill="#3a3a44"></text></g>' +
       '</g>' +
       /* Konsole mit Briefen und der Katze darunter */
-      '<rect x="620" y="78" width="160" height="8" rx="2" fill="#c9a25a"/><rect x="628" y="86" width="6" height="34" fill="#8a6a2e"/><rect x="766" y="86" width="6" height="34" fill="#8a6a2e"/>' +
-      '<g ' + T('briefe', 'Zwei Briefe. Einer davon riecht nach Lavendel.') + ' style="transform-origin:700px 70px"><g transform="rotate(-6 680 64)"><rect x="650" y="58" width="60" height="22" fill="#f1e4c8"/><path d="M650 58l30 14 30-14" fill="none" stroke="#c9a25a" stroke-width="1.5"/></g><g transform="rotate(5 700 66)"><rect x="672" y="62" width="60" height="22" fill="#f6ecd6"/><circle cx="702" cy="73" r="4" fill="#b0552f"/></g></g>' +
+      '<rect x="620" y="78" width="160" height="8" rx="2" fill="#c9a25a"/><rect x="628" y="86" width="6" height="34" fill="#8a6a2e"/><rect x="766" y="86" width="6" height="34" fill="#8a6a2e"/>' + odGlanz('konsole') +
+      '<g ' + T('briefe', 'Zwei Briefe. Einer davon riecht nach Lavendel.') + ' style="transform-origin:700px 70px">' + odBriefe() + '</g>' +
       (typeof katzeSVG === 'function' ? katzeSVG(722, 119, katzeZustand(heute.getHours(), (D.stats && D.stats.tage && D.stats.tage[tagKey()]) || 0), o.katzeName) : '') +
       /* Eine kleine Uhr über der Konsole: die Zeiger stimmen */
-      '<g ' + T('uhr', 'Tick. Die Uhr geht richtig — ' + heute.getHours() + ':' + String(heute.getMinutes()).padStart(2, '0') + '.') + ' style="transform-origin:700px 30px"><circle cx="700" cy="30" r="17" fill="#f3e7c9" stroke="#8a6a2e" stroke-width="3"/>' + [0, 1, 2, 3].map((i) => '<line x1="' + (700 + 13 * Math.sin(i * Math.PI / 2)) + '" y1="' + (30 - 13 * Math.cos(i * Math.PI / 2)) + '" x2="' + (700 + 10 * Math.sin(i * Math.PI / 2)) + '" y2="' + (30 - 10 * Math.cos(i * Math.PI / 2)) + '" stroke="#2c2218" stroke-width="1.5"/>').join('') +
-      '<line x1="700" y1="30" x2="' + (700 + 7 * Math.sin((heute.getHours() % 12 + heute.getMinutes() / 60) * Math.PI / 6)) + '" y2="' + (30 - 7 * Math.cos((heute.getHours() % 12 + heute.getMinutes() / 60) * Math.PI / 6)) + '" stroke="#2c2218" stroke-width="2.2" stroke-linecap="round"/>' +
-      '<line x1="700" y1="30" x2="' + (700 + 11 * Math.sin(heute.getMinutes() * Math.PI / 30)) + '" y2="' + (30 - 11 * Math.cos(heute.getMinutes() * Math.PI / 30)) + '" stroke="#2c2218" stroke-width="1.6" stroke-linecap="round"/>' +
-      '<line class="ort-sekunde" x1="700" y1="34" x2="700" y2="18" stroke="#b0352b" stroke-width="1" style="transform-origin:700px 30px"/><circle cx="700" cy="30" r="1.5" fill="#2c2218"/></g>' +
+      '<g ' + T('uhr', 'Tick. Die Uhr geht richtig — ' + heute.getHours() + ':' + String(heute.getMinutes()).padStart(2, '0') + '.') + ' style="transform-origin:700px 12px">' + odUhr(heute) + '</g>' +
       orteV2DieleOben()
     ));
     /* Neuigkeiten: was in den Räumen wartet */
@@ -489,6 +456,7 @@ function orteKulisse(raum, haupt) {
     } catch (e) {}
     wrap.append(chips);
     if (typeof katzeBeleben === 'function') katzeBeleben(wrap, o, typeof salonAnrede === 'function' ? salonAnrede() : '');
+    if (typeof orteUhrLaufen === 'function') orteUhrLaufen(wrap);
     if (o.spiegelKamera) orteSpiegelKamera(wrap);
   } else if (r === 'schnipsel') {
     /* Zettelkasten: ein Holzkasten mit sieben Karteireitern — ein Reiter je Tag der letzten Woche */
@@ -506,12 +474,13 @@ function orteKulisse(raum, haupt) {
       '<rect x="380" y="98" width="40" height="6" rx="3" fill="#c9a25a"/><rect x="372" y="84" width="56" height="12" rx="2" fill="#c9a25a"/><text x="400" y="93" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-size="7" fill="#3a2a18" letter-spacing=".2">ZETTEL</text>' +
       /* Karteikarten stehen im Kasten */
       Array.from({ length: 22 }, (_, i) => '<rect x="' + (60 + i * 31) + '" y="' + (70 + (i % 3)) + '" width="26" height="52" fill="' + (i % 4 === 0 ? '#f3e7c9' : '#ece0c4') + '" stroke="#b39b6a" stroke-width=".6"/>').join('') +
+      orteV2Malerei('schnipsel', 'mitte') +
       /* Reiter je Tag */
       tage.map((d, i) => { const x = 70 + i * 98; const n = zahlen[i]; return '<g ' + T('reiter', namen[d.getDay()] + ': ' + (n ? n + (n === 1 ? ' Zettel' : ' Zettel') : 'kein Zettel')) + ' style="transform-origin:' + (x + 42) + 'px 70px"><rect x="' + x + '" y="' + (n ? 30 : 40) + '" width="84" height="40" rx="3" fill="' + (n ? '#f3e7c9' : '#d8cfb8') + '" stroke="#b39b6a"/><text x="' + (x + 42) + '" y="' + (n ? 52 : 62) + '" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-size="13" fill="#5a4326">' + namen[d.getDay()] + (n ? ' · ' + n : '') + '</text></g>'; }).join('') +
       /* Eine Karte ragt heraus: der letzte Zettel */
       (letzter ? '<g ' + T('karte', 'Der letzte Zettel: „' + (letzter.text || '').trim().slice(0, 60).replace(/\s+/g, ' ') + '“', 'letzter') + ' style="transform-origin:700px 70px"><g transform="rotate(-4 700 70)"><rect x="660" y="22" width="80" height="50" fill="#fbf6e8" stroke="#c9bda0"/><g stroke="rgba(90,110,170,.25)">' + [34, 42, 50, 58, 66].map((y) => '<line x1="666" y1="' + y + '" x2="734" y2="' + y + '"/>').join('') + '</g><line x1="660" y1="28" x2="740" y2="28" stroke="rgba(200,80,80,.5)"/>' + orteUmbruch(letzter.text, 16, 4).map((z, i) => '<text x="667" y="' + (40 + i * 8) + '" font-family="ui-serif, Georgia, serif" font-size="6.6" fill="#3a2a18">' + orteText(z) + '</text>').join('') + '</g></g>' : '') +
       /* Stempel, Büroklammern, Füller */
-      '<g ' + T('stempel', 'Tock. „Notiert.“') + ' style="transform-origin:120px 40px"><rect x="100" y="18" width="40" height="10" rx="3" fill="#2c2218"/><rect x="114" y="6" width="12" height="14" rx="3" fill="#8a6a3e"/><rect x="104" y="28" width="32" height="6" fill="#8a1c12" opacity=".8"/></g>' +
+      '<g ' + T('stempel', 'Tock. „Notiert.“') + ' style="transform-origin:120px 34px">' + odStempel() + '</g>' +
       '<g ' + T('fueller', 'Die Feder ist voll. Sie will einen Zettel.') + ' style="transform-origin:560px 130px"><g transform="rotate(-18 560 130)"><rect x="520" y="126" width="80" height="7" rx="3.5" fill="#1a1a1a"/><rect x="596" y="126" width="14" height="7" rx="3" fill="#c9a25a"/><path d="M520 129.5l-10 2 10 2z" fill="#c9a25a"/><rect x="560" y="124" width="14" height="2" fill="#c9a25a"/></g></g>' +
       '<g fill="none" stroke="#8a8f96" stroke-width="1.4"><path d="M300 130c0-3 3-5 6-5h10c3 0 5 2 5 5v8"/><path d="M303 132c0-2 2-3 4-3h8c2 0 3 1 3 3v5"/></g>'
     ));
@@ -538,12 +507,12 @@ function orteKulisse(raum, haupt) {
       '<text x="112" y="-4" text-anchor="end" font-family="ui-rounded, system-ui, sans-serif" font-size="7" fill="#8a7a62">' + n + (n === 1 ? ' Blatt' : ' Blätter') + ' auf dem Stapel</text></g></g>' +
       /* Briefbeschwerer aus Glas, Bleistift, Radiergummi */
       '<g ' + T('glas', 'Der Briefbeschwerer. Kühl und schwer, wie ein guter letzter Satz.') + ' style="transform-origin:500px 28px"><ellipse cx="500" cy="34" rx="16" ry="5" fill="rgba(0,0,0,.18)"/><circle cx="500" cy="24" r="14" fill="rgba(140,190,200,.55)" stroke="rgba(255,255,255,.7)"/><path d="M492 18c2-5 8-7 12-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/><circle cx="500" cy="26" r="5" fill="rgba(255,255,255,.35)"/></g>' +
-      '<g ' + T('bleistift', 'Der Bleistift ist gespitzt. Das ist die halbe Arbeit.') + ' style="transform-origin:200px 116px"><g transform="rotate(-12 200 116)"><rect x="150" y="112" width="96" height="8" fill="#e8b43c"/><path d="M246 112l14 4-14 4z" fill="#f3e1b0"/><path d="M256 114.5l4 1.5-4 1.5z" fill="#2c2218"/><rect x="150" y="112" width="8" height="8" fill="#d98b8b"/><rect x="158" y="112" width="5" height="8" fill="#c9c9c9"/><line x1="165" y1="114.5" x2="244" y2="114.5" stroke="rgba(0,0,0,.12)"/></g></g>' +
+      '<g ' + T('bleistift', 'Der Bleistift ist gespitzt. Das ist die halbe Arbeit.') + ' style="transform-origin:200px 116px"><g transform="rotate(-12 200 116)"><rect x="150" y="112" width="96" height="8" fill="#e8b43c"/><path d="M246 112l14 4-14 4z" fill="#f3e1b0"/><path d="M256 114.5l4 1.5-4 1.5z" fill="#2c2218"/><rect x="150" y="112" width="8" height="8" fill="#d98b8b"/><rect x="158" y="112" width="5" height="8" fill="#c9c9c9"/><line x1="165" y1="114.5" x2="244" y2="114.5" stroke="rgba(0,0,0,.12)"/>' + odGlanz('bleistift') + '</g></g>' +
       '<rect x="620" y="106" width="26" height="12" rx="2" fill="#e8d7d0" stroke="#c9a9a0" transform="rotate(8 633 112)"/>' +
       /* Ein Papierflieger, der ab und zu über den Tisch segelt */
-      '<g ' + T('flieger', 'Der Papierflieger segelt davon. Irgendwo landet ein Satz.') + '><g class="ort-flieger"><path d="M121 39.6 L 184 50 L 134 46.4 Z" fill="#e3d7b9" stroke="#a89a78" stroke-width=".6" stroke-linejoin="round"/><path d="M128 49 L 184 50 L 142 57.4 Z" fill="#cbbb94" stroke="#a89a78" stroke-width=".6" stroke-linejoin="round"/><path d="M114 48.6 L 184 50 L 136 63 Z" fill="#fffdf6" stroke="#a89a78" stroke-width=".7" stroke-linejoin="round"/><path d="M114 48.6 L 184 50" stroke="#b8ab8a" stroke-width=".6"/><path d="M124 53.4 L 172 51.4" stroke="rgba(170,150,110,.45)" stroke-width=".5"/><path d="M136 63 L 184 50 L 150 58.6 Z" fill="rgba(160,140,100,.18)"/></g></g>' +
+      '<g ' + T('flieger', 'Der Papierflieger segelt davon. Irgendwo landet ein Satz.') + ' style="transform-origin:150px 52px"><g class="ort-flieger"><path d="M121 39.6 L 184 50 L 134 46.4 Z" fill="#e3d7b9" stroke="#a89a78" stroke-width=".6" stroke-linejoin="round"/><path d="M128 49 L 184 50 L 142 57.4 Z" fill="#cbbb94" stroke="#a89a78" stroke-width=".6" stroke-linejoin="round"/><path d="M114 48.6 L 184 50 L 136 63 Z" fill="#fffdf6" stroke="#a89a78" stroke-width=".7" stroke-linejoin="round"/><path d="M114 48.6 L 184 50" stroke="#b8ab8a" stroke-width=".6"/><path d="M124 53.4 L 172 51.4" stroke="rgba(170,150,110,.45)" stroke-width=".5"/><path d="M136 63 L 184 50 L 150 58.6 Z" fill="rgba(160,140,100,.18)"/></g></g>' +
       /* Tintenfass */
-      '<g ' + T('tinte', 'Die Tinte ist schwarz wie drei Uhr nachts.') + ' style="transform-origin:690px 100px"><rect x="676" y="90" width="28" height="24" rx="3" fill="#1e2430"/><rect x="682" y="84" width="16" height="8" rx="2" fill="#2c2218"/><rect x="679" y="96" width="22" height="10" fill="rgba(255,255,255,.12)"/><path d="M704 86l18-40" stroke="#2c2218" stroke-width="2.5" stroke-linecap="round"/><path d="M722 46c-2-6-6-8-6-8l2 10z" fill="#c9a25a"/></g>'
+      '<g ' + T('tinte', 'Die Tinte ist schwarz wie drei Uhr nachts.') + ' style="transform-origin:690px 114px">' + odTintenfass() + '</g>'
     ));
   } else if (r === 'hefte') {
     wrap.append(svg(
@@ -554,17 +523,11 @@ function orteKulisse(raum, haupt) {
       '<rect x="0" y="112" width="800" height="38" fill="url(#orthtisch)"/><rect x="0" y="112" width="800" height="3" fill="rgba(255,230,190,.4)"/>' +
       orteV2Malerei('hefte', 'unten') +
       /* Leselampe: tippen schaltet das Licht */
-      '<g ' + T('lampe', null, 'lampe') + ' style="transform-origin:121px 112px"><rect x="118" y="52" width="6" height="60" fill="#8a6a2e"/><ellipse cx="121" cy="112" rx="22" ry="5" fill="#8a6a2e"/><path d="M86 56h70l-12-26H98z" fill="#2f6b4f"/><path d="M86 56h70" stroke="#c9a25a" stroke-width="2"/><path class="ort-lichtkegel" d="M86 56h70l54 58H30z" fill="rgba(255,220,150,.26)"/><ellipse class="ort-gluehbirne" cx="121" cy="54" rx="8" ry="4" fill="rgba(255,236,190,.9)"/></g>' +
+      '<g ' + T('lampe', null, 'lampe') + ' style="transform-origin:121px 112px"><rect x="118" y="52" width="6" height="60" fill="#8a6a2e"/><ellipse cx="121" cy="112" rx="22" ry="5" fill="#8a6a2e"/><path d="M86 56h70l-12-26H98z" fill="#2f6b4f"/><path d="M86 56h70" stroke="#c9a25a" stroke-width="2"/>' + odGlanz('lampe') + '<path class="ort-lichtkegel" d="M86 56h70l54 58H30z" fill="rgba(255,220,150,.26)"/><ellipse class="ort-gluehbirne" cx="121" cy="54" rx="8" ry="4" fill="rgba(255,236,190,.9)"/></g>' +
       /* Bücherstapel mit Lesezeichen */
-      '<g ' + T('buecher', 'Drei Bücher, alle angefangen. So muss das.') + ' style="transform-origin:230px 112px"><rect x="190" y="96" width="84" height="16" rx="2" fill="#7a3b2e"/><rect x="196" y="82" width="76" height="14" rx="2" fill="#2f5a7a"/><rect x="192" y="70" width="70" height="12" rx="2" fill="#b8923f"/><path d="M250 70v-18" stroke="#b0352b" stroke-width="3"/><g stroke="rgba(255,255,255,.35)"><line x1="196" y1="104" x2="268" y2="104"/><line x1="202" y1="89" x2="266" y2="89"/></g></g>' +
+      '<g ' + T('buecher', 'Drei Bücher, alle angefangen. So muss das.') + ' style="transform-origin:230px 112px"><rect x="190" y="96" width="84" height="16" rx="2" fill="#7a3b2e"/><rect x="196" y="82" width="76" height="14" rx="2" fill="#2f5a7a"/><rect x="192" y="70" width="70" height="12" rx="2" fill="#b8923f"/><path d="M250 70v-18" stroke="#b0352b" stroke-width="3"/><g stroke="rgba(255,255,255,.35)"><line x1="196" y1="104" x2="268" y2="104"/><line x1="202" y1="89" x2="266" y2="89"/></g>' + odGlanz('buecher') + '</g>' +
       /* Die Schreibmaschine: Wagen, Papier, Tasten — sie funktioniert */
-      '<g ' + T('schreibmaschine', null, 'schreibmaschine') + ' style="transform-origin:400px 112px">' +
-      '<rect x="366" y="30" width="70" height="52" fill="#fbf6e8" stroke="#d9caa6"/><g stroke="rgba(0,0,0,.18)">' + [40, 47, 54, 61].map((y) => '<line x1="372" y1="' + y + '" x2="' + (372 + 20 + (y % 13) * 2) + '" y2="' + y + '"/>').join('') + '</g>' +
-      '<rect x="330" y="72" width="140" height="14" rx="4" fill="#1d2024"/><rect x="326" y="70" width="8" height="18" rx="2" fill="#c9a25a"/><rect x="466" y="70" width="8" height="18" rx="2" fill="#c9a25a"/><path d="M326 74l-14-16" stroke="#c9a25a" stroke-width="3" stroke-linecap="round"/>' +
-      '<path d="M340 86h120l10 26H330z" fill="url(#ortsm)"/><rect x="352" y="78" width="96" height="6" fill="#8a1c12" opacity=".85"/><rect x="372" y="86" width="56" height="8" fill="#0e0f11"/>' +
-      [0, 1, 2, 3].map((reihe) => Array.from({ length: 10 - reihe }, (_, i) => '<circle class="ort-taste" cx="' + (360 + reihe * 5 + i * 9) + '" cy="' + (92 + reihe * 6) + '" r="2.6" fill="#e9e2d2" stroke="#1d2024" stroke-width=".6"/>').join('')).join('') +
-      '<rect x="372" y="112" width="56" height="3" rx="1.5" fill="#e9e2d2"/>' +
-      '<text x="400" y="124" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-size="6" letter-spacing=".25" fill="#e9e2d2" opacity=".8">TIPPEN ZUM SCHREIBEN</text></g>' +
+      '<g ' + T('schreibmaschine', null, 'schreibmaschine') + ' style="transform-origin:400px 112px">' + odSchreibmaschine() + '</g>' +
       /* Tasse mit Dampf, Brille, Pflanze */
       /* Ein Steingutbecher: gerundeter Koerper, Glasur mit Glanz, Henkel mit Volumen, Tee mit Spiegelung */
       '<g ' + T('tasse', 'Der Tee dampft noch. Gut so.') + ' style="transform-origin:560px 112px">' +
@@ -580,7 +543,7 @@ function orteKulisse(raum, haupt) {
       '<ellipse cx="560" cy="94.6" rx="13.6" ry="2.6" fill="url(#orthtee)"/><ellipse cx="555" cy="94" rx="5" ry=".9" fill="rgba(255,235,200,.35)"/>' +
       orteDampf(560, 88) + '</g>' +
       '<g ' + T('brille', 'Die Lesebrille. Jemand hat sie wieder liegen lassen.') + ' style="transform-origin:640px 104px" stroke="#2c2218" stroke-width="2" fill="none"><circle cx="628" cy="104" r="9"/><circle cx="652" cy="104" r="9"/><path d="M637 104h6M619 102l-14-4M661 102l14-4"/><circle cx="628" cy="104" r="7" fill="rgba(255,255,255,.12)" stroke="none"/></g>' +
-      '<g ' + T('pflanze', 'Das Blatt zittert. Die Pflanze will auch gegossen werden.') + ' style="transform-origin:730px 112px"><rect x="710" y="84" width="40" height="28" rx="3" fill="#a3562f"/><rect x="708" y="82" width="44" height="6" rx="2" fill="#b8693c"/><g class="ort-blaetter"><path d="M730 84c-6-18-22-26-34-26 4 16 16 26 34 26z" fill="#4a7a46"/><path d="M730 84c6-18 22-26 34-26-4 16-16 26-34 26z" fill="#5a8a52"/><path d="M730 84c-2-22 4-34 10-44 6 14 4 30-10 44z" fill="#3f6e3c"/></g></g>' +
+      '<g ' + T('pflanze', 'Das Blatt zittert. Die Pflanze will auch gegossen werden.') + ' style="transform-origin:730px 112px"><rect x="710" y="84" width="40" height="28" rx="3" fill="#a3562f"/><rect x="708" y="82" width="44" height="6" rx="2" fill="#b8693c"/>' + odGlanz('topf') + '<g class="ort-blaetter"><path d="M730 84c-6-18-22-26-34-26 4 16 16 26 34 26z" fill="#4a7a46"/><path d="M730 84c6-18 22-26 34-26-4 16-16 26-34 26z" fill="#5a8a52"/><path d="M730 84c-2-22 4-34 10-44 6 14 4 30-10 44z" fill="#3f6e3c"/>' + odGlanz('adern') + '</g></g>' +
       /* Ein Lesezeichenband hängt von oben */
       '<path class="ort-band" d="M70 0v60l-6 8 6-2 6 2-6-8" fill="#b0352b" style="transform-origin:70px 0px"/>'
     ));
@@ -612,7 +575,7 @@ function orteKulisse(raum, haupt) {
     wrap.append(svg(
       '<defs><linearGradient id="ortholz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8895a"/><stop offset="1" stop-color="#8a6238"/></linearGradient></defs>' +
       '<rect width="800" height="150" fill="url(#ortholz)"/>' +
-      '<g stroke="rgba(60,35,15,.18)" stroke-width="1.2" fill="none">' + [10, 38, 64, 92, 120, 146].map((y, i) => '<path d="M0 ' + y + ' C 200 ' + (y + (i % 2 ? 6 : -6)) + ', 420 ' + (y - 4) + ', 800 ' + (y + 3) + '"/>').join('') + '<path d="M300 40c-10 8-10 20 0 28 10-8 10-20 0-28z" opacity=".6"/></g>' +
+      '<g stroke="rgba(60,35,15,.18)" stroke-width="1.2" fill="none">' + [10, 38, 64, 92, 120, 146].map((y, i) => '<path d="M0 ' + y + ' C 200 ' + (y + (i % 2 ? 6 : -6)) + ', 420 ' + (y - 4) + ', 800 ' + (y + 3) + '"/>').join('') + '<ellipse cx="300" cy="54" rx="5" ry="12" opacity=".6"/><ellipse cx="300" cy="54" rx="2" ry="6" fill="rgba(60,35,15,.25)" stroke="none"/></g>' +
       orteV2Malerei('cluster', 'unten') +
       /* Das aufgeschlagene Heft mit einer Gedankenkarte */
       '<g ' + T('heft', 'Ein Gedanke, noch ein Gedanke, ein Strich dazwischen. So fängt es immer an.') + ' style="transform-origin:400px 80px"><g transform="rotate(-2 400 80)">' +
@@ -623,7 +586,7 @@ function orteKulisse(raum, haupt) {
       '<g font-family="\'Bradley Hand\', \'Segoe Print\', \'Chalkboard SE\', cursive" font-size="8" fill="#3a3028"><text x="470" y="77" text-anchor="middle">Idee</text><text x="420" y="49" text-anchor="middle">wer?</text><text x="512" y="47" text-anchor="middle">wo?</text><text x="432" y="115" text-anchor="middle">warum</text><text x="510" y="113" text-anchor="middle">dann</text></g>' +
       '<g fill="none" stroke="#5a5048" stroke-width="1.2" opacity=".75"><path d="M276 50c10-4 22-2 30 2M276 66c14-6 30-4 44 0M276 82c8-2 16-2 24 0M284 98c12-6 28-2 40 2"/><path d="M300 118c8-10 20-10 26 0" stroke="#b0352b"/></g>' +
       '<text x="290" y="40" font-family="\'Bradley Hand\', \'Segoe Print\', \'Chalkboard SE\', cursive" font-size="7.5" fill="#3a3028">' + bretter + (bretter === 1 ? ' Cluster' : ' Cluster') + ' · Gedanken</text>' +
-      '</g></g>' +
+      '</g>' + odGlanz('heft') + '</g>' +
       /* Zwei Zettel mit Messingnadeln und rotem Faden */
       '<g ' + T('faden', 'Der Faden spannt sich. Zwei Gedanken, die zusammengehören.') + '><g transform="rotate(-6 120 70)"><rect x="90" y="50" width="60" height="40" fill="#fbf6e8" stroke="#d9caa6"/><line x1="98" y1="62" x2="140" y2="62" stroke="#c9bda0"/><line x1="98" y1="72" x2="132" y2="72" stroke="#c9bda0"/></g><g transform="rotate(5 180 110)"><rect x="150" y="92" width="60" height="40" fill="#f7efe0" stroke="#d9caa6"/><line x1="158" y1="104" x2="200" y2="104" stroke="#c9bda0"/><line x1="158" y1="114" x2="192" y2="114" stroke="#c9bda0"/></g>' +
       '<path class="ort-faden-rot" d="M120 52 C 150 70, 160 80, 180 94" fill="none" stroke="#b0352b" stroke-width="1.6"/><circle cx="120" cy="52" r="3.5" fill="#c9a25a"/><circle cx="180" cy="94" r="3.5" fill="#c9a25a"/></g>' +
@@ -651,7 +614,7 @@ function orteKulisse(raum, haupt) {
       '<ellipse cx="634" cy="85.8" rx="7" ry="1.4" fill="rgba(255,235,200,.35)"/>' +
       '<path d="M618.4 85.4 Q 640 79.6 661.6 85.4" fill="none" stroke="#c9a25a" stroke-width=".8"/>' +
       orteDampf(640, 80, 'rgba(255,255,255,.75)') + '</g>' +
-      '<g ' + T('keks', 'Ein Keks. Für den Gedanken, der noch fehlt.') + ' style="transform-origin:716px 124px"><circle cx="716" cy="124" r="12" fill="#d9a85a"/><circle cx="711" cy="120" r="1.5" fill="#5a3a1a"/><circle cx="720" cy="126" r="1.5" fill="#5a3a1a"/><circle cx="714" cy="129" r="1.2" fill="#5a3a1a"/><path d="M724 116c4 4 6 8 4 12" stroke="#b8863f" stroke-width="1" fill="none"/></g>' +
+      '<g ' + T('keks', 'Ein Keks. Für den Gedanken, der noch fehlt.') + ' style="transform-origin:716px 124px"><circle cx="716" cy="124" r="12" fill="#d9a85a"/><circle cx="711" cy="120" r="1.5" fill="#5a3a1a"/><circle cx="720" cy="126" r="1.5" fill="#5a3a1a"/><circle cx="714" cy="129" r="1.2" fill="#5a3a1a"/><path d="M724 116c4 4 6 8 4 12" stroke="#b8863f" stroke-width="1" fill="none"/>' + odGlanz('keks') + '</g>' +
       /* Kleiner Topf Kräuter links oben, Bleistift mit Spitzerspänen */
       /* Rosmarin im Terrakottatopf: Rand, Erde, Zweige mit nadelfeinen Blaettchen */
       '<g ' + T('kraut', 'Rosmarin. Riecht nach Sonntagmittag.') + ' style="transform-origin:40px 44px">' +
@@ -683,9 +646,9 @@ function orteKulisse(raum, haupt) {
       /* Der Kasten mit Fächern */
       '<rect x="40" y="20" width="540" height="116" rx="4" fill="#5a4326"/><rect x="46" y="26" width="528" height="104" fill="#3a2a18"/>' +
       '<g stroke="#6b4a32" stroke-width="2">' + [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => '<line x1="' + (46 + i * 44) + '" y1="26" x2="' + (46 + i * 44) + '" y2="130"/>').join('') + '<line x1="46" y1="78" x2="574" y2="78"/></g>' +
-      buchstaben.map((c, i) => { const x = 52 + (i % 6) * 88 + (i % 2) * 6, y = 34 + Math.floor(i / 6) * 52; return '<g ' + T('letter', 'Die Letter „' + c + '“. Spiegelverkehrt, wie es sich gehört — gedruckt wird sie richtig.') + ' style="transform-origin:' + (x + 20) + 'px ' + (y + 18) + 'px"><rect x="' + x + '" y="' + y + '" width="40" height="36" rx="3" fill="#1f1f22"/><rect x="' + (x + 3) + '" y="' + (y + 3) + '" width="34" height="30" rx="2" fill="#3d3d42"/><text x="' + (x + 20) + '" y="' + (y + 26) + '" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-weight="700" font-size="22" fill="#d9d4c8" transform="scale(-1 1) translate(-' + (2 * x + 40) + ' 0)">' + c + '</text></g>'; }).join('') +
+      buchstaben.map((c, i) => { const x = 52 + (i % 6) * 88 + (i % 2) * 6, y = 34 + Math.floor(i / 6) * 52; return '<g ' + T('letter', 'Die Letter „' + c + '“. Spiegelverkehrt, wie es sich gehört — gedruckt wird sie richtig.') + ' style="transform-origin:' + (x + 20) + 'px ' + (y + 18) + 'px"><rect x="' + x + '" y="' + y + '" width="40" height="36" rx="3" fill="#1f1f22"/><rect x="' + (x + 3) + '" y="' + (y + 3) + '" width="34" height="30" rx="2" fill="#3d3d42"/><text x="' + (x + 20) + '" y="' + (y + 26) + '" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-weight="700" font-size="22" fill="#d9d4c8" transform="scale(-1 1) translate(-' + (2 * x + 40) + ' 0)">' + c + '</text>' + odGlanz('letter', x, y) + '</g>'; }).join('') + odGlanz('letterDefs') +
       /* Farbwalze rechts oben */
-      '<g ' + T('walze', 'Die Farbwalze rollt. Schwarz wie Druckerschwärze.') + ' style="transform-origin:690px 40px"><rect x="650" y="30" width="80" height="20" rx="10" fill="#141414"/><rect x="650" y="30" width="80" height="20" rx="10" fill="url(#ortwalze)"/><defs><linearGradient id="ortwalze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(255,255,255,.25)"/><stop offset=".5" stop-color="rgba(255,255,255,0)"/><stop offset="1" stop-color="rgba(0,0,0,.4)"/></linearGradient></defs><path d="M730 40h20v-16" fill="none" stroke="#8a6a2e" stroke-width="3"/><rect x="745" y="8" width="10" height="18" rx="3" fill="#a3562f"/></g>' +
+      '<g ' + T('walze', 'Die Farbwalze rollt. Schwarz wie Druckerschwärze.') + ' style="transform-origin:690px 50px">' + odFarbwalze() + '</g>' +
       /* Der Andruck: ein Papierbogen mit den neuesten Wörtern, richtig herum */
       '<g ' + T('andruck', druck.length ? 'Der Andruck: ' + druck.join(', ') + '.' : 'Der Andruck ist noch leer. Ein Wort in eine Kiste, und er füllt sich.') + ' style="transform-origin:700px 100px"><g transform="rotate(3 700 100)"><rect x="620" y="64" width="160" height="70" fill="#f3ecd9" stroke="#c9bda0"/><g stroke="rgba(0,0,0,.1)">' + [80, 96, 112, 128].map((y) => '<line x1="630" y1="' + y + '" x2="770" y2="' + y + '"/>').join('') + '</g>' +
       (druck.length ? druck.map((w, i) => '<text x="632" y="' + (92 + i * 16) + '" font-family="ui-serif, Georgia, serif" font-weight="700" font-size="12" fill="#1d1d1f" opacity="' + (0.92 - i * .12) + '">' + orteText(w.slice(0, 22)) + '</text>').join('') : '<text x="632" y="96" font-family="ui-serif, Georgia, serif" font-style="italic" font-size="10" fill="#8a7a62">noch kein Andruck</text>') + '</g></g>'
@@ -698,7 +661,7 @@ function orteKulisse(raum, haupt) {
       '<rect x="0" y="120" width="800" height="30" fill="#3a2818"/><rect x="0" y="118" width="800" height="4" fill="#8a6a3e"/>' +
       orteV2Malerei('klang', 'unten') +
       /* Grammophon: Kasten, Teller, Horn */
-      '<g ' + T('horn', 'Das Horn summt nach. Messing vergisst nichts.') + ' style="transform-origin:330px 80px"><rect x="250" y="76" width="170" height="44" rx="4" fill="#6b4a32"/><rect x="250" y="76" width="170" height="6" fill="#8a6a3e"/><rect x="258" y="90" width="154" height="24" rx="2" fill="#3a2818"/>' +
+      '<g ' + T('horn', 'Das Horn summt nach. Messing vergisst nichts.') + ' style="transform-origin:330px 80px">' + odGrammophonKasten() +
       /* Die Platte, schraeg von oben gesehen: eine Ellipse. Sie selbst darf sich
          NICHT drehen — eine gedrehte Ellipse kippt wie ein Propeller. Umriss,
          Rillen und Lichtreflex stehen still (wie bei einer echten Platte);
@@ -730,11 +693,11 @@ function orteKulisse(raum, haupt) {
       /* Schwebende Noten, wenn etwas spielt */
       '<g class="ort-noten' + (spielt ? ' an' : '') + '" fill="#f3e7c9">' + [0, 1, 2].map((i) => '<g class="ort-note n' + i + '" style="transform-origin:' + (470 + i * 18) + 'px 40px"><ellipse cx="' + (470 + i * 18) + '" cy="40" rx="4" ry="3" transform="rotate(-20 ' + (470 + i * 18) + ' 40)"/><rect x="' + (473 + i * 18) + '" y="24" width="1.6" height="16"/><path d="M' + (474.6 + i * 18) + ' 24c4 2 6 6 4 10" fill="none" stroke="#f3e7c9" stroke-width="1.6"/></g>').join('') + '</g>' +
       /* Plattenhüllen links */
-      '<g ' + T('huellen', 'Vier Platten, alle gut. Die Nadel entscheidet.') + ' style="transform-origin:130px 118px">' + [0, 1, 2, 3].map((i) => '<rect x="' + (80 + i * 28) + '" y="' + (48 + (i % 2) * 4) + '" width="26" height="70" rx="2" fill="' + ['#b0552f', '#5f7752', '#b8923f', '#4f7587'][i] + '" transform="rotate(' + (-6 + i * 3) + ' ' + (93 + i * 28) + ' 118)"/><rect x="' + (84 + i * 28) + '" y="' + (60 + (i % 2) * 4) + '" width="18" height="6" fill="rgba(255,255,255,.2)" transform="rotate(' + (-6 + i * 3) + ' ' + (93 + i * 28) + ' 118)"/>').join('') + '</g>' +
+      '<g ' + T('huellen', 'Vier Platten, alle gut. Die Nadel entscheidet.') + ' style="transform-origin:130px 118px">' + [0, 1, 2, 3].map((i) => '<rect x="' + (80 + i * 28) + '" y="' + (48 + (i % 2) * 4) + '" width="26" height="70" rx="2" fill="' + ['#b0552f', '#5f7752', '#b8923f', '#4f7587'][i] + '" transform="rotate(' + (-6 + i * 3) + ' ' + (93 + i * 28) + ' 118)"/><rect x="' + (84 + i * 28) + '" y="' + (60 + (i % 2) * 4) + '" width="18" height="6" fill="rgba(255,255,255,.2)" transform="rotate(' + (-6 + i * 3) + ' ' + (93 + i * 28) + ' 118)"/>').join('') + odGlanz('huellen') + '</g>' +
       /* Metronom rechts, das Pendel schwingt */
-      '<g ' + T('metronom', 'Tack. Tack. Tack. Dein Takt.') + ' style="transform-origin:700px 118px"><path d="M680 118l10-70h20l10 70z" fill="#8a5a2a"/><path d="M684 112l8-58h16l8 58z" fill="#c9a25a" opacity=".25"/><line class="ort-pendel" x1="700" y1="108" x2="700" y2="58" stroke="#d9d4c8" stroke-width="2" style="transform-origin:700px 108px"/><rect class="ort-pendel" x="696" y="66" width="8" height="5" fill="#d9d4c8" style="transform-origin:700px 108px"/><rect x="676" y="118" width="48" height="4" fill="#5a3a1a"/></g>' +
+      '<g ' + T('metronom', 'Tack. Tack. Tack. Dein Takt.') + ' style="transform-origin:700px 118px">' + odMetronom() + '</g>' +
       /* Kerze auf dem Kasten */
-      '<g ' + T('kerze', 'Die Kerze flackert. Irgendwer hat die Tür offen gelassen.') + ' style="transform-origin:590px 118px"><rect x="584" y="96" width="12" height="22" fill="#f3e7c6"/><ellipse cx="590" cy="118" rx="12" ry="3" fill="#8a6a2e"/><path class="ort-flamme" d="M590 94c-4-5-3-10 0-13 3 3 4 8 0 13z" fill="#ffcc66" style="transform-origin:590px 94px"/><path d="M590 92c-1.5-2-1-4 0-5 1 1 1.5 3 0 5z" fill="#fff5cc"/></g>'
+      '<g ' + T('kerze', 'Die Kerze flackert. Irgendwer hat die Tür offen gelassen.') + ' style="transform-origin:590px 118px">' + odKerze() + '</g>'
     ));
     /* Die Platten sind Klangbilder: eine auflegen startet sie */
     if (typeof KLANG_SZENEN !== 'undefined' && typeof mischungAnwenden === 'function') {
@@ -750,17 +713,17 @@ function orteKulisse(raum, haupt) {
       '<rect x="0" y="128" width="800" height="22" fill="#3a2818"/><rect x="0" y="126" width="800" height="4" fill="#8a6a3e"/>' +
       orteV2Malerei('faden', 'unten') +
       /* Bank */
-      '<g ' + T('bank', 'Die Bank knarzt. Setz dich, das Gespräch dauert.') + ' style="transform-origin:400px 128px"><rect x="250" y="94" width="300" height="14" rx="4" fill="#8a6a3e"/><rect x="262" y="108" width="10" height="20" fill="#6b4a32"/><rect x="528" y="108" width="10" height="20" fill="#6b4a32"/><rect x="250" y="60" width="300" height="34" rx="8" fill="#a3562f"/><path d="M262 70h276M262 80h276" stroke="rgba(0,0,0,.18)"/><rect x="264" y="72" width="80" height="18" rx="6" fill="#b8693c" opacity=".7"/></g>' +
+      '<g ' + T('bank', 'Die Bank knarzt. Setz dich, das Gespräch dauert.') + ' style="transform-origin:400px 128px">' + odBank() + '</g>' +
       /* Das Telefon: Wählscheibe, Hörer, Schnur */
-      '<g ' + T('telefon', 'Brrr. Brrr. Jemand ruft die Wand an.') + ' style="transform-origin:625px 86px"><rect x="590" y="64" width="70" height="30" rx="8" fill="#2c2218"/><circle cx="625" cy="82" r="11" fill="#f3e7c9"/><circle cx="625" cy="82" r="7" fill="#2c2218"/>' + [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => '<circle cx="' + (625 + 9 * Math.cos(i * .55)) + '" cy="' + (82 + 9 * Math.sin(i * .55)) + '" r="1.2" fill="#2c2218"/>').join('') + '<path d="M594 60c0-8 12-14 31-14s31 6 31 14" fill="none" stroke="#2c2218" stroke-width="9" stroke-linecap="round"/><path class="ort-schnur" d="M660 86c10 10 4 22 16 30 10 6 8 14 14 12" fill="none" stroke="#2c2218" stroke-width="2" style="transform-origin:660px 86px"/></g>' +
+      '<g ' + T('telefon', 'Brrr. Brrr. Jemand ruft die Wand an.') + ' style="transform-origin:625px 86px"><rect x="590" y="64" width="70" height="30" rx="8" fill="#2c2218"/><circle cx="625" cy="82" r="11" fill="#f3e7c9"/><circle cx="625" cy="82" r="7" fill="#2c2218"/>' + [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => '<circle cx="' + (625 + 9 * Math.cos(i * .55)) + '" cy="' + (82 + 9 * Math.sin(i * .55)) + '" r="1.2" fill="#2c2218"/>').join('') + '<path d="M594 60c0-8 12-14 31-14s31 6 31 14" fill="none" stroke="#2c2218" stroke-width="9" stroke-linecap="round"/>' + odGlanz('telefon') + '<path class="ort-schnur" d="M660 86c10 10 4 22 16 30 10 6 8 14 14 12" fill="none" stroke="#2c2218" stroke-width="2" style="transform-origin:660px 86px"/></g>' +
       /* Notizblock mit Gekritzel und Stift */
       '<g ' + T('block', 'Drei Striche, ein Name, eine Nummer. Und ein Herz.') + ' style="transform-origin:440px 124px"><g transform="rotate(-8 440 116)"><rect x="410" y="100" width="60" height="36" fill="#fbf6e8" stroke="#c9bda0"/><g stroke="#5a5048" stroke-width="1.2" fill="none" opacity=".8"><path d="M418 110c8-3 16 0 24-2M418 118c10-2 20 2 30 0M418 126c6 0 12-2 18 0"/><path d="M450 126c-2-3 2-5 4-2 2-3 6-1 4 2l-4 4z" stroke="#b0352b"/></g></g><rect x="470" y="118" width="50" height="5" rx="2.5" fill="#2f5a7a" transform="rotate(20 495 120)"/></g>' +
       /* Lampe mit Lichtkegel, tippen schaltet */
-      '<g ' + T('lampe', null, 'lampe') + ' style="transform-origin:160px 128px"><rect x="157" y="30" width="6" height="98" fill="#8a6a2e"/><ellipse cx="160" cy="128" rx="22" ry="5" fill="#8a6a2e"/><path d="M124 36h72l-12-20H136z" fill="#e8c27a"/><ellipse class="ort-gluehbirne" cx="160" cy="34" rx="8" ry="4" fill="rgba(255,236,190,.9)"/><path class="ort-lichtkegel" d="M124 36h72l64 92H60z" fill="rgba(255,220,150,.22)"/></g>' +
+      '<g ' + T('lampe', null, 'lampe') + ' style="transform-origin:160px 128px"><rect x="157" y="30" width="6" height="98" fill="#8a6a2e"/><ellipse cx="160" cy="128" rx="22" ry="5" fill="#8a6a2e"/><path d="M124 36h72l-12-20H136z" fill="#e8c27a"/>' + odGlanz('stehlampe') + '<ellipse class="ort-gluehbirne" cx="160" cy="34" rx="8" ry="4" fill="rgba(255,236,190,.9)"/><path class="ort-lichtkegel" d="M124 36h72l64 92H60z" fill="rgba(255,220,150,.22)"/></g>' +
       /* Garderobenhaken mit Hut und Regenschirm */
-      '<g ' + T('hut', 'Der Hut wartet auf den nächsten Anruf nach draußen.') + ' style="transform-origin:60px 30px"><rect x="40" y="26" width="40" height="6" rx="2" fill="#c9a25a"/><circle cx="60" cy="36" r="3" fill="#8a6a2e"/><path d="M60 42c-14 0-20 12-20 22h40c0-10-6-22-20-22z" fill="#2c2218"/><rect x="34" y="62" width="52" height="5" rx="2" fill="#2c2218"/></g>' +
+      odHakenleiste() + '<g ' + T('hut', 'Der Hut wartet auf den nächsten Anruf nach draußen.') + ' style="transform-origin:60px 38px">' + odHutAmHaken() + '</g>' +
       /* Pflanze rechts */
-      '<g ' + T('pflanze', 'Der Farn wedelt. Er hört mit, sagt aber nichts.') + ' style="transform-origin:740px 128px"><rect x="722" y="100" width="36" height="28" rx="3" fill="#a3562f"/><g class="ort-blaetter" fill="#4a7a46"><path d="M740 100c-10-16-26-20-36-18 6 12 20 20 36 18z"/><path d="M740 100c10-16 26-20 36-18-6 12-20 20-36 18z"/><path d="M740 100c-4-20 2-32 8-40 6 12 2 30-8 40z" fill="#5a8a52"/></g></g>'
+      '<g ' + T('pflanze', 'Der Farn wedelt. Er hört mit, sagt aber nichts.') + ' style="transform-origin:740px 128px">' + odFarn() + '</g>'
     ));
   } else if (r === 'feinheiten') {
     wrap.append(svg(
@@ -769,19 +732,18 @@ function orteKulisse(raum, haupt) {
       /* Lochwand mit Werkzeug */
       '<g fill="rgba(0,0,0,.25)">' + Array.from({ length: 60 }, (_, i) => '<circle cx="' + (20 + (i % 20) * 40) + '" cy="' + (16 + Math.floor(i / 20) * 30) + '" r="1.8"/>').join('') + '</g>' +
       orteV2Malerei('feinheiten', 'unten') +
-      '<g ' + T('hammer', 'Klopf. Sitzt.') + ' style="transform-origin:110px 40px"><rect x="106" y="40" width="8" height="60" rx="2" fill="#c9a25a"/><rect x="90" y="26" width="40" height="18" rx="3" fill="#3a3a3e"/><rect x="90" y="26" width="40" height="5" fill="rgba(255,255,255,.15)"/></g>' +
-      '<g ' + T('saege', 'Die Säge singt, wenn man sie biegt.') + ' style="transform-origin:210px 40px"><path d="M180 30h70v22H180z" fill="#8a8f96"/><path d="M180 52l4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6" fill="none" stroke="#8a8f96" stroke-width="1.5"/><rect x="246" y="26" width="26" height="30" rx="6" fill="#a3562f"/></g>' +
-      '<g ' + T('zange', 'Die Zange. Für Sätze, die nicht loslassen.') + ' style="transform-origin:320px 40px"><path d="M310 26l8 30M330 26l-8 30" stroke="#3a3a3e" stroke-width="6" stroke-linecap="round"/><path d="M314 54l-6 30M326 54l6 30" stroke="#c0392b" stroke-width="7" stroke-linecap="round"/></g>' +
+      '<g ' + T('hammer', 'Klopf. Sitzt.') + ' style="transform-origin:110px 34px">' + odHammer() + '</g>' +
+      '<g ' + T('saege', 'Die Säge singt, wenn man sie biegt.') + ' style="transform-origin:258px 34px">' + odSaege() + '</g>' +
+      '<g ' + T('zange', 'Die Zange. Für Sätze, die nicht loslassen.') + ' style="transform-origin:320px 26px">' + odZange() + '</g>' +
       /* Die Werkzeugkiste */
-      '<rect x="380" y="60" width="260" height="60" rx="6" fill="#b0352b"/><rect x="380" y="60" width="260" height="10" fill="#8a2a22"/><rect x="490" y="48" width="40" height="14" rx="4" fill="#2c2218"/><rect x="384" y="72" width="252" height="4" fill="rgba(255,255,255,.12)"/>' +
-      '<text x="510" y="104" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-weight="700" font-size="11" letter-spacing=".3" fill="#f3e7c9" opacity=".8">VANI · FEINHEITEN</text>' +
-      '<g ' + T('schrauber', 'Der Schraubendreher. Eine Vierteldrehung, und es sitzt.') + ' style="transform-origin:420px 80px"><rect x="392" y="82" width="40" height="6" rx="3" fill="#8a8f96" transform="rotate(-30 412 85)"/><rect x="424" y="72" width="24" height="10" rx="4" fill="#2f5a7a" transform="rotate(-30 436 77)"/></g>' +
+      odWerkzeugkiste() +
+      '<g ' + T('schrauber', 'Der Schraubendreher. Eine Vierteldrehung, und es sitzt.') + ' style="transform-origin:420px 80px">' + odSchrauber() + '</g>' +
       /* Wasserwaage mit Libelle, die beim Tippen wandert */
-      '<g ' + T('waage', 'Die Libelle wandert. Und findet die Mitte wieder.') + ' style="transform-origin:720px 100px"><rect x="660" y="94" width="120" height="14" rx="3" fill="#e8c23a"/><rect x="704" y="92" width="32" height="18" rx="4" fill="#d9f5d8" stroke="#8a8f96"/><circle class="ort-libelle" cx="720" cy="101" r="4" fill="rgba(255,255,255,.9)" stroke="#5f7752" style="transform-origin:720px 101px"/><line x1="716" y1="92" x2="716" y2="110" stroke="#5f7752" stroke-width=".8"/><line x1="724" y1="92" x2="724" y2="110" stroke="#5f7752" stroke-width=".8"/></g>' +
+      '<g ' + T('waage', 'Die Libelle wandert. Und findet die Mitte wieder.') + ' style="transform-origin:720px 108px">' + odWasserwaage() + '</g>' +
       /* Maßband, Schrauben, Bleistiftstummel */
-      '<g ' + T('massband', 'Zwei Meter. Reicht für einen langen Satz.') + ' style="transform-origin:60px 100px"><circle cx="60" cy="100" r="16" fill="#e8c23a"/><circle cx="60" cy="100" r="6" fill="#3a3a3e"/><path d="M76 100h60" stroke="#f3e7c9" stroke-width="6"/><g stroke="#3a3a3e" stroke-width="1">' + [80, 86, 92, 98, 104, 110, 116, 122, 128].map((x) => '<line x1="' + x + '" y1="97" x2="' + x + '" y2="' + (x % 12 === 8 ? 103 : 100) + '"/>').join('') + '</g><rect x="134" y="95" width="4" height="10" fill="#3a3a3e"/></g>' +
-      '<g fill="#8a8f96">' + [[160, 108], [172, 112], [166, 100]].map(([x, y]) => '<circle cx="' + x + '" cy="' + y + '" r="3"/><line x1="' + (x - 2) + '" y1="' + y + '" x2="' + (x + 2) + '" y2="' + y + '" stroke="#3a3a3e"/>').join('') + '</g>' +
-      '<g ' + T('stummel', 'Der Bleistiftstummel. Hat schon drei Bücher hinter sich.') + ' style="transform-origin:250px 110px"><rect x="232" y="106" width="36" height="7" fill="#e8b43c" transform="rotate(-8 250 110)"/><path d="M268 104l8 4-8 4z" fill="#f3e1b0" transform="rotate(-8 270 108)"/><rect x="232" y="106" width="6" height="7" fill="#d98b8b" transform="rotate(-8 250 110)"/></g>'
+      '<g ' + T('massband', 'Fünf Meter. Reicht für einen langen Satz.') + ' style="transform-origin:60px 100px">' + odMassband() + '</g>' +
+      odSchrauben() +
+      '<g ' + T('stummel', 'Der Bleistiftstummel. Hat schon drei Bücher hinter sich.') + ' style="transform-origin:252px 110px">' + odStummel() + '</g>'
     ));
   } else return null;
   /* v2: die Zierschicht liegt deckungsgleich ueber dem Buehnenbild. */
@@ -817,10 +779,13 @@ function orteBeleben(wrap, o) {
   wrap.addEventListener('click', (ev) => {
     const ding = ev.target.closest('.ort-tipp'); if (!ding || !wrap.contains(ding)) return;
     ding.classList.remove('tippt'); void ding.getBoundingClientRect(); ding.classList.add('tippt');
-    setTimeout(() => ding.classList.remove('tippt'), 1100);
+    /* Ein zweites Antippen startet die Bewegung neu; der alte Zeitgeber darf sie nicht mittendrin abbrechen. */
+    clearTimeout(ding._tippZeit); ding._tippZeit = setTimeout(() => ding.classList.remove('tippt'), 1500);
+    /* 5.66: zu jeder Tipp-Bewegung ein kleiner Effekt am Ding (nur v2 mit Bewegung) */
+    if (typeof orteFunken === 'function') { try { orteFunken(ding); } catch (e) {} }
     const tun = ding.dataset.tun || '';
     const [name, arg] = tun.split(':');
-    if (o.geraeusche && typeof schreibtischKlick === 'function') schreibtischKlick('tick');
+    if (o.geraeusche && !(typeof orteTon === 'function' && orteTon(ding.dataset.tipp)) && typeof schreibtischKlick === 'function') schreibtischKlick('tick');
     if (ding.dataset.sag && !(name && ['schreibmaschine', 'oben', 'neu', 'letzter', 'projekt'].includes(name))) toast(ding.dataset.sag, 2200);
     if (name && ORTE_TUN[name]) { try { ORTE_TUN[name](ding, wrap, arg); } catch (e) {} }
   });

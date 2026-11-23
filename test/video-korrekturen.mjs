@@ -381,3 +381,73 @@ test('Realistisch neu gemalt: Diele, Becher, Horn, Flieger, Rosmarin', () => {
   assert.ok(orte.includes('rotate(25 478 36)') && orte.includes('transform-origin:484px 40px'));
   assert.ok(!orte.includes('rotate(-25 478 36)'), 'Kelch war einmal falsch herum geneigt');
 });
+
+/* ===== 5.66: alle Dinge neu gemalt, eigene Tipp-Bewegungen, Teilchen ===== */
+
+test('5.66: die neue Dinge-Datei steht in Bau, Desktop-Bau und Sandkasten', () => {
+  assert.match(lies('build.sh'), /src\/57c-katze\.js src\/57d-orte-dinge\.js /);
+  assert.match(lies('werkzeug/build-web.mjs'), /'src\/57c-katze\.js', 'src\/57d-orte-dinge\.js', /);
+  assert.match(lies('test/sandkasten.mjs'), /'57c-katze\.js', '57d-orte-dinge\.js', /);
+});
+
+test('5.66: der Glanz haengt am Ding, nicht mehr in der Schicht darueber', async () => {
+  const k = await frisch();
+  k.document.documentElement.dataset.v2 = 'an';
+  const oben = ['zuhause', 'schnipsel', 'blaetter', 'hefte', 'cluster', 'woerter', 'klang', 'faden', 'feinheiten'].map((r) => k.orteV2Malerei(r, 'oben')).join('');
+  /* Formen antippbarer Dinge duerfen oben nicht mehr stehen — sie blieben beim Wackeln stehen. */
+  for (const form of ['M86 56h70l-12-26H98z', 'x="544" y="92" width="32"', 'x="24" y="30" width="32"', 'M70 50c-18 0-26 14-26 26h52', 'x="364" y="28" width="96"', 'cx="700" cy="30" r="15.5"', 'x="90" y="26" width="40" height="18"', 'M680 118l10-70h20l10 70z', 'x="590" y="64" width="70"']) {
+    assert.ok(!oben.includes(form), 'noch Glanz eines Dings oben: ' + form);
+  }
+  assert.ok(k.odGlanz('lampe').length > 100, 'der Glanz kommt mit dem Ding');
+  /* Die Reiter im Zettelkasten liegen ueber dem Kastenglanz, nicht darunter. */
+  const orte = lies('src/57-orte.js');
+  assert.ok(orte.indexOf("orteV2Malerei('schnipsel', 'mitte')") < orte.indexOf("T('reiter'"), 'Kastenglanz vor den Reitern');
+  k.document.documentElement.dataset.v2 = 'aus';
+  assert.equal(k.odGlanz('lampe'), '', 'ohne v2 kein Glanz');
+});
+
+test('5.66: jedes antippbare Ding hat eine eigene Bewegung (mit v2 und Bewegung)', () => {
+  const orte = lies('src/57-orte.js'), css = lies('src/10-style.css');
+  const ids = [...new Set([...orte.matchAll(/T\('([a-z0-9]+)'/g)].map((m) => m[1]))];
+  assert.ok(ids.length > 40);
+  const ohne = ids.filter((id) => id !== 'spiegel' && !css.includes('html[data-v2="an"][data-v2bewegung="an"] .ort-tipp.ort-' + id + '.tippt'));
+  assert.deepEqual(ohne, [], 'ohne eigene Tipp-Bewegung');
+  /* Mit Kamera wackelt der Spiegel nicht — das Videobild koennte nicht mit. */
+  assert.match(css, /\.ort-kulisse\.kamera \.ort-tipp\.ort-spiegel\.tippt \{ animation: none; \}/);
+  /* Zweimal schnell tippen: der alte Zeitgeber bricht die neue Bewegung nicht ab. */
+  assert.match(orte, /clearTimeout\(ding\._tippZeit\); ding\._tippZeit = setTimeout/);
+});
+
+test('5.66: Teilchen nur mit v2, Bewegung und ohne „Bewegung reduzieren“', async () => {
+  const k = await frisch();
+  const h = k.document.documentElement;
+  h.dataset.v2 = 'an'; h.dataset.v2bewegung = 'aus';
+  assert.equal(k.orteFunkenAn(), false);
+  h.dataset.v2 = 'aus'; h.dataset.v2bewegung = 'an';
+  assert.equal(k.orteFunkenAn(), false);
+  const d = lies('src/57d-orte-dinge.js');
+  assert.match(d, /prefers-reduced-motion: reduce/);
+  assert.match(d, /childElementCount > 48\) return 0/, 'eine Obergrenze fuer wildes Tippen');
+  assert.match(d, /setAttribute\('pointer-events', 'none'\)/, 'Teilchen fangen keine Tipps ab');
+  assert.ok(!/ORTE_KLANG\b/.test(d), 'kein Namenszusammenstoss mit dem Klang der Orte');
+});
+
+test('5.66: neu gemalt — Schreibmaschine, Werkzeugwand, Grammophon, Bank, Feder', () => {
+  const d = lies('src/57d-orte-dinge.js'), orte = lies('src/57-orte.js');
+  for (const f of ['odSchreibmaschine', 'odHutAmHaken', 'odTintenfass', 'odFarbwalze', 'odGrammophonKasten', 'odMetronom', 'odKerze', 'odHammer', 'odSaege', 'odZange', 'odSchrauber', 'odWasserwaage', 'odMassband', 'odWerkzeugkiste', 'odStempel', 'odBriefe', 'odUhr', 'odJahreszeitHaken', 'odFarn', 'odBank']) {
+    assert.match(d, new RegExp('function ' + f + '\\('), f + ' fehlt');
+    assert.ok(orte.includes(f + '('), f + ' wird nicht benutzt');
+  }
+  /* Klassen, an denen Bewegung haengt, ueberleben das Neumalen */
+  for (const kl of ['ort-taste', 'ort-pendel', 'ort-flamme', 'ort-libelle', 'ort-sekunde', 'ort-blaetter']) assert.ok(d.includes('class="' + kl + '"') || d.includes('class="' + kl + ' '), kl);
+  /* Astloecher statt Blattumrissen auf dem Kuechentisch */
+  assert.ok(!orte.includes('M300 40c-10 8-10 20 0 28 10-8 10-20 0-28z'));
+});
+
+test('5.66: die Dielenuhr geht weiter', async () => {
+  const d = lies('src/57d-orte-dinge.js'), orte = lies('src/57-orte.js');
+  assert.match(d, /class="' \+ kl \+ '"/);
+  assert.match(d, /'ort-stunde'\) \+ zeiger\(11, m \* Math\.PI \/ 30, 1\.5, '#2c2218', 'ort-minute'\)/);
+  assert.match(d, /if \(!wrap\.isConnected\) \{ clearInterval\(t\); return; \}/, 'der Zeitgeber raeumt sich weg');
+  assert.match(orte, /orteUhrLaufen\(wrap\)/);
+});
