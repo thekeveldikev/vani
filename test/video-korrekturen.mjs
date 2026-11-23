@@ -529,7 +529,7 @@ test('5.67: Klang — Ausklang speichert nicht, Freigabe nur einmal gleichzeitig
   assert.match(au, /if \(_audioFreigabeLaeuft\) return _audioFreigabeLaeuft/);
   assert.match(a, /f\.zuLang = true/);
   assert.match(a, /\(fehler && fehler\.zuLang\)\) throw fehler;/, 'eine zu lange eigene Aufnahme wird nicht weggeworfen');
-  assert.ok(kr.indexOf('await audioFreigeben();\n      /* Erst jetzt lesen') > 0, 'Mischung erst nach der Freigabe lesen');
+  assert.match(kr, /await audioFreigeben\(\);\s*\/\* Erst jetzt lesen/, 'Mischung erst nach der Freigabe lesen');
 });
 
 test('5.67: Bedienung — Raumleiste zeigt den aktiven Raum, Tippflaechen auf Touch, Raumfehler ohne leere Seite', () => {
