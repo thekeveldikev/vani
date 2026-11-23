@@ -3142,3 +3142,27 @@ als die Textspalte sein (bis Fensterbreite, mittig) und wischt seitlich, wenn es
 „Notiz“ ist nur noch ein Symbol. (3) Der Groesse-Regler war auf Touch ein Kasten: 5.67 gab dem
 Regler `height: 32px`, aber die Hoehe IST die Schiene. Jetzt 4px Rille, 28px Knopf, Luft per margin.
 Geprueft bei 1180×820 und 820×1180 mit Touch-Groessen.
+
+**5.68.2 (Weisser Nebel oben, Punkt 5 aus 5.67 — die echte Ursache):** `apple-mobile-web-app-status-bar-style`
+stand auf `black-translucent`: die Seite liegt dann UNTER der Statusleiste, und iPadOS 26 legt dort einen
+milchigen Systemschleier darueber. `theme-color`, ein festes Band (`#statusband`), farbiger Kopf oder
+`html`-Grund helfen nicht (an einem iPad in einem anderen Projekt nachgewiesen). Jetzt `content="default"`
+(helle Leiste, dunkle Schrift, passt zum Papierton) in `src/00-head.html` und `hosting/public/rettung.html`;
+die Seite beginnt unter der Leiste, `env(safe-area-inset-top)` wird 0. `#statusband`/`orteStatusFarbe()`
+bleiben vorerst (Hoehe 0, schaden nicht). **Falle:** iPadOS liest die Einstellung nur beim Anlegen des
+Symbols — Symbol vom Home-Bildschirm loeschen, in Safari oeffnen, „Teilen → Zum Home-Bildschirm“ neu.
+Vorher die Daten sichern/syncen (neues Symbol = evtl. neuer Speicher). Auf Sarahs iPad noch ungeprueft.
+
+**5.68.2 außerdem (Sarahs Videos vom 23.11. abends):** (1) Marke auf dem Stadtplan zog stotternd:
+jeder Schritt verschob sie IM grossen SVG (Tausende Haeuser, gedreht, Schattenfilter) → Safari malte das
+Blatt neu; dazu konnte Safari den Finger als Rollen deuten (touch-action an SVG-Teilen unzuverlaessig).
+Jetzt schwebt ein Doppelgaenger (`.kt-markengeist`) im `.kt-rahmen` und wird per translate3d bewegt;
+`touchstart` auf der Marke mit preventDefault; neu gezeichnet erst beim Loslassen; Reste raeumt
+`planMarkenAuftragen` weg. (2) Mit Tastatur nur 2,5 Zeilen: Schreibzeile sass bei 42 % und die klebende
+Formatleiste nahm davon ihren Teil. Jetzt wird die Leiste abgezogen, mit `.tastatur-offen` sitzt die
+Zeile bei 70 %; beim Ein-/Ausfahren der Tastatur rueckt sie nach (30-core `messen`). (3) Groesse-Knopf
+wieder orange (`--akzent`, wie der Cursor im Schreibraum) — Sarah meinte mit „der Punkt“ den Cursor.
+(4) Synonyme-Knopf in der Formatleiste (`synAusLeiste`): nimmt die Markierung oder das Wort unter dem
+Cursor — das iPad-Menue verdeckte die Pille. (5) Synonyme uebernehmen die Endung bei Adjektiven
+(`synEndung`/`synBeugen`: gewöhnlicher → alltäglicher, müden → schläfrigen); Nomen und Wendungen nicht.
+Auf dem iPad selbst ungeprueft.

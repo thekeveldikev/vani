@@ -1326,6 +1326,9 @@ function planMarkenAuftragen(svg, plan, g, neu) {
   const ebene = svg.querySelector('.kt-markenebene');
   if (!ebene) return;
   ebene.innerHTML = '';
+  /* Ein Doppelgaenger von einem abgebrochenen Zug darf nicht liegen bleiben. */
+  const rahmen0 = svg.closest('.kt-rahmen');
+  if (rahmen0) rahmen0.querySelectorAll('.kt-markengeist').forEach((x) => x.remove());
   for (const m of plan.marken) {
     const art = planMarke(m.art);
     const gr = kv('g', {
@@ -1352,8 +1355,40 @@ function planMarkenAuftragen(svg, plan, g, neu) {
     titel.textContent = (m.name || art.name) + (m.name ? ' — ' + art.name : '');
     gr.append(titel);
 
-    /* Ziehen verschiebt die Marke, Tippen nimmt sie in den Blick. */
+    /* Ziehen verschiebt die Marke, Tippen nimmt sie in den Blick.
+       5.68.2: Auf dem iPad stotterte das Ziehen. Jeder Schritt verschob die
+       Marke IN der Karte — und damit musste Safari das ganze Blatt (Tausende
+       Häuser, gedreht, mit Schattenfilter) neu malen. Jetzt schwebt beim Ziehen
+       ein kleiner Doppelgänger über dem Tisch und wird nur verschoben (das kann
+       die Grafikkarte allein); die Karte wird erst beim Loslassen neu gezeichnet.
+       Und Safari darf den Finger auf der Marke nicht für ein Rollen der Karte
+       halten (touch-action wirkt an SVG-Teilen dort nicht verlässlich). */
     let zug = null;
+    gr.addEventListener('touchstart', (ev) => { if (ev.touches.length === 1) ev.preventDefault(); }, { passive: false });
+    const geistWeg = (s) => { if (s && s.geist) { s.geist.remove(); s.geist = null; } gr.style.opacity = ''; };
+    const geistAn = (s) => {
+      const rahmen = svg.closest('.kt-rahmen') || svg.parentElement;
+      const fang = gr.querySelector('.kt-markenfang');
+      if (!rahmen || !fang) return;
+      const f = fang.getBoundingClientRect(), rr = rahmen.getBoundingClientRect();
+      const W = 320, H = 70, sk = s.s;
+      const geist = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      geist.setAttribute('viewBox', (-W) + ' ' + (-H) + ' ' + (2 * W) + ' ' + (2 * H));
+      geist.setAttribute('class', 'kt-markengeist');
+      geist.setAttribute('aria-hidden', 'true');
+      const stil = getComputedStyle(svg);
+      for (const v of ['--ktinte', '--kpapier', '--akzent']) { const w = stil.getPropertyValue(v); if (w) geist.style.setProperty(v, w); }
+      geist.style.width = (2 * W * sk) + 'px'; geist.style.height = (2 * H * sk) + 'px';
+      geist.style.left = (f.left + f.width / 2 - rr.left - W * sk) + 'px';
+      geist.style.top = (f.top + f.height / 2 - rr.top - H * sk) + 'px';
+      const kopie = gr.cloneNode(true);
+      kopie.setAttribute('transform', 'translate(0 0)');
+      kopie.removeAttribute('tabindex'); kopie.style.opacity = ''; kopie.classList.add('zieht');
+      geist.append(kopie);
+      rahmen.append(geist);
+      s.geist = geist;
+      gr.style.opacity = '0';
+    };
     gr.addEventListener('pointerdown', (ev) => {
       if (ev.button != null && ev.button !== 0) return;
       ev.stopPropagation();
@@ -1367,20 +1402,25 @@ function planMarkenAuftragen(svg, plan, g, neu) {
          eine Maus richtig und für einen Finger zu wenig — jeder Tipp wurde
          zum Zug. */
       if (!zug.gezogen && Math.abs(dx) + Math.abs(dy) < zug.schwelle) return;
-      zug.gezogen = true;
-      gr.classList.add('zieht');
-      const r = svg.getBoundingClientRect();
-      const s = r.width / PLAN_GROESSE;
+      if (!zug.gezogen) {
+        zug.gezogen = true;
+        zug.s = svg.getBoundingClientRect().width / PLAN_GROESSE || 1;
+        geistAn(zug);
+      }
+      const s = zug.s;
       zug.neuX = Math.max(0, Math.min(PLAN_GROESSE, zug.x0 + dx / s));
       zug.neuY = Math.max(0, Math.min(PLAN_GROESSE, zug.y0 + dy / s));
-      gr.setAttribute('transform', 'translate(' + kz(zug.neuX) + ' ' + kz(zug.neuY) + ')');
+      const tx = (zug.neuX - zug.x0) * s, ty = (zug.neuY - zug.y0) * s;
+      if (zug.geist) zug.geist.style.transform = 'translate3d(' + tx + 'px,' + ty + 'px,0)';
+      else gr.setAttribute('transform', 'translate(' + kz(zug.neuX) + ' ' + kz(zug.neuY) + ')');
     });
     const los = (ev) => {
       if (!zug) return;
       const s = zug; zug = null;
-      gr.classList.remove('zieht');
       try { gr.releasePointerCapture(ev.pointerId); } catch (e) {}
       if (!s.gezogen) { _kt.nurMarke = _kt.nurMarke === m.id ? '' : m.id; if (neu) neu(); return; }
+      gr.setAttribute('transform', 'translate(' + kz(s.neuX) + ' ' + kz(s.neuY) + ')');
+      geistWeg(s);
       planSchreiben(D.docs.get(_kt.id), (p) => {
         const z = p.marken.find((x) => x.id === m.id);
         if (z) { z.x = Math.round(s.neuX); z.y = Math.round(s.neuY); }
@@ -1388,7 +1428,7 @@ function planMarkenAuftragen(svg, plan, g, neu) {
       }).then(() => { if (neu) neu(); });
     };
     gr.addEventListener('pointerup', los);
-    gr.addEventListener('pointercancel', () => { if (zug) { zug = null; gr.classList.remove('zieht'); if (neu) neu(); } });
+    gr.addEventListener('pointercancel', () => { if (zug) { const s = zug; zug = null; geistWeg(s); gr.setAttribute('transform', 'translate(' + kz(m.x) + ' ' + kz(m.y) + ')'); if (neu) neu(); } });
     gr.addEventListener('dblclick', (ev) => { ev.stopPropagation(); planMarkeBearbeiten(D.docs.get(_kt.id), m, neu); });
     gr.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter') { ev.preventDefault(); planMarkeBearbeiten(D.docs.get(_kt.id), m, neu); }

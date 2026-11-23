@@ -327,6 +327,10 @@ function baueFormatleiste(editor, beiAenderung, kompakt, doc) {
     el('label', { class: 'format-farbe', title: 'Textfarbe' }, 'A', farbe),
     el('label', { class: 'format-farbe marker', title: 'Markierfarbe' }, '▰', marker),
     el('label', { class: 'format-slider' }, 'Größe', groesse, groesseWert),
+    /* 5.68.2: Synonyme auch oben in der Leiste — die Pille unter der Markierung
+       verschwindet auf dem iPad unter dessen eigenem Menue. */
+    typeof synAusLeiste === 'function' && D.einst.synonyme !== false ? el('span', { class: 'format-trenner' }) : null,
+    typeof synAusLeiste === 'function' && D.einst.synonyme !== false ? el('button', { class: 'format-knopf format-synonyme', title: 'Synonyme für das markierte Wort', 'aria-label': 'Synonyme', onpointerdown: (e) => e.preventDefault(), onclick: () => synAusLeiste(editor) }, el('span', { html: ik('woerter'), style: 'display:flex' })) : null,
     doc && typeof randnotizSetzen === 'function' ? el('span', { class: 'format-trenner' }) : null,
     doc && typeof randnotizSetzen === 'function' ? el('button', { class: 'format-knopf format-randnotiz', title: 'Randnotiz an die markierte Stelle', 'aria-label': 'Randnotiz', onpointerdown: (e) => e.preventDefault(), onclick: () => randnotizSetzen(editor, doc, beiAenderung) }, el('span', { html: ik('pin'), style: 'display:flex' })) : null);
 }

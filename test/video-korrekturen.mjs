@@ -766,3 +766,43 @@ test('5.68.1: Sarahs Video — Heftdeckel-Etiketten bleiben eckig, Formatleiste 
   assert.match(css, /\.format-slider input\[type="range"\]::-webkit-slider-thumb \{ width: 28px; height: 28px; \}/);
   assert.match(lies('src/35-richtext.js'), /'aria-label': 'Randnotiz'[^\n]*el\('span', \{ html: ik\('pin'\), style: 'display:flex' \}\)\) : null\);/, 'Notiz nur als Symbol');
 });
+
+test('5.68.2: Statusleiste nicht mehr durchscheinend — sonst legt iPadOS 26 einen hellen Schleier ueber die Seite', () => {
+  for (const datei of ['src/00-head.html', 'hosting/public/rettung.html']) {
+    const t = lies(datei);
+    assert.ok(!/black-translucent/.test(t), datei + ': kein black-translucent');
+    assert.match(t, /name="apple-mobile-web-app-status-bar-style" content="default"/, datei);
+  }
+});
+
+test('5.68.2: Sarahs Videos vom Abend — Marke ziehen, Zeilen mit Tastatur, Reglerfarbe, Synonyme in der Leiste', () => {
+  const karte = lies('src/65b-stadtplan-karte.js');
+  /* Ziehen bewegt einen Doppelgaenger ueber der Karte, nicht die Marke im riesigen SVG. */
+  assert.match(karte, /geist\.style\.transform = 'translate3d\('/);
+  assert.match(karte, /addEventListener\('touchstart', \(ev\) => \{ if \(ev\.touches\.length === 1\) ev\.preventDefault\(\); \}, \{ passive: false \}\)/, 'Safari rollt nicht statt zu ziehen');
+  assert.match(karte, /querySelectorAll\('\.kt-markengeist'\)\.forEach\(\(x\) => x\.remove\(\)\)/, 'kein liegengebliebener Doppelgaenger');
+  assert.match(karte, /kopie\.style\.opacity = ''/, 'der Doppelgaenger erbt die Unsichtbarkeit nicht');
+  const sr = lies('src/45-schreibraum.js');
+  assert.match(sr, /frei \* \(tastatur \? \.7 : \.42\)/, 'mit Tastatur sitzt die Zeile tiefer, die Leiste wird abgezogen');
+  assert.match(sr, /mitte\.clientHeight \* \(tastatur \? \.7 : \.42\)/);
+  assert.match(lies('src/30-core.js'), /_sr\.zentriereSpaeter && tastaturFeld\(document\.activeElement\)\) _sr\.zentriereSpaeter\(\)/);
+  const css = lies('src/10-style.css');
+  assert.match(css, /html\[data-v2="an"\] \.format-slider input\[type="range"\]::-webkit-slider-thumb \{\s*background: radial-gradient\([^)]*var\(--akzent\)/, 'Knopf orange wie der Cursor');
+  assert.match(lies('src/35-richtext.js'), /class: 'format-knopf format-synonyme'[^\n]*onclick: \(\) => synAusLeiste\(editor\)/);
+  assert.match(lies('src/35c-synonyme.js'), /^function synAusLeiste\(editor\) \{/m);
+});
+
+test('5.68.2: Synonyme nehmen die Endung mit (gewöhnlicher → alltäglicher)', async () => {
+  const k = await frisch();
+  const { saetze, index } = k.synBaueIndex('gewöhnlich;alltäglich;normal;im Grunde\nmüde;schläfrig;träge\nHund;Köter (ugs.);Vierbeiner\n');
+  k.SYN.saetze = saetze; k.SYN.index = index;
+  assert.equal(k.synAnpassen('gewöhnlicher', 'alltäglich'), 'alltäglicher');
+  assert.equal(k.synAnpassen('gewöhnlichen', 'normal'), 'normalen');
+  assert.equal(k.synAnpassen('Gewöhnliche', 'alltäglich'), 'Alltägliche', 'am Satzanfang gross, mit Endung');
+  assert.equal(k.synAnpassen('gewöhnlich', 'alltäglich'), 'alltäglich', 'Grundform bleibt Grundform');
+  assert.equal(k.synAnpassen('gewöhnlicher', 'im Grunde'), 'im Grunde', 'Wendungen bleiben, wie sie sind');
+  assert.equal(k.synAnpassen('müden', 'schläfrig'), 'schläfrigen', 'müde + n → schläfrig + en');
+  assert.equal(k.synAnpassen('müden', 'träge'), 'trägen');
+  assert.equal(k.synAnpassen('müder', 'schläfrig'), 'schläfriger');
+  assert.equal(k.synAnpassen('Hunde', 'Vierbeiner'), 'Vierbeiner', 'Nomen bekommen keine geratene Mehrzahl');
+});

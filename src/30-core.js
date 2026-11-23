@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.68.1';
+const APP_VERSION = '5.68.2';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -1798,6 +1798,8 @@ function tastaturZaehmen() {
       wurzel.classList.toggle('tastatur-offen', offen);
       zurueck();
       if (offen && tastaturFeld(document.activeElement)) tastaturInSicht(document.activeElement);
+      /* 5.68.2: Faehrt die Tastatur im Schreibraum ein oder aus, rueckt die Schreibzeile nach. */
+      if (typeof _sr !== 'undefined' && _sr && _sr.zentriereSpaeter && tastaturFeld(document.activeElement)) _sr.zentriereSpaeter();
     };
     window.visualViewport.addEventListener('resize', messen);
     window.visualViewport.addEventListener('scroll', zurueck);

@@ -6175,6 +6175,8 @@ html.tastatur-offen .modal { max-height: calc(var(--sichthoehe, 100vh) - 24px); 
 .kt-markenname.hinter { stroke: var(--kpapier); stroke-width: 3.4; stroke-linejoin: round; fill: none; }
 .kt-marke.wichtig .kt-markenname { font-size: 14px; }
 .kt-marke.zieht { opacity: .82; }
+/* 5.68.2: der Doppelgänger beim Ziehen — schwebt über dem Tisch, die Karte bleibt still. */
+.kt-markengeist { position: absolute; z-index: 6; pointer-events: none; overflow: visible; will-change: transform; color: var(--ktinte); }
 .kt-blatt.eine-im-blick .kt-marke:not(.imblick) { opacity: .35; }
 .kt-marke.imblick .kt-markenzeichen { color: var(--akzent); }
 .kt-marke:focus-visible { outline: none; }
@@ -7403,6 +7405,14 @@ html[data-v2="an"] input[type="range"]::-moz-range-thumb {
   width: 22px; height: 22px; border-radius: 50%; border: 0;
   background: radial-gradient(circle at 35% 30%, #fff3cf, #e0b660 38%, #a87a2c 72%, #7a5520);
   box-shadow: 0 2px 5px rgba(0, 0, 0, .35), 0 0 0 1px rgba(120, 85, 30, .5);
+}
+/* 5.68.2: Der Groesse-Knopf in der Formatleiste ist wieder orange — in der Farbe des
+   Cursors (--akzent). Messing neben dem orangen Cursor stoerte Sarah. */
+html[data-v2="an"] .format-slider input[type="range"]::-webkit-slider-thumb {
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--akzent) 40%, #fff), var(--akzent) 45%, color-mix(in srgb, var(--akzent) 72%, #000));
+}
+html[data-v2="an"] .format-slider input[type="range"]::-moz-range-thumb {
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--akzent) 40%, #fff), var(--akzent) 45%, color-mix(in srgb, var(--akzent) 72%, #000));
 }
 
 /* ----- Salon: Glas vor den Bildnissen, Goldglanz, atmende Bilderleuchten ----- */

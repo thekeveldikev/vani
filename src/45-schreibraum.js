@@ -364,10 +364,18 @@ function zentriereZeileRich(sanft) {
     if (Math.abs(mitte.scrollTop - z) < 10) return;
     if (sanft) mitte.scrollTo({ top: z, behavior: 'smooth' }); else mitte.scrollTop = z;
   };
+  /* 5.68.2: Die Formatleiste klebt oben IN diesem Rollbereich und deckt ihn zu.
+     Gerechnet wird deshalb nur mit dem freien Teil darunter. Und mit offener
+     Tastatur (iPad) steht die Schreibzeile weiter unten: vorher blieben ueber
+     ihr nur zweieinhalb Zeilen sichtbar, darunter lag leeres Papier. */
+  const leiste = mitte.querySelector('.formatleiste');
+  const verdeckt = leiste ? Math.max(0, Math.min(m.height / 2, leiste.getBoundingClientRect().bottom - m.top)) : 0;
+  const frei = m.height - verdeckt;
+  const tastatur = document.documentElement.classList.contains('tastatur-offen');
   if (D.einst.typewriter) {
-    setzeScroll(mitte.scrollTop + oben - m.height * .42);
-  } else if (unten > m.height - 120 || oben < 64) {
-    setzeScroll(mitte.scrollTop + unten - m.height * .55);
+    setzeScroll(mitte.scrollTop + oben - verdeckt - frei * (tastatur ? .7 : .42));
+  } else if (unten > m.height - (tastatur ? 60 : 120) || oben < verdeckt + 24) {
+    setzeScroll(mitte.scrollTop + unten - verdeckt - frei * (tastatur ? .78 : .55));
   }
   /* Und das Fenster bleibt, wo es hingehört. */
   if (window.scrollY) window.scrollTo(0, 0);
@@ -408,7 +416,8 @@ function zentriereZeile() {
   }
   _messer.textContent = t.slice(absatz, caret) || ' ';
   const caretY = obenHoehe + _messer.offsetHeight;
-  const zielY = ta.offsetTop + caretY - mitte.clientHeight * .42;
+  const tastatur = document.documentElement.classList.contains('tastatur-offen');
+  const zielY = ta.offsetTop + caretY - mitte.clientHeight * (tastatur ? .7 : .42);
   mitte.scrollTo({ top: Math.max(0, zielY) });
 }
 
