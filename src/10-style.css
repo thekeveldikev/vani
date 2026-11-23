@@ -2427,7 +2427,10 @@ html[data-thema="tinte"] .salon-galerie, html[data-thema="kerze"] .salon-galerie
 .ort-chip.still { color: var(--blass); box-shadow: none; background: none; }
 .ort-schal { animation: ort-schal 5s ease-in-out infinite alternate; transform-origin: 278px 48px; } @keyframes ort-schal { to { transform: rotate(2deg); } }
 .ort-lichtkegel { animation: ort-kegel 3.5s ease-in-out infinite alternate; } @keyframes ort-kegel { to { opacity: .6; } }
-.ort-platte.dreht { animation: ort-dreht 4s linear infinite; } @keyframes ort-dreht { to { transform: rotate(360deg); } }
+/* Die Platte selbst dreht sich nicht (Ellipse, siehe 57-orte) — nur die Marke auf dem Etikett laeuft um. */
+.ort-platte.dreht { animation: none; }
+.ort-plattenmarke { transform-box: view-box; }
+@keyframes ort-dreht { 0% { transform: translate(0, 0); } 12.5% { transform: translate(-2.05px, 1.13px); } 25% { transform: translate(-7px, 1.6px); } 37.5% { transform: translate(-11.95px, 1.13px); } 50% { transform: translate(-14px, 0); } 62.5% { transform: translate(-11.95px, -1.13px); } 75% { transform: translate(-7px, -1.6px); } 87.5% { transform: translate(-2.05px, -1.13px); } 100% { transform: translate(0, 0); } }
 .ort-schnur { animation: ort-schnur 4s ease-in-out infinite alternate; transform-origin: 660px 78px; } @keyframes ort-schnur { to { transform: rotate(3deg); } }
 /* Türen */
 #raum.tuer-auf > *:not(.ort-kulisse) { animation: tuer-auf .5s cubic-bezier(.2,.8,.2,1) both; }
@@ -2468,7 +2471,7 @@ html[data-thema="tinte"] #raum[data-ort="blaetter"] .blattliste > *, html[data-t
 html[data-thema="tinte"] #raum[data-ort="schnipsel"] .schnipsel-lauf .blase, html[data-thema="kerze"] #raum[data-ort="schnipsel"] .schnipsel-lauf .blase { background-image: repeating-linear-gradient(transparent 0 25px, rgba(120,140,200,.16) 25px 26px), linear-gradient(#2a241e, #221d18); }
 html[data-thema="tinte"] #raum[data-ort="projekte"] .inhalt, html[data-thema="kerze"] #raum[data-ort="projekte"] .inhalt { background-color: #4a3a2a; }
 html[data-thema="tinte"] #raum[data-ort="cluster"] .inhalt, html[data-thema="kerze"] #raum[data-ort="cluster"] .inhalt { background-color: #2a2622; }
-@media (prefers-reduced-motion: reduce) { #raum.tuer-auf > * { animation: none; } .ort-platte.dreht, .ort-schal, .ort-schnur, .ort-lichtkegel { animation: none; } }
+@media (prefers-reduced-motion: reduce) { #raum.tuer-auf > * { animation: none; } .ort-platte.dreht, .ort-plattenmarke, .ort-schal, .ort-schnur, .ort-lichtkegel { animation: none; } }
 
 /* ----- Salon, gemalt ----- */
 .salon-galerie.gemalt { position: relative; overflow: hidden; }
@@ -2598,7 +2601,7 @@ mark.lupe-wdh { background: rgba(255,196,90,.45); color: inherit; border-radius:
 .ort-kulisse .ort-schal, .ort-kulisse .ort-lichtkegel, .ort-kulisse .ort-platte.dreht, .ort-kulisse .ort-schnur { animation: none; }
 .ort-kulisse.lebt .ort-schal { animation: ort-schal 5s ease-in-out infinite alternate; transform-origin: 250px 48px; }
 .ort-kulisse.lebt .ort-lichtkegel { animation: ort-kegel 3.5s ease-in-out infinite alternate; }
-.ort-kulisse.lebt .ort-platte.dreht { animation: ort-dreht 4s linear infinite; }
+.ort-kulisse.lebt .ort-platte.dreht .ort-plattenmarke { animation: ort-dreht 1.8s linear infinite; }
 .ort-kulisse.lebt .ort-schnur { animation: ort-schnur 4s ease-in-out infinite alternate; }
 .ort-kulisse.lebt .ort-dampfzug { animation: ort-dampf 3.2s ease-in-out infinite; opacity: 0; transform-box: view-box; }
 .ort-kulisse.lebt .ort-dampfzug.d1 { animation-delay: 1s; } .ort-kulisse.lebt .ort-dampfzug.d2 { animation-delay: 2.1s; }
@@ -7085,6 +7088,41 @@ html[data-v2="an"] {
   --v2-fleuron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 22'%3E%3Cg fill='none' stroke='%23b8923f' stroke-linecap='round' stroke-width='1.1'%3E%3Cpath d='M4 11h26'/%3E%3Cpath d='M60 11h26'/%3E%3Cpath d='M30 11c4-8 11-9 15-3c4-6 11-5 15 3c-4 8-11 9-15 3c-4 6-11 5-15-3z'/%3E%3C/g%3E%3Ccircle cx='45' cy='11' r='2' fill='%23b8923f'/%3E%3C/svg%3E");
 }
 
+/* ----- Lesbarkeit -----
+   Die „blasse“ Schrift war auf Papier zu hell (Kontrast ~3,4 : 1). In v2
+   je Thema kraeftiger: auf hellem Grund dunkler, auf dunklem heller — alle
+   Hinweise, Untertitel und Zahlen werden damit gut lesbar (>= 4,5 : 1). */
+html[data-v2="an"]:not([data-thema]), html[data-v2="an"][data-thema="papier"] { --blass: #66594a; }
+html[data-v2="an"][data-thema="tinte"] { --blass: #b3a594; }
+html[data-v2="an"][data-thema="kerze"] { --blass: #c2a876; }
+html[data-v2="an"][data-thema="weiss"] { --blass: #6b6b6b; }
+html[data-v2="an"][data-thema="nebel"] { --blass: #56646d; }
+html[data-v2="an"] .lknopf { font-size: 11px; font-weight: 500; letter-spacing: .01em; }
+html[data-v2="an"] .lknopf svg.ik { stroke-width: 1.9; }
+html[data-v2="an"] .karte .klein, html[data-v2="an"] .karte small { font-size: max(13px, 1em * .82); line-height: 1.45; }
+html[data-v2="an"] .kartenkopf { font-size: 11.5px; color: color-mix(in srgb, var(--gold) 62%, var(--tinte)); }
+
+/* Funken-Arten groesser; die stillen Knoepfe in Kartenfuessen sehen wie Knoepfe aus, nicht wie loser Text. */
+html[data-v2="an"] .funke-arten button { font-size: 12.5px; padding: 6px 12px; }
+html[data-v2="an"] .karte .fussreihe .knopf.zart {
+  color: var(--tinte); padding: 7px 13px;
+  background: color-mix(in srgb, var(--papier) 55%, transparent);
+  box-shadow: inset 0 0 0 1px var(--linie);
+}
+
+/* ----- Die Buehnenkante: eine Goldleiste unter jeder Kulisse, die Chips als Papieretiketten ----- */
+html[data-v2="an"] .ort-kulisse > svg.ort-bild:first-of-type { box-shadow: 0 1px 0 #f0d99a, 0 2px 0 #9c7a45, 0 3px 0 #5e4523, 0 8px 14px -6px rgba(20, 10, 0, .5); position: relative; z-index: 0; }
+html[data-v2="an"] .ort-chips { padding: 12px 22px 8px; gap: 8px; background: linear-gradient(180deg, color-mix(in srgb, var(--hg2) 70%, transparent), transparent); }
+html[data-v2="an"] .ort-chip {
+  font-size: 13px; font-weight: 500; padding: 6px 13px; color: var(--tinte);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--papier) 85%, #fff), var(--papier));
+  box-shadow: inset 0 0 0 1px var(--v2-goldzart), 0 2px 6px -2px var(--schein);
+}
+html[data-v2="an"] .ort-chip.still {
+  font-style: italic; font-family: ui-serif, "New York", Georgia, serif; color: var(--blass);
+  background: none; box-shadow: inset 0 -1px 0 var(--v2-goldzart); border-radius: 0; padding-inline: 4px;
+}
+
 /* ----- Papier und Licht ----- */
 html[data-v2="an"] body {
   background:
@@ -7200,7 +7238,8 @@ html[data-v2="an"] .desk-tuer {
 /* ----- Kulissen: Stuck, Lichtstrahl, Vignette, Staub im Licht ----- */
 html[data-v2="an"] .ort-kulisse { box-shadow: 0 10px 24px -14px rgba(20, 10, 0, .55); }
 html[data-v2="an"] .ort-kulisse::before {
-  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  /* nur ueber dem Bild (150 px), nicht ueber der Chipzeile darunter */
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 150px; pointer-events: none; z-index: 1;
   background:
     linear-gradient(180deg, #e3d3ae 0 3px, #9c7a45 3px 4px, rgba(0, 0, 0, .28) 4px, transparent 16px),
     linear-gradient(112deg, transparent 14%, rgba(255, 238, 196, .17) 24%, rgba(255, 238, 196, .05) 34%, transparent 40%),
@@ -7224,7 +7263,7 @@ html[data-v2="an"] .ort-kulisse.zeit-nacht::before {
 }
 html[data-v2="an"] .ort-kulisse.zeit-nacht::after { filter: hue-rotate(180deg) saturate(.4); }
 html[data-v2="an"] .ort-kulisse::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1; opacity: 0;
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 150px; pointer-events: none; z-index: 1; opacity: 0;
   background-image:
     radial-gradient(circle, rgba(255, 244, 214, .9) 0 1px, transparent 1.6px),
     radial-gradient(circle, rgba(255, 244, 214, .7) 0 .8px, transparent 1.4px),
@@ -7235,8 +7274,132 @@ html[data-v2="an"] .ort-kulisse::after {
   mask-image: linear-gradient(112deg, transparent 12%, #000 22%, #000 34%, transparent 42%);
 }
 
+/* ----- Fenster, Suche, Spotlight, Hinweise: dieselbe Rahmung wie die Karten ----- */
+html[data-v2="an"] :where(.modal) {
+  background:
+    var(--v2-ecke-lo) 8px 8px / 13px 13px no-repeat,
+    var(--v2-ecke-ro) calc(100% - 8px) 8px / 13px 13px no-repeat,
+    var(--v2-ecke-lu) 8px calc(100% - 8px) / 11px 11px no-repeat,
+    var(--v2-ecke-ru) calc(100% - 8px) calc(100% - 8px) / 11px 11px no-repeat,
+    radial-gradient(ellipse 90% 50% at 30% 0%, var(--v2-licht), transparent 70%),
+    var(--papier);
+  box-shadow: inset 0 0 0 1px var(--linie), inset 0 0 0 6px var(--papier), inset 0 0 0 7px color-mix(in srgb, var(--gold) 26%, var(--papier)), 0 24px 60px -18px rgba(0, 0, 0, .45), 0 2px 8px var(--schein);
+}
+html[data-v2="an"] .suchkasten, html[data-v2="an"] .spotlight { box-shadow: inset 0 0 0 1px var(--v2-goldzart), 0 24px 60px -16px rgba(0, 0, 0, .45); }
+html[data-v2="an"] .suchtreffer .gruppe {
+  font-size: 10.5px; font-weight: 600; letter-spacing: .18em; color: var(--v2-gold);
+  padding: 12px 12px 7px 26px;
+  background: var(--v2-raute) 12px calc(100% - 9px) / 6px 6px no-repeat, linear-gradient(90deg, color-mix(in srgb, var(--gold) 45%, transparent), transparent 70%) 22px calc(100% - 4px) / calc(100% - 34px) 1px no-repeat;
+}
+html[data-v2="an"] .suchtreffer mark { text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--gold) 70%, transparent); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+html[data-v2="an"] .spotlight-vtext mark { background: linear-gradient(transparent 55%, rgba(232, 180, 80, .45) 55%); border-radius: 0; }
+html[data-v2="an"] .toast { box-shadow: inset 0 0 0 1px var(--v2-goldzart), 0 10px 28px -10px rgba(0, 0, 0, .45); }
+
+/* ----- Schieberegler: eine Rille im Holz, ein Messingknauf (gleiche Groesse wie vorher) ----- */
+html[data-v2="an"] input[type="range"] {
+  background: linear-gradient(180deg, rgba(0, 0, 0, .22), rgba(255, 255, 255, .18));
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .25), 0 1px 0 var(--v2-licht);
+}
+html[data-v2="an"] input[type="range"]::-webkit-slider-thumb {
+  background: radial-gradient(circle at 35% 30%, #fff3cf, #e0b660 38%, #a87a2c 72%, #7a5520);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .35), inset 0 -1px 2px rgba(0, 0, 0, .3), 0 0 0 1px rgba(120, 85, 30, .5);
+}
+html[data-v2="an"] input[type="range"]::-moz-range-thumb {
+  width: 22px; height: 22px; border-radius: 50%; border: 0;
+  background: radial-gradient(circle at 35% 30%, #fff3cf, #e0b660 38%, #a87a2c 72%, #7a5520);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .35), 0 0 0 1px rgba(120, 85, 30, .5);
+}
+
+/* ----- Salon: Glas vor den Bildnissen, Goldglanz, atmende Bilderleuchten ----- */
+html[data-v2="an"] .salon-passepartout { position: relative; overflow: hidden; }
+html[data-v2="an"] .salon-passepartout::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  background: linear-gradient(128deg, rgba(255, 255, 255, .16) 0%, rgba(255, 255, 255, .03) 32%, transparent 33%, transparent 68%, rgba(255, 255, 255, .06) 69%, transparent 80%);
+}
+html[data-v2="an"] .salon-passepartout::after {
+  content: ""; position: absolute; top: -20%; bottom: -20%; left: -60%; width: 38%; pointer-events: none; z-index: 3; opacity: 0;
+  background: linear-gradient(100deg, transparent, rgba(255, 246, 214, .45), transparent);
+  transform: skewX(-14deg);
+}
+html[data-v2="an"] .salon-schild { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 2px 5px rgba(0, 0, 0, .3); }
+
+/* ----- Salon: Damast, Stuckschatten und Vignette ueber der gemalten Wand, unter den Rahmen ----- */
+html[data-v2="an"] .salon-galerie.gemalt::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, .32) 0, transparent 26px),
+    radial-gradient(ellipse 90% 70% at 50% 40%, transparent 55%, rgba(15, 6, 0, .38) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64' viewBox='0 0 56 64'%3E%3Cg fill='none' stroke='%23ffe6bf' stroke-width='.9' opacity='.55'%3E%3Cpath d='M28 6c6 7 13 10 13 19s-7 12-13 18c-6-6-13-9-13-18s7-12 13-19z'/%3E%3Cpath d='M28 18c3 3.5 6 5 6 8.5s-3 5.5-6 8.5c-3-3-6-5-6-8.5s3-5 6-8.5z'/%3E%3C/g%3E%3Cg fill='%23ffe6bf' opacity='.4'%3E%3Ccircle cx='0' cy='56' r='1.6'/%3E%3Ccircle cx='56' cy='56' r='1.6'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 56px 64px;
+  opacity: .9; mix-blend-mode: soft-light;
+}
+
+/* ----- Album: genarbtes Leder auf dem Deckel ----- */
+html[data-v2="an"] .alb-rb-deckel::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: .5;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .3 0 0 0 0 .18 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23l)'/%3E%3C/svg%3E");
+}
+
+/* Titel, Unterzeile und Fleuron liegen ueber dem Leder, nicht darunter. */
+html[data-v2="an"] .alb-rb-titel, html[data-v2="an"] .alb-rb-unter, html[data-v2="an"] .alb-rb-fleuron { position: relative; }
+
+/* ----- Kabinett: Messinggriffe mit Rundung und Glanzlicht ----- */
+html[data-v2="an"] .kab-griff {
+  background: linear-gradient(90deg, #7a5520 0%, #e8cb8a 30%, #fff2cc 42%, #c9a25a 60%, #8a6428 100%);
+  box-shadow: -2px 1px 4px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .4), 0 0 0 1px rgba(60, 40, 10, .35);
+}
+
+/* ----- Album: Goldglanz ueber dem Deckel, das Lesebaendchen schwingt ----- */
+html[data-v2="an"] .alb-rb-deckel::after {
+  content: ""; position: absolute; top: -10%; bottom: -10%; left: -50%; width: 30%; pointer-events: none; opacity: 0;
+  background: linear-gradient(100deg, transparent, rgba(255, 228, 160, .22), transparent);
+  transform: skewX(-12deg);
+}
+html[data-v2="an"] .alb-rb-titel { text-shadow: 0 1px 0 rgba(0, 0, 0, .45), 0 0 14px rgba(255, 210, 120, .25); }
+
+/* ----- Kabinett: Goldschilder glaenzen, Faecher bekommen eine Lichtkante ----- */
+html[data-v2="an"] .kab-schild { position: relative; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 -1px 0 rgba(0, 0, 0, .2), 0 2px 6px rgba(0, 0, 0, .35); }
+html[data-v2="an"] .kab-schild::after {
+  content: ""; position: absolute; top: -30%; bottom: -30%; left: -60%; width: 40%; pointer-events: none; opacity: 0;
+  background: linear-gradient(100deg, transparent, rgba(255, 252, 235, .7), transparent); transform: skewX(-16deg);
+}
+html[data-v2="an"] .kab-fach { box-shadow: inset 0 1px 0 rgba(255, 226, 170, .22), inset 0 0 0 1px rgba(232, 176, 90, .14), 0 14px 26px -14px rgba(0, 0, 0, .7); }
+
+/* ----- Die Zierschicht der Kulissen (57-orte: orteV2Zier) ----- */
+html[data-v2="an"] .ort-v2-zier { position: absolute; top: 0; left: 0; width: 100%; pointer-events: none; z-index: 2; }
+html[data-v2="an"] .ort-v2-zier * { transform-box: view-box; }
+html[data-v2="an"] .ort-v2-zier .v2-hof { opacity: .85; }
+html[data-v2="an"] .ort-v2-zier .v2-funkeln, html[data-v2="an"] .ort-v2-zier .v2-glanzband,
+html[data-v2="an"] .ort-v2-zier .v2-zettelflug, html[data-v2="an"] .ort-v2-zier .v2-flieger2,
+html[data-v2="an"] .ort-v2-zier .v2-schnurglanz, html[data-v2="an"] .ort-v2-zier .v2-schall { opacity: 0; }
+html[data-v2="an"] .ort-v2-zier .v2-staubkorn { opacity: .45; }
+html[data-v2="an"] .ort-v2-zier .v2-dampf2 { opacity: .35; }
+
 /* ----- Bewegung ----- */
 @media (prefers-reduced-motion: no-preference) {
+  html[data-v2="an"][data-v2bewegung="an"] .salon-passepartout::after { animation: v2-goldglanz 11s ease-in-out infinite; animation-delay: calc(var(--n, 0) * 1.4s + 1s); }
+  html[data-v2="an"][data-v2bewegung="an"] .salon-lampe::after { animation: v2-hofatem 6s ease-in-out infinite alternate; }
+  html[data-v2="an"][data-v2bewegung="an"] .alb-rb-deckel::after { animation: v2-goldglanz 10s ease-in-out 1.5s infinite; }
+  html[data-v2="an"][data-v2bewegung="an"] .alb-rb-band { transform-origin: 50% 0; animation: v2-baendchen 6s ease-in-out infinite alternate; }
+  html[data-v2="an"][data-v2bewegung="an"] .kab-schild::after { animation: v2-goldglanz 9s ease-in-out infinite; }
+  html[data-v2="an"][data-v2bewegung="an"] .kab-fach:nth-child(2) .kab-schild::after { animation-delay: 1.2s; }
+  html[data-v2="an"][data-v2bewegung="an"] .kab-fach:nth-child(3) .kab-schild::after { animation-delay: 2.4s; }
+  html[data-v2="an"][data-v2bewegung="an"] .kab-fach:nth-child(n+4) .kab-schild::after { animation-delay: 3.6s; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-funkeln { animation: v2-funken 5.2s ease-in-out infinite; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-hof.atmet { animation: v2-hofatem 5s ease-in-out infinite alternate; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-hof.flackert { animation: v2-flackern 2.6s steps(9, end) infinite; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-staubkorn { animation: v2-korn 10s ease-in-out infinite; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-glanzband { animation: v2-glanzlauf 8s cubic-bezier(.5, 0, .3, 1) 1.5s infinite; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-zettelflug { animation: v2-zettel 19s ease-in-out 2s infinite; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-flieger2 { animation: v2-flug 24s ease-in-out 4s infinite; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-schnurglanz { animation: v2-schnur 7s linear infinite; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-blattschatten { animation: v2-schatten 16s ease-in-out infinite alternate; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-dampf2 path { animation: v2-dampf 4.4s ease-in-out infinite; transform-origin: 640px 84px; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-dampf2 path + path { animation-delay: 2.2s; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-dampf2 { opacity: 1; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-schall { opacity: 1; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-schall path { animation: v2-welle 2.7s ease-out infinite; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-schall .w1 { animation-delay: .9s; }
+  html[data-v2="an"][data-v2bewegung="an"] .ort-v2-zier .v2-schall .w2 { animation-delay: 1.8s; }
   html[data-v2="an"][data-v2bewegung="an"] .gruss-ranke { animation: v2-einzeichnen 1.6s cubic-bezier(.4, .1, .2, 1) .25s both; }
   html[data-v2="an"][data-v2bewegung="an"] .gruss-vignette { animation: v2-medaillon .9s cubic-bezier(.2, .8, .2, 1) both; }
   html[data-v2="an"][data-v2bewegung="an"] .gv-strahlen { transform-box: view-box; transform-origin: 40px 34px; animation: v2-drehen 70s linear infinite; }
@@ -7258,6 +7421,19 @@ html[data-v2="an"] .ort-kulisse::after {
 }
 html[data-v2="an"] .ort-glanz { opacity: 0; transform-box: view-box; transform-origin: 540px 72px; transform: rotate(22deg) translateX(-60px); }
 @keyframes v2-glanz { 0% { transform: rotate(22deg) translateX(-60px); opacity: 0; } 8% { opacity: 1; } 22% { transform: rotate(22deg) translateX(110px); opacity: 0; } 100% { transform: rotate(22deg) translateX(110px); opacity: 0; } }
+@keyframes v2-goldglanz { 0% { left: -60%; opacity: 0; } 4% { opacity: 1; } 22% { left: 130%; opacity: 0; } 100% { left: 130%; opacity: 0; } }
+@keyframes v2-baendchen { from { transform: rotate(-1.6deg); } to { transform: rotate(1.8deg); } }
+@keyframes v2-funken { 0%, 62%, 100% { opacity: 0; transform: scale(.2) rotate(0deg); } 72% { opacity: 1; transform: scale(1) rotate(45deg); } 84% { opacity: .1; transform: scale(.4) rotate(90deg); } }
+@keyframes v2-hofatem { from { opacity: .62; } to { opacity: 1; } }
+@keyframes v2-flackern { 0% { opacity: .85; } 20% { opacity: .62; } 35% { opacity: .95; } 50% { opacity: .7; } 70% { opacity: 1; } 85% { opacity: .66; } 100% { opacity: .88; } }
+@keyframes v2-korn { 0% { transform: translate(0, 0); opacity: 0; } 20% { opacity: .9; } 80% { opacity: .7; } 100% { transform: translate(14px, -26px); opacity: 0; } }
+@keyframes v2-glanzlauf { 0% { transform: translateX(0); opacity: 0; } 6% { opacity: 1; } 30% { transform: translateX(var(--v2-weg)); opacity: 0; } 100% { transform: translateX(var(--v2-weg)); opacity: 0; } }
+@keyframes v2-zettel { 0% { transform: translate(840px, -24px) rotate(10deg); opacity: 0; } 3% { opacity: 1; } 15% { transform: translate(640px, 30px) rotate(-14deg); } 28% { transform: translate(430px, 68px) rotate(16deg); } 40% { transform: translate(230px, 110px) rotate(-10deg); opacity: 1; } 46% { transform: translate(140px, 170px) rotate(8deg); opacity: 0; } 100% { transform: translate(140px, 170px); opacity: 0; } }
+@keyframes v2-flug { 0% { transform: translate(-60px, 96px) rotate(-8deg); opacity: 0; } 3% { opacity: 1; } 18% { transform: translate(220px, 54px) rotate(-14deg); } 32% { transform: translate(520px, 70px) rotate(4deg); } 46% { transform: translate(860px, 24px) rotate(-12deg); opacity: 1; } 48% { opacity: 0; } 100% { transform: translate(860px, 24px); opacity: 0; } }
+@keyframes v2-schnur { 0% { stroke-dashoffset: 100; opacity: 0; } 10% { opacity: .9; } 60% { opacity: .9; } 70%, 100% { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes v2-schatten { from { transform: translate(-10px, -4px) rotate(-2deg); } to { transform: translate(24px, 8px) rotate(3deg); } }
+@keyframes v2-dampf { 0% { transform: translateY(6px) scaleY(.7); opacity: 0; } 30% { opacity: .9; } 100% { transform: translateY(-14px) scaleY(1.15); opacity: 0; } }
+@keyframes v2-welle { 0% { transform: scale(.6); opacity: 0; } 25% { opacity: .9; } 100% { transform: scale(1.9); opacity: 0; } }
 @keyframes v2-einzeichnen { from { clip-path: inset(0 100% 0 0); opacity: .2; } to { clip-path: inset(0 0 0 0); opacity: .85; } }
 @keyframes v2-medaillon { from { transform: scale(.82) rotate(-8deg); opacity: 0; } }
 @keyframes v2-drehen { to { transform: rotate(360deg); } }

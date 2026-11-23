@@ -70,6 +70,248 @@ function orteV2DieleOben() {
     '<g pointer-events="none" clip-path="url(#ortSpiegelGlas)"><rect class="ort-glanz" x="470" y="-10" width="18" height="170" fill="rgba(255,255,255,.42)" transform="rotate(22 540 72)"/></g>';
 }
 
+/* ----- Gestaltung v2: neu ausgemalt (5.65) -----
+   Zwei Malschichten je Kulisse, deckungsgleich mit dem Buehnenbild:
+   „unten“ liegt zwischen Hintergrund und Dingen (Schlagschatten, Maserung,
+   Struktur, Licht an der Wand), „oben“ ueber den Dingen (Rundung, Glanz,
+   Kanten, Eigenschatten). Keine Bewegung, keine Zeiger. */
+function orteV2Malerei(r, ebene) {
+  if (!orteV2An()) return '';
+  const S = (x, y, w, h, a, rx) => '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="' + (rx || 3) + '" fill="rgba(20,10,0,' + a + ')"/>';
+  const E = (cx, cy, rx, ry, a, f) => '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '" fill="' + (f || 'rgba(20,10,0,' + a + ')') + '"/>';
+  const L = (d, farbe, b) => '<path d="' + d + '" fill="none" stroke="' + farbe + '" stroke-width="' + (b || 1) + '" stroke-linecap="round"/>';
+  const verlauf = (id, x1, y1, x2, y2, stops) => '<linearGradient id="' + id + '" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '">' + stops.map(([o, c]) => '<stop offset="' + o + '" stop-color="' + c + '"/>').join('') + '</linearGradient>';
+  const kugel = (id, licht, mitte, rand) => '<radialGradient id="' + id + '" cx=".36" cy=".32" r=".72"><stop offset="0" stop-color="' + licht + '"/><stop offset=".55" stop-color="' + mitte + '"/><stop offset="1" stop-color="' + rand + '"/></radialGradient>';
+  const rund = verlauf('v2mRund', 0, 0, 1, 0, [[0, 'rgba(255,255,255,.22)'], [.4, 'rgba(255,255,255,0)'], [.75, 'rgba(0,0,0,.12)'], [1, 'rgba(0,0,0,.3)']]);
+  const oben2 = verlauf('v2mOben', 0, 0, 0, 1, [[0, 'rgba(255,255,255,.28)'], [.45, 'rgba(255,255,255,0)'], [1, 'rgba(0,0,0,.22)']]);
+  const holz = (x, y, w, h, n, a) => '<g stroke="rgba(40,20,5,' + a + ')" fill="none" stroke-width=".8">' + Array.from({ length: n }, (_, i) => { const yy = y + (i + .5) * h / n; return '<path d="M' + x + ' ' + yy.toFixed(1) + ' C ' + (x + w * .3) + ' ' + (yy + (i % 2 ? 2.4 : -2.4)).toFixed(1) + ', ' + (x + w * .62) + ' ' + (yy + (i % 3 ? -1.6 : 1.8)).toFixed(1) + ', ' + (x + w) + ' ' + (yy + .8).toFixed(1) + '"/>'; }).join('') + '</g>';
+  const defs = (inhalt) => '<defs>' + rund + oben2 + inhalt + '</defs>';
+
+  if (r === 'zuhause') {
+    if (ebene === 'unten') return '';   /* unten malt orteV2DieleUnten */
+    return defs(kugel('v2mUhrglas', 'rgba(255,255,255,.55)', 'rgba(255,255,255,.05)', 'rgba(0,0,0,.18)') +
+      verlauf('v2mGoldring', 0, 0, 1, 1, [[0, '#fff1c4'], [.35, 'rgba(201,162,90,0)'], [.7, 'rgba(90,60,20,.0)'], [1, 'rgba(90,60,20,.45)']])) +
+      '<path d="M70 50c-18 0-26 14-26 26h52c0-12-8-26-26-26z" fill="url(#v2mRund)"/>' + L('M56 60 Q 62 54 70 53', 'rgba(255,255,255,.28)', 1.4) +
+      '<path d="M117 51 C 114.5 59 114 70 113 84 L111 116 q 5 3 10 1 l 4 -2 q 5 2 10 0 l 4 2 q 5 2 10 -1 L147 84 C 146 70 145.5 59 143 51 C 139 48.6 121 48.6 117 51 Z" fill="url(#v2mRund)" opacity=".8"/>' +
+      '<ellipse cx="540" cy="72" rx="48" ry="58" fill="none" stroke="url(#v2mGoldring)" stroke-width="5"/>' +
+      '<circle cx="700" cy="30" r="15.5" fill="url(#v2mUhrglas)"/>' + L('M690 22 Q 694 18 700 17', 'rgba(255,255,255,.7)', 1.2) +
+      '<rect x="620" y="78" width="160" height="8" rx="2" fill="url(#v2mOben)"/>' +
+      '<rect x="40" y="26" width="300" height="10" rx="3" fill="url(#v2mOben)"/>' +
+      '<rect x="364" y="28" width="96" height="46" rx="4" fill="url(#v2mOben)" opacity=".7"/>';
+  }
+  if (r === 'schnipsel') {
+    if (ebene === 'unten') return defs('') +
+      '<rect x="0" y="0" width="800" height="124" fill="url(#v2mOben)" opacity=".5"/>' +
+      S(46, 66, 720, 70, .2, 8) + S(30, 124, 742, 8, .28, 4) +
+      E(120, 36, 22, 3, .25) + E(318, 139, 14, 2, .2) + E(560, 136, 46, 3, .22);
+    return defs(verlauf('v2mKasten', 0, 0, 1, 0, [[0, 'rgba(255,230,190,.14)'], [.5, 'rgba(255,230,190,0)'], [1, 'rgba(0,0,0,.24)']]) +
+      verlauf('v2mMessing', 0, 0, 0, 1, [[0, '#fff1c6'], [.5, 'rgba(201,162,90,0)'], [1, 'rgba(90,60,20,.5)']])) +
+      '<rect x="40" y="60" width="720" height="68" rx="6" fill="url(#v2mKasten)"/>' +
+      holz(46, 100, 708, 26, 4, .16) +
+      L('M44 60.6 H756', 'rgba(255,236,200,.4)', 1) + L('M42 127.4 H758', 'rgba(0,0,0,.4)', 1.2) +
+      Array.from({ length: 22 }, (_, i) => L('M' + (60 + i * 31) + ' ' + (70.6 + (i % 3)) + ' h26', 'rgba(255,255,255,.7)', .8) + L('M' + (86 + i * 31) + ' ' + (71 + (i % 3)) + ' v51', 'rgba(0,0,0,.14)', 1.2)).join('') +
+      '<rect x="372" y="84" width="56" height="12" rx="2" fill="url(#v2mMessing)" opacity=".7"/><rect x="380" y="98" width="40" height="6" rx="3" fill="url(#v2mMessing)" opacity=".8"/>' +
+      '<rect x="114" y="6" width="12" height="14" rx="3" fill="url(#v2mRund)"/><rect x="100" y="18" width="40" height="10" rx="3" fill="url(#v2mOben)"/>';
+  }
+  if (r === 'blaetter') {
+    if (ebene === 'unten') return defs('') +
+      '<rect x="0" y="0" width="800" height="112" fill="url(#v2mOben)" opacity=".35"/>' +
+      E(404, 120, 150, 7, .22) + E(204, 123, 52, 3.4, .22) + E(690, 116, 22, 3, .3) + E(634, 119, 16, 2.4, .2) +
+      holz(0, 116, 800, 32, 5, .14);
+    return defs(verlauf('v2mStift', 0, 0, 0, 1, [[0, 'rgba(255,255,255,.45)'], [.45, 'rgba(255,255,255,0)'], [1, 'rgba(0,0,0,.3)']]) +
+      verlauf('v2mGlasT', 0, 0, 1, 0, [[0, 'rgba(255,255,255,.3)'], [.25, 'rgba(255,255,255,0)'], [.8, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,.35)']])) +
+      /* Papierkanten am Stapel, Eselsohr mit Schatten */
+      [0, 1, 2, 3].map((i) => L('M' + (272 + i * 2) + ' ' + (119 - i * 4) + ' H' + (528 + i * 2), 'rgba(160,140,100,.35)', .7)).join('') +
+      L('M510 10 L530 30', 'rgba(0,0,0,.12)', 3) +
+      '<g transform="rotate(-12 200 116)"><rect x="150" y="112" width="110" height="8" fill="url(#v2mStift)"/></g>' +
+      '<rect x="676" y="90" width="28" height="24" rx="3" fill="url(#v2mGlasT)"/>' + L('M680 92 v18', 'rgba(255,255,255,.4)', 1.4) +
+      '<rect x="620" y="106" width="26" height="12" rx="2" fill="url(#v2mOben)" transform="rotate(8 633 112)"/>';
+  }
+  if (r === 'hefte') {
+    if (ebene === 'unten') return defs(kugel('v2mLampenwand', 'rgba(255,214,140,.5)', 'rgba(255,214,140,.12)', 'rgba(255,214,140,0)')) +
+      '<ellipse cx="121" cy="60" rx="150" ry="80" fill="url(#v2mLampenwand)"/>' +
+      holz(0, 116, 800, 32, 5, .16) +
+      E(232, 114, 48, 3, .3) + E(402, 115, 76, 4, .32) + E(562, 115, 22, 2.6, .3) + E(642, 115, 30, 2.4, .2) + E(732, 114, 26, 3, .3) + E(121, 115, 26, 4, .3);
+    return defs(verlauf('v2mSchirm', 0, 0, 1, 0, [[0, 'rgba(255,255,255,.25)'], [.3, 'rgba(255,255,255,.05)'], [.7, 'rgba(0,0,0,.08)'], [1, 'rgba(0,0,0,.3)']]) +
+      verlauf('v2mMasch', 0, 0, 0, 1, [[0, 'rgba(255,255,255,.18)'], [.4, 'rgba(255,255,255,0)'], [1, 'rgba(0,0,0,.25)']])) +
+      '<path d="M86 56h70l-12-26H98z" fill="url(#v2mSchirm)"/>' + L('M100 32 L90 54', 'rgba(255,255,255,.35)', 1.4) +
+      '<rect x="118" y="52" width="6" height="60" fill="url(#v2mRund)"/>' +
+      /* Buecher: Kapitalbaender und Goldlinien auf den Ruecken */
+      L('M190 99 H274', 'rgba(232,196,110,.7)', .8) + L('M190 109 H274', 'rgba(232,196,110,.7)', .8) + L('M196 85 H272', 'rgba(232,196,110,.6)', .8) + L('M192 73 H262', 'rgba(255,240,200,.5)', .8) +
+      '<rect x="190" y="70" width="84" height="42" fill="url(#v2mOben)" opacity=".6"/>' +
+      '<path d="M340 86h120l10 26H330z" fill="url(#v2mMasch)"/>' + L('M332 72.6 H468', 'rgba(255,255,255,.18)', .8) +
+      '<rect x="544" y="92" width="32" height="22" rx="4" fill="url(#v2mRund)"/>' +
+      '<rect x="710" y="84" width="40" height="28" rx="3" fill="url(#v2mRund)"/>' +
+      '<g stroke="rgba(230,250,220,.35)" stroke-width=".7" fill="none"><path d="M729 82c-8-10-18-16-28-20"/><path d="M731 82c8-10 18-16 28-20"/><path d="M730 80c0-12 3-24 9-36"/></g>';
+  }
+  if (r === 'projekte') {
+    if (ebene === 'unten') return defs('') +
+      '<rect x="0" y="0" width="800" height="150" fill="url(#v2mOben)" opacity=".35"/>' +
+      [[120, 40], [300, 58], [500, 36], [660, 62]].map(([x, y]) => S(x + 4, y + 5, 90, 56, .2, 2)).join('') +
+      S(392, 97, 64, 54, .2, 2) + S(210, 100, 60, 50, .18, 2) + Array.from({ length: Math.min(3, vomTyp('projekt').length) }, (_, i) => S(584 + i * 60, 104, 52, 46, .16, 2)).join('') +
+      '<path d="M167 47 Q 262 23 347 65 T 547 43 T 707 69" fill="none" stroke="rgba(30,10,0,.22)" stroke-width="1.6"/>';
+    return defs(kugel('v2mNadel', '#ff9a8a', '#c0392b', '#6e1a12')) +
+      [[165, 44], [345, 62], [545, 40], [705, 66], [236, 98], [60, 90]].map(([x, y]) => '<circle cx="' + x + '" cy="' + y + '" r="5" fill="url(#v2mNadel)"/><circle cx="' + (x - 1.6) + '" cy="' + (y - 1.8) + '" r="1.3" fill="rgba(255,255,255,.8)"/>').join('') +
+      '<rect x="0" y="0" width="800" height="6" fill="url(#v2mOben)"/><rect x="0" y="144" width="800" height="6" fill="url(#v2mOben)"/>';
+  }
+  if (r === 'cluster') {
+    if (ebene === 'unten') return defs(kugel('v2mTischlicht', 'rgba(255,236,200,.35)', 'rgba(255,236,200,.08)', 'rgba(255,236,200,0)')) +
+      '<ellipse cx="420" cy="40" rx="420" ry="120" fill="url(#v2mTischlicht)"/>' +
+      holz(0, 0, 800, 150, 14, .12) +
+      '<path d="M120 20c-6 6-6 14 0 20 6-6 6-14 0-20z M650 30c-8 7-8 17 0 24 8-7 8-17 0-24z" fill="none" stroke="rgba(60,35,15,.18)" stroke-width="1"/>' +
+      '<g transform="rotate(-2 400 80)">' + S(268, 30, 276, 112, .22, 2) + '</g>' +
+      '<g transform="rotate(-6 120 70)">' + S(94, 55, 60, 40, .2, 1) + '</g><g transform="rotate(5 180 110)">' + S(154, 97, 60, 40, .2, 1) + '</g>' +
+      E(718, 128, 13, 3, .25) + E(42, 54, 18, 3, .25);
+    return defs(verlauf('v2mFalz', 0, 0, 1, 0, [[0, 'rgba(0,0,0,0)'], [.42, 'rgba(0,0,0,0)'], [.5, 'rgba(60,40,10,.22)'], [.58, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,0)']]) +
+      kugel('v2mKeks', 'rgba(255,230,170,.5)', 'rgba(255,230,170,0)', 'rgba(80,40,10,.35)')) +
+      '<g transform="rotate(-2 400 80)"><rect x="262" y="24" width="276" height="112" fill="url(#v2mFalz)"/>' + L('M264 25 H536', 'rgba(255,255,255,.6)', .8) + '</g>' +
+      '<circle cx="716" cy="124" r="12" fill="url(#v2mKeks)"/>' +
+      '<g fill="rgba(120,70,20,.35)"><circle cx="709" cy="127" r=".9"/><circle cx="722" cy="119" r=".8"/><circle cx="716" cy="117" r=".7"/></g>' +
+      '<rect x="24" y="30" width="32" height="22" rx="3" fill="url(#v2mRund)"/>';
+  }
+  if (r === 'woerter') {
+    if (ebene === 'unten') return defs('') +
+      S(46, 26, 540, 120, .35, 5) + S(626, 70, 160, 70, .25, 2) + E(690, 52, 42, 4, .35);
+    return defs(verlauf('v2mLetter', 0, 0, 0, 1, [[0, 'rgba(255,255,255,.3)'], [.35, 'rgba(255,255,255,.04)'], [1, 'rgba(0,0,0,.35)']]) +
+      verlauf('v2mRahmen', 0, 0, 0, 1, [[0, 'rgba(255,230,190,.35)'], [.08, 'rgba(255,230,190,0)'], [.92, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,.4)']])) +
+      '<rect x="40" y="20" width="540" height="116" rx="4" fill="url(#v2mRahmen)"/>' +
+      holz(40, 20, 540, 6, 1, .25) + holz(40, 130, 540, 6, 1, .25) +
+      Array.from({ length: 12 }, (_, i) => { const x = 52 + (i % 6) * 88 + (i % 2) * 6, y = 34 + Math.floor(i / 6) * 52; return '<rect x="' + (x + 3) + '" y="' + (y + 3) + '" width="34" height="30" rx="2" fill="url(#v2mLetter)"/>' + L('M' + (x + 4) + ' ' + (y + 3.6) + ' h32', 'rgba(255,255,255,.45)', .7); }).join('') +
+      L('M622 65 H778', 'rgba(255,255,255,.5)', .8);
+  }
+  if (r === 'klang') {
+    if (ebene === 'unten') return defs(kugel('v2mKerzenwand', 'rgba(255,190,110,.4)', 'rgba(255,190,110,.1)', 'rgba(255,190,110,0)')) +
+      '<ellipse cx="590" cy="80" rx="150" ry="90" fill="url(#v2mKerzenwand)"/>' +
+      '<g stroke="rgba(255,220,170,.05)" stroke-width="18">' + Array.from({ length: 9 }, (_, i) => '<line x1="' + (i * 96 + 20) + '" y1="0" x2="' + (i * 96 + 20) + '" y2="118"/>').join('') + '</g>' +
+      holz(0, 122, 800, 26, 4, .18) +
+      S(254, 116, 176, 8, .35, 4) + E(132, 122, 66, 3.5, .3) + E(700, 122, 30, 3, .3) + E(590, 121, 16, 2.5, .3);
+    return defs(verlauf('v2mKasten2', 0, 0, 0, 1, [[0, 'rgba(255,220,170,.28)'], [.15, 'rgba(255,220,170,0)'], [1, 'rgba(0,0,0,.3)']]) +
+      verlauf('v2mWachs', 0, 0, 1, 0, [[0, 'rgba(255,255,255,.5)'], [.4, 'rgba(255,255,255,0)'], [1, 'rgba(120,80,30,.25)']])) +
+      '<rect x="250" y="76" width="170" height="44" rx="4" fill="url(#v2mKasten2)"/>' + holz(258, 90, 154, 24, 3, .2) +
+      L('M250 82.4 H420', '#e8c27a', .8) + L('M252 119 H418', 'rgba(0,0,0,.4)', 1) +
+      '<ellipse cx="478" cy="36" rx="13" ry="31.6" transform="rotate(25 478 36)" fill="none" stroke="rgba(120,80,20,.45)" stroke-width="1"/>' +
+      '<path d="M430 16c20 2 44 14 54 34" fill="none" stroke="rgba(90,60,10,.3)" stroke-width="5" stroke-linecap="round"/>' +
+      '<rect x="584" y="96" width="12" height="22" fill="url(#v2mWachs)"/>' +
+      '<path d="M680 118l10-70h20l10 70z" fill="url(#v2mRund)"/>' +
+      [0, 1, 2, 3].map((i) => '<rect x="' + (80 + i * 28) + '" y="' + (48 + (i % 2) * 4) + '" width="26" height="70" rx="2" fill="url(#v2mRund)" transform="rotate(' + (-6 + i * 3) + ' ' + (93 + i * 28) + ' 118)"/>').join('');
+  }
+  if (r === 'faden') {
+    if (ebene === 'unten') return defs(kugel('v2mLampenwand2', 'rgba(255,214,140,.45)', 'rgba(255,214,140,.1)', 'rgba(255,214,140,0)')) +
+      '<ellipse cx="160" cy="50" rx="160" ry="90" fill="url(#v2mLampenwand2)"/>' +
+      '<rect x="0" y="96" width="800" height="30" fill="rgba(0,0,0,.08)"/>' + L('M0 96 H800', 'rgba(255,232,200,.18)', 2) +
+      holz(0, 130, 800, 18, 3, .18) +
+      E(400, 129, 160, 4, .3) + E(625, 96, 40, 3, .3) + E(160, 129, 26, 4, .3) + E(740, 129, 24, 3, .3);
+    return defs(verlauf('v2mPolster', 0, 0, 0, 1, [[0, 'rgba(255,220,180,.3)'], [.3, 'rgba(255,220,180,0)'], [1, 'rgba(0,0,0,.28)']]) +
+      kugel('v2mBakelit', 'rgba(255,255,255,.35)', 'rgba(255,255,255,0)', 'rgba(0,0,0,.2)')) +
+      '<rect x="250" y="60" width="300" height="34" rx="8" fill="url(#v2mPolster)"/>' +
+      [300, 350, 400, 450, 500].map((x) => '<circle cx="' + x + '" cy="76" r="1.6" fill="rgba(60,20,5,.4)"/><path d="M' + (x - 8) + ' 72 Q ' + x + ' 76 ' + (x - 8) + ' 80 M' + (x + 8) + ' 72 Q ' + x + ' 76 ' + (x + 8) + ' 80" fill="none" stroke="rgba(60,20,5,.18)"/>').join('') +
+      '<rect x="590" y="64" width="70" height="30" rx="8" fill="url(#v2mBakelit)"/>' + L('M598 66 Q 625 62 652 66', 'rgba(255,255,255,.4)', 1.2) +
+      '<path d="M124 36h72l-12-20H136z" fill="url(#v2mRund)"/>' +
+      '<path d="M60 42c-14 0-20 12-20 22h40c0-10-6-22-20-22z" fill="url(#v2mRund)"/>';
+  }
+  if (r === 'feinheiten') {
+    if (ebene === 'unten') return defs('') +
+      '<g fill="rgba(255,255,255,.12)">' + Array.from({ length: 60 }, (_, i) => '<circle cx="' + (20 + (i % 20) * 40) + '" cy="' + (17.6 + Math.floor(i / 20) * 30) + '" r="1.8"/>').join('') + '</g>' +
+      '<rect x="0" y="0" width="800" height="118" fill="url(#v2mOben)" opacity=".5"/>' +
+      holz(0, 122, 800, 26, 4, .2) +
+      S(386, 66, 260, 60, .32, 6) + S(664, 99, 120, 14, .3, 3) + E(64, 117, 18, 3, .3) +
+      S(112, 44, 8, 60, .22, 2) + S(186, 36, 70, 22, .18, 2);
+    return defs(verlauf('v2mKiste', 0, 0, 0, 1, [[0, 'rgba(255,200,180,.3)'], [.2, 'rgba(255,200,180,0)'], [.85, 'rgba(0,0,0,.12)'], [1, 'rgba(0,0,0,.35)']]) +
+      verlauf('v2mStahl', 0, 0, 0, 1, [[0, 'rgba(255,255,255,.45)'], [.5, 'rgba(255,255,255,0)'], [1, 'rgba(0,0,0,.3)']])) +
+      '<rect x="380" y="60" width="260" height="60" rx="6" fill="url(#v2mKiste)"/>' +
+      '<rect x="386" y="76" width="16" height="10" rx="2" fill="#c9a25a"/><rect x="618" y="76" width="16" height="10" rx="2" fill="#c9a25a"/>' +
+      '<rect x="386" y="76" width="16" height="10" rx="2" fill="url(#v2mStahl)"/><rect x="618" y="76" width="16" height="10" rx="2" fill="url(#v2mStahl)"/>' +
+      '<rect x="90" y="26" width="40" height="18" rx="3" fill="url(#v2mStahl)"/><rect x="106" y="40" width="8" height="60" rx="2" fill="url(#v2mRund)"/>' +
+      '<path d="M180 30h70v22H180z" fill="url(#v2mStahl)"/>' +
+      '<rect x="660" y="94" width="120" height="14" rx="3" fill="url(#v2mOben)"/>' +
+      '<circle cx="60" cy="100" r="16" fill="url(#v2mRund)"/>';
+  }
+  return '';
+}
+
+/* ----- Gestaltung v2: die Zierschicht jeder Kulisse -----
+   Ein zweites SVG mit demselben Koordinatensystem (800 × 150, „slice“) wie
+   das Buehnenbild — so sitzt jedes Funkeln, jeder Lichthof genau auf dem
+   gemalten Ding. Komplett ohne Zeiger. Was sich bewegt, haengt im CSS an
+   „Bewegung in den Verzierungen“; ohne Bewegung bleibt das stille Licht. */
+function orteV2Funkeln(x, y, g, verz, farbe) {
+  const s = g || 5, f = farbe || '#fff6dc';
+  return '<path class="v2-funkeln" style="animation-delay:' + (verz || 0) + 's;transform-origin:' + x + 'px ' + y + 'px" d="M' + x + ' ' + (y - s) + 'Q' + x + ' ' + y + ' ' + (x + s) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y + s) + 'Q' + x + ' ' + y + ' ' + (x - s) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y - s) + 'z" fill="' + f + '"/>';
+}
+function orteV2Hof(id, cx, cy, rx, ry, farbe, klasse) {
+  return '<defs><radialGradient id="' + id + '"><stop offset="0" stop-color="' + farbe + '" stop-opacity=".55"/><stop offset=".45" stop-color="' + farbe + '" stop-opacity=".18"/><stop offset="1" stop-color="' + farbe + '" stop-opacity="0"/></radialGradient></defs>' +
+    '<ellipse class="' + (klasse || 'v2-hof') + '" style="transform-origin:' + cx + 'px ' + cy + 'px" cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '" fill="url(#' + id + ')"/>';
+}
+function orteV2Staub(id, pfad, n, saat) {
+  let z = saat || 7; const zu = () => { z = (z * 9301 + 49297) % 233280; return z / 233280; };
+  const punkte = Array.from({ length: n }, (_, i) => '<circle class="v2-staubkorn" style="animation-delay:-' + (zu() * 9).toFixed(2) + 's;animation-duration:' + (7 + zu() * 7).toFixed(1) + 's" cx="' + (zu() * 800).toFixed(0) + '" cy="' + (zu() * 150).toFixed(0) + '" r="' + (.6 + zu() * 1.1).toFixed(2) + '" fill="#fff4d6"/>').join('');
+  return '<defs><clipPath id="' + id + '"><path d="' + pfad + '"/></clipPath></defs><g clip-path="url(#' + id + ')">' + punkte + '</g>';
+}
+function orteV2Glanzband(id, x, y, w, h) {
+  return '<defs><clipPath id="' + id + '"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"/></clipPath></defs>' +
+    '<g clip-path="url(#' + id + ')"><rect class="v2-glanzband" style="--v2-weg:' + (w + 120) + 'px" x="' + (x - 80) + '" y="' + (y - 40) + '" width="34" height="' + (h + 80) + '" fill="rgba(255,255,255,.22)" transform="rotate(20 ' + (x + w / 2) + ' ' + (y + h / 2) + ')"/></g>';
+}
+/* Die obere Malschicht (Rundung, Glanz) liegt zuunterst in der Zierschicht,
+   darueber das, was sich bewegt. */
+function orteV2Zier(r) {
+  if (!orteV2An()) return '';
+  return orteV2Malerei(r, 'oben') + orteV2ZierBewegt(r);
+}
+function orteV2ZierBewegt(r) {
+  const spielt = Object.values((D.einst && D.einst.ambience) || {}).some((v) => v > 0) || Object.values((D.einst && D.einst.mischung) || {}).some((v) => v > 0);
+  if (r === 'schnipsel') {
+    return orteV2Hof('v2hS', 400, 40, 380, 90, '#ffe3a8') +
+      orteV2Glanzband('v2gS', 372, 84, 56, 20) +
+      '<g class="v2-zettelflug"><g transform="rotate(-12)"><rect x="-13" y="-9" width="26" height="18" fill="#fbf6e8" stroke="#c9bda0" stroke-width=".6"/><line x1="-9" y1="-3" x2="9" y2="-3" stroke="rgba(90,110,170,.3)" stroke-width=".6"/><line x1="-9" y1="2" x2="6" y2="2" stroke="rgba(90,110,170,.3)" stroke-width=".6"/></g></g>' +
+      orteV2Funkeln(124, 20, 4, 1.4) + orteV2Funkeln(604, 128, 4, 3.1);
+  }
+  if (r === 'blaetter') {
+    return orteV2Hof('v2hB', 400, 0, 420, 120, '#fff0c8') +
+      '<g class="v2-flieger2"><path d="M0 0l40 7-31 7z" fill="#fffdf6" stroke="#c9bda0" stroke-width=".7"/><path d="M0 0l9 14 0-4z" fill="#eadfc4" stroke="#c9bda0" stroke-width=".6"/></g>' +
+      orteV2Funkeln(494, 18, 5, .4) + orteV2Funkeln(506, 30, 3, 2.2) + orteV2Funkeln(721, 44, 3.5, 1.3, '#ffe9a8') +
+      orteV2Glanzband('v2gB', 676, 90, 28, 24);
+  }
+  if (r === 'hefte') {
+    return orteV2Hof('v2hH', 121, 58, 120, 70, '#ffd894', 'v2-hof atmet') +
+      orteV2Staub('v2kH', 'M86 56h70l54 58H30z', 26, 11) +
+      orteV2Funkeln(628, 100, 3.5, 1.8) + orteV2Funkeln(652, 100, 3, 3.6) +
+      orteV2Glanzband('v2gH', 330, 72, 140, 14);
+  }
+  if (r === 'projekte') {
+    return '<path class="v2-schnurglanz" d="M165 44 Q 260 20 345 62 T 545 40 T 705 66" fill="none" stroke="#ffd9c8" stroke-width="1.8" stroke-linecap="round" pathLength="100" stroke-dasharray="8 92"/>' +
+      [[165, 44], [345, 62], [545, 40], [705, 66], [236, 98]].map(([x, y], i) => orteV2Funkeln(x - 2, y - 2, 3.5, i * .9)).join('') +
+      orteV2Hof('v2hP', 420, 0, 460, 110, '#fff2d0');
+  }
+  if (r === 'cluster') {
+    return '<g class="v2-blattschatten" fill="rgba(40,24,8,.075)">' +
+      '<path d="M90 0c40 10 60 40 30 70-30-6-50-36-30-70z"/><path d="M200 -10c30 20 40 50 10 70-26-14-34-44-10-70z"/><path d="M60 60c34 4 50 30 30 56-30-6-44-30-30-56z"/></g>' +
+      orteV2Funkeln(633, 86, 2.6, .6) + orteV2Funkeln(626, 92, 2.4, 2.4) +
+      '<g class="v2-dampf2" fill="none" stroke="rgba(255,255,255,.55)" stroke-linecap="round" stroke-width="2.2"><path d="M634 79c-6-8 6-14 0-24c-5-8 4-14 0-22"/><path d="M648 78c5-8-6-14 0-22c5-8-4-12 0-20"/></g>' +
+      orteV2Hof('v2hC', 640, 60, 120, 80, '#fff4dc');
+  }
+  if (r === 'woerter') {
+    return orteV2Glanzband('v2gW', 46, 26, 528, 104) +
+      [[72, 52], [248, 60], [424, 54], [160, 104], [336, 110], [512, 106]].map(([x, y], i) => orteV2Funkeln(x, y, 3.5, i * .7, '#e8e4da')).join('') +
+      orteV2Hof('v2hW', 700, 60, 140, 90, '#ffe6b0');
+  }
+  if (r === 'klang') {
+    return orteV2Hof('v2hK', 590, 88, 90, 70, '#ffc870', 'v2-hof flackert') +
+      (spielt ? '<g class="v2-schall" fill="none" stroke="#f3e2b8" stroke-linecap="round">' + [0, 1, 2].map((i) => '<path class="w' + i + '" style="transform-origin:484px 40px" d="M496 22c11 11 11 30 0 41" stroke-width="1.4"/>').join('') + '</g>' : '') +
+      orteV2Funkeln(450, 12, 4, .5) + orteV2Funkeln(478, 30, 3, 2) +
+      orteV2Staub('v2kK', 'M380 0h300v150H380z', 18, 5);
+  }
+  if (r === 'faden') {
+    return orteV2Hof('v2hF', 160, 40, 120, 80, '#ffd894', 'v2-hof atmet') +
+      orteV2Staub('v2kF', 'M124 36h72l64 92H60z', 24, 3) +
+      orteV2Funkeln(625, 82, 3, 1.1) + orteV2Funkeln(60, 33, 3, 2.7);
+  }
+  if (r === 'feinheiten') {
+    return orteV2Glanzband('v2gF1', 90, 26, 40, 18) + orteV2Glanzband('v2gF2', 180, 30, 70, 22) +
+      [[160, 108], [172, 112], [166, 100], [510, 55], [720, 101]].map(([x, y], i) => orteV2Funkeln(x, y, 3, i * .8, '#f2f4f8')).join('');
+  }
+  return '';
+}
+
 /* ----- Die Kulissen: kleine Bühnenbilder oben im Raum ----- */
 const ORTE_SVG = 'xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"';
 const ORTE_H = 150;
@@ -102,7 +344,21 @@ function orteKulisse(raum, haupt) {
       /* Garderobenleiste mit fünf Haken */
       '<rect x="40" y="26" width="300" height="10" rx="3" fill="#c9a25a"/><rect x="40" y="36" width="300" height="3" fill="rgba(0,0,0,.25)"/><g fill="#8a6a2e">' + [70, 130, 190, 250, 310].map((x) => '<circle cx="' + x + '" cy="42" r="4"/><rect x="' + (x - 2) + '" y="42" width="4" height="10"/>').join('') + '</g>' +
       /* Hut */
-      '<g ' + T('hut', 'Der Hut nickt. Guten Tag.') + ' style="transform-origin:70px 44px"><path d="M70 50c-18 0-26 14-26 26h52c0-12-8-26-26-26z" fill="#2c2218"/><rect x="36" y="74" width="68" height="6" rx="3" fill="#2c2218"/><path d="M52 68h36" stroke="#8a1c12" stroke-width="3"/></g>' +
+      /* Ein Filzhut (Fedora): Kniff oben, Ripsband mit Schleife, geschwungene Krempe, Licht von links */
+      '<g ' + T('hut', 'Der Hut nickt. Guten Tag.') + ' style="transform-origin:70px 44px">' +
+      '<defs><linearGradient id="orthutfilz" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a4634"/><stop offset=".45" stop-color="#3a2b1f"/><stop offset="1" stop-color="#1a120c"/></linearGradient>' +
+      '<linearGradient id="orthutkrempe" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a3828"/><stop offset="1" stop-color="#1c140e"/></linearGradient></defs>' +
+      '<ellipse cx="76" cy="84" rx="34" ry="4" fill="rgba(0,0,0,.22)"/>' +
+      '<ellipse cx="70" cy="75.5" rx="34" ry="6" fill="#1e1610"/>' +
+      '<path d="M48.5 75 C 47.5 62 51.5 52 59.5 48.6 C 63.6 47 66.6 49.8 70 48.2 C 73.4 49.8 76.4 47 80.5 48.6 C 88.5 52 92.5 62 91.5 75 Z" fill="url(#orthutfilz)"/>' +
+      '<path d="M61 50.5 Q 70 58.5 79 50.5" fill="none" stroke="rgba(0,0,0,.45)" stroke-width="1.2"/>' +
+      '<path d="M55 72 C 53.6 62 56 55 61 51.5" fill="none" stroke="rgba(255,240,220,.16)" stroke-width="2.2" stroke-linecap="round"/>' +
+      '<path d="M48.6 67.6 C 60 71 80 71 91.4 67.6 L 91.6 74.2 C 80 77.6 60 77.6 48.4 74.2 Z" fill="#7a1a10"/>' +
+      '<path d="M48.6 67.6 C 60 71 80 71 91.4 67.6" fill="none" stroke="rgba(255,200,180,.25)" stroke-width=".7"/>' +
+      '<path d="M53 69.6 l -4 -3 l .6 5 z M53 69.6 l -3.4 5 l 5 -1.2 z" fill="#5e140c"/>' +
+      '<path d="M35.5 76 C 42 83.5 98 83.5 104.5 76 C 99 79.6 41 79.6 35.5 76 Z" fill="url(#orthutkrempe)"/>' +
+      '<path d="M37 76.6 C 48 80.2 92 80.2 103 76.6" fill="none" stroke="rgba(255,235,210,.22)" stroke-width=".8"/>' +
+      '</g>' +
       /* Der blaue Mantel: ein langer Trenchcoat am Bügel — schmal wie ein hängendes
          Kleidungsstück (doppelt so hoch wie breit), Schulter 24 breit, Saum 34, Fall bis
          knapp über den Boden. Ärmel liegen INNERHALB der Silhouette, sonst wird er breit.
@@ -151,11 +407,47 @@ function orteKulisse(raum, haupt) {
       '<path d="M111 116 q 5 3 10 1 l 4 -2 q 5 2 10 0 l 4 2 q 5 2 10 -1" fill="none" stroke="#1a2a44" stroke-width="1.2" stroke-linejoin="round"/>' +
       '<path d="M128.6 104 C 128 109 128 113 128.6 117" fill="none" stroke="rgba(10,18,34,.3)" stroke-width="1"/></g>' +
       /* Schal (bewegt sich) und Jahreszeit am Haken */
-      '<path class="ort-schal" d="M244 48c-6 20-2 40 4 60M256 48c6 20 2 40-4 60" stroke="#b0552f" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M240 104l8 6M256 104l-8 6" stroke="#b0552f" stroke-width="2"/>' +
+      /* Ein Strickschal ueber dem Haken: zwei Enden mit Rippen, Querstreifen und Fransen */
+      '<g class="ort-schal" style="transform-origin:250px 48px">' +
+      '<defs><linearGradient id="ortschalL" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c96a3f"/><stop offset=".6" stop-color="#b0552f"/><stop offset="1" stop-color="#7e3a1e"/></linearGradient>' +
+      '<linearGradient id="ortschalR" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e4424"/><stop offset="1" stop-color="#6a2f16"/></linearGradient></defs>' +
+      '<path d="M252.5 49 C 256.5 64 260.5 84 258.6 103 L 266.4 104 C 268.4 85 263 62 257.6 47.4 Z" fill="url(#ortschalR)"/>' +
+      '<path d="M246.2 48.4 C 241.4 64 241 86 243 107 L 251.6 107 C 250.6 86 251.4 64 252.8 49.6 Z" fill="url(#ortschalL)"/>' +
+      '<path d="M243.6 50.6 C 245.6 43.6 256.6 43.4 258.8 48.8 C 254.6 46.6 248.4 46.8 243.6 50.6 Z" fill="#9a4726"/>' +
+      '<g stroke="rgba(60,20,5,.28)" stroke-width=".7" fill="none">' + [245, 247.4, 249.6].map((x) => '<path d="M' + x + ' 52 C ' + (x - 2.6) + ' 70 ' + (x - 2.4) + ' 90 ' + (x - .6) + ' 106"/>').join('') + [256.8, 259.6, 262.4].map((x) => '<path d="M' + x + ' 52 C ' + (x + 2.4) + ' 70 ' + (x + 3.4) + ' 88 ' + (x + 2) + ' 103"/>').join('') + '</g>' +
+      '<g fill="#e2c799" opacity=".9">' + [64, 80, 96].map((y) => '<path d="M' + (242.4 + (y - 64) * -.02) + ' ' + y + ' L 251.8 ' + (y - .6) + ' L 251.7 ' + (y + 2.8) + ' L ' + (242.2) + ' ' + (y + 3.4) + ' Z"/>').join('') + [68, 84].map((y) => '<path d="M' + (255 + (y - 60) * .12) + ' ' + y + ' L ' + (262.6 + (y - 60) * .1) + ' ' + (y - .4) + ' L ' + (263 + (y - 60) * .1) + ' ' + (y + 2.8) + ' L ' + (255.4 + (y - 60) * .12) + ' ' + (y + 3.2) + ' Z" opacity=".85"/>').join('') + '</g>' +
+      '<g stroke="#b0552f" stroke-width="1.2" stroke-linecap="round">' + [244, 246, 248, 250].map((x) => '<path d="M' + x + ' 107 l ' + ((x - 247) * .3) + ' 5"/>').join('') + [260, 262, 264, 266].map((x) => '<path d="M' + x + ' 103.6 l ' + ((x - 263) * .3) + ' 5"/>').join('') + '</g>' +
+      '</g>' +
       (jz === 'winter' ? '<g ' + T('zweig', 'Tannenzweig. Es duftet nach Dezember.') + ' style="transform-origin:310px 48px"><path d="M310 48l0 44M310 60l-10-8M310 60l10-8M310 74l-10-8M310 74l10-8M310 86l-8-6M310 86l8-6" stroke="#4a7a46" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="310" cy="52" r="4" fill="#c0392b"/></g>' : jz === 'fruehling' ? '<g ' + T('bluete', 'Die Blüte nickt. Frühling in der Diele.') + ' style="transform-origin:310px 50px"><g fill="#e9a9b8"><circle cx="305" cy="56" r="5"/><circle cx="315" cy="56" r="5"/><circle cx="310" cy="50" r="5"/><circle cx="310" cy="62" r="5"/><circle cx="310" cy="56" r="3" fill="#f2d98a"/></g><path d="M310 64v28" stroke="#4a7a46" stroke-width="2.5"/></g>' : jz === 'sommer' ? '<g ' + T('strohhut', 'Der Strohhut. Riecht nach Heu und Meer.') + ' style="transform-origin:310px 50px"><ellipse cx="310" cy="62" rx="26" ry="7" fill="#d9b463"/><path d="M296 62c0-12 6-18 14-18s14 6 14 18" fill="#e8c878"/><path d="M296 60h28" stroke="#b0352b" stroke-width="3"/></g>' : '<g ' + T('blatt', 'Ein Herbstblatt. Es knistert.') + ' style="transform-origin:310px 50px"><path d="M310 50c-14 6-16 22-4 30 12-8 10-24 4-30z" fill="#c8873a"/><path d="M308 54l-2 26" stroke="#8a4a22" stroke-width="1.2"/></g>') +
       /* Schuhe und Schirmständer */
-      '<g ' + T('schuhe', 'Die Schuhe stehen ordentlich. Fast.') + ' style="transform-origin:200px 118px"><path d="M176 120c0-4 4-6 10-6h10c6 0 8 4 10 6h-30z" fill="#2c2218"/><path d="M200 120c0-4 4-6 10-6h10c6 0 8 4 10 6h-30z" fill="#2c2218" transform="rotate(-6 215 120)"/></g>' +
-      '<g ' + T('schirm', 'Der Schirm tropft nicht mehr. Fast.') + ' style="transform-origin:22px 118px"><rect x="10" y="84" width="24" height="34" rx="3" fill="#8a6a3e"/><path d="M22 86v-30" stroke="#2c2218" stroke-width="2.5"/><path d="M12 58c2-8 6-12 10-12s8 4 10 12z" fill="#3b5a86"/><path d="M22 46v-4" stroke="#2c2218" stroke-width="2"/></g>' +
+      /* Ein Paar Lederschuhe: Sohle, Absatz, Kappe, Schnuerung, Glanz auf dem Leder */
+      '<g ' + T('schuhe', 'Die Schuhe stehen ordentlich. Fast.') + ' style="transform-origin:200px 118px">' +
+      '<defs><linearGradient id="ortleder" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a6440"/><stop offset=".5" stop-color="#5e3820"/><stop offset="1" stop-color="#2e1a0c"/></linearGradient></defs>' +
+      [[174, 0], [200, -5]].map(([x, w]) => '<g transform="rotate(' + w + ' ' + (x + 16) + ' 120)">' +
+        '<ellipse cx="' + (x + 17) + '" cy="121.4" rx="19" ry="1.8" fill="rgba(0,0,0,.35)"/>' +
+        '<path d="M' + x + ' 120 L ' + x + ' 114.6 C ' + x + ' 111.6 ' + (x + 4) + ' 110 ' + (x + 9) + ' 110.6 L ' + (x + 19) + ' 111.6 C ' + (x + 26) + ' 112 ' + (x + 31) + ' 115 ' + (x + 33) + ' 118.4 L ' + (x + 33) + ' 120 Z" fill="url(#ortleder)"/>' +
+        '<path d="M' + (x + 22) + ' 112.4 C ' + (x + 27) + ' 113.2 ' + (x + 30.6) + ' 115.6 ' + (x + 32) + ' 118.4" fill="none" stroke="rgba(0,0,0,.4)" stroke-width=".7"/>' +
+        '<path d="M' + (x + 2.4) + ' 112.4 C ' + (x + 4) + ' 110.8 ' + (x + 9) + ' 110.6 ' + (x + 11) + ' 111.6 C ' + (x + 8) + ' 113 ' + (x + 4) + ' 113.4 ' + (x + 2.4) + ' 112.4 Z" fill="#1a0f08"/>' +
+        '<path d="M' + (x + 10) + ' 111 l 8 1 M' + (x + 10.6) + ' 112.6 l 7 .8" stroke="#d9c49a" stroke-width=".7"/>' +
+        '<path d="M' + (x + 24) + ' 113.6 C ' + (x + 27) + ' 114.2 ' + (x + 29) + ' 115.4 ' + (x + 30) + ' 116.6" fill="none" stroke="rgba(255,235,210,.35)" stroke-width="1" stroke-linecap="round"/>' +
+        '<rect x="' + (x - .6) + '" y="119.4" width="34.4" height="2.2" rx="1" fill="#120c08"/><rect x="' + (x - .6) + '" y="115.6" width="6" height="5.6" rx="1" fill="#1a110a"/>' +
+        '</g>').join('') +
+      '</g>' +
+      /* Schirmstaender aus Messing, darin ein geschlossener Schirm mit Krueckengriff aus Holz */
+      '<g ' + T('schirm', 'Der Schirm tropft nicht mehr. Fast.') + ' style="transform-origin:22px 118px">' +
+      '<defs><linearGradient id="ortstaender" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7a5a2a"/><stop offset=".3" stop-color="#e2c180"/><stop offset=".55" stop-color="#b08a44"/><stop offset="1" stop-color="#5e4220"/></linearGradient>' +
+      '<linearGradient id="ortschirmstoff" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4f73a6"/><stop offset=".5" stop-color="#2f4f7e"/><stop offset="1" stop-color="#1c3358"/></linearGradient></defs>' +
+      '<ellipse cx="24" cy="120" rx="16" ry="2.4" fill="rgba(0,0,0,.3)"/>' +
+      '<path d="M22 50 V 34 C 22 26.5 31.5 26.5 31.5 33.6" fill="none" stroke="#6b4a2a" stroke-width="3.4" stroke-linecap="round"/>' +
+      '<path d="M22.6 34 C 22.8 29.4 28.6 28.6 30 32" fill="none" stroke="rgba(255,230,190,.35)" stroke-width="1"/>' +
+      '<rect x="21" y="48" width="2.4" height="6" fill="#c9a25a"/>' +
+      '<path d="M17.4 88 L 17.8 66 C 18 60 20 56 22.2 53.6 C 24.4 56 26.4 60 26.6 66 L 27 88 Z" fill="url(#ortschirmstoff)"/>' +
+      '<g stroke="rgba(10,20,40,.4)" stroke-width=".7" fill="none"><path d="M20.4 56 L 19.6 88"/><path d="M24 56 L 24.6 88"/></g>' +
+      '<path d="M18.4 70 Q 22.2 72.6 26 70" fill="none" stroke="#1c3358" stroke-width="2.4"/><circle cx="25.4" cy="70.6" r="1" fill="#c9a25a"/>' +
+      '<path d="M10 86 L 34 86 L 32.4 118 L 11.6 118 Z" fill="url(#ortstaender)"/>' +
+      '<ellipse cx="22" cy="86" rx="12" ry="2.6" fill="#3a2a14"/><ellipse cx="22" cy="86" rx="12" ry="2.6" fill="none" stroke="#f0d79a" stroke-width=".8"/>' +
+      '<path d="M10.6 96 L 33.4 96 M11.2 108 L 32.8 108" stroke="rgba(60,40,10,.45)" stroke-width="1.2"/>' +
+      '</g>' +
       /* Schlüsselbrett: drei Haken — Haustür, Fahrrad, der Busschlüssel mit Bus-Anhänger */
       '<g ' + T('schluessel', 'Der Busschlüssel klimpert. Wohin fahren wir?') + ' style="transform-origin:410px 30px"><rect x="364" y="28" width="96" height="46" rx="4" fill="#a3783f"/><rect x="368" y="32" width="88" height="38" rx="3" fill="#7a5a2e"/><text x="412" y="41" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-size="6.5" letter-spacing=".2" fill="#f3e7c9">SCHLÜSSEL</text>' +
       '<g fill="#d9c29a"><circle cx="384" cy="50" r="2.2"/><circle cx="412" cy="50" r="2.2"/><circle cx="440" cy="50" r="2.2"/></g>' +
@@ -208,6 +500,7 @@ function orteKulisse(raum, haupt) {
     wrap.append(svg(
       '<defs><linearGradient id="ortkasten" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5638"/><stop offset="1" stop-color="#4e3620"/></linearGradient></defs>' +
       '<rect x="0" y="126" width="800" height="24" fill="#3a2818"/><rect x="0" y="124" width="800" height="4" fill="#8a6a3e"/>' +
+      orteV2Malerei('schnipsel', 'unten') +
       '<rect x="40" y="60" width="720" height="68" rx="6" fill="url(#ortkasten)"/><rect x="40" y="60" width="720" height="8" fill="#8a6a3e"/><rect x="46" y="68" width="708" height="54" fill="#3a2a18" opacity=".55"/>' +
       /* Messinggriff und Schildchen */
       '<rect x="380" y="98" width="40" height="6" rx="3" fill="#c9a25a"/><rect x="372" y="84" width="56" height="12" rx="2" fill="#c9a25a"/><text x="400" y="93" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-size="7" fill="#3a2a18" letter-spacing=".2">ZETTEL</text>' +
@@ -234,6 +527,7 @@ function orteKulisse(raum, haupt) {
       '<rect width="800" height="150" fill="#e6dcc6"/><rect width="800" height="150" fill="url(#ortlicht)"/>' +
       '<rect x="0" y="112" width="800" height="38" fill="url(#orttisch)"/><rect x="0" y="112" width="800" height="3" fill="rgba(255,230,190,.35)"/>' +
       '<g stroke="rgba(0,0,0,.12)" stroke-width="1">' + [120, 126, 133, 141].map((y) => '<line x1="0" y1="' + y + '" x2="800" y2="' + y + '" stroke-dasharray="' + (40 + y) + ' 12"/>').join('') + '</g>' +
+      orteV2Malerei('blaetter', 'unten') +
       /* Der Stapel: fünf Blätter, das oberste beschrieben — der Text sitzt auf den Linien */
       [0, 1, 2, 3].map((i) => '<g transform="translate(' + (400 + (i - 2) * 2) + ' ' + (118 - i * 4) + ') rotate(' + ((i % 2 ? 1 : -1) * (1.2 + i * .4)) + ')"><rect x="-130" y="-92" width="260" height="94" fill="#f2e8d4" stroke="#d9caa6"/></g>').join('') +
       '<g ' + T('stapel', oben ? n + (n === 1 ? ' Blatt' : ' Blätter') + '. Obenauf: „' + titel + '“ — tippen öffnet es.' : 'Der Stapel ist leer. Das erste Blatt wartet.', oben ? 'oben' : 'neu') + ' style="transform-origin:400px 70px"><g transform="translate(400 102) rotate(-.6)">' +
@@ -247,7 +541,7 @@ function orteKulisse(raum, haupt) {
       '<g ' + T('bleistift', 'Der Bleistift ist gespitzt. Das ist die halbe Arbeit.') + ' style="transform-origin:200px 116px"><g transform="rotate(-12 200 116)"><rect x="150" y="112" width="96" height="8" fill="#e8b43c"/><path d="M246 112l14 4-14 4z" fill="#f3e1b0"/><path d="M256 114.5l4 1.5-4 1.5z" fill="#2c2218"/><rect x="150" y="112" width="8" height="8" fill="#d98b8b"/><rect x="158" y="112" width="5" height="8" fill="#c9c9c9"/><line x1="165" y1="114.5" x2="244" y2="114.5" stroke="rgba(0,0,0,.12)"/></g></g>' +
       '<rect x="620" y="106" width="26" height="12" rx="2" fill="#e8d7d0" stroke="#c9a9a0" transform="rotate(8 633 112)"/>' +
       /* Ein Papierflieger, der ab und zu über den Tisch segelt */
-      '<g ' + T('flieger', 'Der Papierflieger segelt davon. Irgendwo landet ein Satz.') + '><g class="ort-flieger"><path d="M120 40l60 10-46 10z" fill="#fbf6e8" stroke="#c9bda0"/><path d="M120 40l14 20 0-6z" fill="#e8dcc0" stroke="#c9bda0"/></g></g>' +
+      '<g ' + T('flieger', 'Der Papierflieger segelt davon. Irgendwo landet ein Satz.') + '><g class="ort-flieger"><path d="M121 39.6 L 184 50 L 134 46.4 Z" fill="#e3d7b9" stroke="#a89a78" stroke-width=".6" stroke-linejoin="round"/><path d="M128 49 L 184 50 L 142 57.4 Z" fill="#cbbb94" stroke="#a89a78" stroke-width=".6" stroke-linejoin="round"/><path d="M114 48.6 L 184 50 L 136 63 Z" fill="#fffdf6" stroke="#a89a78" stroke-width=".7" stroke-linejoin="round"/><path d="M114 48.6 L 184 50" stroke="#b8ab8a" stroke-width=".6"/><path d="M124 53.4 L 172 51.4" stroke="rgba(170,150,110,.45)" stroke-width=".5"/><path d="M136 63 L 184 50 L 150 58.6 Z" fill="rgba(160,140,100,.18)"/></g></g>' +
       /* Tintenfass */
       '<g ' + T('tinte', 'Die Tinte ist schwarz wie drei Uhr nachts.') + ' style="transform-origin:690px 100px"><rect x="676" y="90" width="28" height="24" rx="3" fill="#1e2430"/><rect x="682" y="84" width="16" height="8" rx="2" fill="#2c2218"/><rect x="679" y="96" width="22" height="10" fill="rgba(255,255,255,.12)"/><path d="M704 86l18-40" stroke="#2c2218" stroke-width="2.5" stroke-linecap="round"/><path d="M722 46c-2-6-6-8-6-8l2 10z" fill="#c9a25a"/></g>'
     ));
@@ -258,6 +552,7 @@ function orteKulisse(raum, haupt) {
       '<rect width="800" height="150" fill="#5a4430"/><rect width="800" height="150" fill="url(#ortw2)"/>' +
       '<defs><linearGradient id="ortw2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(255,230,190,.10)"/><stop offset="1" stop-color="rgba(0,0,0,.25)"/></linearGradient></defs>' +
       '<rect x="0" y="112" width="800" height="38" fill="url(#orthtisch)"/><rect x="0" y="112" width="800" height="3" fill="rgba(255,230,190,.4)"/>' +
+      orteV2Malerei('hefte', 'unten') +
       /* Leselampe: tippen schaltet das Licht */
       '<g ' + T('lampe', null, 'lampe') + ' style="transform-origin:121px 112px"><rect x="118" y="52" width="6" height="60" fill="#8a6a2e"/><ellipse cx="121" cy="112" rx="22" ry="5" fill="#8a6a2e"/><path d="M86 56h70l-12-26H98z" fill="#2f6b4f"/><path d="M86 56h70" stroke="#c9a25a" stroke-width="2"/><path class="ort-lichtkegel" d="M86 56h70l54 58H30z" fill="rgba(255,220,150,.26)"/><ellipse class="ort-gluehbirne" cx="121" cy="54" rx="8" ry="4" fill="rgba(255,236,190,.9)"/></g>' +
       /* Bücherstapel mit Lesezeichen */
@@ -271,7 +566,19 @@ function orteKulisse(raum, haupt) {
       '<rect x="372" y="112" width="56" height="3" rx="1.5" fill="#e9e2d2"/>' +
       '<text x="400" y="124" text-anchor="middle" font-family="ui-rounded, system-ui, sans-serif" font-size="6" letter-spacing=".25" fill="#e9e2d2" opacity=".8">TIPPEN ZUM SCHREIBEN</text></g>' +
       /* Tasse mit Dampf, Brille, Pflanze */
-      '<g ' + T('tasse', 'Der Tee dampft noch. Gut so.') + ' style="transform-origin:560px 112px"><rect x="544" y="92" width="32" height="22" rx="4" fill="#f3e7c9"/><path d="M576 98c8 0 8 12 0 12" fill="none" stroke="#f3e7c9" stroke-width="4"/><rect x="547" y="95" width="26" height="4" fill="#8a5a2a" opacity=".7"/>' + orteDampf(560, 90) + '</g>' +
+      /* Ein Steingutbecher: gerundeter Koerper, Glasur mit Glanz, Henkel mit Volumen, Tee mit Spiegelung */
+      '<g ' + T('tasse', 'Der Tee dampft noch. Gut so.') + ' style="transform-origin:560px 112px">' +
+      '<defs><linearGradient id="orthbecher" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fffaf0"/><stop offset=".3" stop-color="#f3e7c9"/><stop offset=".8" stop-color="#cdb98f"/><stop offset="1" stop-color="#a89268"/></linearGradient>' +
+      '<radialGradient id="orthtee" cx=".4" cy=".4" r=".7"><stop offset="0" stop-color="#b8743a"/><stop offset="1" stop-color="#5a3412"/></radialGradient></defs>' +
+      '<ellipse cx="562" cy="114.6" rx="22" ry="3" fill="rgba(0,0,0,.32)"/>' +
+      '<path d="M575 97 C 586 96 587 111 574.4 110" fill="none" stroke="#d9c79f" stroke-width="4.6" stroke-linecap="round"/>' +
+      '<path d="M576 99.6 C 582 99.6 582.4 107.4 575.4 107.4" fill="none" stroke="rgba(120,90,50,.4)" stroke-width="1"/>' +
+      '<path d="M544 94 L 545 111 C 545.2 113.6 552 114.4 560 114.4 C 568 114.4 574.8 113.6 575 111 L 576 94 Z" fill="url(#orthbecher)"/>' +
+      '<path d="M547.6 97 L 548.2 110" stroke="rgba(255,255,255,.75)" stroke-width="1.8" stroke-linecap="round"/>' +
+      '<path d="M544.6 101 Q 560 104 575.4 101" fill="none" stroke="#2f5a7a" stroke-width="1.4" opacity=".8"/>' +
+      '<ellipse cx="560" cy="94" rx="16" ry="3.6" fill="#f6eedb" stroke="#bfa97e" stroke-width=".7"/>' +
+      '<ellipse cx="560" cy="94.6" rx="13.6" ry="2.6" fill="url(#orthtee)"/><ellipse cx="555" cy="94" rx="5" ry=".9" fill="rgba(255,235,200,.35)"/>' +
+      orteDampf(560, 88) + '</g>' +
       '<g ' + T('brille', 'Die Lesebrille. Jemand hat sie wieder liegen lassen.') + ' style="transform-origin:640px 104px" stroke="#2c2218" stroke-width="2" fill="none"><circle cx="628" cy="104" r="9"/><circle cx="652" cy="104" r="9"/><path d="M637 104h6M619 102l-14-4M661 102l14-4"/><circle cx="628" cy="104" r="7" fill="rgba(255,255,255,.12)" stroke="none"/></g>' +
       '<g ' + T('pflanze', 'Das Blatt zittert. Die Pflanze will auch gegossen werden.') + ' style="transform-origin:730px 112px"><rect x="710" y="84" width="40" height="28" rx="3" fill="#a3562f"/><rect x="708" y="82" width="44" height="6" rx="2" fill="#b8693c"/><g class="ort-blaetter"><path d="M730 84c-6-18-22-26-34-26 4 16 16 26 34 26z" fill="#4a7a46"/><path d="M730 84c6-18 22-26 34-26-4 16-16 26-34 26z" fill="#5a8a52"/><path d="M730 84c-2-22 4-34 10-44 6 14 4 30-10 44z" fill="#3f6e3c"/></g></g>' +
       /* Ein Lesezeichenband hängt von oben */
@@ -286,6 +593,7 @@ function orteKulisse(raum, haupt) {
     wrap.append(svg(
       '<rect width="800" height="150" fill="#b8915e"/><rect width="800" height="150" fill="url(#ortkork)"/><defs><pattern id="ortkork" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="6" cy="9" r="1.6" fill="rgba(90,60,30,.25)"/><circle cx="19" cy="20" r="1.2" fill="rgba(90,60,30,.2)"/><circle cx="23" cy="5" r="1" fill="rgba(255,240,210,.25)"/><circle cx="12" cy="24" r=".8" fill="rgba(90,60,30,.18)"/></pattern></defs>' +
       '<rect x="0" y="0" width="800" height="6" fill="#6b4a32"/><rect x="0" y="144" width="800" height="6" fill="#6b4a32"/>' +
+      orteV2Malerei('projekte', 'unten') +
       /* Karten mit Nadeln und roter Schnur */
       [[120, 40, -4], [300, 58, 3], [500, 36, -2], [660, 62, 4]].map(([x, y, d]) => '<g ' + T('karte', 'Die Karte hängt schief. So gehört sich das.') + ' style="transform-origin:' + (x + 45) + 'px ' + (y + 4) + 'px"><g transform="rotate(' + d + ' ' + (x + 45) + ' ' + (y + 28) + ')"><rect x="' + x + '" y="' + y + '" width="90" height="56" fill="#f7efe0" stroke="#d9caa6"/><line x1="' + (x + 10) + '" y1="' + (y + 18) + '" x2="' + (x + 70) + '" y2="' + (y + 18) + '" stroke="#c9bda0"/><line x1="' + (x + 10) + '" y1="' + (y + 30) + '" x2="' + (x + 60) + '" y2="' + (y + 30) + '" stroke="#c9bda0"/><line x1="' + (x + 10) + '" y1="' + (y + 42) + '" x2="' + (x + 50) + '" y2="' + (y + 42) + '" stroke="#c9bda0"/><circle cx="' + (x + 45) + '" cy="' + (y + 4) + '" r="5" fill="#c0392b"/><circle cx="' + (x + 43) + '" cy="' + (y + 2) + '" r="1.5" fill="#fff" opacity=".6"/></g></g>').join('') +
       '<path class="ort-schnur-rot" d="M165 44 Q 260 20 345 62 T 545 40 T 705 66" fill="none" stroke="#b0352b" stroke-width="1.6"/>' +
@@ -305,6 +613,7 @@ function orteKulisse(raum, haupt) {
       '<defs><linearGradient id="ortholz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8895a"/><stop offset="1" stop-color="#8a6238"/></linearGradient></defs>' +
       '<rect width="800" height="150" fill="url(#ortholz)"/>' +
       '<g stroke="rgba(60,35,15,.18)" stroke-width="1.2" fill="none">' + [10, 38, 64, 92, 120, 146].map((y, i) => '<path d="M0 ' + y + ' C 200 ' + (y + (i % 2 ? 6 : -6)) + ', 420 ' + (y - 4) + ', 800 ' + (y + 3) + '"/>').join('') + '<path d="M300 40c-10 8-10 20 0 28 10-8 10-20 0-28z" opacity=".6"/></g>' +
+      orteV2Malerei('cluster', 'unten') +
       /* Das aufgeschlagene Heft mit einer Gedankenkarte */
       '<g ' + T('heft', 'Ein Gedanke, noch ein Gedanke, ein Strich dazwischen. So fängt es immer an.') + ' style="transform-origin:400px 80px"><g transform="rotate(-2 400 80)">' +
       '<rect x="262" y="24" width="138" height="112" fill="#f7efe0" stroke="#d9caa6"/><rect x="400" y="24" width="138" height="112" fill="#fbf6e8" stroke="#d9caa6"/><path d="M400 24v112" stroke="#c9bda0" stroke-width="2"/>' +
@@ -319,10 +628,45 @@ function orteKulisse(raum, haupt) {
       '<g ' + T('faden', 'Der Faden spannt sich. Zwei Gedanken, die zusammengehören.') + '><g transform="rotate(-6 120 70)"><rect x="90" y="50" width="60" height="40" fill="#fbf6e8" stroke="#d9caa6"/><line x1="98" y1="62" x2="140" y2="62" stroke="#c9bda0"/><line x1="98" y1="72" x2="132" y2="72" stroke="#c9bda0"/></g><g transform="rotate(5 180 110)"><rect x="150" y="92" width="60" height="40" fill="#f7efe0" stroke="#d9caa6"/><line x1="158" y1="104" x2="200" y2="104" stroke="#c9bda0"/><line x1="158" y1="114" x2="192" y2="114" stroke="#c9bda0"/></g>' +
       '<path class="ort-faden-rot" d="M120 52 C 150 70, 160 80, 180 94" fill="none" stroke="#b0352b" stroke-width="1.6"/><circle cx="120" cy="52" r="3.5" fill="#c9a25a"/><circle cx="180" cy="94" r="3.5" fill="#c9a25a"/></g>' +
       /* Teetasse mit Dampf auf Untertasse, Kekse */
-      '<g ' + T('tasse', 'Der Tee dampft noch. Kein Grund zur Eile.') + ' style="transform-origin:640px 100px"><ellipse cx="640" cy="104" rx="34" ry="11" fill="#e9e2d2" stroke="#c9bda0"/><ellipse cx="640" cy="100" rx="26" ry="9" fill="#fbf6e8" stroke="#c9bda0"/><ellipse cx="640" cy="96" rx="21" ry="7" fill="#8a5a2a"/><path d="M666 92c10 0 10 14 0 14" fill="none" stroke="#fbf6e8" stroke-width="4"/><path d="M626 92c4-4 12-5 22-3" stroke="rgba(255,255,255,.5)" stroke-width="1.5" fill="none"/>' + orteDampf(640, 86, 'rgba(255,255,255,.75)') + '</g>' +
+      /* Die Teetasse in Dreiviertelansicht: gerundeter Porzellankoerper mit
+         Licht- und Schattenseite, Goldrand, Tee mit Spiegelung, Henkel mit
+         Volumen, Untertasse mit Mulde, Schlagschatten auf dem Holz. */
+      '<g ' + T('tasse', 'Der Tee dampft noch. Kein Grund zur Eile.') + ' style="transform-origin:640px 100px">' +
+      '<defs><linearGradient id="ortporz" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fffdf7"/><stop offset=".35" stop-color="#f6efe0"/><stop offset=".8" stop-color="#d9ccb2"/><stop offset="1" stop-color="#b8a888"/></linearGradient>' +
+      '<radialGradient id="ortuntert" cx=".42" cy=".38" r=".62"><stop offset="0" stop-color="#fffdf6"/><stop offset=".7" stop-color="#efe6d2"/><stop offset="1" stop-color="#cdbf9f"/></radialGradient>' +
+      '<radialGradient id="orttee" cx=".38" cy=".4" r=".7"><stop offset="0" stop-color="#b8743a"/><stop offset=".6" stop-color="#7a4518"/><stop offset="1" stop-color="#4a2a0e"/></radialGradient>' +
+      '<linearGradient id="orthenkel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e9dfca"/><stop offset=".5" stop-color="#fbf7ee"/><stop offset="1" stop-color="#bcae90"/></linearGradient></defs>' +
+      '<ellipse cx="645" cy="117" rx="46" ry="11" fill="rgba(60,30,10,.24)"/>' +
+      '<ellipse cx="640" cy="112" rx="40" ry="10.5" fill="url(#ortuntert)" stroke="#bfae8a" stroke-width=".8"/>' +
+      '<ellipse cx="640" cy="111" rx="27" ry="6.4" fill="rgba(150,130,95,.18)"/>' +
+      '<path d="M604 108 Q 640 98 676 108" fill="none" stroke="#c9a25a" stroke-width=".9" opacity=".7"/>' +
+      '<ellipse cx="643" cy="109.5" rx="23" ry="4.6" fill="rgba(70,45,20,.22)"/>' +
+      '<path d="M661 90 C 676 88 677 106 659 104" fill="none" stroke="url(#orthenkel)" stroke-width="4.6" stroke-linecap="round"/>' +
+      '<path d="M662 92.5 C 671 92 671 102 660 101.4" fill="none" stroke="rgba(120,100,70,.35)" stroke-width="1"/>' +
+      '<path d="M618 86 C 618 99 626 109.5 640 109.5 C 654 109.5 662 99 662 86 Z" fill="url(#ortporz)"/>' +
+      '<path d="M619.2 93 Q 640 100.5 660.8 93" fill="none" stroke="#c9a25a" stroke-width="1.1"/>' +
+      '<path d="M623 89 C 623 98 628 105 636 107.5" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="1.6" stroke-linecap="round"/>' +
+      '<ellipse cx="640" cy="86" rx="22" ry="5.6" fill="#f7f1e4" stroke="#c9b892" stroke-width=".8"/>' +
+      '<ellipse cx="640" cy="86.8" rx="19.4" ry="4.4" fill="url(#orttee)"/>' +
+      '<ellipse cx="634" cy="85.8" rx="7" ry="1.4" fill="rgba(255,235,200,.35)"/>' +
+      '<path d="M618.4 85.4 Q 640 79.6 661.6 85.4" fill="none" stroke="#c9a25a" stroke-width=".8"/>' +
+      orteDampf(640, 80, 'rgba(255,255,255,.75)') + '</g>' +
       '<g ' + T('keks', 'Ein Keks. Für den Gedanken, der noch fehlt.') + ' style="transform-origin:716px 124px"><circle cx="716" cy="124" r="12" fill="#d9a85a"/><circle cx="711" cy="120" r="1.5" fill="#5a3a1a"/><circle cx="720" cy="126" r="1.5" fill="#5a3a1a"/><circle cx="714" cy="129" r="1.2" fill="#5a3a1a"/><path d="M724 116c4 4 6 8 4 12" stroke="#b8863f" stroke-width="1" fill="none"/></g>' +
       /* Kleiner Topf Kräuter links oben, Bleistift mit Spitzerspänen */
-      '<g ' + T('kraut', 'Rosmarin. Riecht nach Sonntagmittag.') + ' style="transform-origin:40px 44px"><rect x="24" y="30" width="32" height="22" rx="3" fill="#a3562f"/><g class="ort-blaetter" stroke="#4a7a46" stroke-width="2" stroke-linecap="round"><path d="M40 30v-22M40 20l-6-6M40 14l6-6M40 26l-7-4M40 22l7-4M34 30l-4-10M46 30l5-10"/></g></g>' +
+      /* Rosmarin im Terrakottatopf: Rand, Erde, Zweige mit nadelfeinen Blaettchen */
+      '<g ' + T('kraut', 'Rosmarin. Riecht nach Sonntagmittag.') + ' style="transform-origin:40px 44px">' +
+      '<defs><linearGradient id="ortterra" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d07a4c"/><stop offset=".4" stop-color="#b8603a"/><stop offset="1" stop-color="#7a3a1e"/></linearGradient></defs>' +
+      '<ellipse cx="42" cy="54" rx="18" ry="3" fill="rgba(40,20,5,.3)"/>' +
+      '<g class="ort-blaetter" stroke-linecap="round">' +
+      [[40, 33, 36, 6, -.18], [36, 33, 30, 10, -.5], [44, 33, 48, 9, .45], [40, 33, 42, 4, .08], [33, 33, 24, 16, -.8], [47, 33, 56, 15, .75]].map(([x0, y0, x1, y1, w], i) =>
+        '<path d="M' + x0 + ' ' + y0 + ' Q ' + ((x0 + x1) / 2 + w * 4).toFixed(1) + ' ' + ((y0 + y1) / 2).toFixed(1) + ' ' + x1 + ' ' + y1 + '" fill="none" stroke="#5a6b3c" stroke-width="1.3"/>' +
+        Array.from({ length: 6 }, (_, k) => { const t = (k + 1) / 7, px = x0 + (x1 - x0) * t, py = y0 + (y1 - y0) * t; return '<path d="M' + px.toFixed(1) + ' ' + py.toFixed(1) + ' l ' + (-3.2 + w).toFixed(1) + ' -1.6 M' + px.toFixed(1) + ' ' + py.toFixed(1) + ' l ' + (3.2 + w).toFixed(1) + ' -1.6" stroke="' + (k % 2 ? '#6f8a4e' : '#4f6a3a') + '" stroke-width="1.5"/>'; }).join('')).join('') +
+      '</g>' +
+      '<path d="M26 35 L 54 35 L 51.4 52.6 C 51.2 53.6 28.8 53.6 28.6 52.6 Z" fill="url(#ortterra)"/>' +
+      '<rect x="24" y="30.6" width="32" height="6" rx="1.6" fill="#c9714a"/><rect x="24" y="30.6" width="32" height="1.6" rx=".8" fill="rgba(255,220,190,.35)"/>' +
+      '<ellipse cx="40" cy="31.4" rx="14" ry="1.4" fill="#3a2414"/>' +
+      '<path d="M29 37 L 31 52" stroke="rgba(255,220,190,.3)" stroke-width="1.4" stroke-linecap="round"/>' +
+      '</g>' +
       '<g ' + T('spitzer', 'Frisch gespitzt. Die Späne riechen nach Schule — im guten Sinn.') + ' style="transform-origin:560px 30px"><rect x="520" y="26" width="70" height="6" fill="#e8b43c" transform="rotate(-22 555 29)"/><path d="M586 14l10 0-6 6z" fill="#f3e1b0" transform="rotate(-22 590 17)"/><g fill="#e8c892" stroke="#b89040" stroke-width=".5"><path d="M596 36c6-3 10 0 8 5-5 2-9 0-8-5z"/><path d="M608 30c5-3 9 0 7 5-4 2-8 0-7-5z"/></g></g>'
     ));
   } else if (r === 'woerter') {
@@ -335,6 +679,7 @@ function orteKulisse(raum, haupt) {
     wrap.dataset.woerter = druck.join(' · ');
     wrap.append(svg(
       '<rect width="800" height="150" fill="#2b2b2e"/><rect width="800" height="150" fill="url(#ortsetz)"/><defs><pattern id="ortsetz" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M0 6h12M6 0v12" stroke="rgba(255,255,255,.03)"/></pattern></defs>' +
+      orteV2Malerei('woerter', 'unten') +
       /* Der Kasten mit Fächern */
       '<rect x="40" y="20" width="540" height="116" rx="4" fill="#5a4326"/><rect x="46" y="26" width="528" height="104" fill="#3a2a18"/>' +
       '<g stroke="#6b4a32" stroke-width="2">' + [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => '<line x1="' + (46 + i * 44) + '" y1="26" x2="' + (46 + i * 44) + '" y2="130"/>').join('') + '<line x1="46" y1="78" x2="574" y2="78"/></g>' +
@@ -351,10 +696,36 @@ function orteKulisse(raum, haupt) {
       '<defs><linearGradient id="ortmusik" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a3020"/><stop offset="1" stop-color="#2a1c12"/></linearGradient><linearGradient id="orthorn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8c27a"/><stop offset=".5" stop-color="#b8863f"/><stop offset="1" stop-color="#e8c27a"/></linearGradient></defs>' +
       '<rect width="800" height="150" fill="url(#ortmusik)"/>' +
       '<rect x="0" y="120" width="800" height="30" fill="#3a2818"/><rect x="0" y="118" width="800" height="4" fill="#8a6a3e"/>' +
+      orteV2Malerei('klang', 'unten') +
       /* Grammophon: Kasten, Teller, Horn */
       '<g ' + T('horn', 'Das Horn summt nach. Messing vergisst nichts.') + ' style="transform-origin:330px 80px"><rect x="250" y="76" width="170" height="44" rx="4" fill="#6b4a32"/><rect x="250" y="76" width="170" height="6" fill="#8a6a3e"/><rect x="258" y="90" width="154" height="24" rx="2" fill="#3a2818"/>' +
-      '<g class="ort-platte' + (spielt ? ' dreht' : '') + '" style="transform-origin:300px 78px"><ellipse cx="300" cy="78" rx="40" ry="9" fill="#141110"/><ellipse cx="300" cy="78" rx="30" ry="6.5" fill="none" stroke="rgba(255,255,255,.06)"/><ellipse cx="300" cy="78" rx="22" ry="5" fill="none" stroke="rgba(255,255,255,.05)"/><ellipse cx="300" cy="78" rx="12" ry="2.8" fill="#b0552f"/></g>' +
-      '<path d="M356 78c8-28 30-48 60-56" stroke="#8a6a2e" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M416 22c-10-10-6-22 6-20 40 4 70 22 72 50-20 10-50 0-78-30z" fill="url(#orthorn)"/><path d="M424 4c10-2 24 4 40 14" stroke="rgba(255,255,255,.5)" stroke-width="2" fill="none"/><ellipse cx="492" cy="52" rx="4" ry="12" fill="#8a6a2e" transform="rotate(-20 492 52)"/>' +
+      /* Die Platte, schraeg von oben gesehen: eine Ellipse. Sie selbst darf sich
+         NICHT drehen — eine gedrehte Ellipse kippt wie ein Propeller. Umriss,
+         Rillen und Lichtreflex stehen still (wie bei einer echten Platte);
+         es laeuft nur die Marke auf dem Etikett im Kreis. */
+      '<g class="ort-platte' + (spielt ? ' dreht' : '') + '">' +
+      '<defs><radialGradient id="ortvinyl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#2a2420"/><stop offset=".35" stop-color="#121010"/><stop offset=".9" stop-color="#1c1816"/><stop offset="1" stop-color="#050404"/></radialGradient>' +
+      '<radialGradient id="ortetikett" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#d0704a"/><stop offset="1" stop-color="#8e3d22"/></radialGradient></defs>' +
+      '<ellipse cx="300" cy="80.5" rx="41" ry="9.4" fill="rgba(0,0,0,.45)"/>' +
+      '<ellipse cx="300" cy="78" rx="40" ry="9" fill="url(#ortvinyl)"/>' +
+      [36, 32, 28, 24, 19, 15].map((r) => '<ellipse cx="300" cy="78" rx="' + r + '" ry="' + (r * .225).toFixed(2) + '" fill="none" stroke="rgba(255,255,255,' + (r % 8 === 0 ? '.07' : '.035') + ')" stroke-width=".6"/>').join('') +
+      /* der stehende Glanz: zwei Lichtboegen auf den Rillen */
+      '<path d="M268 74.6 Q 284 70.4 300 70.2" fill="none" stroke="rgba(255,250,235,.32)" stroke-width="1.4" stroke-linecap="round"/>' +
+      '<path d="M310 85.6 Q 324 84.8 334 81.6" fill="none" stroke="rgba(255,250,235,.16)" stroke-width="1.2" stroke-linecap="round"/>' +
+      '<ellipse cx="300" cy="78" rx="12" ry="2.8" fill="url(#ortetikett)"/>' +
+      '<ellipse cx="300" cy="78" rx="12" ry="2.8" fill="none" stroke="rgba(255,230,190,.35)" stroke-width=".5"/>' +
+      '<g class="ort-plattenmarke"><ellipse cx="307" cy="78" rx="2.6" ry=".75" fill="#f3e2c0"/></g>' +
+      '<ellipse cx="300" cy="78" rx="1.3" ry=".5" fill="#d9d4c8"/></g>' +
+      '<path d="M356 78c8-28 28-50 56-56" stroke="#8a6a2e" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+      /* Ein Trichterhorn aus Messing: vom Hals zum Kelch, Segmentnaehte, dunkle Kehle, Lichtkante */
+      '<defs><linearGradient id="orthorn2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a5520"/><stop offset=".35" stop-color="#f2d38c"/><stop offset=".55" stop-color="#c9963e"/><stop offset="1" stop-color="#6e4a18"/></linearGradient>' +
+      '<radialGradient id="ortkehle" cx=".38" cy=".5" r=".6"><stop offset="0" stop-color="#2a1a08"/><stop offset=".7" stop-color="#6e4a18"/><stop offset="1" stop-color="#b8863f"/></radialGradient></defs>' +
+      '<path d="M413 18.6 Q 452 9 490.6 8.6 L 465.2 63.4 Q 440 38 418.4 26.6 Z" fill="url(#orthorn2)"/>' +
+      '<g stroke="rgba(90,60,15,.45)" stroke-width=".8" fill="none"><path d="M415 21 Q 450 18 484 22"/><path d="M416.4 24 Q 446 32 474 44"/></g>' +
+      '<ellipse cx="478" cy="36" rx="11.6" ry="30.2" transform="rotate(25 478 36)" fill="url(#ortkehle)"/>' +
+      '<ellipse cx="478" cy="36" rx="11.6" ry="30.2" transform="rotate(25 478 36)" fill="none" stroke="#f6dc9a" stroke-width="1.8"/>' +
+      '<path d="M418 18.4 Q 452 10.4 488 10" fill="none" stroke="rgba(255,250,225,.65)" stroke-width="1.4" stroke-linecap="round"/>' +
+      '<rect x="410" y="18" width="10" height="9" rx="2" fill="#8a6a2e" transform="rotate(-12 415 22)"/>' +
       '<path d="M360 60l-20 18" stroke="#c9a25a" stroke-width="3" stroke-linecap="round"/><circle cx="360" cy="60" r="6" fill="#8a6a2e"/></g>' +
       /* Schwebende Noten, wenn etwas spielt */
       '<g class="ort-noten' + (spielt ? ' an' : '') + '" fill="#f3e7c9">' + [0, 1, 2].map((i) => '<g class="ort-note n' + i + '" style="transform-origin:' + (470 + i * 18) + 'px 40px"><ellipse cx="' + (470 + i * 18) + '" cy="40" rx="4" ry="3" transform="rotate(-20 ' + (470 + i * 18) + ' 40)"/><rect x="' + (473 + i * 18) + '" y="24" width="1.6" height="16"/><path d="M' + (474.6 + i * 18) + ' 24c4 2 6 6 4 10" fill="none" stroke="#f3e7c9" stroke-width="1.6"/></g>').join('') + '</g>' +
@@ -377,6 +748,7 @@ function orteKulisse(raum, haupt) {
       '<defs><linearGradient id="ortflur" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a6450"/><stop offset="1" stop-color="#4a3a2c"/></linearGradient></defs>' +
       '<rect width="800" height="150" fill="url(#ortflur)"/><g opacity=".07" stroke="#ffe8c8" stroke-width="10">' + Array.from({ length: 17 }, (_, i) => '<line x1="' + (i * 50 + 10) + '" y1="0" x2="' + (i * 50 + 10) + '" y2="128"/>').join('') + '</g>' +
       '<rect x="0" y="128" width="800" height="22" fill="#3a2818"/><rect x="0" y="126" width="800" height="4" fill="#8a6a3e"/>' +
+      orteV2Malerei('faden', 'unten') +
       /* Bank */
       '<g ' + T('bank', 'Die Bank knarzt. Setz dich, das Gespräch dauert.') + ' style="transform-origin:400px 128px"><rect x="250" y="94" width="300" height="14" rx="4" fill="#8a6a3e"/><rect x="262" y="108" width="10" height="20" fill="#6b4a32"/><rect x="528" y="108" width="10" height="20" fill="#6b4a32"/><rect x="250" y="60" width="300" height="34" rx="8" fill="#a3562f"/><path d="M262 70h276M262 80h276" stroke="rgba(0,0,0,.18)"/><rect x="264" y="72" width="80" height="18" rx="6" fill="#b8693c" opacity=".7"/></g>' +
       /* Das Telefon: Wählscheibe, Hörer, Schnur */
@@ -396,6 +768,7 @@ function orteKulisse(raum, haupt) {
       '<rect width="800" height="150" fill="url(#ortwerk)"/><rect x="0" y="120" width="800" height="30" fill="#8a6a3e"/><rect x="0" y="118" width="800" height="4" fill="#c9a25a" opacity=".6"/>' +
       /* Lochwand mit Werkzeug */
       '<g fill="rgba(0,0,0,.25)">' + Array.from({ length: 60 }, (_, i) => '<circle cx="' + (20 + (i % 20) * 40) + '" cy="' + (16 + Math.floor(i / 20) * 30) + '" r="1.8"/>').join('') + '</g>' +
+      orteV2Malerei('feinheiten', 'unten') +
       '<g ' + T('hammer', 'Klopf. Sitzt.') + ' style="transform-origin:110px 40px"><rect x="106" y="40" width="8" height="60" rx="2" fill="#c9a25a"/><rect x="90" y="26" width="40" height="18" rx="3" fill="#3a3a3e"/><rect x="90" y="26" width="40" height="5" fill="rgba(255,255,255,.15)"/></g>' +
       '<g ' + T('saege', 'Die Säge singt, wenn man sie biegt.') + ' style="transform-origin:210px 40px"><path d="M180 30h70v22H180z" fill="#8a8f96"/><path d="M180 52l4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6" fill="none" stroke="#8a8f96" stroke-width="1.5"/><rect x="246" y="26" width="26" height="30" rx="6" fill="#a3562f"/></g>' +
       '<g ' + T('zange', 'Die Zange. Für Sätze, die nicht loslassen.') + ' style="transform-origin:320px 40px"><path d="M310 26l8 30M330 26l-8 30" stroke="#3a3a3e" stroke-width="6" stroke-linecap="round"/><path d="M314 54l-6 30M326 54l6 30" stroke="#c0392b" stroke-width="7" stroke-linecap="round"/></g>' +
@@ -411,6 +784,9 @@ function orteKulisse(raum, haupt) {
       '<g ' + T('stummel', 'Der Bleistiftstummel. Hat schon drei Bücher hinter sich.') + ' style="transform-origin:250px 110px"><rect x="232" y="106" width="36" height="7" fill="#e8b43c" transform="rotate(-8 250 110)"/><path d="M268 104l8 4-8 4z" fill="#f3e1b0" transform="rotate(-8 270 108)"/><rect x="232" y="106" width="6" height="7" fill="#d98b8b" transform="rotate(-8 250 110)"/></g>'
     ));
   } else return null;
+  /* v2: die Zierschicht liegt deckungsgleich ueber dem Buehnenbild. */
+  const zier = orteV2Zier(r);
+  if (zier) { const z = svg(zier); z.classList.add('ort-v2-zier'); z.setAttribute('pointer-events', 'none'); wrap.append(z); }
   orteBeleben(wrap, o);
   return wrap;
 }

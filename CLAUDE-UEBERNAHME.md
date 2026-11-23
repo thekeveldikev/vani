@@ -2817,3 +2817,88 @@ setzt beide Attribute, aufgerufen aus `setzeThema`.
   keine Regel ohne Schalter, keine Animation ohne Bewegungsschalter).
 
 Tests 451/451.
+
+## 5.64.0 — Gestaltung v2 in allen Räumen (23. November 2026)
+
+Alles an die beiden Schalter aus 5.63 gebunden (`html[data-v2]`,
+`html[data-v2bewegung]`), Standard an.
+
+- **Schreibtisch, nasse Scheibe** (54b, `maleNasseScheibe`): bei Regen und
+  Gewitter haften Perlen am Glas; grosse Tropfen haengen, laufen dann fast
+  gerade mit kleinen Rucken ab (um eine feste Mitte `l.mitte` — aufaddierte
+  Seitenbewegung machte Kometenschweife) und ziehen eine nasse Spur, schlucken
+  Perlen auf ihrem Weg. Tropfen: dunkler oberer Rand, Glanzpunkt, Lichtsichel
+  unten, das Bild dahinter kopfueber (wie die alten Glastropfen). Glas unten
+  beschlagen, Spritzer auf dem Brett. **Gewitter:** verzweigter Blitzstrahl
+  (`maleBlitzStrahl`), das Licht erhellt den ganzen Raum. **Winter:**
+  Eisblumen aus den Ecken, Schnee in den unteren Scheibenecken
+  (`maleEisUndSchnee`). Ohne v2 die alten 18 Glastropfen.
+- **Alle Kulissen** bekommen eine deckungsgleiche Zierschicht (57-orte,
+  `orteV2Zier(r)`; zweites SVG 800 × 150 „slice“, `pointer-events="none"`,
+  Klasse `.ort-v2-zier`): Zettel, der ueber den Zettelkasten segelt;
+  zweiter Papierflieger, Funkeln im Briefbeschwerer; Lichthof und Staub im
+  Kegel der Bankerlampe; Schimmer entlang des roten Fadens und blitzende
+  Nadeln; wandernde Blattschatten und Dampf am Kuechentisch; Metallglanz
+  ueber dem Setzkasten; Schallwellen aus dem Grammophon (nur wenn etwas
+  spielt), flackernder Kerzenschein; Staub im Lampenkegel der Telefonbank;
+  Werkzeugglanz. Bausteine: `orteV2Funkeln`, `orteV2Hof`, `orteV2Staub`,
+  `orteV2Glanzband`.
+- **Salon:** Glas vor den Bildnissen (Spiegelung), Goldglanz laeuft zeitversetzt
+  ueber die Rahmen (`--n`), Bilderleuchten atmen. **Album:** Goldglanz ueber
+  dem Deckel, das Lesebaendchen schwingt, der Titel leuchtet. **Kabinett:**
+  Goldschilder glaenzen nacheinander, Faecher mit Lichtkante.
+- **Ueberall:** Dialogfenster (`.modal`, ueber `:where()`), Suche und Spotlight
+  mit Goldrahmen und Eckranken; Gruppentitel der Suche mit Raute und
+  Goldlinie; Fundstellen goldene Unterstreichung; Toasts mit Goldkante;
+  Schieberegler als Rille mit Messingknauf (Groesse unveraendert).
+- Geprueft im Browser bei 1024×768 (Schreibtisch auch 800×600 ohne
+  Verkleinerung). **Nicht auf dem iPad**, auch nicht, wie viel Leistung die
+  nasse Scheibe dort kostet.
+
+Tests 453/453.
+
+## 5.65.0 — Neu ausgemalt (23. November 2026)
+
+5.64 wurde nicht einzeln veroeffentlicht; 5.65 enthaelt beides.
+
+- **Schallplatte (Klang):** Die Platte ist eine Ellipse (schraeg von oben).
+  Frueher drehte sich die ganze Gruppe — eine gedrehte Ellipse kippt wie ein
+  Propeller. Jetzt stehen Umriss, Rillen und Lichtboegen still, nur die Marke
+  auf dem Etikett laeuft um (`.ort-plattenmarke`, `@keyframes ort-dreht` als
+  Ellipsenbahn, 1,8 s je Umdrehung). Gilt auch ohne v2 (war ein Fehler).
+- **Teetasse (Cluster):** neu gemalt in Dreiviertelansicht — Porzellan mit
+  Licht- und Schattenseite, Goldrand, Tee mit Spiegelung, Henkel mit Volumen,
+  Untertasse mit Mulde, Schlagschatten. Auch ohne v2.
+- **Neu ausgemalt (nur mit v2):** `orteV2Malerei(r, 'unten'|'oben')` in
+  57-orte.js. „unten“ wird in jedes Buehnenbild direkt nach dem Hintergrund
+  eingehaengt (Schlagschatten, Maserung, Licht an der Wand), „oben“ liegt
+  zuunterst in der Zierschicht (Rundung, Glanz, Kanten, Goldlinien,
+  Bakelitglanz, Stahl, Messing, Polsterknoepfe …). Alle neun Kulissen plus
+  die Diele (oben). Gemeinsame Bausteine: Verlaeufe `v2mRund`, `v2mOben`,
+  `holz()`-Maserung, `kugel()`.
+- **Salon:** feine Damasttapete, Stuckschatten und Vignette ueber der
+  gemalten Wand (`.salon-galerie.gemalt::after`, unter den Rahmen).
+  **Album:** genarbtes Leder auf dem Deckel. **Kabinett:** Messinggriffe mit
+  Rundung und Glanzlicht.
+- **Lesbarkeit (nur mit v2):** `--blass` je Thema dunkler bzw. heller (mehr
+  Kontrast), Seitenleiste 11 px, Kartenkoepfe 11,5 px, Funken-Chips 12,5 px,
+  Kulissen-Chips als Papieretiketten, leise Fusszeilen-Knoepfe als Pillen,
+  Buehnenkante unter dem Kulissenbild. Die Licht- und Staubschichten der
+  Kulisse sind auf die 150 px Bildhoehe begrenzt (graute sonst die Chips aus).
+- **Realistisch neu gemalt (immer, nicht nur mit v2):** Diele: Filzhut mit
+  Kniff, Ripsband und Krempe; Strickschal mit Rippen, Streifen und Fransen
+  (`.ort-schal` jetzt auf einer Gruppe); Lederschuhe mit Sohle, Absatz,
+  Schnuerung; Messing-Schirmstaender mit geschlossenem Schirm (las sich vorher
+  wie eine Lampe). Hefte: Steingutbecher. Blaetter: Papierflieger mit nahem
+  und fernem Fluegel und Kiel. Cluster: Rosmarin im Terrakottatopf.
+  Klang: Trichterhorn mit Kelch (Ellipse `rotate(25 478 36)`), Schallwellen
+  auf `484px 40px` nachgezogen, Umriss in der Malschicht ebenso.
+- **Falle:** Eine SVG-`path`-Kurve ohne `fill="none"` wird schwarz gefuellt,
+  auch wenn sie nur als Linie gedacht ist (passierte bei den Schal-Rippen).
+- **Falle beim Pruefen:** Der lokale Server liefert die Seite aus dem
+  Browser-Zwischenspeicher, auch mit `?kein-sw`. Nach jedem Bau eine neue
+  Adresse nehmen (`?kein-sw&neu=N`).
+- Schreibtisch auf Wunsch nicht neu gemalt (nur die Scheibe aus 5.64).
+- Geprueft im Browser bei 800×600 und 1024×768. **Nicht auf dem iPad.**
+
+Tests 457/457.

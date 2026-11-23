@@ -304,3 +304,80 @@ test('Gestaltung v2: die Malschicht der Diele faengt keine Tipps ab', () => {
   assert.match(css, /\.ort-kulisse::before \{[^}]*pointer-events: none/);
   assert.match(css, /\.ort-kulisse::after \{[^}]*pointer-events: none/);
 });
+
+/* ===== Gestaltung v2, zweite Runde (5.64): alle Raeume ===== */
+
+test('v2: jede Kulisse hat eine eigene Zierschicht, und keine faengt Tipps ab', async () => {
+  const k = await frisch();
+  k.document.documentElement.dataset.v2 = 'an';
+  for (const r of ['schnipsel', 'blaetter', 'hefte', 'projekte', 'cluster', 'woerter', 'klang', 'faden', 'feinheiten']) {
+    const z = k.orteV2Zier(r);
+    assert.ok(z.length > 200, r + ' hat eine Zierschicht');
+    assert.ok(!/data-tipp|ort-tipp|onclick/.test(z), r + ': nichts Antippbares in der Zierschicht');
+  }
+  k.document.documentElement.dataset.v2 = 'aus';
+  assert.equal(k.orteV2Zier('hefte'), '', 'ohne v2 keine Zierschicht');
+  const orte = lies('src/57-orte.js');
+  assert.match(orte, /z\.classList\.add\('ort-v2-zier'\); z\.setAttribute\('pointer-events', 'none'\)/);
+  assert.match(lies('src/10-style.css'), /\.ort-v2-zier \{[^}]*pointer-events: none/);
+});
+
+test('v2: die nasse Scheibe am Schreibtisch haengt am Schalter', () => {
+  const m = lies('src/54b-schreibtisch-malerei.js');
+  assert.match(m, /if \(v2An\(\)\) \{ maleNasseScheibe\(dt, fx, fy, fw, fh\); \} else for \(const g of glasTropfen\)/, 'ohne v2 die alten Tropfen');
+  assert.match(m, /function maleBlitzStrahl\([^)]*\) \{\s*if \(!v2An\(\)/, 'der Blitzstrahl nur mit v2');
+  assert.match(m, /function maleEisUndSchnee\([^)]*\) \{\s*if \(!v2An\(\)/, 'Eisblumen nur mit v2');
+  /* Tropfen laufen um eine feste Mitte — sonst werden aus Spuren Kometenschweife. */
+  assert.match(m, /l\.x = l\.mitte \+ l\.ruck \+ Math\.sin\(l\.zick\) \* \.0012;/);
+});
+
+/* ===== 5.65: neu ausgemalt ===== */
+
+test('Neu ausgemalt: zwei Malschichten je Kulisse, still, ohne Zeiger, nur mit v2', async () => {
+  const k = await frisch();
+  k.document.documentElement.dataset.v2 = 'an';
+  for (const r of ['schnipsel', 'blaetter', 'hefte', 'projekte', 'cluster', 'woerter', 'klang', 'faden', 'feinheiten']) {
+    const unten = k.orteV2Malerei(r, 'unten'), oben = k.orteV2Malerei(r, 'oben');
+    assert.ok(unten.length > 150 && oben.length > 150, r + ': beide Schichten');
+    assert.ok(!/class="v2-|data-tipp|ort-tipp/.test(unten + oben), r + ': keine Bewegung, nichts Antippbares');
+  }
+  assert.ok(k.orteV2Malerei('zuhause', 'oben').length > 150, 'die Diele bekommt Rundung und Glanz');
+  k.document.documentElement.dataset.v2 = 'aus';
+  assert.equal(k.orteV2Malerei('hefte', 'unten'), '');
+  /* Die untere Schicht steht in jedem Buehnenbild VOR den Dingen. */
+  const orte = lies('src/57-orte.js');
+  for (const r of ['schnipsel', 'blaetter', 'hefte', 'projekte', 'cluster', 'woerter', 'klang', 'faden', 'feinheiten']) {
+    assert.match('x', orte.includes("orteV2Malerei('" + r + "', 'unten')") ? /./ : /^$/, r + ' haengt die untere Schicht ein');
+  }
+});
+
+test('Schallplatte: die Ellipse dreht sich nicht, nur die Marke auf dem Etikett', () => {
+  const orte = lies('src/57-orte.js'), css = lies('src/10-style.css');
+  assert.match(orte, /class="ort-plattenmarke"/);
+  assert.match(css, /\.ort-platte\.dreht \{ animation: none; \}/, 'keine Drehung der ganzen Platte — eine gedrehte Ellipse kippt');
+  assert.match(css, /\.ort-kulisse\.lebt \.ort-platte\.dreht \.ort-plattenmarke \{ animation: ort-dreht/);
+  assert.ok(!/@keyframes ort-dreht \{ to \{ transform: rotate\(360deg\)/.test(css));
+});
+
+test('Cluster: die Teetasse steht in Dreiviertelansicht', () => {
+  const orte = lies('src/57-orte.js');
+  const tasse = orte.slice(orte.indexOf("T('tasse', 'Der Tee dampft noch. Kein Grund zur Eile.')"), orte.indexOf("T('keks'"));
+  assert.match(tasse, /url\(#ortporz\)/, 'gerundeter Porzellankoerper');
+  assert.match(tasse, /url\(#orttee\)/, 'Tee mit Verlauf');
+  assert.match(tasse, /url\(#orthenkel\)/, 'Henkel mit Volumen');
+});
+
+test('Realistisch neu gemalt: Diele, Becher, Horn, Flieger, Rosmarin', () => {
+  const orte = lies('src/57-orte.js');
+  for (const id of ['orthutfilz', 'ortschalL', 'ortleder', 'ortstaender', 'orthbecher', 'orthorn2', 'ortkehle', 'ortterra']) {
+    assert.ok(orte.includes('id="' + id + '"'), 'Verlauf ' + id + ' fehlt');
+    assert.ok(orte.includes('url(#' + id + ')'), 'Verlauf ' + id + ' wird nicht benutzt');
+  }
+  // Die Schal-Rippen sind Kurven: ohne fill="none" malt der Browser sie schwarz aus.
+  assert.match(orte, /<g stroke="rgba\(60,20,5,\.28\)" stroke-width="\.7" fill="none">/);
+  assert.match(orte, /<g class="ort-schal" style="transform-origin:250px 48px">/, 'Schal behaelt seine Wackel-Klasse');
+  assert.match(orte, /<g class="ort-blaetter" stroke-linecap="round">/, 'Rosmarin behaelt seine Wackel-Klasse');
+  // Kelch und Schallwellen sitzen an derselben Stelle
+  assert.ok(orte.includes('rotate(25 478 36)') && orte.includes('transform-origin:484px 40px'));
+  assert.ok(!orte.includes('rotate(-25 478 36)'), 'Kelch war einmal falsch herum geneigt');
+});

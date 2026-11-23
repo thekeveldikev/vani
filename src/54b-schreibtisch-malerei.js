@@ -114,6 +114,139 @@ function schreibtischMaler(canvas, optionen = {}) {
   const wuermchen = Array.from({ length: 16 }, () => ({ x: .1 + zuf() * .8, y: .35 + zuf() * .5, ph: zuf() * 6, v: .3 + zuf() * .7 }));
   const nebel = Array.from({ length: 5 }, (_, i) => ({ y: .55 + i * .09, v: .004 + zuf() * .006, ph: zuf() * 6 }));
 
+  /* ===== Gestaltung v2: die nasse Scheibe, Blitz, Eisblumen =====
+     Nur mit „Gestaltung v2“. Feine Perlen haften am Glas; grosse Tropfen
+     haengen erst, dann laufen sie im Zickzack ab und ziehen eine nasse Spur.
+     Unten beschlaegt das Glas, auf dem Brett spritzt es. Ein Blitz hat einen
+     verzweigten Strahl und erhellt den ganzen Raum. Im Winter: Eisblumen in
+     den Ecken und Schnee in den unteren Fensterecken. */
+  const v2An = () => document.documentElement.dataset.v2 === 'an';
+  const perlen = Array.from({ length: 170 }, () => ({ x: zuf(), y: zuf(), r: .9 + zuf() * 1.8, a: .5 + zuf() * .5 }));
+  const neuerLaeufer = (oben) => { const x = .03 + zuf() * .94; return { x, mitte: x, ruck: 0, y: oben ? -.05 - zuf() * .3 : zuf() * .8, r: 2.6 + zuf() * 3.2, v: 0, warte: 1 + zuf() * 6, spur: [], zick: zuf() * 6.3 }; };
+  const laeufer = Array.from({ length: 11 }, () => neuerLaeufer(false));
+  const spritzer = Array.from({ length: 14 }, () => ({ x: zuf(), t: zuf(), d: .35 + zuf() * .4 }));
+  let strahl = null;
+  const blitzStrahl = () => {
+    const pkt = [{ x: .2 + zuf() * .6, y: 0 }]; const aeste = [];
+    while (pkt[pkt.length - 1].y < .82) {
+      const p = pkt[pkt.length - 1];
+      const n = { x: p.x + (zuf() - .5) * .09, y: p.y + .05 + zuf() * .07 };
+      pkt.push(n);
+      if (zuf() < .28) { const a = [n]; let q = n; for (let i = 0; i < 3; i++) { q = { x: q.x + (zuf() - .3) * .07, y: q.y + .04 + zuf() * .05 }; a.push(q); } aeste.push(a); }
+    }
+    return { pkt, aeste };
+  };
+  /* Eisblumen: verzweigte Raeder aus den vier Ecken, einmal gewuerfelt */
+  const eisblumen = [];
+  const eisAst = (x, y, w, l, tiefe) => {
+    const x2 = x + Math.cos(w) * l, y2 = y + Math.sin(w) * l;
+    eisblumen.push([x, y, x2, y2, tiefe]);
+    if (tiefe < 4) for (const d of [-.7, .7]) eisAst(x + (x2 - x) * .55, y + (y2 - y) * .55, w + d * (.6 + zuf() * .5), l * (.45 + zuf() * .2), tiefe + 1);
+    if (tiefe < 3) eisAst(x2, y2, w + (zuf() - .5) * .5, l * .7, tiefe + 1);
+  };
+  for (const [ex, ey, w0] of [[0, 0, .78], [1, 0, 2.36], [0, 1, -.78], [1, 1, -2.36]]) for (let i = 0; i < 4; i++) eisAst(ex, ey, w0 + (zuf() - .5) * 1.1, .07 + zuf() * .06, 0);
+
+  function maleNasseScheibe(dt, fx, fy, fw, fh) {
+    /* Beschlagen: unten milchig, oben klar */
+    const dunst = ctx.createLinearGradient(0, fy + fh * .45, 0, fy + fh);
+    dunst.addColorStop(0, 'rgba(225,232,242,0)'); dunst.addColorStop(1, 'rgba(225,232,242,.16)');
+    ctx.fillStyle = dunst; ctx.fillRect(fx, fy, fw, fh);
+    /* Perlen: dunkler Rand unten, Lichtpunkt oben — so liest das Auge Wasser */
+    for (const p of perlen) {
+      const px = fx + p.x * fw, py = fy + p.y * fh;
+      ctx.fillStyle = 'rgba(12,18,28,' + (.34 * p.a).toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(px, py + p.r * .25, p.r, 0, 6.29); ctx.fill();
+      ctx.fillStyle = 'rgba(214,226,244,' + (.55 * p.a).toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(px - p.r * .3, py - p.r * .35, p.r * .38, 0, 6.29); ctx.fill();
+      ctx.strokeStyle = 'rgba(200,214,236,' + (.22 * p.a).toFixed(3) + ')'; ctx.lineWidth = .6; ctx.beginPath(); ctx.arc(px, py, p.r, .3, 2.8); ctx.stroke();
+    }
+    /* Laeufer: haengen, schwellen, laufen */
+    for (let i = 0; i < laeufer.length; i++) {
+      const l = laeufer[i];
+      if (l.warte > 0) { l.warte -= dt; if (l.warte <= 0) l.v = .02; }
+      else {
+        l.v = Math.min(.26, l.v + dt * .12 * (l.r / 4));
+        l.y += l.v * dt; l.zick += dt * 3;
+        /* fast gerade, mit kleinen Rucken zur Seite — um eine feste Mitte, nicht aufaddiert */
+        if (zuf() < dt * 2.2) l.ruck = (zuf() - .5) * .006;
+        l.x = l.mitte + l.ruck + Math.sin(l.zick) * .0012;
+        l.spur.push({ x: l.x, y: l.y, a: 1 });
+        if (l.spur.length > 60) l.spur.shift();
+        /* Kurz innehalten, wie echtes Wasser, das an einer Unebenheit haengt */
+        if (zuf() < dt * .35) { l.v = .015; l.warte = .2 + zuf() * .8; }
+        /* Unterwegs schluckt er Perlen — und hinterlaesst eine klare Bahn */
+        for (const p of perlen) if (Math.abs(p.x - l.x) < .012 && Math.abs(p.y - l.y) < .02) { p.y = zuf(); p.x = zuf(); }
+      }
+      for (const s of l.spur) s.a -= dt * .18;
+      while (l.spur.length && l.spur[0].a <= 0) l.spur.shift();
+      if (l.spur.length > 1) {
+        ctx.lineCap = 'round';
+        for (let k = 1; k < l.spur.length; k++) {
+          const a = l.spur[k - 1], b = l.spur[k];
+          ctx.strokeStyle = 'rgba(215,226,244,' + (.34 * b.a).toFixed(3) + ')';
+          ctx.lineWidth = l.r * .7; ctx.beginPath(); ctx.moveTo(fx + a.x * fw, fy + a.y * fh); ctx.lineTo(fx + b.x * fw, fy + b.y * fh); ctx.stroke();
+        }
+      }
+      const gx = fx + l.x * fw, gy = fy + l.y * fh, r = l.r, lang = l.warte > 0 ? 1.15 : 1.55;
+      try {
+        ctx.save(); ctx.beginPath(); ctx.ellipse(gx, gy, r, r * lang, 0, 0, 6.29); ctx.clip();
+        ctx.translate(gx, gy); ctx.scale(1.7, -1.7);
+        ctx.drawImage(canvas, Math.max(0, (gx - r * 2.4) * dpr), Math.max(0, (gy - r * 3.4) * dpr), r * 4.8 * dpr, r * 6.8 * dpr, -r * 2.4, -r * 3.4, r * 4.8, r * 6.8);
+        ctx.restore();
+      } catch (e) {}
+      ctx.fillStyle = 'rgba(8,12,20,.38)'; ctx.beginPath(); ctx.ellipse(gx, gy - r * .1, r, r * lang, 0, 3.6, 5.85); ctx.lineTo(gx, gy); ctx.fill();
+      /* unten eine Lichtsichel: das Licht, das durch den Tropfen faellt */
+      ctx.strokeStyle = 'rgba(230,238,252,.5)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(gx, gy, r * .72, r * lang * .78, 0, .5, 2.64); ctx.stroke();
+      ctx.fillStyle = 'rgba(250,252,255,.92)'; ctx.beginPath(); ctx.ellipse(gx - r * .35, gy - r * .55, r * .3, r * .42, -.5, 0, 6.29); ctx.fill();
+      if (l.y > 1.04) laeufer[i] = neuerLaeufer(true);
+    }
+    /* Spritzer auf dem Brett unter der Scheibe */
+    for (const s of spritzer) {
+      s.t += dt / s.d;
+      if (s.t > 1) { s.t = 0; s.x = zuf(); }
+      const sx = fx + s.x * fw, sy = fy + fh - 3, k = s.t;
+      ctx.strokeStyle = 'rgba(215,226,245,' + (.45 * (1 - k)).toFixed(3) + ')'; ctx.lineWidth = .9;
+      ctx.beginPath(); ctx.ellipse(sx, sy, 2 + k * 7, .8 + k * 2, 0, 3.4, 6.0); ctx.stroke();
+    }
+  }
+  function maleBlitzStrahl(fx, fy, fw, fh) {
+    if (!v2An() || opt.wetter !== 'gewitter') { strahl = null; return; }
+    if (blitz > 0 && !strahl) strahl = blitzStrahl();
+    if (blitz <= 0) { strahl = null; return; }
+    const zeichne = (liste, breite) => {
+      ctx.beginPath(); liste.forEach((p, i) => { const x = fx + p.x * fw, y = fy + p.y * fh * .9; if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); }); ctx.lineWidth = breite; ctx.stroke();
+    };
+    ctx.save(); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.shadowColor = 'rgba(190,205,255,' + blitz.toFixed(2) + ')'; ctx.shadowBlur = 18;
+    ctx.strokeStyle = 'rgba(245,248,255,' + Math.min(1, blitz * 1.2).toFixed(2) + ')';
+    zeichne(strahl.pkt, 2.2); for (const a of strahl.aeste) zeichne(a, 1.1);
+    ctx.restore();
+  }
+  function maleEisUndSchnee(fx, fy, fw, fh, nacht) {
+    if (!v2An() || jahreszeit !== 'winter') return;
+    /* Eisblumen, nachts deutlicher */
+    ctx.save(); ctx.strokeStyle = 'rgba(235,244,255,' + (.18 + .22 * nacht).toFixed(3) + ')'; ctx.lineCap = 'round';
+    for (const [x1, y1, x2, y2, tiefe] of eisblumen) {
+      ctx.lineWidth = Math.max(.4, 1.4 - tiefe * .3);
+      ctx.beginPath(); ctx.moveTo(fx + x1 * fw, fy + y1 * fh); ctx.lineTo(fx + x2 * fw, fy + y2 * fh); ctx.stroke();
+    }
+    ctx.restore();
+    if (opt.wetter === 'regen' || opt.wetter === 'gewitter') return;
+    /* Schnee sammelt sich in den unteren Ecken der Scheiben */
+    const unten = fy + fh;
+    for (const [x0, x1] of [[fx, fx + fw / 2 - 6], [fx + fw / 2 + 6, fx + fw]]) {
+      const b = x1 - x0;
+      const sch = ctx.createLinearGradient(0, unten - 16, 0, unten);
+      sch.addColorStop(0, '#f4f7fb'); sch.addColorStop(1, '#cfd8e4');
+      ctx.fillStyle = sch;
+      ctx.beginPath(); ctx.moveTo(x0, unten); ctx.lineTo(x0, unten - 14);
+      ctx.quadraticCurveTo(x0 + b * .12, unten - 8, x0 + b * .3, unten - 5);
+      ctx.quadraticCurveTo(x0 + b * .5, unten - 3, x0 + b * .7, unten - 5);
+      ctx.quadraticCurveTo(x0 + b * .88, unten - 8, x1, unten - 13);
+      ctx.lineTo(x1, unten); ctx.closePath(); ctx.fill();
+    }
+  }
+
   /* Holz, Kratzer, Tinte — einmal gewürfelt, einmal gemalt */
   const maser = Array.from({ length: 70 }, () => ({ y: zuf(), amp: 2 + zuf() * 6, f: 1 + zuf() * 3, ph: zuf() * 6, a: .05 + zuf() * .1, dick: .6 + zuf() * 1.6 }));
   const aeste = Array.from({ length: 3 }, () => ({ x: .15 + zuf() * .7, y: .3 + zuf() * .6, rx: 10 + zuf() * 16, ry: 6 + zuf() * 8 }));
@@ -291,7 +424,8 @@ function schreibtischMaler(canvas, optionen = {}) {
     if (opt.wetter === 'gewitter') {
       blitzWarte -= dt;
       if (blitzWarte <= 0) { blitz = 1; blitzWarte = 5 + zuf() * 11; }
-      if (blitz > 0) { ctx.fillStyle = 'rgba(225,232,255,' + (blitz * .55).toFixed(2) + ')'; ctx.fillRect(fx, fy, fw, fh); blitz = Math.max(0, blitz - dt * 6 * (blitz > .6 ? 1 : 2.5)); }
+      if (blitz > 0) { ctx.fillStyle = 'rgba(225,232,255,' + (blitz * .55).toFixed(2) + ')'; ctx.fillRect(fx, fy, fw, fh); maleBlitzStrahl(fx, fy, fw, fh); blitz = Math.max(0, blitz - dt * 6 * (blitz > .6 ? 1 : 2.5)); }
+      else strahl = null;
     }
     /* Vögel: am Tag zieht ab und zu ein Schwarm durchs Fenster; im Herbst Gänse im Keil */
     if (sonne > .05 && opt.wetter !== 'regen' && opt.wetter !== 'gewitter') {
@@ -410,7 +544,7 @@ function schreibtischMaler(canvas, optionen = {}) {
         ctx.moveTo(fx + r.x * fw, fy + r.y * fh); ctx.lineTo(fx + (r.x + schraeg * r.l) * fw, fy + (r.y + r.l) * fh); ctx.stroke();
       }
       ctx.globalAlpha = 1;
-      for (const g of glasTropfen) {
+      if (v2An()) { maleNasseScheibe(dt, fx, fy, fw, fh); } else for (const g of glasTropfen) {
         g.y += g.v * dt * (.5 + g.r * .2); if (g.y > 1.02) { g.y = -.02; g.x = zuf(); }
         const gx = fx + g.x * fw, gy = fy + g.y * fh;
         try {
@@ -429,6 +563,7 @@ function schreibtischMaler(canvas, optionen = {}) {
     const glanz = ctx.createLinearGradient(fx, fy, W * .5, fensterH);
     glanz.addColorStop(0, 'rgba(255,255,255,' + (.05 + .05 * licht).toFixed(3) + ')'); glanz.addColorStop(.45, 'rgba(255,255,255,0)'); glanz.addColorStop(1, 'rgba(255,255,255,.03)');
     ctx.fillStyle = glanz; ctx.fillRect(fx, fy, fw, fh);
+    maleEisUndSchnee(fx, fy, fw, fh, nacht);
     ctx.restore();
     /* Für das Licht im Raum merken */
     sonneJetzt = { info, sx, sy };
@@ -517,6 +652,8 @@ function schreibtischMaler(canvas, optionen = {}) {
       const fl = 1 + .1 * Math.sin(t * 9) + .06 * Math.sin(t * 17.3);
       kerzeSchein(ctx, W * .88, oben + 20, W * .26 * fl, (H - oben) * .45, [[0, 'rgba(255,175,80,.26)'], [.5, 'rgba(255,150,60,.1)'], [1, 'rgba(255,140,50,0)']]);
     }
+    /* v2: der Blitz erhellt den ganzen Raum, nicht nur das Fenster */
+    if (blitz > 0 && opt.wetter === 'gewitter' && v2An()) { ctx.fillStyle = 'rgba(205,215,255,' + (blitz * .2).toFixed(3) + ')'; ctx.fillRect(0, 0, W, H); }
   }
 
   function bild(jetzt) {
