@@ -581,7 +581,7 @@ async function buchOeffnen(b) {
     else if (ev.key === 'Home') { leser.seite = 1; zeige(0); } else if (ev.key === 'End') { leser.seite = b.seiten; zeige(0); }
   };
   document.addEventListener('keydown', leser.tasten, true);
-  leser.beiGroesse = () => { leser.cache.clear(); zeige(0); };
+  leser.beiGroesse = entprellt(() => { leser.cache.clear(); zeige(0); }, 220);
   window.addEventListener('resize', leser.beiGroesse);
   leserStil();
   await zeige(0);

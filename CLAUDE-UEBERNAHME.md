@@ -2960,3 +2960,80 @@ Tests 457/457.
   angehoert.
 
 Tests 463/463.
+
+
+## 5.67.0 — Grosse Bugjagd ueber die ganze App (23. November 2026)
+
+Zwei Pruefer haben je eine Haelfte der Module gelesen (Kern/Daten/Sync/Editor
+und alle Raeume), jeder Fund wurde vor dem Fix am Code bestaetigt. Dazu
+Messungen im Browser (Renderzeit 1–6 ms je Raum, keine Schleifen im
+Hintergrund, kein DOM-Leck) und eine Bedienpruefung bei 1024×768.
+
+**Kritisch, behoben:**
+- **Einstellungen gingen bei jedem Neustart verloren:** `v2`, `v2Bewegung`,
+  `albumMarke`, `albumBildnis`, `albumWorte`, `fadenBibliothek` fehlten in
+  `STANDARD_EINST`; `uebernehmeEinstellungen` laesst nur bekannte Schluessel
+  durch. Ein Test prueft jetzt jeden gesetzten `D.einst.x` gegen die Standards.
+- **Kritzeln im Heft:** Raumwechsel (hashchange) raeumte auf, ohne zu sichern —
+  alles Gezeichnete war weg. Jetzt `kritzelSichern()` beim Weggehen und bei
+  `visibilitychange: hidden`; Zeichenflaeche hoechstens ~16 MP (iOS-Grenze).
+- **Schreibmaschine:** Escape/Danebentippen bei der Ablage-Frage verwarf den
+  Text. Jetzt verwirft nur ein ausdrueckliches „Verwerfen“. Das zweite
+  „Als Blatt ablegen“ schreibt auch `rich` (vorher nur `text`, der Editor las
+  den alten Stand).
+- **Bild-/Kritzelspeichern hing ewig** bei einem Speicherfehler (await ohne
+  try im toBlob-Callback). Jetzt kommt `null`, der Aufrufer meldet es.
+- **Import und Sync:** eingespielte Texte meldeten sich nicht beim Sync an und
+  wurden beim naechsten Abgleich lokal geloescht. „Ersetzen“ legt vorher eine
+  Rettung unter `kv/vorImport` ab.
+
+**Mittel, behoben:**
+- Sync ueberschreibt einen gerade offenen Text nicht mehr unter den Haenden
+  (Fassung vom anderen Geraet wird als Stand eingefroren, Hinweis).
+- Vom Sync geloeschte Texte gehen in den Papierkorb (`herkunft: 'sync'`).
+- IndexedDB: tote Verbindung (iOS) wird einmal neu geoeffnet (`dbTu` →
+  `dbTuEinmal`, `onversionchange`, `onclose`).
+- Raumwechsel: Leseposition bleibt beim Neuzeichnen desselben Raums; wirft ein
+  Raum beim Aufbau, erscheint eine Karte statt einer leeren Seite.
+- Auto-Sperre rechnet beim Zurueckkommen nach (iOS friert Zeitgeber ein).
+- Blosses Oeffnen/Schliessen eines Textes aendert ihn nicht mehr (Speichern
+  ueberspringt Unveraendertes) — er springt nicht mehr in „zuletzt“ nach oben.
+- Rettungskopie: kein grundloses „Da war noch etwas“ mehr bei Rich-Text;
+  der Rettungs-Spueler wird beim Schliessen ausgetragen.
+- Fehlertolerante Suche: Vorfilter (eine Haelfte muss genau stimmen) statt
+  Millionen Teilstuecke bei langen Texten. `wortDiff`-Matrix hoechstens ~25 MB.
+- Suchen & Ersetzen im Schreibraum zaehlt entprellt.
+- Klang: Einschlaf-Ausklang ueberschreibt die gespeicherte Lautstaerke nicht
+  mehr; `audioFreigeben` laeuft nie doppelt; das Klangpult liest die Mischung
+  erst nach der Freigabe (zwei Regler schalten sich nicht mehr gegenseitig aus);
+  zu lange eigene Aufnahmen werden mit Hinweis abgelehnt statt den Speicher zu
+  sprengen (und nicht weggeworfen).
+- Cluster-Bildexport bleibt unter dem iOS-Leinwandlimit.
+- Schnipsel verwandeln: lange Schnipsel werden nicht still auf 60 Zeichen
+  gekuerzt, Bilder gehen nicht still verloren.
+- Karteikarten: Enter auf einem Knopf drueckt den Knopf (bewertete vorher die
+  Karte). Wortziel versteht „80.000“ (`zielZahl`).
+- Standuhr laeutet je Stunde genau einmal. PDF-Leser entprellt Groessenwechsel.
+  Malschleifen von Schreibtisch und Salon enden selbst, wenn ihre Leinwand weg ist.
+- Bedienung: Raumleiste bei wenig Hoehe kompakter, weicher Rand zeigt weitere
+  Raeume, der aktive Raum liegt immer im Sichtbaren (iPad quer: Woerter/Klang
+  lagen unter dem Rand). Auf Touch-Geraeten groessere Tippflaechen
+  (Formatknoepfe, Funken-Chips, Ort-Chips, Knoepfe, Schieberegler).
+
+**Offen (bewusst nicht in dieser Runde, mit Grund):**
+- Strg+Z nach „Loeschen“ stellt Verweise nicht wieder her und laesst das
+  Papierkorb-Buendel liegen (30-core.js `schrittMerken`/`putzen`) — braucht
+  eigene Runde mit Tests.
+- Sync-Verkehr: `stats.letzte`, `rich` und `staende` werden bei jedem Speichern
+  ganz uebertragen bzw. serialisiert (31-sync.js) — Umbau des Sync-Formats,
+  nur mit Desktop-Gegenstueck.
+- PBKDF2 wird beim Anmelden zweimal abgeleitet (29-profile.js) — Sicherheitscode,
+  nur mit eigenem Pruefplan anfassen.
+- EPUB-Saeuberung laesst SVG-`xlink:href` durch (55b-epub.js) — nur fuer fremde Buecher.
+- Drei visualViewport-Listener mit zwei CSS-Variablen fuer dasselbe; Esc schliesst
+  den Schreibraum auch waehrend einer IME-Eingabe; Tageswoerter zaehlen Umschreiben doppelt.
+- Tonnotiz: AudioContext erst nach getUserMedia; Doppeltipp auf Abspielen.
+- Goodnotes-Leser ohne Escape; Kalender-Grenzfaelle (29. Februar, ungenaues Todesjahr).
+
+Geprueft: Tests 472/472, Browser 1024×768 (Raumleiste, Einstellungen ueber
+Neustart, Kritzeln → Raumwechsel → Striche in der Datenbank). **Nicht auf dem iPad.**

@@ -658,6 +658,8 @@ function schreibtischMaler(canvas, optionen = {}) {
 
   function bild(jetzt) {
     if (!laeuft) return;
+    /* Ist die Leinwand weg (Raum verlassen, Seite neu gebaut), endet die Schleife selbst — nicht erst ueber den Beobachter (5.67). */
+    if (canvas.isConnected) canvas._warDran = true; else if (canvas._warDran) { laeuft = false; return; }
     /* Verdeckt (Schreibraum, Leser) oder Tab im Hintergrund: nicht malen, nur gelegentlich nachsehen */
     if ((typeof _sr !== 'undefined' && _sr) || (typeof _leser !== 'undefined' && _leser) || (typeof _smOffen !== 'undefined' && _smOffen) || (typeof _epub !== 'undefined' && _epub) || document.visibilityState === 'hidden') { letzte = jetzt; setTimeout(() => requestAnimationFrame(bild), 500); return; }
     const dt = Math.min(.05, (jetzt - letzte) / 1000 || .016); letzte = jetzt; t += dt;

@@ -38,11 +38,12 @@ function baueAmbiencePult(kompakt, statusNeu) {
     standNeu();
 
     const anAus = async (wert) => {
-      const m = { ...(D.einst.ambience || {}) };
-      if (wert > 0) m[a.id] = wert; else delete m[a.id];
       zeile.classList.toggle('an', wert > 0);
       zeile.classList.toggle('laedt', wert > 0 && !a.eigen);
       await audioFreigeben();
+      /* Erst jetzt lesen: waehrend der Freigabe kann ein anderer Regler schon etwas eingeschaltet haben. */
+      const m = { ...(D.einst.ambience || {}) };
+      if (wert > 0) m[a.id] = wert; else delete m[a.id];
       const fehler = await ambienceMischungAnwenden(m, (id, p) => {
         if (id !== a.id) return;
         balken.style.width = Math.round(p * 100) + '%';

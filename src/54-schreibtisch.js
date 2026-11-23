@@ -627,7 +627,8 @@ function baueUhr(e) {
     const d = new Date();
     if (!e.uhrTickt || document.hidden || begrenze(D.einst.lautstaerke, 0, 1, .5) <= 0) { uhrTickenAus(); return; }
     if (!_uhrTicken) uhrTickenAn();
-    if (d.getMinutes() === 0 && d.getSeconds() === 0 && typeof glocke === 'function') glocke();
+    /* Die Sekunde 0 kann der Zeitgeber verpassen; darum je Stunde genau einmal. */
+    if (d.getMinutes() === 0 && timer._glocke !== d.getHours() && typeof glocke === 'function') { timer._glocke = d.getHours(); glocke(); }
   }, 1000);
   /* Sofort anfangen, nicht erst nach einer Sekunde. */
   if (e.uhrTickt && !document.hidden) uhrTickenAn();

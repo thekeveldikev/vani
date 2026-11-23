@@ -186,6 +186,8 @@ async function baueSicherungsPaket({ mitMedien = true } = {}) {
    räumt vorher alles weg. Gibt zurück, was wirklich neu angekommen ist. */
 async function sicherungEinspielen(paket, modus) {
   if (modus === 'ersetzen') {
+    /* Erst ein Netz: die alten Texte als Rettung im kv-Speicher, bevor geleert wird. */
+    try { await dbPut('kv', { wann: Date.now(), docs: [...D.docs.values()] }, 'vorImport'); } catch (e) { throw new Error('Vor dem Ersetzen ließ sich keine Sicherung anlegen — es wurde nichts verändert.'); }
     await dbTu('docs', 'readwrite', (s) => s.clear());
     await dbTu('media', 'readwrite', (s) => s.clear());
     await dbTu('sync', 'readwrite', (s) => s.clear());
@@ -202,6 +204,8 @@ async function sicherungEinspielen(paket, modus) {
     /* Nur was wirklich in der Datenbank liegt, gilt als angekommen — sonst
        stuende es hier und waere nach dem naechsten Start spurlos weg. */
     if (!(await sicherSpeichern('docs', d))) { D.docs.delete(d.id); uebersprungen++; continue; }
+    /* Beim Sync anmelden — sonst haelt der naechste Abgleich das Dokument fuer geloescht. */
+    if (typeof syncDokumentGeaendert === 'function') { try { syncDokumentGeaendert(d, false); } catch (e) {} }
     neu.push(d);
     if (d.bild) benoetigteMedien.add(d.bild);
     if (d.skizze) benoetigteMedien.add(d.skizze);

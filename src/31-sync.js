@@ -373,6 +373,14 @@ async function syncUebernehmeAusY() {
          weiterschreiben können, statt ins Leere. */
       if (alt && syncGleich(ohneIntern(alt), ohneIntern(d))) continue;
       if (alt && _sync.nachzug && _sync.nachzug.has(id)) continue;   /* lokal gerade geändert: lokal gewinnt, kommt gleich nach */
+      /* Der Text ist hier gerade offen: nicht unter den Haenden austauschen (der naechste
+         Tastendruck schriebe den alten Stand zurueck). Die Fassung vom anderen Geraet
+         wird als Stand eingefroren; was hier geschrieben wird, gewinnt und geht hinueber. */
+      if (alt && typeof _sr !== 'undefined' && _sr && _sr.doc && _sr.doc.id === id && (d.text !== alt.text || d.rich !== alt.rich)) {
+        if (typeof standEinfrieren === 'function') { standEinfrieren(alt, 'Fassung vom anderen Gerät', d.text, d.rich); await sicherSpeichern('docs', alt); }
+        if (!_sync.offenGewarnt || _sync.offenGewarnt !== id) { _sync.offenGewarnt = id; toast('Dieser Text wurde auf dem anderen Gerät geändert. Die Fassung von dort liegt unter „Stände“.', 5200); }
+        continue;
+      }
       if (alt) {
         for (const k of Object.keys(alt)) if (!(k in d) && !SYNC_INTERNE_FELDER.has(k)) delete alt[k];
         for (const f of SYNC_INTERNE_FELDER) delete d[f];
@@ -399,7 +407,11 @@ async function syncUebernehmeAusY() {
       for (const id of [...D.docs.keys()]) {
         const d = D.docs.get(id);
         /* Nur löschen, was nicht währenddessen hier entstanden oder angefasst wurde */
-        if (!da.has(id) && !(d && (d.angelegt > start || d.geaendert > start)) && !(_sync.nachzug && _sync.nachzug.has(id))) { D.docs.delete(id); await dbDel('docs', id); veraendert++; }
+        if (!da.has(id) && !(d && (d.angelegt > start || d.geaendert > start)) && !(_sync.nachzug && _sync.nachzug.has(id))) {
+          /* Loeschen ist nie endgueltig — auch nicht, wenn es vom anderen Geraet kommt. */
+          try { if (d) { await sicherSpeichern('papierkorb', { id: uid(), wann: Date.now(), name: d.titel || (d.text || '').slice(0, 40) || d.typ, typ: d.typ, docs: [d], referenzen: [], herkunft: 'sync' }); if (typeof papierkorbZahlSetzen === 'function' && typeof _korbZahl === 'number') papierkorbZahlSetzen(_korbZahl + 1); } } catch (e) {}
+          D.docs.delete(id); await dbDel('docs', id); veraendert++;
+        }
       }
     }
     if (veraendert) _sync.fremdZuletzt = Date.now();

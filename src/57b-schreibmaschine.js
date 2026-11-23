@@ -126,7 +126,7 @@ function schreibmaschineOeffnen(startText) {
     try {
       const t = text.replace(/\s+$/, '');
       if (!t.trim()) { toast('Noch nichts getippt.'); return false; }
-      if (docId && D.docs.get(docId)) { const d = D.docs.get(docId); d.text = t; speichere(d); }
+      if (docId && D.docs.get(docId)) { const d = D.docs.get(docId); d.text = t; d.rich = richAusText(t); d.format = 'rich'; speichere(d); }
       else { const b = blattAusText('Getippt · ' + fmtDatum(Date.now()), t); docId = b.id; }
       abgelegt = true; geschriebenSeitAblage = 0; toast('Liegt bei den Blättern.', 1800); return true;
     } catch (e) { toast('Ablegen ging gerade nicht — der Text bleibt hier stehen.'); return false; }
@@ -136,7 +136,9 @@ function schreibmaschineOeffnen(startText) {
   const schliessen = async () => {
     if (schliesst) return; schliesst = true;
     try {
-      if (text.trim() && geschriebenSeitAblage > 0) { const ja = await frage('Das Getippte als Blatt ablegen?', { ja: 'Ablegen', nein: 'Verwerfen' }); if (ja) ablegen(); }
+      /* Der sichere Weg ist der Standard: nur ein ausdrueckliches „Verwerfen“ verwirft.
+         Escape oder Tippen daneben legt ab (vorher verwarf es den Text ohne Rueckweg). */
+      if (text.trim() && geschriebenSeitAblage > 0) { const weg = await frage('Das Getippte verwerfen? Sonst liegt es gleich bei den Blättern.', { ja: 'Verwerfen', nein: 'Ablegen', gefahr: true }); if (!weg) ablegen(); }
     } catch (e) {} finally { if (_smOffen === buehne) schliesst = false; }
     wegraeumen();
   };

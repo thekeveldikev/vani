@@ -182,7 +182,10 @@ async function ambienceDekodieren(id, a, eintrag, beiFortschritt, ohneAblage) {
   const ausDerAblage = !!blob._ausDerAblage;
   const roh = await blob.arrayBuffer();
   const puffer = await new Promise((res, rej) => {
-    const fertig = (p) => res(p);
+    const fertig = (p) => {
+      if (p && p.length * p.numberOfChannels * 4 > 180 * 1024 * 1024) { const f = new Error('Diese Aufnahme ist zu lang für den Speicher des Geräts — bitte auf höchstens etwa 10 Minuten kürzen.'); f.zuLang = true; rej(f); return; }
+      res(p);
+    };
     /* Beim Scheitern nicht nur sagen, DASS es nicht geht, sondern warum —
        und was hilft. Sonst sucht man den Fehler bei der Datei. */
     const schief = () => {
@@ -201,7 +204,7 @@ async function ambienceDekodieren(id, a, eintrag, beiFortschritt, ohneAblage) {
       if (p && typeof p.then === 'function') p.then(fertig, schief);
     } catch (e) { schief(e); }
   }).catch(async (fehler) => {
-    if (!ausDerAblage || ohneAblage) throw fehler;
+    if (!ausDerAblage || ohneAblage || (fehler && fehler.zuLang)) throw fehler;
     /* Das lag in der Ablage und laesst sich nicht abspielen — weg damit. */
     try { await dbDel('media', ambienceSchluessel(id)); } catch (e) {}
     return ambienceDekodieren(id, a, eintrag, beiFortschritt, true);
@@ -509,7 +512,8 @@ function ausklangStarten(minuten) {
     }
     /* die letzten 40 % werden hörbar leiser, davor bleibt es fast gleich */
     const kurve = anteil < .6 ? 1 - anteil * .18 : (1 - .108) * Math.pow(1 - (anteil - .6) / .4, 1.6);
-    setzeLautstaerke(start * Math.max(0, kurve));
+    /* Nur der Klang wird leiser — die gespeicherte Lautstaerke bleibt (vorher blieb sie nach einem Abbruch dauerhaft leise). */
+    if (typeof _audio !== 'undefined' && _audio && _audio.master) _audio.master.gain.setTargetAtTime(audioLautheitsKurve(start * Math.max(0, kurve)), _audio.ctx.currentTime, .4);
   }, 2000);
   _ausklang = { ende: von + dauer, start, takt };
   return ausklangRestMinuten();

@@ -106,14 +106,20 @@ async function speichereDateiBlob(datei) {
 }
 async function speichereKritzelei(canvas, alteId) {
   return new Promise((res) => {
-    canvas.toBlob(async (blob) => {
-      if (!blob) return res(null);
-      const id = alteId || uid();
-      await dbPut('media', blob, id);
-      if (typeof syncMediaGeaendert === 'function') syncMediaGeaendert(id);
-      loeseMedienURL(id);
-      res(id);
-    }, 'image/png');
+    /* Scheitert das Speichern (Speicher voll, Verbindung weg), kommt null zurueck —
+       vorher hing das Versprechen fuer immer und „Fertig“ tat nichts mehr. */
+    try {
+      canvas.toBlob(async (blob) => {
+        try {
+          if (!blob) return res(null);
+          const id = alteId || uid();
+          await dbPut('media', blob, id);
+          if (typeof syncMediaGeaendert === 'function') syncMediaGeaendert(id);
+          loeseMedienURL(id);
+          res(id);
+        } catch (e) { res(null); }
+      }, 'image/png');
+    } catch (e) { res(null); }
   });
 }
 

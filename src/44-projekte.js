@@ -63,7 +63,7 @@ function neuesProjekt() {
         class: 'knopf voll', onclick: () => {
           const t = name.value.trim();
           if (!t) return;
-          const p = neuDoc('projekt', { titel: t, art, ziel: parseInt(ziel.value, 10) || 0 });
+          const p = neuDoc('projekt', { titel: t, art, ziel: zielZahl(ziel.value) });
           neuDoc('kapitel', { parent: p.id, titel: 'Kapitel 1', ord: 0 });
           zu();
           location.hash = '#/projekt/' + p.id;
@@ -89,7 +89,7 @@ async function projektMenue(p, danach) {
     if (neu) { p.titel = neu; speichere(p); }
   } else if (wahl === 'ziel') {
     const neu = await eingabe({ titel: 'Wortziel (0 = keins)', wert: String(p.ziel || '') });
-    if (neu !== null) { p.ziel = parseInt(neu, 10) || 0; speichereStill(p); }
+    if (neu !== null) { p.ziel = zielZahl(neu); speichereStill(p); }
   } else if (wahl === 'lesen') {
     zeigeLeseansicht(p);
     return;
@@ -600,4 +600,10 @@ function projektGliederung(p) {
   const kasten = el('div', { class: 'modal gliederung-kasten' }, el('h2', {}, p.titel), liste,
     el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Schließen')));
   const zu = zeigeDeck(kasten);
+}
+
+/* Deutsche Zahlen: „80.000“, „80 000“, „80’000“ sind achtzigtausend (parseInt las 80). Pur. */
+function zielZahl(v) {
+  const n = parseInt(String(v == null ? '' : v).replace(/[.\s'’]/g, ''), 10);
+  return Number.isFinite(n) && n > 0 ? Math.min(n, 10000000) : 0;
 }

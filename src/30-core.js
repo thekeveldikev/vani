@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.66.0';
+const APP_VERSION = '5.67.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -131,6 +131,10 @@ function fastGleich(wort, suchwort) {
   if (wort.includes(suchwort)) return true;
   if (suchwort.length < 5) return false;
   const n = suchwort.length;
+  /* Bei hoechstens einem Fehler stimmt eine Haelfte genau — fehlt beide, kann es nichts werden.
+     Spart bei langen Texten Sekunden (vorher: ein Teilstueck je Zeichen und Dokument). */
+  const h = n >> 1;
+  if (!wort.includes(suchwort.slice(0, h)) && !wort.includes(suchwort.slice(h))) return false;
   for (let start = 0; start + n - 1 <= wort.length; start++) {
     const stueck = wort.slice(start, start + n);
     let fehler = 0;
@@ -248,7 +252,6 @@ const IK = {
   zuhause: '<path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/>',
   sticker: '<path d="M5 7a2 2 0 0 1 2-2h7.5L19 9.5V17a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"/><path d="M14.5 5v4.5H19"/><path d="M8.5 13.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8"/>',
   brief: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3.5 7l8.5 6.5L20.5 7"/><path d="M3.5 18l6-5.5M20.5 18l-6-5.5"/>',
-  rahmen: '<rect x="4" y="3" width="16" height="18" rx="1.5"/><rect x="7.5" y="6.5" width="9" height="10"/><path d="M9 21v1.5M15 21v1.5"/><path d="M10.5 12.5c1-1.5 2-1.5 3 0"/>',
   schreibtisch: '<path d="M3 14h18"/><path d="M5 14v6M19 14v6"/><path d="M8 14v-3.5a2 2 0 0 1 2-2h1"/><path d="M14 5.5 12.5 10h4L15 5.5h-1Z"/><path d="M13.2 10.5v3.5"/><circle cx="7" cy="10.5" r="1.2"/>',
   lasso: '<path d="M12 4c4.4 0 8 2 8 4.8S16.4 13.6 12 13.6 4 11.6 4 8.8 7.6 4 12 4Z" stroke-dasharray="3 2.2"/><path d="M8.5 13.2c-.6 2.2-.2 4.3 1.4 6.3"/><circle cx="10.4" cy="20" r="1.2"/>',
   gliederung: '<path d="M5 6h3M10 6h9"/><path d="M7 11h3M12 11h7"/><path d="M7 16h3M12 16h7"/><path d="M5 20h3M10 20h9"/>',
@@ -347,11 +350,25 @@ function dbAuf() {
          App-Abbruch und einen Neustart. */
       if (!d.objectStoreNames.contains('sync-pending')) d.createObjectStore('sync-pending');
     };
-    r.onsuccess = () => { _db = r.result; res(); };
+    r.onsuccess = () => {
+      _db = r.result;
+      /* Wird die Verbindung von aussen geschlossen (iOS, neue Version in anderem Tab), merkt sich das dbTu und oeffnet neu. */
+      try { _db.onversionchange = () => { try { _db.close(); } catch (e) {} _db = null; }; _db.onclose = () => { _db = null; }; } catch (e) {}
+      res();
+    };
     r.onerror = () => rej(r.error);
   });
 }
-function dbTu(store, modus, arbeit) {
+async function dbTu(store, modus, arbeit) {
+  if (!_db) await dbAuf();
+  try { return await dbTuEinmal(store, modus, arbeit); }
+  catch (e) {
+    if (!e || e.name !== 'InvalidStateError') throw e;
+    _db = null; await dbAuf();
+    return dbTuEinmal(store, modus, arbeit);
+  }
+}
+function dbTuEinmal(store, modus, arbeit) {
   return new Promise((res, rej) => {
     let tx, antwort;
     try {
@@ -379,7 +396,9 @@ const STANDARD_EINST = {
   goodnotesSync: false, fadenAbgewaehlt: false, raeume: null,
   stiftFarbe: '#2c251c', stiftDicke: 3.5, sperreNachMinuten: 10,
   ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95,
-  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null, sitzung: null, salonBriefe: [], pausenErinnerung: true, schreibmaschine: null, salonTon: false, salonAnrede: '', salonWelten: false
+  stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null, sitzung: null, salonBriefe: [], pausenErinnerung: true, schreibmaschine: null, salonTon: false, salonAnrede: '', salonWelten: false,
+  /* 5.67: fehlten hier — und wurden darum bei jedem Neustart verworfen */
+  v2: true, v2Bewegung: true, albumMarke: '', albumBildnis: false, albumWorte: [], fadenBibliothek: []
 };
 const D = {
   docs: new Map(),
@@ -398,6 +417,11 @@ function uebernehmeEinstellungen(quelle) {
   D.einst.groesse = begrenze(D.einst.groesse, 15, 26, 19);
   D.einst.lautstaerke = begrenze(D.einst.lautstaerke, 0, 1, .5);
   D.einst.tagesziel = Math.round(begrenze(D.einst.tagesziel, 0, 10000000, 0));
+  D.einst.v2 = D.einst.v2 !== false; D.einst.v2Bewegung = D.einst.v2Bewegung !== false;
+  D.einst.albumMarke = typeof D.einst.albumMarke === 'string' ? D.einst.albumMarke.slice(0, 80) : '';
+  D.einst.albumBildnis = D.einst.albumBildnis === true;
+  D.einst.albumWorte = Array.isArray(D.einst.albumWorte) ? D.einst.albumWorte.filter((w) => typeof w === 'string').map((w) => w.slice(0, 60)).slice(-400) : [];
+  if (!Array.isArray(D.einst.fadenBibliothek)) D.einst.fadenBibliothek = [];
   D.einst.stiftDicke = begrenze(D.einst.stiftDicke, 1, 24, 3.5);
   D.einst.stiftFarbe = /^#[0-9a-f]{6}$/i.test(D.einst.stiftFarbe || '') ? D.einst.stiftFarbe : '#2c251c';
   D.einst.stickerDicke = begrenze(D.einst.stickerDicke, 1, 24, 5);

@@ -7064,6 +7064,29 @@ body.liest-vor .an { opacity: 1; }
 @media (hover: hover) and (pointer: fine) { .sr-fund-leiste .knopf.klein:hover { opacity: 1; } }
 .sr-fund-wo { font-size: 12.5px; color: var(--blass); font-variant-numeric: tabular-nums; margin-left: 6px; }
 
+/* ===================== 5.67: Bedienung auf dem iPad =====================
+   1. Die Raumleiste: bei wenig Hoehe (iPad quer: 768 px) passten nicht alle
+      Raeume hinein; die Rolle scrollt zwar, verraet das aber nicht. Jetzt
+      werden die Knoepfe kompakter, und ein weicher Rand zeigt, dass es weitergeht.
+   2. Fingergerechte Tippflaechen (Apple: 44 pt) nur auf Touch-Geraeten —
+      am Rechner bleibt alles, wie es war. */
+@media (max-height: 860px) and (min-width: 701px) {
+  .raumrolle .lknopf { padding: 6px 0 5px; gap: 2px; }
+  .raumrolle .lknopf svg.ik { width: 21px; height: 21px; }
+  #leiste .wortmarke { margin-bottom: 8px; }
+}
+.raumrolle.mehr-unten { -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 34px), transparent); mask-image: linear-gradient(180deg, #000 calc(100% - 34px), transparent); }
+.raumrolle.mehr-oben { -webkit-mask-image: linear-gradient(0deg, #000 calc(100% - 34px), transparent); mask-image: linear-gradient(0deg, #000 calc(100% - 34px), transparent); }
+.raumrolle.mehr-oben.mehr-unten { -webkit-mask-image: linear-gradient(180deg, transparent, #000 34px, #000 calc(100% - 34px), transparent); mask-image: linear-gradient(180deg, transparent, #000 34px, #000 calc(100% - 34px), transparent); }
+@media (pointer: coarse) {
+  .format-knopf { min-width: 38px; min-height: 40px; }
+  .format-slider input[type="range"] { width: 96px; height: 32px; }
+  .funke-arten button { min-height: 38px; padding-top: 7px; padding-bottom: 7px; }
+  .ort-chip { min-height: 38px; }
+  .knopf.zart, .knopf.voll { min-height: 40px; }
+  .sl-sprung { min-width: 36px; min-height: 36px; }
+}
+
 /* =====================================================================
    GESTALTUNG v2 (5.63)
    Eine zweite Schicht ueber allem, geschaltet ueber html[data-v2="an"]

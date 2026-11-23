@@ -21,7 +21,7 @@ function sitzungFundsatz(vorher, nachher) {
 
 /* Wort-Diff zweier Texte (LCS auf Wörtern, für Schreibtexte bis ein paar tausend Wörter
    schnell genug). Ergebnis: Liste aus {art: 'gleich'|'neu'|'weg', text}. Pur. */
-function wortDiff(alt, neu, grenze = 6000) {
+function wortDiff(alt, neu, grenze = 2500) {
   const A = String(alt || '').split(/(\s+)/).filter((s) => s.length), B = String(neu || '').split(/(\s+)/).filter((s) => s.length);
   if (A.length * B.length > grenze * grenze) {
     /* Zu groß für die Matrix: nur Anfang und Ende vergleichen */

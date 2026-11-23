@@ -210,9 +210,20 @@ async function profilPasswortAendern() {
   });
 }
 
+let _profilVersteckt = 0;
 function profilAktivitaet() { _profilLetzteAktivitaet = Date.now(); }
 function profilStarteAutosperre() {
   for (const art of ['pointerdown', 'keydown', 'input']) document.addEventListener(art, profilAktivitaet, { passive: true });
+  /* iOS friert Zeitgeber im Hintergrund ein; darum beim Zurueckkommen nachrechnen, wie lange es weg war. */
+  if (!profilStarteAutosperre._sicht) {
+    profilStarteAutosperre._sicht = true;
+    document.addEventListener('visibilitychange', () => {
+      const min = D.einst.sperreNachMinuten;
+      if (document.visibilityState === 'hidden') { _profilVersteckt = Date.now(); try { spueleAlles(); } catch (e) {} return; }
+      if (min && _profilVersteckt && Date.now() - _profilVersteckt >= min * 60000) { _profilVersteckt = 0; location.reload(); }
+      _profilVersteckt = 0;
+    });
+  }
   clearInterval(_profilSperrtimer);
   _profilSperrtimer = setInterval(() => {
     const min = D.einst.sperreNachMinuten;

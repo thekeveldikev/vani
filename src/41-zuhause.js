@@ -12,8 +12,9 @@ function wiederFunde(jetzt = Date.now()) {
   const typen = new Set(['schnipsel', 'szene', 'seite', 'blatt', 'blase', 'faden', 'funkeln']);
   const funde = [];
   for (const d of D.docs.values()) {
-    const text = (d.text || '').trim();
-    if (!typen.has(d.typ) || text.length < 24 || jetzt - d.angelegt < 2 * 86400000) continue;
+    if (!typen.has(d.typ)) continue;
+    const text = (d.text || '').slice(0, 4000).trim();
+    if (text.length < 24 || jetzt - d.angelegt < 2 * 86400000) continue;
     const damals = new Date(d.angelegt);
     let art = d.typ === 'funkeln' ? 'FUNKELN' : d.typ === 'faden' ? 'AUS DEM FADEN' : 'LIEGEN GEBLIEBEN';
     if (/\n— [^\n]{3,120}(?:, S\. \d+|, Kapitel \d+|, [^\n,]{2,60})\s*$/.test(text) && text.length < 1200) art = 'EIN ZITAT';

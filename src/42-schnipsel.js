@@ -229,6 +229,8 @@ async function verwandleSchnipsel(s, neuZeichnen) {
     { text: 'Als Wort in die Kiste', icon: 'woerter', wert: 'wort' }
   ], 'Woraus soll das werden?');
   if (!ziel) return;
+  /* Ein Bild-Schnipsel wuerde als Blatt, Szene, Blase oder Wort sein Bild verlieren. */
+  if (s.bild && ziel !== 'seite' && !await frage('Das Bild kann nur auf eine Heftseite mit. Als ' + ({ blatt: 'Blatt', szene: 'Szene', blase: 'Blase', wort: 'Wort' }[ziel] || 'Text') + ' bleibt nur der Text — das Bild liegt dann im Papierkorb.', { ja: 'Trotzdem' })) return;
 
   if (ziel === 'blatt') {
     blattAusText('', s.text || '');
@@ -238,6 +240,8 @@ async function verwandleSchnipsel(s, neuZeichnen) {
     return;
   }
   if (ziel === 'wort') {
+    /* Ein Wort ist kurz. Ein langer Schnipsel wird nicht still auf 60 Zeichen gestutzt. */
+    if ((s.text || '').trim().length > 60 && !await frage('Der Schnipsel ist länger als ein Wort. Nur die ersten 60 Zeichen in die Kiste legen? Der ganze Schnipsel bleibt im Papierkorb.', { ja: 'Ja, kürzen' })) return;
     neuDoc('wort', { text: (s.text || '').slice(0, 60) });
     toast('Liegt in der Wortschatzkiste.');
     await loesche(s.id, true);

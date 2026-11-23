@@ -573,7 +573,8 @@ async function brettAlsBild(brett) {
   const rand = 60;
   const breite = Math.min(6000, Math.round(x2 - x1 + rand * 2));
   const hoehe = Math.min(6000, Math.round(y2 - y1 + rand * 2 + 54));
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  /* iOS malt hoechstens ~16 Megapixel — darueber kommt ein leeres Bild. Also die Dichte anpassen. */
+  const dpr = Math.max(.35, Math.min(2, window.devicePixelRatio || 1, Math.sqrt(14e6 / (breite * hoehe))));
   const c = document.createElement('canvas');
   c.width = Math.round(breite * dpr); c.height = Math.round(hoehe * dpr);
   const g = c.getContext('2d');

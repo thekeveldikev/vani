@@ -377,7 +377,10 @@ function baueRichEditor(doc, optionen = {}) {
   editor.innerHTML = sauberesRichHTML(doc.rich || richAusText(doc.text || ''));
   let startWorte = worte(doc.text || '');
   const sichern = entprellt(() => {
-    doc.rich = sauberesRichHTML(editor.innerHTML);
+    const rich = sauberesRichHTML(editor.innerHTML);
+    /* Unveraendert? Dann nichts anfassen (sonst sprang ein nur angesehener Text in „zuletzt“ nach oben). */
+    if (rich === doc.rich && doc.format === 'rich') return;
+    doc.rich = rich;
     doc.text = richReinerText(doc.rich).replace(/\n{3,}/g, '\n\n').trimEnd();
     doc.format = 'rich';
     speichere(doc); zaehleWorte(doc.id, doc.text);

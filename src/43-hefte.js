@@ -827,7 +827,9 @@ function kritzelZeichneStrich(ctx, s, breite) {
 
 async function starteKritzeln(blatt, seite) {
   if ($('.kritzelflaeche', blatt)) return;
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  /* iOS gibt einer Zeichenflaeche hoechstens ~16 Megapixel; lange Seiten bekommen darum weniger Dichte statt einer leeren Flaeche. */
+  const dprMax = Math.min(2, window.devicePixelRatio || 1);
+  let dpr = dprMax;
   const canvas = el('canvas', { class: 'kritzelflaeche' });
   const ctx = canvas.getContext('2d');
 
@@ -852,6 +854,7 @@ async function starteKritzeln(blatt, seite) {
     const b = Math.max(1, Math.round(cr.width)), h = Math.max(1, Math.round(cr.height));
     if (b === breite && h === hoehe) return false;
     breite = b; hoehe = h;
+    dpr = Math.max(.5, Math.min(dprMax, Math.sqrt(16e6 / (b * h))));
     canvas.width = Math.round(b * dpr);
     canvas.height = Math.round(h * dpr);
     return true;
@@ -962,8 +965,10 @@ async function starteKritzeln(blatt, seite) {
     }
     ctx.globalCompositeOperation = 'source-over';
   });
+  let kritzelVeraendert = false;
   const strichEnde = () => {
     clearTimeout(formTimer);
+    if (strich && werkzeug !== 'lasso') kritzelVeraendert = true;
     if (werkzeug === 'lasso') {
       if (lasso) { auswahl = stricheImLasso(striche, lasso); lasso = null; if (!auswahl.length) toast('Nichts in der Schlinge.'); }
       zieheAuswahl = null; alleszeichnen(); auswahlLeisteAuffrischen();
@@ -999,14 +1004,14 @@ async function starteKritzeln(blatt, seite) {
   const zurueckKnopf = el('button', {
     class: 'rundknopf kritzel-werkzeug', html: ik('zurueck'), title: 'Einen Schritt zurück', onclick: () => {
       if (!striche.length) return;
-      zurueckgelegt.push(striche.pop());
+      zurueckgelegt.push(striche.pop()); kritzelVeraendert = true;
       alleszeichnen(); knoepfeAuffrischen();
     }
   });
   const vorKnopf = el('button', {
     class: 'rundknopf kritzel-werkzeug', html: ik('rechts'), title: 'Schritt wiederherstellen', onclick: () => {
       if (!zurueckgelegt.length) return;
-      striche.push(zurueckgelegt.pop());
+      striche.push(zurueckgelegt.pop()); kritzelVeraendert = true;
       alleszeichnen(); knoepfeAuffrischen();
     }
   });
@@ -1024,7 +1029,7 @@ async function starteKritzeln(blatt, seite) {
     class: 'rundknopf kritzel-werkzeug', html: ik('kreuz'), title: 'Ausgewählte Striche löschen', onclick: () => {
       if (!auswahl.length) return;
       const menge = new Set(auswahl);
-      striche = striche.filter((s, i) => !menge.has(i)); auswahl = []; zurueckgelegt = [];
+      striche = striche.filter((s, i) => !menge.has(i)); auswahl = []; zurueckgelegt = []; kritzelVeraendert = true;
       alleszeichnen(); knoepfeAuffrischen(); auswahlLeisteAuffrischen();
     }
   });
@@ -1032,7 +1037,7 @@ async function starteKritzeln(blatt, seite) {
     class: 'rundknopf kritzel-werkzeug', html: ik('farbe'), title: 'Ausgewählte Striche in der Stiftfarbe', onclick: () => {
       if (!auswahl.length) return;
       const menge = new Set(auswahl);
-      striche = striche.map((s, i) => menge.has(i) && !s.radierer ? { ...s, farbe } : s);
+      striche = striche.map((s, i) => menge.has(i) && !s.radierer ? { ...s, farbe } : s); kritzelVeraendert = true;
       alleszeichnen();
     }
   });
@@ -1043,22 +1048,25 @@ async function starteKritzeln(blatt, seite) {
     class: 'rundknopf kritzel-werkzeug', html: ik('muell'), title: 'Alles löschen', onclick: async () => {
       if (!striche.length && !basis) { toast('Hier ist noch nichts.'); return; }
       if (!await frage('Die ganze Zeichnung von dieser Seite nehmen?', { ja: 'Alles löschen', gefahr: true })) return;
-      striche.push({ leeren: true });
+      striche.push({ leeren: true }); kritzelVeraendert = true;
       zurueckgelegt = [];
       alleszeichnen(); knoepfeAuffrischen();
       toast('Weg. Der Pfeil zurück holt es wieder.');
     }
   });
 
-  const beiWeg = () => aufraeumen();
+  /* Weggehen (anderer Raum) und Hintergrund sichern jetzt — vorher war alles Gezeichnete weg (5.67). */
+  const beiWeg = async () => { if (kritzelVeraendert) { try { await kritzelSichern(); } catch (e) {} } aufraeumen(); };
+  const beiVersteckt = () => { if (document.visibilityState === 'hidden' && kritzelVeraendert) kritzelSichern().catch(() => {}); };
   window.addEventListener('hashchange', beiWeg);
+  document.addEventListener('visibilitychange', beiVersteckt);
   const aufraeumen = () => {
     try { beobachter.disconnect(); } catch (e) {}
-    window.removeEventListener('resize', beiGroesse); window.removeEventListener('hashchange', beiWeg);
+    window.removeEventListener('resize', beiGroesse); window.removeEventListener('hashchange', beiWeg); document.removeEventListener('visibilitychange', beiVersteckt);
     leiste.remove(); canvas.remove();
   };
-  const fertigKnopf = el('button', {
-    class: 'knopf voll', style: 'padding:7px 14px', onclick: async () => {
+  const kritzelSichern = async () => {
+      kritzelVeraendert = false;
       const leer = !striche.length && !basis;
       /* Ein altes Bild ohne Striche bleibt als Grundlage erhalten — unter
          eigener Kennung, damit das fertige Bild darüber nicht die Grundlage
@@ -1083,6 +1091,10 @@ async function starteKritzeln(blatt, seite) {
         if (bildSicher && seiteSicher) dbDel('media', altBasis).catch(() => {});
         else seite.skizzeBasis = altBasis;   /* nichts verloren: die alte Grundlage bleibt */
       }
+  };
+  const fertigKnopf = el('button', {
+    class: 'knopf voll', style: 'padding:7px 14px', onclick: async () => {
+      await kritzelSichern();
       aufraeumen();
       if (altesBild) {
         altesBild.style.display = '';

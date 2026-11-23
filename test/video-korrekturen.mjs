@@ -451,3 +451,104 @@ test('5.66: die Dielenuhr geht weiter', async () => {
   assert.match(d, /if \(!wrap\.isConnected\) \{ clearInterval\(t\); return; \}/, 'der Zeitgeber raeumt sich weg');
   assert.match(orte, /orteUhrLaufen\(wrap\)/);
 });
+
+/* ===== 5.67: grosse Bugjagd ueber die ganze App ===== */
+
+test('5.67: Einstellungen ueberleben den Neustart (v2, Bewegung, Album, Faden-Bibliothek)', async () => {
+  const k = await frisch();
+  k.uebernehmeEinstellungen({ v2: false, v2Bewegung: false, albumMarke: 'f1', albumBildnis: true, albumWorte: ['Ahnin', 7], fadenBibliothek: [{ x: 1 }] });
+  assert.equal(k.D.einst.v2, false);
+  assert.equal(k.D.einst.v2Bewegung, false);
+  assert.equal(k.D.einst.albumMarke, 'f1');
+  assert.equal(k.D.einst.albumBildnis, true);
+  assert.deepEqual([...k.D.einst.albumWorte], ['Ahnin'], 'nur Woerter, keine Zahlen');
+  assert.equal(k.D.einst.fadenBibliothek.length, 1);
+  /* Jeder gesetzte D.einst-Schluessel hat einen Standard — sonst wirft die Uebernahme ihn beim Start weg. */
+  const fs = await import('node:fs');
+  const quellen = fs.readdirSync(join(wurzel, 'src')).filter((f) => f.endsWith('.js')).map((f) => lies('src/' + f)).join('\n');
+  const gesetzt = new Set([...quellen.matchAll(/D\.einst\.(\w+)\s*(?:=[^=]|\|\|=|\?\?=)/g)].map((m) => m[1]));
+  const core = lies('src/30-core.js'), std = core.slice(core.indexOf('const STANDARD_EINST'), core.indexOf('const D = {'));
+  const bekannt = new Set([...std.matchAll(/(\w+)\s*:/g)].map((m) => m[1]));
+  const fehlt = [...gesetzt].filter((s) => s !== 'klang' && !bekannt.has(s));
+  assert.deepEqual(fehlt, [], 'Einstellungen ohne Standardwert gehen beim Neustart verloren');
+});
+
+test('5.67: fehlertolerante Suche bleibt richtig, wird aber nicht mehr teuer', async () => {
+  const k = await frisch();
+  assert.equal(k.fastGleich('der kartoffelsalat war kalt', 'kartofelsalat'.padEnd(13, 't')), false);
+  assert.equal(k.fastGleich('der kartoffelsalat war kalt', 'kartoffelsalaz'), true, 'ein Tippfehler am Ende');
+  assert.equal(k.fastGleich('der kartoffelsalat war kalt', 'xartoffelsalat'), true, 'ein Tippfehler am Anfang');
+  assert.equal(k.fastGleich('ganz anderer text ohne treffer', 'kartoffelsalat'), false);
+  const lang = 'abcdefghij '.repeat(60000);
+  const t0 = Date.now(); k.fastGleich(lang, 'kartoffelsalat'); assert.ok(Date.now() - t0 < 150, 'langer Text ohne Treffer ist schnell');
+});
+
+test('5.67: Wortziel versteht deutsche Tausenderpunkte', async () => {
+  const k = await frisch();
+  assert.equal(k.zielZahl('80.000'), 80000);
+  assert.equal(k.zielZahl('80 000'), 80000);
+  assert.equal(k.zielZahl('2500'), 2500);
+  assert.equal(k.zielZahl(''), 0);
+  assert.equal(k.zielZahl('abc'), 0);
+});
+
+test('5.67: Daten — Import meldet sich beim Sync, Sync loescht in den Papierkorb, offener Text bleibt', () => {
+  const an = lies('src/49b-ankommen.js'), fh = lies('src/49-feinheiten.js'), sy = lies('src/31-sync.js');
+  assert.match(an, /syncDokumentGeaendert\(d, false\)/);
+  assert.match(fh, /syncDokumentGeaendert\(d, false\)/);
+  assert.match(an, /'vorImport'/, 'vor dem Ersetzen ein Netz');
+  assert.match(sy, /herkunft: 'sync'/, 'Loeschen vom anderen Geraet geht in den Papierkorb');
+  assert.match(sy, /_sr\.doc\.id === id && \(d\.text !== alt\.text \|\| d\.rich !== alt\.rich\)/, 'offener Text wird nicht unter den Haenden ersetzt');
+  assert.match(sy, /standEinfrieren\(alt, 'Fassung vom anderen Gerät', d\.text, d\.rich\)/);
+});
+
+test('5.67: Speicher — tote Verbindung wird neu geoeffnet, Bildfehler haengen nicht', () => {
+  const c = lies('src/30-core.js'), m = lies('src/38-media.js');
+  assert.match(c, /if \(!e \|\| e\.name !== 'InvalidStateError'\) throw e;\s*_db = null; await dbAuf\(\);/);
+  assert.match(c, /_db\.onversionchange = /);
+  assert.match(m, /\} catch \(e\) \{ res\(null\); \}\s*\}, 'image\/png'\);/, 'Speicherfehler im toBlob loest auf');
+});
+
+test('5.67: Schreiben — Kritzeln, Schreibmaschine, Ansehen ohne Aendern, Rettung', () => {
+  const h = lies('src/43-hefte.js'), sm = lies('src/57b-schreibmaschine.js'), sr = lies('src/45-schreibraum.js'), rt = lies('src/35-richtext.js'), si = lies('src/32-sicherheit.js');
+  assert.match(h, /const beiWeg = async \(\) => \{ if \(kritzelVeraendert\) \{ try \{ await kritzelSichern\(\); \} catch \(e\) \{\} \} aufraeumen\(\); \};/, 'Weggehen sichert die Striche');
+  assert.match(h, /document\.addEventListener\('visibilitychange', beiVersteckt\)/, 'Hintergrund sichert');
+  assert.match(h, /Math\.sqrt\(16e6 \/ \(b \* h\)\)/, 'Pixelgrenze fuer iOS');
+  assert.match(sm, /\{ ja: 'Verwerfen', nein: 'Ablegen', gefahr: true \}\); if \(!weg\) ablegen\(\);/, 'Escape legt ab, verwirft nicht');
+  assert.match(sm, /d\.rich = richAusText\(t\); d\.format = 'rich';/, 'zweites Ablegen auch formatiert');
+  assert.match(sr, /if \(doc\.text === ta\.value\) return;/);
+  assert.match(rt, /if \(rich === doc\.rich && doc\.format === 'rich'\) return;/);
+  assert.match(sr, /_sr\.rettung\.loesen\(\)/, 'der Rettungs-Spueler wird ausgetragen');
+  assert.match(si, /ohneLeer\(doc\.text\) === ohneLeer\(r\.text\)/, 'kein grundloses „Da war noch etwas“');
+});
+
+test('5.67: Klang — Ausklang speichert nicht, Freigabe nur einmal gleichzeitig, zu lange Aufnahmen', () => {
+  const a = lies('src/53-ambience.js'), au = lies('src/50-audio.js'), kr = lies('src/51-klangraum.js');
+  const ausklang = a.slice(a.indexOf('function ausklangStarten'), a.indexOf('_ausklang = { ende'));
+  assert.ok(!/setzeLautstaerke\(start \* /.test(ausklang), 'der Ausklang ueberschreibt die gespeicherte Lautstaerke nicht');
+  assert.match(au, /if \(_audioFreigabeLaeuft\) return _audioFreigabeLaeuft/);
+  assert.match(a, /f\.zuLang = true/);
+  assert.match(a, /\(fehler && fehler\.zuLang\)\) throw fehler;/, 'eine zu lange eigene Aufnahme wird nicht weggeworfen');
+  assert.ok(kr.indexOf('await audioFreigeben();\n      /* Erst jetzt lesen') > 0, 'Mischung erst nach der Freigabe lesen');
+});
+
+test('5.67: Bedienung — Raumleiste zeigt den aktiven Raum, Tippflaechen auf Touch, Raumfehler ohne leere Seite', () => {
+  const css = lies('src/10-style.css'), r = lies('src/40-router.js');
+  const vorV2 = css.slice(0, css.indexOf('GESTALTUNG v2 (5.63)'));
+  assert.match(vorV2, /@media \(max-height: 860px\) and \(min-width: 701px\)/);
+  assert.match(vorV2, /\.raumrolle\.mehr-unten \{/);
+  assert.match(vorV2, /@media \(pointer: coarse\) \{\s*\.format-knopf \{ min-width: 38px; min-height: 40px; \}/);
+  assert.match(r, /Dieser Raum hakt gerade\. Deine Texte sind sicher\./);
+  assert.match(r, /const gleicherRaum = haupt\.dataset\.ansicht === location\.hash;/, 'Leseposition bleibt beim Neuzeichnen');
+  assert.match(r, /Der aktive Raum liegt in der Rolle immer im Sichtbaren/);
+});
+
+test('5.67: Raeume — Schnipsel, Karteikarten, Cluster-Export, Uhr, Malschleifen', () => {
+  const s = lies('src/42-schnipsel.js'), kk = lies('src/47b-karteikarten.js'), cl = lies('src/46-cluster.js'), st = lies('src/54-schreibtisch.js');
+  assert.match(s, /Das Bild kann nur auf eine Heftseite mit/);
+  assert.match(s, /Der Schnipsel ist länger als ein Wort/);
+  assert.match(kk, /e\.target\.closest\('button, input, textarea, select, \[contenteditable\]'\) && e\.target !== karte\) return;/);
+  assert.match(cl, /Math\.sqrt\(14e6 \/ \(breite \* hoehe\)\)/);
+  assert.match(st, /timer\._glocke !== d\.getHours\(\)/);
+  for (const f of ['src/54b-schreibtisch-malerei.js', 'src/56b-salon-malerei.js']) assert.match(lies(f), /if \(canvas\.isConnected\) canvas\._warDran = true; else if \(canvas\._warDran\) \{ laeuft = false; return; \}/, f);
+});

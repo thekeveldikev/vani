@@ -700,6 +700,7 @@ async function holeFaden() {
     D.docs.set(d.id, d);
     D.stats.letzte[d.id] = worte(d.text || '');
     if (!(await sicherSpeichern('docs', d))) { D.docs.delete(d.id); continue; }
+    if (typeof syncDokumentGeaendert === 'function') { try { syncDokumentGeaendert(d, false); } catch (e) {} }
     dazu++;
   }
   speichereStats();

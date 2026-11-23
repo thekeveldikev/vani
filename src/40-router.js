@@ -53,6 +53,13 @@ async function oeffneMobileRaumwahl() {
 
 function aktualisiereLeiste(aktiv) {
   $$('#leiste .lknopf').forEach((k) => k.classList.toggle('an', k.dataset.raum === aktiv));
+  /* Der aktive Raum liegt in der Rolle immer im Sichtbaren (iPad quer: sonst unter dem Rand). */
+  const rolle = $('#leiste .raumrolle'), an = rolle && $('.lknopf.an', rolle);
+  if (an && rolle.scrollHeight > rolle.clientHeight + 4) {
+    const r = an.getBoundingClientRect(), q = rolle.getBoundingClientRect();
+    if (r.top < q.top || r.bottom > q.bottom) rolle.scrollTop += r.top < q.top ? r.top - q.top - 8 : r.bottom - q.bottom + 8;
+    rolle.dispatchEvent(new Event('scroll'));
+  }
   const mehr = $('#leiste .mobile-mehr');
   if (!mehr) return;
   const istMehr = aktiv === 'feinheiten' || !MOBILE_HAUPTRAEUME.includes(aktiv);
@@ -72,6 +79,10 @@ function baueLeiste() {
   /* Am Rechner bleibt die vollständige Raumrolle. Am Handy zeigt CSS daraus
      nur die drei Hauptziele; Suche und Mehr bilden die beiden festen Plätze. */
   const rolle = el('div', { class: 'raumrolle' });
+  /* Zeigt am Rand, ob ueber oder unter dem Sichtbaren noch Raeume liegen (die Rolle hat keinen sichtbaren Balken). */
+  const rolleRand = () => { rolle.classList.toggle('mehr-oben', rolle.scrollTop > 4); rolle.classList.toggle('mehr-unten', rolle.scrollTop + rolle.clientHeight < rolle.scrollHeight - 4); };
+  rolle.addEventListener('scroll', rolleRand, { passive: true });
+  requestAnimationFrame(() => { const an = rolle.querySelector('.lknopf.an'); if (an && an.scrollIntoView) { try { an.scrollIntoView({ block: 'nearest' }); } catch (e) {} } rolleRand(); });
   for (const r of aktiveRaeume()) {
     rolle.append(el('button', {
       class: 'lknopf' + (MOBILE_HAUPTRAEUME.includes(r.id) ? ' mobil-haupt' : ''), 'data-raum': r.id,
@@ -101,9 +112,19 @@ function zeichne() {
     aktualisiereLeiste(aktiv0);
     return;
   }
+  /* Wird derselbe Raum neu gezeichnet (nach „Fertig“, nach Sync), bleibt die Leseposition. */
+  const gleicherRaum = haupt.dataset.ansicht === location.hash;
+  const altScroll = gleicherRaum ? haupt.scrollTop : 0;
   haupt.innerHTML = '';
   haupt.scrollTop = 0;
-  fn(haupt, arg);
+  try { fn(haupt, arg); }
+  catch (e) {
+    try { if (typeof protokollSchreiben === 'function') protokollSchreiben('raum', String(e && e.message || e)); } catch (x) {}
+    haupt.innerHTML = '';
+    haupt.append(el('div', { class: 'karte', style: 'margin:24px auto;max-width:520px;text-align:center' }, el('p', { class: 'serif', style: 'font-size:18px' }, 'Dieser Raum hakt gerade. Deine Texte sind sicher.'), el('button', { class: 'knopf voll', onclick: () => { location.hash = '#/'; } }, 'Nach Hause')));
+  }
+  haupt.dataset.ansicht = location.hash;
+  if (altScroll) { haupt.scrollTop = altScroll; requestAnimationFrame(() => { if (haupt.scrollTop < altScroll) haupt.scrollTop = altScroll; }); }
   /* Räume als Orte: Kulisse davor, Haut anlegen, Tür aufgehen lassen (wenn eingeschaltet) */
   if (typeof orteAnwenden === 'function') { try { orteAnwenden(haupt, raum); } catch (e) {} }
   const aktiv = { heft: 'hefte', projekt: 'projekte', brett: 'cluster' }[raum] || raum;

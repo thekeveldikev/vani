@@ -23,7 +23,7 @@ const SPOTLIGHT_BEFEHLE = () => [
   { text: 'Suche', unter: 'die große Suche mit Gruppen', icon: 'suche', tu: () => { if (typeof oeffneSuche === 'function') oeffneSuche(); } },
   { text: 'Tastaturkürzel', unter: 'Übersicht', icon: 'feinheiten', tu: () => kuerzelZeigen() },
   { text: 'Anleitung', unter: 'alles, was VANI kann', icon: 'lesen', tu: () => { if (typeof oeffneAnleitung === 'function') oeffneAnleitung(); } },
-  { text: 'Sicherung in die Zwischenablage', unter: 'alles, ohne Datei', icon: 'sichern', tu: () => { if (typeof inZwischenablageSichern === 'function') inZwischenablageSichern(); } }
+  { text: 'Sicherung in die Zwischenablage', unter: 'alles, ohne Datei', icon: 'schild', tu: () => { if (typeof inZwischenablageSichern === 'function') inZwischenablageSichern(); } }
 ].filter((b) => b.text);
 
 /* Treffer zu einer Eingabe: Titel- und Textsuche, pro Dokument ein Eintrag. Pur bis auf D.docs. */
@@ -91,7 +91,7 @@ function spotlightOeffnen() {
     liste.innerHTML = '';
     eintraege.forEach((e, i) => {
       const b = el('button', { class: 'spotlight-eintrag' + (i === wahl ? ' an' : ''), onclick: () => { wahl = i; ausfuehren(); } },
-        el('span', { class: 'sp-icon', html: ik(e.befehl ? e.befehl.icon || 'stern' : SUCH_ICON(e.d.typ)) }),
+        el('span', { class: 'sp-icon', html: ik(e.befehl ? e.befehl.icon || 'pin' : SUCH_ICON(e.d.typ)) }),
         el('span', { class: 'sp-text' }, el('b', {}, e.befehl ? e.befehl.text : (e.d.titel || (e.text || '').split('\n')[0] || 'Ohne Titel').slice(0, 70)), el('small', {}, e.befehl ? e.befehl.unter || '' : e.gruppe)));
       b.addEventListener('pointerenter', () => { wahl = i; [...liste.children].forEach((c, j) => c.classList.toggle('an', j === wahl)); zeigeVorschau(); });
       liste.append(b);

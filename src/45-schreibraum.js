@@ -151,6 +151,8 @@ function oeffneSchreibraum(docId) {
   }
 
   const sichern = istRich ? richPaket.sichern : entprellt(() => {
+    /* Unveraendert? Dann nichts anfassen — blosses Oeffnen und Schliessen setzt kein „geaendert“ mehr (5.67). */
+    if (doc.text === ta.value) return;
     doc.text = ta.value;
     if (typeof klangkarteMerken === 'function') klangkarteMerken(doc);
     speichere(doc);
@@ -284,6 +286,7 @@ function schliesseSchreibraum(zurueck) {
   const sitzungOffen = typeof _sitzung !== 'undefined' && _sitzung && !_sr.sprint;
   if (typeof vorlesenStopp === 'function') vorlesenStopp();
   _sr.sichern && _sr.sichern.sofort();
+  if (_sr.rettung) { if (_sr.rettung.haengt && _sr.rettung.haengt()) _sr.rettung.sofort(); if (_sr.rettung.loesen) _sr.rettung.loesen(); }
   if (_sr.titelSichern) { _sr.titelSichern.sofort(); if (_sr.titelSichern.loesen) _sr.titelSichern.loesen(); }
   if (_sr.sichern && _sr.sichern.loesen) _sr.sichern.loesen();
   document.removeEventListener('selectionchange', _sr.spiegelBeiAuswahl);
@@ -684,7 +687,8 @@ function sucheErsetze() {
     springLeiste.classList.toggle('aus', !suchFeld.value.trim() || srFundZahl(suchFeld.value.trim()) === 0);
     return n;
   };
-  suchFeld.addEventListener('input', zaehleUndZeigen);
+  /* Erst zaehlen, wenn die Haende kurz ruhen — bei langen Texten war jeder Anschlag ein ganzer Suchlauf. */
+  suchFeld.addEventListener('input', entprellt(zaehleUndZeigen, 160));
   /* Enter im Suchfeld springt weiter — nicht ersetzen. Ersetzen ist ein Knopf,
      und das soll es auch bleiben: es ist der Schritt, der etwas kaputtmachen kann. */
   suchFeld.addEventListener('keydown', (ev) => {

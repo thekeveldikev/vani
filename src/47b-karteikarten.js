@@ -88,6 +88,9 @@ function wortkisteAbfragen(kistenId, titel) {
     };
     karte.addEventListener('click', () => { if (karten[nr]) { umgedreht = !umgedreht; karte.classList.toggle('umgedreht', umgedreht); } });
     const tasten = (e) => {
+      /* Liegt der Fokus auf einem Knopf oder Feld, gehoert die Taste dorthin; liegt ein anderer Dialog oben, auch. */
+      if (e.target && e.target.closest && e.target.closest('button, input, textarea, select, [contenteditable]') && e.target !== karte) return;
+      if (document.querySelectorAll('.schleier').length > 1) return;
       if (e.key === ' ') { e.preventDefault(); karte.click(); }
       else if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); bewerte(true); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); bewerte(false); }

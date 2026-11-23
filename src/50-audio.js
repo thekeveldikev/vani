@@ -105,7 +105,13 @@ async function _audioMedienBruecke() {
   try { return await _audioBrueckeLaeuft; } finally { _audioBrueckeLaeuft = null; }
 }
 
-async function audioFreigeben({ neu = false, probe = false } = {}) {
+let _audioFreigabeLaeuft = null;
+function audioFreigeben(opt = {}) {
+  if (_audioFreigabeLaeuft) return _audioFreigabeLaeuft.then((ok) => { if (ok && opt.probe) audioProbe(); return ok; });
+  _audioFreigabeLaeuft = audioFreigebenEcht(opt).finally(() => { _audioFreigabeLaeuft = null; });
+  return _audioFreigabeLaeuft;
+}
+async function audioFreigebenEcht({ neu = false, probe = false } = {}) {
   if (!audioUnterstuetzt()) { _audioFehler = 'Dieser Browser unterstützt Web Audio nicht.'; return false; }
   try {
     if (neu || !_audio || _audio.ctx.state !== 'running' || _audioMussNeu) await _audioMedienBruecke();

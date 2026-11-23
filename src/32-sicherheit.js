@@ -124,7 +124,8 @@ function rettungPruefen() {
   if (!r || !r.text.trim()) return null;
   const doc = r.docId ? D.docs.get(r.docId) : null;
   /* Alles in Ordnung: der Text steht schon so im Hauptspeicher */
-  if (doc && String(doc.text || '').trim() === r.text.trim()) { rettungLoeschen(); return null; }
+  const ohneLeer = (t) => String(t || '').replace(/\s+/g, '');
+  if (doc && ohneLeer(doc.text) === ohneLeer(r.text)) { rettungLoeschen(); return null; }
   /* Auch in Ordnung: der Hauptspeicher ist neuer (woanders weitergeschrieben) */
   if (doc && (doc.geaendert || 0) > r.wann + 2000 && String(doc.text || '').length >= r.text.length) { rettungLoeschen(); return null; }
   return { rettung: r, doc };
