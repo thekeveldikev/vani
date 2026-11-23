@@ -3044,3 +3044,90 @@ checkt mit CRLF aus. **Falle:** In Tests nie ein festes `\n` in `indexOf` — ei
 Regex mit `\s*` nehmen. Vor dem Push pruefen: Kopie mit CRLF anlegen und
 `node --test` darin laufen lassen. Der Workflow startet nur bei einer Aenderung an
 `package.json` — ein gescheitertes Release braucht darum eine neue Versionsnummer.
+
+## 5.68.0 — Sicherung nach draussen, Manuskript, Randnotizen, Etiketten, Synonyme, Auftritte (23. November 2026)
+
+Aus `BRAINSTORM-5.67.md` gebaut, dazu das, was 5.67 offen liess. Danach eine
+Pruefrunde (ein Pruefer liest alles, jeder Fund am Code bestaetigt) und eine
+Browserpruefung bei 1024×768 und 768×1024.
+
+**Was 5.67 offen liess — erledigt:**
+- **Strg+Z nach dem Loeschen** holt jetzt auch die Verweise zurueck (`quelle`,
+  `projektRef`, `parent`): `loesche` merkt den Schritt NACH `putzen`, mit allen
+  betroffenen Dokumenten. Der Schritt kennt sein Papierkorb-Buendel
+  (`schritt.korb`): Zuruecknehmen nimmt es aus dem Korb, Wiederholen legt es mit
+  dem JETZIGEN Stand wieder hinein (zwischendurch Geschriebenes geht nicht verloren).
+- **Speichern und Sync schlanker:** Staende (bis 20 Volltexte) liegen im eigenen
+  Store `staende` (IndexedDB Version 5). `sicherSpeichern('docs')` schreibt das
+  Dokument ohne sie (interner Name `docs-roh`) und die Staende nur, wenn sich
+  ihre Kennung (Anzahl + Summe aus Zeit und Laenge) aendert. `ladeAlles` liest
+  Schluessel und Werte in EINER Transaktion; scheitert das Lesen, werden die
+  Staende in der Sitzung nicht ueberschrieben (`_staendeLesefehler`). Der Sync
+  serialisiert unveraenderte Staende nicht neu (`_syncStaendeKennung`), die
+  Statistik geht hoechstens alle 45 s hinaus (Drossel, nicht nur Entprellung).
+  Faellt das Schreiben der Staende aus, wird der Text trotzdem gesichert.
+- **Passwort einmal abgeleitet:** `profilLeiteAb` macht einmal PBKDF2 (256 Bit),
+  daraus der AES-Schluessel (importKey raw) und der Pruefwert
+  `v2_` + SHA-256(Bits + Etikett). **Sicherheitsfund:** Der alte Pruefwert war
+  das Schluesselmaterial selbst (im localStorage lesbar). Alte Profile werden beim
+  Anmelden umgestellt; geprueft wird gegen beide Formen. Folge: Ein umgestelltes
+  Profil laesst sich mit einer Fassung VOR 5.68 nicht mehr oeffnen.
+- Kleinigkeiten: Escape waehrend IME-Eingabe, Tonnotiz (AudioContext/Doppeltipp),
+  EPUB-SVG (`animate`, `set`, `use`, `javascript:`), Goodnotes-Leser mit Escape,
+  Lesestapel-Cover-Fehler, `teileDatei` (charset nur fuer Text; Binaeres nie in
+  die Zwischenablage).
+
+**Neu:**
+- **Sicherung nach draussen:** Ampel unten auf Zuhause (gruen ≤ 7 Tage, gelb ≤ 14,
+  rot) mit „Jetzt sichern“ und dem Speicherstand ab 70 %. Alle 7 Tage einmal
+  eine Erinnerung mit Teilen-Knopf (`sicherungErinnern`, nicht im Schreibraum),
+  ab 80 % Speicher eine Warnung pro Tag (`speicherWarnen`). „Alles sicher“ zeigt
+  „Ausser Haus gesichert“.
+- **Manuskript** (`src/44c-manuskript.js`, ohne Bibliothek): Word (.docx),
+  PDF in Normseiten (Courier 12, 60 Anschlaege × 30 Zeilen, Kopfzeile, Seitenzahl,
+  Kapitel auf rechten Seiten, Titelblatt mit Wort- und Seitenzahl) und EPUB 3.
+  Im Hinausgeben-Dialog des Projekts; die Leseansicht hat „Als E-Book“ und
+  „Als PDF“. Name aufs Manuskript: `D.einst.manuskriptName`.
+- **Randnotizen** (`src/35b-randnotizen.js`): Stelle markieren → „Notiz“ in der
+  Formatleiste. Im Text nur `<span data-notiz="n…">` (die einzige Kennung, die die
+  Saeuberung durchlaesst, streng geprueft), die Notiz in `doc.randnotizen`. Breit:
+  Notizen am Rand neben der Stelle; schmal: Punkt + Antippen. Exporte lassen sie
+  weg (Markdown auf Wunsch). Doppelte Kennungen nach Kopieren und Markierungen
+  ohne Notiz werden aufgeloest.
+- **Etiketten** in allen Raeumen (Szenen, Blaetter, Schnipsel, Hefte): Menue
+  „Etiketten …“, Chips an den Karten, Suche mit `#Etikett` (Anfang genuegt,
+  Leerzeichen zaehlen nicht, unbekanntes `#` bleibt Suchtext).
+- **Synonyme offline** (`src/35c-synonyme.js`, Daten `synonyme/openthesaurus.txt`,
+  OpenThesaurus, LGPL 2.1, Lizenz und Quelle in `synonyme/LIZENZ.txt`): Ein Wort
+  markieren (iPad: lange druecken) → kleiner Knopf UNTER der Markierung (oben liegt
+  das iOS-Menue) → Gruppen, Antippen ersetzt (mit Strg+Z zuruecknehmbar). Die 4 MB
+  werden erst beim ersten Nachschlagen geholt und in `kv/synonyme` behalten,
+  der Service Worker legt sie nicht zusaetzlich ab. Abschaltbar im Schreibraum.
+  **Der Ordner muss ueberall freigegeben sein:** `server.js`, `sync-server/server.mjs`,
+  `desktop/main.cjs` (`OEFFENTLICHE_ORDNER`), `package.json` files, `copy-vani.mjs`.
+- **Figuren-Auftritte** (Album, Knopf „Auftritte“ am Figurenblatt): in welchen
+  Szenen und Blaettern die Figur vorkommt (Name, Vorname ohne Anrede/Artikel,
+  Spitznamen aus „Nennung“), Reihenfolge der Geschichte, „zuletzt in der
+  Geschichte“ und „zuletzt darueber geschrieben“.
+
+**Pruefrunde, behoben:** Synonym-Ordner war in Desktop und lokalem Server
+gesperrt (403); `force-cache` hielt einen alten Fehler fest; Synonym-Knopf lag
+hinter dem Schreibraum (z-index); Randnotiz-Rand erzeugte eine waagrechte
+Laufleiste (Laufleiste des Behaelters nicht abgezogen); PDF-Kopfzeile brach bei
+langem Titel mit Klammer den Inhaltsstrom (erst escapen, dann kuerzen); ein
+geloeschtes Dokument konnte nach dem Warten auf die Staende zurueckkommen;
+„Mira Stern“ zaehlte doppelt; Etiketten mit Leerzeichen waren nicht auffindbar;
+Notiz in Notiz moeglich; DOCX liess Kapitel 1 auf Seite 3 beginnen; PDF-Titel
+in den Eigenschaften jetzt UTF-16; ungueltige XML-Zeichen; gueltige EPUB-UUID.
+
+**Bewusst offen:** Sync-Format `rich` als Y.Text (braucht das Desktop-Gegenstueck);
+PDF kennt nur WinAnsi (ł, č, Emoji werden „?“); Thesaurus-Index kostet beim
+ersten Nachschlagen ~0,2 s.
+
+Geprueft: Tests 481/481 (9 neue in `test/video-korrekturen.mjs`), Hosting-Tests,
+Browser: Profil-Umstellung, Staende-Store ueber Neuladen, Loeschen/Zurueck/
+Wiederholen mit Verweis und Korb, Synonyme (Laden, Knopf, Ersetzen, gespeichert),
+Randnotizen (setzen, Rand, schmal + Antippen, loesen), Etiketten-Suche,
+Auftritte-Fenster, Manuskript: PDF mit pdf.js gerendert, DOCX/EPUB-XML wohlgeformt.
+**Nicht geprueft:** DOCX in Word/Pages, EPUB in Apple Books/epubcheck, alles auf
+dem iPad (Lange-Druecken-Menue, Tastatur, Knopfposition), Desktop-App selbst.

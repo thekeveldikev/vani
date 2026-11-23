@@ -244,6 +244,7 @@ function syncTextSetzen(ytext, text) {
   const neu = text.slice(vorne, text.length - hinten);
   if (neu) ytext.insert(vorne, neu);
 }
+const _syncStaendeKennung = new Map();
 function syncSchreibeDokument(d) {
   if (!_sync.ydoc || !_sync.ydocs || _sync.uebernimmt || !d || !d.id) return;
   const Y = VaniY.Y;
@@ -258,6 +259,11 @@ function syncSchreibeDokument(d) {
       if (!(text instanceof Y.Text)) { text = new Y.Text(); y.set(k, text); }
       syncTextSetzen(text, wert);
     } else {
+      if (k === 'staende' && Array.isArray(wert)) {
+        const l = wert[wert.length - 1], kennung = wert.length + ':' + (l ? (l.wann || 0) + ':' + String(l.text || '').length : 0);
+        if (_syncStaendeKennung.get(d.id) === kennung && typeof y.get(k) === 'string') continue;
+        _syncStaendeKennung.set(d.id, kennung);
+      }
       let gepackt;
       try { gepackt = JSON.stringify(wert); } catch (e) { continue; }
       if (gepackt !== undefined && y.get(k) !== gepackt) y.set(k, gepackt);
@@ -921,7 +927,7 @@ async function syncStarte(config, modus = 'start') {
      nie etwas wegraeumen, bevor der Ersatz sicher da ist. Kam noch nicht alles
      an, bleibt der hiesige Bestand stehen; sobald der Bereich vollstaendig
      angekommen ist, raeumt die Uebernahme weg, was darin nicht vorkommt. */
-  if (modus === 'ersetzen' && aufgeholt) { D.docs.clear(); await dbTu('docs', 'readwrite', (s) => s.clear()); }
+  if (modus === 'ersetzen' && aufgeholt) { D.docs.clear(); await dbTu('docs', 'readwrite', (s) => s.clear()); try { await dbTu('staende', 'readwrite', (s) => s.clear()); } catch (e) {} }
   await syncUebernehmeAusY();
   _sync.ydocs.observeDeep((_events, tx) => { if (tx.origin !== SYNC_LOKAL) syncPlaneUebernahme(); });
   _sync.ystate.observeDeep((_events, tx) => { if (tx.origin !== SYNC_LOKAL) syncPlaneUebernahme(); });

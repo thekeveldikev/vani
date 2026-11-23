@@ -552,3 +552,201 @@ test('5.67: Raeume — Schnipsel, Karteikarten, Cluster-Export, Uhr, Malschleife
   assert.match(st, /timer\._glocke !== d\.getHours\(\)/);
   for (const f of ['src/54b-schreibtisch-malerei.js', 'src/56b-salon-malerei.js']) assert.match(lies(f), /if \(canvas\.isConnected\) canvas\._warDran = true; else if \(canvas\._warDran\) \{ laeuft = false; return; \}/, f);
 });
+
+/* ===================== 5.68 ===================== */
+const roh568 = (x) => JSON.parse(JSON.stringify(x));
+
+test('5.68: Etiketten — sauber, und die Suche findet sie mit #, auch mit Leerzeichen', async () => {
+  const k = await frisch();
+  assert.deepEqual(roh568(k.etikettenSauber(['Plot', 'plot', '#Mira', '  Rot ', '', 'x'.repeat(50), null])), ['Plot', 'Mira', 'Rot', 'x'.repeat(40)]);
+  assert.equal(k.etikettenSauber(Array.from({ length: 40 }, (_, i) => 'e' + i)).length, 24, 'hoechstens 24');
+  const a = doc(k, { typ: 'blatt', titel: 'Hafen', text: 'Mira stand am Hafen.', etiketten: ['Kapitel 3', 'Wasser'] });
+  doc(k, { typ: 'blatt', titel: 'Turm', text: 'Mira stand im Turm.', etiketten: ['Kapitel 4'] });
+  const titel = (r) => roh568(k.suchErgebnisse(k.D.docs.values(), r).flatMap((g) => g.liste.map((x) => x.d.titel)));
+  assert.deepEqual(titel('#Kapitel3'), ['Hafen'], 'Leerzeichen im Etikett zaehlen nicht');
+  assert.deepEqual(titel('#kap').sort(), ['Hafen', 'Turm'], 'der Anfang genuegt');
+  assert.deepEqual(titel('#Kapitel3 #Wasser Mira'), ['Hafen'], 'mehrere Etiketten und Text zugleich');
+  assert.deepEqual(titel('#zzz Mira'), [], 'ein unbekanntes # bleibt Suchtext');
+  assert.equal(a.etiketten.length, 2);
+});
+
+test('5.68: Randnotizen — saubere Liste, nur der Notiz-Span ueberlebt die Saeuberung', async () => {
+  const k = await frisch();
+  const liste = k.randnotizenSauber([{ id: 'nabc12', text: 'Hallo', wann: 5 }, { id: 'boese"><x', text: 'x' }, null, { id: 'n1', text: 'zu kurz' }]);
+  assert.deepEqual(roh568(liste).map((n) => n.id), ['nabc12']);
+  const viele = Array.from({ length: 310 }, (_, i) => ({ id: 'nid' + String(i).padStart(4, '0'), text: 't' + i }));
+  const gekappt = k.randnotizenSauber(viele);
+  assert.equal(gekappt.length, 300);
+  assert.equal(gekappt[gekappt.length - 1].id, 'nid0309', 'die neueste bleibt, die aeltesten fallen');
+  /* Die Saeuberung (braucht ein DOM, darum am Quelltext): nur SPAN, nur gepruefte Kennung, alles andere faellt */
+  const rt = lies('src/35-richtext.js');
+  assert.match(rt, /const notizId = node\.tagName === 'SPAN' \? String\(node\.getAttribute\('data-notiz'\) \|\| ''\) : '';/);
+  assert.match(rt, /if \(notizId && \/\^n\[a-z0-9\]\{4,24\}\$\/\.test\(notizId\)\) node\.setAttribute\('data-notiz', notizId\);/);
+  assert.equal(k.randnotizStelle({ rich: '<p>Am <span data-notiz="nabc12" style="color:red">Hafen</span>.</p>' }, 'nabc12'), 'Hafen', 'auch mit Zusatz am Span');
+  const md = lies('src/35b-randnotizen.js');
+  assert.match(md, /gemeinsam\.nodeType === 1 \? gemeinsam : gemeinsam\.parentElement/, 'keine Notiz in einer Notiz');
+  assert.match(md, /function randnotizenAufraeumen/, 'doppelte Kennungen nach Einfuegen werden geloest');
+});
+
+test('5.68: Manuskript — ZIP mit richtiger Pruefsumme, Normseiten 60 x 30, Kapitel rechts, PDF heil', async () => {
+  const k = await frisch();
+  assert.equal(k.crc32(new TextEncoder().encode('123456789')) >>> 0, 0xcbf43926);
+  const zip = k.zipBauen([{ name: 'mimetype', daten: 'application/epub+zip' }, { name: 'a/ä.txt', daten: 'Grüße' }]);
+  const dv = new DataView(zip.buffer);
+  assert.equal(dv.getUint32(0, true), 0x04034b50);
+  assert.equal(new TextDecoder().decode(zip.slice(30, 38)), 'mimetype', 'mimetype zuerst und ungepackt');
+  assert.equal(dv.getUint32(zip.length - 22, true), 0x06054b50);
+  const zeilen = k.nsUmbrechen('Wort '.repeat(40) + 'https://beispiel.de/' + 'x'.repeat(130), true);
+  assert.ok(zeilen.every((z) => z.length <= k.NS_SPALTEN), 'keine Zeile ueber 60 Zeichen');
+  assert.ok(k.nsUmbrechen('y'.repeat(150), false).every((z) => z.length <= 60), 'auch ein ueberlanges erstes Wort wird gebrochen');
+  const absatz = { art: 'absatz', laeufe: [{ t: 'Satz. '.repeat(400) }] };
+  const kapitel = [{ titel: 'Eins', szenen: [{ titel: '', absaetze: [absatz] }] }, { titel: 'Zwei', szenen: [{ titel: '', absaetze: [{ art: 'absatz', laeufe: [{ t: 'kurz' }] }] }] }];
+  const seiten = k.nsSeiten(kapitel);
+  assert.ok(seiten.every((s) => s.length <= k.NS_ZEILEN), 'hoechstens 30 Zeilen je Seite');
+  const zwei = seiten.findIndex((s) => s.some((z) => z.t === 'Zwei'));
+  assert.equal(zwei % 2, 0, 'Kapitel zwei beginnt auf einer ungeraden Seite (rechts)');
+  /* Langer Titel mit Klammer: die Kopfzeile darf den Inhaltsstrom nicht brechen */
+  const p = { id: 'p1', titel: 'T'.repeat(88) + '(x) „Hafen“', art: 'Roman' };
+  const { bytes } = k.pdfNormseiten(p, kapitel, { name: 'A', worte: 10 });
+  const pdf = Array.from(bytes, (b) => String.fromCharCode(b)).join('');
+  for (const zeile of pdf.split('\n').filter((z) => / Tj ET$/.test(z))) {
+    const inhalt = zeile.slice(zeile.indexOf('(') + 1, zeile.lastIndexOf(') Tj'));
+    assert.ok(!/(^|[^\\])(\\\\)*[()]/.test(inhalt.replace(/\\[()\\]/g, '')), 'ungeschuetzte Klammer in: ' + zeile.slice(0, 80));
+    assert.ok(!/\\$/.test(inhalt.replace(/\\\\/g, '')), 'kein einsamer Backslash am Ende');
+  }
+  assert.match(pdf, /\/Info \d+ 0 R/, 'Info als eigenes Objekt');
+  assert.match(pdf, /\/Title <FEFF/, 'Titel als Unicode');
+  const xref = +pdf.match(/startxref\n(\d+)/)[1];
+  assert.equal(pdf.slice(xref, xref + 4), 'xref', 'Versatztabelle sitzt');
+  const m = lies('src/44c-manuskript.js');
+  assert.match(m, /sect\(ki === 0 \? 'nextPage' : 'oddPage', false, ki === 0\)/, 'Kapitel 1 direkt nach dem Titelblatt, Zaehlung ab 1');
+  assert.match(m, /'-4' \+ hex\.slice\(13, 16\)/, 'gueltige UUID im EPUB');
+});
+
+test('5.68: Synonyme — Index, Hauptform zuerst, einfache Beugung, Grossschreibung', async () => {
+  const k = await frisch();
+  const probe = '# Kommentar\nschön;hübsch;ansprechend\neinverstanden (ugs.);schön;gut\nHund;Köter (ugs.);Vierbeiner\nkalt (Hauptform);frostig;eisig\nallein\n';
+  const { saetze, index } = k.synBaueIndex(probe);
+  assert.equal(saetze.length, 4, 'Kommentare und Einzelwoerter zaehlen nicht');
+  assert.ok(index.has('schon') && index.has('koter'), 'normalisierte Schluessel ohne Zusatz');
+  k.SYN.saetze = saetze; k.SYN.index = index;
+  const schoen = k.synonymeFuer('schön');
+  assert.deepEqual(roh568(schoen[0]), ['hübsch', 'ansprechend'], 'die schlichte Bedeutung zuerst, das Wort selbst fehlt');
+  assert.deepEqual(roh568(k.synonymeFuer('Hunde')[0]), ['Köter (ugs.)', 'Vierbeiner'], 'Hunde → Hund, die Grundform selbst nicht');
+  assert.deepEqual(roh568(k.synonymeFuer('kalt')[0]), ['frostig', 'eisig']);
+  assert.deepEqual(roh568(k.synonymeFuer('Quatschwort')), []);
+  assert.equal(k.synAnpassen('Schön', 'hübsch'), 'Hübsch');
+  assert.equal(k.synAnpassen('kalt', 'eisig (geh.)'), 'eisig');
+  const s = lies('src/35c-synonyme.js');
+  assert.match(s, /cache: 'no-cache'/, 'nie einen alten Fehler aus dem Browser-Cache');
+  assert.match(s, /text\.length < 100000 \|\| \/\^\\s\*<\/\.test\(text\)/, 'eine Startseite statt Thesaurus wird nicht gemerkt');
+  /* Ausgeliefert wird der Ordner ueberall */
+  for (const f of ['server.js', 'sync-server/server.mjs', 'desktop/main.cjs']) assert.match(lies(f), /OEFFENTLICHE_ORDNER = new Set\(\[[^\]]*'synonyme'/, f);
+  assert.match(lies('package.json'), /"synonyme\/\*\*"/);
+  assert.match(lies('hosting/scripts/copy-vani.mjs'), /kopiereOrdner\('synonyme'\)/);
+  assert.match(lies('sw.js'), /url\.pathname\.indexOf\('\/synonyme\/'\) !== -1\) return;/, 'nicht doppelt im SW-Cache');
+  assert.match(lies('synonyme/LIZENZ.txt'), /LESSER GENERAL PUBLIC LICENSE/);
+  /* Der Knopf liegt ueber dem Schreibraum, unter den Fenstern */
+  const css = lies('src/10-style.css');
+  const z = +css.match(/\.syn-pille \{ position: fixed; z-index: (\d+);/)[1];
+  const sr = +css.match(/\.schreibraum \{[^}]*z-index: (\d+)/)[1];
+  assert.ok(z > sr && z < 100, 'z-index ' + z);
+});
+
+test('5.68: Figuren-Auftritte — Namen ohne Anrede, keine Doppelzaehlung, Geschichtsreihenfolge', async () => {
+  const k = await frisch();
+  assert.deepEqual(roh568(k.figurNamen({ name: 'Mira Stern', felder: { nennung: 'Mimi; Sternchen' } })), ['Mira Stern', 'Mira', 'Mimi', 'Sternchen']);
+  assert.deepEqual(roh568(k.figurNamen({ name: 'Frau Meier' })), ['Frau Meier'], 'keine Anrede als Vorname');
+  assert.deepEqual(roh568(k.figurNamen({ name: 'Der Alte' })), ['Der Alte']);
+  const n = (t, namen) => k.figurZaehlen(k.normalisiere(t), namen.map((x) => k.normalisiere(x)));
+  assert.equal(n('Dann kam Mira Stern. Mira lachte.', ['Mira Stern', 'Mira']), 2, 'der volle Name zaehlt einmal');
+  assert.equal(n('Miras Hut. Mirabelle.', ['Mira']), 0, 'nur ganze Woerter');
+  assert.equal(n('Jürgen, jurgen und JÜRGEN', ['Jürgen']), 3, 'Umlaute und Gross egal');
+  const proj = doc(k, { typ: 'projekt', titel: 'Roman' });
+  const k1 = doc(k, { typ: 'kapitel', parent: proj.id, titel: 'Eins', ord: 0 });
+  const k2 = doc(k, { typ: 'kapitel', parent: proj.id, titel: 'Zwei', ord: 1 });
+  doc(k, { typ: 'szene', parent: k2.id, projekt: proj.id, ord: 0, titel: 'Spaet', text: 'Mira ging.' });
+  doc(k, { typ: 'szene', parent: k1.id, projekt: proj.id, ord: 0, titel: 'Frueh', text: 'Mira kam.' });
+  doc(k, { typ: 'szene', parent: k1.id, projekt: proj.id, ord: 1, titel: 'Ohne', text: 'Niemand.' });
+  const { treffer } = k.figurAuftritte({ name: 'Mira' });
+  assert.deepEqual(roh568(treffer.map((t) => t.d.titel)), ['Frueh', 'Spaet'], 'in der Reihenfolge der Geschichte');
+  assert.match(lies('src/62d-album-mehr.js'), /\$\$\('\.schleier'\)\.forEach\(\(s\) => schliesseDeck\(s\)\)/, 'Fenster ordentlich schliessen');
+});
+
+test('5.68: Rueckgaengig nach dem Loeschen holt Verweise zurueck und raeumt den Korb', async () => {
+  const k = await frisch();
+  k.schritteVergessen();
+  const a = doc(k, { typ: 'blatt', titel: 'A', text: 'a' });
+  const b = doc(k, { typ: 'blatt', titel: 'B', text: 'b', quelle: a.id });
+  await k.sicherSpeichern('docs', a); await k.sicherSpeichern('docs', b);
+  const korb = async () => (await k.dbAlle('papierkorb')).length;
+  const vorher = await korb();
+  await k.loesche(a.id, true); await mikrotasksLeeren();
+  assert.equal(k.D.docs.has(a.id), false);
+  assert.equal(k.D.docs.get(b.id).quelle, undefined, 'der Verweis ist geputzt');
+  assert.equal(await korb(), vorher + 1);
+  await k.schrittZurueck(); await mikrotasksLeeren();
+  assert.equal(k.D.docs.has(a.id), true, 'A ist wieder da');
+  assert.equal(k.D.docs.get(b.id).quelle, a.id, 'und B zeigt wieder auf A');
+  assert.equal((await k.dbGet('docs', b.id)).quelle, a.id, 'auch im Speicher');
+  assert.equal(await korb(), vorher, 'kein Duplikat im Korb');
+  /* Zwischendurch weitergeschrieben — Wiederholen nimmt den neuen Stand mit in den Korb */
+  k.D.docs.get(a.id).text = 'a, weitergeschrieben';
+  await k.schrittVor(); await mikrotasksLeeren();
+  assert.equal(k.D.docs.has(a.id), false);
+  const buendel = (await k.dbAlle('papierkorb')).find((x) => x.docs.some((d) => d.id === a.id));
+  assert.equal(buendel.docs.find((d) => d.id === a.id).text, 'a, weitergeschrieben');
+});
+
+test('5.68: Staende liegen getrennt — Dokument klein, Staende nur bei Aenderung, Geloeschtes kommt nicht zurueck', async () => {
+  const k = await frisch();
+  const d = doc(k, { typ: 'blatt', titel: 'S', text: 'jetzt', staende: [{ wann: 1000, text: 'frueher', worte: 1 }] });
+  await k.sicherSpeichern('docs', d);
+  const imDoc = await k.dbGet('docs', d.id);
+  assert.equal('staende' in imDoc, false, 'das Dokument reist ohne Staende');
+  assert.equal(imDoc.text, 'jetzt');
+  assert.equal((await k.dbGet('staende', d.id)).length, 1);
+  await k.dbPut('staende', ['marke'], d.id);
+  await k.sicherSpeichern('docs', d);
+  assert.deepEqual(roh568(await k.dbGet('staende', d.id)), ['marke'], 'unveraenderte Staende werden nicht neu geschrieben');
+  d.staende.push({ wann: 2000, text: 'neuer', worte: 1 });
+  await k.sicherSpeichern('docs', d);
+  assert.equal((await k.dbGet('staende', d.id)).length, 2);
+  const s = lies('src/32-sicherheit.js');
+  assert.match(s, /if \(typeof istWeggeraeumt === 'function' && istWeggeraeumt\(wert\)\) return true;\n?\s*\/\* Der Text ist wichtiger/, 'nach dem Warten auf die Staende erneut pruefen');
+  assert.match(s, /const textOk = await sicherSpeichern\('docs-roh'/, 'der Text wird auch ohne Staende gesichert');
+  assert.match(lies('src/30-core.js'), /getAllKeys\(\), w = s\.getAll\(\); return \{ get result\(\)/, 'Schluessel und Werte in einer Transaktion');
+});
+
+test('5.68: Profil — Pruefwert ist nicht mehr der Schluessel, alte Profile ziehen um', async () => {
+  const k = await frisch();
+  const p = await k.profilErstelle('Pruefling', 'eine-lange-test-tuer', true);
+  assert.match(p.pruefung, /^v2_[A-Za-z0-9_-]{43}$/);
+  const ab = await k.profilLeiteAb('eine-lange-test-tuer', p.salz);
+  assert.notEqual(p.pruefung.slice(3), ab.pruefungAlt, 'der gespeicherte Wert ist nicht das Schluesselmaterial');
+  assert.ok(await k.profilPruefePasswort(p, 'eine-lange-test-tuer'));
+  /* Ein Profil im alten Format */
+  const reg = k.profilLadeRegistry();
+  reg[0].pruefung = ab.pruefungAlt;
+  k.profilSpeichereRegistry(reg);
+  const alt = k.profilLadeRegistry()[0];
+  assert.equal(alt.pruefung, ab.pruefungAlt, 'die Registry nimmt das alte Format an');
+  assert.ok(await k.profilPruefePasswort(alt, 'eine-lange-test-tuer'), 'altes Format laesst herein');
+  assert.match(k.profilLadeRegistry()[0].pruefung, /^v2_/, 'und wird umgestellt');
+  assert.equal(await k.profilPruefePasswort(p, 'falsch'), null);
+});
+
+test('5.68: Sicherung, Speicher, Einstellungen', async () => {
+  const k = await frisch();
+  assert.equal(k.STANDARD_EINST.synonyme, true);
+  assert.equal(k.STANDARD_EINST.manuskriptName, '');
+  k.D.stats.letzteSicherung = 0;
+  assert.equal(k.sicherungAmpel().farbe, 'rot');
+  k.D.stats.letzteSicherung = Date.now() - 3 * 86400000;
+  assert.equal(k.sicherungAmpel().farbe, 'gruen');
+  k.D.stats.letzteSicherung = Date.now() - 10 * 86400000;
+  assert.equal(k.sicherungAmpel().farbe, 'gelb');
+  const c = lies('src/30-core.js');
+  assert.match(c, /if \(!statsInDenSync\.haengt\(\)\) statsInDenSync\(\);/, 'Statistik gedrosselt, nicht nur entprellt');
+  assert.match(lies('src/49-feinheiten.js'), /if \(typeof inhalt !== 'string'\) \{ toast\('Das hat leider nicht geklappt\.'\); return false; \}/, 'Binaeres nie in die Zwischenablage');
+});

@@ -3,7 +3,7 @@
    VANI — Kern: Helfer, Icons, Datenbank, Modale
    ================================================================ */
 
-const APP_VERSION = '5.67.1';
+const APP_VERSION = '5.68.0';
 /* Eine einzige sichtbare Web-App. GitHub ist die Werkstatt und die Adresse,
    die iPad, Handy und Browser installieren. Der Sites-Host bleibt nur der
    verschlüsselte Hintergrunddienst und wird nie als zweite App beworben. */
@@ -76,7 +76,9 @@ function spueleAlles() {
   for (const s of [..._spueler]) { try { s(); } catch (e) {} if (s.lebt && !s.lebt()) { const i = _spueler.indexOf(s); if (i >= 0) _spueler.splice(i, 1); } }
 }
 
-const worte = (t) => { t = (t || '').trim(); return t ? t.split(/\s+/).length : 0; };
+/* Zaehlt wie split(/\s+/) — aber ohne ein Feld aller Woerter zu bauen (bei langen Texten bei jedem Speichern). Pur. */
+const WORT_LEER = new Set([9, 10, 11, 12, 13, 32, 160, 0x1680, 0x2028, 0x2029, 0x202f, 0x205f, 0x3000, 0xfeff]);
+const worte = (t) => { t = String(t || ''); let n = 0, drin = false; for (let i = 0; i < t.length; i++) { const c = t.charCodeAt(i); if (WORT_LEER.has(c) || (c >= 0x2000 && c <= 0x200a)) drin = false; else if (!drin) { drin = true; n++; } } return n; };
 
 const MONATE = ['Jan', 'Feb', 'März', 'Apr', 'Mai', 'Juni', 'Juli', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
 const TAGE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
@@ -314,6 +316,9 @@ function ik(name, kl) { return `<svg class="ik${kl ? ' ' + kl : ''}" viewBox="0 
 
 /* ----- Datenbank ----- */
 let _db;
+/* Konnten die ausgelagerten Staende nicht gelesen werden, werden sie in dieser Sitzung auch nicht
+   ueberschrieben — sonst ersetzte ein leerer Neuanfang die zwanzig alten Fassungen (5.68). */
+let _staendeLesefehler = false;
 let AKTIVES_PROFIL_ID = 'legacy';
 let AKTIVES_PROFIL = null;
 let GERAET_ID = '';
@@ -336,7 +341,7 @@ function profilDatenbankName() {
 
 function dbAuf() {
   return new Promise((res, rej) => {
-    const r = indexedDB.open(profilDatenbankName(), 4);
+    const r = indexedDB.open(profilDatenbankName(), 5);
     r.onupgradeneeded = () => {
       const d = r.result;
       if (!d.objectStoreNames.contains('docs')) d.createObjectStore('docs', { keyPath: 'id' });
@@ -349,6 +354,9 @@ function dbAuf() {
       /* Verschlüsselte, noch nicht bestätigte Netzpakete überleben Offlinezeit,
          App-Abbruch und einen Neustart. */
       if (!d.objectStoreNames.contains('sync-pending')) d.createObjectStore('sync-pending');
+      /* 5.68: Staende (bis 20 Volltexte je Dokument) liegen in einem eigenen Speicher.
+         Vorher schrieb jedes Autospeichern sie alle mit — bei langen Szenen Megabytes je Pause. */
+      if (!d.objectStoreNames.contains('staende')) d.createObjectStore('staende');
     };
     r.onsuccess = () => {
       _db = r.result;
@@ -398,7 +406,8 @@ const STANDARD_EINST = {
   ambience: {}, ambienceFein: {}, klangReiter: 'echt', klangFolgt: true, vorleseTempo: .95,
   stickerFarbe: '#c8322b', stickerDicke: 5, tisch: null, schreibtisch: null, salonGelesen: {}, orte: null, sitzung: null, salonBriefe: [], pausenErinnerung: true, schreibmaschine: null, salonTon: false, salonAnrede: '', salonWelten: false,
   /* 5.67: fehlten hier — und wurden darum bei jedem Neustart verworfen */
-  v2: true, v2Bewegung: true, albumMarke: '', albumBildnis: false, albumWorte: [], fadenBibliothek: []
+  v2: true, v2Bewegung: true, albumMarke: '', albumBildnis: false, albumWorte: [], fadenBibliothek: [],
+  manuskriptName: '', synonyme: true
 };
 const D = {
   docs: new Map(),
@@ -422,6 +431,8 @@ function uebernehmeEinstellungen(quelle) {
   D.einst.albumBildnis = D.einst.albumBildnis === true;
   D.einst.albumWorte = Array.isArray(D.einst.albumWorte) ? D.einst.albumWorte.filter((w) => typeof w === 'string').map((w) => w.slice(0, 60)).slice(-400) : [];
   if (!Array.isArray(D.einst.fadenBibliothek)) D.einst.fadenBibliothek = [];
+  D.einst.manuskriptName = typeof D.einst.manuskriptName === 'string' ? D.einst.manuskriptName.slice(0, 80) : '';
+  D.einst.synonyme = D.einst.synonyme !== false;
   D.einst.stiftDicke = begrenze(D.einst.stiftDicke, 1, 24, 3.5);
   D.einst.stiftFarbe = /^#[0-9a-f]{6}$/i.test(D.einst.stiftFarbe || '') ? D.einst.stiftFarbe : '#2c251c';
   D.einst.stickerDicke = begrenze(D.einst.stickerDicke, 1, 24, 5);
@@ -498,6 +509,19 @@ function saubererSyncMarker(quelle) {
     geloescht: !!quelle.geloescht
   };
 }
+/* Etiketten: kurze Stichworte, ohne Doppelte (gross/klein egal), hoechstens 24. Pur. */
+function etikettenSauber(liste) {
+  if (!Array.isArray(liste)) return [];
+  const gesehen = new Set(), aus = [];
+  for (const roh of liste) {
+    const t = String(roh == null ? '' : roh).replace(/[\u0000-\u001f#]/g, '').replace(/\s+/g, ' ').trim().slice(0, 40);
+    const k = t.toLowerCase();
+    if (!t || gesehen.has(k)) continue;
+    gesehen.add(k); aus.push(t);
+    if (aus.length >= 24) break;
+  }
+  return aus;
+}
 function sauberesDokument(quelle) {
   if (!quelle || typeof quelle !== 'object' || typeof quelle.id !== 'string' || quelle.id.length < 1 || quelle.id.length > 200 ||
       typeof quelle.typ !== 'string' || quelle.typ.length < 1 || quelle.typ.length > 40 || Object.keys(quelle).length > 250) return null;
@@ -529,6 +553,9 @@ function sauberesDokument(quelle) {
   if (d.papier && !['liniert', 'kariert', 'blank', 'punkte', 'breit', 'cornell', 'storyboard', 'dialog'].includes(d.papier)) d.papier = 'liniert';
   if (d.ansicht && !['seiten', 'rolle', 'fluss'].includes(d.ansicht)) d.ansicht = 'seiten';
   if (d.papierfarbe && !['hell', 'weiss', 'creme', 'kraft', 'nacht'].includes(d.papierfarbe)) d.papierfarbe = 'hell';
+  /* 5.68: Randnotizen (je Stelle im Text) und Etiketten (Stichworte ueber alle Raeume) */
+  if (d.randnotizen != null) { if (typeof randnotizenSauber === 'function') d.randnotizen = randnotizenSauber(d.randnotizen); else if (!Array.isArray(d.randnotizen)) delete d.randnotizen; }
+  if (d.etiketten != null) d.etiketten = etikettenSauber(d.etiketten);
   /* Klangbilder merken sich Mischungen und woran sie hängen. */
   if (d.pegel != null && typeof saubereAmbienceMischung === 'function' && d.typ === 'klangbild') d.pegel = saubereAmbienceMischung(d.pegel);
   if (d.gewebt != null && typeof saubereMischung === 'function') d.gewebt = saubereMischung(d.gewebt);
@@ -661,10 +688,18 @@ async function ladeAlles() {
   /* Die drei unabhaengigen IndexedDB-Lesevorgaenge duerfen gleichzeitig
      laufen. Auf grossen iPad-Bestaenden warteten Einstellungen und Statistik
      vorher erst darauf, dass wirklich jedes Dokument eingelesen war. */
-  const [dokumente, einstellungen, statistik] = await Promise.all([
-    dbAlle('docs'), dbGet('kv', 'einst'), dbGet('kv', 'stats')
+  const [dokumente, einstellungen, statistik, staendePaar] = await Promise.all([
+    dbAlle('docs'), dbGet('kv', 'einst'), dbGet('kv', 'stats'),
+    /* Schluessel und Werte in EINER Transaktion — sonst koennten sie gegeneinander verrutschen */
+    dbTu('staende', 'readonly', (s) => { const k = s.getAllKeys(), w = s.getAll(); return { get result() { return [k.result, w.result]; } }; }).catch(() => null)
   ]);
+  /* Ausgelagerte Staende wieder ans Dokument haengen; aeltere Bestaende haben sie noch im Dokument. */
+  const staendeVon = new Map();
+  const [staendeSchluessel, staendeWerte] = staendePaar || [];
+  if (!staendePaar || !Array.isArray(staendeSchluessel) || !Array.isArray(staendeWerte) || staendeSchluessel.length !== staendeWerte.length) _staendeLesefehler = true;
+  else staendeSchluessel.forEach((k, i) => { if (Array.isArray(staendeWerte[i])) staendeVon.set(k, staendeWerte[i]); });
   dokumente.forEach((roh) => {
+    if (roh && roh.staende == null && staendeVon.has(roh.id)) roh.staende = staendeVon.get(roh.id);
     const d = sauberesDokument(roh);
     if (d) D.docs.set(d.id, d);
   });
@@ -679,9 +714,13 @@ const speichereEinst = entprellt(() => {
   sicherSpeichern('kv', D.einst, 'einst');
   if (typeof syncMetadatenGeaendert === 'function') syncMetadatenGeaendert('einst');
 }, 300);
+const statsInDenSync = entprellt(() => { if (typeof syncMetadatenGeaendert === 'function') syncMetadatenGeaendert('stats'); }, 45000, true);
 const speichereStats = entprellt(() => {
   sicherSpeichern('kv', D.stats, 'stats');
-  if (typeof syncMetadatenGeaendert === 'function') syncMetadatenGeaendert('stats');
+  /* Der Sync bekommt die Statistik gebuendelt (hoechstens alle 45 s; beim Schliessen spuelt der Notfall-Spueler). */
+  /* Nur anstossen, wenn nicht schon einer wartet: so geht es spaetestens 45 s nach der
+     ersten Aenderung hinaus (Drossel) — nicht erst nach 45 s Ruhe. */
+  if (!statsInDenSync.haengt()) statsInDenSync();
 }, 800);
 
 /* ----- Weggeräumt bleibt weggeräumt -----
@@ -780,7 +819,6 @@ async function loesche(id, still, kinderDerWurzelBehalten = false) {
   /* Auch das Löschen kommt auf den Stapel — damit Strg+Z dasselbe tut wie
      überall sonst. Der Papierkorb bleibt daneben bestehen: er hält länger,
      das Zurücknehmen ist schneller. */
-  schrittMerken('„' + ((wurzel.titel || wurzel.typ || 'Etwas')) + '“ weggenommen', opfer);
   const opferSet = new Set(opfer);
   const buendel = { id: uid(), wann: Date.now(), name: wurzel.titel || (wurzel.text || '').slice(0, 40) || wurzel.typ, typ: wurzel.typ, docs: [], referenzen: [] };
   /* Lose Zuordnungen überleben das Löschen ihres Ziels, dürfen danach aber
@@ -792,6 +830,13 @@ async function loesche(id, still, kinderDerWurzelBehalten = false) {
     if (d.quelle && opferSet.has(d.quelle)) { buendel.referenzen.push({ id: d.id, feld: 'quelle', wert: d.quelle }); putzen.push([d, 'quelle']); }
     if (kinderDerWurzelBehalten && d.parent === id) { buendel.referenzen.push({ id: d.id, feld: 'parent', wert: d.parent }); putzen.push([d, 'parent']); }
   }
+  /* Auch das Loeschen kommt auf den Stapel — samt der Dokumente, die dabei
+     einen Verweis verlieren (5.68: vorher kamen Verweise mit Strg+Z nicht zurueck).
+     Der Schritt kennt sein Papierkorb-Buendel: Zuruecknehmen raeumt es weg,
+     Wiederholen legt es wieder hinein — keine Dubletten im Korb. */
+  schrittMerken('„' + ((wurzel.titel || wurzel.typ || 'Etwas')) + '“ weggenommen', [...opfer, ...new Set(putzen.map((x) => x[0].id))]);
+  const schrittDazu = _zug.zurueck[_zug.zurueck.length - 1];
+  if (schrittDazu && schrittDazu.ids[0] === opfer[0]) schrittDazu.korb = buendel;
   for (const oid of opfer) {
     const d = D.docs.get(oid);
     if (!d) continue;
@@ -813,6 +858,7 @@ async function loesche(id, still, kinderDerWurzelBehalten = false) {
     D.docs.delete(d.id);
     _weggeraeumt.add(d.id);
     await dbDel('docs', d.id);
+    try { await dbDel('staende', d.id); } catch (e) {}
   }
   if (!still) {
     toastMitAktion('Im Papierkorb.', 'Rückgängig', async () => {
@@ -936,6 +982,7 @@ function seiteZuBlatt(d) {
 function zaehleWorte(docId, text) {
   const n = worte(text);
   const alt = D.stats.letzte[docId];
+  /* Bewusst: Umschreiben ist Schreiben — wer loescht und neu tippt, hat geschrieben (siehe Test „Wieder-Tippen zählt ab neuer Basis“). */
   if (alt !== undefined && n > alt) {
     const k = tagKey();
     D.stats.tage[k] = (D.stats.tage[k] || 0) + (n - alt);
@@ -1161,8 +1208,11 @@ async function _zugEinsetzen(stand) {
       await sicherSpeichern('docs', abschrift);
     } else {
       /* Es gab das Dokument vorher nicht — dann muss es wieder weg. */
+      const weg = D.docs.get(eintrag.id);
+      if (weg) { try { markiereAenderung(weg, true); } catch (e) {} _weggeraeumt.add(eintrag.id); }
       D.docs.delete(eintrag.id);
       try { await dbDel('docs', eintrag.id); } catch (e) {}
+      try { await dbDel('staende', eintrag.id); } catch (e) {}
     }
   }
 }
@@ -1190,6 +1240,7 @@ async function schrittZurueck() {
     /* Den jetzigen Stand für den Weg nach vorn aufheben. */
     schritt.nachher = _zugStand(schritt.ids);
     await _zugEinsetzen(schritt.vorher);
+    if (schritt.korb) { try { if (await dbGet('papierkorb', schritt.korb.id)) { await dbDel('papierkorb', schritt.korb.id); papierkorbZahlSetzen(_korbZahl - 1); } } catch (e) {} }
     _zug.vor.push(schritt);
     while (_zug.vor.length > ZUG_GRENZE) _zug.vor.shift();
   } finally { _zug.laeuft = false; }
@@ -1204,6 +1255,13 @@ async function schrittVor() {
   if (!schritt) { toast('Es gibt nichts wiederherzustellen.', 2600); return false; }
   _zug.laeuft = true;
   try {
+    if (schritt.korb) {
+      /* Was seit dem Zuruecknehmen weitergeschrieben wurde, muss mit in den Korb. */
+      const jetzt = schritt.korb.docs.map((d) => (D.docs.has(d.id) ? _zugAbschrift(D.docs.get(d.id)) : null) || d);
+      schritt.korb = Object.assign({}, schritt.korb, { docs: jetzt });
+    }
+    if (schritt.korb && !(await sicherSpeichern('papierkorb', schritt.korb))) { _zug.vor.push(schritt); toast('Der Papierkorb nimmt gerade nichts an — darum bleibt alles, wie es ist.', 6000); return false; }
+    if (schritt.korb) papierkorbZahlSetzen(_korbZahl + 1);
     await _zugEinsetzen(schritt.nachher || []);
     _zug.zurueck.push(schritt);
   } finally { _zug.laeuft = false; }

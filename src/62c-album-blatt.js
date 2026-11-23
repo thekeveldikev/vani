@@ -181,6 +181,7 @@ function albumBearbeiten(doc, danach, frisch) {
           zu(); if (danach) danach();
         }
       } }, 'Aus dem Album nehmen'),
+      el('button', { class: 'knopf zart', title: 'In welchen Szenen und Blättern diese Figur vorkommt', onclick: () => { sichern.sofort(); figurAuftritteZeigen(doc); } }, 'Auftritte'),
       el('button', { class: 'knopf zart', title: 'Alles zu dieser Figur als Blatt ablegen — zum Weiterschreiben', onclick: () => { albumAlsBlatt(stand, doc); } }, 'Als Blatt ablegen'),
       el('button', { class: 'knopf zart', title: 'Eine zweite Figur mit denselben Angaben anlegen — Geschwister, Zwillinge, dieselbe zehn Jahre später', onclick: () => albumAbschreiben(doc, stand, sichern, zu, danach) }, 'Abschreiben'),
       el('button', { class: 'knopf voll', onclick: () => { sichern.sofort(); zu(); if (danach) danach(); } }, 'Fertig')));

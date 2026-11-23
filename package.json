@@ -1,6 +1,6 @@
 {
   "name": "vani",
-  "version": "5.67.1",
+  "version": "5.68.0",
   "private": true,
   "author": "VANI",
   "description": "VANI – ein privates Zuhause zum Schreiben, auf iPad und Desktop.",
@@ -47,6 +47,7 @@
       "klang/**",
       "sticker/**",
       "autoren/**",
+      "synonyme/**",
       "einlesung/**",
       "!einlesung/einlesung.json",
       "!einlesung/*.quelle.js",

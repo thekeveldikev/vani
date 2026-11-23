@@ -301,6 +301,7 @@ function baueSzenenkarte(s, p) {
     el('div', { class: 'szvorn', style: s.farbe ? '--szfarbe:' + s.farbe : '' },
       el('div', { class: 'sztitel' }, s.titel || 'Ohne Titel'),
       el('div', { class: 'szprobe' }, probe || 'Noch leer. Noch alles möglich.'),
+      etikettenZeile(s),
       el('div', { class: 'szfusszeile' },
         statusPunkt,
         el('span', { class: 'szworte' }, worte(s.text) ? worte(s.text) + ' W.' : ''),
@@ -422,8 +423,10 @@ function szenenGesten(karte, s, p) {
       { text: 'Duplizieren', icon: 'wandel', wert: 'doppel' },
       { text: 'In anderes Kapitel …', icon: 'projekte', wert: 'zieh' },
       { text: 'Teilen', icon: 'teilen', wert: 'teilen' },
+      { text: 'Etiketten …' + (s.etiketten && s.etiketten.length ? ' (' + s.etiketten.slice(0, 3).join(', ') + ')' : ''), icon: 'lesezeichen', wert: 'etiketten' },
       { text: 'Szene löschen', icon: 'muell', wert: 'weg', rot: true }
     ], s.titel || 'Szene');
+    if (wahl === 'etiketten') { await etikettenBearbeiten(s); zeichne(); return; }
     if (wahl === 'name') {
       const neu = await eingabe({ titel: 'Die Szene heißt jetzt …', wert: s.titel });
       if (neu !== null) { s.titel = neu || s.titel; speichereStill(s); zeichne(); }
@@ -489,6 +492,7 @@ function manuskriptText(p, was = {}) {
       if (text) zeilen.push(text);
       else if (was.leere) zeilen.push('*(noch leer)*');
       if (was.notizen && (sz.notiz || '').trim()) zeilen.push('', '> **Notiz:** ' + sz.notiz.trim().replace(/\n/g, '\n> '));
+      if (was.randnotizen && Array.isArray(sz.randnotizen) && sz.randnotizen.length) for (const n of sz.randnotizen) zeilen.push('', '> **Randnotiz** zu „' + (typeof randnotizStelle === 'function' ? randnotizStelle(sz, n.id) : '').slice(0, 80) + '“: ' + n.text.replace(/\n/g, ' '));
     });
   }
   if (was.hefte) {
@@ -506,7 +510,7 @@ function manuskriptText(p, was = {}) {
 }
 
 async function projektHinausgeben(p) {
-  const was = { kopf: true, szenentitel: true, status: false, notizen: false, figuren: true, hefte: false, leere: false };
+  const was = { kopf: true, szenentitel: true, status: false, notizen: false, randnotizen: false, figuren: true, hefte: false, leere: false };
   const schalter = (name, schluessel, hinweis) => {
     const s = el('button', { class: 'schalter' + (was[schluessel] ? ' an' : ''), onclick: (e) => { was[schluessel] = !was[schluessel]; e.currentTarget.classList.toggle('an', was[schluessel]); vorschauNeu(); } }, el('i'));
     return el('div', { class: 'einstellzeile' }, el('span', { class: 'ename' }, name, hinweis ? el('div', { style: 'font-size:12.5px;color:var(--blass)' }, hinweis) : null), s);
@@ -527,10 +531,19 @@ async function projektHinausgeben(p) {
       schalter('Szenentitel', 'szenentitel'),
       schalter('Stand je Szene', 'status', 'Funke, Entwurf, Steht'),
       schalter('Notizen von den Rückseiten', 'notizen'),
+      schalter('Randnotizen', 'randnotizen', 'nur im Markdown; Word, PDF und EPUB bleiben sauber'),
       schalter('Figuren & Orte', 'figuren'),
       schalter('Hefte am Projekt', 'hefte'),
       schalter('Auch leere Szenen', 'leere')),
     vorschau, zahl,
+    /* 5.68: als Manuskript in Normseiten (Word, PDF) und als E-Book (EPUB) */
+    el('div', { class: 'manuskript-formate' },
+      el('label', { class: 'manuskript-name' }, el('span', {}, 'Name auf dem Manuskript'), el('input', { type: 'text', maxlength: '80', value: msName(), oninput: (e) => { D.einst.manuskriptName = e.target.value.slice(0, 80); speichereEinst(); } })),
+      el('div', { class: 'manuskript-normseiten' }, '≈ ' + manuskriptNormseiten(p, was).toLocaleString('de-DE') + ' Normseiten · 60 Anschläge × 30 Zeilen'),
+      el('div', { class: 'reihe' },
+        el('button', { class: 'knopf', onclick: async () => { if (await manuskriptAusgeben(p, 'docx', was)) zu(); } }, 'Word (.docx)'),
+        el('button', { class: 'knopf', onclick: async () => { if (await manuskriptAusgeben(p, 'pdf', was)) zu(); } }, 'PDF in Normseiten'),
+        el('button', { class: 'knopf', onclick: async () => { if (await manuskriptAusgeben(p, 'epub', was)) zu(); } }, 'E-Book (EPUB)'))),
     el('div', { class: 'reihe' },
       el('button', { class: 'knopf zart', onclick: () => zu() }, 'Abbrechen'),
       el('button', { class: 'knopf', onclick: async () => {
@@ -542,7 +555,7 @@ async function projektHinausgeben(p) {
         const name = (p.titel || 'Manuskript').replace(/[^\wäöüÄÖÜß -]/g, '').trim().slice(0, 60) || 'Manuskript';
         await teileDatei(name + '.md', manuskriptText(p, was), 'text/markdown');
         zu();
-      } }, 'Als Datei')));
+      } }, 'Als Markdown')));
   const zu = zeigeDeck(kasten);
 }
 
@@ -569,7 +582,7 @@ function zeigeLeseansicht(p) {
 
   const bogen = el('div', { class: 'lesebogen' }, innen);
   const leiste = el('div', { class: 'schwebeleiste' },
-    el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Leseansicht schließen', onclick: () => { if (typeof vorlesenStopp === 'function') vorlesenStopp(); bogen.remove(); leiste.remove(); } }),
+    el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Leseansicht schließen', onclick: () => lzu() }),
     el('button', { class: 'rundknopf zart vorlese-knopf', html: ik('vorlesen'), title: 'Vorlesen lassen', onclick: (e) => vorlesen(gesamt, e.currentTarget) }),
     el('button', {
       class: 'knopf', onclick: async () => {
@@ -577,8 +590,12 @@ function zeigeLeseansicht(p) {
         catch (e) { toast('Die Zwischenablage wollte nicht.'); }
       }
     }, 'Kopieren'),
-    el('button', { class: 'knopf', onclick: () => teileDatei(p.titel.replace(/[^\wäöüß -]/gi, '') + '.txt', gesamt) }, 'Als Datei')
+    el('button', { class: 'knopf', onclick: () => manuskriptAusgeben(p, 'epub', { szenentitel: true }) }, 'Als E-Book'),
+    el('button', { class: 'knopf', onclick: () => manuskriptAusgeben(p, 'pdf', { szenentitel: false }) }, 'Als PDF')
   );
+  const lzu = () => { if (typeof vorlesenStopp === 'function') vorlesenStopp(); bogen.remove(); leiste.remove(); document.removeEventListener('keydown', ltaste, true); window.removeEventListener('hashchange', lzu); };
+  const ltaste = (e) => { if (e.key === 'Escape') { e.preventDefault(); lzu(); } };
+  document.addEventListener('keydown', ltaste, true); window.addEventListener('hashchange', lzu);
   document.body.append(bogen, leiste);
 }
 

@@ -49,12 +49,21 @@ function profilBytes(s) {
   return aus;
 }
 
+/* 5.68: einmal ableiten statt zweimal (halbe Anmeldezeit) — und der gespeicherte
+   Pruefwert ist nicht mehr der Schluessel selbst. Vorher lieferten deriveBits und
+   deriveKey mit denselben Parametern dieselben 256 Bit: der Pruefwert im Profil WAR
+   der AES-Schluessel. Jetzt: Schluessel = die Bits, Pruefwert = SHA-256(Bits + Etikett),
+   gekennzeichnet mit „v2_“. Alte Profile werden beim naechsten Anmelden umgestellt;
+   der Schluessel bleibt derselbe, verschluesselte Daten bleiben lesbar. */
 async function profilLeiteAb(passwort, salz) {
-  const basis = await crypto.subtle.importKey('raw', new TextEncoder().encode(String(passwort || '')), 'PBKDF2', false, ['deriveBits', 'deriveKey']);
+  const basis = await crypto.subtle.importKey('raw', new TextEncoder().encode(String(passwort || '')), 'PBKDF2', false, ['deriveBits']);
   const opts = { name: 'PBKDF2', salt: profilBytes(salz), iterations: PROFIL_ITERATIONEN, hash: 'SHA-256' };
-  const pruefung = new Uint8Array(await crypto.subtle.deriveBits(opts, basis, 256));
-  const schluessel = await crypto.subtle.deriveKey(opts, basis, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
-  return { pruefung: profilB64(pruefung), schluessel };
+  const bits = new Uint8Array(await crypto.subtle.deriveBits(opts, basis, 256));
+  const schluessel = await crypto.subtle.importKey('raw', bits, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
+  const etikett = new TextEncoder().encode('vani-profil-pruefung-v2');
+  const misch = new Uint8Array(bits.length + etikett.length); misch.set(bits, 0); misch.set(etikett, bits.length);
+  const pruefung = 'v2_' + profilB64(new Uint8Array(await crypto.subtle.digest('SHA-256', misch)));
+  return { pruefung, pruefungAlt: profilB64(bits), schluessel };
 }
 
 function profilGleich(a, b) {
@@ -67,7 +76,18 @@ function profilGleich(a, b) {
 async function profilPruefePasswort(profil, passwort) {
   if (!profil || typeof passwort !== 'string' || passwort.length > 200) return null;
   const ab = await profilLeiteAb(passwort, profil.salz);
-  return profilGleich(ab.pruefung, profil.pruefung) ? ab.schluessel : null;
+  const gespeichert = String(profil.pruefung || '');
+  /* Gegen beide Formen pruefen — ein alter Wert koennte zufaellig mit „v2_“ beginnen. */
+  const neu = profilGleich(ab.pruefung, gespeichert);
+  if (!neu && !profilGleich(ab.pruefungAlt, gespeichert)) return null;
+  /* Altes Profil: den Pruefwert umstellen, damit der Schluessel nicht mehr offen im Profil liegt. */
+  if (!neu) {
+    try {
+      const registry = profilLadeRegistry(), eintrag = registry.find((p) => p.id === profil.id);
+      if (eintrag) { eintrag.pruefung = ab.pruefung; profilSpeichereRegistry(registry); profil.pruefung = ab.pruefung; }
+    } catch (e) {}
+  }
+  return ab.schluessel;
 }
 
 async function profilErstelle(name, passwort, erstes) {

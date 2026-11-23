@@ -65,19 +65,32 @@ function suchTextFuer(d) {
    „Zander“ jedes „anderen“ als ähnlichen Treffer vor die echten, und bei
    sechs Plaetzen je Gruppe blieb fuer die echten oft nur einer. */
 function suchErgebnisse(docs, roh, filter) {
-  const q = normalisiere(String(roh || '').trim());
-  if (q.length < 2) return [];
+  /* 5.68: „#Mira“ filtert nach Etikett (Anfang genuegt, mehrere = alle muessen passen). */
+  const alle = [...docs];
+  /* Etiketten mit Leerzeichen („Kapitel 3“) heissen in der Suche „#Kapitel3“ — darum ohne Leerraum vergleichen. */
+  const etikettN = (x) => normalisiere(x).replace(/\s+/g, '');
+  const bekannt = new Set();
+  for (const d of alle) for (const x of (d && d.etiketten) || []) bekannt.add(etikettN(x));
+  /* Ein „#“, zu dem es kein Etikett gibt (etwa „#1“), bleibt ganz normaler Suchtext. */
+  const etiketten = [];
+  const q = normalisiere(String(roh || '').replace(/#([^\s#]{1,40})/g, (ganz, name) => {
+    const e = etikettN(name);
+    if (e && [...bekannt].some((x) => x.startsWith(e))) { etiketten.push(e); return ' '; }
+    return ganz;
+  }).replace(/\s+/g, ' ').trim());
+  if (q.length < 2 && !etiketten.length) return [];
+  const passt = (d) => !etiketten.length || etiketten.every((e) => (d.etiketten || []).some((x) => etikettN(x).startsWith(e)));
   const proGruppe = [];
   let genaueGesamt = 0;
-  const alle = [...docs];
   for (const [typ, name] of SUCH_GRUPPEN) {
     if (filter && typ !== filter) continue;
     const genau = [], vielleicht = [];
     for (const d of alle) {
-      if (!d || d.typ !== typ || d.geloescht) continue;
+      if (!d || d.typ !== typ || d.geloescht || !passt(d)) continue;
+      if (q.length < 2) { genau.push({ d, stellen: [], unscharf: false, suchText: '', imTitel: false }); continue; }
       const titelN = normalisiere(suchTitelFuer(d));
       const suchText = suchTextFuer(d);
-      const imTitel = titelN.indexOf(q) >= 0;
+      const imTitel = titelN.indexOf(q) >= 0 || (d.etiketten || []).some((x) => normalisiere(x).indexOf(q) >= 0);
       /* Schneller Vortest auf der (gemerkten) normalisierten Fassung — die
          Karte fuer die genaue Stelle wird nur fuer echte Funde gebaut. */
       const stellen = suchNorm(d, suchText).indexOf(q) >= 0 ? suchFundstellen(suchText, q) : [];
@@ -87,7 +100,7 @@ function suchErgebnisse(docs, roh, filter) {
     genaueGesamt += genau.length;
     proGruppe.push({ typ, name, genau, vielleicht });
   }
-  const mitNachsicht = genaueGesamt < 3;
+  const mitNachsicht = genaueGesamt < 3 && q.length >= 5;
   const raus = [];
   for (const g of proGruppe) {
     /* Genaue zuerst: Titeltreffer vor Texttreffern, dann die mit den meisten
@@ -168,6 +181,17 @@ function oeffneSuche() {
         class: 'suchchip' + (filter === typ ? ' an' : ''),
         onclick: () => { filter = filter === typ ? null : typ; baueChips(); suche(); }
       }, name));
+    }
+    /* Etiketten: antippen setzt „#Etikett“ ins Feld */
+    const bekannt = etikettenAlle().slice(0, 14);
+    if (bekannt.length) {
+      const reihe = el('div', { class: 'such-etiketten' });
+      for (const { name: et } of bekannt) reihe.append(el('button', { class: 'etikett', onclick: () => {
+        const marke = '#' + et.replace(/\s+/g, '');
+        feld.value = feld.value.includes(marke) ? feld.value.replace(marke, '').replace(/\s+/g, ' ').trim() : (feld.value.trim() + ' ' + marke).trim();
+        baueChips(); suche(); feld.focus();
+      } }, '#' + et));
+      chips.append(reihe);
     }
   };
   baueChips();
@@ -281,3 +305,55 @@ function oeffneSuche() {
 }
 
 /* ⌘/Strg+K öffnet das Spotlight (48b); ⌘/Strg+⇧+K diese Suche. */
+
+/* ===================== Etiketten ueber alle Raeume (5.68) =====================
+   Ein Stichwort („Kapitel 3“, „Mira“, „Idee“) an Schnipsel, Blaetter, Szenen,
+   Hefte; die Suche filtert mit „#Mira“. Gespeichert als `etiketten` am
+   Dokument (siehe etikettenSauber in 30-core.js). */
+function etikettenAlle() {
+  const zaehl = new Map();
+  for (const d of D.docs.values()) for (const e of d.etiketten || []) { const k = e.toLowerCase(); const alt = zaehl.get(k); zaehl.set(k, { name: alt ? alt.name : e, n: (alt ? alt.n : 0) + 1 }); }
+  return [...zaehl.values()].sort((a, b) => b.n - a.n || a.name.localeCompare(b.name, 'de'));
+}
+function etikettenZeile(d) {
+  if (!d || !Array.isArray(d.etiketten) || !d.etiketten.length) return null;
+  return el('div', { class: 'etiketten-zeile' }, d.etiketten.slice(0, 6).map((e) => el('span', { class: 'etikett klein' }, e)), d.etiketten.length > 6 ? el('span', { class: 'etikett klein' }, '+' + (d.etiketten.length - 6)) : null);
+}
+function etikettenBearbeiten(d) {
+  return new Promise((res) => {
+    let liste = [...(d.etiketten || [])];
+    const feld = el('input', { type: 'text', maxlength: '40', placeholder: 'Neues Etikett, dann Enter', 'aria-label': 'Neues Etikett', enterkeyhint: 'done' });
+    const jetzt = el('div', { class: 'etiketten-jetzt' });
+    const vorschlaege = el('div', { class: 'etiketten-vorschlaege' });
+    const neu = () => {
+      jetzt.innerHTML = '';
+      if (!liste.length) jetzt.append(el('span', { class: 'leise' }, 'Noch keine Etiketten.'));
+      for (const e of liste) jetzt.append(el('button', { class: 'etikett mit-weg', title: 'Etikett abnehmen', onclick: () => { liste = liste.filter((x) => x !== e); neu(); } }, e, el('span', { html: ik('kreuz'), style: 'display:flex;width:12px' })));
+      vorschlaege.innerHTML = '';
+      const f = normalisiere(feld.value.trim());
+      const passend = etikettenAlle().filter((x) => !liste.some((y) => y.toLowerCase() === x.name.toLowerCase()) && (!f || normalisiere(x.name).includes(f))).slice(0, 12);
+      for (const x of passend) vorschlaege.append(el('button', { class: 'etikett', onclick: () => { liste = etikettenSauber([...liste, x.name]); feld.value = ''; neu(); } }, '+ ' + x.name));
+    };
+    const dazu = () => { const t = feld.value.trim(); if (!t) return; liste = etikettenSauber([...liste, t]); feld.value = ''; neu(); };
+    feld.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); dazu(); } });
+    feld.addEventListener('input', neu);
+    const fertig = () => {
+      dazu();
+      const sauber = etikettenSauber(liste);
+      const vorher = JSON.stringify(d.etiketten || []);
+      if (sauber.length) d.etiketten = sauber; else delete d.etiketten;
+      if (JSON.stringify(d.etiketten || []) !== vorher) speichereStill(d);
+      zu(); res(true);
+    };
+    const kasten = el('div', { class: 'modal etiketten-modal' },
+      el('div', { class: 'kartenkopf' }, el('span', { html: ik('lesezeichen') }), 'ETIKETTEN'),
+      el('h2', {}, suchTitelFuer(d) || 'Ohne Titel'), jetzt,
+      el('div', { class: 'etiketten-feld' }, feld, el('button', { class: 'knopf', onclick: dazu }, 'Dazu')),
+      vorschlaege,
+      el('p', { class: 'leise' }, 'In der Suche findet „#' + (liste[0] || 'Etikett').replace(/\s+/g, '') + '“ alles mit diesem Etikett.'),
+      el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: fertig }, 'Fertig')));
+    const zu = zeigeDeck(kasten, () => fertig());
+    neu();
+    setTimeout(() => feld.focus(), 80);
+  });
+}

@@ -166,9 +166,13 @@ async function teileGespeicherteDatei(d) {
 async function oeffneGoodnote(d) {
   const bogen = el('div', { class: 'goodnote-leser' });
   const leiste = el('div', { class: 'schwebeleiste' },
-    el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Notizbuch schließen', onclick: () => { bogen.remove(); leiste.remove(); } }),
+    el('button', { class: 'rundknopf zart', html: ik('kreuz'), title: 'Notizbuch schließen', onclick: () => zu() }),
     el('span', { class: 'goodnote-lesertitel' }, d.titel || d.dateiname),
     el('button', { class: 'knopf', onclick: () => teileGespeicherteDatei(d) }, 'Original'));
+  /* Escape und Raumwechsel schliessen den Leser (vorher blieb er als Ebene ueber allem haengen). */
+  const taste = (e) => { if (e.key === 'Escape') { e.preventDefault(); zu(); } };
+  function zu() { bogen.remove(); leiste.remove(); document.removeEventListener('keydown', taste, true); window.removeEventListener('hashchange', zu); }
+  document.addEventListener('keydown', taste, true); window.addEventListener('hashchange', zu);
   bogen.append(el('div', { class: 'leer' }, 'Notizbuch wird geöffnet …'));
   document.body.append(bogen, leiste);
   const url = await bildURL(d.datei);

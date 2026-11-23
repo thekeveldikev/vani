@@ -189,6 +189,7 @@ async function sicherungEinspielen(paket, modus) {
     /* Erst ein Netz: die alten Texte als Rettung im kv-Speicher, bevor geleert wird. */
     try { await dbPut('kv', { wann: Date.now(), docs: [...D.docs.values()] }, 'vorImport'); } catch (e) { throw new Error('Vor dem Ersetzen ließ sich keine Sicherung anlegen — es wurde nichts verändert.'); }
     await dbTu('docs', 'readwrite', (s) => s.clear());
+    try { await dbTu('staende', 'readwrite', (s) => s.clear()); } catch (e) {}
     await dbTu('media', 'readwrite', (s) => s.clear());
     await dbTu('sync', 'readwrite', (s) => s.clear());
     D.docs.clear();

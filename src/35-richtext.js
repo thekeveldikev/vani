@@ -70,7 +70,10 @@ function sauberesRichHTML(html) {
     const kursiv = style.fontStyle === 'italic' || style.fontStyle === 'oblique';
     const deko = String(style.textDecorationLine || style.textDecoration || '');
     const unter = /underline/.test(deko), durch = /line-through/.test(deko);
+    /* Randnotiz-Markierung (5.68): die einzige Kennung, die bleibt — streng geprueft, ohne jeden Inhalt. */
+    const notizId = node.tagName === 'SPAN' ? String(node.getAttribute('data-notiz') || '') : '';
     for (const attr of [...node.attributes]) node.removeAttribute(attr.name);
+    if (notizId && /^n[a-z0-9]{4,24}$/.test(notizId)) node.setAttribute('data-notiz', notizId);
     const teile = [];
     if (farbe) teile.push('color:' + farbe);
     if (hintergrund) teile.push('background-color:' + hintergrund);
@@ -298,7 +301,7 @@ function richTeileFuerHoehe(editor, passtHtml) {
   return { hier: sauberesRichHTML(teil.hier), weiter: sauberesRichHTML(teil.weiter) };
 }
 
-function baueFormatleiste(editor, beiAenderung, kompakt) {
+function baueFormatleiste(editor, beiAenderung, kompakt, doc) {
   const knopf = (text, titel, befehl, wert) => el('button', {
     class: 'format-knopf', title: titel, 'aria-label': titel,
     onpointerdown: (e) => e.preventDefault(), onclick: () => { richBefehl(editor, befehl, wert); if (beiAenderung) beiAenderung(); }
@@ -323,7 +326,9 @@ function baueFormatleiste(editor, beiAenderung, kompakt) {
     ikKnopf('ausRechts', 'Rechts ausrichten', 'justifyRight'), ikKnopf('ausBlock', 'Blocksatz', 'justifyFull'),
     el('label', { class: 'format-farbe', title: 'Textfarbe' }, 'A', farbe),
     el('label', { class: 'format-farbe marker', title: 'Markierfarbe' }, '▰', marker),
-    el('label', { class: 'format-slider' }, 'Größe', groesse, groesseWert));
+    el('label', { class: 'format-slider' }, 'Größe', groesse, groesseWert),
+    doc && typeof randnotizSetzen === 'function' ? el('span', { class: 'format-trenner' }) : null,
+    doc && typeof randnotizSetzen === 'function' ? el('button', { class: 'format-knopf format-randnotiz', title: 'Randnotiz an die markierte Stelle', 'aria-label': 'Randnotiz', onpointerdown: (e) => e.preventDefault(), onclick: () => randnotizSetzen(editor, doc, beiAenderung) }, el('span', { html: ik('pin'), style: 'display:flex' }), 'Notiz') : null);
 }
 
 /* ----- Ersetzen, ohne die Formatierung mitzunehmen -----
@@ -404,5 +409,7 @@ function baueRichEditor(doc, optionen = {}) {
     richBefehl(editor, 'insertHTML', fertig);
     editor.dispatchEvent(new Event('input', { bubbles: true }));
   });
-  return { editor, leiste: baueFormatleiste(editor, () => editor.dispatchEvent(new Event('input', { bubbles: true })), !!optionen.kompakt), sichern };
+  if (typeof randnotizenBeleben === 'function' && optionen.randnotizen !== false) randnotizenBeleben(editor, doc);
+  if (typeof synonymeBeleben === 'function') synonymeBeleben(editor);
+  return { editor, leiste: baueFormatleiste(editor, () => editor.dispatchEvent(new Event('input', { bubbles: true })), !!optionen.kompakt, optionen.randnotizen !== false ? doc : null), sichern };
 }

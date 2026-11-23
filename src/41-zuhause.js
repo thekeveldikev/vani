@@ -377,13 +377,15 @@ RENDER.zuhause = function (haupt) {
     el('span', { html: ik('schreibtisch'), style: 'display:flex' }),
     el('span', {}, el('b', {}, 'Der Schreibtisch'), el('small', {}, 'Lampe an, Fenster zur Nacht, die letzten Texte liegen noch da.'))));
 
-  /* Sicherungs-Erinnerung, ganz leise */
-  const tageOhneSicherung = D.stats.letzteSicherung ? Math.floor((Date.now() - D.stats.letzteSicherung) / 86400000) : null;
-  if (D.docs.size > 12 && (tageOhneSicherung === null || tageOhneSicherung > 14)) {
-    inhalt.append(el('div', { class: 'sicherungs-mahnung' },
-      tageOhneSicherung === null ? 'Noch nie gesichert. ' : 'Letzte Sicherung: vor ' + tageOhneSicherung + ' Tagen. ',
-      el('button', { onclick: () => { location.hash = '#/feinheiten'; } }, 'Sicher ist sicher →')
-    ));
+  /* Die Sicherungs-Ampel (5.68): zaehlt nur, was das Geraet verlassen hat. Gruen bleibt leise. */
+  if (D.docs.size >= 3 && typeof sicherungAmpel === 'function') {
+    const a = sicherungAmpel();
+    const platzZeile = el('span', { class: 'ampel-platz' });
+    inhalt.append(el('div', { class: 'sicherungs-ampel ' + a.farbe },
+      el('i', { class: 'ampel-punkt', 'aria-hidden': 'true' }),
+      el('span', {}, a.text), platzZeile,
+      a.farbe === 'gruen' ? null : el('button', { class: 'knopf zart', onclick: () => sichereAlles() }, 'Jetzt sichern')));
+    if (typeof speicherPlatz === 'function') speicherPlatz().then((p) => { if (p && p.gesamt && p.anteil >= .7) platzZeile.textContent = ' · Speicher ' + Math.round(p.anteil * 100) + ' % voll'; }).catch(() => {});
   }
 
   haupt.append(inhalt);

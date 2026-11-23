@@ -87,6 +87,7 @@ function tonAufnehmen() {
       };
       try {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        try { if (audioCtx.state === 'suspended') audioCtx.resume(); } catch (x) {}
         analyser = audioCtx.createAnalyser(); analyser.fftSize = 512;
         audioCtx.createMediaStreamSource(strom).connect(analyser);
         pegelZeichnen();
@@ -126,7 +127,8 @@ function baueTon(a, blatt, neuBauen) {
   spiel.addEventListener('click', async (e) => {
     e.stopPropagation();
     if (audio && !audio.paused) { audio.pause(); audio.currentTime = 0; spielBeenden(); return; }
-    const url = await bildURL(a.datei);
+    if (spiel._laedt) return; spiel._laedt = true;
+    let url; try { url = await bildURL(a.datei); } finally { spiel._laedt = false; }
     if (!url) { toast('Die Aufnahme ist nicht da.'); return; }
     audio = new Audio(url);
     audio.ontimeupdate = () => { zeit.textContent = tonFormat(audio.currentTime) + ' / ' + tonFormat(a.dauer); };

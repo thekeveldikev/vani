@@ -426,7 +426,8 @@ async function buchCoverAusSeite(b, n) {
     const vp0 = seite.getViewport({ scale: 1 }); const vp = seite.getViewport({ scale: 480 / vp0.width });
     const c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
     await seite.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
-    const id = await new Promise((res) => c.toBlob(async (bl) => res(bl ? await speichereDateiBlob(new File([bl], 'cover.jpg', { type: 'image/jpeg' })) : null), 'image/jpeg', .82));
+    const id = await new Promise((res) => c.toBlob(async (bl) => { try { res(bl ? await speichereDateiBlob(new File([bl], 'cover.jpg', { type: 'image/jpeg' })) : null); } catch (e) { res(null); } }, 'image/jpeg', .82));
+    c.width = c.height = 0;
     if (id) { b.bild = id; speichere(b); toast('Neues Cover.'); }
     } finally { try { dok.destroy(); } catch (e) {} }
   } catch (e) { toast('Das Cover ließ sich nicht malen.'); }

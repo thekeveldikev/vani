@@ -19,10 +19,11 @@ const MIME = {
   '.json': 'application/json; charset=utf-8', '.png': 'image/png',
   '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.ico': 'image/x-icon',
   '.webmanifest': 'application/manifest+json', '.wasm': 'application/wasm',
-  '.opus': 'audio/ogg', '.wav': 'audio/wav', '.enc': 'application/octet-stream'
+  '.opus': 'audio/ogg', '.wav': 'audio/wav', '.enc': 'application/octet-stream',
+  '.txt': 'text/plain; charset=utf-8'
 };
 const OEFFENTLICHE_DATEIEN = new Set(['index.html', 'manifest.json', 'sw.js', 'robots.txt']);
-const OEFFENTLICHE_ORDNER = new Set(['icons', 'vendor', 'klang', 'sticker', 'autoren', 'buecher']);
+const OEFFENTLICHE_ORDNER = new Set(['icons', 'vendor', 'klang', 'sticker', 'autoren', 'synonyme', 'buecher']);
 const OEFFENTLICHE_EINLESUNG = new Set(['einlesung/einlesung.enc', 'einlesung/umschlag.json']);
 
 export function oeffentlicherPfad(p) {

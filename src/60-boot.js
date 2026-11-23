@@ -200,6 +200,8 @@ async function sucheAppUpdate(neuLaden = false) {
 
   /* Papierkorb: sehr Altes still wegräumen */
   setTimeout(() => { papierkorbLeeren(30).catch(() => {}); }, 4000);
+  /* 5.68: Sicherung ausser Haus (alle 7 Tage) und volle Speicher — nach dem Ankommen, nie mitten ins Schreiben */
+  setTimeout(() => { try { if (typeof _sr !== 'undefined' && _sr) return; if (typeof sicherungErinnern === 'function' && sicherungErinnern()) return; if (typeof speicherWarnen === 'function') speicherWarnen().catch(() => {}); } catch (e) {} }, 9000);
 
   /* Service Worker — nur wo es ihn gibt */
   if ('serviceWorker' in navigator && location.protocol.startsWith('http') && !location.search.includes('kein-sw')) {

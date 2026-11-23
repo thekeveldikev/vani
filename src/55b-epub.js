@@ -94,7 +94,8 @@ async function epubKapitelHTML(buch, pfad, urls) {
   const dok = new DOMParser().parseFromString(roh, 'text/html');
   const body = dok.body || dok.documentElement;
   for (const e of body.querySelectorAll('script, style, link, iframe, object, embed, form, input, button, video, audio, svg foreignObject, noscript')) e.remove();
-  for (const e of body.querySelectorAll('*')) for (const a of [...e.attributes]) { if (/^on/i.test(a.name) || a.name === 'style' && /url\(/i.test(a.value)) e.removeAttribute(a.name); }
+  for (const e of body.querySelectorAll('animate, set, animateTransform, animateMotion, use')) e.remove();
+  for (const e of body.querySelectorAll('*')) for (const a of [...e.attributes]) { if (/^on/i.test(a.name) || a.name === 'style' && /url\(/i.test(a.value) || /^\s*(javascript|vbscript):/i.test(a.value)) e.removeAttribute(a.name); }
   const ordner = pfad.replace(/[^/]*$/, '');
   for (const img of body.querySelectorAll('img, image')) {
     const src = img.getAttribute('src') || img.getAttribute('xlink:href') || img.getAttribute('href');

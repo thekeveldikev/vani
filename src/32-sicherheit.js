@@ -40,11 +40,34 @@ function speicherMelden() { for (const fn of [..._speicherHorcher]) { try { fn(s
 const warte = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* Speichern mit drei Anläufen. Gibt true zurück, wenn es geklappt hat. */
+const _staendeStand = new WeakMap();
 async function sicherSpeichern(store, wert, key, { versuche = 3 } = {}) {
   /* Ein eben geloeschtes Dokument kommt nicht durch die Hintertuer zurueck
      (siehe istWeggeraeumt in 30-core.js). Kein Fehler — es gibt nur nichts
      mehr zu sichern. */
   if (store === 'docs' && typeof istWeggeraeumt === 'function' && istWeggeraeumt(wert)) return true;
+  /* Staende reisen getrennt: das Dokument ohne sie (flache Kopie, billig), die Staende
+     nur, wenn sich an ihnen etwas geaendert hat (5.68). */
+  if (store === 'docs' && wert && Array.isArray(wert.staende)) {
+    const st = wert.staende;
+    let summe = 0;
+    for (const s of st) summe += ((s && s.wann) || 0) % 1e9 + String((s && s.text) || '').length;
+    const kennung = st.length + ':' + summe;
+    let staendeOk = true;
+    if (!_staendeLesefehler && _staendeStand.get(wert) !== kennung) {
+      staendeOk = await sicherSpeichern('staende', st, wert.id, { versuche });
+      if (staendeOk) _staendeStand.set(wert, kennung);
+    }
+    /* Waehrend die Staende geschrieben wurden, kann das Dokument geloescht worden sein —
+       dann nicht durch die Hintertuer wieder anlegen. */
+    if (typeof istWeggeraeumt === 'function' && istWeggeraeumt(wert)) return true;
+    /* Der Text ist wichtiger als die alten Fassungen: er wird auch dann gesichert,
+       wenn die Staende gerade nicht in den Speicher wollten. */
+    const ohne = Object.assign({}, wert); delete ohne.staende;
+    const textOk = await sicherSpeichern('docs-roh', ohne, key, { versuche });
+    return textOk && staendeOk;
+  }
+  if (store === 'docs-roh') { if (typeof istWeggeraeumt === 'function' && istWeggeraeumt(wert)) return true; store = 'docs'; }
   _speicher.offen++; speicherMelden();
   let letzter = null;
   for (let i = 0; i < versuche; i++) {
@@ -331,6 +354,7 @@ async function zeigeSicherheit() {
       zeile('Zuletzt gespeichert', z.zuletzt ? vorZeit(z.zuletzt) : 'noch nichts in dieser Sitzung'),
       zeile('Speicher hakt', z.fehler ? z.fehler + '× — Rettungskopie greift' : 'nein', z.fehler ? 'warn' : 'gut'),
       zeile('Wochensicherung', sich ? fmtDatum(sich.wann) + ', ' + zaehl(sich.texte, 'Text', 'Texte') : 'wird gleich angelegt'),
+      zeile('Außer Haus gesichert', sicherungAmpel().tage === null ? 'noch nie — „Alles sichern“' : vorZeit(D.stats.letzteSicherung), sicherungAmpel().farbe === 'gruen' ? 'gut' : 'warn'),
       platz ? zeile('Platz belegt', bytesLesbar(platz.belegt) + (platz.gesamt ? ' von ' + bytesLesbar(platz.gesamt) : ''), platz.anteil > .9 ? 'warn' : 'gut') : null,
       platz ? zeile('Dauerspeicher', platz.dauerhaft === true ? 'ja — nichts wird weggeräumt' : platz.dauerhaft === false ? 'nicht bestätigt' : 'unbekannt', platz.dauerhaft === true ? 'gut' : '') : null),
     platz && platz.dauerhaft === false ? el('button', { class: 'knopf zart', style: 'justify-self:start', onclick: async () => {
@@ -356,4 +380,48 @@ async function zeigeSicherheit() {
       ...prot.slice(-8).reverse().map((p) => el('div', { class: 'sicher-protokollzeile' }, el('small', {}, fmtDatum(p.wann) + ' ' + fmtZeit(p.wann) + ' · ' + p.art), el('span', {}, p.text))),
       el('button', { class: 'knopf zart', style: 'margin-top:8px', onclick: (ev) => { protokollLoeschen(); ev.currentTarget.closest('details').remove(); toast('Protokoll geleert.'); } }, 'Protokoll leeren')) : null);
   const zu = zeigeDeck(kasten);
+}
+
+/* ===================== 5.68: Sicherung ausser Haus, Platz im Blick =====================
+   Die Wochensicherung liegt im selben Speicher wie die Texte — faellt der weg
+   (iPad zurueckgesetzt, Safari raeumt auf), ist beides weg. Darum zaehlt hier nur,
+   was das Geraet verlassen hat: „Alles sichern“ als Datei (Teilen-Blatt → Dateien/iCloud).
+   Die Ampel steht auf Zuhause; alle 7 Tage erinnert VANI einmal freundlich.
+   Die Speicherwarnung meldet sich, bevor iOS das Speichern verweigert. */
+function sicherungAmpel(jetzt = Date.now()) {
+  const wann = D.stats && D.stats.letzteSicherung || 0;
+  const tage = wann ? Math.floor((jetzt - wann) / 86400000) : null;
+  const farbe = tage === null ? 'rot' : tage <= 7 ? 'gruen' : tage <= 14 ? 'gelb' : 'rot';
+  const text = tage === null ? 'Noch nie außer Haus gesichert'
+    : tage === 0 ? 'Heute außer Haus gesichert'
+    : tage === 1 ? 'Letzte Sicherung außer Haus: gestern'
+    : 'Letzte Sicherung außer Haus: vor ' + tage + ' Tagen';
+  return { tage, farbe, text };
+}
+function sicherungErinnerungFaellig(jetzt = Date.now()) {
+  if (!D.docs || D.docs.size < 3) return false;
+  const a = sicherungAmpel(jetzt);
+  if (a.tage !== null && a.tage < 7) return false;
+  let zuletzt = 0;
+  try { zuletzt = Number(localStorage.getItem(sicherungErinnerungSchluessel())) || 0; } catch (e) {}
+  return jetzt - zuletzt > 7 * 86400000;
+}
+function sicherungErinnerungSchluessel() { return 'vani-sicherung-erinnert-' + (typeof AKTIVES_PROFIL_ID !== 'undefined' && AKTIVES_PROFIL_ID || 'standard'); }
+function sicherungErinnern() {
+  if (!sicherungErinnerungFaellig()) return false;
+  try { localStorage.setItem(sicherungErinnerungSchluessel(), String(Date.now())); } catch (e) {}
+  const a = sicherungAmpel();
+  toastMitAktion((a.tage === null ? 'Deine Texte liegen bisher nur auf diesem Gerät.' : 'Seit ' + a.tage + ' Tagen keine Sicherung außer Haus.') + ' Im Teilen-Blatt „In Dateien sichern“ wählen — am besten iCloud Drive.', 'Jetzt sichern', () => { if (typeof sichereAlles === 'function') sichereAlles(); }, 12000);
+  return true;
+}
+async function speicherWarnen() {
+  const p = await speicherPlatz();
+  if (!p || !p.gesamt || p.anteil < .8) return false;
+  const tag = typeof tagKey === 'function' ? tagKey() : '';
+  let schon = '';
+  try { schon = localStorage.getItem('vani-speicher-gewarnt') || ''; } catch (e) {}
+  if (schon === tag) return false;
+  try { localStorage.setItem('vani-speicher-gewarnt', tag); } catch (e) {}
+  toastMitAktion('Der Speicher ist zu ' + Math.round(p.anteil * 100) + ' % voll (' + bytesLesbar(p.belegt) + ' von ' + bytesLesbar(p.gesamt) + '). Große Klänge, PDFs oder Fotos machen Platz frei — vorher bitte einmal sichern.', 'Ansehen', () => { location.hash = '#/feinheiten'; }, 12000);
+  return true;
 }

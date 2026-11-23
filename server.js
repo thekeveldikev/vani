@@ -19,10 +19,11 @@ const MIME = {
   '.wasm': 'application/wasm',
   '.opus': 'audio/ogg',
   '.wav': 'audio/wav',
-  '.enc': 'application/octet-stream'
+  '.enc': 'application/octet-stream',
+  '.txt': 'text/plain; charset=utf-8'
 };
 const OEFFENTLICHE_DATEIEN = new Set(['index.html', 'manifest.json', 'sw.js', 'robots.txt']);
-const OEFFENTLICHE_ORDNER = new Set(['icons', 'vendor', 'klang', 'sticker', 'autoren', 'buecher']);
+const OEFFENTLICHE_ORDNER = new Set(['icons', 'vendor', 'klang', 'sticker', 'autoren', 'synonyme', 'buecher']);
 const OEFFENTLICHE_EINLESUNG = new Set(['einlesung/einlesung.enc', 'einlesung/umschlag.json']);
 const SICHERHEITSHEADER = {
   'X-Content-Type-Options': 'nosniff',

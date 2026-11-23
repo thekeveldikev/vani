@@ -22,6 +22,8 @@ kopiereOrdner('vendor');
 /* Mitgebrachte Sticker ebenso — der Rettungsraum soll sie auch kennen. */
 kopiereOrdner('sticker');
 kopiereOrdner('autoren');
+/* Synonyme (OpenThesaurus, LGPL) — erst beim ersten Nachschlagen geladen. */
+kopiereOrdner('synonyme');
 kopiereOrdner('einlesung', { filter: (q) => !/(?:einlesung\.json|\.quelle\.js)$/i.test(q) });
 /* Der frühere Sites-Origin bleibt für die verschlüsselten Pakete erhalten, ist
    aber keine zweite installierbare App mehr. Die echte App liegt als bewusst

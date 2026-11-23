@@ -217,7 +217,7 @@ function oeffneSchreibraum(docId) {
   });
   ta.addEventListener('keydown', (e) => {
     if (D.einst.tastenklang && e.key.length === 1) tippKlick();
-    if (e.key === 'Escape') { schliesseSchreibraum(true); return; }
+    if (e.key === 'Escape' && !e.isComposing && e.keyCode !== 229) { schliesseSchreibraum(true); return; }
     const cmd = e.metaKey || e.ctrlKey;
     /* Die Griffe, die man aus jedem Schreibprogramm im Finger hat. */
     if (cmd && e.key.toLowerCase() === 's') { e.preventDefault(); friereEin(); return; }
@@ -445,6 +445,7 @@ function srEinstellungen() {
     zeileFuer('Tastenklang', wahl([[true, 'An'], [false, 'Aus']], s.tastenklang, (v) => { s.tastenklang = v; })),
     zeileFuer('„Kluge Zeichen“', wahl([[true, 'An'], [false, 'Aus']], s.ersetzungen, (v) => { s.ersetzungen = v; })),
     zeileFuer('Autokorrektur', wahl([[true, 'An'], [false, 'Aus']], s.autokorrektur, (v) => { s.autokorrektur = v; })),
+    zeileFuer('Synonyme beim Markieren', wahl([[true, 'An'], [false, 'Aus']], s.synonyme !== false, (v) => { s.synonyme = v; if (!v && typeof synPilleWeg === 'function') synPilleWeg(); })),
     zeileFuer('Vorlesetempo', wahl([[.8, 'Ruhig'], [.95, 'Normal'], [1.15, 'Zügig']], begrenze(s.vorleseTempo, .6, 1.4, .95), (v) => { s.vorleseTempo = v; })),
     zeileFuer('Pause nach 40 Minuten', wahl([[true, 'Erinnern'], [false, 'Aus']], s.pausenErinnerung !== false, (v) => { s.pausenErinnerung = v; })),
     el('div', { class: 'reihe', style: 'justify-content:flex-start;flex-wrap:wrap;gap:8px' },

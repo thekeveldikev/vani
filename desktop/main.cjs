@@ -15,7 +15,7 @@ const APP_ID = 'de.vani.schreibzuhause';
 let fenster = null;
 let updater = null;
 const OEFFENTLICHE_DATEIEN = new Set(['index.html', 'manifest.json', 'sw.js', 'robots.txt']);
-const OEFFENTLICHE_ORDNER = new Set(['icons', 'vendor', 'klang', 'sticker', 'autoren']);
+const OEFFENTLICHE_ORDNER = new Set(['icons', 'vendor', 'klang', 'sticker', 'autoren', 'synonyme']);
 const OEFFENTLICHE_EINLESUNG = new Set(['einlesung/einlesung.enc', 'einlesung/umschlag.json']);
 
 function oeffentlicherPfad(p) {

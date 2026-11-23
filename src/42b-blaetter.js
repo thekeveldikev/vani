@@ -63,7 +63,8 @@ RENDER.blaetter = function (haupt) {
       el('div', { class: 'btitel serif' }, b.titel || erste.slice(0, 60) || 'Ohne Titel'),
       el('div', { class: 'bprobe' }, (b.text || '').trim().replace(/\s+/g, ' ').slice(0, 140) || 'Noch leer.'),
       el('div', { class: 'bfuss' }, (worteZahl ? zaehl(worteZahl, 'Wort', 'Wörter') + ' · ' : '') + vorZeit(b.geaendert)
-        + (worteZahl > 60 ? ' · ' + Math.max(1, Math.round(worteZahl / 200)) + ' Min.' : ''))
+        + (worteZahl > 60 ? ' · ' + Math.max(1, Math.round(worteZahl / 200)) + ' Min.' : '')),
+      etikettenZeile(b)
     );
     langdruck(karte, async () => {
       const wahl = await menue([
@@ -74,8 +75,10 @@ RENDER.blaetter = function (haupt) {
         { text: 'Duplizieren', icon: 'wandel', wert: 'doppel' },
         { text: 'In ein Heft legen …', icon: 'hefte', wert: 'heft' },
         { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
+        { text: 'Etiketten …' + (b.etiketten && b.etiketten.length ? ' (' + b.etiketten.slice(0, 3).join(', ') + ')' : ''), icon: 'lesezeichen', wert: 'etiketten' },
         { text: 'Löschen', icon: 'muell', wert: 'weg', rot: true }
       ], b.titel || 'Blatt');
+      if (wahl === 'etiketten') { await etikettenBearbeiten(b); zeichne(); return; }
       if (wahl === 'pin') {
         b.gepinnt = !b.gepinnt; speichereStill(b); zeichne();
       } else if (wahl === 'vorlesen') {

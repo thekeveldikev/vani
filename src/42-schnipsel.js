@@ -123,6 +123,7 @@ RENDER.schnipsel = function (haupt) {
         blase.append(img);
       }
       if (s.text) blase.append(el('div', { class: 'btext', html: schmuecke(s.text) }));
+      const etz = etikettenZeile(s); if (etz) blase.append(etz);
       blase.append(el('div', { class: 'bzeit' },
         s.gepinnt ? el('span', { html: ik('pin'), style: 'display:flex;width:11px;color:var(--gold)' }) : null,
         fmtZeit(s.angelegt)));
@@ -206,6 +207,7 @@ async function schnipselMenue(s, blase, neuZeichnen) {
     s.text ? { text: 'Bearbeiten', icon: 'stift', wert: 'edit' } : null,
     { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
     { text: 'Verwandeln …', icon: 'wandel', wert: 'wandel' },
+    { text: 'Etiketten …' + (s.etiketten && s.etiketten.length ? ' (' + s.etiketten.slice(0, 3).join(', ') + ')' : ''), icon: 'lesezeichen', wert: 'etiketten' },
     { text: 'Löschen', icon: 'muell', wert: 'weg', rot: true }
   ]);
   if (wahl === 'pin') { s.gepinnt = !s.gepinnt; speichereStill(s); neuZeichnen(); }
@@ -218,6 +220,7 @@ async function schnipselMenue(s, blase, neuZeichnen) {
   }
   else if (wahl === 'dazu') { await hinzufuegenMenue(s); if (neuZeichnen) neuZeichnen(); }
   else if (wahl === 'wandel') verwandleSchnipsel(s, neuZeichnen);
+  else if (wahl === 'etiketten') { await etikettenBearbeiten(s); if (neuZeichnen) neuZeichnen(); }
 }
 
 async function verwandleSchnipsel(s, neuZeichnen) {

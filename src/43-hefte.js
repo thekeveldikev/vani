@@ -89,9 +89,11 @@ async function heftMenue(h, danach) {
     { text: h.projektRef ? 'Projekt-Zuordnung ändern' : 'Einem Projekt zuordnen', icon: 'projekte', wert: 'projekt' },
     { text: 'Text aus einer anderen App hereinholen', icon: 'runter', wert: 'einfuegen' },
     { text: 'Hinzufügen & verbinden', icon: 'verbinden', wert: 'dazu' },
+    { text: 'Etiketten …' + (h.etiketten && h.etiketten.length ? ' (' + h.etiketten.slice(0, 3).join(', ') + ')' : ''), icon: 'lesezeichen', wert: 'etiketten' },
     h.archiv ? { text: 'Zurück auf den Tisch', icon: 'archiv', wert: 'zurueck' } : { text: 'Ins Regal stellen', icon: 'archiv', wert: 'archiv' },
     { text: 'Heft verbrennen', icon: 'muell', wert: 'weg', rot: true }
   ].filter(Boolean), h.titel);
+  if (wahl === 'etiketten') { await etikettenBearbeiten(h); if (danach) danach(); else zeichne(); return; }
   if (wahl === 'name') {
     const neu = await eingabe({ titel: 'Das Heft heißt jetzt …', wert: h.titel });
     if (neu) { h.titel = neu; speichere(h); }

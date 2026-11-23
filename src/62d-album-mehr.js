@@ -321,3 +321,90 @@ function albumBlattVon(id, liste) {
   const i = (liste || []).findIndex((f) => f.id === id);
   return i < 0 ? 0 : i + 1;
 }
+
+/* ===================== Figuren-Auftritte (5.68) =====================
+   Zu jeder Figur die Szenen (und Blaetter), in denen sie vorkommt — gefunden
+   ueber Name, Vorname und alle Spitznamen (ganze Woerter, Umlaute und ß egal).
+   Dazu: wo sie in der Geschichte zuletzt auftritt und wann zuletzt ueber sie
+   geschrieben wurde. Nur lesen, nichts aendern. */
+const FIGUR_KEIN_VORNAME = new Set(['der', 'die', 'das', 'den', 'dem', 'des', 'ein', 'eine', 'einer', 'herr', 'frau', 'fraulein', 'dr', 'prof', 'doktor', 'professor', 'sir', 'lady', 'lord', 'konig', 'konigin', 'prinz', 'prinzessin', 'graf', 'grafin', 'tante', 'onkel', 'oma', 'opa', 'mama', 'papa', 'mutter', 'vater', 'kapitan', 'pater', 'schwester', 'bruder', 'meister', 'the', 'mr', 'mrs', 'miss', 'ms', 'von', 'van', 'zu', 'la', 'le', 'el', 'kleine', 'kleiner', 'alte', 'alter', 'junge', 'junger', 'grosse', 'grosser']);
+function figurNamen(figur) {
+  const namen = new Set();
+  const dazu = (n) => { const t = String(n || '').replace(/\s+/g, ' ').trim(); if (t.length >= 2 && t.length <= 60) namen.add(t); };
+  const name = String(figur && (figur.name || figur.titel) || '').trim();
+  dazu(name);
+  /* Der Vorname allein — aber nie ein Artikel oder eine Anrede („Der Alte“, „Frau Meier“). */
+  const teile = name.split(' ').filter(Boolean);
+  const vorn = teile[0] ? teile[0].replace(/\.$/, '') : '';
+  if (teile.length > 1 && vorn.length >= 3 && !FIGUR_KEIN_VORNAME.has(normalisiere(vorn))) dazu(teile[0]);
+  const nennung = figur && figur.felder && figur.felder.nennung;
+  const flach = (v) => Array.isArray(v) ? v.flatMap(flach) : v && typeof v === 'object' ? flach(v.text || v.wert || v.name || '') : String(v || '').split(/[,;]/);
+  for (const n of flach(nennung)) dazu(n);
+  return [...namen];
+}
+/* Zaehlt ganze Woerter in normalisiertem Text. Pur. */
+function figurZaehlen(textN, namenN) {
+  /* Laengste Namen zuerst, und Gefundenes wird ausgeblendet: „Mira Stern“ zaehlt
+     einmal — nicht noch ein zweites Mal als „Mira“. */
+  let n = 0, rest = String(textN || '');
+  for (const name of [...new Set(namenN)].sort((a, b) => b.length - a.length)) {
+    const muster = new RegExp('(^|[^a-z0-9])' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?=$|[^a-z0-9])', 'g');
+    rest = rest.replace(muster, (treffer, vor) => { n++; return vor + ' '.repeat(treffer.length - vor.length); });
+  }
+  return n;
+}
+function figurAuftritte(figur) {
+  const namenN = figurNamen(figur).map((n) => normalisiere(n)).filter((n) => n.length >= 2);
+  if (!namenN.length) return { namen: [], treffer: [] };
+  const treffer = [];
+  for (const d of D.docs.values()) {
+    if (!['szene', 'blatt'].includes(d.typ) || !(d.text || '').trim()) continue;
+    const n = figurZaehlen(normalisiere(d.text), namenN);
+    if (!n) continue;
+    const t = { d, n, wann: d.geaendert || d.angelegt || 0, projekt: null, kapitel: null, stelle: [Infinity, Infinity] };
+    if (d.typ === 'szene') {
+      const kap = D.docs.get(d.parent), proj = kap ? D.docs.get(kap.parent) : (d.projekt ? D.docs.get(d.projekt) : null);
+      t.kapitel = kap || null; t.projekt = proj || null;
+      if (kap && proj) {
+        const kListe = kinder(proj.id, 'kapitel'), sListe = kinder(kap.id, 'szene');
+        t.stelle = [kListe.findIndex((x) => x.id === kap.id), sListe.findIndex((x) => x.id === d.id)];
+      }
+    }
+    treffer.push(t);
+  }
+  /* In Geschichtsreihenfolge: je Projekt nach Kapitel und Szene; Blaetter danach, juengste zuerst */
+  treffer.sort((a, b) => (a.projekt ? 0 : 1) - (b.projekt ? 0 : 1) || String(a.projekt && a.projekt.titel || '').localeCompare(String(b.projekt && b.projekt.titel || ''), 'de') || a.stelle[0] - b.stelle[0] || a.stelle[1] - b.stelle[1] || b.wann - a.wann);
+  return { namen: figurNamen(figur), treffer };
+}
+function figurAuftritteZeigen(figur) {
+  const { namen, treffer } = figurAuftritte(figur);
+  const name = (figur && (figur.name || figur.titel)) || 'Diese Figur';
+  const szenen = treffer.filter((t) => t.d.typ === 'szene');
+  /* „Zuletzt in der Geschichte“: im Projekt, an dem zuletzt geschrieben wurde, die spaeteste Szene. */
+  const mitProjekt = szenen.filter((t) => t.projekt);
+  const juengstes = mitProjekt.slice().sort((a, b) => b.wann - a.wann)[0];
+  const imProjekt = juengstes ? mitProjekt.filter((t) => t.projekt.id === juengstes.projekt.id) : [];
+  const zuletztGeschichte = imProjekt.length ? imProjekt[imProjekt.length - 1] : null;
+  const zuletztGeschrieben = treffer.slice().sort((a, b) => b.wann - a.wann)[0];
+  const liste = el('div', { class: 'auftritte-liste' });
+  let projektVorher;
+  for (const t of treffer) {
+    const pid = t.projekt ? t.projekt.id : '';
+    if (pid !== projektVorher) { projektVorher = pid; liste.append(el('div', { class: 'auftritte-projekt' }, t.projekt ? (t.projekt.titel || 'Projekt') : 'Blätter')); }
+    liste.append(el('button', { class: 'auftritt', onclick: () => { zu(); $$('.schleier').forEach((s) => schliesseDeck(s)); oeffneSchreibraum(t.d.id); } },
+      el('span', { class: 'auftritt-titel' }, (t.kapitel ? (t.kapitel.titel || 'Kapitel') + ' · ' : '') + (t.d.titel || 'Ohne Titel')),
+      el('span', { class: 'auftritt-zahl' }, t.n === 1 ? 'einmal genannt' : t.n + '× genannt'),
+      el('span', { class: 'auftritt-wann' }, vorZeit(t.wann))));
+  }
+  const kasten = el('div', { class: 'modal auftritte-modal' },
+    el('div', { class: 'kartenkopf' }, el('span', { html: ik('figur') }), 'AUFTRITTE'),
+    el('h2', {}, name),
+    el('p', { class: 'auftritte-namen' }, namen.length ? 'Gesucht nach: ' + namen.join(' · ') : 'Ohne Namen findet sich nichts — erst einen Namen eintragen.'),
+    treffer.length ? el('div', { class: 'auftritte-kopf' },
+      el('div', {}, el('b', {}, String(szenen.length)), szenen.length === 1 ? ' Szene' : ' Szenen', treffer.length > szenen.length ? ' · ' + (treffer.length - szenen.length) + (treffer.length - szenen.length === 1 ? ' Blatt' : ' Blätter') : ''),
+      zuletztGeschichte ? el('div', {}, 'Zuletzt in der Geschichte: ', el('b', {}, (zuletztGeschichte.kapitel ? (zuletztGeschichte.kapitel.titel || 'Kapitel') + ' · ' : '') + '„' + (zuletztGeschichte.d.titel || 'Ohne Titel') + '“')) : null,
+      zuletztGeschrieben ? el('div', {}, 'Zuletzt darüber geschrieben: ', el('b', {}, vorZeit(zuletztGeschrieben.wann))) : null) : null,
+    treffer.length ? liste : (namen.length ? el('p', { class: 'leise' }, name + ' kommt in keiner Szene und keinem Blatt vor — noch nicht.') : null),
+    el('div', { class: 'reihe' }, el('button', { class: 'knopf voll', onclick: () => zu() }, 'Schließen')));
+  const zu = zeigeDeck(kasten);
+}

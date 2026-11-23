@@ -615,7 +615,7 @@ function alleTexteAlsText() {
 
 /* Datei hinausgeben: Teilen-Menü → Download → Zwischenablage */
 async function teileDatei(name, inhalt, typ = 'text/plain') {
-  const blob = new Blob([inhalt], { type: typ + ';charset=utf-8' });
+  const blob = new Blob([inhalt], { type: /^text\/|json|xml/.test(typ) ? typ + ';charset=utf-8' : typ });
   const datei = new File([blob], name, { type: typ });
   if (navigator.canShare && navigator.canShare({ files: [datei] })) {
     try { await navigator.share({ files: [datei] }); return true; }
@@ -630,6 +630,8 @@ async function teileDatei(name, inhalt, typ = 'text/plain') {
     toast('Gespeichert — schau in „Dateien“ nach.');
     return true;
   } catch (e) {}
+  /* Binaeres (Word, PDF, EPUB) taugt nicht fuer die Zwischenablage */
+  if (typeof inhalt !== 'string') { toast('Das hat leider nicht geklappt.'); return false; }
   try {
     await navigator.clipboard.writeText(inhalt);
     toast('Ging nicht als Datei — liegt jetzt in der Zwischenablage.');

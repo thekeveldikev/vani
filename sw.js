@@ -1,5 +1,5 @@
 /* VANI Service Worker — Seiten frisch aus dem Netz, offline aus dem sicheren Cache. */
-const VERSION = '5.67.1';
+const VERSION = '5.68.0';
 const CACHE = 'vani-v5-' + VERSION;
 const KERN = [
   './',
@@ -29,6 +29,9 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
+  /* Die Synonyme (4 MB) behaelt VANI selbst in der Datenbank — nicht noch ein
+     zweites Mal je Fassung im Cache ablegen. */
+  if (url.pathname.indexOf('/synonyme/') !== -1) return;
 
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req).then((res) => {
