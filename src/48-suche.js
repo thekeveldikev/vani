@@ -186,7 +186,7 @@ function oeffneSuche() {
     const bekannt = etikettenAlle().slice(0, 14);
     if (bekannt.length) {
       const reihe = el('div', { class: 'such-etiketten' });
-      for (const { name: et } of bekannt) reihe.append(el('button', { class: 'etikett', onclick: () => {
+      for (const { name: et } of bekannt) reihe.append(el('button', { class: 'stichwort', onclick: () => {
         const marke = '#' + et.replace(/\s+/g, '');
         feld.value = feld.value.includes(marke) ? feld.value.replace(marke, '').replace(/\s+/g, ' ').trim() : (feld.value.trim() + ' ' + marke).trim();
         baueChips(); suche(); feld.focus();
@@ -317,7 +317,7 @@ function etikettenAlle() {
 }
 function etikettenZeile(d) {
   if (!d || !Array.isArray(d.etiketten) || !d.etiketten.length) return null;
-  return el('div', { class: 'etiketten-zeile' }, d.etiketten.slice(0, 6).map((e) => el('span', { class: 'etikett klein' }, e)), d.etiketten.length > 6 ? el('span', { class: 'etikett klein' }, '+' + (d.etiketten.length - 6)) : null);
+  return el('div', { class: 'etiketten-zeile' }, d.etiketten.slice(0, 6).map((e) => el('span', { class: 'stichwort klein' }, e)), d.etiketten.length > 6 ? el('span', { class: 'stichwort klein' }, '+' + (d.etiketten.length - 6)) : null);
 }
 function etikettenBearbeiten(d) {
   return new Promise((res) => {
@@ -328,11 +328,11 @@ function etikettenBearbeiten(d) {
     const neu = () => {
       jetzt.innerHTML = '';
       if (!liste.length) jetzt.append(el('span', { class: 'leise' }, 'Noch keine Etiketten.'));
-      for (const e of liste) jetzt.append(el('button', { class: 'etikett mit-weg', title: 'Etikett abnehmen', onclick: () => { liste = liste.filter((x) => x !== e); neu(); } }, e, el('span', { html: ik('kreuz'), style: 'display:flex;width:12px' })));
+      for (const e of liste) jetzt.append(el('button', { class: 'stichwort mit-weg', title: 'Etikett abnehmen', onclick: () => { liste = liste.filter((x) => x !== e); neu(); } }, e, el('span', { html: ik('kreuz'), style: 'display:flex;width:12px' })));
       vorschlaege.innerHTML = '';
       const f = normalisiere(feld.value.trim());
       const passend = etikettenAlle().filter((x) => !liste.some((y) => y.toLowerCase() === x.name.toLowerCase()) && (!f || normalisiere(x.name).includes(f))).slice(0, 12);
-      for (const x of passend) vorschlaege.append(el('button', { class: 'etikett', onclick: () => { liste = etikettenSauber([...liste, x.name]); feld.value = ''; neu(); } }, '+ ' + x.name));
+      for (const x of passend) vorschlaege.append(el('button', { class: 'stichwort', onclick: () => { liste = etikettenSauber([...liste, x.name]); feld.value = ''; neu(); } }, '+ ' + x.name));
     };
     const dazu = () => { const t = feld.value.trim(); if (!t) return; liste = etikettenSauber([...liste, t]); feld.value = ''; neu(); };
     feld.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); dazu(); } });

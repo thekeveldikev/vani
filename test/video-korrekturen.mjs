@@ -750,3 +750,19 @@ test('5.68: Sicherung, Speicher, Einstellungen', async () => {
   assert.match(c, /if \(!statsInDenSync\.haengt\(\)\) statsInDenSync\(\);/, 'Statistik gedrosselt, nicht nur entprellt');
   assert.match(lies('src/49-feinheiten.js'), /if \(typeof inhalt !== 'string'\) \{ toast\('Das hat leider nicht geklappt\.'\); return false; \}/, 'Binaeres nie in die Zwischenablage');
 });
+
+test('5.68.1: Sarahs Video — Heftdeckel-Etiketten bleiben eckig, Formatleiste im Schreibraum einzeilig', () => {
+  const css = lies('src/10-style.css');
+  /* Die Schlagwort-Chips hiessen „.etikett“ wie das Schild auf dem Heftdeckel — und machten es rund. */
+  assert.ok(!/^\.etikett[ .{:]/m.test(css), 'keine nackte .etikett-Regel mehr (gehoert dem Heftdeckel)');
+  assert.match(css, /^\.stichwort \{ display: inline-flex;/m);
+  assert.ok(!/class: 'etikett(?: klein| mit-weg)?'/.test(lies('src/48-suche.js')), 'Chips heissen stichwort');
+  assert.match(lies('src/43e-deckel.js'), /el\('div', \{ class: 'etikett' \}/, 'der Deckel behaelt sein etikett');
+  /* Umbrach die Leiste, klebte eine zweite Zeile ueber dem Text; mit Tastatur blieb eine Zeile. */
+  const vorV2 = css.slice(0, css.indexOf('GESTALTUNG v2 (5.63)'));
+  assert.match(vorV2, /\.schreibraum \.formatleiste \{ flex-wrap: nowrap; overflow-x: auto;/);
+  assert.match(vorV2, /max-width: min\(calc\(100vw - 48px\), 1040px\); margin-left: 50%; translate: -50% 0;/);
+  assert.ok(!/\.format-slider input\[type="range"\] \{[^}]*height: 32px/.test(css), 'die Regler-Schiene ist kein Kasten');
+  assert.match(css, /\.format-slider input\[type="range"\]::-webkit-slider-thumb \{ width: 28px; height: 28px; \}/);
+  assert.match(lies('src/35-richtext.js'), /'aria-label': 'Randnotiz'[^\n]*el\('span', \{ html: ik\('pin'\), style: 'display:flex' \}\)\) : null\);/, 'Notiz nur als Symbol');
+});

@@ -328,7 +328,7 @@ function baueFormatleiste(editor, beiAenderung, kompakt, doc) {
     el('label', { class: 'format-farbe marker', title: 'Markierfarbe' }, '▰', marker),
     el('label', { class: 'format-slider' }, 'Größe', groesse, groesseWert),
     doc && typeof randnotizSetzen === 'function' ? el('span', { class: 'format-trenner' }) : null,
-    doc && typeof randnotizSetzen === 'function' ? el('button', { class: 'format-knopf format-randnotiz', title: 'Randnotiz an die markierte Stelle', 'aria-label': 'Randnotiz', onpointerdown: (e) => e.preventDefault(), onclick: () => randnotizSetzen(editor, doc, beiAenderung) }, el('span', { html: ik('pin'), style: 'display:flex' }), 'Notiz') : null);
+    doc && typeof randnotizSetzen === 'function' ? el('button', { class: 'format-knopf format-randnotiz', title: 'Randnotiz an die markierte Stelle', 'aria-label': 'Randnotiz', onpointerdown: (e) => e.preventDefault(), onclick: () => randnotizSetzen(editor, doc, beiAenderung) }, el('span', { html: ik('pin'), style: 'display:flex' })) : null);
 }
 
 /* ----- Ersetzen, ohne die Formatierung mitzunehmen -----

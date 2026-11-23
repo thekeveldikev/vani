@@ -3131,3 +3131,14 @@ Randnotizen (setzen, Rand, schmal + Antippen, loesen), Etiketten-Suche,
 Auftritte-Fenster, Manuskript: PDF mit pdf.js gerendert, DOCX/EPUB-XML wohlgeformt.
 **Nicht geprueft:** DOCX in Word/Pages, EPUB in Apple Books/epubcheck, alles auf
 dem iPad (Lange-Druecken-Menue, Tastatur, Knopfposition), Desktop-App selbst.
+
+**5.68.1 (Sarahs Video vom 23.11.):** (1) Die Etiketten auf den Heftdeckeln waren rund,
+Titel passten nicht, Klebestreifen lagen daneben — die neuen Schlagwort-Chips hiessen
+`.etikett` wie das Deckelschild. Chips heissen jetzt `.stichwort`. **Falle:** vor einer neuen
+CSS-Klasse im alten Stylesheet nach dem Namen suchen. (2) Die Formatleiste im Schreibraum
+brach auf dem iPad um (groessere Tippflaechen + Notiz-Knopf); die zweite Zeile klebte ueber
+dem Text, mit Tastatur blieb eine Zeile. Im Schreibraum ist sie jetzt einzeilig, darf breiter
+als die Textspalte sein (bis Fensterbreite, mittig) und wischt seitlich, wenn es nicht reicht;
+„Notiz“ ist nur noch ein Symbol. (3) Der Groesse-Regler war auf Touch ein Kasten: 5.67 gab dem
+Regler `height: 32px`, aber die Hoehe IST die Schiene. Jetzt 4px Rille, 28px Knopf, Luft per margin.
+Geprueft bei 1180×820 und 820×1180 mit Touch-Groessen.

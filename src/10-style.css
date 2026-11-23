@@ -1662,6 +1662,14 @@ textarea:focus-visible, input:focus-visible, [contenteditable]:focus-visible, .s
 .rich-editor blockquote { margin: .7em 0; padding-left: 1em; border-left: 3px solid var(--gold); color: var(--blass); font-style: italic; }
 .sr-text.rich-editor { min-height: 62dvh; overflow: visible; }
 .schreibraum .formatleiste { top: 0; }
+/* 5.68.1: Im Schreibraum bleibt die Leiste EINE Zeile. Brach sie um (iPad, groessere
+   Tippflaechen + Notiz-Knopf), klebte eine zweite Zeile oben und mit Tastatur blieb nur
+   eine Textzeile sichtbar. Was nicht passt, wird seitlich gewischt. */
+.schreibraum .formatleiste { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+  /* breiter als die Textspalte erlaubt, mittig darueber — so passt meist alles ohne Wischen */
+  width: max-content; max-width: min(calc(100vw - 48px), 1040px); margin-left: 50%; translate: -50% 0; }
+.schreibraum .formatleiste::-webkit-scrollbar { display: none; }
+.schreibraum .formatleiste > * { flex: none; }
 
 /* Hefte: kombinierbare, unaufdringliche Umschläge. */
 .heftdeckel { --heft1:#8c5a3b; --heft2:var(--heft1); --heftband:#d6bd92; background-color: var(--heft1); transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, filter .28s ease; isolation: isolate; }
@@ -7080,7 +7088,11 @@ body.liest-vor .an { opacity: 1; }
 .raumrolle.mehr-oben.mehr-unten { -webkit-mask-image: linear-gradient(180deg, transparent, #000 34px, #000 calc(100% - 34px), transparent); mask-image: linear-gradient(180deg, transparent, #000 34px, #000 calc(100% - 34px), transparent); }
 @media (pointer: coarse) {
   .format-knopf { min-width: 38px; min-height: 40px; }
-  .format-slider input[type="range"] { width: 96px; height: 32px; }
+  /* Die Schiene bleibt eine feine Rille (die Hoehe IST die Schiene — 32px machten einen Kasten);
+     fuer den Finger wird der Knopf groesser und bekommt Luft drumherum. */
+  .format-slider input[type="range"] { width: 96px; height: 4px; margin-block: 14px; }
+  .format-slider input[type="range"]::-webkit-slider-thumb { width: 28px; height: 28px; }
+  .format-slider input[type="range"]::-moz-range-thumb { width: 28px; height: 28px; }
   .funke-arten button { min-height: 38px; padding-top: 7px; padding-bottom: 7px; }
   .ort-chip { min-height: 38px; }
   .knopf.zart, .knopf.voll { min-height: 40px; }
@@ -7112,16 +7124,16 @@ body.liest-vor .an { opacity: 1; }
 @media print { .rn-rand { display: none; } .rich-editor span[data-notiz] { background: none; border: 0; } }
 
 /* 5.68: Etiketten */
-.etikett { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 12.5px; background: color-mix(in srgb, var(--akzent) 10%, var(--papier)); color: var(--tinte); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--akzent) 26%, transparent); }
-.etikett.klein { padding: 1px 8px; font-size: 11px; color: var(--blass); }
-.etikett.mit-weg { padding-right: 7px; }
+.stichwort { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 12.5px; background: color-mix(in srgb, var(--akzent) 10%, var(--papier)); color: var(--tinte); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--akzent) 26%, transparent); }
+.stichwort.klein { padding: 1px 8px; font-size: 11px; color: var(--blass); }
+.stichwort.mit-weg { padding-right: 7px; }
 .etiketten-zeile { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 .etiketten-jetzt, .etiketten-vorschlaege, .such-etiketten { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
 .such-etiketten { width: 100%; margin: 4px 0 0; }
 .etiketten-feld { display: flex; gap: 8px; margin-top: 6px; }
 .etiketten-feld input { flex: 1; font-size: 16px; padding: 9px 12px; border-radius: 10px; background: var(--papier); box-shadow: inset 0 0 0 1px var(--linie); color: var(--tinte); }
 .etiketten-modal .leise, .etiketten-jetzt .leise { color: var(--blass); font-size: 12.5px; }
-@media (pointer: coarse) { .etikett { min-height: 34px; } .etikett.klein { min-height: 0; } }
+@media (pointer: coarse) { .stichwort { min-height: 34px; } .stichwort.klein { min-height: 0; } }
 
 /* 5.68: Synonyme */
 .syn-pille { position: fixed; z-index: 96; display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px; font-size: 13px; color: var(--tinte); background: var(--papier); box-shadow: 0 4px 14px rgba(40,25,10,.22), inset 0 0 0 1px var(--linie); animation: syn-auf .18s ease-out; }
