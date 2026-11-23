@@ -3037,3 +3037,10 @@ Hintergrund, kein DOM-Leck) und eine Bedienpruefung bei 1024×768.
 
 Geprueft: Tests 472/472, Browser 1024×768 (Raumleiste, Einstellungen ueber
 Neustart, Kritzeln → Raumwechsel → Striche in der Datenbank). **Nicht auf dem iPad.**
+
+**5.67.1:** gleicher Stand wie 5.67.0. Das Desktop-Release zu 5.67.0 scheiterte,
+weil ein neuer Test einen Zeilenumbruch als festes `\n` suchte; der Windows-Runner
+checkt mit CRLF aus. **Falle:** In Tests nie ein festes `\n` in `indexOf` — eine
+Regex mit `\s*` nehmen. Vor dem Push pruefen: Kopie mit CRLF anlegen und
+`node --test` darin laufen lassen. Der Workflow startet nur bei einer Aenderung an
+`package.json` — ein gescheitertes Release braucht darum eine neue Versionsnummer.
